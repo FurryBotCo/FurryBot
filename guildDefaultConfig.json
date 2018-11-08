@@ -1,0 +1,102 @@
+{
+  "userBlacklist": {
+    "enabled": false,
+    "ids": []
+  },
+  "disabledCommands": [],
+  "userCommandBlacklist": {},
+  "commandsModOnly": false,
+  "deleteCmds": false,
+  "funModuleEnabled": true,
+  "moderationModuleEnabled": true,
+  "infoModuleEnabled": true,
+  "miscModuleEnabled": true,
+  "utilityModuleEnabled": true,
+  "fResponseEnabled": true,
+  "nsfwModuleEnabled": false,
+  "premium": false,
+  "prefix": "f!",
+  "locale": "en",
+  "autoYiff": {
+    "enabled": false,
+    "channel": null,
+    "interval": 60,
+    "type": "gay"
+  },
+  "autoFur": {
+    "enabled": false,
+    "channel": null,
+    "interval": 60
+  },
+  "commandImages": false,
+  "joinMessage": {
+    "enabled": false,
+    "channel": null,
+    "message": "Welcome {user} to {guild}!~",
+    "image": false
+  },
+  "leaveMessage": {
+    "enabled": false,
+    "channel": null,
+    "message": "{user} left..\nGoodbye {user}!",
+    "image": false
+  },
+  "logging": {
+    "channelcreated": {
+      "channel": null,
+      "enabled": false
+    },
+    "channeldestroyed": {
+      "channel": null,
+      "enabled": false
+    },
+    "channelupdated": {
+      "channel": null,
+      "enabled": false
+    },
+    "guildupdated": {
+      "channel": null,
+      "enabled": false
+    },
+    "join": {
+      "channel": null,
+      "enabled": false
+    },
+    "leave": {
+      "channel": null,
+      "enabled": false
+    },
+    "messagedeleted": {
+      "channel": null,
+      "enabled": false
+    },
+    "messageupdated": {
+      "channel": null,
+      "enabled": false
+    },
+    "rolecreated": {
+      "channel": null,
+      "enabled": false
+    },
+    "roledeleted": {
+      "channel": null,
+      "enabled": false
+    },
+    "roleupdated": {
+      "channel": null,
+      "enabled": false
+    },
+    "userbanned": {
+      "channel": null,
+      "enabled": false
+    },
+    "userunbanned": {
+      "channel": null,
+      "enabled": false
+    },
+    "userupdated": {
+      "channel": null,
+      "enabled": false
+    }
+  }
+}
