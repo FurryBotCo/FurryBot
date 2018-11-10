@@ -1,7 +1,5 @@
-module.exports=(async (message, gConfig) => {
-	if(!message) return new Error ("missing message parameter");
-	if(!gConfig) return new Error ("missing gConfig parameter");
-	await require(`../../BaseCommand.js`)(message, gConfig);
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	var position="1/2";
 	var level="15";
 	var xp_left="5";
@@ -21,21 +19,21 @@ module.exports=(async (message, gConfig) => {
 		.setColor(rank.color)
 		.addText(rank.name, 445, 300)
 		.setColor("#F00");
-	if(message.member.nickname !== null) {
+	if(self.member.nickname !== null) {
 		pr.setColor("#F00");
-		pr.addText(message.author.tag, 150, 220);
+		pr.addText(self.author.tag, 150, 220);
 		pr.setColor("#00F");
-		pr.addText(message.member.nickname, 150, 190);
+		pr.addText(self.member.nickname, 150, 190);
 	} else {
 		pr.setColor("#00F");
 		pr.addText(message.author.tag, 150, 190);
 	}
-	var u=message.author.displayAvatarURL.split(".");
+	var u = self.author.displayAvatarURL().split(".");
 	u.pop();
-	fetch(u.join(".")+".png")
+	self.fetch(u.join(".")+".png")
 		.then(res=>res.buffer())
 		.then(buffer=>pr.addImage(buffer, 18, 128, 119, 119));
 	var a = await pr.toBufferAsync();
-	var at = new Discord.Attachment(a);
-	message.channel.send(at);
+	var at = new self.Discord.Attachment(a);
+	self.channel.send(at);
 });
