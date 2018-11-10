@@ -1,48 +1,46 @@
-module.exports=(async (message, gConfig) => {
-	if(!message) return new Error ("missing message parameter");
-	if(!gConfig) return new Error ("missing gConfig parameter");
-	await require(`../../BaseCommand.js`)(message, gConfig);
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	
-	if(args.length == 0 || !args) {
-		var user=message.member;
+	if(self.args.length == 0 || !self.args) {
+		var user = self.member;
 	} else {
 		// member mention
-		if(message.mentions.members.first()) {
-			var user = message.mentions.members.first();
+		if(self.message.mentions.members.first()) {
+			var user = self.message.mentions.members.first();
 		}
 		
 		// user ID
-		if(!isNaN(args[0]) && !(args.length === 0 || !args || message.mentions.members.first())) {
-			var user = message.guild.members.get(args[0]);
+		if(!isNaN(self.args[0]) && !(self.args.length === 0 || !self.args || self.message.mentions.members.first())) {
+			var user = self.guild.members.get(args[0]);
 		}
 		
 		// username
-		if(isNaN(args[0]) && args[0].indexOf("#") === -1 && !(args.length == 0 || !args || message.mentions.members.first())) {
-			var usr=client.users.find(t=>t.usernam=e==args[0]);
-			if(usr instanceof Discord.User) var user = message.guild.members.get(usr.id);
+		if(isNaN(self.args[0]) && self.args[0].indexOf("#") === -1 && !(self.args.length == 0 || !self.args || self.message.mentions.members.first())) {
+			var usr = self.users.find(t=>t.username==args[0]);
+			if(usr instanceof self.Discord.User) var user = self.message.guild.members.get(usr.id);
 		}
 		
 		// user tag
-		if(isNaN(args[0]) && args[0].indexOf("#") !== -1 && !message.mentions.members.first()) {
-			var usr=client.users.find(t=>t.tag===args[0]);
-			if(usr instanceof Discord.User) var user = message.guild.members.get(usr.id);
+		if(isNaN(self.args[0]) && self.args[0].indexOf("#") !== -1 && !self.message.mentions.members.first()) {
+			var usr = self.users.find(t=>t.tag===args[0]);
+			if(usr instanceof self.Discord.User) var user = self.guild.members.get(usr.id);
 		}
 	}
 
 	
 	if(!user) {
-		var data={
+		var data = {
 			title: "User not found",
 			description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
 		}
-		Object.assign(data, embed_defaults);
-		var embed=new Discord.MessageEmbed(data);
-		return message.channel.send(embed);
+		Object.assign(data, self.embed_defaults);
+		var embed = new self.Discord.MessageEmbed(data);
+		return self.channel.send(embed);
 	}
 	
 	var roles = user.roles.map(role=>{if(role.name!=="@everyone"){return `<@&${role.id}>`}else{return "@everyone"}});
 	
-	var xhr1 = new XMLHttpRequest();
+	var xhr1 = new self.XMLHttpRequest();
 
 	xhr1.open("GET", `https://discord.services/api/ban/${user.id}`,false);
 
@@ -52,8 +50,8 @@ module.exports=(async (message, gConfig) => {
 	var ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:false;
 	var l = db.isBanned(user.id);
 	var ll = l.banned?`Reason: ${l.reason}\nProof: [${l.proof}](${l.proof})`:false;
-	var rr = roles.length > 30?`Too many roles to list, please use **${gConfig.prefix}roles ${user.id}**`:roles.toString();
-	var data={
+	var rr = roles.length > 15?`Too many roles to list, please use **${self.gConfig.prefix}roles ${user.id}**`:roles.toString();
+	var data = {
 			name: "User info",
 			fields: [
 			{
@@ -82,13 +80,13 @@ module.exports=(async (message, gConfig) => {
 				inline: false
 			}, {
 				name: "Vote for this bot",
-				value: config.vote,
+				value: self.config.vote,
 				inline: false
 			}
 			]
 		};
-		Object.assign(data, embed_defaults);
-		data.thumbnail={url: user.user.displayAvatarURL};
-		var embed=new Discord.MessageEmbed(data);
-		return message.channel.send(embed);
+		Object.assign(data, self.embed_defaults);
+		data.thumbnail={url: user.user.displayAvatarURL()};
+		var embed = new self.Discord.MessageEmbed(data);
+		return self.channel.send(embed);
 });
