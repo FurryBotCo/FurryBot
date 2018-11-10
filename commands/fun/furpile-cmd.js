@@ -1,4 +1,5 @@
-module.exports=(async (self) => {
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	if(self.args.length == 0 && !self.furpile[self.guild.id]) {
 		return self.message.reply(`A furpile is not currently active, or has timed out due to inactivity.${"\n"}start one by running the command **${gConfig.prefix}furpile <user>**${"\n"}(do not include the < >)`);
 	}
