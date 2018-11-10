@@ -1,3 +1,9 @@
-module.exports = (async(self,rl) => {
-    self.warn(`Ratelimit: ${rl.method} ${rl.path} | Route: ${rl.route} | Timeout: ${rl.timeout}ms | Limit: ${rl.limit}`);
+module.exports = (async(self,rateLimitInfo)=>{
+    console.warn(`Ratelimit: ${self.util.inspect(rateLimitInfo,{showHidden: true, depth: null, color: true})}`);
+    var dt = {
+        timestamp: new Date(),
+        file: self.filename
+    }
+    Object.assign(dt,rateLimitInfo);
+    self.mixpanel.track(`bot.events.rateLimit`,dt)
 });
