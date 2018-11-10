@@ -1,15 +1,13 @@
-module.exports=(async (message, gConfig) => {
-	if(!message) return new Error ("missing message parameter");
-	if(!gConfig) return new Error ("missing gConfig parameter");
-	await require(`../../BaseCommand.js`)(message, gConfig);
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	var data = {
 		"title": "Discord",
-		"description": `[Join Our Support Discord Server!](${config.discordSupportInvite})`,
+		"description": `[Join Our Support Discord Server!](${self.config.discordSupportInvite})`,
 		"thumbnail": {
 			"url": "https://cdn.discordapp.com/embed/avatars/0.png"
 		}
 	};
-	Object.assign(data, embed_defaults);
-	var embed = new Discord.MessageEmbed(data);
-	message.channel.send(embed);
+	Object.assign(data,self.embed_defaults);
+	var embed = new self.Discord.MessageEmbed(data);
+	self.channel.send(embed);
 });
