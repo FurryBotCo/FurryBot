@@ -1,4 +1,5 @@
-module.exports = (async (self) => {
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	return self.message.reply("Command temporarily disabled.");
 	/*var xhr = new self.XMLHttpRequest();
 	xhr.open("GET", "https://api.furrybot.me/antijokes/", false);
