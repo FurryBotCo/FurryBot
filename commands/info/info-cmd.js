@@ -1,13 +1,11 @@
-module.exports=(async (message, gConfig) => {
-	if(!message) return new Error ("missing message parameter");
-	if(!gConfig) return new Error ("missing gConfig parameter");
-	await require(`../../BaseCommand.js`)(message, gConfig);
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	var userCount=0;
 	client.guilds.forEach((guild) => {
 		userCount+=guild.memberCount;
 	});
 	var largeGuildCount=0;
-	var srv=Array.from(client.guilds.values());
+	var srv=Array.from(self.guilds.values());
 	for(i=0;i<srv.length;i++) {
 		if(!srv[i].unavailable) {
 			if(srv[i].large) {
@@ -20,28 +18,28 @@ module.exports=(async (message, gConfig) => {
 	var data = {
 		"title": "Bot Info!",
 		"image": {
-			"url": message.channel.guild.iconURL
+			"url": self.channel.guild.iconURL()
 		},
 		"fields": [
 			{
 				name: "Process Memory Usage",
-				value: `${custom.getUsedMemory()}/${custom.getTotalMemory()}`,
+				value: `${self.getUsedMemory()}/${self.getTotalMemory()}`,
 				inline: true
 			}, {
 				name: "Server Memory Usage",
-				value: `${custom.getSYSUsedGB()}GB/${custom.getSYSTotalGB()}GB`,
+				value: `${self.getSYSUsedGB()}GB/${self.getSYSTotalGB()}GB`,
 				inline: true
 			}, {
 				name: "Library",
-				value: config.bot.library,
+				value: self.config.bot.library,
 				inline: true
 			}, {
 				name: "Uptime",
-				value: `${custom.parseTime(process.uptime())} (${custom.secondsToHours(process.uptime())})`,
+				value: `${self.parseTime(process.uptime())} (${self.secondsToHours(process.uptime())})`,
 				inline: true
 			}, {
 				name: "Total Guilds",
-				value: client.guilds.size,
+				value: self.guilds.size,
 				inline: true
 			}, {
 				name: "Large Guilds (300+)",
@@ -53,19 +51,19 @@ module.exports=(async (message, gConfig) => {
 				inline: true
 			}, {
 				name: "Commands",
-				value: config.commandList.all.length,
+				value: self.config.commandList.all.length,
 				inline: true
 			}, {
 				name: "API Version",
-				value: config.bot.apiVersion,
+				value: self.config.bot.apiVersion,
 				inline: true
 			}, {
 				name: "Bot Version",
-				value: config.bot.version,
+				value: self.config.bot.version,
 				inline: true
 			}, {
 				name: "Discord.JS Version",
-				value: Discord.version,
+				value: self.Discord.version,
 				inline: true
 			}, {
 				name: "Node.JS Version",
@@ -73,7 +71,7 @@ module.exports=(async (message, gConfig) => {
 				inline: true
 			}, {
 				name: "Support Server",
-				value: config.discordSupportInvite,
+				value: self.config.discordSupportInvite,
 				inline: false
 			}, {
 				name: "Bot Creator",
@@ -81,17 +79,17 @@ module.exports=(async (message, gConfig) => {
 				inline: false
 			}, {
 				name: "Trello Board",
-				value: config.trello.board,
+				value: self.config.trello.board,
 				inline: false
 			},
 			  {
 			   name: "Vote for this bot",
-			   value: config.vote,
+			   value: self.config.vote,
 			   inline: false
 			  }
 			]
 		};
-	Object.assign(data, embed_defaults);
-	var embed = new Discord.MessageEmbed(data);
-	return message.channel.send(embed);
+	Object.assign(data, self.embed_defaults);
+	var embed = new self.Discord.MessageEmbed(data);
+	return self.channel.send(embed);
 });
