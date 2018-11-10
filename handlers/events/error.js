@@ -1,3 +1,3 @@
 module.exports = (async(self,error)=>{
-    self.error(error);
+    console.error(error);
 })
