@@ -1,5 +1,5 @@
 module.exports = (async(self) => {
-    var resp = await self.request("https://api.furrybot.me/commands", {
+    var resp = await self.request(`https://api.furrybot.me/commands${self.config.beta?"?beta":""}`, {
         method: "GET",
         headers: {
             Authorization: `Key ${self.config.apiKey}`
@@ -10,10 +10,8 @@ module.exports = (async(self) => {
     self.config.commandList.all.forEach((command)=>{
         self.commandTimeout[command] = new Set();
     });
-    self.debug("Command Timeouts & Command List loaded");
-    self.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
+    console.debug("Command Timeouts & Command List loaded");
+    console.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
 
-    self.embed_defaults_na = {"footer": {text: `Shard ${self.shard !== null?self.shard.id+"/"+self.shard.count+0:"1/1"} - Bot Version ${self.config.bot.version}`}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp(),"thumbnail": {"url": "https://i.furrybot.me/furry-small.png"}};
-    self.embed_defaults_nt = {"footer": {text: `Shard ${self.shard !== null?self.shard.id+"/"+self.shard.count+0:"1/1"} - Bot Version ${self.config.bot.version}`}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
-    self.user.setActivity("Debugging!", {type: "PLAYING"});
+   self.user.setActivity("Debugging!", {type: "PLAYING"});
 });
