@@ -1,36 +1,45 @@
-module.exports=(async (message, gConfig) => {
-	if(!message) return new Error ("missing message parameter");
-	if(!gConfig) return new Error ("missing gConfig parameter");
-	await require(`../../BaseCommand.js`)(message, gConfig);
-	if(!args[0] || ["enable","en","e","disable","dis","d"].indexOf(args[0]) === -1 || !args[1]) {
-		return new Error("INVALID_USAGE");
-	}
-	var type = [...args];
-	type.shift();
-	var event = type.join("").toLowerCase();
-	if(typeof gConfig.logging === "undefined") db.updateGuild(message.guild.id, config.logging.def);
+module.exports=(async (self,local) => {
+	Object.assign(self,local);
+	if(self.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	
-	if(!config.logging.types.includes(event)) {
-		var data = {
-			title: "Invalid command usage",
-			description: `Invalid event\n\nuse the command **${gConfig.prefix}logevents** to see the possible events`
+	if(typeof self.gConfig.logging === "undefined") self.db.updateGuild(self.guild.id, self.config.logging.def);
+
+	if(["enable","en","e","disable","dis","d"].indexOf(self.args[0]) !== -1) {
+		var type = [...self.args];
+		type.shift();
+		var event = type.join("").toLowerCase();
+		if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
+		
+		switch(args[0]) {
+			case "enable":
+			case "en":
+			case "e":
+				// enable
+				break;
+				
+			case "disable":
+			case "dis":
+			case "d":
+				// disable
+				break;
 		}
-		Object.assign(data, embed_defaults);
-		var embed = new Discord.MessageEmbed(data);
-		return message.channel.send(embed);
-	}
-	
-	switch(args[0]) {
-		case "enable":
-		case "en":
-		case "e":
-			// enable
-			break;
-			
-		case "disable":
-		case "dis":
-		case "d":
-			// disable
-			break;
+	} else {
+		var a = self.args.join(" ").toLowerCase();
+		if(self.message.mentions.channels.first()) {
+			var a = a.replace(`<#${self.message.mentions.channels.first().id}>`,"");
+			var ch = self.message.mentions.channels.first();
+		}
+		var event = a.replace(" ","");
+		console.log(event);
+		if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
+
+		if(self.gConfig.logging[event].enabled === true && !ch) {
+			self.db.updateGuild(self.guild.id,{logging:{[event]:{channel:null,enabled:false}}});
+			return self.message.reply(`Stopped logging **${event}**!`);
+		} else {
+			if(!ch) ch = self.channel;
+			self.db.updateGuild(self.guild.id,{logging:{[event]:{channel:ch.id,enabled:true}}});
+			return self.message.reply(`Now logging **${event}** in <#${ch.id}>!`);
+		}
 	}
 });
