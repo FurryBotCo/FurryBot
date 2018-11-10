@@ -1,8 +1,5 @@
-module.exports=(async (message,gConfig,uConfig) => {
-	if(!message) return new Error ("missing message parameter");
-	if(!gConfig) return new Error ("missing gConfig parameter");
-	if(!uConfig) return new Error ("missing uConfig parameter");
-    await require(handlers.baseCommand)(message,gConfig,uConfig);
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	
-	return message.reply(`Your ballance is ${uConfig.bal}.`);
+	return self.message.reply(`Your balance is ${self.uConfig.bal}.`);
 });
