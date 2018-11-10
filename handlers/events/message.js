@@ -22,7 +22,7 @@ module.exports = (async(self,message)=>{
 	
 	if(message.channel.type === "dm") {
 		await message.author.send(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://www.furrybot.me> to see our website, <https://docs.furrybot.me> to see my documentation, and join <${self.config.discordSupportInvite}> if you need more help!`);
-		return console.log(`[${event}Event][User: ${message.author.id}]:Direct message recieved from ${message.author.tag}: ${message.content}`);
+		console.log(`[${event}Event][User: ${message.author.id}]:Direct message recieved from ${message.author.tag}: ${message.content}`);
 		self.mixpanel.track(`bot.directMessage`,{
 			distinct_id: message.author.id,
 			timestamp: new Date().toISOString(),
@@ -31,6 +31,7 @@ module.exports = (async(self,message)=>{
 			message: message.content,
 			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 		});
+		return;
 	}
 	
 	const local = {
@@ -42,14 +43,15 @@ module.exports = (async(self,message)=>{
 	};
 	
 	// temporary - during beta
-	if(local.guild.id !== "329498711338123268") return;
+	if(!self.config.betaGuilds.includes(local.guild.id)) return;
+	
 	try {
 		self.messageCount++;
 		self.localMessageCount++;
-		local.embed_defaults = {"footer": {text: `Shard ${self.shard !== null?self.shard.id+"/"+self.shard.count+0:"1/1"} - Bot Version ${self.config.bot.version}`}, "author": {"name": self.author.tag,"icon_url": self.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
+		local.embed_defaults = {"footer": {text: `Shard ${self.shard !== null?self.shard.id+1+"/"+self.shard.count:"1/1"} - Bot Version ${self.config.bot.version}`}, "author": {"name": local.author.tag,"icon_url": local.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
 		try {
 			local.gConfig = await self.db.getGuild(message.guild.id) ||  self.config.guildDefaultConfig;
-			localf.uConfig = await self.db.getUser(self.message.member.id) || self.config.userDefaultConfig;
+			local.uConfig = await self.db.getUser(local.message.member.id) || self.config.userDefaultConfig;
 			if(self.config.beta) local.gConfig.prefix = "fb!";
 		}catch(e){
 			console.error(e);
@@ -105,20 +107,20 @@ module.exports = (async(self,message)=>{
 			//}
 		}
 		try {
-			if(local.message.content === `<@${self.user.id}>` || self.message.content === `<@!${self.user.id}>`) {
+			if(local.message.content === `<@${self.user.id}>` || local.message.content === `<@!${self.user.id}>`) {
 				var c = await require(`${process.cwd()}/commands/${self.config.commandList.fullList["help"].category}/help-cmd.js`)(self,local);
 				if(c instanceof Error) throw c;
 			}
 		}catch(e){
 			local.message.reply(`Error while running command: ${e}`);
-			return console.error(`[${event}Event][Guild: ${local.guild.id}]: Command error:\n\tCommand: ${self.command}\n\tSupplied arguments: ${self.args.join(' ')}\n\tServer ID: ${self.guild.id}\n\t${e.stack}`);
+			return console.error(`[${event}Event][Guild: ${local.guild.id}]: Command error:\n\tCommand: ${local.command}\n\tSupplied arguments: ${self.args.join(' ')}\n\tServer ID: ${local.guild.id}\n\t${e.stack}`);
 		}
 		if(!local.message.content.startsWith(local.prefix)) return;
 		if(!self.config.commandList.all.includes(local.command)) return;
 		if(local.gConfig.deleteCmds) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
 		if(self.config.commandList.fullList[local.command].userPermissions.length > 0) {
-			if(self.config.commandList.fullList[self.command].userPermissions.some(perm => !self.channel.permissionsFor(self.member).has(perm,null,true,true))) {
-				var neededPerms = self.config.commandList.fullList[self.command].userPermissions.filter(perm => !self.channel.permissionsFor(self.member).has(perm,null,true,true));
+			if(self.config.commandList.fullList[local.command].userPermissions.some(perm => !local.channel.permissionsFor(local.member).has(perm,true))) {
+				var neededPerms = self.config.commandList.fullList[local.command].userPermissions.filter(perm => !local.channel.permissionsFor(local.member).has(perm,true));
 				self.mixpanel.track(`commands.${local.command}.missingUserPermissions`, {
 					distinct_id: local.author.id,
 					timestamp: new Date().toISOString(),
@@ -131,7 +133,7 @@ module.exports = (async(self,message)=>{
 					discriminator: local.author.discriminator,
 					tag: local.author.tag,
 					displayName: local.member.displayName,
-					missingPermissions: neededPerms
+					missingPermissions: neededPerms,
 					filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 				});
 				neededPerms = neededPerms.length > 1 ? neededPerms.join(", ") : neededPerms;
@@ -145,9 +147,9 @@ module.exports = (async(self,message)=>{
 				return local.channel.send(embed);
 			}
 		}
-		if(self.config.commandList.fullList[self.command].botPermissions.length > 0) {
-			if(self.config.commandList.fullList[self.command].botPermissions.some(perm => !self.channel.permissionsFor(self.guild.me).has(perm,null,true,true))) {
-				var neededPerms = config.commandList.fullList[command].botPermissions.filter(perm => !self.channel.permissionsFor(self.guild.me).has(perm,null,true,true));
+		if(self.config.commandList.fullList[local.command].botPermissions.length > 0) {
+			if(self.config.commandList.fullList[local.command].botPermissions.some(perm => !local.channel.permissionsFor(local.guild.me).has(perm,true))) {
+				var neededPerms = config.commandList.fullList[command].botPermissions.filter(perm => !local.channel.permissionsFor(local.guild.me).has(perm,true));
 				self.mixpanel.track(`commands.${local.command}.missingBotPermissions`, {
 					distinct_id: local.author.id,
 					timestamp: new Date().toISOString(),
@@ -170,11 +172,11 @@ module.exports = (async(self,message)=>{
 				};
 				Object.assign(data, self.embed_defaults);
 				var embed = new self.MessageEmbed(data);
-				self.debug(`I am missing the permission(s) ${neededPerms} to run the command ${self.command} in guild ${self.guild.name} (${self.guild.id})`);
-				return self.channel.send(embed);
+				self.debug(`I am missing the permission(s) ${neededPerms} to run the command ${local.command} in guild ${local.guild.name} (${local.guild.id})`);
+				return local.channel.send(embed);
 			}
 		}
-		if(self.config.commandList.fullList[local.command].nsfw === true && !self.channel.nsfw) {
+		if(self.config.commandList.fullList[local.command].nsfw === true && !local.channel.nsfw) {
 			self.mixpanel.track(`commands.${local.command}.nonNSFW`, {
 				distinct_id: local.author.id,
 				timestamp: new Date().toISOString(),
@@ -211,11 +213,11 @@ module.exports = (async(self,message)=>{
 				
 				var command = self.config.commandList.fullList[local.command];
 				if(self.commandTimeout[command.aliasof].has(local.author.id) && !self.config.developers.includes(local.author.id)) {
-					console.log(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: Command timeout encountered by user ${self.author.tag} (${self.author.id}) on command alias "${self.command}" (aliasof: ${command.aliasof}) in guild ${self.guild.name} (${self.guild.id})`);
-					return self.message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(command.cooldown)} before using this command again!`);
+					console.log(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on command alias "${local.command}" (aliasof: ${command.aliasof}) in guild ${local.guild.name} (${local.guild.id})`);
+					return local.message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(command.cooldown)} before using this command again!`);
 					}
 				self.commandTimeout[command.aliasof].add(local.author.id);
-				self.setTimeout(() => {self.commandTimeout[self.config.commandList.fullList[local.command].aliasof].delete(self.author.id);}, command.cooldown);
+				self.setTimeout(() => {self.commandTimeout[self.config.commandList.fullList[local.command].aliasof].delete(local.author.id);}, command.cooldown);
 				self.mixpanel.track(`commands.${command.aliasof}.used`, {
 					distinct_id: local.author.id,
 					timestamp: new Date().toISOString(),
@@ -238,8 +240,8 @@ module.exports = (async(self,message)=>{
 				break;
 				
 			default:
-				var command = self.config.commandList.fullList[self.command];
-				if(self.commandTimeout[local.command].has(self.author.id) && !self.config.developers.includes(self.author.id)) {
+				var command = self.config.commandList.fullList[local.command];
+				if(self.commandTimeout[local.command].has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 					console.log(`Command timeout encountered by user ${local.author.tag} (${local.author.id}) on command "${local.command}" in guild ${local.guild.name} (${local.guild.id})`);
 					return local.message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(command.cooldown)} before using this command again!`);
 				}
@@ -265,20 +267,20 @@ module.exports = (async(self,message)=>{
 		}
 	}catch(e){
 		if(e.message === "ERR_INVALID_USAGE") {
-			var isAlias = (self.config.commandList[local.command].alias == "true");
-			var cmd = isAlias?self.config.commandList[local.command].aliasof:local.command;
-			var usage = self.config.commandList[local.command].usage;
-			self.mixpanel.track(`commands.${local.command}.invalidUsage`, {
-				distinct_id: local.author.id,
+			var isAlias = self.config.commandList.fullList[self.command].alias;
+			var cmd = isAlias?self.config.commandList.fullList[self.command].aliasof:self.command;
+			var usage = self.config.commandList.fullList[self.command].usage;
+			self.mixpanel.track(`commands.${self.command}.invalidUsage`, {
+				distinct_id: self.author.id,
 				timestamp: new Date().toISOString(),
-				args: local.args.join(" "),
-				message: local.message.id,
-				guild: local.guild.id,
-				userId:local.author.id,
-				username: local.author.username,
-				discriminator: local.author.discriminator,
-				tag: local.author.tag,
-				displayName: local.member.displayName,
+				args: self.args.join(" "),
+				message: self.message.id,
+				guild: self.guild.id,
+				userId:self.author.id,
+				username: self.author.username,
+				discriminator: self.author.discriminator,
+				tag: self.author.tag,
+				displayName: self.member.displayName,
 				filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 			});
 			var data = {
@@ -294,21 +296,21 @@ module.exports = (async(self,message)=>{
 						inline: false
 					},{
 						name: "Arguments Provided",
-						value: local.args.join(" ")||"NONE",
+						value: self.args.join(" ")||"NONE",
 						inline: false
 					}
 				]
 			};
-			Object.assign(data, local.embed_defaults);
+			Object.assign(data, self.embed_defaults);
 			var embed = new self.Discord.MessageEmbed(data);
-			return local.channel.send(embed);
+			return self.channel.send(embed);
 		} else {
 			self.mixpanel.track(`bot.error`,{
-				distinct_id: local.author.id,
+				distinct_id: self.author.id,
 				timestamp: new Date().toISOString(),
-				command: local.commands,
-				messageId: local.message.id,
-				message: local.message.content,
+				command: self.command,
+				messageId: self.message.id,
+				message: self.message.content,
 				error: e,
 				errorMessage: e.message,
 				errorStack: e.stack,
@@ -322,9 +324,9 @@ module.exports = (async(self,message)=>{
 		self.mixpanel.track(`bot.error`,{
 			distinct_id: local.author.id,
 			timestamp: new Date().toISOString(),
-			command: local.commands,
-			messageContent: local.message.id,
-			message: local.message.content,
+			command: self.command,
+			messageContent: self.message.id,
+			message: self.message.content,
 			error: e,
 			errorMessage: e.message,
 			errorStack: e.stack,
