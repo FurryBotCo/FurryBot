@@ -14,18 +14,18 @@ module.exports = {
 			}
 			if(type.length == 0) var type = "log";
 			
-			if(typeof client !== "undefined") {
+			/*if(typeof self !== "undefined") {
 				var no_shard = false;
 				try {
-					var shard_id = client.shard.id;
-					var shard_count = client.shard.count;
+					var shard_id = self.shard.id;
+					var shard_count = self.shard.count;
 				}catch(e){
 					var shard_id = 0;
 					var shard_count = 1;
 				}
-			} else {
+			} else {*/
 				var no_shard = true;
-			}
+			//}
 			
 			var time = Date().toString().split(' ').slice(1, 5)[3];
 			var message = message instanceof Object ? require('util').inspect(message) : message;
@@ -132,7 +132,7 @@ module.exports = {
 	})
 };
 
-/*global.console.log=module.exports.log;
+global.console.log=module.exports.log;
 global.console.warn=module.exports.warn;
 global.console.error=module.exports.error;
 global.console.debug=module.exports.debug;
@@ -141,4 +141,4 @@ global.console.rethinkdb=module.exports.rethinkd;
 global.console.rethinkdblog=module.exports.rethinkdblog;
 global.console.command=module.exports.command;
 global.console.commandlog=module.exports.commandlog;
-global.console.clear=module.exports.clear;*/
+global.console.clear=module.exports.clear;
