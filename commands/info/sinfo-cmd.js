@@ -1,12 +1,10 @@
-module.exports=(async (message, gConfig) => {
-	if(!message) return new Error ("missing message parameter");
-	if(!gConfig) return new Error ("missing gConfig parameter");
-	await require(`../../BaseCommand.js`)(message, gConfig);
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	var textChCount = 0;
 	var voiceChCount = 0;
 	var roleCount = 0;
 	var categoryChCount = 0;
-	message.channel.guild.channels.forEach((ch) => {
+	self.guild.channels.forEach((ch) => {
 		switch (ch.type) {
 			case "text":
 				textChCount++;
@@ -22,7 +20,7 @@ module.exports=(async (message, gConfig) => {
 		}
 	});
 	
-	var o = message.guild.members.find(m=>m.id===message.guild.ownerID);
+	var o = self.guild.members.find(m=>m.id===self.guild.owner.id);
 	if(!o) {
 		var owner="Unknown";
 	} else {
@@ -45,18 +43,16 @@ module.exports=(async (message, gConfig) => {
 		"**NONE**",
 		"**ELEVATED**"
 	];
+
 	var data = {
-		title: `Server Info - **${message.guild.name}**`,
+		title: `Server Info - **${self.guild.name}**`,
 		image: {
-			url: message.guild.iconURL
-		},
-		thumbnail: {
-			url: config.botIconURL
+			url: message.guild.iconURL()
 		},
 		fields: [
 			{
 				name: "Guild ID",
-				value: message.guild.id,
+				value: self.guild.id,
 				inline: true
 			},
 			{
@@ -66,59 +62,59 @@ module.exports=(async (message, gConfig) => {
 			},
 			{
 				name: "Members",
-				value: `Total: ${message.guild.memberCount}\n\n${config.emojis.online}: ${message.guild.members.filter(m=>m.user.presence.status==="online").size}\n${config.emojis.idle}: ${message.guild.members.filter(m=>m.user.presence.status==="idle").size}\n${config.emojis.offline}: ${message.guild.members.filter(m=>m.user.presence.status==="offline").size}\n${config.emojis.dnd}: ${message.guild.members.filter(m=>m.user.presence.status==="dnd").size}`,
+				value: `Total: ${self.guild.memberCount}\n\n${self.config.emojis.online}: ${self.guild.members.filter(m=>m.user.presence.status==="online").size}\n${self.config.emojis.idle}: ${message.guild.members.filter(m=>m.user.presence.status==="idle").size}\n${self.config.emojis.offline}: ${self.guild.members.filter(m=>m.user.presence.status==="offline").size}\n${self.emojis.dnd}: ${self.guild.members.filter(m=>m.user.presence.status==="dnd").size}`,
 				inline: true
 			},
 			{
 				name: "Channels",
-				value: `Total: ${message.guild.channels.size}\n\Text: ${textChCount}\nVoice: ${voiceChCount}\nCategory: ${categoryChCount}`,
+				value: `Total: ${self.guild.channels.size}\n\hText: ${textChCount}\nVoice: ${voiceChCount}\nCategory: ${categoryChCount}`,
 				inline: true
 			},
 			{
 				name: "Large Guild (300+ Members)",
-				value: message.guild.large,
+				value: self.guild.large,
 				inline: true
 			},
 			{
 				name: "Guild Creation Date",
-				value: message.guild.createdAt.toString().split("GMT")[0],
+				value: self.guild.createdAt.toString().split("GMT")[0],
 				inline: true
 			},
 			{
 				name: "Region",
-				value: message.guild.region,
+				value: self.guild.region,
 				inline: true
 			},
 			{
 				name: "Default Notification Level",
-				value: message.guild.defaultMessageNotifications,
+				value: self.guild.defaultMessageNotifications,
 				inline: true
 			},
 			{
-				name: `Roles [${message.guild.roles.size-1}]`,
+				name: `Roles [${self.guild.roles.size-1}]`,
 				value: `run **${gConfig.prefix}roles** for a list of roles`,
 				inline: true
 			},
 			{
 				name: "Extra",
-				value: `Verified: ${message.guild.verified}\nVIP Regions: ${vipRegion}\nVanity URL: ${vanityURL}\nInvite Splash: ${inviteSplash}`,
+				value: `Verified: ${self.guild.verified}\nVIP Regions: ${vipRegion}\nVanity URL: ${vanityURL}\nInvite Splash: ${inviteSplash}`,
 				inline: true
 			},
 			{
 				name: "Verification/2FA Levels",
-				value: `Verification: ${verificationLevel[message.guild.verificationLevel]}\n2FA: ${mfaLevel[message.guild.mfaLevel]}`,
+				value: `Verification: ${verificationLevel[self.guild.verificationLevel]}\n2FA: ${mfaLevel[self.guild.mfaLevel]}`,
 				inline: true
 			},
 			{
 			 name: "Vote for this bot!",
-			 value: config.vote,
+			 value: self.config.vote,
 			 inline: true
 			}
 		]
 	};
 	
-	Object.assign(data, embed_defaults);
+	Object.assign(data, self.embed_defaults);
 	
-	var embed = new Discord.MessageEmbed(data);
-	message.channel.send(embed);
+	var embed = new self.Discord.MessageEmbed(data);
+	self.channel.send(embed);
 });
