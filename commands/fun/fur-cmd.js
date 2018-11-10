@@ -1,10 +1,11 @@
-module.exports=(async (self) => {
+module.exports=(async (self,local) => {
+	Object.assign(self,local);
 	if(self.fs.existsSync(`${process.cwd()}/ib.txt`)) {
     	var sid = self.fs.readFile(`${process.cwd()}/ib.txt`,"UTF8",(err,sid)=>{
     	   var ib = sid; 
     	});
 	
-    	checksid = new XMLHttpRequest();
+    	checksid = new self.XMLHttpRequest();
     	
     	checksid.open("GET",`https://inkbunny.net/api_userrating.php?sid=${ib}`,false);
     	
