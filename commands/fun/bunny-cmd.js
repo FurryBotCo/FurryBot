@@ -1,4 +1,5 @@
-module.exports=(async (self) => {
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 
 	var xhr = new self.XMLHttpRequest();
 	xhr.open("GET","https://api.bunnies.io/v2/loop/random/?media=gif", false);
