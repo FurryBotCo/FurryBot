@@ -1,4 +1,5 @@
-module.exports=(async (self) => {
+module.exports=(async (self,local) => {
+	Object.assign(self,local);
 	if(!self.args[0]) {
 		var lnk=self.gConfig.prefix != "f!"?`${self.config.documentationURL}?prefix=${self.gConfig.prefix}`:config.documentationURL;
 		return self.channel.send(`You can view our full command documentation here: ${lnk}\n\nMake sure to check the Trello board regularly: <${self.config.trello.board}>\nYou can use **${self.gConfig.prefix}help <command>** to get help with a specific command.\nMake sure to check out our official Twitter account: ${self.config.twitterAccountURL}.\n\nJoin can join our support server here: ${self.config.discordSupportInvite}`);
