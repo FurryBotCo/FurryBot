@@ -1,4 +1,5 @@
-module.exports=(async (self) => {
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	
 	var image = await self.fsn.readFile(`${process.cwd()}/images/deersteak.png`);
 	await self.download(`https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png`,`${config.rootDir}/tmp/${message.author.id}.png`);
