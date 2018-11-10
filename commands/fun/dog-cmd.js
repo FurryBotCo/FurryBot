@@ -1,4 +1,5 @@
-module.exports=(async (self) => {
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	var xhr = new self.XMLHttpRequest();
 	
 	xhr.open("GET","https://dog.ceo/api/breeds/image/random",false);
