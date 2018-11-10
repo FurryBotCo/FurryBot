@@ -1,5 +1,5 @@
-module.exports=(async (self) => {
-
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
 	xhr = new self.XMLHttpRequest();
 
 	xhr.open("GET","https://aws.random.cat/meow", false);
