@@ -267,6 +267,7 @@ module.exports = (async(self,message)=>{
 		}
 	}catch(e){
 		if(e.message === "ERR_INVALID_USAGE") {
+			if(typeof local !== "undefined") Object.assign(self,local);
 			var isAlias = self.config.commandList.fullList[self.command].alias;
 			var cmd = isAlias?self.config.commandList.fullList[self.command].aliasof:self.command;
 			var usage = self.config.commandList.fullList[self.command].usage;
@@ -305,6 +306,7 @@ module.exports = (async(self,message)=>{
 			var embed = new self.Discord.MessageEmbed(data);
 			return self.channel.send(embed);
 		} else {
+			if(typeof local !== "undefined") Object.assign(self,local);
 			self.mixpanel.track(`bot.error`,{
 				distinct_id: self.author.id,
 				timestamp: new Date().toISOString(),
@@ -321,8 +323,9 @@ module.exports = (async(self,message)=>{
 		}
 	}
 	}catch(e){
+		if(typeof local !== "undefined") Object.assign(self,local);
 		self.mixpanel.track(`bot.error`,{
-			distinct_id: local.author.id,
+			distinct_id: self.author.id,
 			timestamp: new Date().toISOString(),
 			command: self.command,
 			messageContent: self.message.id,
