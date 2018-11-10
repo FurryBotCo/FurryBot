@@ -1,25 +1,23 @@
-module.exports=(async (message, gConfig) => {
-	if(!message) return new Error ("missing message parameter");
-	if(!gConfig) return new Error ("missing gConfig parameter");
-	await require(`../../BaseCommand.js`)(message, gConfig);
-	var data={
+module.exports = (async (self,local) => {
+	Object.assign(self,local);
+	var data = {
 		"title": "Invites",
 		"fields": [
 			{
 				name: "Discord Bot",
-				value: config.discordInviteLink,
+				value: self.config.discordInviteLink,
 				inline: false
 			},
 			{
 				name: "Discord Support Server",
-				value: config.discordSupportInvite,
+				value: self.config.discordSupportInvite,
 				inline: false
 			}
 		]
 	};
 	
-	Object.assign(data, embed_defaults);
+	Object.assign(data, self.embed_defaults);
 	
-	var embed = new Discord.MessageEmbed(data);
-	return message.channel.send(embed);
+	var embed = new self.Discord.MessageEmbed(data);
+	return self.channel.send(embed);
 });
