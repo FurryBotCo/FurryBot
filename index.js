@@ -12,32 +12,43 @@ const config = require("./config");
 class FurryBot extends Discord.Client {
 	constructor(options) {
 		var opt = options || {};
-    super(opt);
-    Object.assign(this, require(`${process.cwd()}/utility/logger.js`), require(`${process.cwd()}/utility/misc`), require(`${process.cwd()}/utility/functions`));
-		global.util = require("util");
+   		super(opt);
+    	Object.assign(this, require(`${process.cwd()}/util/logger`), require(`${process.cwd()}/util/misc`), require(`${process.cwd()}/util/functions`));
+		this.util = require("util");
 		this.config = config;
-		this.MessageEmbed = Discord.MessageEmbed;
-		this.MessageAttachment = Discord.MessageAttachment;
+		this.Discord = Discord;
 		this.os = require("os");
 		this.request = require("async-request");
 		this.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-    this.fs = require("fs");
-    this.r = require("rethinkdbdash")(this.config.db);
-		this.db = require(`${process.cwd()}/utility/dbFunctions`)(this);
+		this.Mixpanel = require("mixpanel");
+		this.uuid = require("uuid/v4");
+		this.fetch = require("node-fetch");
+		this.mixpanel = this.Mixpanel.init(this.config.mixpanel, {
+			protocol: 'https'
+		});
+    	this.fs = require("fs");
+    	this.r = require("rethinkdbdash")(this.config.db);
+		this.db = require(`${process.cwd()}/util/dbFunctions`)(this);
 		this.commandTimeout = {};
-		this.varParse = require(`${process.cwd()}/utility/varHandler`);
+		this.varParse = require(`${process.cwd()}/util/varHandler`);
 		this.lang = require(`${process.cwd()}/lang`)(this);
 		this.colors = require("console-colors-2");
 		this.Canvas = require("canvas-constructor");
 		this.fsn = require("fs-nextra");
 		this.furpile = {};
-		this._ = require("lodash")
+		this._ = require("lodash");
 		this.imageAPIRequest = (async(safe=true,category=null,json=true,filetype=null)=>{
 			return new Promise(async(resolve, reject)=>{
 				if(!self) var self = this;
-				var url=`https://api.furrybot.me/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?filetype:""}`;
+				if([undefined,null,""].includes(json)) json = true;
+				var url=`https://api.furrybot.me/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?`/${filetype}`:""}`;
 				var r = await self.request(url);
-				return resolve(JSON.parse(r.body));
+				try {
+					var j = JSON.parse(r.body);
+					resolve(j);
+				} catch(e) {
+					reject({error:e,response:r.body});
+				}
 			});
 		});
 		this.download = ((url, filename)=>{
@@ -52,7 +63,7 @@ class FurryBot extends Discord.Client {
 					delete require.cache[key];
 				}
 			}
-			self.debug("Reloaded all modules");
+			console.debug("Reloaded all modules");
 			return true;
 		});
 		this.reloadCommands = (async()=>{
@@ -75,27 +86,37 @@ class FurryBot extends Discord.Client {
 				self.reloadCommands();
 				self.reloadModules();
 		});
-    this.load.apply(this);
+		this.mixpanel.track('bot.setup', {
+			distinct_id: this.uuid(),
+			timestamp: new Date().toISOString(),
+			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
+		});
+    	this.load.apply(this);
 	}
 	
 	/**
 	  * Load Function
 	  */
 	load() {
-		this.log("load");
+		console.log(`[loadEvent]: start load`);
+		this.mixpanel.track('bot.load.start', {
+			distinct_id: this.uuid(),
+			timestamp: new Date().toISOString(),
+			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
+		});
 		this.fs.readdir(`${process.cwd()}/handlers/events/`, (err, files) => {
 		    if (err) return console.error(err);
 		    files.forEach(file => {
 				if (!file.endsWith(".js")) return;
-				const event = require(`./handlers/events/${file}`);
-				let eventName = file.split(".")[0];
+				const event = require(`./handlers/events/${file}`),
+				 eventName = file.split(".")[0];
 
 				this.on(eventName, event.bind(null,this));
-				this.log(`Loaded ${eventName} event`);
+				console.log(`[EventManager]: Loaded ${eventName} event`);
 				delete require.cache[require.resolve(`./handlers/events/${file}`)];
 		    });
 		});
-		this.log("end of load");
+		console.log("[loadEvent]: end of load");
 	}
 }
 
@@ -107,7 +128,7 @@ client.login(config.bot.token);
 
 process.on("SIGINT", async () => {
 	self = client;
-	self.debug(`${self.colors.fg.red}${self.colors.sp.bold}Force close via CTRL+C${self.colors.sp.reset}`);
+	console.debug(`${self.colors.fg.red}${self.colors.sp.bold}Force close via CTRL+C${self.colors.sp.reset}`);
 	self.destroy();
 	process.kill(process.pid, 'SIGTERM' );
 });
