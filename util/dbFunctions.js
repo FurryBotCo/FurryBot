@@ -186,5 +186,8 @@ module.exports = ((self)=>{
 			
 			return user;
 		}),
+		updateUser: (async(uid, fields)=>{
+			return self.r.table("users").get(uid).update(fields);
+		})
 	};
 });
