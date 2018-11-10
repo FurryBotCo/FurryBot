@@ -86,3 +86,4 @@ counts/
 
 # jsdocs
 out/
+package-lock.json
