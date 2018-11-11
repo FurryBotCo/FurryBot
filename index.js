@@ -107,7 +107,9 @@ class FurryBot extends Discord.Client {
 				}
 			});
 			const create = (async(url)=>{
-				var rand = self.random(5);
+				var count = await self.r.table("shorturl").count();
+				//62 = 26  (a-z) + 26 (A-Z) + 10 (0-9)
+				var rand = self.random(Math.ceil(count/62));
 				var a = await self.r.table("shorturl").insert({id:rand,url});
 				if(a.errors === 1) {
 					return create(url);
@@ -117,7 +119,6 @@ class FurryBot extends Discord.Client {
 			});
 
 			var res = await self.r.table("shorturl").filter({url});
-			const rand = self.random(5);
 			
 			switch(res.length) {
 				case 0:
