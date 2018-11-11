@@ -7,16 +7,16 @@ module.exports = (async (self,local) => {
 	try {
 		const r = self.r;
 		var exec = self.args.join(" ");
+		var start = self.performance.now();
 		var res = await eval(exec);
-	}catch(err){
+		var end = self.performance.now();
+	}catch(e){
 		//return self.message.reply(`Error evaluating: ${err}`);
-		if(typeof err !== "string") err = self.util.inspect(err,{showHidden:true,depth:null});
-		if(err.length > 1000) {
-			console.error(`Eval Command Error Output: ${err}`);
-			err = "Logged To Console";
-		}
+		var m = typeof e.message !== "string" ? self.util.inspect(e.message,{depth:null}) : e.message;
+		console.log(self.util.inspect(e.message,{depth:null}));
+		var res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Evaluating:\n${e.name}: ${m}\`\`\``;
 		var data = {
-			title: "Evaluated",
+			title: `Evaluated - Time: \`\`${(end-start).toFixed(3)}ms\`\``,
 			author: {
 				name: self.author.tag,
 				icon_url: self.author.displayAvatarURL()
@@ -29,17 +29,17 @@ module.exports = (async (self,local) => {
 					inline: false
 				}, {
 					name: ":outbox_tray:  Output",
-					value: `\`\`\`fix\nError Evaluating: ${err}\`\`\``,
+					value: res,
 					inline: false
 				}
 			]
 		};
+		console.error(`[Eval]: ${self.util.inspect(e,{depth:null,color:true})}`);
 		Object.assign(data,self.embed_defaults);
 		var embed = new self.Discord.MessageEmbed(data);
 		return self.channel.send(embed).catch(err => {
-			console.error(err);
 			self.channel.send(`I could not return the result: ${err}`).catch(error=>{
-				self.author.send(`I could not return the result: ${err}`).catch(noerr=>null);
+				self.author.send(`I could not return the result: ${error}`).catch(noerr=>null);
 			});
 		});
 	}
@@ -48,13 +48,13 @@ module.exports = (async (self,local) => {
 	} else {
 		if(typeof res !== "string") res = self.util.inspect(res,{showHidden:true,depth:null});
 		if(res.length > 1000) {
-			console.log(`Eval Command Output: ${res}`);
+			console.log(`[Eval]: ${res}`);
 			res = "Logged To Console";
 		}
 		res = "```js\n"+res+"```";
 	}
 	var data = {
-		title: "Evaluated",
+		title: `Evaluated - Time: \`${(end-start).toFixed(3)}ms\``,
 		author: {
 			name: self.author.tag,
 			icon_url: self.author.displayAvatarURL()
