@@ -109,6 +109,7 @@ class FurryBot extends Discord.Client {
 			const create = (async(url)=>{
 				var count = await self.r.table("shorturl").count();
 				if(count == 0) count = 1;
+				if(Number.isInteger(count)) count++;
 				//36 = 26 (A-Z) + 10 (0-9)
 				var rand = self.random(Math.ceil(count/36));
 				var a = await self.r.table("shorturl").insert({id:rand,url});
