@@ -108,15 +108,17 @@ class FurryBot extends Discord.Client {
 			});
 			const create = (async(url)=>{
 				var count = await self.r.table("shorturl").count();
-				if(count == 0) count = 1;
-				if(Number.isInteger(count)) count++;
+				var c = count;
+				if(c == 0) c = 1;
 				//36 = 26 (A-Z) + 10 (0-9)
-				var rand = self.random(Math.ceil(count/36));
-				var a = await self.r.table("shorturl").insert({id:rand,url});
+				if(Number.isInteger(c/36)) c++;
+				var rand = self.random(Math.ceil(c/36));
+				var created = Date.now();
+				var a = await self.r.table("shorturl").insert({id:rand,url,imageNumber:count+1,createdTimestamp:created});
 				if(a.errors === 1) {
 					return create(url);
 				} else {
-					return {code:rand,url,link:`https://furry.services/r/${rand}`};
+					return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,imageNumber:count+1,createdTimestamp:created};
 				}
 			});
 
@@ -131,7 +133,7 @@ class FurryBot extends Discord.Client {
 				case 1:
 					// return
 					var a = res[0];
-					return {code:a.id,url,link:`https://furry.services/r/${a.id}`};
+					return {code:a.id,url,link:`https://furry.services/r/${a.id}`,new:false};
 					break;
 
 				default:
@@ -154,7 +156,8 @@ class FurryBot extends Discord.Client {
 			return self.r.db(database).table(table).forEach((entry)=>{
 				return self.r.db(database).table(table).get(entry("id")).delete();
 			})
-		})
+		});
+		this.clearTable = this.deleteAll;
 		this.mixpanel.track('bot.setup', {
 			distinct_id: this.uuid(),
 			timestamp: new Date().toISOString(),
