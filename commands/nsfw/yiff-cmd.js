@@ -10,7 +10,7 @@ module.exports = (async (self,local) => {
             var type = self.config.yiff.defaultType;
             if(!self.yiffNoticeViewed.has(self.guild.id)) {
                 self.yiffNoticeViewed.add(self.guild.id);
-                self.channel.send(`Showing default yiff type **${type}**\nTo change thos, add one of these values somewhere in the channel __name__: **${self.config.yiff.types.join("**, **")}**.`);
+                self.channel.send(`Showing default yiff type **${type}**\nTo change this, add one of these values somewhere in the channel __name__: **${self.config.yiff.types.join("**, **")}**.`);
             }
         }
 
@@ -33,6 +33,6 @@ module.exports = (async (self,local) => {
     }
     var attachment = new self.Discord.MessageAttachment(img.response.image);
     var short = await self.shortenUrl(img.response.image);
-
-    return self.channel.send(`Short URL: <${short.link}>\n\nType: ${type}\n\nRequested By: ${self.author.tag}`,attachment);
+    var extra = short.new ? `**This is the first time this has been viewed! Image #${short.imageNumber}**\n\n` : "";
+    return self.channel.send(`${extra}Short URL: <${short.link}>\n\nType: ${type}\n\nRequested By: ${self.author.tag}`,attachment);
 });
