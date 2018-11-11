@@ -216,11 +216,13 @@ module.exports = (async(self,message)=>{
 				var embed = new self.Discord.MessageEmbed(data);
 				return local.channel.send(embed);
 			}
-
-			if(local.channel.topic.indexOf("furrybot-yiff-disabled") !== -1) {
+			if(self.config.yiff.disableStatements.some(t=>local.channel.topic.indexOf(t) !== -1)) {
+					for(let key of self.config.yiff.disableStatements) {
+						if(local.channel.topic.indexOf(key) !== -1) var st = key;
+					}
 				var data = {
 					"title": "Yiff commands are explicitly disabled in this channel.",
-					"description": `Ask a staff member to re-enabled them by removing \`furrybot-yiff-disabled\` from the channel topic`
+					"description": `Ask a staff member to re-enabled them by removing \`${st}\` from the channel topic`
 				};
 				
 				Object.assign(data, local.embed_defaults);
