@@ -80,6 +80,9 @@ module.exports = (async(self,message)=>{
 			return;
 			}
 		}
+
+		var command = self.config.commandList.fullList[local.command];
+
 		if(local.message.content.toLowerCase() == "whatismyprefix") {
 			if(self.commandTimeout.whatismyprefix.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 				console.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${message.author.tag} (${message.author.id}) on response "whatismyprefix" in guild ${message.guild.name} (${message.guild.id})`);
@@ -118,9 +121,9 @@ module.exports = (async(self,message)=>{
 		if(!local.message.content.startsWith(local.prefix)) return;
 		if(!self.config.commandList.all.includes(local.command)) return;
 		if(local.gConfig.deleteCmds) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
-		if(self.config.commandList.fullList[local.command].userPermissions.length > 0) {
-			if(self.config.commandList.fullList[local.command].userPermissions.some(perm => !local.channel.permissionsFor(local.member).has(perm,true))) {
-				var neededPerms = self.config.commandList.fullList[local.command].userPermissions.filter(perm => !local.channel.permissionsFor(local.member).has(perm,true));
+		if(command.userPermissions.length > 0) {
+			if(command.userPermissions.some(perm => !local.channel.permissionsFor(local.member).has(perm,true))) {
+				var neededPerms = command.userPermissions.filter(perm => !local.channel.permissionsFor(local.member).has(perm,true));
 				self.mixpanel.track(`commands.${local.command}.missingUserPermissions`, {
 					distinct_id: local.author.id,
 					timestamp: new Date().toISOString(),
@@ -147,8 +150,8 @@ module.exports = (async(self,message)=>{
 				return local.channel.send(embed);
 			}
 		}
-		if(self.config.commandList.fullList[local.command].botPermissions.length > 0) {
-			if(self.config.commandList.fullList[local.command].botPermissions.some(perm => !local.channel.permissionsFor(local.guild.me).has(perm,true))) {
+		if(command.botPermissions.length > 0) {
+			if(command.botPermissions.some(perm => !local.channel.permissionsFor(local.guild.me).has(perm,true))) {
 				var neededPerms = config.commandList.fullList[command].botPermissions.filter(perm => !local.channel.permissionsFor(local.guild.me).has(perm,true));
 				self.mixpanel.track(`commands.${local.command}.missingBotPermissions`, {
 					distinct_id: local.author.id,
@@ -176,31 +179,56 @@ module.exports = (async(self,message)=>{
 				return local.channel.send(embed);
 			}
 		}
-		if(self.config.commandList.fullList[local.command].nsfw === true && !local.channel.nsfw) {
-			self.mixpanel.track(`commands.${local.command}.nonNSFW`, {
-				distinct_id: local.author.id,
-				timestamp: new Date().toISOString(),
-				args: local.args.join(" "),
-				command: local.command,
-				message: local.message.id,
-				guild: local.guild.id,
-				userId: local.author.id,
-				username: local.author.username,
-				discriminator: local.author.discriminator,
-				tag: local.author.tag,
-				displayName: local.member.displayName,
-				missingPermissions: neededPerms,
-				filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
-			});
-			var data={
-				"title": "NSFW commands are not allowed here",
-				"description": "NSFW commands must be ran in channels marked as NSFW"
-			};
-			Object.assign(data, local.embed_defaults);
-			var embed = new self.Discord.MessageEmbed(data);
-			return local.channel.send(embed);
+
+		if(command.nsfw === true) {
+			if(!local.channel.nsfw) {
+				self.mixpanel.track(`commands.${local.command}.nonNSFW`, {
+					distinct_id: local.author.id,
+					timestamp: new Date().toISOString(),
+					args: local.args.join(" "),
+					command: local.command,
+					message: local.message.id,
+					guild: local.guild.id,
+					userId: local.author.id,
+					username: local.author.username,
+					discriminator: local.author.discriminator,
+					tag: local.author.tag,
+					displayName: local.member.displayName,
+					missingPermissions: neededPerms,
+					filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
+				});
+				var data={
+					"title": "NSFW commands are not allowed here",
+					"description": "NSFW commands must be ran in channels marked as NSFW"
+				};
+				Object.assign(data, local.embed_defaults);
+				var embed = new self.Discord.MessageEmbed(data);
+				return local.channel.send(embed);
+			}
+
+			if(!local.gConfig.nsfwModuleEnabled) {
+				var data = {
+					"title": "NSFW commands are not enabled",
+					"description": `NSFW commands are not enabled in this server, ask a staff member to run the command \`${local.gConfig.prefix}togglensfw\` to enable NSFW commands!`
+				};
+				
+				Object.assign(data, local.embed_defaults);
+				var embed = new self.Discord.MessageEmbed(data);
+				return local.channel.send(embed);
+			}
+
+			if(local.channel.topic.indexOf("furrybot-yiff-disabled") !== -1) {
+				var data = {
+					"title": "Yiff commands are explicitly disabled in this channel.",
+					"description": `Ask a staff member to re-enabled them by removing \`furrybot-yiff-disabled\` from the channel topic`
+				};
+				
+				Object.assign(data, local.embed_defaults);
+				var embed = new self.Discord.MessageEmbed(data);
+				return local.channel.send(embed);
+			}
 		}
-		var isAlias = self.config.commandList.fullList[local.command].alias == "true";
+		var isAlias = command.alias == "true";
 
 		if(Object.keys(self.lang[local.gConfig.locale]).includes(local.command)) {
 			local.cmd = self.lang[local.gConfig.locale][local.command];
@@ -210,14 +238,12 @@ module.exports = (async(self,message)=>{
 		switch(isAlias) {
 			case true:
 				//alias
-				
-				var command = self.config.commandList.fullList[local.command];
 				if(self.commandTimeout[command.aliasof].has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 					console.log(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on command alias "${local.command}" (aliasof: ${command.aliasof}) in guild ${local.guild.name} (${local.guild.id})`);
 					return local.message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(command.cooldown)} before using this command again!`);
 					}
 				self.commandTimeout[command.aliasof].add(local.author.id);
-				self.setTimeout(() => {self.commandTimeout[self.config.commandList.fullList[local.command].aliasof].delete(local.author.id);}, command.cooldown);
+				self.setTimeout(() => {self.commandTimeout[command.aliasof].delete(local.author.id);}, command.cooldown);
 				self.mixpanel.track(`commands.${command.aliasof}.used`, {
 					distinct_id: local.author.id,
 					timestamp: new Date().toISOString(),
@@ -240,7 +266,6 @@ module.exports = (async(self,message)=>{
 				break;
 				
 			default:
-				var command = self.config.commandList.fullList[local.command];
 				if(self.commandTimeout[local.command].has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 					console.log(`Command timeout encountered by user ${local.author.tag} (${local.author.id}) on command "${local.command}" in guild ${local.guild.name} (${local.guild.id})`);
 					return local.message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(command.cooldown)} before using this command again!`);
@@ -270,7 +295,7 @@ module.exports = (async(self,message)=>{
 			if(typeof local !== "undefined") Object.assign(self,local);
 			var isAlias = self.config.commandList.fullList[self.command].alias;
 			var cmd = isAlias?self.config.commandList.fullList[self.command].aliasof:self.command;
-			var usage = self.config.commandList.fullList[self.command].usage;
+			var command = self.config.commandList.fullList[self.command];
 			self.mixpanel.track(`commands.${self.command}.invalidUsage`, {
 				distinct_id: self.author.id,
 				timestamp: new Date().toISOString(),
@@ -293,7 +318,11 @@ module.exports = (async(self,message)=>{
 						inline: false
 					},{
 						name: "Usage",
-						value: usage,
+						value: `${self.gConfig.prefix}${command.usage}`,
+						inline: false
+					},{
+						name: "Description",
+						value: command.description,
 						inline: false
 					},{
 						name: "Arguments Provided",
