@@ -90,7 +90,7 @@ class FurryBot extends Discord.Client {
 				self.reloadCommands();
 				self.reloadModules();
 		});
-		this.random = ((len=10,keyset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")=>{
+		this.random = ((len=10,keyset="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")=>{
 			if(len > 250 && !self[self.config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
 			let rand = ""
 			for (var i = 0; i < len; i++)
@@ -108,8 +108,9 @@ class FurryBot extends Discord.Client {
 			});
 			const create = (async(url)=>{
 				var count = await self.r.table("shorturl").count();
-				//62 = 26  (a-z) + 26 (A-Z) + 10 (0-9)
-				var rand = self.random(Math.ceil(count/62));
+				if(count == 0) count = 1;
+				//36 = 26 (A-Z) + 10 (0-9)
+				var rand = self.random(Math.ceil(count/36));
 				var a = await self.r.table("shorturl").insert({id:rand,url});
 				if(a.errors === 1) {
 					return create(url);
