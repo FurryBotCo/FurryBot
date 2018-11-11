@@ -1,3 +1,6 @@
+# package lock
+package-lock.json
+
 # Logs
 logs
 *.log
@@ -86,5 +89,3 @@ counts/
 
 # jsdocs
 out/
-
-*package-lock*
