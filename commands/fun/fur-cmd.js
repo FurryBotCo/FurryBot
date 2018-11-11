@@ -49,6 +49,7 @@ module.exports=(async (self,local) => {
 		case "inkbunny":
 			if(!self.config.furryArtAPIs.inkbunny.sid) {
 				await self.fsn.readFile(`${process.cwd()}/inkbunny-sid.txt`,"UTF8").then(async(sid)=>{
+					if(sid === "") sid = "nosid";
 					var req = await self.request(`https://inkbunny.net/api_userrating.php?sid=${sid}`,{
 						method: "GET"
 					});
