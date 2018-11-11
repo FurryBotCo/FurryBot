@@ -16,6 +16,7 @@ class FurryBot extends Discord.Client {
     	Object.assign(this, require(`${process.cwd()}/util/logger`), require(`${process.cwd()}/util/misc`), require(`${process.cwd()}/util/functions`));
 		this.util = require("util");
 		this.config = config;
+		for(let key in this.config.overrides) this[this.config.overrides[key]] = false;
 		this.Discord = Discord;
 		this.os = require("os");
 		this.request = require("async-request");
@@ -81,11 +82,60 @@ class FurryBot extends Discord.Client {
 			});
 			self.debug("Command Timeouts & Command List reloaded");
 		});
-		this.reload = (async()=>{
+		this.reloadAll = (async()=>{
 			if(!self) var self = this;
 				self.reloadCommands();
 				self.reloadModules();
 		});
+		this.random = ((len=10,keyset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")=>{
+			if(len > 250 && !self[self.config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
+			let rand = ""
+			for (var i = 0; i < len; i++)
+			rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
+
+			return rand;
+		});
+		this.shortenUrl = (async(url)=>{
+			if(!self) var self = this;
+			self.r.tableList().then((list)=>{
+				if(!list.includes("shorturl")) {
+					self.r.tableCreate("shorturl");
+					console.log(`[ShortURL]: Created Short URL table`);
+				}
+			});
+			const create = (async(url)=>{
+				var rand = self.random(5);
+				var a = await self.r.table("shorturl").insert({id:rand,url});
+				if(a.errors === 1) {
+					return create(url);
+				} else {
+					return a.id;
+				}
+			});
+
+			var res = await self.r.table("shorturl").filter({url});
+			const rand = self.random(5);
+			
+			switch(res.length) {
+				case 0:
+					// create
+					return create(url);
+					break;
+
+				case 1:
+					// return
+					return res[0];
+					break;
+
+				default:
+					// delete & recreate
+					console.log(`[ShortURL]: Duplicate records found, deleting`);
+					self.r.table("shorturl").filter({url}).forEach((short)=>{
+						return self.r.table("shorturl").get(short("id")).delete();
+					});
+					return create(url);
+			}
+		})
 		this.mixpanel.track('bot.setup', {
 			distinct_id: this.uuid(),
 			timestamp: new Date().toISOString(),
@@ -116,6 +166,7 @@ class FurryBot extends Discord.Client {
 				delete require.cache[require.resolve(`./handlers/events/${file}`)];
 		    });
 		});
+		
 		console.log("[loadEvent]: end of load");
 	}
 }
