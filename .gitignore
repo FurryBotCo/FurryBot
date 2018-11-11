@@ -76,7 +76,7 @@ test/
 docs/
 
 # inkbunny sid
-ib.txt
+inkbunny-sid.txt
 
 # vsc
 .vscode/

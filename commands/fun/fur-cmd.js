@@ -48,7 +48,7 @@ module.exports=(async (self,local) => {
 	switch(web) {
 		case "inkbunny":
 			if(!self.config.furryArtAPIs.inkbunny.sid) {
-				await self.fsn.readFile(`${process.cwd()}/ib.txt`,"UTF8").then(async(sid)=>{
+				await self.fsn.readFile(`${process.cwd()}/inkbunny-sid.txt`,"UTF8").then(async(sid)=>{
 					var req = await self.request(`https://inkbunny.net/api_userrating.php?sid=${sid}`,{
 						method: "GET"
 					});
@@ -70,7 +70,7 @@ module.exports=(async (self,local) => {
 											console.error(`[CommandHandler:${self.command}][InkbunnyLogin]: ${e}`);
 									}
 								} else {
-									await self.fsn.writeFile(`${process.cwd()}/ib.txt`,b.sid);
+									await self.fsn.writeFile(`${process.cwd()}/inkbunny-sid.txt`,b.sid);
 									self.config.furryArtAPIs.inkbunny.sid = b.sid;
 									console.log(`[CommandHandler:${self.command}][InkbunnyLogin]: Generated new SID`);
 								}
@@ -97,7 +97,7 @@ module.exports=(async (self,local) => {
 									console.error(`[CommandHandler:${self.command}][InkbunnyLogin]: ${e}`);
 							}
 						} else {
-							await self.fsn.writeFile(`${process.cwd()}/ib.txt`,a.sid);
+							await self.fsn.writeFile(`${process.cwd()}/inkbunny-sid.txt`,a.sid);
 							self.config.furryArtAPIs.inkbunny.sid = a.sid;
 							console.log(`[CommandHandler:${self.command}][InkbunnyLogin]: Generated new SID`);
 						}
@@ -127,7 +127,7 @@ module.exports=(async (self,local) => {
 											console.error(`[CommandHandler:${self.command}][InkbunnyLogin]: ${e}`);
 									}
 								} else {
-									await self.fsn.writeFile(`${process.cwd()}/ib.txt`,b.sid);
+									await self.fsn.writeFile(`${process.cwd()}/inkbunny-sid.txt`,b.sid);
 									self.config.furryArtAPIs.inkbunny.sid = b.sid;
 									console.log(`[CommandHandler:${self.command}][InkbunnyLogin]: Generated new SID`);
 								}
