@@ -37,18 +37,21 @@ class FurryBot extends Discord.Client {
 		this.Canvas = require("canvas-constructor");
 		this.fsn = require("fs-nextra");
 		this.furpile = {};
+		this.yiffNoticeViewed = new Set();
 		this._ = require("lodash");
+		const perf = require("perf_hooks");
+		this.performance = perf.performance;
+		this.PerformanceObserver = perf.PerformanceObserver;
 		this.imageAPIRequest = (async(safe=true,category=null,json=true,filetype=null)=>{
 			return new Promise(async(resolve, reject)=>{
 				if(!self) var self = this;
 				if([undefined,null,""].includes(json)) json = true;
-				var url=`https://api.furrybot.me/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?`/${filetype}`:""}`;
-				var r = await self.request(url);
+				var s = await self.request(`https://api.furrybot.me/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?`/${filetype}`:""}`);
 				try {
-					var j = JSON.parse(r.body);
+					var j = JSON.parse(s.body);
 					resolve(j);
 				} catch(e) {
-					reject({error:e,response:r.body});
+					reject({error:e,response:s.body});
 				}
 			});
 		});
@@ -109,7 +112,7 @@ class FurryBot extends Discord.Client {
 				if(a.errors === 1) {
 					return create(url);
 				} else {
-					return a.id;
+					return {code:rand,url,link:`https://furry.services/r/${rand}`};
 				}
 			});
 
@@ -124,7 +127,8 @@ class FurryBot extends Discord.Client {
 
 				case 1:
 					// return
-					return res[0];
+					var a = res[0];
+					return {code:a.id,url,link:`https://furry.services/r/${a.id}`};
 					break;
 
 				default:
@@ -135,6 +139,18 @@ class FurryBot extends Discord.Client {
 					});
 					return create(url);
 			}
+		});
+		this.deleteAll = (async(table,database = "furrybot")=>{
+			if(!self) var self = this;
+			if(["rethinkdb"].includes(database)) throw new Error(`{code:2,error:"ERR_ILLEGAL_DB",description:"illegal database"}`);
+			if(["guilds","users"].includes(table)) throw new Error(`{code:1,error:"ERR_ILLEGAL_TABLE",description:"illegal database"}`);
+			var dbList = await self.r.dbList();
+			if(!dbList.includes(database)) throw new Error(`{code:3,error:"ERR_INVALID_DB",description:"invalid database"}`);
+			var tableList = await self.r.db(database).tableList();
+			if(!tableList.includes(table)) throw new Error(`{code:4,error:"ERR_INVALID_TABLE",description:"invalid table"}`);
+			return self.r.db(database).table(table).forEach((entry)=>{
+				return self.r.db(database).table(table).get(entry("id")).delete();
+			})
 		})
 		this.mixpanel.track('bot.setup', {
 			distinct_id: this.uuid(),
