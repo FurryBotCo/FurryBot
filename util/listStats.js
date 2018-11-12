@@ -4,7 +4,7 @@ module.exports = (async(self)=>{
     const guilds = self.shard !== null ? await self.shard.fetchClientValues("guilds.size").then((res)=>{return res.reduce((prev, val) => prev + val, 0)}) : self.guilds.size,
         users = self.shard !== null ? await self.shard.fetchClientValues("users.size").then((res)=>{return res.reduce((prev, val) => prev + val, 0)}) : self.users.size,
         voice = self.shard !== null ? await self.shard.fetchClientValues("voiceConnections.size").then((res)=>{return res.reduce((prev, val) => prev + val, 0)}) : self.voiceConnections.size,
-        shards = self.shard !== null ? self.shard.count : 1;
+        shards = self.shard !== null ? self.options.totalShardCount : 1;
     for(let key in self.config.botLists) {
         if(self.config.botLists[key].alt !== undefined) {
             switch(self.config.botLists[key].alt) {
