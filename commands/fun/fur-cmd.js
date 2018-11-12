@@ -156,11 +156,13 @@ module.exports=(async (self,local) => {
 					console.log(`[CommandHandler:${self.command}][Inkbunny]: Body: ${jsn}`);
 					return self.message.reply("Image API returned a non-safe image! Please try again later.");
 				}
+				var short = await self.shortenUrl(`https://inkbunny.net/s/${submission.submission_id}`);
+    			var extra = short.new ? `**This is the first time this has been viewed! Image #${short.number}**\n\n` : "";
 				var attachment = new self.Discord.MessageAttachment(submission.file_url_full,submission.file_name)
-				return self.channel.send(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRID: ${jsn.rid}\nSite: Inkbunny`,attachment)
+				return self.channel.send(`${extra}${submission.title} (type ${submission.type_name}) by ${submission.username}\n<${short.url}>\n\nRequested By: ${self.author.tag}\n\nRID: ${jsn.rid}\nSite: Inkbunny`,attachment)
 			}catch(e){
 				console.error(`[CommandHandler:${self.command}][Inkbunny]: Error:\n${e}`);
-				console.log(`[CommandHandler:${self.command}][Inkbunny]: Body: ${jsn}`);
+				console.log(`[CommandHandler:${self.command}][Inkbunny]: Body: ${self.util.inspect(jsn,{depth:null})}`);
 				var attachment = new self.Discord.MessageAttachment("https://furrybot.furcdn.net/NotFound.png");
 				return self.channel.send("Unknown API Error",attachment);
 			}
@@ -184,14 +186,16 @@ module.exports=(async (self,local) => {
 				if(typeof submission.contentLevel === "undefined") throw new Error("secondary");
 				if(submission.contentLevel !== 0) {
 					console.log(`[CommandHandler:${self.command}][SoFurry]: unsafe image:\n${self.util.inspect(submission,{depth:null,showHidden:true})}`);
-					console.log(`[CommandHandler:${self.command}][SoFurry]: Body: ${jsn}`);
+					console.log(`[CommandHandler:${self.command}][SoFurry]: Body: ${self.inspect(jsn,{depth:null})}`);
 					return self.message.reply("Image API returned a non-safe image! Please try again later.");
 				}
+				var short = await self.shortenUrl(`http://www.sofurry.com/view/${submission.id}`);
+    			var extra = short.new ? `**This is the first time this has been viewed! Image #${short.number}**\n\n` : "";
 				if([1,4].includes(submission.contentType)) {
 					var attachment = new self.Discord.MessageAttachment(submission.full,"sofurry.png");
-					return self.channel.send(`${submission.title} (type ${self.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nSite: SoFurry`,attachment);
+					return self.channel.send(`${extra}${submission.title} (type ${self.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\n\nRequested By: ${self.author.tag}\n\nSite: SoFurry`,attachment);
 				} else {
-					return self.channel.send(`${submission.title} (type ${self.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nSite: SoFurry`);
+					return self.channel.send(`${extra}${submission.title} (type ${self.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\n\nRequested By: ${self.author.tag}\n\nSite: SoFurry`);
 				}
 			}catch(e){
 				console.error(`[CommandHandler:${self.command}][SoFurry]: Error:\n${e}`);
@@ -206,8 +210,10 @@ module.exports=(async (self,local) => {
 				if(!type) type = "hug";
 				var safe = self.channel.nsfw ? !["bulge","yiff/gay","yiff/straight"].includes(type) : true;
 				var req = await self.imageAPIRequest(safe,type);
+				var short = await self.shortenUrl(req.response.image);
+    			var extra = short.new ? `**This is the first time this has been viewed! Image #${short.number}**\n\n` : "";
 				var attachment = new self.Discord.MessageAttachment(req.response.image);
-				return self.channel.send(`<${req.response.image}>\nSite: FurCDN-FurryBot-${self.ucwords(type)}`,attachment);
+				return self.channel.send(`${extra}Short URL: <${short.link}>\n\nRequested By: ${self.author.tag}\n\nSite: FurryBot/${self.ucwords(type)}`,attachment);
 			}catch(e){
 				console.error(`[CommandHandler:${self.command}][furrybot/${type}]: Error:\n${e}`);
 				console.log(`[CommandHandler:${self.command}][furrybot/${type}]: Body: ${jsn}`);
