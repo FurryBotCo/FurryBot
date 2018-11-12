@@ -48,7 +48,7 @@ module.exports = (async(self,message)=>{
 	try {
 		self.messageCount++;
 		self.localMessageCount++;
-		local.embed_defaults = {"footer": {text: `Shard ${self.shard !== null?self.shard.id+1+"/"+self.shard.count:"1/1"} - Bot Version ${self.config.bot.version}`}, "author": {"name": local.author.tag,"icon_url": local.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
+		local.embed_defaults = {"footer": {text: `Shard ${self.shard !== null?+self.shard.id+1+"/"+self.options.totalShardCount:"1/1"} - Bot Version ${self.config.bot.version}`}, "author": {"name": local.author.tag,"icon_url": local.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
 		try {
 			local.gConfig = await self.db.getGuild(message.guild.id) ||  self.config.guildDefaultConfig;
 			local.uConfig = await self.db.getUser(local.message.member.id) || self.config.userDefaultConfig;
