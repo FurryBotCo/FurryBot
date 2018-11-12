@@ -40,16 +40,21 @@ module.exports = (async (self,local) => {
 	
 	var roles = user.roles.map(role=>{if(role.name!=="@everyone"){return `<@&${role.id}>`}else{return "@everyone"}});
 	
-	var xhr1 = new self.XMLHttpRequest();
+	if(!user.user.bot) {
+		const req = await self.request(`https://discord.services/api/ban/${user.id}`,{
+			method: "GET"
+		});
 
-	xhr1.open("GET", `https://discord.services/api/ban/${user.id}`,false);
-
-	xhr1.send();
-
-	var x = JSON.parse(xhr1.responseText);
-	var ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:false;
-	var l = db.isBanned(user.id);
-	var ll = l.banned?`Reason: ${l.reason}\nProof: [${l.proof}](${l.proof})`:false;
+		var x = JSON.parse(req.body);
+		var ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:false;
+		var db = "Down until further notice";
+		var l = self.db.isBlacklisted(user.id);
+		var ll = l.banned?`Reason: ${l.reason}\nProof: [${l.proof}](${l.proof})`:false;
+		var bl = `Discord.Services: **${ds}**\nDiscord Bans: **${db}**\nLocal: **${ll}**`;
+	} else {
+		var bl = "Bots cannot be blacklisted.";
+		// botlist lookup
+	}
 	var rr = roles.length > 15?`Too many roles to list, please use **${self.gConfig.prefix}roles ${user.id}**`:roles.toString();
 	var data = {
 			name: "User info",
@@ -76,11 +81,7 @@ module.exports = (async (self,local) => {
 				inline: false
 			}, {
 				name: "Blacklist",
-				value: `Discord.Services: ${ds}\nLocal: ${ll}`,
-				inline: false
-			}, {
-				name: "Vote for this bot",
-				value: self.config.vote,
+				value: bl,
 				inline: false
 			}
 			]

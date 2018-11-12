@@ -84,11 +84,11 @@ module.exports = ((self)=>{
 			});
 			return tmp.deleted;
 		}),
-		addBlock: (async(uid,reason = "None provided")=>{
-			return self.r.table("blocked").insert({id:uid,reason});
+		blacklistUser: (async(uid,reason = "None provided")=>{
+			return self.r.table("blacklist").insert({id:uid,reason});
 		}),
-		isBlocked: (async(id)=>{
-			return Boolean(await self.r.table("blocked").get(id));
+		isBlacklisted: (async(uid)=>{
+			return Boolean(await self.r.table("blacklist").get(uid));
 		}),
 		addDonor: (async(uid,amount)=>{
 			return self.r.table("donors").insert({id:uid,amount},{conflict:"update"});

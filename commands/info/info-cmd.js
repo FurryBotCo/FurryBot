@@ -1,7 +1,7 @@
 module.exports = (async (self,local) => {
 	Object.assign(self,local);
 	var userCount=0;
-	client.guilds.forEach((guild) => {
+	self.guilds.forEach((guild) => {
 		userCount+=guild.memberCount;
 	});
 	var largeGuildCount=0;

@@ -14,4 +14,6 @@ module.exports = (async(self) => {
     console.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
 
    self.user.setActivity("Debugging!", {type: "PLAYING"});
+   console.log(`Shard #${self.shard.id} Logged in (${self.shard.id+1}/${self.shard.count})`);
+   // TODO: test shard count = 1
 });

@@ -12,7 +12,7 @@ module.exports = (async (self,local) => {
 	}
 	switch(true) {
 		case new RegExp(/^(command|cmd|c)[s]?(list|l)?$/gi).test(type):
-			message.reply("Reloading command list..");
+			self.message.reply("Reloading command list..");
 			self.reloadCommands();
 			break;
 			

@@ -1,134 +1,29 @@
-const Discord = require("discord.js");
-const config = require("./config");
+const config = require("./config.js");
+const logger = require("./util/logger.js");
+const { ShardingManager } = require('discord.js');
+const custom = Object.assign({}, require("./util/misc"), require("./util/functions"));
+//const manager = new ShardingManager(`bot.js`, {totalShards: 2});
 
-/**
-  * Main Class
-  *	@contructor
-  * @param {clientOptions} options - Object of options to pass to parent.
-  * @extends Discord.Client
-  * @see {@link https://discord.js.org/#/docs/master/typedef/ClientOptions|ClientOptions}
-  * @see {@link https://discord.js.org/#/docs/master/class/Client|Discord.Client}
-  */
-class FurryBot extends Discord.Client {
-	constructor(options) {
-		var opt = options || {};
-   		super(opt);
-    	Object.assign(this, require(`${process.cwd()}/util/logger`), require(`${process.cwd()}/util/misc`), require(`${process.cwd()}/util/functions`));
-		this.util = require("util");
-		this.config = config;
-		this.Discord = Discord;
-		this.os = require("os");
-		this.request = require("async-request");
-		this.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-		this.Mixpanel = require("mixpanel");
-		this.uuid = require("uuid/v4");
-		this.fetch = require("node-fetch");
-		this.mixpanel = this.Mixpanel.init(this.config.mixpanel, {
-			protocol: 'https'
-		});
-    	this.fs = require("fs");
-    	this.r = require("rethinkdbdash")(this.config.db);
-		this.db = require(`${process.cwd()}/util/dbFunctions`)(this);
-		this.commandTimeout = {};
-		this.varParse = require(`${process.cwd()}/util/varHandler`);
-		this.lang = require(`${process.cwd()}/lang`)(this);
-		this.colors = require("console-colors-2");
-		this.Canvas = require("canvas-constructor");
-		this.fsn = require("fs-nextra");
-		this.furpile = {};
-		this._ = require("lodash");
-		this.imageAPIRequest = (async(safe=true,category=null,json=true,filetype=null)=>{
-			return new Promise(async(resolve, reject)=>{
-				if(!self) var self = this;
-				if([undefined,null,""].includes(json)) json = true;
-				var url=`https://api.furrybot.me/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?`/${filetype}`:""}`;
-				var r = await self.request(url);
-				try {
-					var j = JSON.parse(r.body);
-					resolve(j);
-				} catch(e) {
-					reject({error:e,response:r.body});
-				}
-			});
-		});
-		this.download = ((url, filename)=>{
-			return new Promise((resolve,reject)=>{
-				if(!self) var self = this;
-				self.request(url).pipe(self.fsn.createWriteStream(filename)).on('close', resolve)
-			});
-		});
-		this.reloadModules = (async()=>{
-			for(var key in require.cache){
-				if(key.indexOf("\\node_modules") != -1){
-					delete require.cache[key];
-				}
-			}
-			console.debug("Reloaded all modules");
-			return true;
-		});
-		this.reloadCommands = (async()=>{
-			if(!self) var self = this;
-			var resp = await self.request("https://api.furrybot.me/commands", {
-					method: "GET",
-					headers: {
-							Authorization: `Key ${self.config.apiKey}`
-					}
-			});
-			var response = JSON.parse(resp.body);
-			self.config.commandList = {fullList: response.return.fullList, all: response.return.all};
-			self.config.commandList.all.forEach((command)=>{
-					self.commandTimeout[command] = new Set();
-			});
-			self.debug("Command Timeouts & Command List reloaded");
-		});
-		this.reload = (async()=>{
-			if(!self) var self = this;
-				self.reloadCommands();
-				self.reloadModules();
-		});
-		this.mixpanel.track('bot.setup', {
-			distinct_id: this.uuid(),
-			timestamp: new Date().toISOString(),
-			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
-		});
-    	this.load.apply(this);
-	}
-	
-	/**
-	  * Load Function
-	  */
-	load() {
-		console.log(`[loadEvent]: start load`);
-		this.mixpanel.track('bot.load.start', {
-			distinct_id: this.uuid(),
-			timestamp: new Date().toISOString(),
-			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
-		});
-		this.fs.readdir(`${process.cwd()}/handlers/events/`, (err, files) => {
-		    if (err) return console.error(err);
-		    files.forEach(file => {
-				if (!file.endsWith(".js")) return;
-				const event = require(`./handlers/events/${file}`),
-				 eventName = file.split(".")[0];
+//manager.spawn();
+//manager.on('launch', shard => {console.debug(`Successfully launched shard ${shard.id+1} (ID: ${shard.id})`);console.debug(`Memory: ${custom.getUsedMemory("MB")}/${custom.getTotalMemory("MB")}`)});
+if(config.beta) {
+	console.warn(`[ShardingManager] Warning! Launching beta version of bot.. (waiting ${.5e3/1000} seconds)`);
+	setTimeout(function(token){
+		const manager = new ShardingManager(`main.js`, {token: config.bot.token, respawn: true, totalShards: "auto"});
 
-				this.on(eventName, event.bind(null,this));
-				console.log(`[EventManager]: Loaded ${eventName} event`);
-				delete require.cache[require.resolve(`./handlers/events/${file}`)];
-		    });
+		manager.spawn();
+		manager.on('launch', (shard) => {
+			console.debug(`Successfully launched shard ${shard.id+1} (ID: ${shard.id})`);
+			console.debug(`Memory: ${custom.getUsedMemory("MB")}/${custom.getTotalMemory("MB")}`)
 		});
-		console.log("[loadEvent]: end of load");
-	}
+	}, .5e3, config.bot.token);
+} else {
+	console.log(`Launching normal bot..`);
+	const manager = new ShardingManager(`main.js`, {token: config.bot.token, respawn: true, totalShards: "auto"});
+
+	manager.spawn();
+	manager.on('launch', (shard) => {
+		console.debug(`Successfully launched shard ${shard.id+1} (ID: ${shard.id})`);
+		console.debug(`Memory: ${custom.getUsedMemory("MB")}/${custom.getTotalMemory("MB")}`)
+	});
 }
-
-const client = new FurryBot({disableEveryone:true});
-
-//console.log(client.db.getGuild);
-
-client.login(config.bot.token);
-
-process.on("SIGINT", async () => {
-	self = client;
-	console.debug(`${self.colors.fg.red}${self.colors.sp.bold}Force close via CTRL+C${self.colors.sp.reset}`);
-	self.destroy();
-	process.kill(process.pid, 'SIGTERM' );
-});

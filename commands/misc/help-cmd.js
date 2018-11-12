@@ -45,13 +45,13 @@ module.exports=(async (self,local) => {
 			inline: true
 		},{
 			name: "Cooldown",
-			value: self.ucwords(command.cooldown),
+			value: self.ucwords(self.ms(command.cooldown)),
 			inline: true
 		}
 		]
 	};
 	
 	Object.assign(data, self.embed_defaults);
-	var embed = new self.MessageEmbed(data);
+	var embed = new self.Discord.MessageEmbed(data);
 	return self.channel.send(embed);
 });

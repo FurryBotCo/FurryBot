@@ -76,7 +76,7 @@ test/
 docs/
 
 # inkbunny sid
-ib.txt
+inkbunny-sid.txt
 
 # vsc
 .vscode/
@@ -88,3 +88,9 @@ counts/
 out/
 
 *package-lock*
+
+# ignore .files/folders
+.*
+
+# Dont ignore .gitignore
+!/.gitignore
