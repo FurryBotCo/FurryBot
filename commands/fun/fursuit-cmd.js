@@ -1,12 +1,11 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
-	//if(!self.channel.permissionsFor(self.guild.me).has("ATTACH_FILES")) return self.message.reply("Hey, I require the `ATTACH_FILES` permission for this command to work!");
-    var img = await self.imageAPIRequest(true,self.command);
-    if(!img.success) return self.message.reply(`Image API returned an error: ${img.error.description}`);
+    Object.assign(self,local);
+    const img = await self.imageAPIRequest(true,"fursuit",true);
+    if(img.success !== true) {
+        return self.message.reply(`API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
+    }
     var attachment = new self.Discord.MessageAttachment(img.response.image);
-    self.channel.send(`Fursuit!\nCDN URL: <${img.response.image}>`,attachment);
-	
-	if(!self.gConfig.deleteCmds) {
-		self.message.delete().catch(noerr => {});
-	}
+    var short = await self.shortenUrl(img.response.image);
+    var extra = short.new ? `**This is the first time this has been viewed! Image #${short.imageNumber}**\n\n` : "";
+    return self.channel.send(`${extra}Short URL: <${short.link}>\n\nRequested By: ${self.author.tag}`,attachment);
 });
