@@ -27,9 +27,9 @@ module.exports = (async (self,local) => {
 		owner = `${o.user.tag} (${o.id})`;
 	}
 	
-	var vipRegion = message.guild.features.indexOf("VIP_REGIONS") !== -1;
-	var vanityURL = message.guild.features.indexOf("VANITY_URL") !== -1;
-	var inviteSplash = message.guild.features.indexOf("INVITE_SPLASH") !== -1;
+	var vipRegion = self.guild.features.indexOf("VIP_REGIONS") !== -1;
+	var vanityURL = self.guild.features.indexOf("VANITY_URL") !== -1;
+	var inviteSplash = self.guild.features.indexOf("INVITE_SPLASH") !== -1;
 
 	var verificationLevel = [
 		"**NONE** - unrestricted",
@@ -47,7 +47,7 @@ module.exports = (async (self,local) => {
 	var data = {
 		title: `Server Info - **${self.guild.name}**`,
 		image: {
-			url: message.guild.iconURL()
+			url: self.guild.iconURL()
 		},
 		fields: [
 			{
@@ -92,7 +92,7 @@ module.exports = (async (self,local) => {
 			},
 			{
 				name: `Roles [${self.guild.roles.size-1}]`,
-				value: `run **${gConfig.prefix}roles** for a list of roles`,
+				value: `run **${self.gConfig.prefix}roles** for a list of roles`,
 				inline: true
 			},
 			{
