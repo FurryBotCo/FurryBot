@@ -11,7 +11,7 @@ if(config.beta) {
 	setTimeout(()=>{
 		const manager = new ShardingManager(`main.js`, {token: config.bot.token, respawn: true, totalShards: config.bot.shardCount, mode: "process"});
 		manager.on('shardCreate', (shard) => {
-			console.debug(`Successfully launched shard #${shard.id} (${+shard.id+1}/${shard.manager.totalShards}})`);
+			console.debug(`Successfully launched shard #${shard.id} (${+shard.id+1}/${shard.manager.totalShards})`);
 			console.debug(`Memory: ${custom.getUsedMemory("MB")}/${custom.getTotalMemory("MB")}`)
 		});
 		manager.spawn();
@@ -21,7 +21,7 @@ if(config.beta) {
 	const manager = new ShardingManager(`main.js`, {token: config.bot.token, respawn: true, totalShards: config.bot.shardCount, mode: "process"});
 
 	manager.on('shardCreate', (shard) => {
-		console.debug(`Successfully launched shard #${shard.id} (${+shard.id+1}/${shard.manager.totalShards}})`);
+		console.debug(`Successfully launched shard #${shard.id} (${+shard.id+1}/${shard.manager.totalShards})`);
 		console.debug(`Memory: ${custom.getUsedMemory("MB")}/${custom.getTotalMemory("MB")}`)
 	});
 	manager.spawn();
