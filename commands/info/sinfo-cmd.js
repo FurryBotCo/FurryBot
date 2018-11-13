@@ -27,10 +27,14 @@ module.exports = (async (self,local) => {
 		owner = `${o.user.tag} (${o.id})`;
 	}
 	
-	var vipRegion = self.guild.features.indexOf("VIP_REGIONS") !== -1;
-	var vanityURL = self.guild.features.indexOf("VANITY_URL") !== -1;
-	var inviteSplash = self.guild.features.indexOf("INVITE_SPLASH") !== -1;
+	var features = "";
+if(self.guild.verified) features+="Verified\n";
+	if(self.guild.features.indexOf("VIP_REGIONS") !== -1) features+="VIP Voice Vegions\n";
+	// if fetching vanity url fails return discord-api
+	if(self.guild.features.indexOf("VANITY_URL") !== -1) features+=`Vanity URL: https://discord.gg/${self.guild.fetchVanityCode().catch(noerr=>"discord-api")}\n`;
+	if(self.guild.features.indexOf("INVITE_SPLASH") !== -1) features+=`[Invite Splash](${self.guild.inviteSplash()})\n`;
 
+	if(features === "") features = "NONE";
 	var verificationLevel = [
 		"**NONE** - unrestricted",
 		"**LOW** - 	must have verified email on account",
@@ -40,8 +44,8 @@ module.exports = (async (self,local) => {
 	];
 
 	var mfaLevel = [
-		"**NONE**",
-		"**ELEVATED**"
+		"NONE",
+		"ELEVATED"
 	];
 
 	var data = {
@@ -53,62 +57,42 @@ module.exports = (async (self,local) => {
 			{
 				name: "Guild ID",
 				value: self.guild.id,
-				inline: true
+				inline: false
 			},
 			{
 				name: "Guild Owner",
 				value: owner,
-				inline: true
+				inline: false
 			},
 			{
 				name: "Members",
-				value: `Total: ${self.guild.memberCount}\n\n${self.config.emojis.online}: ${self.guild.members.filter(m=>m.user.presence.status==="online").size}\n${self.config.emojis.idle}: ${message.guild.members.filter(m=>m.user.presence.status==="idle").size}\n${self.config.emojis.offline}: ${self.guild.members.filter(m=>m.user.presence.status==="offline").size}\n${self.emojis.dnd}: ${self.guild.members.filter(m=>m.user.presence.status==="dnd").size}`,
-				inline: true
+				value: `Total: ${self.guild.memberCount}\n\n${self.config.emojis.online}: ${self.guild.members.filter(m=>m.user.presence.status==="online").size}\n${self.config.emojis.idle}: ${self.message.guild.members.filter(m=>m.user.presence.status==="idle").size}\n${self.config.emojis.dnd}: ${self.guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${self.config.emojis.offline}: ${self.guild.members.filter(m=>m.user.presence.status==="offline").size}`,
+				inline: false
 			},
 			{
 				name: "Channels",
-				value: `Total: ${self.guild.channels.size}\n\hText: ${textChCount}\nVoice: ${voiceChCount}\nCategory: ${categoryChCount}`,
-				inline: true
-			},
-			{
-				name: "Large Guild (300+ Members)",
-				value: self.guild.large,
-				inline: true
+				value: `Total: ${self.guild.channels.size}\nText: ${textChCount}\nVoice: ${voiceChCount}\nCategory: ${categoryChCount}`,
+				inline: false
 			},
 			{
 				name: "Guild Creation Date",
 				value: self.guild.createdAt.toString().split("GMT")[0],
-				inline: true
+				inline: false
 			},
 			{
 				name: "Region",
-				value: self.guild.region,
-				inline: true
-			},
-			{
-				name: "Default Notification Level",
-				value: self.guild.defaultMessageNotifications,
-				inline: true
+				value: self.ucwords(self.guild.region),
+				inline: false
 			},
 			{
 				name: `Roles [${self.guild.roles.size-1}]`,
 				value: `run **${self.gConfig.prefix}roles** for a list of roles`,
-				inline: true
+				inline: false
 			},
 			{
 				name: "Extra",
-				value: `Verified: ${self.guild.verified}\nVIP Regions: ${vipRegion}\nVanity URL: ${vanityURL}\nInvite Splash: ${inviteSplash}`,
-				inline: true
-			},
-			{
-				name: "Verification/2FA Levels",
-				value: `Verification: ${verificationLevel[self.guild.verificationLevel]}\n2FA: ${mfaLevel[self.guild.mfaLevel]}`,
-				inline: true
-			},
-			{
-			 name: "Vote for this bot!",
-			 value: self.config.vote,
-			 inline: true
+				value: `**Large Guild**: ${self.ucwords(self.guild.large)}\n**Verification**: ${verificationLevel[self.guild.verificationLevel]}\n**2FA**: ${mfaLevel[self.guild.mfaLevel]}\n**Default Notifications**: ${self.guild.defaultMessageNotifications}\n**Features**:\n${features}`,
+				inline: false
 			}
 		]
 	};
