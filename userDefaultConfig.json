@@ -1,7 +1,10 @@
 {
-    "bal": "100",
     "preferences":{
         "disableMention": false,
         "disableFunUsage": false
-    }
+    },
+    "blacklistedCommands": [
+
+    ],
+    "globallyBlacklisted": false 
 }
