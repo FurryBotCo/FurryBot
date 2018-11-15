@@ -115,6 +115,17 @@ class FurryBotLogger {
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
         process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${shard}|${file}]: ${msg}\n`);
     }
+
+    async command(msg) {
+        var color = this.chalk.blue,
+            extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+            type  = color.bold("RETHINKDB"),
+            time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
+            shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
+            msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
+            file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
+        process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${shard}|${file}]: ${msg}\n`);
+    }
 }
 
 module.exports = FurryBotLogger;
