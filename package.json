@@ -24,6 +24,7 @@
     "async-request": "^1.2.0",
     "canvas": "^1.6.12",
     "canvas-constructor": "^1.1.2",
+    "chalk": "^2.4.1",
     "console-colors-2": "^1.0.2",
     "discord.js": "github:discordjs/discord.js#master",
     "file-type": "^9.0.0",
