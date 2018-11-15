@@ -1,0 +1,34 @@
+{
+    "economyEnabled": false,
+    "currencyName" : "RecBucks",
+    "currencyEmoji": ":paws:",
+    "robbing": {
+        "min": 1,
+        "max": 10,
+        "chance": "25%"
+    },
+    "work": {
+        "min": 1,
+        "max": 10,
+        "chance": "25%"
+    },
+    "crime": {
+        "min": 1,
+        "max": 10,
+        "chance": "25%"
+    },
+    "slut": {
+        "min": 1,
+        "max": 10,
+        "chance": "25%"
+    },
+    "chat": {
+        "enabled": false,
+        "min": 1,
+        "max": 10,
+        "cooldown": -1
+    },
+    "users": [
+        
+    ]
+}
