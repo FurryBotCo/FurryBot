@@ -13,7 +13,15 @@ module.exports = (async(self) => {
     console.debug("Command Timeouts & Command List loaded");
     console.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
 
-   self.user.setActivity("Debugging!", {type: "PLAYING"});
+    self.rotatingStatus = self.setInterval(()=>{
+        for(let key in self.config.bot.rotatingStatus) {
+            var interval = key*15e3;
+            setTimeout((st)=>{
+                self.user.setActivity(eval(st.message),{type:st.type});
+                console.log(`set status to ${eval(st.message)}`);
+            },interval,self.config.bot.rotatingStatus[key]);
+        }
+    }, self.config.bot.rotatingStatus.length*15e3)
    console.log(`Shard #${self.shard.id} Logged in (${+self.shard.id+1}/${self.options.totalShardCount})`);
    // TODO: test shard count = 1
 });
