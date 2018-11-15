@@ -1,4 +1,5 @@
 module.exports = (async(self) => {
+    self.logger = new (require(`${self.config.rootDir}/util/loggerV3.js`))(self);
     var resp = await self.request(`https://api.furrybot.me/commands${self.config.beta?"?beta":""}`, {
         method: "GET",
         headers: {
@@ -18,10 +19,12 @@ module.exports = (async(self) => {
             var interval = key*15e3;
             setTimeout((st)=>{
                 self.user.setActivity(eval(st.message),{type:st.type});
-                console.log(`set status to ${eval(st.message)}`);
             },interval,self.config.bot.rotatingStatus[key]);
         }
-    }, self.config.bot.rotatingStatus.length*15e3)
+    }, self.config.bot.rotatingStatus.length*15e3);
+    self.player = new self.PlayerManager(self, self.config.musicPlayer.nodes, {
+        user: self.user.id,
+        shards: self.options.shardCount
+    });
    console.log(`Shard #${self.shard.id} Logged in (${+self.shard.id+1}/${self.options.totalShardCount})`);
-   // TODO: test shard count = 1
 });
