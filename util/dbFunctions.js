@@ -196,8 +196,10 @@ module.exports = ((self)=>{
 			if(!user) obj.user = await self.db.createUser(uid);
 			if(gid !== null) {
 				var e = await self.r.table("economy").get(gid);
-				var economy = e.users[uid];
-				if(economy !== null) Object.assign(obj,economy);
+				if(!e) {} else {
+					var economy = e.users[uid];
+					if(economy !== null) Object.assign(obj,economy);
+				}
 			}
 			return obj;
 		}),
