@@ -27,7 +27,7 @@ module.exports = {
 				var no_shard = true;
 			//}
 			
-			var time = Date().toString().split(' ').slice(1, 5)[3];
+			var time = Date().toString().split(' ')[4];
 			var message = message instanceof Object ? require('util').inspect(message) : message;
 			
 			switch(type.toLowerCase()) {

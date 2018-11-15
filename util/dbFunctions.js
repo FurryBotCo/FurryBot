@@ -169,8 +169,8 @@ module.exports = ((self)=>{
 			var uConf = {id: uid};
 			Object.assign(uConf, self.config.userDefaultConfig);
 			await self.r.table("users").insert(uConf);
-			await self.r.table("economy").get(gid);
-			return self.db.getUser(uid);
+			await self.r.table("economy").get(gid).update({users:{[uid]:self.config.economyUserDefaultConfig}}).catch(false);
+			return self.db.getUser(uid,gid);
 		}),
 		deleteUser: (async(uid,gid=null)=>{
 			var obj = {};
@@ -196,8 +196,10 @@ module.exports = ((self)=>{
 			if(!user) obj.user = await self.db.createUser(uid);
 			if(gid !== null) {
 				var e = await self.r.table("economy").get(gid);
-				var economy = e.users[uid];
-				if(economy !== null) Object.assign(obj,economy);
+				if(!e) {} else {
+					var economy = e.users[uid];
+					if(economy !== null) Object.assign(obj,economy);
+				}
 			}
 			return obj;
 		}),
@@ -214,14 +216,15 @@ module.exports = ((self)=>{
 					obj.economy = await self.r.table("economy").get(ext.gid).update(ext.fields.economy);
 				}
 			} else {
-				var type = !ext.type ? "furrybot" : ext.type; 
-				if(!["users","economy"].includes(type)) type = "furrybot";
+				var type = !ext.type ? "users" : ext.type; 
+				if(!["users","economy"].includes(type)) type = "users";
 				switch(type) {
 					case "users":
 						var obj = await self.r.table(type).get(ext.uid).update(fields);
 						break;
 
 						case "economy":
+						if(!ext.gid) throw new Error("ERR_MISSING_GUILD");
 						var obj = await self.r.table(type).get(ext.gid).update(fields);
 						break;
 				}

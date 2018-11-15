@@ -37,6 +37,7 @@ class FurryBot extends Discord.Client {
 		this.colors = require("console-colors-2");
 		this.Canvas = require("canvas-constructor");
 		this.fsn = require("fs-nextra");
+		this.PlayerManager = require("discord.js-lavalink").PlayerManager;
 		this.furpile = {};
 		this.yiffNoticeViewed = new Set();
 		this._ = require("lodash");
@@ -158,9 +159,46 @@ class FurryBot extends Discord.Client {
 			if(!tableList.includes(table)) throw new Error(`{code:4,error:"ERR_INVALID_TABLE",description:"invalid table"}`);
 			return self.r.db(database).table(table).forEach((entry)=>{
 				return self.r.db(database).table(table).get(entry("id")).delete();
-			})
+			});
 		});
 		this.clearTable = this.deleteAll;
+		this.player = null;
+		this.getRegion = ((region)=>{
+			if(!self) var self = this;
+			region = region.replace("vip-", "");
+			for (const key in self.config.musicPlayer.regions) {
+				const nodes = self.config.musicPlayer.nodes.filter(node => node.connected && node.region === key);
+				if (!nodes) continue;
+				for (const id of self.config.musicPlayer.regions[key]) {
+					if (id === region || region.startsWith(id) || region.includes(id)) return key;
+				}
+			}
+			return "us";
+		});
+		this.getIdealHost = ((region)=>{
+			if(!self) var self = this;
+			region = getRegion(region);
+			const foundNode = self.config.musicPlayer.nodes.find(node => node.ready && node.region === region);
+			if (foundNode) return foundNode.host;
+			return self.config.musicPlayer.nodes.first().host;
+		});
+		this.getSong = (async(str)=>{
+			if(!self) var self = this;
+			const res = await self.request(`http://${self.config.restnode.host}:${self.config.restnode.port}/loadtracks`,{
+				qs: {
+					identifier: str
+				},
+				headers: {
+					Authorization: self.config.restnode.password
+				}
+			}).catch(err => {
+				console.error(err);
+				return null;
+			});
+			if (!res) throw "There was an error, try again";
+			if (res.body.length == 0) throw `No tracks found`;
+			return JSON.parse(res.body);
+		})
 		this.mixpanel.track('bot.setup', {
 			distinct_id: this.uuid(),
 			timestamp: new Date().toISOString(),
