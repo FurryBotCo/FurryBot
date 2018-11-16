@@ -1,4 +1,3 @@
-const snekfetch = require("snekfetch");
 const config = require("../config");
 const Discord = require("discord.js");
 const { inspect } = require("util");
@@ -168,10 +167,11 @@ async function clean(text) {
 }
 
 async function getSong(string) {
-    const res = await snekfetch.get(`http://${config.musicPlayer.restnode.host}:${config.musicPlayer.restnode.port}/loadtracks`)
-        .query({ identifier: string })
-        .set("Authorization", config.musicPlayer.restnode.secret)
-        .catch(err => {
+    const res = await request(`http://${config.musicPlayer.restnode.host}:${config.musicPlayer.restnode.port}/loadtracks?identifier=${string}`,{
+        headers: {
+            Authorization: config.musicPlayer.restnode.secret
+        }
+    }).catch(err => {
             console.error(err);
             return null;
         });
