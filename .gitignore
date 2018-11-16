@@ -94,3 +94,6 @@ out/
 
 # Dont ignore .gitignore
 !/.gitignore
+
+# lavalink config
+application.yml
