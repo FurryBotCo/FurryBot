@@ -139,12 +139,12 @@ client.on("message", async (message)=>{
             break;
 
         case "resume":
-        var c = client.voiceConnections.filter(g=>g.channel.guild.id===message.guild.id);
-        if(c.size === 0) return message.reply("Please play something before using this!");
-        if(c.first().speaking.has("SPEAKING")) return message.reply("Player is not paused.");
-        if(!c.first().dispatcher.paused) return message.reply("Player is not paused.");
-        c.first().dispatcher.resume();
-        return message.reply(":play_pause: **Resumed**");
+            var c = client.voiceConnections.filter(g=>g.channel.guild.id===message.guild.id);
+            if(c.size === 0) return message.reply("Please play something before using this!");
+            if(c.first().speaking.has("SPEAKING")) return message.reply("Player is not paused.");
+            if(!c.first().dispatcher.paused) return message.reply("Player is not paused.");
+            c.first().dispatcher.resume();
+            return message.reply(":play_pause: **Resumed**");
             break;
 
         case "eval":
@@ -172,9 +172,9 @@ async function getSong(string) {
             Authorization: config.musicPlayer.restnode.secret
         }
     }).catch(err => {
-            console.error(err);
-            return null;
-        });
+        console.error(err);
+        return null;
+    });
     if (!res) throw "There was an error, try again";
     if (res.body.length === 0) throw `No tracks found`;
     return res.body;
