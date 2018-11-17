@@ -15,7 +15,7 @@ class FurryBotLogger {
         this.util = util;
         this.path = path;
         this.client = !client ? null : client;
-        this.isSharded = this.client !== null ? this.client.shard !== null ? true : false : false;
+        this.isSharded = this.client !== null ? ![undefined,null].includes(this.client.shard) ? true : false : false;
         this.shardID = this.isSharded ? this.client.shard.id : 0;
         this.shardCount = this.isSharded ? this.client.options.shardCount : 1;
         this._getCallerFile = (()=>{
@@ -75,7 +75,7 @@ class FurryBotLogger {
     async error(msg) {
         var color = this.chalk.red,
             extra = this.config.beta ? this.chalk.magenta("BETA") : "",
-            type  = color.bold("LOG"),
+            type  = color.bold("ERROR"),
             time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
             shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
@@ -97,7 +97,7 @@ class FurryBotLogger {
     async info(msg) {
         var color = this.chalk.blue,
             extra = this.config.beta ? this.chalk.magenta("BETA") : "",
-            type  = color.bold("BLUE"),
+            type  = color.bold("INFO"),
             time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
             shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
@@ -119,7 +119,7 @@ class FurryBotLogger {
     async command(msg) {
         var color = this.chalk.blue,
             extra = this.config.beta ? this.chalk.magenta("BETA") : "",
-            type  = color.bold("RETHINKDB"),
+            type  = color.bold("COMMAND"),
             time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
             shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
