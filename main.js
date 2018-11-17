@@ -37,7 +37,9 @@ class FurryBot extends Discord.Client {
 		this.colors = require("console-colors-2");
 		this.Canvas = require("canvas-constructor");
 		this.fsn = require("fs-nextra");
-		this.PlayerManager = require("discord.js-lavalink").PlayerManager;
+		this.chalk = require("chalk");
+		this.chunk = require("chunk");
+		this.ytdl = require("ytdl-core");
 		this.furpile = {};
 		this.yiffNoticeViewed = new Set();
 		this._ = require("lodash");
@@ -198,7 +200,108 @@ class FurryBot extends Discord.Client {
 			if (!res) throw "There was an error, try again";
 			if (res.body.length == 0) throw `No tracks found`;
 			return JSON.parse(res.body);
-		})
+		});
+		this.songSearch = (async(strSearch,platform="youtube")=>{
+			if(!self) var self = this;
+			return new Promise(async(resolve,reject)=>{
+				if(!strSearch) reject(new Error("Missing parameters"));
+				switch(platform) {
+					case "youtube":
+						var res = await self.request(`http://${self.config.musicPlayer.restnode.host}:${self.config.musicPlayer.restnode.port}/loadtracks?identifier=ytsearch:${strSearch}`,{
+							method: "GET",
+							headers: {
+								Authorization: self.config.musicPlayer.restnode.secret
+							}
+						});
+						resolve(JSON.parse(res.body));
+						break;
+					
+					default:
+						reject(new Error("Invalid platform"));
+				}
+			});
+		});
+		this.playSong = (async(channel,song,platform="youtube")=>{
+			if(!self) var self = this;
+			return new Promise(async(resolve,reject)=>{
+				if(!channel || !song) reject(new Error("Missing parameters"));
+			
+                channel.join().catch((e)=>{
+                    reject(e);
+                }).then(async(ch)=>{
+                    switch(platform) {
+                        case "youtube":
+                            try {
+                                resolve(ch.play(self.ytdl(song.uri, { quality: 'highestaudio' })));
+                            }catch(err){
+                                ch.disconnect().then(()=>{
+                                    channel.leave()
+                                }).then(()=>{
+                                    reject(err);
+                                });
+                            }
+                            break;
+
+                        default:
+                            reject("invalid platform");
+                    }
+                })
+            });
+        });
+
+        this.songMenu = (async(pageNumber,pageCount,songs,msg,ma,mb)=>{
+			if(!self) var self = this;
+			return new Promise(async(resolve,reject)=>{
+				if(!pageNumber || !pageCount || !songs || !msg) reject(new Error("missing parameters."));
+				if(typeof ma !== "undefined" && typeof mb !== "undefined") {
+					ma.edit(`Multiple songs found, please specify the number you would like to play\n\n${rt[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
+				} else {
+					var mid = await msg.channel.send(`Multiple songs found, please specify the number you would like to play\n\n${songs.list[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
+					var ma = mid;
+					var mb = msg;
+				}
+				ma.channel.awaitMessages(m=>m.author.id === mb.author.id,{max:1,time: 1e4,errors:["time"]}).then(async(m)=>{
+					var res = songs.list[pageNumber];
+					var resultCount = songs.list.length;
+					var s = m.first().content.split(" ");
+					if(s[0] === "cancel") throw new Error("CANCEL");
+					if(s[0] === "page") {
+						if(pageNumber === s[1]) {
+							m.first().reply("You are already on that page.");
+							resolve(self.songMenu(pageNumber,pageCount,songs,msg,ma,mb));
+						}
+						if(pageCount - s[1] < 0) {
+							m.first().reply("Invalid page!");
+							resolve(self.songMenu(pageNumber,pageCount,songs,m,ma,mb));
+						}  else {
+							resolve(self.songMenu(s[1],pageCount,songs,m,ma,mb));
+						}
+					} else {
+						if(resultCount.length < s[0]) {
+							m.first().reply("Invalid Selection!");
+							resolve(self.songMenu(pageNumber,pageCount,songs,m,ma,mb));
+						} else {
+							var song = songs.tracks[pageNumber * 10 - Math.abs(s[0]-10) - 1];
+							resolve({song,msg:ma});
+						}
+					}
+				}).catch(resolve);
+			});
+		});
+		this.getSong = (async(strIdentifier)=>{
+			if(!self) var self = this;
+			return new Promise(async(resolve,reject)=>{
+				if(!strIdentifier) reject(new Error("Missing parameters"));
+				var res = await self.request(`http://${config.musicPlayer.restnode.host}:${config.musicPlayer.restnode.port}/loadtracks?identifier=${strIdentifier}`,{
+					headers: {
+						Authorization: config.musicPlayer.restnode.secret
+					}
+				});
+				if(res.body.length === 0) return resolve(res.body);
+				return resolve(JSON.parse(res.body));
+			})
+		});
+
 		this.mixpanel.track('bot.setup', {
 			distinct_id: this.uuid(),
 			timestamp: new Date().toISOString(),
