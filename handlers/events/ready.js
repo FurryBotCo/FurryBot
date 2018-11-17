@@ -22,9 +22,14 @@ module.exports = (async(self) => {
             },interval,self.config.bot.rotatingStatus[key]);
         }
     }, self.config.bot.rotatingStatus.length*15e3);
-    self.player = new self.PlayerManager(self, self.config.musicPlayer.nodes, {
-        user: self.user.id,
-        shards: self.options.shardCount
-    });
    console.log(`Shard #${self.shard.id} Logged in (${+self.shard.id+1}/${self.options.totalShardCount})`);
+
+   self.setInterval(()=>{
+    self.voiceConnections.forEach((vc)=>{
+        if(vc.channel.members.filter(m=>m.id!==self.user.id).size === 0) {
+            vc.channel.leave();
+            console.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to 30+ seconds of inactivity.`);
+        }
+    });
+   },3e4);
 });
