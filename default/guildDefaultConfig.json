@@ -98,5 +98,9 @@
       "channel": null,
       "enabled": false
     }
-  }
+  },
+  "musicQueue": {
+
+  },
+  "djRole": null
 }
