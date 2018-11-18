@@ -116,6 +116,10 @@ class FurryBotLogger {
         process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${shard}|${file}]: ${msg}\n`);
     }
 
+    get rethinkdblog() {
+        return this.rethink
+    }
+
     async command(msg) {
         var color = this.chalk.blue,
             extra = this.config.beta ? this.chalk.magenta("BETA") : "",
@@ -125,6 +129,10 @@ class FurryBotLogger {
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
         process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${shard}|${file}]: ${msg}\n`);
+    }
+
+    get commandlog() {
+        return this.command
     }
 }
 
