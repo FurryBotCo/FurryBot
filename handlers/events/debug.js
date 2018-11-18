@@ -1,3 +1,7 @@
 module.exports = (async(self,info)=>{
-    console.debug(info);
+    if(!self.logger) {
+        console.debug(info);
+    } else {
+        self.logger.debug(info);
+    }
 })

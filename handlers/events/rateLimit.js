@@ -1,5 +1,5 @@
 module.exports = (async(self,rateLimitInfo)=>{
-    console.warn(`Ratelimit: ${self.util.inspect(rateLimitInfo,{showHidden: true, depth: null, color: true})}`);
+    self.logger.warn(`Ratelimit: ${self.util.inspect(rateLimitInfo,{showHidden: true, depth: null, color: true})}`);
     var dt = {
         timestamp: new Date(),
         file: self.filename

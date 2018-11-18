@@ -11,8 +11,8 @@ module.exports = (async(self) => {
     self.config.commandList.all.forEach((command)=>{
         self.commandTimeout[command] = new Set();
     });
-    console.debug("Command Timeouts & Command List loaded");
-    console.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
+    self.logger.debug("Command Timeouts & Command List loaded");
+    self.logger.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
 
     self.rotatingStatus = self.setInterval(()=>{
         for(let key in self.config.bot.rotatingStatus) {
@@ -22,14 +22,18 @@ module.exports = (async(self) => {
             },interval,self.config.bot.rotatingStatus[key]);
         }
     }, self.config.bot.rotatingStatus.length*15e3);
-   console.log(`Shard #${self.shard.id} Logged in (${+self.shard.id+1}/${self.options.totalShardCount})`);
+   self.logger.log(`Shard #${self.shard.id} Logged in (${+self.shard.id+1}/${self.options.totalShardCount})`);
 
-   self.setInterval(()=>{
-    self.voiceConnections.forEach((vc)=>{
-        if(vc.channel.members.filter(m=>m.id!==self.user.id).size === 0) {
-            vc.channel.leave();
-            console.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to 30+ seconds of inactivity.`);
-        }
-    });
+     self.setInterval(()=>{
+        self.voiceConnections.forEach((vc)=>{
+            if(vc.channel.members.filter(m=>m.id!==self.user.id).size === 0) {
+                vc.channel.leave();
+                self.logger.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to 30+ seconds of inactivity.`);
+            }
+        });
    },3e4);
+
+   self.dbStats(self);
+   // post general stats to db every 60 seconds
+   self.setInterval(self.dbStats,6e4,self);
 });
