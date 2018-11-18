@@ -16,6 +16,14 @@ class FurryBot extends Discord.Client {
     	Object.assign(this, require(`${process.cwd()}/util/logger`), require(`${process.cwd()}/util/misc`), require(`${process.cwd()}/util/functions`));
 		this.util = require("util");
 		this.config = config;
+		this.stats = {
+			messagesSinceStart: 0,
+			messagesSinceLastPost: 0,
+			dmMessagesSinceStart: 0,
+			dmMessagesSinceLastPost: 0,
+			commandTotalsSinceStart: 0,
+			commandTotalsSinceLastPost: 0
+		};
 		for(let key in this.config.overrides) this[this.config.overrides[key]] = false;
 		this.Discord = Discord;
 		this.os = require("os");
@@ -25,7 +33,7 @@ class FurryBot extends Discord.Client {
 		this.uuid = require("uuid/v4");
 		this.fetch = require("node-fetch");
 		this.postStats = require("./util/listStats");
-		this.mixpanel = this.Mixpanel.init(this.config.mixpanel, {
+		this.mixpanel = this.Mixpanel.init(this.config.mixpanel.token, {
 			protocol: 'https'
 		});
     	this.fs = require("fs");
@@ -44,7 +52,8 @@ class FurryBot extends Discord.Client {
 		this.yiffNoticeViewed = new Set();
 		this._ = require("lodash");
 		const perf = require("perf_hooks");
-		this.performance = perf.performance;
+		this.dbStats = require(`${self.config.rootDir}/util/dbStats`);
+   		this.performance = perf.performance;
 		this.PerformanceObserver = perf.PerformanceObserver;
 		this.imageAPIRequest = (async(safe=true,category=null,json=true,filetype=null)=>{
 			return new Promise(async(resolve, reject)=>{
@@ -345,7 +354,10 @@ client.login(config.bot.token);
 
 process.on("SIGINT", async () => {
 	self = client;
-	console.debug(`${self.colors.fg.red}${self.colors.sp.bold}Force close via CTRL+C${self.colors.sp.reset}`);
+	self.logger.debug("Started termination via CTRL+C");
+	self.voiceConnections.forEach((v)=>v.disconnect());
+	self.logger.debug("Terminated all voice connections");
 	self.destroy();
+	self.logger.log("Terminated client");
 	process.kill(process.pid, 'SIGTERM' );
 });
