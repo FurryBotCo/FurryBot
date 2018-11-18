@@ -165,6 +165,133 @@ class FurryBotDatabase {
 			resolve(a.deleted);
 		})
 	}
+
+	async addDonator(uid,level) {
+		return new Promise(async(resolve,reject)=>{
+			if(!uid || !level) reject(new Error("missing parameter"));
+			// level:
+			// -1 = freemium
+			// 1 = $2-$3
+			// 2 = $5
+			// 3 = $10
+			resolve(this.r.table("donors").insert({id:uid,level}));
+		})
+	}
+
+	async updateDonator(uid,level) {
+		return new Promise(async(resolve,reject)=>{
+			if(!uid || !level) reject(new Error("missing parameter"));
+			// level:
+			// -1 = freemium
+			// 1 = $2-$3
+			// 2 = $5
+			// 3 = $10
+			var a = await this.r.table("donors").get(uid).update({level});
+			if(a.skipped) resolve(this.addDonator(uid,level));
+			resolve(true);
+		})
+	}
+
+	async removeDonor(uid) {
+		return new Promise(async(resolve,reject)=>{
+			if(!uid) reject(new Error("missing parameter"));
+			await this.r.table("donors").get(uid).delete();
+			resolve(true);
+		})
+	}
+
+	async isDonor(uid) {
+		return new Promise(async(resolve,reject)=>{
+			if(!uid) reject(new Error("missing parameter"));
+			var a = await this.r.table("donors").get(uid);
+			if(!a) resolve(false);
+			resolve(true);
+		})
+	}
+
+	async addBlacklistedUser(uid,reason) {
+		return new Promise(async(resolve,reject)=>{
+			if(!uid || !reason) reject(new Error("missing parameter"));
+			await this.r.table("blacklist").insert({id:uid,reason,type:"user"});
+			resolve(true);
+		})
+	}
+
+	async updateBlacklistedUser(uid,reason) {
+		return new Promise(async(resolve,reject)=>{
+			if(!uid || !reason) reject(new Error("missing parameter"));
+			var a = await this.r.table("blacklist").get(uid).update({reason});
+			if(a.skipped) resolve(this.addBlacklistedUser(uid,reason));
+			resolve(true);
+		})
+	}
+
+	async removeBlacklistedUser(uid) {
+		return new Promise(async(resolve,reject)=>{
+			if(!uid) reject(new Error("missing parameter"));
+			await this.r.table("donors").get(uid).delete();
+			resolve(true);
+		})
+	}
+
+	async addBlacklistedGuild(gid,reason) {
+		return new Promise(async(resolve,reject)=>{
+			if(!gid || !reason) reject(new Error("missing parameter"));
+			await this.r.table("blacklist").insert({id:gid,reason,type:"guild"});
+			resolve(true);
+		})
+	}
+
+	async updateBlacklistedGuild(gid,reason) {
+		return new Promise(async(resolve,reject)=>{
+			if(!gid || !reason) reject(new Error("missing parameter"));
+			var a = await this.r.table("blacklist").get(uid).update({reason});
+			if(a.skipped) resolve(this.addBlacklistedGuild(gid,reason));
+			resolve(true);
+		})
+	}
+
+	async removeBlacklistedGuild(gid) {
+		return new Promise(async(resolve,reject)=>{
+			if(!gid) reject(new Error("missing parameter"));
+			await this.r.table("donors").get(gid).delete();
+			resolve(true);
+		})
+	}
+
+	async isBlacklisted(id) {
+		return new Promise(async(resolve,reject)=>{
+			if(!id) reject(new Error("missing parameter"));
+			var a = await this.r.table("blacklist").get(id);
+			if(!a) resolve(false);
+			resolve(true);
+		})
+	}
+
+
+
+	async getStats(type) {
+		return new Promise(async(resolve,reject)=>{
+			var types = ["fcount","commands","general","shards"];
+			if(type !== "" && !types.includes(type.toLowerCase())) reject(new Error("invalid type"));
+			var fCount = (await this.r.table("stats").get("fCount")).count;
+			var commands = await this.r.table("stats").get("commands");
+			var shardsUnsorted = (await this.r.table("stats").get("general")).shards;
+			var general = await this.r.table("stats").get("general").without("shards");
+			var shards = {};
+			for(let key of Object.keys(shardsUnsorted[0])) shards[key]=0;
+			shardsUnsorted.forEach((shard)=>{for(let key in shard) shards[key]+=shard[key]});
+			shards.shardCount = shardsUnsorted.length;
+			resolve({fCount,commands,general,shards});
+		})
+	}
+
+	async updateCommandStats(command) {
+		return new Promise((resolve,reject)=>{
+			if(!command) reject(new Error("missing paramter"));
+			
+		})
+	}
 }
 
 // gid: 329498711338123268
@@ -174,5 +301,6 @@ const client = new Discord.Client({disableEveryone:true});
 client.login(config.bot.token);
 client.on("ready",async()=>{
 	var a = new FurryBotDatabase(client);
+	var b = await a.getStats();
 });
 
