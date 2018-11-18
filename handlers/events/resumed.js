@@ -1,3 +1,3 @@
 module.exports = (async(self,replayed)=>{
-    console.debug(`Resumed ${replayed} events.`);
+    self.logger.debug(`Resumed ${replayed} events.`);
 })

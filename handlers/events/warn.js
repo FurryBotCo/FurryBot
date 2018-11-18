@@ -1,3 +1,3 @@
 module.exports = (async(self,info)=>{
-    console.warn(info);
+    self.logger.warn(info);
 })
