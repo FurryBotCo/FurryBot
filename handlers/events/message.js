@@ -2,6 +2,13 @@ module.exports = (async(self,message)=>{
 	const event = __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0].split(".")[0] : __filename.split("\\").reverse()[0].split(".")[0],
 		  filename = __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0];
 	if(!message || !message.guild) return;
+	self.stats.messagesSinceStart++;
+	self.stats.messagesSinceLastPost++;
+
+	self.mixpanel.people.set(message.author.id, {
+		timestamp: new Date().toISOString(),
+		guilds: self.guilds.filter(g=>g.members.has(message.author.id)).map(g=>g.id)
+});
 
 	self.mixpanel.track(`bot.events.message`,{
 		distinct_id: message.author.id,
@@ -14,15 +21,10 @@ module.exports = (async(self,message)=>{
 	});
 
 	if(message.author.bot) return;
-
-	self.mixpanel.people.set(message.author.id, {
-			timestamp: new Date().toISOString(),
-			guilds: self.guilds.filter(g=>g.members.has(message.author.id)).map(g=>g.id)
-	});
 	
 	if(message.channel.type === "dm") {
 		await message.author.send(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://www.furrybot.me> to see our website, <https://docs.furrybot.me> to see my documentation, and join <${self.config.discordSupportInvite}> if you need more help!`);
-		console.log(`[${event}Event][User: ${message.author.id}]:Direct message recieved from ${message.author.tag}: ${message.content}`);
+		self.logger.log(`[${event}Event][User: ${message.author.id}]:Direct message recieved from ${message.author.tag}: ${message.content}`);
 		self.mixpanel.track(`bot.directMessage`,{
 			distinct_id: message.author.id,
 			timestamp: new Date().toISOString(),
@@ -31,6 +33,8 @@ module.exports = (async(self,message)=>{
 			message: message.content,
 			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 		});
+		self.stats.dmMessagesSinceStart++;
+		self.stats.dmMessagesSinceLastPost++;
 		return;
 	}
 	
@@ -54,7 +58,7 @@ module.exports = (async(self,message)=>{
 			local.uConfig = await self.db.getUser(local.member.id,local.guild.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyDefaultConfig);
 			if(self.config.beta) local.gConfig.prefix = "fb!";
 		}catch(e){
-			console.error(e);
+			self.logger.error(e);
 			return;
 		}
 		local.prefix = local.message.content.startsWith(`<@${self.user.id}>`)?`<@${self.user.id}>`:local.message.content.startsWith(`<@!${self.user.id}>`)?`<@!${self.user.id}>`:local.gConfig.prefix;
@@ -64,7 +68,9 @@ module.exports = (async(self,message)=>{
 		
 		if(local.guild.id == "400284026885373962") {
 			if(self.config.customCommands.includes(local.command)) {
-				console.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Command  "${local.command}" ran with arguments "${local.args.join(" ")}" by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
+				self.stats.commandTotalsSinceStart++;
+				self.stats.commandTotalsSinceLastPost++;
+				self.logger.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Command  "${local.command}" ran with arguments "${local.args.join(" ")}" by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
 			
 			switch(local.command) {
 				case "updates":
@@ -85,19 +91,21 @@ module.exports = (async(self,message)=>{
 
 		if(local.message.content.toLowerCase() == "whatismyprefix") {
 			if(self.commandTimeout.whatismyprefix.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
-				console.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${message.author.tag} (${message.author.id}) on response "whatismyprefix" in guild ${message.guild.name} (${message.guild.id})`);
+				self.logger.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${message.author.tag} (${message.author.id}) on response "whatismyprefix" in guild ${message.guild.name} (${message.guild.id})`);
 				return message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(self.config.commandList.response.whatismyprefix.cooldown)} before using this again!`);
 			}
 				self.commandTimeout.whatismyprefix.add(local.author.id);
 				setTimeout(() => {self.commandTimeout.whatismyprefix.delete(local.author.id);}, self.config.commandList.response.whatismyprefix.cooldown);
 			// whatismyprefix autoresponse stats
-			console.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Response of "whatismyprefix" triggered by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
+			self.logger.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Response of "whatismyprefix" triggered by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
+			self.stats.commandTotalsSinceStart++;
+			self.stats.commandTotalsSinceLastPost++;
 			return local.message.reply(`this guilds prefix is **${local.gConfig.prefix}**`);
 		}
 		if(["f","rip"].includes(local.message.content.toLowerCase()) && local.gConfig.fResponseEnabled) {
 			//if(self.gConfig.fResponseEnabled) {
 				if(self.commandTimeout.f.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
-					console.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on response "f" in guild ${local.guild.name} (${local.guild.id})`);
+					self.logger.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on response "f" in guild ${local.guild.name} (${local.guild.id})`);
 					return message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(self.config.commandList.response.f.cooldown)} before using this again!`);
 				}
 				self.commandTimeout.f.add(message.author.id);
@@ -105,7 +113,9 @@ module.exports = (async(self,message)=>{
 				// f autoresponse stats
 				var f = await self.r.table("stats").get("fCount");
 				self.r.table("stats").get("fCount").update({count:parseInt(f.count)+1}).run();
-				console.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Response of "f" triggered by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
+				self.logger.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Response of "f" triggered by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
+				self.stats.commandTotalsSinceStart++;
+				self.stats.commandTotalsSinceLastPost++;
 				return local.channel.send(`<@!${local.author.id}> has paid respects.\n\nRespects paid total: ${parseInt(f.count)+1}`);
 			//}
 		}
@@ -116,7 +126,7 @@ module.exports = (async(self,message)=>{
 			}
 		}catch(e){
 			local.message.reply(`Error while running command: ${e}`);
-			return console.error(`[${event}Event][Guild: ${local.guild.id}]: Command error:\n\tCommand: ${local.command}\n\tSupplied arguments: ${self.args.join(' ')}\n\tServer ID: ${local.guild.id}\n\t${e.stack}`);
+			return self.logger.error(`[${event}Event][Guild: ${local.guild.id}]: Command error:\n\tCommand: ${local.command}\n\tSupplied arguments: ${self.args.join(' ')}\n\tServer ID: ${local.guild.id}\n\t${e.stack}`);
 		}
 		if(!local.message.content.startsWith(local.prefix)) return;
 		if(!self.config.commandList.all.includes(local.command)) return;
@@ -146,7 +156,7 @@ module.exports = (async(self,message)=>{
 				};
 				Object.assign(data, self.embed_defaults);
 				var embed = new self.MessageEmbed(data);
-				console.debug(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: User ${local.author.tag} (${local.author.id}) is missing the permission(s) ${neededPerms} to run the command ${local.command} in guild ${local.guild.name} (${local.guild.id})`);
+				self.logger.debug(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: User ${local.author.tag} (${local.author.id}) is missing the permission(s) ${neededPerms} to run the command ${local.command} in guild ${local.guild.name} (${local.guild.id})`);
 				return local.channel.send(embed);
 			}
 		}
@@ -237,11 +247,13 @@ module.exports = (async(self,message)=>{
 			local.c = local.cmd[Math.floor(Math.random()*local.cmd.length)];
 		}
 		try {
+		self.stats.commandTotalsSinceStart++;
+		self.stats.commandTotalsSinceLastPost++;
 		switch(isAlias) {
 			case true:
 				//alias
 				if(self.commandTimeout[command.aliasof].has(local.author.id) && !self.config.developers.includes(local.author.id)) {
-					console.log(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on command alias "${local.command}" (aliasof: ${command.aliasof}) in guild ${local.guild.name} (${local.guild.id})`);
+					self.logger.log(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on command alias "${local.command}" (aliasof: ${command.aliasof}) in guild ${local.guild.name} (${local.guild.id})`);
 					return local.message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(command.cooldown)} before using this command again!`);
 					}
 				self.commandTimeout[command.aliasof].add(local.author.id);
@@ -262,14 +274,14 @@ module.exports = (async(self,message)=>{
 					filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 				});
 				
-				console.commandlog(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: Command Alias "${local.command}" (aliasof: ${command.aliasof}) ran with arguments "${local.args.join(" ")}" by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
+				self.logger.commandlog(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: Command Alias "${local.command}" (aliasof: ${command.aliasof}) ran with arguments "${local.args.join(" ")}" by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
 				var c = await require(`${process.cwd()}/commands/${command.category}/${command.aliasof}-cmd.js`)(self,local);
 				if(c instanceof Error) throw c;
 				break;
 				
 			default:
 				if(self.commandTimeout[local.command].has(local.author.id) && !self.config.developers.includes(local.author.id)) {
-					console.log(`Command timeout encountered by user ${local.author.tag} (${local.author.id}) on command "${local.command}" in guild ${local.guild.name} (${local.guild.id})`);
+					self.logger.log(`Command timeout encountered by user ${local.author.tag} (${local.author.id}) on command "${local.command}" in guild ${local.guild.name} (${local.guild.id})`);
 					return local.message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(command.cooldown)} before using this command again!`);
 				}
 				self.commandTimeout[local.command].add(local.author.id);
@@ -288,7 +300,7 @@ module.exports = (async(self,message)=>{
 					displayName: local.member.displayName,
 					filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 				});
-				console.commandlog(`Command  "${local.command}" ran with arguments "${local.args.join(" ")}" by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
+				self.logger.commandlog(`Command  "${local.command}" ran with arguments "${local.args.join(" ")}" by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
 				var c=await require(`${process.cwd()}/commands/${command.category}/${local.command}-cmd.js`)(self,local);
 				if(c instanceof Error) throw c;
 		}
@@ -350,7 +362,7 @@ module.exports = (async(self,message)=>{
 				level: "e1",
 				filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 			});
-			console.error(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}][CommandHandler] e1: ${e.stack}`);
+			self.logger.error(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}][CommandHandler] e1: ${e.stack}`);
 		}
 	}
 	}catch(e){
@@ -367,7 +379,7 @@ module.exports = (async(self,message)=>{
 			level: "e2",
 			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 		});
-		console.error(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}][CommandHandler] e2: ${e.stack}`);
+		self.logger.error(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}][CommandHandler] e2: ${e.stack}`);
 		//message.reply(`Error while running command: ${e}`);
 		//return self.error(`[messageEvent][Guild: ${message.guild.id}]: Command error:\n\tCommand: ${command}\n\tSupplied arguments: ${args.length==0?"none":args.join(" ")}\n\tServer ID: ${message.guild.id}\n\t${e.stack}`);
     }
