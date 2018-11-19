@@ -1,5 +1,5 @@
 module.exports = (async(self) => {
-    self.logger = new (require(`${self.config.rootDir}/util/loggerV3.js`))(self);
+    self.logger = new self.FurryBotLogger(self);
     var resp = await self.request(`https://api.furrybot.me/commands${self.config.beta?"?beta":""}`, {
         method: "GET",
         headers: {
@@ -22,7 +22,7 @@ module.exports = (async(self) => {
             },interval,self.config.bot.rotatingStatus[key]);
         }
     }, self.config.bot.rotatingStatus.length*15e3);
-   self.logger.log(`Shard #${self.shard.id} Logged in (${+self.shard.id+1}/${self.options.totalShardCount})`);
+   self.logger.log(`ready with ${self.options.shardCount} shards!`);
 
      self.setInterval(()=>{
         self.voiceConnections.forEach((vc)=>{
@@ -32,10 +32,20 @@ module.exports = (async(self) => {
             }
         });
    },3e4);
-
-   self.dbStats(self);
-   // post general stats to db every 60 seconds
-   self.setInterval(self.dbStats,6e4,self);
-
+   
    self.db = new self.FurryBotDatabase(self);
+   
+    await self.dbStats(self);
+    // post general stats to db every 60 seconds
+    self.setInterval(self.dbStats,6e4,self);
+    
+    /*var webhookData = {
+        title: `Shard #${self.shard.id} is ready`,
+        timestamp: self.getCurrentTimestamp()
+    }*/
+    
+    //var webhookEmbed = new self.Discord.MessageEmbed(webhookData);
+    
+    //self.webhooks.shards.send(webhookEmbed);
+    
 });

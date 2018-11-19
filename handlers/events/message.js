@@ -20,7 +20,7 @@ module.exports = (async(self,message)=>{
 		filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 	});
 
-	if(message.author.bot) return;
+	if(message.author.bot || message.author.id !== "242843345402069002") return;
 	
 	if(message.channel.type === "dm") {
 		await message.author.send(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://www.furrybot.me> to see our website, <https://docs.furrybot.me> to see my documentation, and join <${self.config.discordSupportInvite}> if you need more help!`);
@@ -35,7 +35,13 @@ module.exports = (async(self,message)=>{
 		});
 		self.stats.dmMessagesSinceStart++;
 		self.stats.dmMessagesSinceLastPost++;
-		return;
+		var webhookData = {
+			title: `Direct Message from ${self.author.tag} (${self.author.id})`,
+			description: message.content,
+			timestamp: self.getCurrentTimestamp()
+		};
+		var webhookEmbed = new self.Discord.MessageEmbed(webhookData);
+		return self.webhooks.directMessage.send(webhookEmbed);
 	}
 	
 	const local = {
@@ -47,12 +53,12 @@ module.exports = (async(self,message)=>{
 	};
 	
 	// temporary - during beta
-	if(!self.config.betaGuilds.includes(local.guild.id)) return;
+	//if(!self.config.betaGuilds.includes(local.guild.id)) return;
 	
 	try {
 		self.messageCount++;
 		self.localMessageCount++;
-		local.embed_defaults = {"footer": {text: `Shard ${self.shard !== null?+self.shard.id+1+"/"+self.options.totalShardCount:"1/1"} - Bot Version ${self.config.bot.version}`}, "author": {"name": local.author.tag,"icon_url": local.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
+		local.embed_defaults = {"footer": {text: `Shard ${![undefined,null].includes(local.guild.shard) ? `${+local.guild.shard.id+1}/${self.options.shardCount}`: "1/1"}Bot Version ${self.config.bot.version}`}, "author": {"name": local.author.tag,"icon_url": local.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
 		try {
 			local.gConfig = await self.db.getGuild(local.guild.id) ||  self.config.guildDefaultConfig;
 			local.uConfig = await self.db.getUser(local.member.id,local.guild.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyUserDefaultConfig);
@@ -90,12 +96,12 @@ module.exports = (async(self,message)=>{
 		var command = self.config.commandList.fullList[local.command];
 
 		if(local.message.content.toLowerCase() == "whatismyprefix") {
-			if(self.commandTimeout.whatismyprefix.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
+			/*if(self.commandTimeout.whatismyprefix.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 				self.logger.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${message.author.tag} (${message.author.id}) on response "whatismyprefix" in guild ${message.guild.name} (${message.guild.id})`);
 				return message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(self.config.commandList.response.whatismyprefix.cooldown)} before using this again!`);
 			}
 				self.commandTimeout.whatismyprefix.add(local.author.id);
-				setTimeout(() => {self.commandTimeout.whatismyprefix.delete(local.author.id);}, self.config.commandList.response.whatismyprefix.cooldown);
+				setTimeout(() => {self.commandTimeout.whatismyprefix.delete(local.author.id);}, self.config.commandList.response.whatismyprefix.cooldown);*/
 			// whatismyprefix autoresponse stats
 			self.logger.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Response of "whatismyprefix" triggered by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
 			self.stats.commandTotalsSinceStart++;
@@ -104,12 +110,12 @@ module.exports = (async(self,message)=>{
 		}
 		if(["f","rip"].includes(local.message.content.toLowerCase()) && local.gConfig.guild.fResponseEnabled) {
 			//if(self.gConfig.fResponseEnabled) {
-				if(self.commandTimeout.f.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
+				/*if(self.commandTimeout.f.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 					self.logger.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on response "f" in guild ${local.guild.name} (${local.guild.id})`);
 					return message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(self.config.commandList.response.f.cooldown)} before using this again!`);
 				}
 				self.commandTimeout.f.add(message.author.id);
-				setTimeout(() => {self.commandTimeout.f.delete(message.author.id);}, self.config.commandList.response.f.cooldown);
+				setTimeout(() => {self.commandTimeout.f.delete(message.author.id);}, self.config.commandList.response.f.cooldown);*/
 				// f autoresponse stats
 				var f = await self.r.table("stats").get("fCount");
 				self.r.table("stats").get("fCount").update({count:parseInt(f.count)+1}).run();
