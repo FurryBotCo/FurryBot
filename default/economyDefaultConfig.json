@@ -1,7 +1,7 @@
 {
     "economyEnabled": false,
     "currencyName" : "RecBucks",
-    "currencyEmoji": ":paws:",
+    "currencyEmoji": ":feet:",
     "robbing": {
         "min": 1,
         "max": 10,
