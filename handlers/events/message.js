@@ -20,7 +20,7 @@ module.exports = (async(self,message)=>{
 		filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 	});
 
-	if(message.author.bot || message.author.id !== "242843345402069002") return;
+	if(message.author.bot || (self.config.devOnly && !self.config.developers.includes(message.author.id))) return;
 	
 	if(message.channel.type === "dm") {
 		await message.author.send(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://www.furrybot.me> to see our website, <https://docs.furrybot.me> to see my documentation, and join <${self.config.discordSupportInvite}> if you need more help!`);
@@ -367,7 +367,7 @@ module.exports = (async(self,message)=>{
 				level: "e1",
 				filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 			});
-			self.logger.error(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}][CommandHandler] e1: ${e.stack}`);
+			self.logger.error(`[CommandHandler] e1: ${self.util.inspect(e,{depth:null,colors:true})}`);
 		}
 	}
 	}catch(e){
@@ -384,7 +384,7 @@ module.exports = (async(self,message)=>{
 			level: "e2",
 			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 		});
-		self.logger.error(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}][CommandHandler] e2: ${e.stack}`);
+		self.logger.error(`[CommandHandler] e2: ${self.util.inspect(e,{depth:null,colors:true})}`);
 		//message.reply(`Error while running command: ${e}`);
 		//return self.error(`[messageEvent][Guild: ${message.guild.id}]: Command error:\n\tCommand: ${command}\n\tSupplied arguments: ${args.length==0?"none":args.join(" ")}\n\tServer ID: ${message.guild.id}\n\t${e.stack}`);
     }
