@@ -54,14 +54,14 @@ module.exports = (async(self,message)=>{
 		self.localMessageCount++;
 		local.embed_defaults = {"footer": {text: `Shard ${self.shard !== null?+self.shard.id+1+"/"+self.options.totalShardCount:"1/1"} - Bot Version ${self.config.bot.version}`}, "author": {"name": local.author.tag,"icon_url": local.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
 		try {
-			local.gConfig = await self.db.getGuild(message.guild.id) ||  self.config.guildDefaultConfig;
-			local.uConfig = await self.db.getUser(local.member.id,local.guild.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyDefaultConfig);
-			if(self.config.beta) local.gConfig.prefix = "fb!";
+			local.gConfig = await self.db.getGuild(local.guild.id) ||  self.config.guildDefaultConfig;
+			local.uConfig = await self.db.getUser(local.member.id,local.guild.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyUserDefaultConfig);
+			if(self.config.beta) local.gConfig.guild.prefix = "fb!";
 		}catch(e){
 			self.logger.error(e);
 			return;
 		}
-		local.prefix = local.message.content.startsWith(`<@${self.user.id}>`)?`<@${self.user.id}>`:local.message.content.startsWith(`<@!${self.user.id}>`)?`<@!${self.user.id}>`:local.gConfig.prefix;
+		local.prefix = local.message.content.startsWith(`<@${self.user.id}>`)?`<@${self.user.id}>`:local.message.content.startsWith(`<@!${self.user.id}>`)?`<@!${self.user.id}>`:local.gConfig.guild.prefix;
 		local.args = local.message.content.slice(local.prefix.length).trim().split(/\s+/g);
 		local.command = local.args.shift().toLowerCase();
 			
@@ -100,9 +100,9 @@ module.exports = (async(self,message)=>{
 			self.logger.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Response of "whatismyprefix" triggered by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
 			self.stats.commandTotalsSinceStart++;
 			self.stats.commandTotalsSinceLastPost++;
-			return local.message.reply(`this guilds prefix is **${local.gConfig.prefix}**`);
+			return local.message.reply(`this guilds prefix is **${local.gConfig.guild.prefix}**`);
 		}
-		if(["f","rip"].includes(local.message.content.toLowerCase()) && local.gConfig.fResponseEnabled) {
+		if(["f","rip"].includes(local.message.content.toLowerCase()) && local.gConfig.guild.fResponseEnabled) {
 			//if(self.gConfig.fResponseEnabled) {
 				if(self.commandTimeout.f.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 					self.logger.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on response "f" in guild ${local.guild.name} (${local.guild.id})`);
@@ -130,7 +130,7 @@ module.exports = (async(self,message)=>{
 		}
 		if(!local.message.content.startsWith(local.prefix)) return;
 		if(!self.config.commandList.all.includes(local.command)) return;
-		if(local.gConfig.deleteCmds) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
+		if(local.gConfig.guild.deleteCmds) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
 		if(command.userPermissions.length > 0) {
 			if(command.userPermissions.some(perm => !local.channel.permissionsFor(local.member).has(perm,true))) {
 				var neededPerms = command.userPermissions.filter(perm => !local.channel.permissionsFor(local.member).has(perm,true));
@@ -216,10 +216,10 @@ module.exports = (async(self,message)=>{
 				return local.channel.send(embed);
 			}
 
-			if(!local.gConfig.nsfwModuleEnabled) {
+			if(!local.gConfig.guild.nsfwModuleEnabled) {
 				var data = {
 					"title": "NSFW commands are not enabled",
-					"description": `NSFW commands are not enabled in this server, ask a staff member to run the command \`${local.gConfig.prefix}togglensfw\` to enable NSFW commands!`
+					"description": `NSFW commands are not enabled in this server, ask a staff member to run the command \`${local.gConfig.guild.prefix}togglensfw\` to enable NSFW commands!`
 				};
 				
 				Object.assign(data, local.embed_defaults);
@@ -241,9 +241,8 @@ module.exports = (async(self,message)=>{
 			}
 		}
 		var isAlias = command.alias == "true";
-
-		if(Object.keys(self.lang[local.gConfig.locale]).includes(local.command)) {
-			local.cmd = self.lang[local.gConfig.locale][local.command];
+		if(Object.keys(self.lang[local.gConfig.guild.locale]).includes(local.command)) {
+			local.cmd = self.lang[local.gConfig.guild.locale][local.command];
 			local.c = local.cmd[Math.floor(Math.random()*local.cmd.length)];
 		}
 		try {

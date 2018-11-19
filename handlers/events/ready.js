@@ -36,4 +36,6 @@ module.exports = (async(self) => {
    self.dbStats(self);
    // post general stats to db every 60 seconds
    self.setInterval(self.dbStats,6e4,self);
+
+   self.db = new self.FurryBotDatabase(self);
 });

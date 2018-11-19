@@ -38,7 +38,7 @@ class FurryBot extends Discord.Client {
 		});
     	this.fs = require("fs");
     	this.r = require("rethinkdbdash")(this.config.db);
-		this.db = require(`${process.cwd()}/util/dbFunctions`)(this);
+		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
 		this.commandTimeout = {};
 		this.varParse = require(`${process.cwd()}/util/varHandler`);
 		this.lang = require(`${process.cwd()}/lang`)(this);
@@ -52,7 +52,7 @@ class FurryBot extends Discord.Client {
 		this.yiffNoticeViewed = new Set();
 		this._ = require("lodash");
 		const perf = require("perf_hooks");
-		this.dbStats = require(`${self.config.rootDir}/util/dbStats`);
+		this.dbStats = require(`${this.config.rootDir}/util/dbStats`);
    		this.performance = perf.performance;
 		this.PerformanceObserver = perf.PerformanceObserver;
 		this.imageAPIRequest = (async(safe=true,category=null,json=true,filetype=null)=>{
@@ -361,3 +361,13 @@ process.on("SIGINT", async () => {
 	self.logger.log("Terminated client");
 	process.kill(process.pid, 'SIGTERM' );
 });
+
+/*process.on('unhandledRejection', (reason, p) => {
+	if(this.logger !== undefined) {
+		var t = p instanceof Object ? this.util.inspect(p,{depth:null,color:true}) : p;
+		this.logger.log(`Unhandled Rejection at: Promise ${t}, reason: ${reason}`);
+	} else {
+		var t = p instanceof Object ? require("util").inspect(p,{depth:null,color:true}) : p;
+		console.error(`Unhandled Rejection at: Promise ${t}, reason: ${reason}`);
+	}*
+  });*/
