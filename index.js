@@ -370,12 +370,10 @@ process.on("SIGINT", async () => {
 	process.kill(process.pid, 'SIGTERM' );
 });
 
-/*process.on('unhandledRejection', (reason, p) => {
-	if(this.logger !== undefined) {
-		var t = p instanceof Object ? this.util.inspect(p,{depth:null,color:true}) : p;
-		this.logger.log(`Unhandled Rejection at: Promise ${t}, reason: ${reason}`);
+process.on('unhandledRejection', (reason, p) => {
+	if(client.logger !== undefined) {
+		client.logger.log(`Unhandled Rejection at: Promise ${p}, reason: ${reason}`);
 	} else {
-		var t = p instanceof Object ? require("util").inspect(p,{depth:null,color:true}) : p;
-		console.error(`Unhandled Rejection at: Promise ${t}, reason: ${reason}`);
-	}*
-  });*/
+		console.error(`Unhandled Rejection at: Promise ${p}, reason: ${reason}`);
+	}
+  });
