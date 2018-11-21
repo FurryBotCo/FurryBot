@@ -1,9 +1,8 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
-	
+	local.channel.startTyping();
 	var image = await self.fsn.readFile(`${process.cwd()}/images/deersteak.png`);
 	await self.download(`https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png`,`${config.rootDir}/tmp/${message.author.id}.png`);
-	var profile = await self.fsn.readFile(`${process.cwd()}/tmp/${self.author.id}.png`);
+	var profile = await self.fsn.readFile(`${process.cwd()}/tmp/${local.author.id}.png`);
 	
 	var d = new Date();
 	var time = d.getHours() < 10?d.getMinutes() < 10?`0${d.getHours()}:0${d.getMinutes()}`:`0${d.getHours()}:${d.getMinutes()}`:`${d.getHours()}:${d.getMinutes()}`
@@ -21,7 +20,8 @@ module.exports = (async (self,local) => {
 		.addText(message.member.displayName, 77, 33)
         .toBufferAsync();
 		
-	var attachment = new self.MessageAttachment(i);
+	var attachment = new local.messageAttachment(i);
 	
-	return self.channel.send(`Here you go!\n(This is an inside joke from ${self.users.fetch("185938944460980224").tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
+	local.channel.send(`Here you go!\n(This is an inside joke from ${self.users.fetch("185938944460980224").tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
+	return local.channel.stopTyping();
 });

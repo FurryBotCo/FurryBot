@@ -1,5 +1,5 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
-	
-	return self.message.reply(`Your balance is ${self.uConfig.bal}.`);
+	local.channel.startTyping();
+	local.message.reply(`Your balance is ${self.uConfig.bal}.`);
+	return local.channel.stopTyping();
 });

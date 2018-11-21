@@ -1,13 +1,18 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
-
-	var xhr = new self.XMLHttpRequest();
-	xhr.open("GET","https://api.bunnies.io/v2/loop/random/?media=gif", false);
-	
-	xhr.send();
-	
-	var response = JSON.parse(xhr.responseText);
-	
-	var attachment = new self.MessageAttachment(response.media.gif,`${response.id}.gif`);
-	return self.channel.send(attachment);
+	local.channel.startTyping();
+	try {
+		var req = await self.request("https://api.bunnies.io/v2/loop/random/?media=gif",{
+		method: "GET",
+		headers: {
+			"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+		}
+	});
+	var response = JSON.parse(req.body);
+	var attachment = new self.Discord.MessageAttachment(response.media.gif,`${response.id}.gif`);
+	}catch(e){
+		console.log(e);
+		var attachment = new self.Discord.messageAttachment("https://i.imgur.com/p4zFqH3.png");
+	}
+	local.channel.send(attachment);
+	return local.channel.stopTyping();
 });

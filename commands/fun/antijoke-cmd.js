@@ -1,6 +1,6 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
-	return self.message.reply("Command temporarily disabled.");
+	local.channel.startTyping();
+	local.message.reply("Command temporarily disabled.");
 	/*var xhr = new self.XMLHttpRequest();
 	xhr.open("GET", "https://api.furrybot.me/antijokes/", false);
 
@@ -17,8 +17,8 @@ module.exports = (async (self,local) => {
 		]
 	  };
 	Object.assign(data, embed_defaults);
-	var embed = new self.MessageEmbed(data);
-	var m = await self.channel.send(embed);
+	var embed = new local.messageEmbed(data);
+	var m = await local.channel.send(embed);
 	var data2={
 	 "title": "Here's an anti-joke for you",
 		"description": `Posted by ${j.poster}`,
@@ -34,6 +34,7 @@ module.exports = (async (self,local) => {
 		]
 	  };
 	Object.assign(data2, self.embed_defaults);
-	var embed2 = new self.MessageEmbed(data2);
+	var embed2 = new local.messageEmbed(data2);
 	setTimeout((msg,e2)=>{msg.edit(e2);}, 7000,m,embed2);*/
+	return local.channel.stopTyping();
 });

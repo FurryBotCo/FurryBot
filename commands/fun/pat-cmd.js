@@ -1,14 +1,11 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
-	if(!self.args[0]) {
-		return new Error("ERR_INVALID_USAGE");
-	}
+	if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
-	var input = self.args.join(" ");
-	var text = self.varParse(self.c,{author:self.author,input:input});
-	self.channel.send(text);
+	var input = local.args.join(" ");
+	var text = self.varParse(local.c,{author:local.author,input:input});
+	local.channel.send(text);
 	
-	if(!self.gConfig.deleteCmds) {
-		self.message.delete().catch(noerr => {});
+	if(!local.gConfig.deleteCmds) {
+		local.message.delete().catch(noerr => {});
 	}
 });

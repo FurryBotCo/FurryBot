@@ -1,5 +1,5 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
+	local.channel.startTyping();
 	var userCount=0;
 	self.guilds.forEach((guild) => {
 		userCount+=guild.memberCount;
@@ -17,9 +17,6 @@ module.exports = (async (self,local) => {
 	}
 	var data = {
 		"title": "Bot Info!",
-		"image": {
-			"url": self.channel.guild.iconURL()
-		},
 		"fields": [
 			{
 				name: "Process Memory Usage",
@@ -89,7 +86,8 @@ module.exports = (async (self,local) => {
 			  }
 			]
 		};
-	Object.assign(data, self.embed_defaults);
+	Object.assign(data, local.embed_defaults);
 	var embed = new self.Discord.MessageEmbed(data);
-	return self.channel.send(embed);
+	local.channel.send(embed);
+	return local.channel.stopTyping();
 });

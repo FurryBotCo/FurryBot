@@ -49,7 +49,8 @@ module.exports = (async(self,message)=>{
 		author: message.author,
 		member: message.member,
 		guild: message.guild,
-		channel: message.channel
+		channel: message.channel,
+		user: await self.resolveUser(message.member)
 	};
 	
 	// temporary - during beta
@@ -58,16 +59,16 @@ module.exports = (async(self,message)=>{
 	try {
 		self.messageCount++;
 		self.localMessageCount++;
-		local.embed_defaults = {"footer": {text: `Shard ${![undefined,null].includes(local.guild.shard) ? `${+local.guild.shard.id+1}/${self.options.shardCount}`: "1/1"}Bot Version ${self.config.bot.version}`}, "author": {"name": local.author.tag,"icon_url": local.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
+		local.embed_defaults = {"footer": {text: `Shard ${![undefined,null].includes(local.guild.shard) ? `${+local.guild.shard.id+1}/${self.options.shardCount}`: "1/1"} | Bot Version ${self.config.bot.version}`}, "author": {"name": local.author.tag,"icon_url": local.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
 		try {
 			local.gConfig = await self.db.getGuild(local.guild.id) ||  self.config.guildDefaultConfig;
 			local.uConfig = await self.db.getUser(local.member.id,local.guild.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyUserDefaultConfig);
-			if(self.config.beta) local.gConfig.guild.prefix = "fb!";
+			if(self.config.beta) local.gConfig.prefix = "fb!";
 		}catch(e){
 			self.logger.error(e);
 			return;
 		}
-		local.prefix = local.message.content.startsWith(`<@${self.user.id}>`)?`<@${self.user.id}>`:local.message.content.startsWith(`<@!${self.user.id}>`)?`<@!${self.user.id}>`:local.gConfig.guild.prefix;
+		local.prefix = local.message.content.startsWith(`<@${self.user.id}>`)?`<@${self.user.id}>`:local.message.content.startsWith(`<@!${self.user.id}>`)?`<@!${self.user.id}>`:local.gConfig.prefix;
 		local.args = local.message.content.slice(local.prefix.length).trim().split(/\s+/g);
 		local.command = local.args.shift().toLowerCase();
 			
@@ -106,9 +107,9 @@ module.exports = (async(self,message)=>{
 			self.logger.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Response of "whatismyprefix" triggered by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
 			self.stats.commandTotalsSinceStart++;
 			self.stats.commandTotalsSinceLastPost++;
-			return local.message.reply(`this guilds prefix is **${local.gConfig.guild.prefix}**`);
+			return local.message.reply(`this guilds prefix is **${local.gConfig.prefix}**`);
 		}
-		if(["f","rip"].includes(local.message.content.toLowerCase()) && local.gConfig.guild.fResponseEnabled) {
+		if(["f","rip"].includes(local.message.content.toLowerCase()) && local.gConfig.fResponseEnabled) {
 			//if(self.gConfig.fResponseEnabled) {
 				/*if(self.commandTimeout.f.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 					self.logger.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on response "f" in guild ${local.guild.name} (${local.guild.id})`);
@@ -127,8 +128,21 @@ module.exports = (async(self,message)=>{
 		}
 		try {
 			if(local.message.content === `<@${self.user.id}>` || local.message.content === `<@!${self.user.id}>`) {
-				var c = await require(`${process.cwd()}/commands/${self.config.commandList.fullList["help"].category}/help-cmd.js`)(self,local);
-				if(c instanceof Error) throw c;
+				/*var c = await require(`${process.cwd()}/commands/${self.config.commandList.fullList["help"].category}/help-cmd.js`)(self,local);
+				if(c instanceof Error) throw c;*/
+				var data = {
+					title: "Hewwo!",
+					description: `You can find out how to use me on my [docs page](https://docs.furrybot.me), my current prefix here is: **${local.gConfig.prefix}**\n(this can be chanegd via \`${local.gConfig.prefix}prefix <newprefix>\`)`
+				}
+				Object.assign(data,local.embed_defaults);
+				var embed = new self.Discord.MessageEmbed(data);
+				if(!local.channel.permissionsFor(self.user).has("SEND_MESSAGES")) {
+					local.author.send("I couldn't send messages in the channel where I was mentioned, so I sent this directly to you!",embed).catch(noerr=>null);
+				} else if(!local.channel.permissionsFor(self.user).has("EMBED_LINKS")) {
+					return local.channel.send(`${embed.title}\n${embed.description}\n(If you give me permission to embed links this would look a lot nicer)`);
+				} else {
+					return local.channel.send(embed);
+				}
 			}
 		}catch(e){
 			local.message.reply(`Error while running command: ${e}`);
@@ -136,7 +150,7 @@ module.exports = (async(self,message)=>{
 		}
 		if(!local.message.content.startsWith(local.prefix)) return;
 		if(!self.config.commandList.all.includes(local.command)) return;
-		if(local.gConfig.guild.deleteCmds) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
+		if(local.gConfig.deleteCmds) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
 		if(command.userPermissions.length > 0) {
 			if(command.userPermissions.some(perm => !local.channel.permissionsFor(local.member).has(perm,true))) {
 				var neededPerms = command.userPermissions.filter(perm => !local.channel.permissionsFor(local.member).has(perm,true));
@@ -160,8 +174,8 @@ module.exports = (async(self,message)=>{
 						"title": "You Don't have permission to do this!",
 						"description": `You require the permission(s) **${neededPerms}** to run this command!`
 				};
-				Object.assign(data, self.embed_defaults);
-				var embed = new self.MessageEmbed(data);
+				Object.assign(data, local.embed_defaults);
+				var embed = new self.Discord.MessageEmbed(data);
 				self.logger.debug(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: User ${local.author.tag} (${local.author.id}) is missing the permission(s) ${neededPerms} to run the command ${local.command} in guild ${local.guild.name} (${local.guild.id})`);
 				return local.channel.send(embed);
 			}
@@ -189,8 +203,8 @@ module.exports = (async(self,message)=>{
 					"title": "I don't have the required permissions!",
 					"description": `I require the permission(s) **${neededPerms}** to run this command!`
 				};
-				Object.assign(data, self.embed_defaults);
-				var embed = new self.MessageEmbed(data);
+				Object.assign(data, local.embed_defaults);
+				var embed = new self.Discord.MessageEmbed(data);
 				self.debug(`I am missing the permission(s) ${neededPerms} to run the command ${local.command} in guild ${local.guild.name} (${local.guild.id})`);
 				return local.channel.send(embed);
 			}
@@ -222,10 +236,10 @@ module.exports = (async(self,message)=>{
 				return local.channel.send(embed);
 			}
 
-			if(!local.gConfig.guild.nsfwModuleEnabled) {
+			if(!local.gConfig.nsfwModuleEnabled) {
 				var data = {
 					"title": "NSFW commands are not enabled",
-					"description": `NSFW commands are not enabled in this server, ask a staff member to run the command \`${local.gConfig.guild.prefix}togglensfw\` to enable NSFW commands!`
+					"description": `NSFW commands are not enabled in this server, ask a staff member to run the command \`${local.gConfig.prefix}togglensfw\` to enable NSFW commands!`
 				};
 				
 				Object.assign(data, local.embed_defaults);
@@ -247,8 +261,8 @@ module.exports = (async(self,message)=>{
 			}
 		}
 		var isAlias = command.alias == "true";
-		if(Object.keys(self.lang[local.gConfig.guild.locale]).includes(local.command)) {
-			local.cmd = self.lang[local.gConfig.guild.locale][local.command];
+		if(Object.keys(self.lang[local.gConfig.locale]).includes(local.command)) {
+			local.cmd = self.lang[local.gConfig.locale][local.command];
 			local.c = local.cmd[Math.floor(Math.random()*local.cmd.length)];
 		}
 		try {
@@ -311,21 +325,20 @@ module.exports = (async(self,message)=>{
 		}
 	}catch(e){
 		if(e.message === "ERR_INVALID_USAGE") {
-			if(typeof local !== "undefined") Object.assign(self,local);
-			var isAlias = self.config.commandList.fullList[self.command].alias;
-			var cmd = isAlias?self.config.commandList.fullList[self.command].aliasof:self.command;
-			var command = self.config.commandList.fullList[self.command];
-			self.mixpanel.track(`commands.${self.command}.invalidUsage`, {
-				distinct_id: self.author.id,
+			var isAlias = self.config.commandList.fullList[local.command].alias;
+			var cmd = isAlias?self.config.commandList.fullList[local.command].aliasof:local.command;
+			var command = self.config.commandList.fullList[local.command];
+			self.mixpanel.track(`commands.${local.command}.invalidUsage`, {
+				distinct_id: local.author.id,
 				timestamp: new Date().toISOString(),
-				args: self.args.join(" "),
-				message: self.message.id,
-				guild: self.guild.id,
-				userId:self.author.id,
-				username: self.author.username,
-				discriminator: self.author.discriminator,
-				tag: self.author.tag,
-				displayName: self.member.displayName,
+				args: local.args.join(" "),
+				message: local.message.id,
+				guild: local.guild.id,
+				userId:local.author.id,
+				username: local.author.username,
+				discriminator: local.author.discriminator,
+				tag: local.author.tag,
+				displayName: local.member.displayName,
 				filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 			});
 			var data = {
@@ -337,7 +350,7 @@ module.exports = (async(self,message)=>{
 						inline: false
 					},{
 						name: "Usage",
-						value: `${self.gConfig.prefix}${command.usage}`,
+						value: `${local.gConfig.prefix}${command.usage}`,
 						inline: false
 					},{
 						name: "Description",
@@ -345,46 +358,44 @@ module.exports = (async(self,message)=>{
 						inline: false
 					},{
 						name: "Arguments Provided",
-						value: self.args.join(" ")||"NONE",
+						value: local.args.join(" ")||"NONE",
 						inline: false
 					}
 				]
 			};
-			Object.assign(data, self.embed_defaults);
+			Object.assign(data, local.embed_defaults);
 			var embed = new self.Discord.MessageEmbed(data);
-			return self.channel.send(embed);
+			return local.channel.send(embed);
 		} else {
-			if(typeof local !== "undefined") Object.assign(self,local);
 			self.mixpanel.track(`bot.error`,{
-				distinct_id: self.author.id,
+				distinct_id: local.author.id,
 				timestamp: new Date().toISOString(),
-				command: self.command,
-				messageId: self.message.id,
-				message: self.message.content,
+				command: local.command,
+				messageId: local.message.id,
+				message: local.message.content,
 				error: e,
 				errorMessage: e.message,
 				errorStack: e.stack,
 				level: "e1",
 				filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 			});
-			self.logger.error(`[CommandHandler] e1: ${self.util.inspect(e,{depth:null,colors:true})}`);
+			self.logger.error(`[CommandHandler] e1: ${e}`);
 		}
 	}
 	}catch(e){
-		if(typeof local !== "undefined") Object.assign(self,local);
 		self.mixpanel.track(`bot.error`,{
-			distinct_id: self.author.id,
+			distinct_id: local.author.id,
 			timestamp: new Date().toISOString(),
-			command: self.command,
-			messageContent: self.message.id,
-			message: self.message.content,
+			command: local.command,
+			messageContent: local.message.id,
+			message: local.message.content,
 			error: e,
 			errorMessage: e.message,
 			errorStack: e.stack,
 			level: "e2",
 			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 		});
-		self.logger.error(`[CommandHandler] e2: ${self.util.inspect(e,{depth:null,colors:true})}`);
+		self.logger.error(`[CommandHandler] e2: ${e}`);
 		//message.reply(`Error while running command: ${e}`);
 		//return self.error(`[messageEvent][Guild: ${message.guild.id}]: Command error:\n\tCommand: ${command}\n\tSupplied arguments: ${args.length==0?"none":args.join(" ")}\n\tServer ID: ${message.guild.id}\n\t${e.stack}`);
     }

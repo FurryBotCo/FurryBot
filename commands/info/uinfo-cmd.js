@@ -1,29 +1,28 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
-	
-	if(self.args.length == 0 || !self.args) {
-		var user = self.member;
+	local.channel.startTyping();
+	if(local.args.length == 0 || !local.args) {
+		var user = local.member;
 	} else {
 		// member mention
-		if(self.message.mentions.members.first()) {
-			var user = self.message.mentions.members.first();
+		if(local.message.mentions.members.first()) {
+			var user = local.message.mentions.members.first();
 		}
 		
 		// user ID
-		if(!isNaN(self.args[0]) && !(self.args.length === 0 || !self.args || self.message.mentions.members.first())) {
-			var user = self.guild.members.get(args[0]);
+		if(!isNaN(local.args[0]) && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
+			var user = local.guild.members.get(local.args[0]);
 		}
 		
 		// username
-		if(isNaN(self.args[0]) && self.args[0].indexOf("#") === -1 && !(self.args.length == 0 || !self.args || self.message.mentions.members.first())) {
-			var usr = self.users.find(t=>t.username==args[0]);
-			if(usr instanceof self.Discord.User) var user = self.message.guild.members.get(usr.id);
+		if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length == 0 || !local.args || local.message.mentions.members.first())) {
+			var usr = self.users.find(t=>t.username==local.args[0]);
+			if(usr instanceof self.Discord.User) var user = local.message.guild.members.get(usr.id);
 		}
 		
 		// user tag
-		if(isNaN(self.args[0]) && self.args[0].indexOf("#") !== -1 && !self.message.mentions.members.first()) {
-			var usr = self.users.find(t=>t.tag===args[0]);
-			if(usr instanceof self.Discord.User) var user = self.guild.members.get(usr.id);
+		if(isNaN(local.args[0]) && local.args[0].indexOf("#") !== -1 && !local.message.mentions.members.first()) {
+			var usr = self.users.find(t=>t.tag===local.args[0]);
+			if(usr instanceof self.Discord.User) var user = local.guild.members.get(usr.id);
 		}
 	}
 
@@ -33,9 +32,9 @@ module.exports = (async (self,local) => {
 			title: "User not found",
 			description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
 		}
-		Object.assign(data, self.embed_defaults);
+		Object.assign(data, local.embed_defaults);
 		var embed = new self.Discord.MessageEmbed(data);
-		return self.channel.send(embed);
+		return local.channel.send(embed);
 	}
 	
 	var roles = user.roles.map(role=>{if(role.name!=="@everyone"){return `<@&${role.id}>`}else{return "@everyone"}});
@@ -55,7 +54,7 @@ module.exports = (async (self,local) => {
 		var bl = "Bots cannot be blacklisted.";
 		// botlist lookup
 	}
-	var rr = roles.length > 15?`Too many roles to list, please use **${self.gConfig.prefix}roles ${user.id}**`:roles.toString();
+	var rr = roles.length > 15 ?`Too many roles to list, please use **${local.gConfig.prefix}roles ${user.id}**`:roles.toString();
 	var data = {
 			name: "User info",
 			fields: [
@@ -89,5 +88,6 @@ module.exports = (async (self,local) => {
 		Object.assign(data, self.embed_defaults);
 		data.thumbnail={url: user.user.displayAvatarURL()};
 		var embed = new self.Discord.MessageEmbed(data);
-		return self.channel.send(embed);
+		local.channel.send(embed);
+		return local.channel.stopTyping();
 });

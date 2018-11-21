@@ -1,5 +1,5 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
+	
 	var data = {
 		"title": "Discord",
 		"description": `[Join Our Support Discord Server!](${self.config.discordSupportInvite})`,
@@ -9,5 +9,5 @@ module.exports = (async (self,local) => {
 	};
 	Object.assign(data,self.embed_defaults);
 	var embed = new self.Discord.MessageEmbed(data);
-	self.channel.send(embed);
+	local.channel.send(embed);
 });

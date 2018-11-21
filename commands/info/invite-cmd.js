@@ -1,5 +1,5 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
+	
 	var data = {
 		"title": "Invites",
 		"fields": [
@@ -19,5 +19,5 @@ module.exports = (async (self,local) => {
 	Object.assign(data, self.embed_defaults);
 	
 	var embed = new self.Discord.MessageEmbed(data);
-	return self.channel.send(embed);
+	return local.channel.send(embed);
 });

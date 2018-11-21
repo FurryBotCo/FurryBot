@@ -1,10 +1,23 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
-	var textChCount = 0;
-	var voiceChCount = 0;
-	var roleCount = 0;
-	var categoryChCount = 0;
-	self.guild.channels.forEach((ch) => {
+	local.channel.startTyping();
+	var textChCount = 0,
+	voiceChCount = 0,
+	categoryChCount = 0;
+	if(!isNaN(local.args[0]) && self.user.isDeveloper) {
+		var guild = local.guilds.get(local.args[0]);
+		if(!guild) {
+			var data = {
+				title: "Guild Not Found"
+			}
+			Object.assign(data,local.embed_defaults);
+			var embed = new self.Discord.MessageEmbed(data);
+			return local.channel.send(embed);
+		}
+	} else {
+		var guild = local.guild;
+	}
+	var guildConfig = await self.db.getGuild(guild.id);
+	guild.channels.forEach((ch) => {
 		switch (ch.type) {
 			case "text":
 				textChCount++;
@@ -20,7 +33,7 @@ module.exports = (async (self,local) => {
 		}
 	});
 	
-	var o = self.guild.members.find(m=>m.id===self.guild.owner.id);
+	var o = guild.members.find(m=>m.id===guild.owner.id);
 	if(!o) {
 		var owner="Unknown";
 	} else {
@@ -28,11 +41,11 @@ module.exports = (async (self,local) => {
 	}
 	
 	var features = "";
-if(self.guild.verified) features+="Verified\n";
-	if(self.guild.features.indexOf("VIP_REGIONS") !== -1) features+="VIP Voice Vegions\n";
+if(guild.verified) features+="Verified\n";
+	if(guild.features.indexOf("VIP_REGIONS") !== -1) features+="VIP Voice Vegions\n";
 	// if fetching vanity url fails return discord-api
-	if(self.guild.features.indexOf("VANITY_URL") !== -1) features+=`Vanity URL: https://discord.gg/${self.guild.fetchVanityCode().catch(noerr=>"discord-api")}\n`;
-	if(self.guild.features.indexOf("INVITE_SPLASH") !== -1) features+=`[Invite Splash](${self.guild.inviteSplash()})\n`;
+	if(guild.features.indexOf("VANITY_URL") !== -1) features+=`Vanity URL: https://discord.gg/${guild.fetchVanityCode().catch(noerr=>"discord-api")}\n`;
+	if(guild.features.indexOf("INVITE_SPLASH") !== -1) features+=`[Invite Splash](${guild.inviteSplash()})\n`;
 
 	if(features === "") features = "NONE";
 	var verificationLevel = [
@@ -47,16 +60,17 @@ if(self.guild.verified) features+="Verified\n";
 		"NONE",
 		"ELEVATED"
 	];
-
+	var roles = guild.roles.map(role=>{if(role.name!=="@everyone"){return `<@&${role.id}> `}else{return "@everyone "}}).toString();
+	var rr = roles.length > 1000 ? `Too many to list, please use \`${local.gConfig.prefix}roles server\`` : roles;
 	var data = {
-		title: `Server Info - **${self.guild.name}**`,
+		title: `Server Info - **${guild.name}**`,
 		image: {
-			url: self.guild.iconURL()
+			url: guild.iconURL()
 		},
 		fields: [
 			{
 				name: "Guild ID",
-				value: self.guild.id,
+				value: guild.id,
 				inline: false
 			},
 			{
@@ -66,32 +80,32 @@ if(self.guild.verified) features+="Verified\n";
 			},
 			{
 				name: "Members",
-				value: `Total: ${self.guild.memberCount}\n\n${self.config.emojis.online}: ${self.guild.members.filter(m=>m.user.presence.status==="online").size}\n${self.config.emojis.idle}: ${self.message.guild.members.filter(m=>m.user.presence.status==="idle").size}\n${self.config.emojis.dnd}: ${self.guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${self.config.emojis.offline}: ${self.guild.members.filter(m=>m.user.presence.status==="offline").size}`,
+				value: `Total: ${guild.memberCount}\n\n${self.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${self.config.emojis.idle}: ${local.message.guild.members.filter(m=>m.user.presence.status==="idle").size}\n${self.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${self.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}`,
 				inline: false
 			},
 			{
 				name: "Channels",
-				value: `Total: ${self.guild.channels.size}\nText: ${textChCount}\nVoice: ${voiceChCount}\nCategory: ${categoryChCount}`,
+				value: `Total: ${guild.channels.size}\nText: ${textChCount}\nVoice: ${voiceChCount}\nCategory: ${categoryChCount}`,
 				inline: false
 			},
 			{
 				name: "Guild Creation Date",
-				value: self.guild.createdAt.toString().split("GMT")[0],
+				value: guild.createdAt.toString().split("GMT")[0],
 				inline: false
 			},
 			{
 				name: "Region",
-				value: self.ucwords(self.guild.region),
+				value: self.ucwords(guild.region),
 				inline: false
 			},
 			{
-				name: `Roles [${self.guild.roles.size-1}]`,
-				value: `run **${self.gConfig.prefix}roles** for a list of roles`,
+				name: `Roles [${guild.roles.size-1}]`,
+				value: rr,
 				inline: false
 			},
 			{
 				name: "Extra",
-				value: `**Large Guild**: ${self.ucwords(self.guild.large)}\n**Verification**: ${verificationLevel[self.guild.verificationLevel]}\n**2FA**: ${mfaLevel[self.guild.mfaLevel]}\n**Default Notifications**: ${self.guild.defaultMessageNotifications}\n**Features**:\n${features}`,
+				value: `**Large Guild**: ${self.ucwords(guild.large)}\n**Verification**: ${verificationLevel[guild.verificationLevel]}\n**2FA**: ${mfaLevel[guild.mfaLevel]}\n**Default Notifications**: ${guild.defaultMessageNotifications}\n**Features**:\n${features}`,
 				inline: false
 			}
 		]
@@ -100,5 +114,6 @@ if(self.guild.verified) features+="Verified\n";
 	Object.assign(data, self.embed_defaults);
 	
 	var embed = new self.Discord.MessageEmbed(data);
-	self.channel.send(embed);
+	local.channel.send(embed);
+	return local.channel.stopTyping();
 });

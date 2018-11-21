@@ -14,21 +14,49 @@ module.exports = (async(self) => {
     self.logger.debug("Command Timeouts & Command List loaded");
     self.logger.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
 
-    self.rotatingStatus = self.setInterval(()=>{
+    /*self.rotatingStatus = self.setInterval(()=>{
         for(let key in self.config.bot.rotatingStatus) {
             var interval = key*15e3;
             setTimeout((st)=>{
+                console.log(`Set to (${st.message}) ${eval(st.message)} ${st.type}`);
                 self.user.setActivity(eval(st.message),{type:st.type});
             },interval,self.config.bot.rotatingStatus[key]);
         }
-    }, self.config.bot.rotatingStatus.length*15e3);
-   self.logger.log(`ready with ${self.options.shardCount} shards!`);
+    }, self.config.bot.rotatingStatus.length*15e3);*/
+    //self.user.setActivity("🐾 Debugging! 🐾",{type: "PLAYING"});
+    rotatingStatus = (async()=>{
+		self.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"}).then(()=>{
+            setTimeout(()=>{
+                self.user.setActivity(`🐾 ${self.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"}).then(()=>{
+                    setTimeout(()=>{
+                        self.user.setActivity(`🐾 ${self.config.defaultPrefix}help in ${self.guilds.size} guilds! 🐾`,{type: "PLAYING"}).then(()=>{
+                            setTimeout(()=>{
+                                self.user.setActivity(`🐾 ${self.config.defaultPrefix}help with ${self.users.size} users! 🐾`,{type: "WATCHING"}).then(()=>{
+                                    setTimeout(()=>{
+                                        self.user.setActivity(`🐾 ${self.config.defaultPrefix}help in ${self.channels.size} channels! 🐾`,{type: "LISTENING"}).then(()=>{
+                                            setTimeout(()=>{
+                                                self.user.setActivity(`🐾 ${self.config.defaultPrefix}help with ${self.options.shardCount} shard${self.options.shardCount>1?"s":""}! 🐾`,{type: "PLAYING"});
+                                            },15e3);
+                                        });
+                                    },15e3);
+                                });
+                            },15e3);
+                        });
+                    },15e3);
+                });
+            },15e3);
+        });
+    });
+
+    rotatingStatus();
+    setInterval(rotatingStatus,75e3)
+   self.logger.log(`ready with ${self.options.shardCount} shard${self.options.shardCount>1?"s":""}!`);
 
      self.setInterval(()=>{
         self.voiceConnections.forEach((vc)=>{
             if(vc.channel.members.filter(m=>m.id!==self.user.id).size === 0) {
                 vc.channel.leave();
-                self.logger.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to 30+ seconds of inactivity.`);
+                self.logger.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to inactivity.`);
             }
         });
    },3e4);

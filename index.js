@@ -1,5 +1,6 @@
 const Discord = require("discord.js");
 const config = require("./config");
+global.Promise = require("bluebird");
 
 /**
   * Main Class
@@ -13,7 +14,7 @@ class FurryBot extends Discord.Client {
 	constructor(options) {
 		var opt = options || {};
    		super(opt);
-    	Object.assign(this, require(`${process.cwd()}/util/logger`), require(`${process.cwd()}/util/misc`), require(`${process.cwd()}/util/functions`));
+    	Object.assign(this, /*require(`${process.cwd()}/util/logger`), */require(`${process.cwd()}/util/misc`), require(`${process.cwd()}/util/functions`));
 		this.util = require("util");
 		this.config = config;
 		this.stats = {
@@ -44,7 +45,7 @@ class FurryBot extends Discord.Client {
 		this.varParse = require(`${process.cwd()}/util/varHandler`);
 		this.lang = require(`${process.cwd()}/lang`)(this);
 		this.colors = require("console-colors-2");
-		this.Canvas = require("canvas-constructor");
+		this.Canvas = require("canvas-constructor").Canvas;
 		this.fsn = require("fs-nextra");
 		this.chalk = require("chalk");
 		this.chunk = require("chunk");
@@ -58,262 +59,7 @@ class FurryBot extends Discord.Client {
 		this.PerformanceObserver = this.perf.PerformanceObserver;
 		this.child_process = require('child-process-promise');
 		this.shell = this.child_process.exec;
-		this.imageAPIRequest = (async(safe=true,category=null,json=true,filetype=null)=>{
-			return new Promise(async(resolve, reject)=>{
-				if(!self) var self = this;
-				if([undefined,null,""].includes(json)) json = true;
-				var s = await self.request(`https://api.furrybot.me/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?`/${filetype}`:""}`);
-				try {
-					var j = JSON.parse(s.body);
-					resolve(j);
-				} catch(e) {
-					reject({error:e,response:s.body});
-				}
-			});
-		});
-		this.download = ((url, filename)=>{
-			return new Promise((resolve,reject)=>{
-				if(!self) var self = this;
-				self.request(url).pipe(self.fsn.createWriteStream(filename)).on('close', resolve)
-			});
-		});
-		this.reloadModules = (async()=>{
-			for(var key in require.cache){
-				if(key.indexOf("\\node_modules") != -1){
-					delete require.cache[key];
-				}
-			}
-			console.debug("Reloaded all modules");
-			return true;
-		});
-		this.reloadCommands = (async()=>{
-			if(!self) var self = this;
-			var resp = await self.request("https://api.furrybot.me/commands", {
-					method: "GET",
-					headers: {
-							Authorization: `Key ${self.config.apiKey}`
-					}
-			});
-			var response = JSON.parse(resp.body);
-			self.config.commandList = {fullList: response.return.fullList, all: response.return.all};
-			self.config.commandList.all.forEach((command)=>{
-					self.commandTimeout[command] = new Set();
-			});
-			self.debug("Command Timeouts & Command List reloaded");
-		});
-		this.reloadAll = (async()=>{
-			if(!self) var self = this;
-				self.reloadCommands();
-				self.reloadModules();
-		});
-		this.random = ((len=10,keyset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")=>{
-			if(len > 500 && !self[self.config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
-			let rand = ""
-			for (var i = 0; i < len; i++)
-			rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
-
-			return rand;
-		});
-		this.shortenUrl = (async(url)=>{
-			if(!self) var self = this;
-			self.r.tableList().then((list)=>{
-				if(!list.includes("shorturl")) {
-					self.r.tableCreate("shorturl");
-					console.log(`[ShortURL]: Created Short URL table`);
-				}
-			});
-			const create = (async(url)=>{
-				var count = await self.r.table("shorturl").count();
-				var c = count;
-				if(c == 0) c = 1;
-				//62 = 26 (a-z) + 26 (A-Z) + 10 (0-9)
-				if(Number.isInteger(c/62)) c++;
-				if(c < 5) c = c+Math.abs(c-5);
-				var rand = self.random(Math.ceil(c));
-				var createdTimestamp = Date.now();
-				var created = new Date().toISOString();
-				var a = await self.r.table("shorturl").insert({id:rand,url,imageNumber:count+1,createdTimestamp,created,length:c,link:`https://furry.services/r/${rand}`});
-				if(a.errors === 1) {
-					return create(url);
-				} else {
-					return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,imageNumber:count+1,createdTimestamp,created,length:c};
-				}
-			});
-
-			var res = await self.r.table("shorturl").filter({url});
-			
-			switch(res.length) {
-				case 0:
-					// create
-					return create(url);
-					break;
-
-				case 1:
-					// return
-					var a = res[0];
-					return {code:a.id,url,link:`https://furry.services/r/${a.id}`,new:false};
-					break;
-
-				default:
-					// delete & recreate
-					console.log(`[ShortURL]: Duplicate records found, deleting`);
-					self.r.table("shorturl").filter({url}).forEach((short)=>{
-						return self.r.table("shorturl").get(short("id")).delete();
-					});
-					return create(url);
-			}
-		});
-		this.deleteAll = (async(table,database = "furrybot")=>{
-			if(!self) var self = this;
-			if(["rethinkdb"].includes(database)) throw new Error(`{code:2,error:"ERR_ILLEGAL_DB",description:"illegal database"}`);
-			if(["guilds","users"].includes(table)) throw new Error(`{code:1,error:"ERR_ILLEGAL_TABLE",description:"illegal database"}`);
-			var dbList = await self.r.dbList();
-			if(!dbList.includes(database)) throw new Error(`{code:3,error:"ERR_INVALID_DB",description:"invalid database"}`);
-			var tableList = await self.r.db(database).tableList();
-			if(!tableList.includes(table)) throw new Error(`{code:4,error:"ERR_INVALID_TABLE",description:"invalid table"}`);
-			return self.r.db(database).table(table).forEach((entry)=>{
-				return self.r.db(database).table(table).get(entry("id")).delete();
-			});
-		});
-		this.clearTable = this.deleteAll;
-		this.player = null;
-		this.getRegion = ((region)=>{
-			if(!self) var self = this;
-			region = region.replace("vip-", "");
-			for (const key in self.config.musicPlayer.regions) {
-				const nodes = self.config.musicPlayer.nodes.filter(node => node.connected && node.region === key);
-				if (!nodes) continue;
-				for (const id of self.config.musicPlayer.regions[key]) {
-					if (id === region || region.startsWith(id) || region.includes(id)) return key;
-				}
-			}
-			return "us";
-		});
-		this.getIdealHost = ((region)=>{
-			if(!self) var self = this;
-			region = getRegion(region);
-			const foundNode = self.config.musicPlayer.nodes.find(node => node.ready && node.region === region);
-			if (foundNode) return foundNode.host;
-			return self.config.musicPlayer.nodes.first().host;
-		});
-		this.getSong = (async(str)=>{
-			if(!self) var self = this;
-			const res = await self.request(`http://${self.config.restnode.host}:${self.config.restnode.port}/loadtracks`,{
-				qs: {
-					identifier: str
-				},
-				headers: {
-					Authorization: self.config.restnode.password
-				}
-			}).catch(err => {
-				console.error(err);
-				return null;
-			});
-			if (!res) throw "There was an error, try again";
-			if (res.body.length == 0) throw `No tracks found`;
-			return JSON.parse(res.body);
-		});
-		this.songSearch = (async(strSearch,platform="youtube")=>{
-			if(!self) var self = this;
-			return new Promise(async(resolve,reject)=>{
-				if(!strSearch) reject(new Error("Missing parameters"));
-				switch(platform) {
-					case "youtube":
-						var res = await self.request(`http://${self.config.musicPlayer.restnode.host}:${self.config.musicPlayer.restnode.port}/loadtracks?identifier=ytsearch:${strSearch}`,{
-							method: "GET",
-							headers: {
-								Authorization: self.config.musicPlayer.restnode.secret
-							}
-						});
-						resolve(JSON.parse(res.body));
-						break;
-					
-					default:
-						reject(new Error("Invalid platform"));
-				}
-			});
-		});
-		this.playSong = (async(channel,song,platform="youtube")=>{
-			if(!self) var self = this;
-			return new Promise(async(resolve,reject)=>{
-				if(!channel || !song) reject(new Error("Missing parameters"));
-			
-                channel.join().catch((e)=>{
-                    reject(e);
-                }).then(async(ch)=>{
-                    switch(platform) {
-                        case "youtube":
-                            try {
-                                resolve(ch.play(self.ytdl(song.uri, { quality: 'highestaudio' })));
-                            }catch(err){
-                                ch.disconnect().then(()=>{
-                                    channel.leave()
-                                }).then(()=>{
-                                    reject(err);
-                                });
-                            }
-                            break;
-
-                        default:
-                            reject("invalid platform");
-                    }
-                })
-            });
-        });
-
-        this.songMenu = (async(pageNumber,pageCount,songs,msg,ma,mb)=>{
-			if(!self) var self = this;
-			return new Promise(async(resolve,reject)=>{
-				if(!pageNumber || !pageCount || !songs || !msg) reject(new Error("missing parameters."));
-				if(typeof ma !== "undefined" && typeof mb !== "undefined") {
-					ma.edit(`Multiple songs found, please specify the number you would like to play\n\n${rt[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
-				} else {
-					var mid = await msg.channel.send(`Multiple songs found, please specify the number you would like to play\n\n${songs.list[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
-					var ma = mid;
-					var mb = msg;
-				}
-				ma.channel.awaitMessages(m=>m.author.id === mb.author.id,{max:1,time: 1e4,errors:["time"]}).then(async(m)=>{
-					var res = songs.list[pageNumber];
-					var resultCount = songs.list.length;
-					var s = m.first().content.split(" ");
-					if(s[0] === "cancel") throw new Error("CANCEL");
-					if(s[0] === "page") {
-						if(pageNumber === s[1]) {
-							m.first().reply("You are already on that page.");
-							resolve(self.songMenu(pageNumber,pageCount,songs,msg,ma,mb));
-						}
-						if(pageCount - s[1] < 0) {
-							m.first().reply("Invalid page!");
-							resolve(self.songMenu(pageNumber,pageCount,songs,m,ma,mb));
-						}  else {
-							resolve(self.songMenu(s[1],pageCount,songs,m,ma,mb));
-						}
-					} else {
-						if(resultCount.length < s[0]) {
-							m.first().reply("Invalid Selection!");
-							resolve(self.songMenu(pageNumber,pageCount,songs,m,ma,mb));
-						} else {
-							var song = songs.tracks[pageNumber * 10 - Math.abs(s[0]-10) - 1];
-							resolve({song,msg:ma});
-						}
-					}
-				}).catch(resolve);
-			});
-		});
-		this.getSong = (async(strIdentifier)=>{
-			if(!self) var self = this;
-			return new Promise(async(resolve,reject)=>{
-				if(!strIdentifier) reject(new Error("Missing parameters"));
-				var res = await self.request(`http://${config.musicPlayer.restnode.host}:${config.musicPlayer.restnode.port}/loadtracks?identifier=${strIdentifier}`,{
-					headers: {
-						Authorization: config.musicPlayer.restnode.secret
-					}
-				});
-				if(res.body.length === 0) return resolve(res.body);
-				return resolve(JSON.parse(res.body));
-			})
-		});
-
+		this.truncate = require("truncate");
 		this.webhooks = {};
 		for(let key in this.config.webhooks) {
 			this.webhooks[key] = new this.Discord.WebhookClient(this.config.webhooks[key].id,this.config.webhooks[key].token,{disableEveryone:true});
@@ -343,7 +89,6 @@ class FurryBot extends Discord.Client {
 				if (!file.endsWith(".js")) return;
 				const event = require(`./handlers/events/${file}`),
 				 eventName = file.split(".")[0];
-
 				this.on(eventName, event.bind(null,this));
 				console.log(`[EventManager]: Loaded ${eventName} event`);
 				delete require.cache[require.resolve(`./handlers/events/${file}`)];
@@ -352,6 +97,316 @@ class FurryBot extends Discord.Client {
 		
 		console.log("[loadEvent]: end of load");
 	}
+
+	async imageAPIRequest (safe=true,category=null,json=true,filetype=null) {
+		return new Promise(async(resolve, reject)=>{
+			if([undefined,null,""].includes(json)) json = true;
+			var s = await this.request(`https://api.furrybot.me/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?`/${filetype}`:""}`);
+			try {
+				var j = JSON.parse(s.body);
+				resolve(j);
+			} catch(e) {
+				reject({error:e,response:s.body});
+			}
+		});
+	}
+
+	async download (url, filename) {
+		return new Promise((resolve,reject)=>{
+			require("request")(url).pipe(this.fsn.createWriteStream(filename)).on('close', resolve)
+		});
+	}
+
+	async reloadModules () {
+		for(var key in require.cache){
+			if(key.indexOf("\\node_modules") != -1){
+				delete require.cache[key];
+			}
+		}
+		console.debug("Reloaded all modules");
+		return true;
+	}
+
+	async reloadCommands () {
+		var resp = await this.request("https://api.furrybot.me/commands", {
+				method: "GET",
+				headers: {
+						Authorization: `Key ${this.config.apiKey}`
+				}
+		});
+		var response = JSON.parse(resp.body);
+		this.config.commandList = {fullList: response.return.fullList, all: response.return.all};
+		this.config.commandList.all.forEach((command)=>{
+				this.commandTimeout[command] = new Set();
+		});
+		this.debug("Command Timeouts & Command List reloaded");
+	}
+
+	async reloadAll () {
+		this.reloadCommands();
+		this.reloadModules();
+	}
+
+	async random (len=10,keyset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
+		if(len > 500 && !this[this.config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
+		let rand = ""
+		for (var i = 0; i < len; i++)
+		rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
+
+		return rand;
+	}
+
+	async shortenUrl (url) {
+		this.r.tableList().then((list)=>{
+			if(!list.includes("shorturl")) {
+				this.r.tableCreate("shorturl");
+				console.log(`[ShortURL]: Created Short URL table`);
+			}
+		});
+		const create = (async(url)=>{
+			var count = await this.r.table("shorturl").count();
+			var c = count;
+			if(c == 0) c = 1;
+			//62 = 26 (a-z) + 26 (A-Z) + 10 (0-9)
+			if(Number.isInteger(c/62)) c++;
+			if(c < 5) c = c+Math.abs(c-5);
+			var rand = await this.random(Math.ceil(c));
+			var createdTimestamp = Date.now();
+			var created = new Date().toISOString();
+			var a = await this.r.table("shorturl").insert({id:rand,url,imageNumber:count+1,createdTimestamp,created,length:c,link:`https://furry.services/r/${rand}`});
+			if(a.errors === 1) {
+				return create(url);
+			} else {
+				return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,imageNumber:count+1,createdTimestamp,created,length:c};
+			}
+		});
+
+		var res = await this.r.table("shorturl").filter({url});
+		
+		switch(res.length) {
+			case 0:
+				// create
+				return create(url);
+				break;
+
+			case 1:
+				// return
+				var a = res[0];
+				return {code:a.id,url,link:`https://furry.services/r/${a.id}`,new:false};
+				break;
+
+			default:
+				// delete & recreate
+				console.log(`[ShortURL]: Duplicate records found, deleting`);
+				this.r.table("shorturl").filter({url}).forEach((short)=>{
+					return this.r.table("shorturl").get(short("id")).delete();
+				});
+				return create(url);
+		}
+	}
+
+	async deleteAll (table,database = "furrybot") {
+		if(["rethinkdb"].includes(database)) throw new Error(`{code:2,error:"ERR_ILLEGAL_DB",description:"illegal database"}`);
+		if(["guilds","users"].includes(table)) throw new Error(`{code:1,error:"ERR_ILLEGAL_TABLE",description:"illegal database"}`);
+		var dbList = await this.r.dbList();
+		if(!dbList.includes(database)) throw new Error(`{code:3,error:"ERR_INVALID_DB",description:"invalid database"}`);
+		var tableList = await this.r.db(database).tableList();
+		if(!tableList.includes(table)) throw new Error(`{code:4,error:"ERR_INVALID_TABLE",description:"invalid table"}`);
+		return this.r.db(database).table(table).delete();/*.forEach((entry)=>{
+			return this.r.db(database).table(table).get(entry("id")).delete();
+		});*/
+	}
+
+	get clearTable() {return this.deleteAll}
+	
+	async getRegion (region) {
+		region = region.replace("vip-", "");
+		for (const key in this.config.musicPlayer.regions) {
+			const nodes = this.config.musicPlayer.nodes.filter(node => node.connected && node.region === key);
+			if (!nodes) continue;
+			for (const id of this.config.musicPlayer.regions[key]) {
+				if (id === region || region.startsWith(id) || region.includes(id)) return key;
+			}
+		}
+		return "us";
+	}
+
+	async getIdealHost (region) {
+		region = getRegion(region);
+		const foundNode = this.config.musicPlayer.nodes.find(node => node.ready && node.region === region);
+		if (foundNode) return foundNode.host;
+		return this.config.musicPlayer.nodes.first().host;
+	}
+
+	async getSong (str) {
+		const res = await this.request(`http://${this.config.restnode.host}:${this.config.restnode.port}/loadtracks`,{
+			qs: {
+				identifier: str
+			},
+			headers: {
+				Authorization: this.config.restnode.password
+			}
+		}).catch(err => {
+			console.error(err);
+			return null;
+		});
+		if (!res) throw "There was an error, try again";
+		if (res.body.length == 0) throw `No tracks found`;
+		return JSON.parse(res.body);
+	}
+
+	async songSearch (strSearch,platform="youtube") {
+		return new Promise(async(resolve,reject)=>{
+			if(!strSearch) reject(new Error("Missing parameters"));
+			switch(platform) {
+				case "youtube":
+					var res = await this.request(`http://${this.config.musicPlayer.restnode.host}:${this.config.musicPlayer.restnode.port}/loadtracks?identifier=ytsearch:${strSearch}`,{
+						method: "GET",
+						headers: {
+							Authorization: this.config.musicPlayer.restnode.secret
+						}
+					});
+					resolve(JSON.parse(res.body));
+					break;
+				
+				default:
+					reject(new Error("Invalid platform"));
+			}
+		});
+	}
+
+	async playSong (channel,song,platform="youtube") {
+		return new Promise(async(resolve,reject)=>{
+			if(!channel || !song) reject(new Error("Missing parameters"));
+		
+			channel.join().catch((e)=>{
+				reject(e);
+			}).then(async(ch)=>{
+				switch(platform) {
+					case "youtube":
+						try {
+							resolve(ch.play(this.ytdl(song.uri, { quality: 'highestaudio' })));
+						}catch(err){
+							ch.disconnect().then(()=>{
+								channel.leave()
+							}).then(()=>{
+								reject(err);
+							});
+						}
+						break;
+
+					default:
+						reject("invalid platform");
+				}
+			})
+		});
+	}
+
+	async songMenu (pageNumber,pageCount,songs,msg,ma,mb) {
+		return new Promise(async(resolve,reject)=>{
+			if(!pageNumber || !pageCount || !songs || !msg) reject(new Error("missing parameters."));
+			if(typeof ma !== "undefined" && typeof mb !== "undefined") {
+				ma.edit(`Multiple songs found, please specify the number you would like to play\n\n${rt[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
+			} else {
+				var mid = await msg.channel.send(`Multiple songs found, please specify the number you would like to play\n\n${songs.list[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
+				var ma = mid;
+				var mb = msg;
+			}
+			ma.channel.awaitMessages(m=>m.author.id === mb.author.id,{max:1,time: 1e4,errors:["time"]}).then(async(m)=>{
+				var res = songs.list[pageNumber];
+				var resultCount = songs.list.length;
+				var s = m.first().content.split(" ");
+				if(s[0] === "cancel") throw new Error("CANCEL");
+				if(s[0] === "page") {
+					if(pageNumber === s[1]) {
+						m.first().reply("You are already on that page.");
+						resolve(this.songMenu(pageNumber,pageCount,songs,msg,ma,mb));
+					}
+					if(pageCount - s[1] < 0) {
+						m.first().reply("Invalid page!");
+						resolve(this.songMenu(pageNumber,pageCount,songs,m,ma,mb));
+					}  else {
+						resolve(this.songMenu(s[1],pageCount,songs,m,ma,mb));
+					}
+				} else {
+					if(resultCount.length < s[0]) {
+						m.first().reply("Invalid Selection!");
+						resolve(this.songMenu(pageNumber,pageCount,songs,m,ma,mb));
+					} else {
+						var song = songs.tracks[pageNumber * 10 - Math.abs(s[0]-10) - 1];
+						resolve({song,msg:ma});
+					}
+				}
+			}).catch(resolve);
+		});
+	}
+
+	async getSong (strIdentifier) {
+		return new Promise(async(resolve,reject)=>{
+			if(!strIdentifier) reject(new Error("Missing parameters"));
+			var res = await this.request(`http://${config.musicPlayer.restnode.host}:${config.musicPlayer.restnode.port}/loadtracks?identifier=${strIdentifier}`,{
+				headers: {
+					Authorization: config.musicPlayer.restnode.secret
+				}
+			});
+			if(res.body.length === 0) return resolve(res.body);
+			return resolve(JSON.parse(res.body));
+		})
+	}
+
+	async resolveUser (user) {
+		if(user instanceof this.Discord.GuildMember) {
+			// can check permissions
+			var u = {
+				isDeveloper: this.config.developers.includes(user.id),
+				isServerModerator: user.permissions.has("MANAGE_GUILD"),
+				isServerAdministrator: user.permissions.has("ADMINISTRATOR")
+			}
+		} else if (user instanceof this.Discord.User) {
+			// only dev checking
+			var u = {
+				isDeveloper: this.config.developers.includes(user.id)
+			}
+		} else {
+			throw new Error("Invalid user provided");
+		}
+		return u;
+	}
+
+	async runAs (messageContent,user,channel) {
+		if(!user instanceof this.Discord.User) user = this.users.get(user);
+		if(!channel instanceof this.Discord.TextChannel) channel = this.channels.get(channel);
+		if(!messageContent || !channel || !user) return;
+		var msg = new this.Discord.Message(this,{
+			type: 0,
+			content: messageContent,
+			author: user,
+			embeds: [],
+			attachments: [],
+			timestamp: Date.now(),
+			reactions: [],
+			mentions: [],
+			mention_roles: [],
+			mention_everyone: false
+		},channel);
+		return require(`${this.config.rootDir}/handlers/events/message.js`)(this,msg);
+	}
+
+	/*async rotatingStatus() {
+		this.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"});
+		setTimeout(()=>{
+			this.user.setActivity(`🐾 ${this.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"});
+		},15e3);
+		setTimeout(()=>{
+			this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.guilds.size} guilds! 🐾`,{type: "PLAYING"});
+		},3e4);
+		setTimeout(()=>{
+			this.user.setActivity(`🐾 ${this.config.defaultPrefix}help with ${this.users.size} users! 🐾`,{type: "WATCHING"});
+		},45e3);
+		setTimeout(()=>{
+			this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.channels.size} channels! 🐾`,{type: "LISTENING"});
+		},6e4);
+	}*/
 }
 
 const client = new FurryBot(config.bot.clientOptions);
@@ -361,19 +416,30 @@ const client = new FurryBot(config.bot.clientOptions);
 client.login(config.bot.token);
 
 process.on("SIGINT", async () => {
-	self = client;
-	self.logger.debug("Started termination via CTRL+C");
-	self.voiceConnections.forEach((v)=>v.disconnect());
-	self.logger.debug("Terminated all voice connections");
-	self.destroy();
-	console.log("Terminated client");
-	process.kill(process.pid, 'SIGTERM' );
+	if(!client) {
+		process.kill(process.pid, 'SIGTERM' );
+	} else {
+		if(!client.logger) {
+			console.debug("Started termination via CTRL+C");
+			client.voiceConnections.forEach((v)=>v.disconnect());
+			console.debug("Terminated all voice connections");
+		} else {
+			client.logger.debug("Started termination via CTRL+C");
+			client.voiceConnections.forEach((v)=>v.disconnect());
+			client.logger.debug("Terminated all voice connections");
+		}
+		client.destroy();
+		console.log("Terminated client");
+		process.kill(process.pid,"SIGTERM");
+	}
 });
 
-process.on('unhandledRejection', (reason, p) => {
+process.on('unhandledRejection', (p) => {
 	if(client.logger !== undefined) {
-		client.logger.log(`Unhandled Rejection at: Promise ${p}, reason: ${reason}`);
+		client.logger.error("Unhandled Promise Rejection:");
+		client.logger.error(p);
 	} else {
-		console.error(`Unhandled Rejection at: Promise ${p}, reason: ${reason}`);
+		console.error("Unhandled Promise Rejection:");
+		console.error(p);
 	}
-  });
+});

@@ -6,5 +6,7 @@
     "blacklistedCommands": [
 
     ],
-    "globallyBlacklisted": false 
+    "globallyBlacklisted": false,
+    "xp": 0,
+    "level": 0
 }

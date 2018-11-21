@@ -1,11 +1,11 @@
 module.exports = (async (self,local) => {
-	Object.assign(self,local);
-	if (!self.config.developers.includes(self.author.id)) {
-		return self.message.reply("You cannot run this command as you are not a developer of this bot.");
-	}
 	
+	if (!self.config.developers.includes(local.author.id)) {
+		return local.message.reply("You cannot run this command as you are not a developer of this bot.");
+	}
+	local.channel.startTyping();
 	try {
-		var exec = self.args.join(" ");
+		var exec = local.args.join(" ");
 		var start = self.performance.now();
 		var res = await self.shell(exec);
 		var end = self.performance.now();
@@ -14,8 +14,8 @@ module.exports = (async (self,local) => {
 		var data = {
 			title: `Executed - Time: \`\`${(end-start).toFixed(3)}ms\`\``,
 			author: {
-				name: self.author.tag,
-				icon_url: self.author.displayAvatarURL()
+				name: local.author.tag,
+				icon_url: local.author.displayAvatarURL()
 			},
 			color: 3322313,
 			fields: [
@@ -33,11 +33,12 @@ module.exports = (async (self,local) => {
 		self.logger.error(`[Eval]: ${e}`);
 		Object.assign(data,self.embed_defaults);
 		var embed = new self.Discord.MessageEmbed(data);
-		return self.channel.send(embed).catch(err => {
-			self.channel.send(`I could not return the result: ${err}`).catch(error=>{
-				self.author.send(`I could not return the result: ${error}`).catch(noerr=>null);
+		local.channel.send(embed).catch(err => {
+			local.channel.send(`I could not return the result: ${err}`).catch(error=>{
+				local.author.send(`I could not return the result: ${error}`).catch(noerr=>null);
 			});
 		});
+		return local.channel.stopTyping();
 	}
 	if([null,undefined,""].includes(res.stdout)) {
 		var res = "```fix\nfinished with no return```";
@@ -51,8 +52,8 @@ module.exports = (async (self,local) => {
 	var data = {
 		title: `Executed - Time: \`${(end-start).toFixed(3)}ms\``,
 		author: {
-			name: self.author.tag,
-			icon_url: self.author.displayAvatarURL()
+			name: local.author.tag,
+			icon_url: local.author.displayAvatarURL()
 		},
 		color: 3322313,
 		fields: [
@@ -69,10 +70,11 @@ module.exports = (async (self,local) => {
 	};
 	Object.assign(data,self.embed_defaults);
 	var embed = new self.Discord.MessageEmbed(data);
-	return self.channel.send(embed).catch(err => {
+	local.channel.send(embed).catch(err => {
 		console.error(err);
-		self.channel.send(`I could not return the result: ${err}`).catch(error=>{
-			self.author.send(`I could not return the result: ${err}`).catch(noerr=>null);
+		local.channel.send(`I could not return the result: ${err}`).catch(error=>{
+			local.author.send(`I could not return the result: ${err}`).catch(noerr=>null);
 		});
 	});
+	return local.channel.stopTyping();
 });
