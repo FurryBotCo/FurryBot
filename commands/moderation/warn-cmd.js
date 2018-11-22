@@ -27,7 +27,7 @@ module.exports = (async(self,local)=>{
 			title: "User not found",
 			description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
 		}
-		Object.assign(data, local.embed_defaults);
+		Object.assign(data, local.embed_defaults());
 		var embed = new self.Discord.MessageEmbed(data);
         local.channel.send(embed);
         return local.channel.stopTyping();
@@ -42,9 +42,9 @@ module.exports = (async(self,local)=>{
     var w = await self.db.createUserWarning(user.id,local.guild.id,local.author.id,reason);
 
     if(!local.gConfig.delCmds && local.channel.permissionsFor(self.user.id).has("MANAGE_MESSAGES")) local.message.delete().catch(noerr=>null);
-
+    
     var data = {
-        title: `User Warned - #${w.id}`,
+        title: `User Warned - #${w.wid}`,
         description: `User ${user.user.tag} was warned by ${local.author.tag}`,
         fields: [
             {
@@ -54,7 +54,7 @@ module.exports = (async(self,local)=>{
             }
         ]
     }
-    Object.assign(data,local.embed_defaults);
+    Object.assign(data,local.embed_defaults());
     var embed = new self.Discord.MessageEmbed(data);
     return local.channel.send(embed);
 })

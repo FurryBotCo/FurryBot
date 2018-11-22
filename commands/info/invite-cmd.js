@@ -16,7 +16,7 @@ module.exports = (async (self,local) => {
 		]
 	};
 	
-	Object.assign(data, self.embed_defaults);
+	Object.assign(data, self.embed_defaults());
 	
 	var embed = new self.Discord.MessageEmbed(data);
 	return local.channel.send(embed);

@@ -34,7 +34,7 @@ module.exports = (async (self,local) => {
 			]
 		};
 		console.error(`[Eval]: ${self.util.inspect(e,{depth:null,color:true})}`);
-		Object.assign(data,local.embed_defaults);
+		Object.assign(data,local.embed_defaults());
 		var embed = new self.Discord.MessageEmbed(data);
 		local.channel.send(embed).catch(err => {
 			local.channel.send(`I could not return the result: ${err}`).catch(error=>{
@@ -72,7 +72,7 @@ module.exports = (async (self,local) => {
 			}
 		]
 	};
-	Object.assign(data,local.embed_defaults);
+	Object.assign(data,local.embed_defaults());
 	var embed = new self.Discord.MessageEmbed(data);
 	local.channel.send(embed).catch(err => {
 		console.error(err);

@@ -16,7 +16,7 @@ module.exports = (async (self,local) => {
 		  }
 		]
 	  };
-	Object.assign(data, embed_defaults);
+	Object.assign(data, embed_defaults());
 	var embed = new local.messageEmbed(data);
 	var m = await local.channel.send(embed);
 	var data2={
@@ -33,7 +33,7 @@ module.exports = (async (self,local) => {
 		  }
 		]
 	  };
-	Object.assign(data2, self.embed_defaults);
+	Object.assign(data2, self.embed_defaults());
 	var embed2 = new local.messageEmbed(data2);
 	setTimeout((msg,e2)=>{msg.edit(e2);}, 7000,m,embed2);*/
 	return local.channel.stopTyping();

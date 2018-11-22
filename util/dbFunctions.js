@@ -6,6 +6,7 @@ class FurryBotDatabase {
 		this.uuid = require("uuid/v4");
 		this.r = !this.client.r ? require("rethinkdbdash")(this.config.db) : this.client.r;
 		this.logger = new (require(`${this.config.rootDir}/util/LoggerV3.js`))(this.client);
+		this.mdb = "furrybot";
 	}
 	
 	async createGuild(gid,disableCheck=false){
@@ -15,100 +16,82 @@ class FurryBotDatabase {
 			this.logger.warn(`[createGuild]: Attempted to add guild that the bot is not in`);
 			return new Error("ERR_NOT_FOUND");
 		}
-		this.logger.info(`[createGuild]: Added guild "${gid}" with default configuration`);
-		var gConfig = {id: gid};
-		var eConfig = {id: gid};
-		Object.assign(gConfig,this.config.guildDefaultConfig);
+		this.logger.info(`[createGuild]: Added database "${gid}", and tables "users", "settings" for guild ${gid}`);
+		if((await this.r.dbList()).includes(gid)) return this.getGuild(gid);
 		//Object.assign(eConfig,this.config.economyDefaultConfig);
-		await this.r.table("guilds").insert(gConfig);
+		await this.r.dbCreate(gid);
+		await this.r.db(gid).tableCreate("settings");
+		await this.r.db(gid).tableCreate("users");
+		await this.r.db(gid).table("settings").insert(Object.assign({id:1},this.config.defaultGuildSettings))
 		//await this.r.table("economy").insert(eConfig);
 		return this.getGuild(gid);
 	}
 
 	async getGuild(gid) {
 		if(!gid) return new Error("missing parameter");
-		var a = await this.r.table("guilds").get(gid);
-		//var b = await this.r.table("economy").get(gid);
-		if(!a/* || !b*/) return this.createGuild(gid);
-		//a.economy = b;
-		return a;
+		gid = gid.toString();
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("settings")) return this.createGuild(gid);
+		return this.r.db(gid).table("settings").get(1);
 	}
 
 	async deleteGuild(gid) {
 		if(!gid) return new Error("missing parameter");
-		var a = await this.r.table("guilds").get(gid);
-		//var b = await this.r.table("economy").get(gid);
-		if(a !== null) await this.r.table("guilds").get(gid).delete();
-		//if(b !== null) await this.r.table("economy").get(gid).delete();
-		this.logger.info(`[deleteGuild]: Deleted guild "${gid}"`);
-		return {guild:a!==null/*,economy:b!==null*/};
+		gid = gid.toString();
+		if((await this.r.dbList()).includes(gid)) var a = await this.r.dbDrop(this.gdb);
+		if(typeof a.dbs_dropped !== undefined && a.dbs_dropped > 0) {
+			this.logger.info(`[deleteGuild]: Deleted database "${gid}" for guild "${gid}"`);
+			return true;
+		} else {
+			this.logger.info(`[deleteGuild]: Attempted to delete a non-existent guild database "${gid}"`);
+			return false;
+		}
 	}
 
 	async updateGuild(gid,fields) {
 		if(!gid || !fields || fields.length === 0) return new Error("missing parameter");
-		//if(!fields.guild && !fields.economy) return new Error("invalid fields");
-		var a = await this.r.table("guilds").get(gid);
-		//var b = await this.r.table("economy").get(gid);
-		if(!a/* || !b*/) await this.createGuild(gid);
-		if(!fields.guild && !fields.economy) {
-			await this.r.table("guilds").get(gid).update(fields);
+		gid = gid.toString();
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("settings")) await this.createGuild(gid);
+		if(!fields.settings) {
+			await this.r.db(gid).table("settings").get(1).update(fields);
 		}
-		if(fields.guild !== undefined) {
-			await this.r.table("guilds").get(gid).update(fields.guild);
+		if(fields.settings !== undefined) {
+			await this.r.db(gid).table("settings").get(1).update(fields.settings);
 		}
-		/*if(fields.economy !== undefined) {
-			await this.r.table("economy").get(gid).update(fields.economy);
-		}*/
 		return this.getGuild(gid);
 	}
 
 	async sweepGuilds(del=false) {
 		var j = self.guilds;
-		var guilds = [];
-		j.forEach((gj)=>gj.forEach((g)=>guilds.push(g.id)));
-		var g = {
-			guild: await this.r.table("guilds"),
-			//economy: await this.r.table("economy")
-		},
-		g2 = {
-			guild: [],
-			//economy: []
-		};
-		/*
-		fb!eval (async()=>{return (await self.shard.fetchClientValues("guilds"))[0].map(g=>g.id).includes(self.guild.id);})()
-		*/
-		g.guild.forEach((guild)=>{
-			if(!guilds.includes(guild.id)) {
-				g2.guild.push(guild.id);
-				this.logger.warn(`Found guild "${guild.id}" in "guilds" table, which the bot is not in`);
-				if(del) this.r.table("guilds").get(guild.id).delete().then((r)=>{
-					if(r.deleted !== 1) this.logger.error(`[sweepGuilds]: Failed deleting guild "${guild.id}"`);
-					this.logger.info(`[sweepGuilds]: deleted guild "${guild.id}"`);
+		var g = [];
+		this.r.dbList().then(a=>{
+			a.forEach((b)=>{
+				if(b.match(".{17,18}")) g.push(b);
+			})
+		})
+		g2 = [];
+		g.forEach((guild)=>{
+			if(!this.client.guilds.includes(guild)) {
+				g2.push(guild);
+				this.logger.warn(`Found guild "${guild}" in "guilds" table, which the bot is not in`);
+				if(del) this.r.db(this.gdb).tableDrop(guild).then((r)=>{
+					if(r.deleted !== 1) this.logger.error(`[sweepGuilds]: Failed deleting guild "${guild}"`);
+					this.logger.info(`[sweepGuilds]: deleted guild "${guild}"`);
 				});
 			}
 		});
-		/*g.economy.forEach((economy)=>{
-			if(!guilds.includes(economy.id)) {
-				g2.economy.push(economy.id);
-				this.logger.warn(`Found guild "${economy.id}" in "economy" table, which the bot is not in`);
-				if(del) this.r.table("economy").get(economy.id).delete().then((r)=>{
-					if(r.deleted !== 1) this.logger.error(`[sweepGuilds]: Failed deleting guild "${economy.id}"`);
-					this.logger.info(`[sweepGuilds]: deleted guild "${economy.id}"`);
-				});
-			}
-		});*/
+
 		if(del) {
-			this.logger.warn(`Purged ${g2.guild.length} guild${g2.guild.length!==1?"s":""} in "guilds" table that were not in the bot`);
-			//this.logger.warn(`Purged ${g2.economy.length} guild${g2.economy.length!==1?"s":""} in "economy" table that were not in the bot`);
+			this.logger.warn(`Purged ${g2.length} guild${g2.length!==1?"s":""} in "guilds" table that were not in the bot`);
 		} else {
-			this.logger.warn(`Found ${g2.guild.length} guild${g2.guild.length!==1?"s":""} in "guilds" table that were not in the bot`);
-			//this.logger.warn(`Found ${g2.economy.length} guild${g2.economy.length!==1?"s":""} in "economy" table that were not in the bot`);
+			this.logger.warn(`Found ${g2.length} guild${g2.length!==1?"s":""} in "guilds" table that were not in the bot`);
 		}
 		return g2;
 	}
 
 	async createUserWarning(uid,gid,blame,reason,bypassChecks=false) {
 		if(!uid || !gid || !blame || !reason) return new Error("missing parameter");
+		uid = uid.toString();
+		gid = gid.toString();
 		if(!bypassChecks) {
 			if(!this.client.guilds.has(gid)) {
 				this.logger.warn(`[createUserWarning]: Attempted to add warning to a guild that the bot is not in`);
@@ -119,122 +102,148 @@ class FurryBotDatabase {
 				return new Error("ERR_NOT_FOUND");
 			}
 		}
-		//var id = await this.client.random();
-		var id = (await this.r.table("warnings").count())+1;
-		await this.r.table("warnings").insert({id,uid,gid,blame,reason,timestamp:Date.now()});
-		return this.r.table("warnings").get(id);
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
+		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
+		var wid = (await this.getUserWarnings(uid,gid)).length+1;
+		if(isNaN(wid)) wid = 1;
+		await this.r.db(gid).table("users").get(uid).update({warnings:this.r.row("warnings").append({wid,blame,reason,timestamp:Date.now()})});
+		return this.getUserWarning(uid,gid,wid);
 	}
 
 	async getUserWarnings(uid,gid) {
 		if(!uid || !gid) return new Error("missing parameter");
-		return this.r.table("warnings").filter({uid,gid}).orderBy("id");
+		uid = uid.toString();
+		gid = gid.toString();
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
+		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
+		return this.r.db(gid).table("users").get(uid)("warnings").orderBy("id");
 	}
 	
-	async getUserWarning(wid) {
-		if(!wid) return new Error("missing parameter");
-		var j = await this.r.table("warnings").get(wid);
-		if(!j) return new Error("ERR_NOT_FOUND");
-		return j;
-	}
-
-	async deleteUserWarning(wid) {
-		if(!wid) return new Error("missing parameter");
-		var j = await this.r.table("warnings").get(wid);
-		if(!j) return new Error("ERR_NOT_FOUND");
-		var a = await j.delete();
-		return Boolean(a.deleted);
-	}
-
-	async clearUserWarnings(uid,gid=null) {
-		if(!uid) return new Error("missing parameter");
-		var filter = gid !== null ? {uid,gid} : {uid};
-		var j = await this.r.table("warnings").filter(filter);
+	async getUserWarning(uid,gid,wid) {
+		if(!wid || !gid || !wid) return new Error("missing parameter");
+		uid = uid.toString();
+		gid = gid.toString();
+		wid = parseInt(wid);
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
+		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
+		var j = await this.r.db(gid).table("users").get(uid)("warnings").filter({wid});
 		if(j.length === 0) return new Error("ERR_NOT_FOUND");
-		var a = await this.r.table("warnings").filter(filter).delete();
-		return Boolean(a.deleted);
+		return j[0];
+	}
+
+	async deleteUserWarning(uid,gid,wid) {
+		if(!uid || !wid || !gid) return new Error("missing parameter");
+		uid = uid.toString();
+		gid = gid.toString();
+		wid = parseInt(wid);
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
+		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
+		var j = await this.r.db(gid).table("users").get(uid).update((u)=>{
+			return {"warnings": u('warnings').filter((item)=>item('wid').ne(wid))}
+		});
+		return Boolean(j.replaced);
+	}
+
+	async clearUserWarnings(uid,gid) {
+		if(!uid || !gid) return new Error("missing parameter");
+		uid = uid.toString();
+		gid = gid.toString();
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
+		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
+		var j = await this.r.db(gid).table("users").get(uid).update({warnings:[]});
+		return Boolean(j.replaced);
 	}
 
 	async addDonator(uid,level) {
 		if(!uid || !level) return new Error("missing parameter");
+		uid = uid.toString();
 		// level:
 		// -1 = freemium
 		// 1 = $2-$3
 		// 2 = $5
 		// 3 = $10
-		return this.r.table("donors").insert({id:uid,level});
+		return this.r.db(this.mdb).table("donors").insert({id:uid,level});
 	}
 
 	async updateDonator(uid,level) {
 		if(!uid || !level) return new Error("missing parameter");
+		uid = uid.toString();
 		// level:
 		// -1 = freemium
 		// 1 = $2-$3
 		// 2 = $5
 		// 3 = $10
-		var a = await this.r.table("donors").get(uid).update({level});
+		var a = await this.r.db(this.mdb).table("donors").get(uid).update({level});
 		if(a.skipped) return this.addDonator(uid,level);
 		return true;
 	}
 
 	async removeDonor(uid) {
 		if(!uid) return new Error("missing parameter");
-		await this.r.table("donors").get(uid).delete();
+		uid = uid.toString();
+		await this.r.db(this.mdb).table("donors").get(uid).delete();
 		return true;
 	}
 
 	async isDonor(uid) {
 		if(!uid) return new Error("missing parameter");
-		var a = await this.r.table("donors").get(uid);
+		uid = uid.toString();
+		var a = await this.r.db(this.mdb).table("donors").get(uid);
 		if(!a) return false;
 		return true;
 	}
 
 	async addBlacklistedUser(uid,reason) {
 		if(!uid || !reason) return new Error("missing parameter");
-		await this.r.table("blacklist").insert({id:uid,reason,type:"user"});
-		return true;
+		uid = uid.toString();
+		var j = await this.r.db(this.mdb).table("blacklist").insert({id:uid,reason,type:"user"});
+		return Boolean(j.inserted);
 	}
 
 	async updateBlacklistedUser(uid,reason) {
 		if(!uid || !reason) return new Error("missing parameter");
-		var a = await this.r.table("blacklist").get(uid).update({reason});
-		if(a.skipped) return this.addBlacklistedUser(uid,reason);
+		uid = uid.toString();
+		var a = await this.r.db(this.mdb).table("blacklist").get(uid).update({reason});
+		if(!a.replaced) return this.addBlacklistedUser(uid,reason);
 		return true;
 	}
 
 	async removeBlacklistedUser(uid) {
 		if(!uid) return new Error("missing parameter");
-		await this.r.table("donors").get(uid).delete();
+		uid = uid.toString();
+		await this.r.db(this.mdb).table("donors").get(uid).delete();
 		return true;
 	}
 
 	async addBlacklistedGuild(gid,reason) {
 		if(!gid || !reason) return new Error("missing parameter");
-		await this.r.table("blacklist").insert({id:gid,reason,type:"guild"});
+		gid = gid.toString();
+		await this.r.db(this.mdb).table("blacklist").insert({id:gid,reason,type:"guild"});
 		return true;
 	}
 
 	async updateBlacklistedGuild(gid,reason) {
 		if(!gid || !reason) return new Error("missing parameter");
-		var a = await this.r.table("blacklist").get(uid).update({reason});
+		gid = gid.toString();
+		var a = await this.r.db(this.mdb).table("blacklist").get(uid).update({reason});
 		if(a.skipped) return this.addBlacklistedGuild(gid,reason);
 		return true;
 	}
 
 	async removeBlacklistedGuild(gid) {
 		if(!gid) return new Error("missing parameter");
-		await this.r.table("donors").get(gid).delete();
+		gid = gid.toString();
+		await this.r.db(this.mdb).table("blacklist").get(gid).delete();
 		return true;
 	}
 
 	async isBlacklisted(id) {
 		if(!id) return new Error("missing parameter");
-		var a = await this.r.table("blacklist").get(id);
+		id = id.toString();
+		var a = await this.r.db(this.mdb).table("blacklist").get(id);
 		if(!a) return false;
 		return true;
 	}
-
-
 
 	async getStats(type) {
 		var types = ["f","fcount","commands","general"];
@@ -243,34 +252,34 @@ class FurryBotDatabase {
 			switch(type.toLowerCase()) {
 				case "fcount":
 				case "f":
-					return (await this.r.table("stats").get("fCount")).count;
+					return (await this.r.db(this.mdb).table("stats").get("fCount")).count;
 					break;
 
 				case "commands":
-					return this.r.table("stats").get("commands");
+					return this.r.db(this.mdb).table("stats").get("commands");
 					break;
 
 				case "general":
-					return this.r.table("stats").get("general");
+					return this.r.db(this.mdb).table("stats").get("general");
 					break;
 			}
 		} else {
-			var fCount = (await this.r.table("stats").get("fCount")).count;
-			var commands = await this.r.table("stats").get("commands");
-			var general = await this.r.table("stats").get("general");
+			var fCount = (await this.r.db(this.mdb).table("stats").get("fCount")).count;
+			var commands = await this.r.db(this.mdb).table("stats").get("commands");
+			var general = await this.r.db(this.mdb).table("stats").get("general");
 			return {fCount,commands,general};
 		}
 	}
 
 	async incrementCommandStats(command,amount=1) {
 		if(!command) return new Error("missing paramter");
-		var a = await this.r.table("stats").get("commands");
-		if(!a) var a = await this.r.table("stats").insert({id:"commands"});
+		var a = await this.r.db(this.mdb).table("stats").get("commands");
+		if(!a) var a = await this.r.db(this.mdb).table("stats").insert({id:"commands"});
 		if(!a[command]) {
-			await this.r.table("stats").get("commands").update({[command]:amount});
+			await this.r.db(this.mdb).table("stats").get("commands").update({[command]:amount});
 			return amount;
 		} else {
-			await this.r.table("stats").get("commands").update({[command]:+a[command]+amount});
+			await this.r.db(this.mdb).table("stats").get("commands").update({[command]:+a[command]+amount});
 			return +a[command]+amount;
 		}
 	}
@@ -278,95 +287,53 @@ class FurryBotDatabase {
 	async createUser(uid,gid,bypassChecks=false) {
 		if(!uid) return new Error("missing paramter");
 		uid = uid.toString();
-		if(![undefined,null,""].includes(gid)) {
-			if(!this.client.guilds.has(gid) && !bypassChecks) {
-				this.logger.warn(`[createUser]: Attempted to create a user for a guild that the bot is not in.`);
-				return new Error("invalid guild");
-				return;
-			}
-			if(!this.client.guilds.get(gid).members.has(uid) && !bypassChecks) {
-				this.logger.warn(`[createUser]: Attempted to create a user for a guild that the user is not in.`);
-				return new Error("invalid user");
-				return;
-			}
-			if(!(await this.r.table("guilds").get(gid))) await this.createGuild(gid);
-			await this.r.table("users").insert(Object.assign({id:uid},this.config.userDefaultConfig));
-			//await this.updateGuild(gid,{economy:{users:{[uid]:this.config.economyUserDefaultConfig}}});
-			//this.logger.log(`Added user "${uid}" to economy and users tables with default configuration, gid: ${gid}`);
-			this.logger.log(`Added user "${uid}" to users tables with default configuration`);
-			return Object.assign(await this.r.table("users").get(uid),/*(await this.r.table("economy").get(gid)).users[uid]*/{});
-		} else {
-			await this.r.table("users").insert(Object.assign({id:uid},this.config.userDefaultConfig));
-			return this.r.table("users").get(uid);
+		gid = gid.toString();
+		if(!this.client.guilds.has(gid) && !bypassChecks) {
+			this.logger.warn(`[createUser]: Attempted to create a user for a guild that the bot is not in.`);
+			return new Error("invalid guild");
 		}
+		if(!this.client.guilds.get(gid).members.has(uid) && !bypassChecks) {
+			this.logger.warn(`[createUser]: Attempted to create a user for a guild that the user is not in.`);
+			return new Error("invalid user");
+		}
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
+		await this.r.db(gid).table("users").insert(Object.assign({id:uid},this.config.userDefaultConfig));
+		this.logger.info(`[createUser]: Added user "${uid}" to users table in guild "${gid}" with default configuration`);
+		return this.getUser(uid,gid);
 	}
 
-	async getUser(uid,gid,bypassChecks) {
+	async getUser(uid,gid) {
 		if(!uid) return new Error("missing paramter");
 		uid = uid.toString();
-		if(![undefined,null,""].includes(gid)) {
-			//if(!(await this.r.table("guilds").get(gid)) || !(await this.r.table("economy").get(gid))) await this.createGuild(gid,bypassChecks);
-			var user = await this.r.table("users").get(uid);
-			if(!user) var user = await this.createUser(uid,gid,bypassChecks);
-			/*var economy = await this.r.table("economy").get(gid);
-			if(!economy) var economy = (await this.createGuild(gid,bypassChecks)).economy; 
-			if(!economy.users[uid]) {
-				await this.createUser(uid,gid,bypassChecks);
-				var economy = (await this.createGuild(gid,bypassChecks)).economy; 
-			}*/
-			delete user.id;
-			return Object.assign(user,/*economy.users[uid]*/{});
-		} else {
-			var user = await this.r.table("users").get(uid);
-			if(!user) var user = await this.createUser(uid,gid,bypassChecks);
-			return user;
-		}
+		gid = gid.toString();
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
+		if(!(await this.r.db(gid).table("users").get(uid))) return this.createUser(uid,gid);
+		return this.r.db(gid).table("users").get(uid);
+
 	}
 
 	async deleteUser(uid,gid) {
 		if(!uid) return new Error("missing paramter");
 		uid = uid.toString();
-		if(![undefined,null,""].includes(gid)) {
-			//if(!(await this.r.table("guilds").get(gid)) || !(await this.r.table("economy").get(gid))) return new Error("guild not found");
-			var user = await this.r.table("users").get(uid).delete();
-			//var economy = await this.r.table("economy").get(gid).replace(this.r.row.without({users:{[uid]:true}}));
-			return {user:user.deleted===1/*,economy:economy.replaced===1*/};
-		} else {
-			var user = await this.r.table("users").get(uid).delete();
-			return {user:user.deleted===1};
-		}
+		gid = gid.toString();
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
+		if(!(await this.r.db(gid).table("users").get(uid))) return false;
+		return Boolean((await this.r.db(gid).table("users").get(uid).delete()).deleted);
 	}
 
-	async updateUser(uid,gid,fields,bypassChecks) {
-		if(!uid || !fields || fields.length === 0) return new Error("missing parameter");
-		if(!fields.user && !fields.economy) {
-			await this.r.table("users").get(uid).update(fields.user);
-			return this.getUser(uid,null,bypassChecks);
-		} else {
-			if(![undefined,null,""].includes(gid)) {
-				if(!this.client.guilds.has(gid) && !bypassChecks) {
-					this.logger.warn(`[createUser]: Attempted to create a user for a guild that the bot is not in.`);
-					return new Error("invalid guild");
-					return;
-				}
-				if(!this.client.guilds.get(gid).members.has(uid) && !bypassChecks) {
-					this.logger.warn(`[createUser]: Attempted to create a user for a guild that the user is not in.`);
-					return new Error("invalid user");
-					return;
-				}
-				var a = await this.r.table("users").get(uid);
-				//var b = await this.r.table("economy").get(gid);
-				if(!a/* || !b*/) await this.createUser(uid,gid,bypassChecks);
-				if(fields.user !== undefined) await this.r.table("users").get(uid).update(fields.user);
-				//if(fields.economy !== undefined) await this.r.table("economy").get(gid).update({users:{[uid]:fields.economy}});
-				return this.getUser(uid,gid,bypassChecks);
-			} else {
-				var a = await this.r.table("users").get(uid);
-				if(!a) await this.createUser(uid,gid,bypassChecks);
-				if(fields.user !== undefined) await this.r.table("users").get(uid).update(fields.user);
-				return this.getUser(uid,null,bypassChecks);
-			}
+	async updateUser(uid,gid,fields) {
+		if(!uid || !gid || !fields || fields.length === 0) return new Error("missing parameter");
+		uid = uid.toString();
+		gid = gid.toString();
+		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
+		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
+		if(!fields.user) {
+			await this.r.db(gid).table("users").get(uid).update(fields);
+			return this.getUser(uid,gid,bypassChecks);
+		}  else {
+			if(fields.user !== undefined) await this.r.db(gid).table("users").get(uid).update(fields.user);
 		}
+		return this.getUser(uid,gid);
 	}
 }
 

@@ -50,7 +50,25 @@ module.exports = (async(self,message)=>{
 		member: message.member,
 		guild: message.guild,
 		channel: message.channel,
-		user: await self.resolveUser(message.member)
+		user: await self.resolveUser(message.member),
+		embed_defaults: ((without=[])=>{
+			var def = {
+				footer: {
+					text: `Shard ${![undefined,null].includes(local.guild.shard) ? `${+local.guild.shard.id+1}/${self.options.shardCount}`: "1/1"} | Bot Version ${self.config.bot.version}`
+				},
+				author: {
+					name: local.author.tag,
+					icon_url: local.author.avatarURL()
+				},
+				color: self.randomColor(),
+				timestamp: self.getCurrentTimestamp()
+			};
+			if(typeof without === "string") without = [without];
+			without.forEach((wth)=>{
+				if(typeof def[wth] !== "undefined") delete def[wth];
+			});
+			return def;
+		})
 	};
 	
 	// temporary - during beta
@@ -59,7 +77,6 @@ module.exports = (async(self,message)=>{
 	try {
 		self.messageCount++;
 		self.localMessageCount++;
-		local.embed_defaults = {"footer": {text: `Shard ${![undefined,null].includes(local.guild.shard) ? `${+local.guild.shard.id+1}/${self.options.shardCount}`: "1/1"} | Bot Version ${self.config.bot.version}`}, "author": {"name": local.author.tag,"icon_url": local.author.avatarURL()}, "color": self.randomColor(), "timestamp": self.getCurrentTimestamp()};
 		try {
 			local.gConfig = await self.db.getGuild(local.guild.id) ||  self.config.guildDefaultConfig;
 			local.uConfig = await self.db.getUser(local.member.id,local.guild.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyUserDefaultConfig);
@@ -379,7 +396,7 @@ module.exports = (async(self,message)=>{
 				level: "e1",
 				filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 			});
-			self.logger.error(`[CommandHandler] e1: ${e}`);
+			self.logger.error(`[CommandHandler] e1: ${e.name}: ${e.message}\n${e.stack}`);
 		}
 	}
 	}catch(e){
@@ -395,7 +412,7 @@ module.exports = (async(self,message)=>{
 			level: "e2",
 			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 		});
-		self.logger.error(`[CommandHandler] e2: ${e}`);
+		self.logger.error(`[CommandHandler] e2: ${e.name}: ${e.message}\n${e.stack}`);
 		//message.reply(`Error while running command: ${e}`);
 		//return self.error(`[messageEvent][Guild: ${message.guild.id}]: Command error:\n\tCommand: ${command}\n\tSupplied arguments: ${args.length==0?"none":args.join(" ")}\n\tServer ID: ${message.guild.id}\n\t${e.stack}`);
     }
