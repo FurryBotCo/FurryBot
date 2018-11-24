@@ -1,6 +1,6 @@
 module.exports = (async(self) => {
     self.logger = new self.FurryBotLogger(self);
-    var resp = await self.request(`https://api.furrybot.me/commands${self.config.beta?"?beta":""}`, {
+    var resp = await self.request(self.config.commandListURL, {
         method: "GET",
         headers: {
             Authorization: `Key ${self.config.apiKey}`

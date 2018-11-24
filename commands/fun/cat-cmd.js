@@ -3,7 +3,7 @@ module.exports = (async (self,local) => {
 	var req = await self.request("https://aws.random.cat/meow",{
 		method: "GET",
 		headers: {
-			"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+			"User-Agent": self.config.userAgent
 		}
 	})
 	

@@ -18,12 +18,10 @@ class FurryBotDatabase {
 		}
 		this.logger.info(`[createGuild]: Added database "${gid}", and tables "users", "settings" for guild ${gid}`);
 		if((await this.r.dbList()).includes(gid)) return this.getGuild(gid);
-		//Object.assign(eConfig,this.config.economyDefaultConfig);
 		await this.r.dbCreate(gid);
 		await this.r.db(gid).tableCreate("settings");
 		await this.r.db(gid).tableCreate("users");
-		await this.r.db(gid).table("settings").insert(Object.assign({id:1},this.config.defaultGuildSettings))
-		//await this.r.table("economy").insert(eConfig);
+		await this.r.db(gid).table("settings").insert(Object.assign({id:1},this.config.defaultGuildSettings));
 		return this.getGuild(gid);
 	}
 
@@ -37,7 +35,7 @@ class FurryBotDatabase {
 	async deleteGuild(gid) {
 		if(!gid) return new Error("missing parameter");
 		gid = gid.toString();
-		if((await this.r.dbList()).includes(gid)) var a = await this.r.dbDrop(this.gdb);
+		if((await this.r.dbList()).includes(gid)) var a = await this.r.dbDrop(gid);
 		if(typeof a.dbs_dropped !== undefined && a.dbs_dropped > 0) {
 			this.logger.info(`[deleteGuild]: Deleted database "${gid}" for guild "${gid}"`);
 			return true;
@@ -60,6 +58,16 @@ class FurryBotDatabase {
 		return this.getGuild(gid);
 	}
 
+	async resetGuild(gid) {
+		if(!(await this.r.dbList()).includes(gid)) return false;
+		await this.r.dbDrop(gid);
+		await this.r.dbCreate(gid);
+		await this.r.db(gid).tableCreate("settings");
+		await this.r.db(gid).tableCreate("users");
+		await this.r.db(gid).table("settings").insert(Object.assign({id:1},this.config.defaultGuildSettings));
+		return true;
+	}
+	
 	async sweepGuilds(del=false) {
 		var j = self.guilds;
 		var g = [];
@@ -151,7 +159,7 @@ class FurryBotDatabase {
 		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
 		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
 		var j = await this.r.db(gid).table("users").get(uid).update({warnings:[]});
-		return Boolean(j.replaced);
+		return j.replaced >= 1;
 	}
 
 	async addDonator(uid,level) {

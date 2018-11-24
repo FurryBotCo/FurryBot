@@ -4,7 +4,7 @@ module.exports = (async (self,local) => {
 		var req = await self.request("https://api.bunnies.io/v2/loop/random/?media=gif",{
 		method: "GET",
 		headers: {
-			"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+			"User-Agent": self.config.userAgent
 		}
 	});
 	var response = JSON.parse(req.body);

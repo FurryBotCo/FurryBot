@@ -34,7 +34,7 @@ module.exports = (async(self,local)=>{
     }
 
     if(user.id === local.member.id && !local.user.isDeveloper) return local.message.reply("Pretty sure you don't want to do this to yourself.");
-    if(user.roles.highest.rawPosition >= local.member.roles.highest.rawPosition && local.author.id !== local.guild.owner.id) return local.message.reply(`You cannot ban ${user.user.tag} as their highest role is higher than yours!`);
+    if(user.roles.highest.rawPosition >= local.member.roles.highest.rawPosition && local.author.id !== local.guild.owner.id) return local.message.reply(`You cannot kick ${user.user.tag} as their highest role is higher than yours!`);
     if(!user.kickable) return local.message.reply(`I cannot kick ${user.user.tag}! Do they have a higher role than me? Do I have kick permissions?`);
     var reason = local.args.length >= 2 ? local.args.splice(1).join(" ") : "No Reason Specified";
     if(!user.user.bot) var m = await user.user.send(`You were kicked from **${local.guild.name}**\nReason: ${reason}`);

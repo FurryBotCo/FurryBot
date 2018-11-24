@@ -6,7 +6,7 @@
   "disabledCommands": [],
   "userCommandBlacklist": {},
   "commandsModOnly": false,
-  "deleteCmds": false,
+  "deleteCommands": false,
   "funModuleEnabled": true,
   "moderationModuleEnabled": true,
   "infoModuleEnabled": true,
@@ -102,5 +102,10 @@
   "musicQueue": {
 
   },
-  "djRole": null
+  "muteRole": null,
+  "djRole": null,
+  "modlog": {
+    "enabled": false,
+    "channel": null
+  }
 }

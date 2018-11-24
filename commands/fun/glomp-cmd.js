@@ -3,7 +3,7 @@ module.exports = (async (self,local) => {
 	var text = self.varParse(local.c,{author:local.author,input:local.args.join(" ")});
 	local.channel.send(text);
 
-	if(!local.gConfig.deleteCmds) {
+	if(!local.gConfig.deleteCommands) {
 		local.message.delete().catch(noerr => {});
 	}
 });

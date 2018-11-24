@@ -53,7 +53,7 @@ module.exports=(async (self,local) => {
 					var req = await self.request(`https://inkbunny.net/api_userrating.php?sid=${sid}`,{
 						method: "GET",
 						headers: {
-							"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+							"User-Agent": self.config.userAgent
 						}
 					});
 					var a = JSON.parse(req.body);
@@ -63,7 +63,7 @@ module.exports=(async (self,local) => {
 								var login = await self.request(`https://inkbunny.net/api_login.php?${self.config.furryArtAPIs.inkbunny.urlCredentials}`,{
 									method: "GET",
 									headers: {
-										"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+										"User-Agent": self.config.userAgent
 									}
 								});
 								var b = JSON.parse(login.body);
@@ -94,7 +94,7 @@ module.exports=(async (self,local) => {
 						var a = await self.request(`https://inkbunny.net/api_login.php?${self.config.furryArtAPIs.inkbunny.urlCredentials}`,{
 							method: "GET",
 							headers: {
-								"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+								"User-Agent": self.config.userAgent
 							}
 						});
 						if(typeof a.error_code !=="undefined" && typeof a.sid === "undefined") {
@@ -119,7 +119,7 @@ module.exports=(async (self,local) => {
 				var req = await self.request(`https://inkbunny.net/api_userrating.php?sid=${self.config.furryArtAPIs.inkbunny.sid}`,{
 						method: "GET",
 						headers: {
-							"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+							"User-Agent": self.config.userAgent
 						}
 					});
 					var a = JSON.parse(req.body);
@@ -129,7 +129,7 @@ module.exports=(async (self,local) => {
 								var login = await self.request(`https://inkbunny.net/api_login.php?${self.config.furryArtAPIs.inkbunny.urlCredentials}`,{
 									method: "GET",
 									headers: {
-										"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+										"User-Agent": self.config.userAgent
 									}
 								});
 								var b = JSON.parse(login.body);
@@ -160,7 +160,7 @@ module.exports=(async (self,local) => {
 			var req = await self.request(`https://inkbunny.net/api_search.php?sid=${self.config.furryArtAPIs.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=-cub%20-diaper%20-ass%20-upskirt%20-pantsu%20-incest%20-age_difference%20-boobhat&random=yes&get_rid=yes`,{
 				method: "GET",
 				headers: {
-					"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+					"User-Agent": self.config.userAgent
 				}
 			});
 			
@@ -197,7 +197,7 @@ module.exports=(async (self,local) => {
 			var req = await self.request("https://api2.sofurry.com/browse/search?search=furry&format=json&minlevel=0&maxlevel=0",{
 				method: "GET",
 				headers: {
-					"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+					"User-Agent": self.config.userAgent
 				}
 			});
 			try {

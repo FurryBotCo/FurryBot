@@ -151,7 +151,7 @@ module.exports = (async(self,message)=>{
 					title: "Hewwo!",
 					description: `You can find out how to use me on my [docs page](https://docs.furrybot.me), my current prefix here is: **${local.gConfig.prefix}**\n(this can be chanegd via \`${local.gConfig.prefix}prefix <newprefix>\`)`
 				}
-				Object.assign(data,local.embed_defaults);
+				Object.assign(data,local.embed_defaults());
 				var embed = new self.Discord.MessageEmbed(data);
 				if(!local.channel.permissionsFor(self.user).has("SEND_MESSAGES")) {
 					local.author.send("I couldn't send messages in the channel where I was mentioned, so I sent this directly to you!",embed).catch(noerr=>null);
@@ -167,7 +167,7 @@ module.exports = (async(self,message)=>{
 		}
 		if(!local.message.content.startsWith(local.prefix)) return;
 		if(!self.config.commandList.all.includes(local.command)) return;
-		if(local.gConfig.deleteCmds) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
+		if(local.gConfig.deleteCommands) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
 		if(command.userPermissions.length > 0) {
 			if(command.userPermissions.some(perm => !local.channel.permissionsFor(local.member).has(perm,true))) {
 				var neededPerms = command.userPermissions.filter(perm => !local.channel.permissionsFor(local.member).has(perm,true));
@@ -191,7 +191,7 @@ module.exports = (async(self,message)=>{
 						"title": "You Don't have permission to do this!",
 						"description": `You require the permission(s) **${neededPerms}** to run this command!`
 				};
-				Object.assign(data, local.embed_defaults);
+				Object.assign(data, local.embed_defaults());
 				var embed = new self.Discord.MessageEmbed(data);
 				self.logger.debug(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: User ${local.author.tag} (${local.author.id}) is missing the permission(s) ${neededPerms} to run the command ${local.command} in guild ${local.guild.name} (${local.guild.id})`);
 				return local.channel.send(embed);
@@ -220,7 +220,7 @@ module.exports = (async(self,message)=>{
 					"title": "I don't have the required permissions!",
 					"description": `I require the permission(s) **${neededPerms}** to run this command!`
 				};
-				Object.assign(data, local.embed_defaults);
+				Object.assign(data, local.embed_defaults());
 				var embed = new self.Discord.MessageEmbed(data);
 				self.debug(`I am missing the permission(s) ${neededPerms} to run the command ${local.command} in guild ${local.guild.name} (${local.guild.id})`);
 				return local.channel.send(embed);
@@ -248,7 +248,7 @@ module.exports = (async(self,message)=>{
 					"title": "NSFW commands are not allowed here",
 					"description": "NSFW commands must be ran in channels marked as NSFW"
 				};
-				Object.assign(data, local.embed_defaults);
+				Object.assign(data, local.embed_defaults());
 				var embed = new self.Discord.MessageEmbed(data);
 				return local.channel.send(embed);
 			}
@@ -259,7 +259,7 @@ module.exports = (async(self,message)=>{
 					"description": `NSFW commands are not enabled in this server, ask a staff member to run the command \`${local.gConfig.prefix}togglensfw\` to enable NSFW commands!`
 				};
 				
-				Object.assign(data, local.embed_defaults);
+				Object.assign(data, local.embed_defaults());
 				var embed = new self.Discord.MessageEmbed(data);
 				return local.channel.send(embed);
 			}
@@ -272,12 +272,24 @@ module.exports = (async(self,message)=>{
 					"description": `Ask a staff member to re-enabled them by removing \`${st}\` from the channel topic`
 				};
 				
-				Object.assign(data, local.embed_defaults);
+				Object.assign(data, local.embed_defaults());
 				var embed = new self.Discord.MessageEmbed(data);
 				return local.channel.send(embed);
 			}
 		}
-		var isAlias = command.alias == "true";
+
+		if(command.guildOwnerOnly === true && local.author.id !== local.guild.owner.id) {
+			var data = {
+				"title": "Only the owner of this guild (server) can use this!",
+				"description": `Only the owner of this guild, **${local.guild.owner.user.tag}** can run this.`
+			};
+			
+			Object.assign(data, local.embed_defaults());
+			var embed = new self.Discord.MessageEmbed(data);
+			return local.channel.send(embed);
+		}
+
+		var isAlias = command.alias;
 		if(Object.keys(self.lang[local.gConfig.locale]).includes(local.command)) {
 			local.cmd = self.lang[local.gConfig.locale][local.command];
 			local.c = local.cmd[Math.floor(Math.random()*local.cmd.length)];
@@ -310,7 +322,7 @@ module.exports = (async(self,message)=>{
 					filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 				});
 				
-				self.logger.commandlog(`[DiscordBot:${__filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]}]: Command Alias "${local.command}" (aliasof: ${command.aliasof}) ran with arguments "${local.args.join(" ")}" by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
+				self.logger.commandlog(`Command Alias "${local.command}" (aliasof: ${command.aliasof}) ran with arguments "${local.args.join(" ")}" by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
 				var c = await require(`${process.cwd()}/commands/${command.category}/${command.aliasof}-cmd.js`)(self,local);
 				if(c instanceof Error) throw c;
 				break;
@@ -360,10 +372,11 @@ module.exports = (async(self,message)=>{
 			});
 			var data = {
 				title: ":x: Invalid Command Usage",
+				color: 15601937,
 				fields: [
 					{
 						name: "Command",
-						value: cmd,
+						value: `${local.command} ${isAlias?`(aliasof: ${cmd})`:""}`,
 						inline: false
 					},{
 						name: "Usage",
@@ -377,10 +390,14 @@ module.exports = (async(self,message)=>{
 						name: "Arguments Provided",
 						value: local.args.join(" ")||"NONE",
 						inline: false
+					},{
+						name: "Documentation Link",
+						value: `https://docs.furrybot.me/#command/${cmd}`,
+						inline: false
 					}
 				]
 			};
-			Object.assign(data, local.embed_defaults);
+			Object.assign(data, local.embed_defaults("color"));
 			var embed = new self.Discord.MessageEmbed(data);
 			return local.channel.send(embed);
 		} else {

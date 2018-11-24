@@ -10,7 +10,7 @@ module.exports = (async (self,local) => {
 	} else {
 		local.channel.send(text);
 	}
-	if(!local.gConfig.deleteCmds) {
+	if(!local.gConfig.deleteCommands) {
 		local.message.delete().catch(noerr => {});
 	}
 	return local.channel.stopTyping();

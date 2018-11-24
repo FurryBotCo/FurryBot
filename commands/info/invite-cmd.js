@@ -9,7 +9,7 @@ module.exports = (async (self,local) => {
 				inline: false
 			},
 			{
-				name: "Discord Support Server",
+				name: "Discord Server",
 				value: self.config.discordSupportInvite,
 				inline: false
 			}

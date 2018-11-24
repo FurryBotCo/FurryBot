@@ -8,7 +8,7 @@ module.exports = (async (self,local) => {
 	var req = await self.request("https://dog.ceo/api/breeds/image/random",{
 		method: "GET",
 		headers: {
-			"User-Agent": `FurryBot/${self.config.bot.version} (https://www.furrybot.me)`
+			"User-Agent": self.config.userAgent
 		}
 	})
 	var j = JSON.parse(req.body);
