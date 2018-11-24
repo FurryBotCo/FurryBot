@@ -30,12 +30,13 @@ module.exports = (async (self,local) => {
 	}
 	var u = local.author.displayAvatarURL().split(".");
 	u.pop();
-	var imgpath = `${self.config.rootDir}/tmp/${local.guild.id}-${local.channel.id}-${local.author.id}.png`;
+	var imgpath = `${self.config.rootDir}/tmp/${local.guild.id}-${local.channel.id}-${local.author.id}-profile.png`;
 	await self.download(`${u.join(".")}.png`,imgpath);
 	var img = await self.fsn.readFile(imgpath);
 	pr.addImage(img, 18, 128, 119, 119);
 	var a = await pr.toBufferAsync();
 	var at = new self.Discord.MessageAttachment(a);
-	local.channel.send(at);
+	await local.channel.send(at);
+	await self.fsn.unlink(imgpath);
 	local.channel.stopTyping();
 });
