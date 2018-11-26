@@ -11,8 +11,8 @@ module.exports = (async (self,local) => {
 		var end = self.performance.now();
 	}catch(e){
 		//return local.message.reply(`Error evaluating: ${err}`);
-		var m = typeof e.message !== "string" ? self.util.inspect(e.message,{depth:null}) : e.message;
-		console.log(self.util.inspect(e.message,{depth:null}));
+		var m = typeof e.message !== "string" ? self.util.inspect(e.message,{depth: 3}) : e.message;
+		console.log(self.util.inspect(e.message,{depth: 3}));
 		var res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Evaluating:\n${e.name}: ${m}\`\`\``;
 		var data = {
 			title: `Evaluated - Time: \`\`${(end-start).toFixed(3)}ms\`\``,
@@ -32,8 +32,9 @@ module.exports = (async (self,local) => {
 					inline: false
 				}
 			]
-		};
-		console.error(`[Eval]: ${self.util.inspect(e,{depth:null,color:true})}`);
+		}
+
+		console.error(`[Eval]: ${self.util.inspect(e,{depth: 3,color:true})}`);
 		Object.assign(data,local.embed_defaults());
 		var embed = new self.Discord.MessageEmbed(data);
 		local.channel.send(embed).catch(err => {
@@ -46,7 +47,7 @@ module.exports = (async (self,local) => {
 	if([null,undefined,""].includes(res)) {
 		var res = "```fix\nfinished with no return```";
 	} else {
-		if(typeof res !== "string") res = self.util.inspect(res,{showHidden:true,depth:null});
+		if(typeof res !== "string") res = self.util.inspect(res,{showHidden:true,depth: 3});
 		if(res.length > 1000) {
 			console.log(`[Eval]: ${res}`);
 			res = "Logged To Console";
@@ -71,7 +72,8 @@ module.exports = (async (self,local) => {
 				inline: false
 			}
 		]
-	};
+	}
+	
 	Object.assign(data,local.embed_defaults());
 	var embed = new self.Discord.MessageEmbed(data);
 	local.channel.send(embed).catch(err => {

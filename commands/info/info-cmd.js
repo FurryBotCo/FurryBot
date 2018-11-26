@@ -6,7 +6,7 @@ module.exports = (async (self,local) => {
 	});
 	var largeGuildCount=0;
 	var srv=Array.from(self.guilds.values());
-	for(i=0;i<srv.length;i++) {
+	for(let i=0;i<srv.length;i++) {
 		if(!srv[i].unavailable) {
 			if(srv[i].large) {
 				largeGuildCount++;
@@ -39,7 +39,7 @@ module.exports = (async (self,local) => {
 				value: self.guilds.size,
 				inline: true
 			}, {
-				name: "Large Guilds (300+)",
+				name: "Large Guilds (250+)",
 				value: largeGuildCount,
 				inline: true
 			}, {

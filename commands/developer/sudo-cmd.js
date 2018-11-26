@@ -22,7 +22,7 @@ module.exports = (async(self,local)=>{
         var user = self.users.find(t=>t.tag===local.args[0]);
     }
 
-    if(!user || !user instanceof self.Discord.User) {
+    if(!user || !(user instanceof self.Discord.User)) {
         var data = {
 			title: "User not found",
 			description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"

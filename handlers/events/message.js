@@ -1,4 +1,4 @@
-module.exports = (async(self,message)=>{
+module.exports = (async(self,message) => {
 	const event = __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0].split(".")[0] : __filename.split("\\").reverse()[0].split(".")[0],
 		  filename = __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0];
 	if(!message || !message.guild) return;
@@ -20,7 +20,7 @@ module.exports = (async(self,message)=>{
 		filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 	});
 
-	if(message.author.bot || (self.config.devOnly && !self.config.developers.includes(message.author.id))) return;
+	if(/*message.author.bot || */(self.config.devOnly && !self.config.developers.includes(message.author.id))) return;
 	
 	if(message.channel.type === "dm") {
 		await message.author.send(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://www.furrybot.me> to see our website, <https://docs.furrybot.me> to see my documentation, and join <${self.config.discordSupportInvite}> if you need more help!`);

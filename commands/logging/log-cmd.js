@@ -36,7 +36,7 @@ module.exports=(async (self,local) => {
 				var a = type.join(" ").toLowerCase();
 				if(local.message.mentions.channels.first()) {
 					var a = a.replace(`<#${local.message.mentions.channels.first().id}>`,"");
-					var ch = local.message.mentions.channels.first();
+					var ch = local.message.mentions.channels.first(); // lgtm [js/useless-assignment-to-local]
 				}
 				var event = a.replace(" ","");
 				if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
@@ -56,14 +56,40 @@ module.exports=(async (self,local) => {
 			var ch = local.message.mentions.channels.first();
 		}
 		var event = a.replace(" ","");
-		console.log(event);
+		if(event === "all") {
+			var enabledCount = 0,
+			disabledCount = 0;
+			for(let ev in local.gConfig.logging) {
+				var log = local.gConfig.logging[ev];
+				if(log.enabled) enabledCount++;
+				if(!log.enabled) disabledCount++;
+			}
+			if(enabledCount > disabledCount) {
+				// enable all
+				if(!ch) var ch = local.channel;
+				for(let ev in local.gConfig.logging) {
+					var log = local.gConfig.logging[ev];
+					try {
+						var j = await self.db.updateGuild(local.guild.id,{logging:{[ev]:{enabled:true,channel:ch}}});
+					}catch(e){
+						local.message.reply("There was an internal error while doing this.. My owner(s) have been notified!");
+						return self.logger.error(e);
+					}
+				}
+			} else if (enabledCount < disabledCount) {
+				// disable all
+			} else {
+				// tell user to specify
+			}
+			return;
+		}
 		if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
 
 		if(local.gConfig.logging[event].enabled === true && !ch) {
 			self.db.updateGuild(local.guild.id,{logging:{[event]:{channel:null,enabled:false}}});
 			return local.message.reply(`Stopped logging **${event}**!`);
 		} else {
-			if(!ch) ch = local.channel;
+			if(!ch) var ch = local.channel;
 			self.db.updateGuild(local.guild.id,{logging:{[event]:{channel:ch.id,enabled:true}}});
 			return local.message.reply(`Now logging **${event}** in <#${ch.id}>!`);
 		}

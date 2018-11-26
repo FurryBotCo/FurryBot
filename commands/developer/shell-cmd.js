@@ -10,9 +10,9 @@ module.exports = (async (self,local) => {
 		var res = await self.shell(exec);
 		var end = self.performance.now();
 	}catch(e){
-        var res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Executing:\n${typeof res !== "undefind" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}\`\`\``;
+        var res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Executing:\n${typeof res !== "undefined" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}\`\`\``;
 		var data = {
-			title: `Executed - Time: \`\`${(end-start).toFixed(3)}ms\`\``,
+			title: `Executed - Time: \`\`${(+end-start).toFixed(3)}ms\`\``,
 			author: {
 				name: local.author.tag,
 				icon_url: local.author.displayAvatarURL()
@@ -29,8 +29,9 @@ module.exports = (async (self,local) => {
 					inline: false
 				}
 			]
-		};
-		self.logger.error(`[Eval]: ${typeof res !== "undefind" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}`);
+		}
+
+		self.logger.error(`[Eval]: ${typeof res !== "undefined" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}`);
 		Object.assign(data,self.embed_defaults());
 		var embed = new self.Discord.MessageEmbed(data);
 		local.channel.send(embed).catch(err => {
@@ -50,7 +51,7 @@ module.exports = (async (self,local) => {
 		res = "```fix\n"+res.stdout+"```";
 	}
 	var data = {
-		title: `Executed - Time: \`${(end-start).toFixed(3)}ms\``,
+		title: `Executed - Time: \`${(+end-start).toFixed(3)}ms\``,
 		author: {
 			name: local.author.tag,
 			icon_url: local.author.displayAvatarURL()
@@ -67,7 +68,8 @@ module.exports = (async (self,local) => {
 				inline: false
 			}
 		]
-	};
+	}
+	
 	Object.assign(data,self.embed_defaults());
 	var embed = new self.Discord.MessageEmbed(data);
 	local.channel.send(embed).catch(err => {

@@ -36,7 +36,7 @@ class FurryBotDatabase {
 		if(!gid) return new Error("missing parameter");
 		gid = gid.toString();
 		if((await this.r.dbList()).includes(gid)) var a = await this.r.dbDrop(gid);
-		if(typeof a.dbs_dropped !== undefined && a.dbs_dropped > 0) {
+		if(typeof a.dbs_dropped !== "undefined" && a.dbs_dropped > 0) {
 			this.logger.info(`[deleteGuild]: Deleted database "${gid}" for guild "${gid}"`);
 			return true;
 		} else {
@@ -76,7 +76,7 @@ class FurryBotDatabase {
 				if(b.match(".{17,18}")) g.push(b);
 			})
 		})
-		g2 = [];
+		var g2 = [];
 		g.forEach((guild)=>{
 			if(!this.client.guilds.includes(guild)) {
 				g2.push(guild);
@@ -128,7 +128,7 @@ class FurryBotDatabase {
 	}
 	
 	async getUserWarning(uid,gid,wid) {
-		if(!wid || !gid || !wid) return new Error("missing parameter");
+		if(!uid || !gid || !wid) return new Error("missing parameter");
 		uid = uid.toString();
 		gid = gid.toString();
 		wid = parseInt(wid);

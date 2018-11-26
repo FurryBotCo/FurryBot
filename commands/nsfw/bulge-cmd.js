@@ -6,7 +6,7 @@ module.exports = (async (self,local) => {
     }
     var attachment = new self.Discord.MessageAttachment(img.response.image);
     var short = await self.shortenUrl(img.response.image);
-    var extra = short.new ? `**This is the first time this has been viewed! Image #${short.imageNumber}**\n\n` : "";
+    var extra = short.new ? `**This is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
      local.channel.send(`${extra}Short URL: <${short.link}>\n\nRequested By: ${local.author.tag}`,attachment);
      return local.channel.stopTyping();
 });

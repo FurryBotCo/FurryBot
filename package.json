@@ -15,11 +15,11 @@
     "discord"
   ],
   "author": "Donovan_DMC",
-  "license": "AGPL-3.0",
+  "license": "",
   "bugs": {
     "url": "https://github.com/FurryBotCo/FurryBot/issues"
   },
-  "homepage": "https://github.com/FurryBotCo/FurryBot#readme",
+  "homepage": "https://www.furrybot.me",
   "dependencies": {
     "async-request": "^1.2.0",
     "bluebird": "^3.5.3",
@@ -54,5 +54,6 @@
     "xhr-promise": "^2.0.0",
     "xmlhttprequest": "^1.8.0",
     "ytdl-core": "^0.28.0"
-  }
+  },
+  "devDependencies": {}
 }

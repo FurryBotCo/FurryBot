@@ -5,10 +5,10 @@ module.exports = (async(self,local)=>{
         var page = ![undefined,null,""].includes(local.args[0]) && !isNaN(local.args[0]) && local.args[0].length < 17 ? local.args[0] : 1;
 	} else {
         if(![undefined,null,""].includes(local.args[0]) && isNaN(local.args[0]) && local.args[0].length >= 17) {
-            var page = local.args[0];
+            var page = local.args[0]; // lgtm [js/useless-assignment-to-local]
             var mn = 1;
         } else {
-            var page = ![undefined,null,""].includes(local.args[0]) && !isNaN(local.args[0]) && local.args[0].length < 17 ? local.args[0] : 1;
+            var page = ![undefined,null,""].includes(local.args[0]) && !isNaN(local.args[0]) && local.args[0].length < 17 ? local.args[0] : 1; // lgtm [js/useless-assignment-to-local]
         }
 
         if(![undefined,null,""].includes(local.args[1]) && isNaN(local.args[1]) && local.args[1].length >= 17) {

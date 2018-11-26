@@ -167,17 +167,18 @@ class FurryBot extends Discord.Client {
 			var count = await this.r.table("shorturl").count();
 			var c = count;
 			if(c == 0) c = 1;
-			//62 = 26 (a-z) + 26 (A-Z) + 10 (0-9)
-			if(Number.isInteger(c/62)) c++;
+			c = Math.floor(c/62);
+			/*62 = 26 (a-z) + 26 (A-Z) + 10 (0-9)*/
+			if(c === count) c++;
 			if(c < 5) c = c+Math.abs(c-5);
 			var rand = await this.random(Math.ceil(c));
 			var createdTimestamp = Date.now();
 			var created = new Date().toISOString();
-			var a = await this.r.table("shorturl").insert({id:rand,url,imageNumber:count+1,createdTimestamp,created,length:c,link:`https://furry.services/r/${rand}`});
+			var a = await this.r.table("shorturl").insert({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:c,link:`https://furry.services/r/${rand}`});
 			if(a.errors === 1) {
 				return create(url);
 			} else {
-				return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,imageNumber:count+1,createdTimestamp,created,length:c};
+				return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,linkNumber:count+1,createdTimestamp,created,length:c};
 			}
 		});
 
@@ -218,25 +219,6 @@ class FurryBot extends Discord.Client {
 	}
 
 	get clearTable() {return this.deleteAll}
-	
-	async getRegion (region) {
-		region = region.replace("vip-", "");
-		for (const key in this.config.musicPlayer.regions) {
-			const nodes = this.config.musicPlayer.nodes.filter(node => node.connected && node.region === key);
-			if (!nodes) continue;
-			for (const id of this.config.musicPlayer.regions[key]) {
-				if (id === region || region.startsWith(id) || region.includes(id)) return key;
-			}
-		}
-		return "us";
-	}
-
-	async getIdealHost (region) {
-		region = getRegion(region);
-		const foundNode = this.config.musicPlayer.nodes.find(node => node.ready && node.region === region);
-		if (foundNode) return foundNode.host;
-		return this.config.musicPlayer.nodes.first().host;
-	}
 
 	async getSong (str) {
 		const res = await this.request(`http://${this.config.restnode.host}:${this.config.restnode.port}/loadtracks`,{
@@ -305,7 +287,7 @@ class FurryBot extends Discord.Client {
 	async songMenu (pageNumber,pageCount,songs,msg,ma,mb) {
 		return new Promise(async(resolve,reject)=>{
 			if(!pageNumber || !pageCount || !songs || !msg) reject(new Error("missing parameters."));
-			if(typeof ma !== "undefined" && typeof mb !== "undefined") {
+			if(typeof ma !== "undefined" && typeof mb !== "undefined") { // lgtm [js/use-before-declaration]
 				ma.edit(`Multiple songs found, please specify the number you would like to play\n\n${rt[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
 			} else {
 				var mid = await msg.channel.send(`Multiple songs found, please specify the number you would like to play\n\n${songs.list[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
@@ -374,8 +356,8 @@ class FurryBot extends Discord.Client {
 	}
 
 	async runAs (messageContent,user,channel) {
-		if(!user instanceof this.Discord.User) user = this.users.get(user);
-		if(!channel instanceof this.Discord.TextChannel) channel = this.channels.get(channel);
+		if(!(user instanceof this.Discord.User)) user = this.users.get(user);
+		if(!(channel instanceof this.Discord.TextChannel)) channel = this.channels.get(channel);
 		if(!messageContent || !channel || !user) return;
 		var msg = new this.Discord.Message(this,{
 			type: 0,

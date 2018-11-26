@@ -2,9 +2,9 @@ module.exports = (async (self,local) => {
     local.channel.startTyping();
     var extra = "";
     if(local.args.length === 0) {
-        self.config.yiff.types.forEach((ytype)=>{
+        for(let ytype in self.config.yiff.types) {
             if(local.channel.name.indexOf(ytype) !== -1) var type = ytype;
-        });
+        }
 
         if(!type) {
             var type = self.config.yiff.defaultType;
@@ -33,7 +33,7 @@ module.exports = (async (self,local) => {
     }
     var attachment = new self.Discord.MessageAttachment(img.response.image);
     var short = await self.shortenUrl(img.response.image);
-    extra+= short.new ? `**This is the first time this has been viewed! Image #${short.imageNumber}**\n\n` : "";
+    extra+= short.new ? `**This is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
     local.channel.send(`${extra}Short URL: <${short.link}>\n\nType: ${type}\n\nRequested By: ${local.author.tag}`,attachment);
     return local.channel.stopTyping();
 });

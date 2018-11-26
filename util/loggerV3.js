@@ -47,7 +47,7 @@ class FurryBotLogger {
             //shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
-        process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
+        process.stdout.write(`${[undefined,null,""].includes(extra) ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
     }
 
     async warn(msg) {
@@ -58,7 +58,7 @@ class FurryBotLogger {
             //shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
-        process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
+        process.stdout.write(`${[undefined,null,""].includes(extra) ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
     }
 
     async error(msg) {
@@ -69,7 +69,7 @@ class FurryBotLogger {
            //shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
-        process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
+        process.stdout.write(`${[undefined,null,""].includes(extra) ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
     }
 
     async debug(msg) {
@@ -80,7 +80,7 @@ class FurryBotLogger {
             //shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
-        process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
+        process.stdout.write(`${[undefined,null,""].includes(extra) ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
     }
 
     async info(msg) {
@@ -91,7 +91,7 @@ class FurryBotLogger {
             //shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
-        process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
+        process.stdout.write(`${[undefined,null,""].includes(extra) ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
     }
 
     async rethinkdb(msg) {
@@ -102,7 +102,7 @@ class FurryBotLogger {
             //shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
-        process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
+        process.stdout.write(`${[undefined,null,""].includes(extra) ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
     }
 
     get rethinkdblog() {
@@ -117,7 +117,7 @@ class FurryBotLogger {
             //shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
             msg   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
-        process.stdout.write(`${extra = "" ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
+        process.stdout.write(`${[undefined,null,""].includes(extra) ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${msg}\n`);
     }
 
     get commandlog() {

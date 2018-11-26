@@ -24,7 +24,7 @@ module.exports = (async(self) => {
         }
     }, self.config.bot.rotatingStatus.length*15e3);*/
     //self.user.setActivity("🐾 Debugging! 🐾",{type: "PLAYING"});
-    rotatingStatus = (async()=>{
+    const rotatingStatus = (async()=>{
 		self.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"}).then(()=>{
             setTimeout(()=>{
                 self.user.setActivity(`🐾 ${self.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"}).then(()=>{

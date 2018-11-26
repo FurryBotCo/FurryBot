@@ -3,7 +3,7 @@ const config = require("../config.js");
 module.exports = {
 	errorMessages: async (e) => {
 		
-		err=e.toString();
+		var err = e.toString();
 		// Voice
 		if(err.includes("Disconnected")) {
 			return `Discord messed up something. ${config.emojis.furweary}\n\nTry moving the server's voice region to fix this issue. If that doesn't fix it, join our support server <${config.discordSupportInvite}> make sure to tell the support you had error **VC1**`;

@@ -65,7 +65,7 @@ module.exports = (async(self)=>{
             }
             });
                 
-            xhr.send(JSON.stringify({server_count:guilds,key:self.config.botLists[key].token,guilds:guilds,guilds}));
+            xhr.send(JSON.stringify({server_count:guilds,key:self.config.botLists[key].token,guilds}));
         }
     }
 
