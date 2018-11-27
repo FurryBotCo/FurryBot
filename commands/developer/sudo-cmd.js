@@ -3,8 +3,8 @@ module.exports = (async(self,local)=>{
     if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
     
     // member mention
-    if(local.message.mentions.members.first()) {
-        var user = local.message.mentions.members.first();
+    if(local.message.mentions.users.first()) {
+        var user = local.message.mentions.users.first();
     }
     
     // user ID
