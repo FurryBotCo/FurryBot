@@ -8,17 +8,17 @@ module.exports = (async(self,local)=>{
     }
     
     // user ID
-    if(!isNaN(local.args[0]) && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
+    if(!isNaN(local.args[0]) && !(local.args.length === 0 || !local.args || local.message.mentions.users.first())) {
         var user = self.users.get(local.args[0]);
     }
     
     // username
-    if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length == 0 || !local.args || local.message.mentions.members.first())) {
+    if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length == 0 || !local.args || local.message.mentions.users.first())) {
         var user = self.users.find(t=>t.username==local.args[0]);
     }
     
     // user tag
-    if(isNaN(local.args[0]) && local.args[0].indexOf("#") !== -1 && !local.message.mentions.members.first()) {
+    if(isNaN(local.args[0]) && local.args[0].indexOf("#") !== -1 && !local.message.mentions.users.first()) {
         var user = self.users.find(t=>t.tag===local.args[0]);
     }
 
@@ -40,7 +40,7 @@ module.exports = (async(self,local)=>{
     await self.runAs(`${local.gConfig.prefix}${runCommand} ${runArgs.join(" ")}`,user,local.channel);
     var data = {
         title: "Sudo Command",
-        description: `Ran command **${runCommand}** with args "${runArgs.join(" ")}" as ${user.user.tag}`
+        description: `Ran command **${runCommand}** with args "${runArgs.join(" ")}" as ${user.tag}`
     }
     Object.assign(data,local.embed_defaults());
     var embed = new self.Discord.MessageEmbed(data);
