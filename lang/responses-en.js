@@ -73,5 +73,9 @@ module.exports =
   "kiss": [
     "{author} kisses {input}!\nThey must be in love!\n:blue_heart:",
     "{author} kisses {input}!\nCute!"
+  ],
+  "lick": [
+    "{author} licks {input}\nUwU",
+    "{author} decides to make {input}'s fur a little slimy..."
   ]
 }

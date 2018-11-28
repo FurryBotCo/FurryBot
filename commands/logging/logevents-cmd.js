@@ -23,7 +23,7 @@ module.exports = (async(self,local)=>{
         title: "Server Logging Settings",
         description: `You can change these with \`${local.gConfig.prefix}log <enable/disable> <event>\`\n${l}`
     }
-    Object.assign(data,local.embed_defaults()());
+    Object.assign(data,local.embed_defaults());
     var embed = new self.Discord.MessageEmbed(data);
     return local.channel.send(embed);
 })

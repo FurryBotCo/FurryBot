@@ -1,11 +1,11 @@
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
 	var userCount=0;
-	local.guilds.forEach((guild) => {
+	self.guilds.forEach((guild) => {
 		userCount+=guild.memberCount;
 	});
 	var largeGuildCount=0;
-	var srv=Array.from(local.guilds.values());
+	var srv=Array.from(self.guilds.values());
 	for(let i=0;i<srv.length;i++) {
 		if(!srv[i].unavailable) {
 			if(srv[i].large) {
@@ -36,7 +36,7 @@ module.exports = (async (self,local) => {
 				inline: true
 			}, {
 				name: "Total Guilds",
-				value: local.guilds.size,
+				value: self.guilds.size,
 				inline: true
 			}, {
 				name: "Large Guilds (250+)",
@@ -80,13 +80,13 @@ module.exports = (async (self,local) => {
 				inline: false
 			},
 			  {
-			   name: "Vote for this bot",
-			   value: self.config.vote,
+			   name: "Extras",
+			   value: `Vote\n${self.config.vote}\n\nPartners\n-- here --`,
 			   inline: false
 			  }
 			]
 		};
-	Object.assign(data, local.embed_defaults()());
+	Object.assign(data, local.embed_defaults());
 	var embed = new self.Discord.MessageEmbed(data);
 	local.channel.send(embed);
 	return local.channel.stopTyping();
