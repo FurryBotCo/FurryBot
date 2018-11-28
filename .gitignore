@@ -100,3 +100,5 @@ application.yml
 
 tmp/*
 !tmp/placeholder
+
+docs/ssl

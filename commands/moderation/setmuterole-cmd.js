@@ -37,7 +37,7 @@ module.exports = (async(self,local)=>{
             description: "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
             color: 15601937
         }
-        Object.assign(data, local.embed_defaults("color"));
+        Object.assign(data, local.embed_defaults()("color"));
         var embed = new self.Discord.MessageEmbed(data);
         return local.channel.send(embed);
     }
@@ -48,7 +48,7 @@ module.exports = (async(self,local)=>{
             description: `This role (<@&${role.id}>) cannot be used as the muted role, check that is not any of these:\n\t- The guilds \`everyone\` role\n\t- A bots role (generated when a bot is invited)\n\t- Higher than me`,
             color: 15601937
         }
-        Object.assign(data, local.embed_defaults("color"));
+        Object.assign(data, local.embed_defaults()("color"));
         var embed = new self.Discord.MessageEmbed(data);
         return local.channel.send(embed);
     }

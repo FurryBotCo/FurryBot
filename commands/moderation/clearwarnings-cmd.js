@@ -28,7 +28,7 @@ module.exports = (async(self,local)=>{
 			title: "User not found",
 			description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag\n\n(tip: the user must be the first argument)"
 		}
-		Object.assign(data, local.embed_defaults());
+		Object.assign(data, local.embed_defaults()());
 		var embed = new self.Discord.MessageEmbed(data);
         local.channel.send(embed);
     }
@@ -40,7 +40,7 @@ module.exports = (async(self,local)=>{
             description: `Either you provided an invalid user, or there was an internal error. Make sure the user **${user.user.tag}** has at least __*one*__ warning before using this.`,
             color: 15601937
         }
-        Object.assign(data,local.embed_defaults("color"));
+        Object.assign(data,local.embed_defaults()("color"));
         var embed = new self.Discord.MessageEmbed(data);
         return local.channel.send(embed);
     } else {
@@ -49,7 +49,7 @@ module.exports = (async(self,local)=>{
             description: `Cleared warnings for user **${user.user.tag}**.`,
             color: 41728
         }
-        Object.assign(data,local.embed_defaults("color"));
+        Object.assign(data,local.embed_defaults()("color"));
         var embed = new self.Discord.MessageEmbed(data);
         return local.channel.send(embed);
     }

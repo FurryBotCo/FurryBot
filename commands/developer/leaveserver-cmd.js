@@ -4,11 +4,11 @@ module.exports = (async(self,local)=>{
         local.channel.stopTyping();
         return new Error("ERR_INVALID_USAGE");
     }
-    if(!self.guilds.has(local.args[0])) {
+    if(!local.guilds.has(local.args[0])) {
         local.message.reply("Guild not found");
         return local.channel.stopTyping();
     }
-    self.guilds.get(local.args[0]).leave().then((guild)=>{
+    local.guilds.get(local.args[0]).leave().then((guild)=>{
         local.message.reply(`Left guild **${guild.name}** (${guild.id})`);
         return local.channel.stopTyping();
     }).catch((err)=>{

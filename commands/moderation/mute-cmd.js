@@ -28,7 +28,7 @@ module.exports = (async(self,local)=>{
 			title: "User not found",
 			description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
 		}
-		Object.assign(data, local.embed_defaults());
+		Object.assign(data, local.embed_defaults()());
 		var embed = new self.Discord.MessageEmbed(data);
 		return local.channel.send(embed);
     }
@@ -43,7 +43,7 @@ module.exports = (async(self,local)=>{
             description: `This server does not have a mute role set, you can set this with \`${local.gConfig.prefix}setmuterole <role>\``,
             color: 15601937
 		}
-		Object.assign(data, local.embed_defaults("color"));
+		Object.assign(data, local.embed_defaults()("color"));
 		var embed = new self.Discord.MessageEmbed(data);
 		return local.channel.send(embed);
     }
@@ -54,7 +54,7 @@ module.exports = (async(self,local)=>{
             color: 15601937
         }
         await self.db.updateGuild(local.guild.id,{muteRole:null});
-		Object.assign(data, local.embed_defaults("color"));
+		Object.assign(data, local.embed_defaults()("color"));
 		var embed = new self.Discord.MessageEmbed(data);
 		return local.channel.send(embed);
     }
@@ -64,7 +64,7 @@ module.exports = (async(self,local)=>{
             description: `The current mute role <@&${local.gConfig.id}> (${local.gConfig.id}) seems to be higher than me, please move it below me. You can set a new one with \`${local.gConfig.prefix}setmuterole <role>\``,
             color: 15601937
         }
-		Object.assign(data, local.embed_defaults("color"));
+		Object.assign(data, local.embed_defaults()("color"));
 		var embed = new self.Discord.MessageEmbed(data);
 		return local.channel.send(embed);
     }
@@ -75,7 +75,7 @@ module.exports = (async(self,local)=>{
             description: `The user **${user.user.tag}** seems to already be muted.. You can unmute them with \`${local.gConfig.prefix}unmute @${user.user.tag} [reason]\``,
             color: 15601937
         }
-		Object.assign(data, local.embed_defaults("color"));
+		Object.assign(data, local.embed_defaults()("color"));
 		var embed = new self.Discord.MessageEmbed(data);
 		return local.channel.send(embed);
     }

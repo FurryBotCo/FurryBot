@@ -14,7 +14,7 @@ module.exports = (async(self,local)=>{
             title: "No Posts Found",
             description: `no posts were found with the tags "${decodeURIComponent(tags)}", try another query`
         }
-        Object.assign(data,local.embed_defaults());
+        Object.assign(data,local.embed_defaults()());
         var embed = new self.Discord.MessageEmbed(data);
         return local.channel.send(embed);
     } 

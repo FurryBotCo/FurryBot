@@ -63,7 +63,7 @@ module.exports = (async(self,local)=>{
 			title: "User not found",
 			description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
 		}
-		Object.assign(data, local.embed_defaults());
+		Object.assign(data, local.embed_defaults()());
 		var embed = new self.Discord.MessageEmbed(data);
         local.channel.send(embed);
         return local.channel.stopTyping();
@@ -111,7 +111,7 @@ module.exports = (async(self,local)=>{
             url: "attachment://ship.png"
         }
     }
-    Object.assign(data,local.embed_defaults());
+    Object.assign(data,local.embed_defaults()());
     var embed = new self.Discord.MessageEmbed(data);
     embed.attachFiles(attch);
     await local.channel.send(embed);

@@ -21,7 +21,7 @@ module.exports = (async (self,local) => {
                 title: "Invalid yiff type",
                 description: `The type you provided **${type}** is invalid, valid types are: **${self.config.yiff.types.join("**, **")}**.`
             }
-            Object.assign(data,self.embed_defaults());
+            Object.assign(data,local.embed_defaults()());
             var embed = new self.Discord.RichEmbed(data);
             return local.channel.send(embed);
         }
