@@ -102,3 +102,4 @@ tmp/*
 !tmp/placeholder
 
 docs/ssl
+commandList.js
