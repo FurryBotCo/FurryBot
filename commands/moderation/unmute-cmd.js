@@ -1,4 +1,4 @@
-module.exports = (async(self,local)=>{
+module.exports = (async(self,local) => {
     if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
     // member mention
@@ -13,13 +13,13 @@ module.exports = (async(self,local)=>{
     
     // username
     if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
-        var usr = self.users.find(t=>t.username===local.args[0]);
+        var usr = self.users.find(t => t.username===local.args[0]);
         if(usr instanceof self.Discord.User) var user = local.message.guild.members.get(usr.id);
     }
     
     // user tag
     if(isNaN(local.args[0]) && local.args[0].indexOf("#") !== -1 && !local.message.mentions.members.first()) {
-        var usr = self.users.find(t=>t.tag===local.args[0]);
+        var usr = self.users.find(t => t.tag===local.args[0]);
         if(usr instanceof self.Discord.User) var user = local.guild.members.get(usr.id);
     }
     
@@ -80,13 +80,13 @@ module.exports = (async(self,local)=>{
 		return local.channel.send(embed);
     }
 
-    user.roles.remove(local.gConfig.muteRole,`Mute: ${local.author.tag} -> ${reason}`).then(()=>{
-        local.channel.send(`***User ${user.user.tag} was unmuted, ${reason}***`).catch(noerr=>null);
-    }).catch(async(err)=>{
+    user.roles.remove(local.gConfig.muteRole,`Mute: ${local.author.tag} -> ${reason}`).then(() => {
+        local.channel.send(`***User ${user.user.tag} was unmuted, ${reason}***`).catch(noerr => null);
+    }).catch(async(err) => {
         local.message.reply(`I couldn't unmute **${user.user.tag}**, ${err}`);
         if(m !== undefined) {
             await m.delete();
         }
     })
-    if(!local.gConfig.delCmds && local.channel.permissionsFor(self.user.id).has("MANAGE_MESSAGES")) local.message.delete().catch(noerr=>null);
+    if(!local.gConfig.delCmds && local.channel.permissionsFor(self.user.id).has("MANAGE_MESSAGES")) local.message.delete().catch(noerr => null);
 })

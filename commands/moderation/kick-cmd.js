@@ -38,8 +38,8 @@ module.exports = (async(self,local)=>{
     if(!user.kickable) return local.message.reply(`I cannot kick ${user.user.tag}! Do they have a higher role than me? Do I have kick permissions?`);
     var reason = local.args.length >= 2 ? local.args.splice(1).join(" ") : "No Reason Specified";
     if(!user.user.bot) var m = await user.user.send(`You were kicked from **${local.guild.name}**\nReason: ${reason}`);
-    user.kick(`Kick: ${local.author.tag} -> ${reason}`).then(()=>{
-        local.channel.send(`***User ${user.user.tag} was kicked, ${reason}***`).catch(noerr=>null);
+    user.kick(`Kick: ${local.author.tag} -> ${reason}`).then(() => {
+        local.channel.send(`***User ${user.user.tag} was kicked, ${reason}***`).catch(noerr => null);
     }).catch(async(err)=>{
         local.message.reply(`I couldn't kick **${user.user.tag}**, ${err}`);
         if(m !== undefined) {
@@ -47,5 +47,5 @@ module.exports = (async(self,local)=>{
         }
     })
 
-    if(!local.gConfig.delCmds && local.channel.permissionsFor(self.user.id).has("MANAGE_MESSAGES")) local.message.delete().catch(noerr=>null);
+    if(!local.gConfig.delCmds && local.channel.permissionsFor(self.user.id).has("MANAGE_MESSAGES")) local.message.delete().catch(noerr => null);
 })

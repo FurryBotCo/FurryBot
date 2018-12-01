@@ -96,8 +96,8 @@ out/
 !/.gitignore
 !/.codacy.yaml
 
-# lavalink config
-application.yml
+# lavalink 
+lavalink/
 
 tmp/*
 !tmp/placeholder

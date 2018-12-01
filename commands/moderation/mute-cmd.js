@@ -80,9 +80,9 @@ module.exports = (async(self,local)=>{
 		return local.channel.send(embed);
     }
     
-    user.roles.add(local.gConfig.muteRole,`Mute: ${local.author.tag} -> ${reason}`).then(()=>{
+    user.roles.add(local.gConfig.muteRole,`Mute: ${local.author.tag} -> ${reason}`).then(() => {
         local.channel.send(`***User ${user.user.tag} was muted, ${reason}***`).catch(noerr=>null);
-    }).catch(async(err)=>{
+    }).catch(async(err) => {
         local.message.reply(`I couldn't mute **${user.user.tag}**, ${err}`);
         if(m !== undefined) {
             await m.delete();

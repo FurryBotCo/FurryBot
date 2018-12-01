@@ -77,8 +77,8 @@ class FurryBot extends Discord.Client {
 	  * Load Function
 	  */
 	load() {
-		console.log(`[loadEvent]: start load`);
-		this.mixpanel.track('bot.load.start', {
+		console.log("[loadEvent]: start load");
+		this.mixpanel.track("bot.load.start", {
 			distinct_id: this.uuid(),
 			timestamp: new Date().toISOString(),
 			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
@@ -198,7 +198,7 @@ class FurryBot extends Discord.Client {
 
 			default:
 				// delete & recreate
-				console.log(`[ShortURL]: Duplicate records found, deleting`);
+				console.log("[ShortURL]: Duplicate records found, deleting");
 				this.r.table("shorturl").filter({url}).forEach((short)=>{
 					return this.r.table("shorturl").get(short("id")).delete();
 				});
@@ -207,8 +207,8 @@ class FurryBot extends Discord.Client {
 	}
 
 	async deleteAll (table,database = "furrybot") {
-		if(["rethinkdb"].includes(database)) throw new Error(`{code:2,error:"ERR_ILLEGAL_DB",description:"illegal database"}`);
-		if(["guilds","users"].includes(table)) throw new Error(`{code:1,error:"ERR_ILLEGAL_TABLE",description:"illegal database"}`);
+		if(["rethinkdb"].includes(database)) throw new Error("{code:2,error:'ERR_ILLEGAL_DB',description:'illegal database'}");
+		if(["guilds","users"].includes(table)) throw new Error("{code:1,error:'ERR_ILLEGAL_TABLE',description:'illegal database'}");
 		var dbList = await this.r.dbList();
 		if(!dbList.includes(database)) throw new Error(`{code:3,error:"ERR_INVALID_DB",description:"invalid database"}`);
 		var tableList = await this.r.db(database).tableList();
@@ -399,7 +399,7 @@ client.login(config.bot.token);
 
 process.on("SIGINT", async () => {
 	if(!client) {
-		process.kill(process.pid, 'SIGTERM' );
+		process.kill(process.pid, "SIGTERM");
 	} else {
 		if(!client.logger) {
 			console.debug("Started termination via CTRL+C");

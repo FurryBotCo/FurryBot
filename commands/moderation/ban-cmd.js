@@ -48,13 +48,13 @@ module.exports = (async(self,local)=>{
     if(!user.bannable) return local.message.reply(`I cannot ban ${user.user.tag}! Do they have a higher role than me? Do I have ban permissions?`);
     var reason = local.args.length >= 2 ? local.args.splice(1).join(" ") : "No Reason Specified";
     if(!user.user.bot) var m = await user.user.send(`You were baned from **${local.guild.name}**\nReason: ${reason}`);
-    user.ban({reason:`Ban: ${local.author.tag} -> ${reason}`,days:7}).then(()=>{
-        local.channel.send(`***User was banned ${user.tag}, ${reason}***`).catch(noerr=>null);
+    user.ban({reason:`Ban: ${local.author.tag} -> ${reason}`,days:7}).then(() => {
+        local.channel.send(`***User was banned ${user.tag}, ${reason}***`).catch(noerr => null);
     }).catch(async(err)=>{
         local.message.reply(`I couldn't ban **${user.user.tag}**, ${err}`);
         if(m !== undefined) {
             await m.delete();
         }
     });
-    if(!local.gConfig.delCmds && local.channel.permisionssFor(self.user.id).has("MANAGE_MESSAGES")) local.message.delete().catch(noerr=>null);
+    if(!local.gConfig.delCmds && local.channel.permisionssFor(self.user.id).has("MANAGE_MESSAGES")) local.message.delete().catch(noerr => null);
 })

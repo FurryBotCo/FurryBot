@@ -78,4 +78,4 @@ module.exports =
     "{author} licks {input}\nUwU",
     "{author} decides to make {input}'s fur a little slimy..."
   ]
-}
+};

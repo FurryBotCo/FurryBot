@@ -3,7 +3,8 @@ module.exports = (async(self,rateLimitInfo)=>{
     var dt = {
         timestamp: new Date(),
         file: self.filename
-    }
+    };
+    
     Object.assign(dt,rateLimitInfo);
     self.mixpanel.track(`bot.events.rateLimit`,dt)
 });

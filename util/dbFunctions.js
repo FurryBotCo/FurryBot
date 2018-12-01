@@ -71,7 +71,7 @@ class FurryBotDatabase {
 	async sweepGuilds(del=false) {
 		var j = self.guilds;
 		var g = [];
-		this.r.dbList().then(a=>{
+		this.r.dbList().then((a) => {
 			a.forEach((b)=>{
 				if(b.match(".{17,18}")) g.push(b);
 			})
@@ -297,11 +297,11 @@ class FurryBotDatabase {
 		uid = uid.toString();
 		gid = gid.toString();
 		if(!this.client.guilds.has(gid) && !bypassChecks) {
-			this.logger.warn(`[createUser]: Attempted to create a user for a guild that the bot is not in.`);
+			this.logger.warn("[createUser]: Attempted to create a user for a guild that the bot is not in.");
 			return new Error("invalid guild");
 		}
 		if(!this.client.guilds.get(gid).members.has(uid) && !bypassChecks) {
-			this.logger.warn(`[createUser]: Attempted to create a user for a guild that the user is not in.`);
+			this.logger.warn("[createUser]: Attempted to create a user for a guild that the user is not in.");
 			return new Error("invalid user");
 		}
 		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
