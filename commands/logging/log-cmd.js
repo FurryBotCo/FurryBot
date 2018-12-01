@@ -68,9 +68,9 @@ module.exports=(async (self,local) => {
 				// enable all
 				if(!ch) var ch = local.channel;
 				for(let ev in local.gConfig.logging) {
-					var log = local.gConfig.logging[ev];
+					var log = local.gConfig.logging[ev]; # lgtm [js/useless-assignment-to-local]
 					try {
-						var j = await self.db.updateGuild(local.guild.id,{logging:{[ev]:{enabled:true,channel:ch}}});
+						var j = await self.db.updateGuild(local.guild.id,{logging:{[ev]:{enabled:true,channel:ch}}}); # lgtm [js/unused-local-variable]
 					}catch(e){
 						local.message.reply("There was an internal error while doing this.. My owner(s) have been notified!");
 						return self.logger.error(e);
