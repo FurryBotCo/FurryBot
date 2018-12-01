@@ -23,7 +23,7 @@ module.exports = {
 		}
 	},
 	getSYSTotal: function(measurement) {
-		if (!os) var os = require("os");
+		var os = require("os");
 		switch(measurement.toLowerCase()) {
 			case "b":
 				return (Math.round((os.totalmem())*100) / 100);
@@ -46,7 +46,7 @@ module.exports = {
 		}
 	},
 	getSYSFree: function(measurement) {
-		if (!os) var os = require("os")
+		var os = require("os")
 		switch(measurement.toLowerCase()) {
 			case "b":
 				return (Math.round((os.freemem())*100) / 100);
@@ -69,7 +69,7 @@ module.exports = {
 		}
 	},
 	getSYSUsed: function(measurement) {
-		if (!os) var os = require("os")
+		var os = require("os")
 		switch(measurement.toLowerCase()) {
 			case "b":
 				return (Math.round((+(Math.round((os.totalmem())*100) / 100)-Math.round((os.freemem())*100) / 100)* 100) / 100);
@@ -128,7 +128,7 @@ module.exports = {
 		return this.getSYSUsed("GB");
 	},
 	getSYSCPUCount: function() {
-		if (!os) var os = require("os");
+		var os = require("os");
 		var cpu_count=0;
 		for(i=0;i < os.cpus().length;i++) {
 			cpu_count++;
@@ -136,33 +136,33 @@ module.exports = {
 		return cpu_count;
 	},
 	getSYSType: function() {
-		if (!os) var os = require("os");
+		var os = require("os");
 		return os.type();
 	},
 	getSYSName: function() {
-		if (!os) var os = require("os");
+		var os = require("os");
 		return os.hostname();
 	},
 	getSYSArchitecture: function() {
-		if (!os) var os = require("os");
+		var os = require("os");
 		return os.arch();
 	},
 	getSYSArch: function() {
 		return this.getSYSArchitecture();
 	},
 	getSYSPlatform: function() {
-		if (!os) var os = require("os");
+		var os = require("os");
 		return os.platform();
 	},
 	getSYSRelease: function() {
-		if (!os) var os = require("os");
+		var os = require("os");
 		return os.release();
 	},
 	getSYSVersion: function() {
 		return this.getSYSRelease();
 	},
 	checkSemVer: function(ver) {
-		if(!semver) var semver = require("semver");
+		var semver = require("semver");
 		var s=semver.valid(ver);
 		if(s == ver) {
 			return ver;

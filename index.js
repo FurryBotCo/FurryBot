@@ -119,7 +119,7 @@ class FurryBot extends Discord.Client {
 
 	async reloadModules () {
 		for(var key in require.cache){
-			if(key.indexOf("\\node_modules") != -1){
+			if(key.indexOf("\\node_modules") !== -1){
 				delete require.cache[key];
 			}
 		}

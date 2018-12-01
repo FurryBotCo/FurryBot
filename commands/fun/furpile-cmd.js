@@ -1,9 +1,9 @@
 module.exports = (async (self,local) => {
 	
-	if(local.args.length == 0 && !self.furpile[local.guild.id]) {
+	if(local.args.length === 0 && !self.furpile[local.guild.id]) {
 		return local.message.reply(`A furpile is not currently active, or has timed out due to inactivity.${"\n"}start one by running the command **${gConfig.prefix}furpile <user>**${"\n"}(do not include the < >)`);
 	}
-	if(local.args.length == 0 && typeof self.furpile[local.guild.id].fnc !== "undefined") {
+	if(local.args.length === 0 && typeof self.furpile[local.guild.id].fnc !== "undefined") {
 		if(self.furpile[local.guild.id].currentUsers.has(local.author.id) && self.config.developers.indexOf(local.author.id) === -1) {
 			return local.message.reply(`${self.config.emojis.cooldown}\nYou are already in this furpile, you cannot join again!`);
 		}

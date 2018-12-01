@@ -1,7 +1,7 @@
 module.exports=(async (self,local) => {
 	
 	if(!local.args[0]) {
-		var lnk=local.gConfig.prefix != "f!"?`${self.config.documentationURL}?prefix=${local.gConfig.prefix}`:config.documentationURL;
+		var lnk=local.gConfig.prefix !== "f!"?`${self.config.documentationURL}?prefix=${local.gConfig.prefix}`:config.documentationURL;
 		return local.channel.send(`You can view our full command documentation here: ${lnk}\n\nMake sure to check the Trello board regularly: <${self.config.trello.board}>\nYou can use **${local.gConfig.prefix}help <command>** to get help with a specific command.\nMake sure to check out our official Twitter account: ${self.config.twitterAccountURL}.\n\nJoin can join our support server here: ${self.config.discordSupportInvite}`);
 	}
 	

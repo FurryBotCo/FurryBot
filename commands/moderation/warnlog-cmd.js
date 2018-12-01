@@ -1,11 +1,11 @@
 module.exports = (async(self,local)=>{
     local.channel.startTyping();
-	if(local.args.length == 0 || !local.args || (!isNaN(local.args[0]) && local.args[0].length < 17)) {
+	if(local.args.length === 0 || !local.args || (!isNaN(local.args[0]) && local.args[0].length < 17)) {
         var user = local.member;
         var page = ![undefined,null,""].includes(local.args[0]) && !isNaN(local.args[0]) && local.args[0].length < 17 ? local.args[0] : 1;
 	} else {
         if(![undefined,null,""].includes(local.args[0]) && isNaN(local.args[0]) && local.args[0].length >= 17) {
-            var page = local.args[0]; // lgtm [js/useless-assignment-to-local]
+            var page = local.args[0];
             var mn = 1;
         } else {
             var page = ![undefined,null,""].includes(local.args[0]) && !isNaN(local.args[0]) && local.args[0].length < 17 ? local.args[0] : 1; // lgtm [js/useless-assignment-to-local]

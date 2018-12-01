@@ -1,10 +1,10 @@
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
-	if (self.config.developers.indexOf(local.message.author.id) == -1) {
+	if (self.config.developers.indexOf(local.message.author.id) === -1) {
 		return local.message.reply("You cannot run this command as you are not a bot owner.");
 	}
 	var ty=new RegExp(/^(((command|cmd|c)?[s]?(module|m)?[s]?(list|l)?[s]?)||all)$/gi);
-	if(local.args.join("").length == 0) {
+	if(local.args.join("").length === 0) {
 		var type="cl";
 	} else {
 		if(!ty.test(local.args.join(""))) return local.message.reply("Invalid type");
@@ -26,7 +26,7 @@ module.exports = (async (self,local) => {
 			self.reloadModules();
 			break;
 			
-		case type == "all":
+		case "all":
 			local.message.reply("Reloading everything..");
 			self.reloadAll();
 			break;
@@ -34,7 +34,7 @@ module.exports = (async (self,local) => {
 		default:
 			return local.message.reply("Invalid reload type");
 	}
-	setTimeout((msg)=>{
+	setTimeout((msg) => {
 		msg.reply(`specified reloads finished ${self.config.emojis.furokaypaw}`);
 		msg.channel.stopTyping();
 	}, 1e3,local.message);

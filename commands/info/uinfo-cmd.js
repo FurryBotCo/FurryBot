@@ -1,6 +1,6 @@
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
-	if(local.args.length == 0 || !local.args) {
+	if(local.args.length === 0 || !local.args) {
 		var user = local.member;
 	} else {
 		// member mention
@@ -14,8 +14,8 @@ module.exports = (async (self,local) => {
 		}
 		
 		// username
-		if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length == 0 || !local.args || local.message.mentions.members.first())) {
-			var usr = self.users.find(t=>t.username==local.args[0]);
+		if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
+			var usr = self.users.find(t=>t.username===local.args[0]);
 			if(usr instanceof self.Discord.User) var user = local.message.guild.members.get(usr.id);
 		}
 		
