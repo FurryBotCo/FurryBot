@@ -17,7 +17,7 @@ module.exports = (async (self,local) => {
 		self.furpile[local.guild.id].fnc=setTimeout(function(gid){self.furpile[gid]=undefined;}, 3e5, local.guild.id);
 	} else {
 		if(!local.message.mentions) {
-			return local.message.reply(`please mention a user`);
+			return local.message.reply("please mention a user");
 		}
 		var usr = local.message.mentions.members.first();
 		if(!usr) {

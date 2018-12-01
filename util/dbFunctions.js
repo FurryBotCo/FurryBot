@@ -131,7 +131,7 @@ class FurryBotDatabase {
 		if(!uid || !gid || !wid) return new Error("missing parameter");
 		uid = uid.toString();
 		gid = gid.toString();
-		wid = parseInt(wid);
+		wid = parseInt(wid,10);
 		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
 		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
 		var j = await this.r.db(gid).table("users").get(uid)("warnings").filter({wid});
@@ -143,7 +143,7 @@ class FurryBotDatabase {
 		if(!uid || !wid || !gid) return new Error("missing parameter");
 		uid = uid.toString();
 		gid = gid.toString();
-		wid = parseInt(wid);
+		wid = parseInt(wid,10);
 		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
 		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
 		var j = await this.r.db(gid).table("users").get(uid).update((u)=>{

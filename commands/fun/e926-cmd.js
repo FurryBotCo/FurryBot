@@ -1,4 +1,4 @@
-module.exports = (async(self,local)=>{
+module.exports = (async(self,local) => {
     local.channel.startTyping();
     var tags = encodeURIComponent(local.args.join(" "));
     var req = await self.request(`https://e926.net/post/index.json?limit=50&tags=${tags}%20rating%3Asafe`,{

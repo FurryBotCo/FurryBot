@@ -1,4 +1,4 @@
-module.exports = (async(self,local)=>{ 
+module.exports = (async(self,local) => { 
     if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
     local.channel.startTyping();
     if(local.args[0] === "random") {

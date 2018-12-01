@@ -41,9 +41,9 @@ module.exports = (async(self,local)=>{
    }
 
    var reason = local.args.length >= 2 ? local.args.splice(1).join(" ") : "No Reason Specified";
-   local.guild.members.unban(user.id,{reason:`Unban: ${local.author.tag} -> ${reason}`}).then(()=>{
+   local.guild.members.unban(user.id,{reason:`Unban: ${local.author.tag} -> ${reason}`}).then(() => {
        local.channel.send(`***Unbanned ${user.tag}, ${reason}***`).catch(noerr=>null);
-   }).catch(async(err)=>{
+   }).catch(async(err) => {
        local.message.reply(`I couldn't unban **${user.tag}**, ${err}`);
        if(m !== undefined) {
            await m.delete();

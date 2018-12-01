@@ -36,7 +36,7 @@ module.exports = (async(self,local)=>{
             title: "Role not found",
             description: "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
             color: 15601937
-        }
+        };
         Object.assign(data, local.embed_defaults()("color"));
         var embed = new self.Discord.MessageEmbed(data);
         return local.channel.send(embed);

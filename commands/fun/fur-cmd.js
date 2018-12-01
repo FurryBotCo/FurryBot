@@ -70,21 +70,21 @@ module.exports=(async (self,local) => {
 								if(typeof b.error_code !=="undefined" && typeof b.sid === "undefined") {
 									switch(b.error_code) {
 										case 0:
-											console.error(`[CommandHandler:${local.command}][InkbunnyLogin]: Invalid Credentials`);
+											self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: Invalid Credentials`);
 											break;
 						
 										default:
-											console.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
+											self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
 									}
 								} else {
 									await self.fsn.writeFile(`${process.cwd()}/inkbunny-sid.txt`,b.sid);
 									self.config.furryArtAPIs.inkbunny.sid = b.sid;
-									console.log(`[CommandHandler:${local.command}][InkbunnyLogin]: Generated new SID`);
+									self.logger.log(`[CommandHandler:${local.command}][InkbunnyLogin]: Generated new SID`);
 								}
 								break;
 				
 							default:
-								console.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
+								self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
 						}
 					} else {
 						self.config.furryArtAPIs.inkbunny.sid = a.sid;
@@ -100,19 +100,19 @@ module.exports=(async (self,local) => {
 						if(typeof a.error_code !=="undefined" && typeof a.sid === "undefined") {
 							switch(a.error_code) {
 								case 0:
-									console.error(`[CommandHandler:${local.command}][InkbunnyLogin]: Invalid Credentials`);
+									self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: Invalid Credentials`);
 									break;
 				
 								default:
-									console.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
+									self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
 							}
 						} else {
 							await self.fsn.writeFile(`${process.cwd()}/inkbunny-sid.txt`,a.sid);
 							self.config.furryArtAPIs.inkbunny.sid = a.sid;
-							console.log(`[CommandHandler:${local.command}][InkbunnyLogin]: Generated new SID`);
+							self.logger.log(`[CommandHandler:${local.command}][InkbunnyLogin]: Generated new SID`);
 						}
 					} else {
-						console.error(e);
+						self.logger.error(e);
 					}
 				});
 			} else {
@@ -136,21 +136,21 @@ module.exports=(async (self,local) => {
 								if(typeof b.error_code !=="undefined" && typeof b.sid === "undefined") {
 									switch(b.error_code) {
 										case 0:
-											console.error(`[CommandHandler:${local.command}][InkbunnyLogin]: Invalid Credentials`);
+											self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: Invalid Credentials`);
 											break;
 						
 										default:
-											console.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
+											self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
 									}
 								} else {
 									await self.fsn.writeFile(`${process.cwd()}/inkbunny-sid.txt`,b.sid);
 									self.config.furryArtAPIs.inkbunny.sid = b.sid;
-									console.log(`[CommandHandler:${local.command}][InkbunnyLogin]: Generated new SID`);
+									self.logger.log(`[CommandHandler:${local.command}][InkbunnyLogin]: Generated new SID`);
 								}
 								break;
 				
 							default:
-								console.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
+								self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
 						}
 					} else {
 						self.config.furryArtAPIs.inkbunny.sid = a.sid;
@@ -170,8 +170,8 @@ module.exports=(async (self,local) => {
 				var submission = jsn.submissions[rr];
 				if(typeof submission.rating_id === "undefined") throw new Error("secondary");
 				if(submission.rating_id !== "0") {
-					console.log(`[CommandHandler:${local.command}][Inkbunny]: unsafe image:\n${self.util.inspect(submission,{depth:null,showHidden:true})}`);
-					console.log(`[CommandHandler:${local.command}][Inkbunny]: Body: ${jsn}`);
+					self.logger.log(`[CommandHandler:${local.command}][Inkbunny]: unsafe image:\n${self.util.inspect(submission,{depth:null,showHidden:true})}`);
+					self.logger.log(`[CommandHandler:${local.command}][Inkbunny]: Body: ${jsn}`);
 					return local.message.reply("Image API returned a non-safe image! Please try again later.");
 				}
 				var short = await self.shortenUrl(`https://inkbunny.net/s/${submission.submission_id}`);
@@ -179,8 +179,8 @@ module.exports=(async (self,local) => {
 				var attachment = new self.Discord.MessageAttachment(submission.file_url_full,submission.file_name)
 				return local.channel.send(`${extra}${submission.title} (type ${submission.type_name}) by ${submission.username}\n<${short.url}>\n\nRequested By: ${local.author.tag}\n\nRID: ${jsn.rid}\nSite: Inkbunny`,attachment)
 			}catch(e){
-				console.error(`[CommandHandler:${local.command}][Inkbunny]: Error:\n${e}`);
-				console.log(`[CommandHandler:${local.command}][Inkbunny]: Body: ${self.util.inspect(jsn,{depth:null})}`);
+				self.logger.error(`[CommandHandler:${local.command}][Inkbunny]: Error:\n${e}`);
+				self.logger.log(`[CommandHandler:${local.command}][Inkbunny]: Body: ${self.util.inspect(jsn,{depth:null})}`);
 				var attachment = new self.Discord.MessageAttachment("https://furrybot.furcdn.net/NotFound.png");
 				return local.channel.send("Unknown API Error",attachment);
 			}
@@ -206,8 +206,8 @@ module.exports=(async (self,local) => {
 				var submission = jsn.data.entries[rr];
 				if(typeof submission.contentLevel === "undefined") throw new Error("secondary");
 				if(submission.contentLevel !== 0) {
-					console.log(`[CommandHandler:${local.command}][SoFurry]: unsafe image:\n${self.util.inspect(submission,{depth:null,showHidden:true})}`);
-					console.log(`[CommandHandler:${local.command}][SoFurry]: Body: ${self.inspect(jsn,{depth:null})}`);
+					self.logger.log(`[CommandHandler:${local.command}][SoFurry]: unsafe image:\n${self.util.inspect(submission,{depth:null,showHidden:true})}`);
+					self.logger.log(`[CommandHandler:${local.command}][SoFurry]: Body: ${self.inspect(jsn,{depth:null})}`);
 					return local.message.reply("Image API returned a non-safe image! Please try again later.");
 				}
 				var short = await self.shortenUrl(`http://www.sofurry.com/view/${submission.id}`);
@@ -219,8 +219,8 @@ module.exports=(async (self,local) => {
 					return local.channel.send(`${extra}${submission.title} (type ${self.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\n\nRequested By: ${local.author.tag}\n\nSite: SoFurry`);
 				}
 			}catch(e){
-				console.error(`[CommandHandler:${local.command}][SoFurry]: Error:\n${e}`);
-				console.log(`[CommandHandler:${local.command}][SoFurry]: Body: ${jsn}`);
+				self.logger.error(`[CommandHandler:${local.command}][SoFurry]: Error:\n${e}`);
+				self.logger.log(`[CommandHandler:${local.command}][SoFurry]: Body: ${jsn}`);
 				var attachment = new self.Discord.MessageAttachment("https://furrybot.furcdn.net/NotFound.png");
 				return local.channel.send("Unknown API Error",attachment);
 			}
@@ -236,8 +236,8 @@ module.exports=(async (self,local) => {
 				var attachment = new self.Discord.MessageAttachment(req.response.image);
 				return local.channel.send(`${extra}Short URL: <${short.link}>\n\nRequested By: ${local.author.tag}\n\nSite: FurryBot/${self.ucwords(type)}`,attachment);
 			}catch(e){
-				console.error(`[CommandHandler:${local.command}][furrybot/${type}]: Error:\n${e}`);
-				console.log(`[CommandHandler:${local.command}][furrybot/${type}]: Body: ${jsn}`);
+				self.logger.error(`[CommandHandler:${local.command}][furrybot/${type}]: Error:\n${e}`);
+				self.logger.log(`[CommandHandler:${local.command}][furrybot/${type}]: Body: ${jsn}`);
 				var attachment = new self.Discord.MessageAttachment("https://furrybot.furcdn.net/NotFound.png");
 				return local.channel.send("Unknown API Error",attachment);
 			}

@@ -11,7 +11,7 @@ module.exports = (async (self,local) => {
 		var json=JSON.parse(xhr.responseText);
 		var attachment = new self.Discord.messageAttachment(json.file);
 	}catch(e){
-		console.log(e);
+		self.logger.error(e);
 		var attachment = new self.Discord.messageAttachment("https://i.imgur.com/p4zFqH3.png");
 	}
 	local.channel.send(attachment);
