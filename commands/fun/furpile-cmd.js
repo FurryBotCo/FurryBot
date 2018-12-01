@@ -11,7 +11,7 @@ module.exports = (async (self,local) => {
 		self.furpile[local.guild.id].currentUsers.add(local.author.id);
 		self.furpile[local.guild.id].number++;
 		local.channel.send(`<@!${local.member.id}> has joined a furpile on <@!${self.furpile[local.guild.id].user}>!${"\n"}<@!${self.furpile[local.guild.id].user}> Now has ${self.furpile[local.guild.id].number} furs on them!`);
-		if(self.furpile[local.guild.id].number == 7) {
+		if(self.furpile[local.guild.id].number === 7) {
 			message.channel.send(`Poor <@!${self.furpile[local.guild.id].user}>, you furs must be crushing them!`);
 		}
 		self.furpile[local.guild.id].fnc=setTimeout(function(gid){self.furpile[gid]=undefined;}, 3e5, local.guild.id);

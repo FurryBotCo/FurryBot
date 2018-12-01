@@ -27,8 +27,8 @@ module.exports = (async(self,local)=>{
     }
     
     // role name
-    if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length == 0 || !local.args || local.message.mentions.members.first())) {
-        var role = local.guild.roles.find(r=>r.name==local.args.join(" "));
+    if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
+        var role = local.guild.roles.find(r=>r.name===local.args.join(" "));
     }
 
     if(!role) {

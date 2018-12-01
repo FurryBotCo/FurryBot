@@ -10,8 +10,8 @@ module.exports = (async(self,local)=>{
    }
    
    // username
-   if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length == 0 || !local.args || local.message.mentions.members.first())) {
-       var usr = self.users.find(t=>t.username==local.args[0]);
+   if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
+       var usr = self.users.find(t=>t.username===local.args[0]);
        if(usr instanceof self.Discord.User) var user = usr;
    }
    
@@ -42,7 +42,7 @@ module.exports = (async(self,local)=>{
 
    var reason = local.args.length >= 2 ? local.args.splice(1).join(" ") : "No Reason Specified";
    local.guild.members.unban(user.id,{reason:`Unban: ${local.author.tag} -> ${reason}`}).then(() => {
-       local.channel.send(`***Unbanned ${user.tag}, ${reason}***`).catch(noerr=>null);
+       local.channel.send(`***Unbanned ${user.tag}, ${reason}***`).catch(noerr => null);
    }).catch(async(err) => {
        local.message.reply(`I couldn't unban **${user.tag}**, ${err}`);
        if(m !== undefined) {
