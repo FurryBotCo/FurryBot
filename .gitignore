@@ -94,6 +94,7 @@ out/
 
 # Dont ignore .gitignore
 !/.gitignore
+!/.codacy.yaml
 
 # lavalink config
 application.yml

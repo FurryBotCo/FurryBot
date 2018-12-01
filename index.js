@@ -35,7 +35,7 @@ class FurryBot extends Discord.Client {
 		this.fetch = require("node-fetch");
 		this.postStats = require("./util/listStats");
 		this.mixpanel = this.Mixpanel.init(this.config.mixpanel.token, {
-			protocol: 'https'
+			protocol: "https"
 		});
     	this.fs = require("fs");
     	this.r = require("rethinkdbdash")(this.config.db);
