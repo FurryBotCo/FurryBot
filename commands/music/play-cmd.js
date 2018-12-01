@@ -44,7 +44,7 @@ module.exports = (async(self,local)=>{
     }
     if(!song) return local.message.reply("Internal Error `play1`");
     if(song instanceof Error) {
-        if(song.message == "CANCELED") {
+        if(song.message === "CANCELED") {
             local.message.reply("Command canceled.");
             return local.channel.stopTyping();
         }

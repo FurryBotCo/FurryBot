@@ -90,7 +90,7 @@ module.exports = (async(self,message) => {
 		local.command = local.args.shift().toLowerCase();
 			
 		
-		if(local.guild.id == "400284026885373962") {
+		if(local.guild.id === "400284026885373962") {
 			if(self.config.customCommands.includes(local.command)) {
 				self.stats.commandTotalsSinceStart++;
 				self.stats.commandTotalsSinceLastPost++;
@@ -113,7 +113,7 @@ module.exports = (async(self,message) => {
 
 		var command = self.config.commandList.fullList[local.command];
 
-		if(local.message.content.toLowerCase() == "whatismyprefix") {
+		if(local.message.content.toLowerCase() === "whatismyprefix") {
 			/*if(self.commandTimeout.whatismyprefix.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 				self.logger.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${message.author.tag} (${message.author.id}) on response "whatismyprefix" in guild ${message.guild.name} (${message.guild.id})`);
 				return message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(self.config.commandList.response.whatismyprefix.cooldown)} before using this again!`);

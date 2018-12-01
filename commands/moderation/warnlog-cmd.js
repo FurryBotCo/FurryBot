@@ -31,8 +31,8 @@ module.exports = (async(self,local)=>{
             }
             
             // username
-            if(isNaN(local.args[mn]) && local.args[mn].indexOf("#") === -1 && !(local.args.length == 0 || !local.args || local.message.mentions.members.first())) {
-                var usr = self.users.find(t=>t.username==local.args[mn]);
+            if(isNaN(local.args[mn]) && local.args[mn].indexOf("#") === -1 && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
+                var usr = self.users.find(t=>t.username===local.args[mn]);
                 if(usr instanceof self.Discord.User) var user = local.message.guild.members.get(usr.id);
             }
             

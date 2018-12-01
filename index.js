@@ -166,7 +166,7 @@ class FurryBot extends Discord.Client {
 		const create = (async(url)=>{
 			var count = await this.r.table("shorturl").count();
 			var c = count;
-			if(c == 0) c = 1;
+			if(c === 0) c = 1;
 			c = Math.floor(c/62);
 			/*62 = 26 (a-z) + 26 (A-Z) + 10 (0-9)*/
 			if(c === count) c++;
@@ -233,7 +233,7 @@ class FurryBot extends Discord.Client {
 			return null;
 		});
 		if (!res) throw "There was an error, try again";
-		if (res.body.length == 0) throw `No tracks found`;
+		if (res.body.length === 0) throw `No tracks found`;
 		return JSON.parse(res.body);
 	}
 
@@ -287,7 +287,7 @@ class FurryBot extends Discord.Client {
 	async songMenu (pageNumber,pageCount,songs,msg,ma,mb) {
 		return new Promise(async(resolve,reject)=>{
 			if(!pageNumber || !pageCount || !songs || !msg) reject(new Error("missing parameters."));
-			if(typeof ma !== "undefined" && typeof mb !== "undefined") { // lgtm [js/use-before-declaration]
+			if(typeof ma !== "undefined" && typeof mb !== "undefined") {
 				ma.edit(`Multiple songs found, please specify the number you would like to play\n\n${rt[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
 			} else {
 				var mid = await msg.channel.send(`Multiple songs found, please specify the number you would like to play\n\n${songs.list[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);

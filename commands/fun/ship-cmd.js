@@ -46,7 +46,7 @@ module.exports = (async(self,local) => {
             
             // username
             if(isNaN(local.args[1]) && local.args[1].indexOf("#") === -1 && !(local.args.length === 1 || !local.args || local.message.mentions.members.first(2)[1])) {
-                var usr2 = self.users.find(t=>t.username==local.args[1]);
+                var usr2 = self.users.find(t=>t.username===local.args[1]);
                 if(usr2 instanceof self.Discord.User) var user2 = local.message.guild.members.get(usr.id);
             }
             

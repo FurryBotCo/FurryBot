@@ -13,8 +13,8 @@ module.exports = (async(self,local)=>{
     }
     
     // username
-    if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length == 0 || !local.args || local.message.mentions.users.first())) {
-        var user = self.users.find(t=>t.username==local.args[0]);
+    if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length === 0 || !local.args || local.message.mentions.users.first())) {
+        var user = self.users.find(t=>t.username===local.args[0]);
     }
     
     // user tag

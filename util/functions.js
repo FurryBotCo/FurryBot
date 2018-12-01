@@ -164,7 +164,7 @@ module.exports = {
 	checkSemVer: function(ver) {
 		var semver = require("semver");
 		var s=semver.valid(ver);
-		if(s == ver) {
+		if(s === ver) {
 			return ver;
 		} else {
 			throw new Error("Invalid Version");
@@ -223,12 +223,8 @@ module.exports = {
 	},
 	getMusic: async function(url, guild_id) {
 		return new Promise(async function (resolve, reject) {
-			if(!ytdl) {
-				var ytdl=require("ytdl-core");
-			}
-			if(!fs) {
-				var fs = require("fs");
-			}
+			var ytdl=require("ytdl-core");
+			var fs = require("fs");
 			var filename=`tmp-${guild_id}.mp3`;
 			await ytdl(url).pipe(fs.createWriteStream(`music\\${filename}`));
 			setTimeout(function(filename){

@@ -1,6 +1,6 @@
 module.exports = (async(self,local)=>{
     local.channel.startTyping();
-    if(local.args.length == 0 || !local.args) {
+    if(local.args.length === 0 || !local.args) {
 		var user = local.member;
 	} else {
 		// member mention

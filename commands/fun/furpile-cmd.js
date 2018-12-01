@@ -24,7 +24,7 @@ module.exports = (async (self,local) => {
 			return local.message.reply(`failed to fetch specified user.`);
 		}
 		
-		if(local.author.id == usr.id && self.config.developers.indexOf(local.author.id) === -1) {
+		if(local.author.id === usr.id && self.config.developers.indexOf(local.author.id) === -1) {
 			return local.message.reply(`${self.config.emojis.cooldown}\nYou cannot start a furpile on yourself!`);
 		}
 		self.furpile[local.guild.id]={};
