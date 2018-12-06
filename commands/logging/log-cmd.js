@@ -19,7 +19,11 @@ module.exports=(async (self,local) => {
 				}
 				var event = a.replace(" ","");
 				if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
-
+                if([undefined,null,"",[],{}].includes(local.gConfig.logging[event])) {
+                    self.logger.log(`Updated logging for ${local.guild.name} (${local.guild.id}), missing logging config`);
+                    await self.db.updateGuild(local.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
+                    local.gConfig = await self.db.getGuild(local.guild.id);
+                }
 				if(!local.gConfig.logging[event].enabled === true) {
 					if(!ch) ch = local.channel;
 					self.db.updateGuild(local.guild.id,{logging:{[event]:{channel:ch.id,enabled:true}}});
@@ -40,7 +44,11 @@ module.exports=(async (self,local) => {
 				}
 				var event = a.replace(" ","");
 				if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
-
+                if([undefined,null,"",[],{}].includes(local.gConfig.logging[event])) {
+                    self.logger.log(`Updated logging for ${local.guild.name} (${local.guild.id}), missing logging config`);
+                    await self.db.updateGuild(local.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
+                    local.gConfig = await self.db.getGuild(local.guild.id);
+                }
 				if(local.gConfig.logging[event].enabled === true) {
 					self.db.updateGuild(local.guild.id,{logging:{[event]:{channel:null,enabled:false}}});
 					return local.message.reply(`Stopped logging **${event}**!`);
@@ -68,9 +76,9 @@ module.exports=(async (self,local) => {
 				// enable all
 				if(!ch) var ch = local.channel;
 				for(let ev in local.gConfig.logging) {
-					var log = local.gConfig.logging[ev]; # lgtm [js/useless-assignment-to-local]
+					var log = local.gConfig.logging[ev];
 					try {
-						var j = await self.db.updateGuild(local.guild.id,{logging:{[ev]:{enabled:true,channel:ch}}}); # lgtm [js/unused-local-variable]
+						var j = await self.db.updateGuild(local.guild.id,{logging:{[ev]:{enabled:true,channel:ch}}});
 					}catch(e){
 						local.message.reply("There was an internal error while doing this.. My owner(s) have been notified!");
 						return self.logger.error(e);
@@ -84,7 +92,11 @@ module.exports=(async (self,local) => {
 			return;
 		}
 		if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
-
+        if([undefined,null,"",[],{}].includes(local.gConfig.logging[event])) {
+            self.logger.log(`Updated logging for ${local.guild.name} (${local.guild.id}), missing logging config`);
+            await self.db.updateGuild(local.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
+            local.gConfig = await self.db.getGuild(local.guild.id);
+        }
 		if(local.gConfig.logging[event].enabled === true && !ch) {
 			self.db.updateGuild(local.guild.id,{logging:{[event]:{channel:null,enabled:false}}});
 			return local.message.reply(`Stopped logging **${event}**!`);
