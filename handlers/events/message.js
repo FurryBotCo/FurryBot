@@ -51,7 +51,10 @@ module.exports = (async(self,message) => {
 		guild: message.guild,
 		channel: message.channel,
 		user: await self.resolveUser(message.member),
-		embed_defaults: ((without=[])=>{
+		embed_defaults: ((without=[],ext)=>{
+		    if(![undefined,null,""].includes(ext)) {
+		        local = ext;
+		    }
 			var def = {
 				footer: {
 					text: `Shard ${![undefined,null].includes(local.guild.shard) ? `${+local.guild.shard.id+1}/${self.options.shardCount}`: "1/1"} | Bot Version ${self.config.bot.version}`
@@ -59,6 +62,23 @@ module.exports = (async(self,message) => {
 				author: {
 					name: local.author.tag,
 					icon_url: local.author.avatarURL()
+				},
+				color: self.randomColor(),
+				timestamp: self.getCurrentTimestamp()
+			};
+			if(typeof without === "string") without = [without];
+			without.forEach((wth)=>{
+				if(typeof def[wth] !== "undefined") delete def[wth];
+			});
+			return def;
+		}),
+		embed_defaults_na: ((without=[],ext)=>{
+		    if(![undefined,null,""].includes(ext)) {
+		        local = ext;
+		    }
+			var def = {
+				footer: {
+					text: `Shard ${![undefined,null].includes(local.guild.shard) ? `${+local.guild.shard.id+1}/${self.options.shardCount}`: "1/1"} | Bot Version ${self.config.bot.version}`
 				},
 				color: self.randomColor(),
 				timestamp: self.getCurrentTimestamp()

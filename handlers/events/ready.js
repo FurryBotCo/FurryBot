@@ -3,7 +3,7 @@ module.exports = (async(self) => {
     var resp = await self.request(self.config.commandListURL, {
         method: "GET",
         headers: {
-            Authorization: `Key ${self.config.apiKey}`
+            "User-Agent": self.config.userAgent
         }
     });
     var response = JSON.parse(resp.body);
@@ -75,5 +75,5 @@ module.exports = (async(self) => {
     //var webhookEmbed = new self.Discord.MessageEmbed(webhookData);
     
     //self.webhooks.shards.send(webhookEmbed);
-    
+    self.server.load(self);
 });

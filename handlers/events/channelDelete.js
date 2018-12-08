@@ -1,6 +1,6 @@
 module.exports = (async(self,channel)=>{
     if(!channel || !channel.guild || !["text","voice","category"].includes(channel.type)) return;
-    var ev = "channelcreated";
+    var ev = "channeldeleted";
     var gConfig = await self.db.getGuild(channel.guild.id);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = channel.guild.channels.get(gConfig.logging[ev].channel);
@@ -18,10 +18,10 @@ module.exports = (async(self,channel)=>{
             var TypeText = "Category";
             break;
     }
-    var log = (await channel.guild.fetchAuditLogs({limit:1,type:"CHANNEL_CREATE"})).entries.first();
+    var log = (await channel.guild.fetchAuditLogs({limit:1,type:"CHANNEL_DELETE"})).entries.first();
     
     var data = {
-        title: `:new: ${typeText} Channel Created`,
+        title: `:wastebasket: ${typeText} Channel Deleted`,
         author: {
             name: channel.guild.name,
             icon_url: channel.guild.iconURL()
@@ -66,7 +66,7 @@ module.exports = (async(self,channel)=>{
             inline: false
         });
     }
-    if(![undefined,null,"",[],{}].includes(log) && log.action === "CHANNEL_CREATE") {
+    if(![undefined,null,"",[],{}].includes(log) && log.action === "CHANNEL_DELETE") {
         data.fields.push({
            name: "Executor",
            value: log.executor instanceof self.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",

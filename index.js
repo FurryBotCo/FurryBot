@@ -28,7 +28,7 @@ class FurryBot extends Discord.Client {
 		for(let key in this.config.overrides) this[this.config.overrides[key]] = false;
 		this.Discord = Discord;
 		this.os = require("os");
-		this.request = require("async-request");
+		this.request = this.util.promisify(require("request").defaults({encoding:null}));
 		this.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 		this.Mixpanel = require("mixpanel");
 		this.uuid = require("uuid/v4");
@@ -51,6 +51,7 @@ class FurryBot extends Discord.Client {
 		this.chunk = require("chunk");
 		this.ytdl = require("ytdl-core");
 		this.furpile = {};
+		this.server = new (require("./server"));
 		this.yiffNoticeViewed = new Set();
 		this._ = require("lodash");
 		this.perf = require("perf_hooks");
@@ -350,6 +351,7 @@ class FurryBot extends Discord.Client {
 				isDeveloper: this.config.developers.includes(user.id)
 			}
 		} else {
+			console.log(user);
 			throw new Error("Invalid user provided");
 		}
 		return u;
