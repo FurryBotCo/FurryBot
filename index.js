@@ -43,6 +43,7 @@ class FurryBot extends Discord.Client {
 		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV3`);
 		this.commandTimeout = {};
 		this.varParse = require(`${process.cwd()}/util/varHandler`);
+		this.listStats = require("./util/listStats");
 		this.lang = require(`${process.cwd()}/lang`)(this);
 		this.colors = require("console-colors-2");
 		this.Canvas = require("canvas-constructor").Canvas;

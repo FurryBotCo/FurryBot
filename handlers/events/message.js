@@ -1,4 +1,5 @@
 module.exports = (async(self,message) => {
+	if(!self || !self.db) return;
 	const event = __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0].split(".")[0] : __filename.split("\\").reverse()[0].split(".")[0],
 		  filename = __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0];
 	if(!message || !message.guild) return;
@@ -188,7 +189,7 @@ module.exports = (async(self,message) => {
 		if(!local.message.content.startsWith(local.prefix)) return;
 		if(!self.config.commandList.all.includes(local.command)) return;
 		if(local.gConfig.deleteCommands) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
-		if(command.userPermissions.length > 0) {
+		if(command.userPermissions.length > 0 && !local.user.isDeveloper) {
 			if(command.userPermissions.some(perm => !local.channel.permissionsFor(local.member).has(perm,true))) {
 				var neededPerms = command.userPermissions.filter(perm => !local.channel.permissionsFor(local.member).has(perm,true));
 				self.mixpanel.track(`commands.${local.command}.missingUserPermissions`, {

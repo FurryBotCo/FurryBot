@@ -1,11 +1,19 @@
 module.exports = {
 	getTotalMemory: function () {
-		var used = process.memoryUsage().heapTotal / 1024 / 1024;
-		return `${Math.round(used * 100) / 100}MB`;
+		var used = process.memoryUsage().heapTotal;
+		return Math.round(used * 100) / 100;
 	},
 	getUsedMemory: function () {
+		var used = process.memoryUsage().heapUsed;
+		return Math.round(used * 100) / 100;
+	},
+	getTotalMemoryMB: function () {
+		var used = process.memoryUsage().heapTotal / 1024 / 1024;
+		return Math.round(used * 100) / 100;
+	},
+	getUsedMemoryMB: function () {
 		var used = process.memoryUsage().heapUsed / 1024 / 1024;
-		return `${Math.round(used * 100) / 100}MB`;
+		return Math.round(used * 100) / 100;
 	},
 	getRSS: function () {
 		var used = process.memoryUsage().rss / 1024 / 1024;
@@ -22,7 +30,7 @@ module.exports = {
 		 console.log(`${key}: ${Math.round(used[key] / 1024 / 1024 * 100) / 100}MB`);
 		}
 	},
-	getSYSTotal: function(measurement) {
+	getSYSTotal: function(measurement="b") {
 		var os = require("os");
 		switch(measurement.toLowerCase()) {
 			case "b":
@@ -45,7 +53,7 @@ module.exports = {
 				throw new Error("Invalid Measurement");
 		}
 	},
-	getSYSFree: function(measurement) {
+	getSYSFree: function(measurement="b") {
 		var os = require("os")
 		switch(measurement.toLowerCase()) {
 			case "b":
@@ -68,7 +76,7 @@ module.exports = {
 				throw new Error("Invalid Measurement");
 		}
 	},
-	getSYSUsed: function(measurement) {
+	getSYSUsed: function(measurement="b") {
 		var os = require("os")
 		switch(measurement.toLowerCase()) {
 			case "b":

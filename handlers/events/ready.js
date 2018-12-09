@@ -75,5 +75,10 @@ module.exports = (async(self) => {
     //var webhookEmbed = new self.Discord.MessageEmbed(webhookData);
     
     //self.webhooks.shards.send(webhookEmbed);
-    self.server.load(self);
+    self.srv = self.server.load(self);
+
+    if(!self.config.beta) {
+        //const ls = self.listStats(self);
+        setInterval(self.listStats,3e5,self);
+    }
 });

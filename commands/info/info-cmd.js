@@ -20,7 +20,7 @@ module.exports = (async (self,local) => {
 		"fields": [
 			{
 				name: "Process Memory Usage",
-				value: `${self.getUsedMemory()}/${self.getTotalMemory()}`,
+				value: `${self.getUsedMemoryMB()}MB/${self.getTotalMemoryMB()}MB`,
 				inline: true
 			}, {
 				name: "Server Memory Usage",
@@ -81,7 +81,7 @@ module.exports = (async (self,local) => {
 			},
 			  {
 			   name: "Extras",
-			   value: `Vote\n${self.config.vote}\n\nPartners\n-- here --`,
+			   value: `Vote\n${self.config.vote}`,
 			   inline: false
 			  }
 			]

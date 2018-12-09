@@ -1,9 +1,29 @@
 module.exports = (async (self,local) => {
-    
-    if(self.os.hostname() !== "FURRYBOT-SERVER") return local.message.reply("This bot is not running on its main server, so this command is disabled!");
-    const gay = await self.fsn.readdir("D:\\xampp\\websites\\furcdn.net\\webroot\\furrybot\\nsfw\\yiff\\gay").then((f)=>f.length),
-        straight = await self.fsn.readdir("D:\\xampp\\websites\\furcdn.net\\webroot\\furrybot\\nsfw\\yiff\\straight").then((f)=>f.length),
-        bulge = await self.fsn.readdir("D:\\xampp\\websites\\furcdn.net\\webroot\\furrybot\\nsfw\\bulge").then((f)=>f.length);
-
-        return local.channel.send(`Content Counts\n\n**Gay**: ${gay}\n**Straight**: ${straight}\n**Bulge**: ${bulge}\n**Total**: ${gay.length+straight.length+bulge.length}`);
+    var req = await self.request(`https://api.furrybot.me/image-counts.php`,{
+        method: "GET"
+    });
+    var counts = JSON.parse(req.body);
+    var txt = "";
+    for(let key in counts) {
+        txt+=`**${key}:**\n`;
+        console.log(`key ${key}`);
+        console.log(`counts[key] ${counts[key]}`);
+        for(let key2 in counts[key]) {
+            if(["array","obect"].includes(typeof counts[key][key2])) {
+                txt+=`${key2}\n`;
+                console.log(`counts[key][key2] ${counts[key][key2]}`);
+                console.log(`key2 ${key2}`);
+                for(let key3 in counts[key][key2][key3]) {
+                    txt+=`\t${key3}: ${counts[key][key2][key3]}\n`;
+                    console.log(`key3 ${key3}`);
+                    console.log(`counts[key][key2][key3] ${counts[key][key2][key3]}`);
+                }
+            } else {
+                txt+=`\t${key2}: ${counts[key][key2]}\n`;
+                console.log(`key2 ${key2}`);
+                console.log(`counts[key][key2] ${counts[key][key2]}`);
+            }
+        }
+    }
+    return local.channel.send(txt);
 });
