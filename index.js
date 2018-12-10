@@ -38,7 +38,8 @@ class FurryBot extends Discord.Client {
 			protocol: "https"
 		});
     	this.fs = require("fs");
-    	this.r = require("rethinkdbdash")(this.config.db);
+		this.r = require("rethinkdbdash")(this.config.db.bot);
+		this.ro = require("rethinkdbdash")(this.config.db.other);
 		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
 		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV3`);
 		this.commandTimeout = {};
@@ -52,7 +53,7 @@ class FurryBot extends Discord.Client {
 		this.chunk = require("chunk");
 		this.ytdl = require("ytdl-core");
 		this.furpile = {};
-		this.server = new (require("./server"));
+		this.server = new (require("./server"))(this.config.serverOptions);
 		this.yiffNoticeViewed = new Set();
 		this._ = require("lodash");
 		this.perf = require("perf_hooks");

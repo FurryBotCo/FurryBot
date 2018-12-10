@@ -80,7 +80,7 @@ if(guild.verified) features+="Verified\n";
 			},
 			{
 				name: "Members",
-				value: `Total: ${guild.memberCount}\n\n${self.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${self.config.emojis.idle}: ${local.message.guild.members.filter(m=>m.user.presence.status==="idle").size}\n${self.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${self.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}`,
+				value: `Total: ${guild.memberCount}\n\n${self.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${self.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${self.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${self.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}`,
 				inline: false
 			},
 			{

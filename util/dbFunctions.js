@@ -4,7 +4,7 @@ class FurryBotDatabase {
 		this.client = client;
 		this.config = this.client.config;
 		this.uuid = require("uuid/v4");
-		this.r = !this.client.r ? require("rethinkdbdash")(this.config.db) : this.client.r;
+		this.r = !this.client.r ? require("rethinkdbdash")(this.config.db.bot) : this.client.r;
 		this.logger = new (require(`${this.config.rootDir}/util/LoggerV3.js`))(this.client);
 		this.mdb = "furrybot";
 	}
@@ -254,7 +254,7 @@ class FurryBotDatabase {
 	}
 
 	async getStats(type) {
-		var types = ["f","fcount","commands","general"];
+		var types = ["f","fcount","commands","general","dailyjoins"];
 		if(![undefined,null,""].includes(type)) {
 			if(!types.includes(type.toLowerCase())) return new Error("invalid type");
 			switch(type.toLowerCase()) {
@@ -270,12 +270,17 @@ class FurryBotDatabase {
 				case "general":
 					return this.r.db(this.mdb).table("stats").get("general");
 					break;
+
+				case "dailyjoins":
+					return (await this.r.db(this.mdb).table("dailyjoins")).map(day=>({[day.id]:day.count}));
+					break
 			}
 		} else {
-			var fCount = (await this.r.db(this.mdb).table("stats").get("fCount")).count;
-			var commands = await this.r.db(this.mdb).table("stats").get("commands");
-			var general = await this.r.db(this.mdb).table("stats").get("general");
-			return {fCount,commands,general};
+			var fCount = (await this.r.db(this.mdb).table("stats").get("fCount")).count,
+			commands = await this.r.db(this.mdb).table("stats").get("commands"),
+			general = await this.r.db(this.mdb).table("stats").get("general"),
+			dailyjoins = (await this.r.db(this.mdb).table("dailyjoins")).map(day=>({[day.id]:day.count}));
+			return {fCount,commands,general,dailyjoins};
 		}
 	}
 
@@ -290,6 +295,17 @@ class FurryBotDatabase {
 			await this.r.db(this.mdb).table("stats").get("commands").update({[command]:+a[command]+amount});
 			return +a[command]+amount;
 		}
+	}
+
+	async updateDailyCount(negative = false, amount = 1) {
+		var d = new Date();
+        var date = `${d.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${d.getMonth()+1}`}-${d.getDate().toString().length > 1 ? d.getDate() : `0${d.getDate()}`}-${d.getFullYear()}`;
+            
+		var j = await this.r.table("dailyjoins").getAll(date);
+		if(j.length < 1) var j = await this.r.table("dailyjoins").insert({id:date,count:0}).then(s=>this.r.table("dailyjoins").get(date));
+		if(j[0]) j = j[0];
+		var res = negative ? await this.r.table("dailyjoins").update({count:+j.count-amount}) : await this.r.table("dailyjoins").update({count:+j.count+amount});
+		return (await this.r.table("dailyjoins").get(date)).count;
 	}
 
 	async createUser(uid,gid,bypassChecks=false) {
