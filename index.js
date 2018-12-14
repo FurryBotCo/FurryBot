@@ -1,6 +1,5 @@
 const Discord = require("discord.js");
 const config = require("./config");
-global.Promise = require("bluebird");
 
 /**
   * Main Class
@@ -38,11 +37,13 @@ class FurryBot extends Discord.Client {
 			protocol: "https"
 		});
     	this.fs = require("fs");
-    	this.r = require("rethinkdbdash")(this.config.db);
+		this.r = require("rethinkdbdash")(this.config.db.bot);
+		//this.ro = require("rethinkdbdash")(this.config.db.other);
 		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
 		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV3`);
 		this.commandTimeout = {};
 		this.varParse = require(`${process.cwd()}/util/varHandler`);
+		this.listStats = require("./util/listStats");
 		this.lang = require(`${process.cwd()}/lang`)(this);
 		this.colors = require("console-colors-2");
 		this.Canvas = require("canvas-constructor").Canvas;
@@ -51,7 +52,7 @@ class FurryBot extends Discord.Client {
 		this.chunk = require("chunk");
 		this.ytdl = require("ytdl-core");
 		this.furpile = {};
-		this.server = new (require("./server"));
+		this.server = new (require("./server"))(this.config.serverOptions);
 		this.yiffNoticeViewed = new Set();
 		this._ = require("lodash");
 		this.perf = require("perf_hooks");
@@ -338,6 +339,7 @@ class FurryBot extends Discord.Client {
 	}
 
 	async resolveUser (user) {
+		if(!user) return false;
 		if(user instanceof this.Discord.GuildMember) {
 			// can check permissions
 			var u = {

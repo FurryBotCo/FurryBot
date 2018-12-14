@@ -1,4 +1,5 @@
 module.exports = (async(self,message) => {
+	if(!self || !self.db) return;
 	const event = __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0].split(".")[0] : __filename.split("\\").reverse()[0].split(".")[0],
 		  filename = __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0];
 	if(!message || !message.guild) return;
@@ -98,14 +99,14 @@ module.exports = (async(self,message) => {
 		self.messageCount++;
 		self.localMessageCount++;
 		try {
-			local.gConfig = await self.db.getGuild(local.guild.id) ||  self.config.guildDefaultConfig;
-			local.uConfig = await self.db.getUser(local.member.id,local.guild.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyUserDefaultConfig);
+			local.gConfig = await self.db.getGuild(local.guild.id).catch(err=>self.config.guildDefaultSettings) ||  self.config.guildDefaultSettings;
+			local.uConfig = await self.db.getUser(local.member.id).catch(err=>self.config.userDefaultConfig) || self.config.userDefaultConfig;
 			if(self.config.beta) local.gConfig.prefix = "fb!";
 		}catch(e){
 			self.logger.error(e);
 			return;
 		}
-		local.prefix = local.message.content.startsWith(`<@${self.user.id}>`)?`<@${self.user.id}>`:local.message.content.startsWith(`<@!${self.user.id}>`)?`<@!${self.user.id}>`:local.gConfig.prefix;
+		local.prefix = local.message.content.startsWith(`<@${self.user.id}>`)?`<@${self.user.id}>`:local.message.content.startsWith(`<@!${self.user.id}>`)?`<@!${self.user.id}>`:local.gConfig.prefix.toLowerCase();
 		local.args = local.message.content.slice(local.prefix.length).trim().split(/\s+/g);
 		local.command = local.args.shift().toLowerCase();
 			
@@ -185,10 +186,10 @@ module.exports = (async(self,message) => {
 			local.message.reply(`Error while running command: ${e}`);
 			return self.logger.error(`[${event}Event][Guild: ${local.guild.id}]: Command error:\n\tCommand: ${local.command}\n\tSupplied arguments: ${self.args.join(' ')}\n\tServer ID: ${local.guild.id}\n\t${e.stack}`);
 		}
-		if(!local.message.content.startsWith(local.prefix)) return;
+		if(!local.message.content.toLowerCase().startsWith(local.prefix)) return;
 		if(!self.config.commandList.all.includes(local.command)) return;
 		if(local.gConfig.deleteCommands) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
-		if(command.userPermissions.length > 0) {
+		if(command.userPermissions.length > 0 && !local.user.isDeveloper) {
 			if(command.userPermissions.some(perm => !local.channel.permissionsFor(local.member).has(perm,true))) {
 				var neededPerms = command.userPermissions.filter(perm => !local.channel.permissionsFor(local.member).has(perm,true));
 				self.mixpanel.track(`commands.${local.command}.missingUserPermissions`, {

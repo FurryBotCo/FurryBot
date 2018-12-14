@@ -1,26 +1,26 @@
-module.exports = (async(self)=>{
+module.exports = (async(client)=>{
     const config = require("../config");
     const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-    const guilds = self.guilds.size,
-        users = self.users.size,
-        voice = self.voiceConnections.size,
-        shards = self.shard !== null ? self.shard.count : 1;
-    for(let key in self.config.botLists) {
-        if(self.config.botLists[key].alt !== undefined) {
-            switch(self.config.botLists[key].alt) {
+    const guilds = client.guilds.size,
+        users = client.users.size,
+        voice = client.voiceConnections.size,
+        shards = client.shard !== null ? client.shard.count : 1;
+    for(let key in client.config.botLists) {
+        if(client.config.botLists[key].alt !== undefined) {
+            switch(client.config.botLists[key].alt) {
                 case 1:
-                    var xhr = new self.XMLHttpRequest();
-                    xhr.open("POST",self.config.botLists[key].url,false);
-                    xhr.setRequestHeader("Authorization", `Bot ${self.config.botLists[key].token}`);
+                    var xhr = new client.XMLHttpRequest();
+                    xhr.open("POST",client.config.botLists[key].url,false);
+                    xhr.setRequestHeader("Authorization", `Bot ${client.config.botLists[key].token}`);
                     xhr.setRequestHeader("Content-Type", "application/json");
 
                     xhr.addEventListener("readystatechange", function () {
                     if (this.readyState === 4) {
                         //console.log(`${key}:\n${this.responseText}\n---\n`);
                         if(this.status >= 200 && this.status < 400) {
-                            console.log(`Successfully posted to ${self.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
+                            console.log(`Successfully posted to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                         } else {
-                            console.error(`Error posting to ${self.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
+                            console.error(`Error posting to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                         }
                     }
                     });
@@ -29,18 +29,18 @@ module.exports = (async(self)=>{
                     break;
                 
                 case 2:
-                    var xhr = new self.XMLHttpRequest();
-                    xhr.open("POST",self.config.botLists[key].url,false);
-                    xhr.setRequestHeader("Authorization", `Bot ${self.config.botLists[key].token}`);
+                    var xhr = new client.XMLHttpRequest();
+                    xhr.open("POST",client.config.botLists[key].url,false);
+                    xhr.setRequestHeader("Authorization", `Bot ${client.config.botLists[key].token}`);
                     xhr.setRequestHeader("Content-Type", "application/json");
 
                     xhr.addEventListener("readystatechange", function () {
                     if (this.readyState === 4) {
                         //console.log(`${key}:\n${this.responseText}\n---\n`);
                         if(this.status >= 200 && this.status < 400) {
-                            console.log(`Successfully posted to ${self.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
+                            console.log(`Successfully posted to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                         } else {
-                            console.error(`Error posting to ${self.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
+                            console.error(`Error posting to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                         }
                     }
                     });
@@ -49,25 +49,25 @@ module.exports = (async(self)=>{
                     break;
             }
         } else {
-            var xhr = new self.XMLHttpRequest();
-            xhr.open("POST",self.config.botLists[key].url,false);
-            xhr.setRequestHeader("Authorization", self.config.botLists[key].token);
+            var xhr = new client.XMLHttpRequest();
+            xhr.open("POST",client.config.botLists[key].url,false);
+            xhr.setRequestHeader("Authorization", client.config.botLists[key].token);
             xhr.setRequestHeader("Content-Type", "application/json");
 
             xhr.addEventListener("readystatechange", function () {
             if (this.readyState === 4) {
                 //console.log(`${key}:\n${this.responseText}\n---\n`);
                 if(this.status >= 200 && this.status < 400) {
-                    console.log(`Successfully posted to ${self.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
+                    console.log(`Successfully posted to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                 } else {
-                    console.error(`Error posting to ${self.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
+                    console.error(`Error posting to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                 }
             }
             });
                 
-            xhr.send(JSON.stringify({server_count:guilds,key:self.config.botLists[key].token,guilds}));
+            xhr.send(JSON.stringify({server_count:guilds,key:client.config.botLists[key].token,guilds}));
         }
     }
-
+    client.logger.log(`Posted Stats:\nguilds: ${guilds}\nusers: ${users}\nvoice connections: ${voice}\nshard count: ${shards}`);
     return {guilds,users,voice,shards};
 });

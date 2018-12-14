@@ -49,7 +49,7 @@ module.exports = (async(self,local)=>{
     var reason = local.args.length >= 2 ? local.args.splice(1).join(" ") : "No Reason Specified";
     if(!user.user.bot) var m = await user.user.send(`You were baned from **${local.guild.name}**\nReason: ${reason}`);
     user.ban({reason:`Ban: ${local.author.tag} -> ${reason}`,days:7}).then(() => {
-        local.channel.send(`***User was banned ${user.tag}, ${reason}***`).catch(noerr => null);
+        local.channel.send(`***User ${user.tag} was banned, ${reason}***`).catch(noerr => null);
     }).catch(async(err)=>{
         local.message.reply(`I couldn't ban **${user.user.tag}**, ${err}`);
         if(m !== undefined) {

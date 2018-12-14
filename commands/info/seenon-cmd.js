@@ -37,7 +37,7 @@ module.exports = (async(self,local)=>{
 		return local.channel.send(embed);
     }
     
-    var a = local.guilds.filter(g=>g.members.has(user.id));
+    var a = self.guilds.filter(g=>g.members.has(user.id));
     var b = a.map(g=>`${g.name} (${g.id})`),
     guilds = [],
     fields = [],

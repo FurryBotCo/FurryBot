@@ -2,5 +2,5 @@
 title Furry Bot
 cd %~dp0
 :start
-node sharder.js --expose-gc
+node . --expose-gc
 goto start

@@ -107,5 +107,6 @@
   "modlog": {
     "enabled": false,
     "channel": null
-  }
+  },
+  "blacklisted": false
 }

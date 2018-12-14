@@ -45,7 +45,7 @@ module.exports = (async(self,oldChannel,newChannel)=>{
     }
     if(!self._.isEqual(oldChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})),newChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})))) {
         let data = Object.assign({},base);
-        data.fields = Object.assign({
+        data.fields = [{
             name: "Channel",
             value: `${newChannel.name} (${newChannel.id})`,
             inline: false
@@ -57,10 +57,31 @@ module.exports = (async(self,oldChannel,newChannel)=>{
             name: "Update",
             value: "Check Audit Log",
             inline: false
-        },log_data);
+        }].concat(log_data);
         var embed = new self.Discord.MessageEmbed(data);
         logch.send(embed);
-        
+    }
+    if(oldChannel.name !== newChannel.name) {
+        let data = Object.assign({},base);
+        data.fields = [{
+            name: "Channel",
+            value: `${newChannel.name} (${newChannel.id})`,
+            inline: false
+        },{
+            name: "Update Type",
+            value: "Name",
+            inline: false
+        },{
+            name: "Old Value",
+            value: oldChannel.name,
+            inline: false
+        },{
+            name: "New Value",
+            value: newChannel.name,
+            inline: false
+        }].concat(log_data);
+        var embed = new self.Discord.MessageEmbed(data);
+        logch.send(embed);
     }
 
     /*if(typeof channel.parent !== "undefined") {
