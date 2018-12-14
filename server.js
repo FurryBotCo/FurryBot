@@ -10,7 +10,11 @@ class FurryBotServer {
         this.https = require("https");
         this.fs = require("fs");
         this.r = require("rethinkdbdash")(this.config.db.bot);
+<<<<<<< HEAD
         //this.ro = require("rethinkdbdash")(this.config.db.other);
+=======
+        this.ro = require("rethinkdbdash")(this.config.db.other);
+>>>>>>> c77c41c9b1cfbe01522a74ffc45914cc0b9f5de4
     }
 
     load(client) {

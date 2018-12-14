@@ -25,8 +25,15 @@ class FurryBotDatabase {
 			this.logger.warn(`[createGuild]: Attempted to add guild that the bot is not in`);
 			return new Error("ERR_INVALID_GUILD");
 		}
+<<<<<<< HEAD
 		if((await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) return this.getGuild(gid);
 		this.logger.info(`[createGuild]: Added guild "${gid}"`);
+=======
+    console.log("cg1");
+		if((await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) return this.getGuild(gid);
+		this.logger.info(`[createGuild]: Added guild "${gid}"`);
+    console.log("cg2");
+>>>>>>> c77c41c9b1cfbe01522a74ffc45914cc0b9f5de4
 		await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).insert(Object.assign({id:gid},this.config.defaultGuildSettings));
 		return this.getGuild(gid);
 	}
@@ -34,7 +41,13 @@ class FurryBotDatabase {
 	async getGuild(gid) {
 		if(!gid) return new Error("ERR_MISSING_PARAM");
 		gid = gid.toString();
+<<<<<<< HEAD
 		if(!(await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) return this.createGuild(gid);
+=======
+    console.log("gg1");
+		if(!(await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) return this.createGuild(gid);
+    console.log("gg2");
+>>>>>>> c77c41c9b1cfbe01522a74ffc45914cc0b9f5de4
 		return this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).get(gid);
 	}
 
@@ -307,7 +320,13 @@ class FurryBotDatabase {
 				return new Error("ERR_INVALID_USER");
 			}
 		}
+<<<<<<< HEAD
 		if((await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(a=>a.id))).includes(uid)) return this.getUser(uid);
+=======
+    console.log("cu1");
+		if((await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(a=>a.id))).includes(uid)) return this.getUser(uid);
+    console.log("cu2");
+>>>>>>> c77c41c9b1cfbe01522a74ffc45914cc0b9f5de4
 		await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).insert(Object.assign({id:uid},this.config.userDefaultConfig));
 		this.logger.info(`[createUser]: Added user "${uid}" with default configuration`);
 		return this.getUser(uid);
@@ -316,7 +335,13 @@ class FurryBotDatabase {
 	async getUser(uid) {
 		if(!uid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
+<<<<<<< HEAD
 		if(!(await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(a=>a.id))).includes(uid)) return this.createUser(uid);
+=======
+    console.log("gu1");
+		if(!(await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(a=>a.id))).includes(uid)) return this.createUser(uid);
+    console.log("gu2");
+>>>>>>> c77c41c9b1cfbe01522a74ffc45914cc0b9f5de4
 		return await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid);
 	}
 

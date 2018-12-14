@@ -99,8 +99,13 @@ module.exports = (async(self,message) => {
 		self.messageCount++;
 		self.localMessageCount++;
 		try {
+<<<<<<< HEAD
 			local.gConfig = await self.db.getGuild(local.guild.id).catch(err=>self.config.guildDefaultSettings) ||  self.config.guildDefaultSettings;
 			local.uConfig = await self.db.getUser(local.member.id).catch(err=>self.config.userDefaultConfig) || self.config.userDefaultConfig;
+=======
+			local.gConfig = await self.db.getGuild(local.guild.id) ||  self.config.guildDefaultConfig;
+			local.uConfig = await self.db.getUser(local.member.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyUserDefaultConfig);
+>>>>>>> c77c41c9b1cfbe01522a74ffc45914cc0b9f5de4
 			if(self.config.beta) local.gConfig.prefix = "fb!";
 		}catch(e){
 			self.logger.error(e);
