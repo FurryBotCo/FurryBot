@@ -82,11 +82,11 @@ module.exports = (async (self,local) => {
 				name: "Blacklist",
 				value: bl,
 				inline: false
-			},{
+			}/*,{
 				name: "Permissions",
 				value: `__Allow__:\n**${Object.keys(self._.pickBy(local.member.permissions.serialize(),((val,key)=>{return val}))).join("**, **")}**\n\n\n__Deny__:\n**${Object.keys(self._.pickBy(local.member.permissions.serialize(),((val,key)=>{return !val}))).join("**, **")}**`,
 				inline: false
-			}
+			}*/
 			]
 		};
 		Object.assign(data, local.embed_defaults());

@@ -3,7 +3,7 @@ module.exports = (async (self,local) => {
         method: "GET"
     });
     var counts = JSON.parse(req.body);
-    var txt = "";
+    /*var txt = "";
     for(let key in counts) {
         txt+=`**${key}:**\n`;
         console.log(`key ${key}`);
@@ -24,6 +24,23 @@ module.exports = (async (self,local) => {
                 console.log(`counts[key][key2] ${counts[key][key2]}`);
             }
         }
-    }
-    return local.channel.send(txt);
+    }*/
+	
+	var content = "";
+	for(let category in counts) {
+		content+=`**${category}**\n`;
+		if(counts[category] instanceof Object) {
+			for(let level1 in counts[category]) {
+				if(counts[category][level1] instanceof Object) {
+					content+=`${level1}:\n`;
+					for(let level2 in counts[category][level1]) {
+						content+=`\t${level2}: ${counts[category][level1][level2]}\n`;
+					}
+				} else {
+					content+=`${level1}: ${counts[category][level1]}\n`;
+				}
+			}
+		}
+	}
+    return local.channel.send(content);
 });

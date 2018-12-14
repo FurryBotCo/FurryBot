@@ -43,7 +43,7 @@ module.exports = (async(self,local)=>{
             description: `Either you provided an invalid warning id, or there was an internal error. Make sure the user **${user.user.tag}** has a warning with the id ${local.args[1]}.`,
             color: 15601937
         }
-        Object.assign(data,local.embed_defaults()("color"));
+        Object.assign(data,local.embed_defaults("color"));
         var embed = new self.Discord.MessageEmbed(data);
         return local.channel.send(embed);
     } else {
@@ -52,7 +52,7 @@ module.exports = (async(self,local)=>{
             description: `Deleted warning #${local.args[1]} for user **${user.user.tag}**.`,
             color: 41728
         }
-        Object.assign(data,local.embed_defaults()("color"));
+        Object.assign(data,local.embed_defaults("color"));
         var embed = new self.Discord.MessageEmbed(data);
         return local.channel.send(embed);
     }

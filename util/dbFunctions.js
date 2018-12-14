@@ -6,7 +6,16 @@ class FurryBotDatabase {
 		this.uuid = require("uuid/v4");
 		this.r = !this.client.r ? require("rethinkdbdash")(this.config.db.bot) : this.client.r;
 		this.logger = new (require(`${this.config.rootDir}/util/LoggerV3.js`))(this.client);
-		this.mdb = "furrybot";
+    this.dbConfig = {
+        dbs: {
+			main: "furrybot",
+			other: "discord_bot"
+        },
+        tables: {
+            guilds: "guilds",
+            users: "users"
+        }
+    }
 	}
 	
 	async createGuild(gid,disableCheck=false){
@@ -14,64 +23,53 @@ class FurryBotDatabase {
 		gid = gid.toString();
 		if(!this.client.guilds.has(gid) && !disableCheck) {
 			this.logger.warn(`[createGuild]: Attempted to add guild that the bot is not in`);
-			return new Error("ERR_NOT_FOUND");
+			return new Error("ERR_INVALID_GUILD");
 		}
-		this.logger.info(`[createGuild]: Added database "${gid}", and tables "users", "settings" for guild ${gid}`);
-		if((await this.r.dbList()).includes(gid)) return this.getGuild(gid);
-		await this.r.dbCreate(gid);
-		await this.r.db(gid).tableCreate("settings");
-		await this.r.db(gid).tableCreate("users");
-		await this.r.db(gid).table("settings").insert(Object.assign({id:1},this.config.defaultGuildSettings));
+		if((await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) return this.getGuild(gid);
+		this.logger.info(`[createGuild]: Added guild "${gid}"`);
+		await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).insert(Object.assign({id:gid},this.config.defaultGuildSettings));
 		return this.getGuild(gid);
 	}
 
 	async getGuild(gid) {
-		if(!gid) return new Error("missing parameter");
+		if(!gid) return new Error("ERR_MISSING_PARAM");
 		gid = gid.toString();
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("settings")) return this.createGuild(gid);
-		return this.r.db(gid).table("settings").get(1);
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) return this.createGuild(gid);
+		return this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).get(gid);
 	}
 
 	async deleteGuild(gid) {
-		if(!gid) return new Error("missing parameter");
+		if(!gid) return new Error("ERR_MISSING_PARAM");
 		gid = gid.toString();
-		if((await this.r.dbList()).includes(gid)) var a = await this.r.dbDrop(gid);
-		if(typeof a.dbs_dropped !== "undefined" && a.dbs_dropped > 0) {
-			this.logger.info(`[deleteGuild]: Deleted database "${gid}" for guild "${gid}"`);
+		if((await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) var a = await this.r.dbDrop(gid);
+		if(typeof a.deleted !== "undefined" && a.deleted > 0) {
+			this.logger.info(`[deleteGuild]: Deleted entry for guild "${gid}"`);
 			return true;
 		} else {
-			this.logger.info(`[deleteGuild]: Attempted to delete a non-existent guild database "${gid}"`);
+			this.logger.info(`[deleteGuild]: Attempted to delete a non-existent guild entry "${gid}"`);
 			return false;
 		}
 	}
 
 	async updateGuild(gid,fields) {
-		if(!gid || !fields || fields.length === 0) return new Error("missing parameter");
+		if(!gid || !fields) return new Error("ERR_MISSING_PARAM");
 		gid = gid.toString();
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("settings")) await this.createGuild(gid);
-		if(!fields.settings) {
-			await this.r.db(gid).table("settings").get(1).update(fields);
-		}
-		if(fields.settings !== undefined) {
-			await this.r.db(gid).table("settings").get(1).update(fields.settings);
-		}
+		if((await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) await this.createGuild(gid);
+			await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).get(gid).update(fields);
 		return this.getGuild(gid);
 	}
 
-	async resetGuild(gid) {
-		if(!(await this.r.dbList()).includes(gid)) return false;
-		await this.r.dbDrop(gid);
-		await this.r.dbCreate(gid);
-		await this.r.db(gid).tableCreate("settings");
-		await this.r.db(gid).tableCreate("users");
-		await this.r.db(gid).table("settings").insert(Object.assign({id:1},this.config.defaultGuildSettings));
+	async resetGuild(gid,bypassChecks) {
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) return false;
+    	await this.deleteGuild(gid,bypassChecks);
+		await this.createGuild(gid,bypassChecks);
 		return true;
 	}
 	
 	async sweepGuilds(del=false) {
-		var j = self.guilds;
+		var j = this.client.guilds;
 		var g = [];
-		this.r.dbList().then((a) => {
+		this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id)).then((a) => {
 			a.forEach((b)=>{
 				if(b.match(".{17,18}")) g.push(b);
 			})
@@ -97,202 +95,193 @@ class FurryBotDatabase {
 	}
 
 	async createUserWarning(uid,gid,blame,reason,bypassChecks=false) {
-		if(!uid || !gid || !blame || !reason) return new Error("missing parameter");
+		if(!uid || !gid || !blame || !reason) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
 		if(!bypassChecks) {
 			if(!this.client.guilds.has(gid)) {
 				this.logger.warn(`[createUserWarning]: Attempted to add warning to a guild that the bot is not in`);
-				return new Error("ERR_NOT_FOUND");
+				return new Error("ERR_INVALID_GUILD");
 			}
 			if(!this.client.guilds.get(gid).members.has(uid)) {
 				this.logger.warn(`[createUserWarning]: Attempted to add warning to a member that is not in the guild`);
-				return new Error("ERR_NOT_FOUND");
+				return new Error("ERR_INVALID_USER");
 			}
 		}
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
-		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) await this.createGuild(gid);
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid))) await this.createUser(uid,gid);
 		var wid = (await this.getUserWarnings(uid,gid)).length+1;
 		if(isNaN(wid)) wid = 1;
-		await this.r.db(gid).table("users").get(uid).update({warnings:this.r.row("warnings").append({wid,blame,reason,timestamp:Date.now()})});
+		await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid).update({warnings:this.r.row("warnings").append({wid,blame,reason,timestamp:Date.now(),gid})});
 		return this.getUserWarning(uid,gid,wid);
 	}
 
 	async getUserWarnings(uid,gid) {
-		if(!uid || !gid) return new Error("missing parameter");
+		if(!uid || !gid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
-		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
-		return this.r.db(gid).table("users").get(uid)("warnings").orderBy("id");
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) await this.createGuild(gid);
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid))) await this.createUser(uid);
+		return this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid)("warnings").orderBy("id");
 	}
 	
 	async getUserWarning(uid,gid,wid) {
-		if(!uid || !gid || !wid) return new Error("missing parameter");
+		if(!uid || !gid || !wid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
 		wid = parseInt(wid,10);
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
-		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
-		var j = await this.r.db(gid).table("users").get(uid)("warnings").filter({wid});
+		if((await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) await this.createGuild(gid);
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid))) await this.createUser(uid,gid);
+		var j = await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid)("warnings").filter({wid});
 		if(j.length === 0) return new Error("ERR_NOT_FOUND");
 		return j[0];
 	}
 
 	async deleteUserWarning(uid,gid,wid) {
-		if(!uid || !wid || !gid) return new Error("missing parameter");
+		if(!uid || !wid || !gid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
 		wid = parseInt(wid,10);
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
-		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
-		var j = await this.r.db(gid).table("users").get(uid).update((u)=>{
+		if((await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) await this.createGuild(gid);
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid))) await this.createUser(uid,gid);
+		var j = await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid).update((u)=>{
 			return {"warnings": u('warnings').filter((item)=>item('wid').ne(wid))}
 		});
 		return Boolean(j.replaced);
 	}
 
 	async clearUserWarnings(uid,gid) {
-		if(!uid || !gid) return new Error("missing parameter");
+		if(!uid || !gid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
-		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
-		var j = await this.r.db(gid).table("users").get(uid).update({warnings:[]});
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(g=>g.id))).includes(gid)) await this.createGuild(gid);
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid))) await this.createUser(uid,gid);
+		var j = await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid).update({warnings:[]});
 		return j.replaced >= 1;
 	}
 
 	async addDonator(uid,level) {
-		if(!uid || !level) return new Error("missing parameter");
+		if(!uid || !level) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		// level:
 		// -1 = freemium
+		// 0 = none
 		// 1 = $2-$3
 		// 2 = $5
 		// 3 = $10
-		return this.r.db(this.mdb).table("donors").insert({id:uid,level});
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(u=>u.id))).includes(uid)) await this.createUser(uid);
+		return (await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid).update({donator:true,level})).replaced >= 1;
 	}
 
 	async updateDonator(uid,level) {
-		if(!uid || !level) return new Error("missing parameter");
+		if(!uid || !level) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		// level:
 		// -1 = freemium
+		// 0 = none
 		// 1 = $2-$3
 		// 2 = $5
 		// 3 = $10
-		var a = await this.r.db(this.mdb).table("donors").get(uid).update({level});
-		if(a.skipped) return this.addDonator(uid,level);
-		return true;
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(u=>u.id))).includes(uid)) await this.createUser(uid);
+		return (await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid).update({donator:true,level})).replaced >= 1;
 	}
 
 	async removeDonor(uid) {
-		if(!uid) return new Error("missing parameter");
+		if(!uid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		await this.r.db(this.mdb).table("donors").get(uid).delete();
-		return true;
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(u=>u.id))).includes(uid)) return false;
+		return (await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid).update({donator:false,level:0})).replaced >= 1;
 	}
 
 	async isDonor(uid) {
-		if(!uid) return new Error("missing parameter");
+		if(!uid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		var a = await this.r.db(this.mdb).table("donors").get(uid);
-		if(!a) return false;
-		return true;
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(u=>u.id))).includes(uid)) {
+			await this.createUser(uid);
+			return false;
+		}
+		return (await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tabless.users).get(uid)).donator;
 	}
 
-	async addBlacklistedUser(uid,reason) {
-		if(!uid || !reason) return new Error("missing parameter");
-		uid = uid.toString();
-		var j = await this.r.db(this.mdb).table("blacklist").insert({id:uid,reason,type:"user"});
-		return Boolean(j.inserted);
+	async addBlacklistEntry(id,type = "user",reason = "None Specified") {
+		if(!id || !type || !reason) return new Error("ERR_MISSING_PARAM");
+		id = id.toString();
+		var j = await this.r.db(this.dbConfig.dbs.main).table("blacklist").insert({id:uid,reason,type:"user"});
+		var table = ["server","guild"].includes(type) ? this.dbConfig.tables.guilds : this.dbConfig.tables.users; 
+		if(!(await this.r.db(this.dbConfig.dbs.main).table().then(j=>j.map(u=>u.id))).includes(id)) await this.createUser(id);
+		return (await this.r.db(this.dbConfig.dbs.main).table(table).get(id).update({blacklisted:true,blacklistReason:reason})).replaced >= 1;
 	}
 
-	async updateBlacklistedUser(uid,reason) {
-		if(!uid || !reason) return new Error("missing parameter");
-		uid = uid.toString();
-		var a = await this.r.db(this.mdb).table("blacklist").get(uid).update({reason});
-		if(!a.replaced) return this.addBlacklistedUser(uid,reason);
-		return true;
+	async updateBlacklistEntry(id,type = "user",reason = "None Specified") {
+		if(!id || !type || !reason) return new Error("ERR_MISSING_PARAM");
+		id = id.toString();
+		var table = ["server","guild"].includes(type) ? this.dbConfig.tables.guilds : this.dbConfig.tables.users; 
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(table).then(j=>j.map(a=>a.id))).includes(id)) await this.createUser(id);
+		return (await this.r.db(this.dbConfig.dbs.main).table(table).get(id).update({blacklisted:true,blacklistReason:reason})).replaced >= 1;
 	}
 
-	async removeBlacklistedUser(uid) {
-		if(!uid) return new Error("missing parameter");
-		uid = uid.toString();
-		await this.r.db(this.mdb).table("donors").get(uid).delete();
-		return true;
-	}
-
-	async addBlacklistedGuild(gid,reason) {
-		if(!gid || !reason) return new Error("missing parameter");
-		gid = gid.toString();
-		await this.r.db(this.mdb).table("blacklist").insert({id:gid,reason,type:"guild"});
-		return true;
-	}
-
-	async updateBlacklistedGuild(gid,reason) {
-		if(!gid || !reason) return new Error("missing parameter");
-		gid = gid.toString();
-		var a = await this.r.db(this.mdb).table("blacklist").get(uid).update({reason});
-		if(a.skipped) return this.addBlacklistedGuild(gid,reason);
-		return true;
-	}
-
-	async removeBlacklistedGuild(gid) {
-		if(!gid) return new Error("missing parameter");
-		gid = gid.toString();
-		await this.r.db(this.mdb).table("blacklist").get(gid).delete();
-		return true;
+	async removeBlacklistEntry(id,type = "user") {
+		if(!id || !type) return new Error("ERR_MISSING_PARAM");
+		id = id.toString();
+		var table = ["server","guild"].includes(type) ? this.dbConfig.tables.guilds : this.dbConfig.tables.users; 
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(table).then(j=>j.map(a=>a.id))).includes(id) || (await this.r.db(this.dbConfig.dbs.main).table(table)).blacklisted === false) return false;
+		return (await this.r.db(this.dbConfig.dbs.main).table(table).get(id.replace(r.row.without("blacklisted","blacklistReason").merge({blacklisted:false})))).replaced >= 1;
 	}
 
 	async isBlacklisted(id) {
-		if(!id) return new Error("missing parameter");
+		if(!id) return new Error("ERR_MISSING_PARAM");
 		id = id.toString();
-		var a = await this.r.db(this.mdb).table("blacklist").get(id);
-		if(!a) return false;
-		return true;
+		if((await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(a=>a.id))).includes(id)) {
+			var j = await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users);
+			return j.blacklisted ? {blacklisted: true, reason: j.reason,type: "user"} : {blacklisted: false,reason: null,type: "user"};
+		} else if((await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds).then(j=>j.map(a=>a.id))).includes(id)) {
+			var j = await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.guilds);
+			return j.blacklisted ? {blacklisted: true, reason: j.reason,type: "guild"} : {blacklisted: false,reason: null,type: "guild"};
+		} else {
+			return false;
+		}
 	}
 
 	async getStats(type) {
 		var types = ["f","fcount","commands","general","dailyjoins"];
 		if(![undefined,null,""].includes(type)) {
-			if(!types.includes(type.toLowerCase())) return new Error("invalid type");
+			if(!types.includes(type.toLowerCase())) return new Error("ER_INVALID_TYPE");
 			switch(type.toLowerCase()) {
 				case "fcount":
 				case "f":
-					return (await this.r.db(this.mdb).table("stats").get("fCount")).count;
+					return (await this.r.db(this.dbConfig.dbs.main).table("stats").get("fCount")).count;
 					break;
 
 				case "commands":
-					return this.r.db(this.mdb).table("stats").get("commands");
+					return this.r.db(this.dbConfig.dbs.main).table("stats").get("commands");
 					break;
 
 				case "general":
-					return this.r.db(this.mdb).table("stats").get("general");
+					return this.r.db(this.dbConfig.dbs.main).table("stats").get("general");
 					break;
 
 				case "dailyjoins":
-					return (await this.r.db(this.mdb).table("dailyjoins")).map(day=>({[day.id]:day.count}));
+					return (await this.r.db(this.dbConfig.dbs.main).table("dailyjoins")).map(day=>({[day.id]:day.count}));
 					break
 			}
 		} else {
-			var fCount = (await this.r.db(this.mdb).table("stats").get("fCount")).count,
-			commands = await this.r.db(this.mdb).table("stats").get("commands"),
-			general = await this.r.db(this.mdb).table("stats").get("general"),
-			dailyjoins = (await this.r.db(this.mdb).table("dailyjoins")).map(day=>({[day.id]:day.count}));
+			var fCount = (await this.r.db(this.dbConfig.dbs.main).table("stats").get("fCount")).count,
+			commands = await this.r.db(this.dbConfig.dbs.main).table("stats").get("commands"),
+			general = await this.r.db(this.dbConfig.dbs.main).table("stats").get("general"),
+			dailyjoins = (await this.r.db(this.dbConfig.dbs.main).table("dailyjoins")).map(day=>({[day.id]:day.count}));
 			return {fCount,commands,general,dailyjoins};
 		}
 	}
 
 	async incrementCommandStats(command,amount=1) {
-		if(!command) return new Error("missing paramter");
-		var a = await this.r.db(this.mdb).table("stats").get("commands");
-		if(!a) var a = await this.r.db(this.mdb).table("stats").insert({id:"commands"});
+		if(!command) return new Error("ERR_MISSING_PARAM");
+		var a = await this.r.db(this.dbConfig.dbs.main).table("stats").get("commands");
+		if(!a) var a = await this.r.db(this.dbConfig.dbs.main).table("stats").insert({id:"commands"});
 		if(!a[command]) {
-			await this.r.db(this.mdb).table("stats").get("commands").update({[command]:amount});
+			await this.r.db(this.dbConfig.dbs.main).table("stats").get("commands").update({[command]:amount});
 			return amount;
 		} else {
-			await this.r.db(this.mdb).table("stats").get("commands").update({[command]:+a[command]+amount});
+			await this.r.db(this.dbConfig.dbs.main).table("stats").get("commands").update({[command]:+a[command]+amount});
 			return +a[command]+amount;
 		}
 	}
@@ -308,56 +297,41 @@ class FurryBotDatabase {
 		return (await this.r.table("dailyjoins").get(date)).count;
 	}
 
-	async createUser(uid,gid,bypassChecks=false) {
-		if(!uid) return new Error("missing paramter");
+	async createUser(uid,bypassChecks=false) {
+		if(!uid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		gid = gid.toString();
-		if(!this.client.guilds.has(gid) && !bypassChecks) {
-			this.logger.warn("[createUser]: Attempted to create a user for a guild that the bot is not in.");
-			return new Error("invalid guild");
+		if(!bypassChecks) {
+			var u = this.client.users.fetch(uid,true).then(u=>true).catch(u=>false);
+			if(!u) {
+				this.logger.info(`[createUser]: Attempted to create an entry for a user that was not found "${uid}"`);
+				return new Error("ERR_INVALID_USER");
+			}
 		}
-		if(!this.client.guilds.get(gid).members.has(uid) && !bypassChecks) {
-			this.logger.warn("[createUser]: Attempted to create a user for a guild that the user is not in.");
-			return new Error("invalid user");
-		}
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
-		await this.r.db(gid).table("users").insert(Object.assign({id:uid},this.config.userDefaultConfig));
-		this.logger.info(`[createUser]: Added user "${uid}" to users table in guild "${gid}" with default configuration`);
-		return this.getUser(uid,gid);
+		if((await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(a=>a.id))).includes(uid)) return this.getUser(uid);
+		await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).insert(Object.assign({id:uid},this.config.userDefaultConfig));
+		this.logger.info(`[createUser]: Added user "${uid}" with default configuration`);
+		return this.getUser(uid);
 	}
 
-	async getUser(uid,gid) {
-		if(!uid) return new Error("missing paramter");
+	async getUser(uid) {
+		if(!uid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		gid = gid.toString();
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
-		if(!(await this.r.db(gid).table("users").get(uid))) return this.createUser(uid,gid);
-		return this.r.db(gid).table("users").get(uid);
-
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(a=>a.id))).includes(uid)) return this.createUser(uid);
+		return await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).get(uid);
 	}
 
-	async deleteUser(uid,gid) {
-		if(!uid) return new Error("missing paramter");
+	async deleteUser(uid) {
+		if(!uid) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		gid = gid.toString();
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
-		if(!(await this.r.db(gid).table("users").get(uid))) return false;
-		return Boolean((await this.r.db(gid).table("users").get(uid).delete()).deleted);
+		if(!(await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).then(j=>j.map(a=>a.id))).includes(uid)) return false;
+		return (await this.r.db(this.dbConfig.dbs.main).table("users").get(uid).delete()).deleted>=1;
 	}
 
-	async updateUser(uid,gid,fields) {
-		if(!uid || !gid || !fields || fields.length === 0) return new Error("missing parameter");
+	async updateUser(uid,fields) {
+		if(!uid || !fields) return new Error("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		gid = gid.toString();
-		if(!(await this.r.dbList()).includes(gid) || !(await this.r.db(gid).tableList()).includes("users")) await this.createGuild(gid);
-		if(!(await this.r.db(gid).table("users").get(uid))) await this.createUser(uid,gid);
-		if(!fields.user) {
-			await this.r.db(gid).table("users").get(uid).update(fields);
-			return this.getUser(uid,gid,bypassChecks);
-		}  else {
-			if(fields.user !== undefined) await this.r.db(gid).table("users").get(uid).update(fields.user);
-		}
-		return this.getUser(uid,gid);
+		await this.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tabless.users).get(uid).update(fields);
+		return this.getUser(uid);
 	}
 }
 

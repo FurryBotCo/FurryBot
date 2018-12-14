@@ -57,7 +57,17 @@ module.exports = (async(self,local)=>{
     }
     
     var warnings = await self.db.getUserWarnings(user.id,local.guild.id);
-
+    if(warnings.length <= 0) {
+        var data = {
+			title: "No Warnings Found",
+            description: `No warnings were found for the specified user **${user.user.tag}**`,
+            color: 41728
+		}
+		Object.assign(data, local.embed_defaults("color"));
+		var embed = new self.Discord.MessageEmbed(data);
+        local.channel.send(embed);
+        return local.channel.stopTyping();
+    }
     var wr = self.chunk(warnings,10);
     var pages = wr.length;
     if([undefined,null,""].includes(page)) var page = 1;

@@ -100,13 +100,13 @@ module.exports = (async(self,message) => {
 		self.localMessageCount++;
 		try {
 			local.gConfig = await self.db.getGuild(local.guild.id) ||  self.config.guildDefaultConfig;
-			local.uConfig = await self.db.getUser(local.member.id,local.guild.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyUserDefaultConfig);
+			local.uConfig = await self.db.getUser(local.member.id) || Object.assign({},self.config.userDefaultConfig,self.config.economyUserDefaultConfig);
 			if(self.config.beta) local.gConfig.prefix = "fb!";
 		}catch(e){
 			self.logger.error(e);
 			return;
 		}
-		local.prefix = local.message.content.startsWith(`<@${self.user.id}>`)?`<@${self.user.id}>`:local.message.content.startsWith(`<@!${self.user.id}>`)?`<@!${self.user.id}>`:local.gConfig.prefix;
+		local.prefix = local.message.content.startsWith(`<@${self.user.id}>`)?`<@${self.user.id}>`:local.message.content.startsWith(`<@!${self.user.id}>`)?`<@!${self.user.id}>`:local.gConfig.prefix.toLowerCase();
 		local.args = local.message.content.slice(local.prefix.length).trim().split(/\s+/g);
 		local.command = local.args.shift().toLowerCase();
 			
@@ -186,7 +186,7 @@ module.exports = (async(self,message) => {
 			local.message.reply(`Error while running command: ${e}`);
 			return self.logger.error(`[${event}Event][Guild: ${local.guild.id}]: Command error:\n\tCommand: ${local.command}\n\tSupplied arguments: ${self.args.join(' ')}\n\tServer ID: ${local.guild.id}\n\t${e.stack}`);
 		}
-		if(!local.message.content.startsWith(local.prefix)) return;
+		if(!local.message.content.toLowerCase().startsWith(local.prefix)) return;
 		if(!self.config.commandList.all.includes(local.command)) return;
 		if(local.gConfig.deleteCommands) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
 		if(command.userPermissions.length > 0 && !local.user.isDeveloper) {

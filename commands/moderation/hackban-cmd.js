@@ -44,7 +44,7 @@ module.exports = (async(self,local)=>{
     if(user.id === local.member.id && !local.user.isDeveloper) return local.message.reply("Pretty sure you don't want to do this to yourself.");
     var reason = local.args.length >= 2 ? local.args.splice(1).join(" ") : "No Reason Specified";
     local.guild.members.ban(user.id,{reason:`Hackban: ${local.author.tag} -> ${reason}`}).then(()=>{
-        local.channel.send(`***User was banned ${user.tag}, ${reason}***`).catch(noerr=>null);
+        local.channel.send(`***User ${user.tag} was banned, ${reason}***`).catch(noerr=>null);
     }).catch(async(err)=>{
         local.message.reply(`I couldn't hackban **${user.tag}**, ${err}`);
         if(m !== undefined) {

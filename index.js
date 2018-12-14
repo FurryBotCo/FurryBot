@@ -1,6 +1,5 @@
 const Discord = require("discord.js");
 const config = require("./config");
-global.Promise = require("bluebird");
 
 /**
   * Main Class
@@ -340,6 +339,7 @@ class FurryBot extends Discord.Client {
 	}
 
 	async resolveUser (user) {
+		if(!user) return false;
 		if(user instanceof this.Discord.GuildMember) {
 			// can check permissions
 			var u = {

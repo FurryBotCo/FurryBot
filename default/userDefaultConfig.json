@@ -9,5 +9,6 @@
     "globallyBlacklisted": false,
     "xp": 0,
     "level": 0,
-    "warnings": []
+    "warnings": [],
+    "blacklisted": false
 }
