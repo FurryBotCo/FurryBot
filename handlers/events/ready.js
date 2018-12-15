@@ -7,9 +7,11 @@ module.exports = (async(self) => {
         }
     });
     var response = JSON.parse(resp.body);
-    self.config.commandList = {fullList: response.return.fullList, all: response.return.all};
+    self.config.commandList = {fullList: response.return.fullList, all: response.return.all, response: response.return.response};
     self.config.commandList.all.forEach((command)=>{
         self.commandTimeout[command] = new Set();
+		self.commandTimeout.f=new Set();
+		self.commandTimeout.whatismyprefix=new Set();
     });
     self.logger.debug("Command Timeouts & Command List loaded");
     self.logger.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
@@ -81,4 +83,7 @@ module.exports = (async(self) => {
         //const ls = self.listStats(self);
         setInterval(self.listStats,3e5,self);
     }
+	
+	//self.db.getUser(self.user.id).then(u=>self.logger.log(u)).catch(e=>self.logger.error(e));
+	//self.db.getGuild(self.config.betaGuilds[0]).then(g=>self.logger.log(g)).catch(e=>self.logger.error(e));
 });

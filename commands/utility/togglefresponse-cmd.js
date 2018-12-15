@@ -7,7 +7,7 @@ module.exports = (async (self,local) => {
             break;
 
         case false:
-        self.db.updateGuild(local.guild.id, {nsfwModuleEnabled: true});
+        self.db.updateGuild(local.guild.id, {fModuleEnabled: true});
         local.message.reply("Enabled f response.");
             break;
     }

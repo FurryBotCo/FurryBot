@@ -20,7 +20,7 @@ module.exports = (async (self,local) => {
 		.addText(message.member.displayName, 77, 33)
         .toBufferAsync();
 		
-	var attachment = new local.messageAttachment(i);
+	var attachment = new local.MessageAttachment(i);
 	
 	local.channel.send(`Here you go!\n(This is an inside joke from ${self.users.fetch("185938944460980224").tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
 	return local.channel.stopTyping();

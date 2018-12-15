@@ -1,10 +1,8 @@
 module.exports = (async(client)=>{
-    const config = require("../config");
-    const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
     const guilds = client.guilds.size,
         users = client.users.size,
         voice = client.voiceConnections.size,
-        shards = client.shard !== null ? client.shard.count : 1;
+        shards = client.options.shardCount || 1;
     for(let key in client.config.botLists) {
         if(client.config.botLists[key].alt !== undefined) {
             switch(client.config.botLists[key].alt) {
@@ -17,11 +15,11 @@ module.exports = (async(client)=>{
                     xhr.addEventListener("readystatechange", function () {
                     if (this.readyState === 4) {
                         //console.log(`${key}:\n${this.responseText}\n---\n`);
-                        if(this.status >= 200 && this.status < 400) {
+                        /*if(this.status >= 200 && this.status < 400) {
                             console.log(`Successfully posted to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                         } else {
                             console.error(`Error posting to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
-                        }
+                        }*/
                     }
                     });
                         
@@ -37,11 +35,11 @@ module.exports = (async(client)=>{
                     xhr.addEventListener("readystatechange", function () {
                     if (this.readyState === 4) {
                         //console.log(`${key}:\n${this.responseText}\n---\n`);
-                        if(this.status >= 200 && this.status < 400) {
+                        /*if(this.status >= 200 && this.status < 400) {
                             console.log(`Successfully posted to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                         } else {
                             console.error(`Error posting to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
-                        }
+                        }*/
                     }
                     });
                         
@@ -57,11 +55,11 @@ module.exports = (async(client)=>{
             xhr.addEventListener("readystatechange", function () {
             if (this.readyState === 4) {
                 //console.log(`${key}:\n${this.responseText}\n---\n`);
-                if(this.status >= 200 && this.status < 400) {
+                /*if(this.status >= 200 && this.status < 400) {
                     console.log(`Successfully posted to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                 } else {
                     console.error(`Error posting to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
-                }
+                }*/
             }
             });
                 

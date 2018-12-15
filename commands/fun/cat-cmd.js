@@ -9,10 +9,10 @@ module.exports = (async (self,local) => {
 	
 	try {
 		var json=JSON.parse(xhr.responseText);
-		var attachment = new self.Discord.messageAttachment(json.file);
+		var attachment = new self.Discord.MessageAttachment(json.file);
 	}catch(e){
 		self.logger.error(e);
-		var attachment = new self.Discord.messageAttachment("https://i.imgur.com/p4zFqH3.png");
+		var attachment = new self.Discord.MessageAttachment("https://i.imgur.com/p4zFqH3.png");
 	}
 	local.channel.send(attachment);
 	return local.channel.stopTyping();

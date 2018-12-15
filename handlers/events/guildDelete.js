@@ -1,7 +1,7 @@
 module.exports = (async(self,guild)=>{
     await self.db.updateDailyCount(true);
     await self.db.deleteGuild(guild.id);
-    self.logger.log(`Guild left: ${guild.name} (${guild.id}). THis guild had ${guild.memberCount} members.`);
+    self.logger.log(`Guild left: ${guild.name} (${guild.id}). This guild had ${guild.memberCount} members.`);
     var textChCount = 0,
 	voiceChCount = 0,
     categoryChCount = 0;

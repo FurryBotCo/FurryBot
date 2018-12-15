@@ -14,7 +14,7 @@ module.exports = (async (self,local) => {
 	var j = JSON.parse(req.body);
 	var parts = j.message.replace("https://","").split("/");
 	
-	var attachment = new local.messageAttachment(j.message,`${parts[2]}_${parts[3]}.png`);
+	var attachment = new local.MessageAttachment(j.message,`${parts[2]}_${parts[3]}.png`);
 	
 	local.channel.send(`Breed: ${parts[2]}`,attachment);
 	return local.channel.stopTyping();
