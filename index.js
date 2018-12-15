@@ -429,3 +429,5 @@ process.on('unhandledRejection', (p) => {
 		console.error(p);
 	}
 });
+
+module.exports = client;

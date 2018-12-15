@@ -1,10 +1,8 @@
 module.exports = (async(client)=>{
-    const config = require("../config");
-    const XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
     const guilds = client.guilds.size,
         users = client.users.size,
         voice = client.voiceConnections.size,
-        shards = client.shard !== null ? client.shard.count : 1;
+        shards = client.options.shardCount || 1;
     for(let key in client.config.botLists) {
         if(client.config.botLists[key].alt !== undefined) {
             switch(client.config.botLists[key].alt) {

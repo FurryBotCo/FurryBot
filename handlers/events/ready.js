@@ -81,4 +81,7 @@ module.exports = (async(self) => {
         //const ls = self.listStats(self);
         setInterval(self.listStats,3e5,self);
     }
+	
+	//self.db.getUser(self.user.id).then(u=>self.logger.log(u)).catch(e=>self.logger.error(e));
+	//self.db.getGuild(self.config.betaGuilds[0]).then(g=>self.logger.log(g)).catch(e=>self.logger.error(e));
 });

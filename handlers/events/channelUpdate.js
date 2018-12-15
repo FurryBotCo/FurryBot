@@ -1,7 +1,7 @@
 module.exports = (async(self,oldChannel,newChannel)=>{
     if(!newChannel || !newChannel.guild || !["text","voice","category"].includes(newChannel.type)) return;
     var ev = "channelupdated";
-    var gConfig = await self.db.getGuild(newChannel.guild.id);
+    var gConfig = await self.db.getGuild(newChannel.guild.id).catch(err=>self.config.defaultGuildSettings);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = newChannel.guild.channels.get(gConfig.logging[ev].channel);
     if(!logch) return self.db.updateGuild({logging:{[ev]:{enabled:false,channel:null}}});
@@ -15,7 +15,7 @@ module.exports = (async(self,oldChannel,newChannel)=>{
             break;
 
         case "category":
-            var TypeText = "Category";
+            var typeText = "Category";
             break;
     }
     var base = {
