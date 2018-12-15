@@ -15,11 +15,11 @@ module.exports = (async(client)=>{
                     xhr.addEventListener("readystatechange", function () {
                     if (this.readyState === 4) {
                         //console.log(`${key}:\n${this.responseText}\n---\n`);
-                        if(this.status >= 200 && this.status < 400) {
+                        /*if(this.status >= 200 && this.status < 400) {
                             console.log(`Successfully posted to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                         } else {
                             console.error(`Error posting to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
-                        }
+                        }*/
                     }
                     });
                         
@@ -35,11 +35,11 @@ module.exports = (async(client)=>{
                     xhr.addEventListener("readystatechange", function () {
                     if (this.readyState === 4) {
                         //console.log(`${key}:\n${this.responseText}\n---\n`);
-                        if(this.status >= 200 && this.status < 400) {
+                        /*if(this.status >= 200 && this.status < 400) {
                             console.log(`Successfully posted to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                         } else {
                             console.error(`Error posting to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
-                        }
+                        }*/
                     }
                     });
                         
@@ -55,11 +55,11 @@ module.exports = (async(client)=>{
             xhr.addEventListener("readystatechange", function () {
             if (this.readyState === 4) {
                 //console.log(`${key}:\n${this.responseText}\n---\n`);
-                if(this.status >= 200 && this.status < 400) {
+                /*if(this.status >= 200 && this.status < 400) {
                     console.log(`Successfully posted to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
                 } else {
                     console.error(`Error posting to ${client.config.botLists[key].name} - status: ${this.status} - ${this.responseText}`);
-                }
+                }*/
             }
             });
                 

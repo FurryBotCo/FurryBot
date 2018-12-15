@@ -6,10 +6,10 @@ module.exports = (async(self,message) => {
 	self.stats.messagesSinceStart++;
 	self.stats.messagesSinceLastPost++;
 
-	self.mixpanel.people.set(message.author.id, {
+	/*self.mixpanel.people.set(message.author.id, {
 		timestamp: new Date().toISOString(),
 		guilds: self.guilds.filter(g=>g.members.has(message.author.id)).map(g=>g.id)
-});
+	});*/
 
 	self.mixpanel.track(`bot.events.message`,{
 		distinct_id: message.author.id,
@@ -20,9 +20,7 @@ module.exports = (async(self,message) => {
 		tag: message.author.tag,
 		filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
 	});
-
-	if(/*message.author.bot || */(self.config.devOnly && !self.config.developers.includes(message.author.id))) return;
-	
+	if(message.author.bot || (self.config.devOnly && !self.config.developers.includes(message.author.id))) return;
 	if(message.channel.type === "dm") {
 		await message.author.send(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://www.furrybot.me> to see our website, <https://docs.furrybot.me> to see my documentation, and join <${self.config.discordSupportInvite}> if you need more help!`);
 		self.logger.log(`[${event}Event][User: ${message.author.id}]:Direct message recieved from ${message.author.tag}: ${message.content}`);
@@ -135,12 +133,12 @@ module.exports = (async(self,message) => {
 		var command = self.config.commandList.fullList[local.command];
 
 		if(local.message.content.toLowerCase() === "whatismyprefix") {
-			/*if(self.commandTimeout.whatismyprefix.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
+			if(self.commandTimeout.whatismyprefix.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 				self.logger.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${message.author.tag} (${message.author.id}) on response "whatismyprefix" in guild ${message.guild.name} (${message.guild.id})`);
 				return message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(self.config.commandList.response.whatismyprefix.cooldown)} before using this again!`);
 			}
 				self.commandTimeout.whatismyprefix.add(local.author.id);
-				setTimeout(() => {self.commandTimeout.whatismyprefix.delete(local.author.id);}, self.config.commandList.response.whatismyprefix.cooldown);*/
+				setTimeout(() => {self.commandTimeout.whatismyprefix.delete(local.author.id);}, self.config.commandList.response.whatismyprefix.cooldown);
 			// whatismyprefix autoresponse stats
 			self.logger.commandlog(`[${event}Event][Guild: ${local.guild.id}]: Response of "whatismyprefix" triggered by user ${local.author.tag} (${local.author.id}) in guild ${local.guild.name} (${local.guild.id})`);
 			self.stats.commandTotalsSinceStart++;
@@ -149,12 +147,12 @@ module.exports = (async(self,message) => {
 		}
 		if(["f","rip"].includes(local.message.content.toLowerCase()) && local.gConfig.fResponseEnabled) {
 			//if(self.gConfig.fResponseEnabled) {
-				/*if(self.commandTimeout.f.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
+				if(self.commandTimeout.f.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
 					self.logger.log(`[${event}Event][Guild: ${local.guild.id}]: Command timeout encountered by user ${local.author.tag} (${local.author.id}) on response "f" in guild ${local.guild.name} (${local.guild.id})`);
 					return message.reply(`${self.config.emojis.cooldown}\nPlease wait ${self.ms(self.config.commandList.response.f.cooldown)} before using this again!`);
 				}
 				self.commandTimeout.f.add(message.author.id);
-				setTimeout(() => {self.commandTimeout.f.delete(message.author.id);}, self.config.commandList.response.f.cooldown);*/
+				setTimeout(() => {self.commandTimeout.f.delete(message.author.id);}, self.config.commandList.response.f.cooldown);
 				// f autoresponse stats
 				var f = await self.r.table("stats").get("fCount");
 				self.r.table("stats").get("fCount").update({count:parseInt(f.count)+1}).run();

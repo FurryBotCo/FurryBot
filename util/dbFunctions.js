@@ -340,12 +340,12 @@ class FurryBotDatabase {
 
 	async updateDailyCount(negative = false, amount = 1) {
 		var d = new Date();
-        var date = `${d.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${d.getMonth()+1}`}-${d.getDate().toString().length > 1 ? d.getDate() : `0${d.getDate()}`}-${d.getFullYear()}`;
+        var date = `${d.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${d.getMonth()+1}`}-${d.getDate().toString().length > 1 ? d.getDate()-1 : `0${d.getDate()-1}`}-${d.getFullYear()}`;
             
 		var j = await this.client.r.table("dailyjoins").getAll(date);
 		if(j.length < 1) var j = await this.client.r.table("dailyjoins").insert({id:date,count:0}).then(s=>this.client.r.table("dailyjoins").get(date));
 		if(j[0]) j = j[0];
-		var res = negative ? await this.client.r.table("dailyjoins").update({count:+j.count-amount}) : await this.client.r.table("dailyjoins").update({count:+j.count+amount});
+		var res = negative ? await this.client.r.table("dailyjoins").get(date).update({count:+j.count-amount}) : await this.client.r.table("dailyjoins").get(date).update({count:+j.count+amount});
 		return (await this.client.r.table("dailyjoins").get(date)).count;
 	}
 
@@ -360,10 +360,7 @@ class FurryBotDatabase {
 			}
 		}
 		var b = await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).getAll(uid);
-		if(b.length<=0) {
-			await this.createUser(uid);
-			var b = await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).getAll(uid);
-		}
+		if(b.length>=1) return this.getUser(uid);
 		await this.client.r.db(this.dbConfig.dbs.main).table(this.dbConfig.tables.users).insert(Object.assign({id:uid},this.config.userDefaultConfig));
 		this.logger.info(`[createUser]: Added user "${uid}" with default configuration`);
 		return this.getUser(uid);

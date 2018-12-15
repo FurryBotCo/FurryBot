@@ -38,7 +38,7 @@ class FurryBot extends Discord.Client {
 		});
     	this.fs = require("fs");
 		this.r = require("rethinkdbdash")(this.config.db.bot);
-		this.ro = require("rethinkdbdash")(this.config.db.other);
+		//this.ro = require("rethinkdbdash")(this.config.db.other);
 		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
 		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV3`);
 		this.commandTimeout = {};
@@ -378,6 +378,16 @@ class FurryBot extends Discord.Client {
 		return require(`${this.config.rootDir}/handlers/events/message.js`)(this,msg);
 	}
 
+	getDateTime() {
+		var date = new Date();
+		var hour = date.getHours();
+		var min = date.getMinutes();
+		var sec = date.getSeconds();
+		hour = (hour < 10 ? "0" : "") + hour;
+		min = (min < 10 ? "0" : "") + min;
+		sec = (sec < 10 ? "0" : "") + sec;
+		return `${hour}:${min}:${sec}`;
+	}
 	/*async rotatingStatus() {
 		this.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"});
 		setTimeout(()=>{
