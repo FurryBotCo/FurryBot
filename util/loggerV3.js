@@ -110,7 +110,7 @@ class FurryBotLogger {
     }
 
     async command(msg) {
-        var color = this.chalk.blue,
+        var color = this.chalk.green,
             extra = this.config.beta ? this.chalk.magenta("BETA") : "",
             type  = color.bold("COMMAND"),
             time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),

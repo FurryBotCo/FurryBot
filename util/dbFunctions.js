@@ -314,14 +314,20 @@ class FurryBotDatabase {
 
 				case "dailyjoins":
 					return (await this.client.r.db(this.dbConfig.dbs.main).table("dailyjoins")).map(day=>({[day.id]:day.count}));
-					break
+					break;
+					
+				case "messagecount":
+					return (await this.client.r.db(this.dbConfig.dbs.main).table("stats").get("messageCount")).count;
+					break;
 			}
 		} else {
-			var fCount = (await this.client.r.db(this.dbConfig.dbs.main).table("stats").get("fCount")).count,
-			commands = await this.client.r.db(this.dbConfig.dbs.main).table("stats").get("commands"),
-			general = await this.client.r.db(this.dbConfig.dbs.main).table("stats").get("general"),
-			dailyjoins = (await this.client.r.db(this.dbConfig.dbs.main).table("dailyjoins")).map(day=>({[day.id]:day.count}));
-			return {fCount,commands,general,dailyjoins};
+			return {
+				fCount: (await this.client.r.db(this.dbConfig.dbs.main).table("stats").get("fCount")).count,
+				commands: await this.client.r.db(this.dbConfig.dbs.main).table("stats").get("commands"),
+				general: await this.client.r.db(this.dbConfig.dbs.main).table("stats").get("general"),
+				dailyjoins: (await this.client.r.db(this.dbConfig.dbs.main).table("dailyjoins")).map(day=>({[day.id]:day.count})),
+				messageCount: (await this.client.r.db(this.dbConfig.dbs.main).table("stats").get("messageCount")).count
+			};
 		}
 	}
 

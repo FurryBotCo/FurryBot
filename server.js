@@ -83,7 +83,10 @@ class FurryBotServer {
                 monitors: {
                     website: st.monitors.filter(m=>m.id===parseInt(this.config.uptimeRobot.monitors.website),10)[0].status,
                     cdn: st.monitors.filter(m=>m.id===parseInt(this.config.uptimeRobot.monitors.cdn,10))[0].status
-                }
+                },
+				commandCount: Object.keys(this.config.commandList.fullList).length,
+				messageCount: await this.r.table("stats").get("messageCount")("count"),
+				dmMessageCount: await this.r.table("stats").get("messageCount")("dmCount")
             });
         })
         .get("/stats/guilds",async(req,res)=>{
