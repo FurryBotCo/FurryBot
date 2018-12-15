@@ -86,4 +86,31 @@ module.exports = (async(self) => {
 	
 	//self.db.getUser(self.user.id).then(u=>self.logger.log(u)).catch(e=>self.logger.error(e));
 	//self.db.getGuild(self.config.betaGuilds[0]).then(g=>self.logger.log(g)).catch(e=>self.logger.error(e));
+	setInterval(async()=>{
+		if(["00:00:00"].includes(self.getDateTime())) {
+			var date = new Date(),
+			d = `${date.getMonth()+1}-${date.getDate()-1}-${date.getFullYear()}`,
+			count = (await self.db.getStats("dailyjoins"))[date]||0;
+			var data = {
+				author: {
+					name: "Donovan_DMC#1337",
+					"icon_url": "https://i.donovand.info/Don.gif"
+				},
+				title: `Total Guilds Joined ${d}\t Current Total: ${self.guilds.size}`,
+				description: `Total Guilds Joined Today: **${count}**`,
+				footer: {
+					text: `Shard ${self.guilds.get(self.config.bot.mainGuild).shard.id}/${self.options.shardCount} | Bot Version ${self.config.bot.version}`
+				},
+				color: self.randomColor(),
+				timestamp: self.getCurrentTimestamp(),
+				thumbnail: {
+					url: "https://i.furrybot.me/furry-small.png"
+				}
+			}
+			var embed = new self.Discord.MessageEmbed(data);
+			self.channels.get(self.config.bot.dailyJoinsChannel).send(embed).then(n=>{
+				self.logger.log(`Posted daily stats, ${d}: ${count}, total: ${self.guilds.size}`);
+			}).catch(e=>self.logger.log(e));
+		}
+	},1e3);
 });

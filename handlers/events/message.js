@@ -6,10 +6,10 @@ module.exports = (async(self,message) => {
 	self.stats.messagesSinceStart++;
 	self.stats.messagesSinceLastPost++;
 
-	self.mixpanel.people.set(message.author.id, {
+	/*self.mixpanel.people.set(message.author.id, {
 		timestamp: new Date().toISOString(),
 		guilds: self.guilds.filter(g=>g.members.has(message.author.id)).map(g=>g.id)
-});
+	});*/
 
 	self.mixpanel.track(`bot.events.message`,{
 		distinct_id: message.author.id,

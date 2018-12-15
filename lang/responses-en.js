@@ -84,5 +84,8 @@ module.exports =
   pat: [
 	"{author} pats {input} on the head for being a good boi (or girl/other)",
 	"{author} gently pets {input}"
-  ]
+  ],
+  get pet() {
+	  return this.pat;
+  }
 };

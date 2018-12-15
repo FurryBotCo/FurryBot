@@ -378,6 +378,16 @@ class FurryBot extends Discord.Client {
 		return require(`${this.config.rootDir}/handlers/events/message.js`)(this,msg);
 	}
 
+	getDateTime() {
+		var date = new Date();
+		var hour = date.getHours();
+		var min = date.getMinutes();
+		var sec = date.getSeconds();
+		hour = (hour < 10 ? "0" : "") + hour;
+		min = (min < 10 ? "0" : "") + min;
+		sec = (sec < 10 ? "0" : "") + sec;
+		return `${hour}:${min}:${sec}`;
+	}
 	/*async rotatingStatus() {
 		this.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"});
 		setTimeout(()=>{
