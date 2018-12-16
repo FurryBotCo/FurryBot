@@ -9,7 +9,7 @@ module.exports = (async(self,local)=>{
     var req = await self.request("https://api2.sofurry.com/browse/search?search=furry&format=json&minlevel=0&maxlevel=0",{
         method: "GET",
         headers: {
-            "User-Agent": self.config.userAgent
+            "User-Agent": self.config.web.userAgent
         }
     });
     try {
@@ -33,7 +33,7 @@ module.exports = (async(self,local)=>{
     }catch(e){
         self.logger.error(`Error:\n${e}`);
         self.logger.log(`Body: ${jsn}`);
-        var attachment = new self.Discord.MessageAttachment("https://furrybot.furcdn.net/NotFound.png");
+        var attachment = new self.Discord.MessageAttachment(self.config.images.serverError);
         return local.channel.send("Unknown API Error",attachment);
     }
 })

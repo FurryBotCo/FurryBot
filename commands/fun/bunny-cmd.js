@@ -4,14 +4,14 @@ module.exports = (async (self,local) => {
 		var req = await self.request("https://api.bunnies.io/v2/loop/random/?media=gif",{
 		method: "GET",
 		headers: {
-			"User-Agent": self.config.userAgent
+			"User-Agent": self.config.web.userAgent
 		}
 	});
 	var response = JSON.parse(req.body);
 	var attachment = new self.Discord.MessageAttachment(response.media.gif,`${response.id}.gif`);
 	}catch(e){
 		console.log(e);
-		var attachment = new self.Discord.MessageAttachment("https://i.imgur.com/p4zFqH3.png");
+		var attachment = new self.Discord.MessageAttachment(self.config.images.serverError);
 	}
 	local.channel.send(attachment);
 	return local.channel.stopTyping();

@@ -5,7 +5,7 @@ module.exports = (async(self,local)=>{
             var req = await self.request(`https://inkbunny.net/api_userrating.php?sid=${sid}`,{
                 method: "GET",
                 headers: {
-                    "User-Agent": self.config.userAgent
+                    "User-Agent": self.config.web.userAgent
                 }
             });
             var a = JSON.parse(req.body);
@@ -15,7 +15,7 @@ module.exports = (async(self,local)=>{
                         var login = await self.request(`https://inkbunny.net/api_login.php?${self.config.furryArtAPIs.inkbunny.urlCredentials}`,{
                             method: "GET",
                             headers: {
-                                "User-Agent": self.config.userAgent
+                                "User-Agent": self.config.web.userAgent
                             }
                         });
                         var b = JSON.parse(login.body);
@@ -46,7 +46,7 @@ module.exports = (async(self,local)=>{
                 var a = await self.request(`https://inkbunny.net/api_login.php?${self.config.furryArtAPIs.inkbunny.urlCredentials}`,{
                     method: "GET",
                     headers: {
-                        "User-Agent": self.config.userAgent
+                        "User-Agent": self.config.web.userAgent
                     }
                 });
                 if(typeof a.error_code !=="undefined" && typeof a.sid === "undefined") {
@@ -71,7 +71,7 @@ module.exports = (async(self,local)=>{
         var req = await self.request(`https://inkbunny.net/api_userrating.php?sid=${self.config.furryArtAPIs.inkbunny.sid}`,{
                 method: "GET",
                 headers: {
-                    "User-Agent": self.config.userAgent
+                    "User-Agent": self.config.web.userAgent
                 }
             });
             var a = JSON.parse(req.body);
@@ -81,7 +81,7 @@ module.exports = (async(self,local)=>{
                         var login = await self.request(`https://inkbunny.net/api_login.php?${self.config.furryArtAPIs.inkbunny.urlCredentials}`,{
                             method: "GET",
                             headers: {
-                                "User-Agent": self.config.userAgent
+                                "User-Agent": self.config.web.userAgent
                             }
                         });
                         var b = JSON.parse(login.body);
@@ -112,7 +112,7 @@ module.exports = (async(self,local)=>{
     var req = await self.request(`https://inkbunny.net/api_search.php?sid=${self.config.furryArtAPIs.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=-cub%20-diaper%20-ass%20-upskirt%20-pantsu%20-incest%20-age_difference%20-boobhat&random=yes&get_rid=yes`,{
         method: "GET",
         headers: {
-            "User-Agent": self.config.userAgent
+            "User-Agent": self.config.web.userAgent
         }
     });
     
@@ -133,7 +133,7 @@ module.exports = (async(self,local)=>{
     }catch(e){
         self.logger.error(`Error:\n${e}`);
         self.logger.log(`${self.util.inspect(jsn,{depth:3})}`);
-        var attachment = new self.Discord.MessageAttachment("https://furrybot.furcdn.net/NotFound.png");
+        var attachment = new self.Discord.MessageAttachment(self.config.images.serverError);
         return local.channel.send("Unknown API Error",attachment);
     }
 })

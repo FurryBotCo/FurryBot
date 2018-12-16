@@ -3,7 +3,7 @@ module.exports = (async (self,local) => {
 	var req = await self.request("https://aws.random.cat/meow",{
 		method: "GET",
 		headers: {
-			"User-Agent": self.config.userAgent
+			"User-Agent": self.config.web.userAgent
 		}
 	})
 	
@@ -12,7 +12,7 @@ module.exports = (async (self,local) => {
 		var attachment = new self.Discord.MessageAttachment(json.file);
 	}catch(e){
 		self.logger.error(e);
-		var attachment = new self.Discord.MessageAttachment("https://i.imgur.com/p4zFqH3.png");
+		var attachment = new self.Discord.MessageAttachment(self.config.images.serverError);
 	}
 	local.channel.send(attachment);
 	return local.channel.stopTyping();

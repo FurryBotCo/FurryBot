@@ -3,7 +3,7 @@ module.exports = (async (self,local) => {
 	var req = await self.request("https://icanhazdadjoke.com",{
 		headers:{
 			Accept:"application/json",
-			"User-Agent": self.config.userAgent
+			"User-Agent": self.config.web.userAgent
 		}
 	});
 

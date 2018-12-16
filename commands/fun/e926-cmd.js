@@ -4,7 +4,7 @@ module.exports = (async(self,local) => {
     var req = await self.request(`https://e926.net/post/index.json?limit=50&tags=${tags}%20rating%3Asafe`,{
         method: "GET",
         headers: {
-            "User-Agent": `FurryBot/${self.config.bot.version}`,
+            "User-Agent": self.config.web.userAgentExt("Donvan_DMC"),
             "Content-Type": "application/json"
         }
     });
