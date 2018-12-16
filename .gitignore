@@ -105,4 +105,4 @@ tmp/*
 docs/ssl
 commandList.js
 config-testing.js
-util/botLists.js
+conf/

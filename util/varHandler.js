@@ -13,7 +13,7 @@ module.exports = ((input="",rplc={},ext={})=>{
                 if(input.indexOf("{author.tag}") !== -1 ) after = after.replace(/{author.tag}/g,rplc.user.tag);
                 if(input.indexOf("{author.username}") !== -1 ) after = after.replace(/{author.username}/g,rplc.user.username);         //
                 if(input.indexOf("{author.discriminator}") !== -1 ) after = after.replace(/{author.discriminator}/g,rplc.user.discriminator);
-                if(input.indexOf("{author.status}") !== -1 ) after = after.replace(/{author.status}/h,rplc.user.presence.status);
+                if(input.indexOf("{author.status}") !== -1 ) after = after.replace(/{author.status}/g,rplc.user.presence.status);
             }
         }
         if(rplc.user !== undefined) {
