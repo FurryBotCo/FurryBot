@@ -28,16 +28,15 @@ class FurryBot extends Discord.Client {
 		this.Discord = Discord;
 		this.os = require("os");
 		this.request = this.util.promisify(require("request").defaults({encoding:null}));
-		this.XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 		this.Mixpanel = require("mixpanel");
 		this.uuid = require("uuid/v4");
 		this.fetch = require("node-fetch");
 		this.postStats = require("./util/listStats");
-		this.mixpanel = this.Mixpanel.init(this.config.mixpanel.token, {
+		this.mixpanel = this.Mixpanel.init(this.config.apis.mixpanel.token, {
 			protocol: "https"
 		});
     	this.fs = require("fs");
-		this.r = require("rethinkdbdash")(this.config.db.bot);
+		this.r = require("rethinkdbdash")(this.config.db.main);
 		//this.ro = require("rethinkdbdash")(this.config.db.other);
 		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
 		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV3`);
@@ -62,11 +61,11 @@ class FurryBot extends Discord.Client {
 		this.child_process = require('child-process-promise');
 		this.shell = this.child_process.exec;
 		this.truncate = require("truncate");
-		this.webhooks = {};
+		/*this.webhooks = {};
 		for(let key in this.config.webhooks) {
 			this.webhooks[key] = new this.Discord.WebhookClient(this.config.webhooks[key].id,this.config.webhooks[key].token,{disableEveryone:true});
 			console.debug(`Setup ${key} webhook`);
-		}
+		}*/
 		this.mixpanel.track('bot.setup', {
 			distinct_id: this.uuid(),
 			timestamp: new Date().toISOString(),

@@ -64,13 +64,13 @@ module.exports = (async(self,guild)=>{
 		},
     }
     var embed = new self.Discord.MessageEmbed(data);
-    var ch = self.channels.get(self.config.bot.joinLeaveChannel);
+    var ch = self.channels.get(self.config.bot.channels.joinLeave);
     if(ch instanceof self.Discord.TextChannel) {
         ch.send(embed).catch(noerr=>null);
     }
     var dt = {
-        description: self.config.intro.text,
-        fields: self.config.intro.fields,
+        description: self.config.bot.intro.text,
+        fields: self.config.bot.intro.fields,
         author: {
             name: guild.name,
             icon: guild.iconURL()

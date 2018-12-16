@@ -1,23 +1,22 @@
-const express = require("express"),
-    config = require("./config");
+const config = require("./config");
 
 class FurryBotServer {
     constructor(cnf) {
-        this.cnf = cnf || {};
         this.config = config;
-        this.express = express;
+        this.cnf = cnf || this.config.serverOptions;
+        this.express = require("express");
         this.logger = require("morgan");
         this.https = require("https");
         this.fs = require("fs");
-        this.r = require("rethinkdbdash")(this.config.db.bot);
+        this.r = require("rethinkdbdash")(this.config.db.main);
         //this.ro = require("rethinkdbdash")(this.config.db.other);
     }
 
     load(client) {
         this.server = this.express();
         this.checkAuth = ((req,res,next)=>{
-            if(!next) return !((!req.headers.authorization || req.headers.authorization !== this.config.apiKey) && (!req.query.auth || req.query.auth !== this.config.apiKey));
-            if((!req.headers.authorization || req.headers.authorization !== this.config.apiKey) && (!req.query.auth || req.query.auth !== this.config.apiKey)) return res.status(401).json({
+            if(!next) return !((!req.headers.authorization || req.headers.authorization !== this.config.serverOptions.apiKey) && (!req.query.auth || req.query.auth !== this.config.serverOptions.apiKey));
+            if((!req.headers.authorization || req.headers.authorization !== this.config.serverOptions.apiKey) && (!req.query.auth || req.query.auth !== this.config.serverOptions.apiKey)) return res.status(401).json({
                 success: false,
                 error: "invalid credentials"
             });
@@ -38,7 +37,7 @@ class FurryBotServer {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
                 form: {
-                    api_key: this.config.uptimeRobot.apiKey,
+                    api_key: this.config.apis.uptimeRobot.apiKey,
                     format: "json"
                 }
             });
@@ -116,8 +115,8 @@ class FurryBotServer {
         })
         if(![undefined,null,""].includes(this.cnf.ssl) && this.cnf.ssl === true) {
             if(this.cnf.port === 80) throw new Error("ssl server cannot be ran on insecure port");
-            var privateKey = this.fs.readFileSync(`${client.config.rootDir}/ssl/ssl.key`);
-            var certificate = this.fs.readFileSync(`${client.config.rootDir}/ssl/ssl.crt`);
+            var privateKey = this.fs.readFileSync(`${this.config.rootDir}/ssl/ssl.key`);
+            var certificate = this.fs.readFileSync(`${this.config.rootDir}/ssl/ssl.crt`);
 
             return this.https.createServer({
                 key: privateKey,

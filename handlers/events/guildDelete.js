@@ -30,7 +30,7 @@ module.exports = (async(self,guild)=>{
         title: "Guild Left!",
         description: `RIP Guild Number ${+self.guilds.size+1}`,
         image: {
-            url: guild.iconURL()||"https://assets.mcprocdn.com/images/noicon.png"
+            url: guild.iconURL()||self.config.bot.noGuildIcon
         },
         thumbnail: {
             url: guild.owner.user.displayAvatarURL()
@@ -64,7 +64,7 @@ module.exports = (async(self,guild)=>{
 		},
     }
     var embed = new self.Discord.MessageEmbed(data);
-    var ch = self.channels.get(self.config.bot.joinLeaveChannel);
+    var ch = self.channels.get(self.config.bot.channels.joinLeave);
     if(ch instanceof self.Discord.TextChannel) {
         ch.send(embed).catch(noerr=>null);
     }

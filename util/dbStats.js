@@ -1,19 +1,19 @@
 module.exports = (async(self)=>{
     return new Promise(async(resolve,reject)=>{
         
-        var j = await self.r.table("stats").get("messageCount");
+        var j = await self.r.table(self.config.db.tables.stats).get("messageCount");
         
         if(!j) {
-            await self.r.table("stats").insert({
+            await self.r.table(self.config.db.tables.stats).insert({
                 id: "messageCount",
                 count: 0,
                 dmCount: 0,
             });
             
-            var j = await self.r.table("stats").get("messageCount");
+            var j = await self.r.table(self.config.db.tables.stats).get("messageCount");
         }
         
-        await self.r.table("stats").get("messageCount").update({
+        await self.r.table(self.config.db.tables.stats).get("messageCount").update({
             count: +j.count + self.stats.messagesSinceLastPost,
             dmCount: +j.dmCount + self.stats.dmMessagesSinceLastPost
         });
@@ -29,6 +29,6 @@ module.exports = (async(self)=>{
         }
         
        // return self.r.table("stats").get("general").without("id");
-        resolve(self.r.table("stats").get("messageCount"));
+        resolve(self.r.table(self.config.db.tables.stats).get("messageCount"));
     });
 })

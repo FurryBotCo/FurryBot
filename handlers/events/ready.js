@@ -1,9 +1,9 @@
 module.exports = (async(self) => {
     self.logger = new self.FurryBotLogger(self);
-    var resp = await self.request(self.config.commandListURL, {
+    var resp = await self.request(self.config.bot.commandAPIURL, {
         method: "GET",
         headers: {
-            "User-Agent": self.config.userAgent
+            "User-Agent": self.config.web.userAgent
         }
     });
     var response = JSON.parse(resp.body);
@@ -78,7 +78,6 @@ module.exports = (async(self) => {
     
     //self.webhooks.shards.send(webhookEmbed);
     self.srv = self.server.load(self);
-
     if(!self.config.beta) {
         //const ls = self.listStats(self);
         setInterval(self.listStats,3e5,self);
@@ -108,9 +107,10 @@ module.exports = (async(self) => {
 				}
 			}
 			var embed = new self.Discord.MessageEmbed(data);
-			self.channels.get(self.config.bot.dailyJoinsChannel).send(embed).then(n=>{
+			self.channels.get(self.config.bot.channels.daily).send(embed).then(n=>{
 				self.logger.log(`Posted daily stats, ${d}: ${count}, total: ${self.guilds.size}`);
 			}).catch(e=>self.logger.log(e));
 		}
-	},1e3);
+    },1e3);
+    console.log("end of ready");
 });

@@ -34,13 +34,14 @@ module.exports = (async(self,message) => {
 		});
 		self.stats.dmMessagesSinceStart++;
 		self.stats.dmMessagesSinceLastPost++;
-		var webhookData = {
+		/*var webhookData = {
 			title: `Direct Message from ${self.author.tag} (${self.author.id})`,
 			description: message.content,
 			timestamp: self.getCurrentTimestamp()
 		};
 		var webhookEmbed = new self.Discord.MessageEmbed(webhookData);
-		return self.webhooks.directMessage.send(webhookEmbed);
+		return self.webhooks.directMessage.send(webhookEmbed);*/
+		return;
 	}
 	
 	const local = {
@@ -97,8 +98,8 @@ module.exports = (async(self,message) => {
 		self.messageCount++;
 		self.localMessageCount++;
 		try {
-			local.gConfig = await self.db.getGuild(local.guild.id).catch(err=>self.config.guildDefaultSettings) ||  self.config.guildDefaultSettings;
-			local.uConfig = await self.db.getUser(local.author.id).catch(err=>self.config.userDefaultConfig) || self.config.userDefaultConfig;
+			local.gConfig = await self.db.getGuild(local.guild.id).catch(err=>self.config.default.guildConfig) ||  self.config.default.guildConfig;
+			local.uConfig = await self.db.getUser(local.author.id).catch(err=>self.config.default.userConfig) || self.config.default.userConfig;
 			if(self.config.beta) local.gConfig.prefix = "fb!";
 		}catch(e){
 			self.logger.error(e);
