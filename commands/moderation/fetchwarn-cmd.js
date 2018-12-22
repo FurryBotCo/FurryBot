@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["fetchwarn","fetchwarning"],
+	userPermissions: [
+        "MANAGE_GUILD"
+    ],
+	botPermissions: [],
+	cooldown: 2.5e3,
+	description: "Fetch a warning for a specific user",
+	usage: "<@user, or id> <warning id>",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local)=>{
     if(local.args.length < 2) return new Error("ERR_INVALID_USAGE");
 

@@ -1,3 +1,21 @@
+module.exports = {
+	triggers: ["hackban","hb"],
+	userPermissions: [
+        "BAN_MEMBERS"
+    ],
+	botPermissions: [
+        "BAN_MEMBERS"
+    ],
+	cooldown: 2.5e3,
+	description: "Ban a person that isn't in your server",
+	usage: "<@user, or id> [reason]",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local)=>{
      // member mention
      if(local.message.mentions.members.first()) {

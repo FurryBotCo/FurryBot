@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["pet"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 2e3,
+	description: "Pet someone ^w^",
+	usage: "<@user or text>",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
 

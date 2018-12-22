@@ -5,7 +5,7 @@ class FurryBotDatabase {
 		this.config = this.client.config;
 		this.uuid = require("uuid/v4");
 		//this.client.r = !this.client.r ? require("rethinkdbdash")(this.config.db.main) : this.client.r;
-		this.logger = new (require(`${this.config.rootDir}/util/LoggerV3.js`))(this.client);
+		this.logger = this.client.logger;
 	}
 	
 	async createGuild(gid,disableCheck=false){

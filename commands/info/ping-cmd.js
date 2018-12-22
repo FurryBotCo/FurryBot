@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["ping","pong"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: .5e3,
+	description: "Get the bots ping",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
 	var m = await local.channel.send("Checking Ping..");

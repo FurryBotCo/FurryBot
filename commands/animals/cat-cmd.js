@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["cat","kitty","kitten"],
+	userPermissions: [],
+	botPermissions: [
+		"ATTACH_FILES"
+	],
+	cooldown: 3e3,
+	description: "Get a picture of a cat!",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	local.channel.stopTyping();
 	var req = await self.request("https://aws.random.cat/meow",{

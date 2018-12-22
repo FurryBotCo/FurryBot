@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["furpile","pileon","pile"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 5e3,
+	description: "Start a furpile on someone or join in!",
+	usage: "<@user>",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	
 	if(local.args.length === 0 && !self.furpile[local.guild.id]) {

@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["fur"],
+	userPermissions: [],
+	botPermissions: [
+		"ATTACH_FILES"
+	],
+	cooldown: 2e3,
+	description: "Get a random fur image! use `fur list	 to get a list of all supported types!",
+	usage: "[type]",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports=(async (self,local) => {
 	
 	if(local.args.length === 0 ) {

@@ -1,12 +1,26 @@
+module.exports = {
+	triggers: ["perms","listperms"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 2e3,
+	description: "Check your own and the bots permissions",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	var allow_user = Object.keys(self._.pickBy(local.member.permissions.serialize(),((val,key) =>{return val;}))),
 	deny_user = Object.keys(self._.pickBy(local.member.permissions.serialize(),((val,key) => {return !val;}))),
 	allow_bot = Object.keys(self._.pickBy(local.guild.me.permissions.serialize(),((val,key) => {return val;}))),
 	deny_bot = Object.keys(self._.pickBy(local.guild.me.permissions.serialize(),((val,key) => {return !val;})));
 
-	var au = allow_user.length === Object.keys(self.Discord.Permissions.FLAGS).length ? "NONE" : allow_user.join("**, **"),
+	var au = allow_user.length === 0 ? "NONE" : allow_user.join("**, **"),
 	du = deny_user.length === Object.keys(self.Discord.Permissions.FLAGS).length ? "NONE" : deny_user.join("**, **"),
-	ab = allow_bot.length === Object.keys(self.Discord.Permissions.FLAGS).length ? "NONE" : allow_bot.join("**, **"),
+	ab = allow_bot.length === 0 ? "NONE" : allow_bot.join("**, **"),
 	db = deny_bot.length === Object.keys(self.Discord.Permissions.FLAGS).length ? "NONE" : deny_bot.join("**, **");
 	var data = {
 		title: "Permission Info",

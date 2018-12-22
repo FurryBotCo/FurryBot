@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["clearwarnings","warnclear"],
+	userPermissions: [
+        "MANAGE_GUILD"
+    ],
+	botPermissions: [],
+	cooldown: 2.5e3,
+	description: "Clear warnings for a user",
+	usage: "<@user, or id>",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local)=>{
     if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
 

@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["logevents"],
+	userPermissions: [
+        "MANAGE_GUILD"
+    ],
+	botPermissions: [],
+	cooldown: 1e3,
+	description: "List the loggable events, and their current state",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local)=>{
     var l = "";
     var updateFields = {logging:{}};

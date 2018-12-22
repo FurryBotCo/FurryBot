@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["bird","birb"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 3e3,
+	description: "Get a picture of a birb!",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
 	try {

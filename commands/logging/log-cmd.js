@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["log"],
+	userPermissions: [
+		"MANAGE_GUILD"
+	],
+	botPermissions: [],
+	cooldown: .5e3,
+	description: "Enable or disable the logging of an event",
+	usage: "log [e/d] <event>",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports=(async (self,local) => {
 	
 	if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");

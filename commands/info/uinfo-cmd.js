@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["uinfo","userinfo"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 2e3,
+	description: "Get some info on a user",
+	usage: "[@user, or id]",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
 	if(local.args.length === 0 || !local.args) {

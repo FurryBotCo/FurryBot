@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["gay","homo"],
+	userPermissions: [],
+	botPermissions: [
+        "ATTACH_FILES"
+    ],
+	cooldown: 0,
+	description: "",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local)=>{
     local.channel.startTyping();
     if(local.args.length >= 1) {

@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["bap"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 2e3,
+	description: "Bap someone! Ouch!",
+	usage: "<@user or text>",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	

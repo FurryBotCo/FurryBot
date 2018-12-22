@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["deer_steak","deersteak"],
+	userPermissions: [],
+	botPermissions: [
+		"ATTACH_FILES"
+	],
+	cooldown: 5e3,
+	description: "This is an old meme of ours, carried down for months.",
+	usage: "[@user]",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	if(!self.config.beta) local.message.reply("temporarily disabled");
 	local.channel.startTyping();

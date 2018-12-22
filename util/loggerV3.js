@@ -43,10 +43,12 @@ class FurryBotLogger extends EventEmitter {
                 url.params[j[0]]=j[1]||null;
             });
             if(!url.params.auth || url.params.auth !== this.config.universalKey) {
-                socket.send(JSON.stringify({success:false,error:"Invalid Authentication"}));
-                socket.close();
+                if(this.wss.readyState === this.WebSocket.OPEN) {
+                    socket.send(JSON.stringify({success:false,error:"Invalid Authentication"}));
+                    socket.close();
+                }
             }
-            socket.send(JSON.stringify({success:true,message:"Connection Accepted, Authorization Valid",wsType:"EHELLO",type:"IDENTIFY"}));
+            if(this.wss.readyState === this.WebSocket.OPEN) socket.send(JSON.stringify({success:true,message:"Connection Accepted, Authorization Valid",wsType:"EHELLO",type:"IDENTIFY"}));
         });
         this.on("log",async(args)=>{
             this.wss.broadcast(JSON.stringify({type:args.type||null,message:args.message||null,beta:this.config.beta,file:args.file||null,time:args.time||null,console:true}));
@@ -85,7 +87,7 @@ class FurryBotLogger extends EventEmitter {
             m   = msg instanceof Object ? color.bold(this.util.inspect(msg,{depth:null})) : color.bold(msg),
             file  = typeof this._getCallerFile() !== "undefined" ? this.chalk.magenta.bold(this.path.basename(this._getCallerFile())) : this.chalk.magenta.bold("unknown.js");
         this._log(`${[undefined,null,""].includes(extra) ? "" : `[${extra}]`}[${type}][${time}][${file}]: ${m}${this.os.EOL}`);
-        this.emit("log",{type:"log",message:msg,time:Date().toString().split(" ")[4],file:this.path.basename(this._getCallerFile())});
+        this.emit("log",{type:"log",message:msg,time:Date().toString().split(" ")[4],file:typeof this._getCallerFile() !== "undefined" ? this.path.basename(this._getCallerFile()) : "unknown.js"});
     }
 
     async warn(msg) {

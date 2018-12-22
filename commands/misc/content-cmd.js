@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["content"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 5e3,
+	description: "Get the content count for the image types",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
     var req = await self.request(`https://api.furrybot.me/image-counts.php`,{
         method: "GET"

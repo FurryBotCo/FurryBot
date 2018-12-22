@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["dadjoke","joke"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 4e3,
+	description: "Get a dadjoke!",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
 	var req = await self.request("https://icanhazdadjoke.com",{

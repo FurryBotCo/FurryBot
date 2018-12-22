@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["info","inf"],
+	userPermissions: [],
+	botPermissions: [
+		"EMBED_LINKS"
+	],
+	cooldown: 2e3,
+	description: "Get some info about the bot",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
 	var userCount=0;
@@ -21,54 +37,54 @@ module.exports = (async (self,local) => {
 			{
 				name: "Process Memory Usage",
 				value: `${self.getUsedMemoryMB()}MB/${self.getTotalMemoryMB()}MB`,
-				inline: true
+				inline: false
 			}, {
 				name: "Server Memory Usage",
 				value: `${self.getSYSUsedGB()}GB/${self.getSYSTotalGB()}GB`,
-				inline: true
+				inline: false
 			}, {
 				name: "Library",
 				value: self.config.bot.library,
-				inline: true
+				inline: false
 			}, {
 				name: "Uptime",
 				value: `${self.parseTime(process.uptime())} (${self.secondsToHours(process.uptime())})`,
-				inline: true
+				inline: false
 			}, {
 				name: "Total Guilds",
 				value: self.guilds.size,
-				inline: true
+				inline: false
 			}, {
-				name: "Large Guilds (250+)",
+				name: "Large Guilds (300+ Members)",
 				value: largeGuildCount,
-				inline: true
+				inline: false
 			}, {
 				name: "Total Users",
 				value: userCount,
-				inline: true
+				inline: false
 			}, {
 				name: "Commands",
 				value: self.config.commandList.all.length,
-				inline: true
+				inline: false
 			}, {
 				name: "API Version",
 				value: self.config.bot.apiVersion,
-				inline: true
+				inline: false
 			}, {
 				name: "Bot Version",
 				value: self.config.bot.version,
-				inline: true
+				inline: false
 			}, {
 				name: "Discord.JS Version",
 				value: self.Discord.version,
-				inline: true
+				inline: false
 			}, {
 				name: "Node.JS Version",
 				value: process.version,
-				inline: true
+				inline: false
 			}, {
 				name: "Support Server",
-				value: self.config.discordSupportInvite,
+				value: self.config.bot.supportInvite,
 				inline: false
 			}, {
 				name: "Bot Creator",
@@ -76,14 +92,9 @@ module.exports = (async (self,local) => {
 				inline: false
 			}, {
 				name: "Trello Board",
-				value: self.config.trello.board,
+				value: self.config.apis.trello.board,
 				inline: false
-			},
-			  {
-			   name: "Extras",
-			   value: `Vote\n${self.config.vote}`,
-			   inline: false
-			  }
+			}
 			]
 		};
 	Object.assign(data, local.embed_defaults());

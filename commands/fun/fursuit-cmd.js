@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["fursuit"],
+	userPermissions: [],
+	botPermissions: [
+        "ATTACH_FILES"
+    ],
+	cooldown: 2e3,
+	description: "Get a random fursuit image!",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
     local.channel.startTyping();
     const img = await self.imageAPIRequest(true,"fursuit",true);

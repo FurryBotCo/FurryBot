@@ -1,3 +1,21 @@
+module.exports = {
+	triggers: ["ban","b"],
+	userPermissions: [
+        "BAN_MEMBERS"
+    ],
+	botPermissions: [
+        "BAN_MEMBERS"
+    ],
+	cooldown: 1e3,
+	description: "Ban members from your server",
+	usage: "<@Member, or user id>",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local)=>{
     if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
 

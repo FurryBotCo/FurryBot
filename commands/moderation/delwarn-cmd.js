@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["delwarn","rmwarn"],
+	userPermissions: [
+        "MANAGE_GUILD"
+    ],
+	botPermissions: [],
+	cooldown: 2.5e3,
+	description: "Delete a users warning",
+	usage: "<@user, or id>",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local)=>{
     if(local.args.length < 2) return new Error("ERR_INVALID_USAGE");
 

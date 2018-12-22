@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["profile"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 2e3,
+	description: "Get your user profile",
+	usage: "[@user]",
+	nsfw: false,
+	devOnly: true,
+	betaOnly: true,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
 	var position = "1/2";

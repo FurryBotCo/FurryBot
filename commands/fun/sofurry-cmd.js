@@ -1,3 +1,20 @@
+module.exports = {
+	triggers: ["sofurry"],
+	userPermissions: [],
+	botPermissions: [
+        "ATTACH_FILES",
+        "EMBED_LINKS"
+    ],
+	cooldown: 2e3,
+	description: "Get a random post from sofurry!",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local)=>{
     const contentType = [
         "story",

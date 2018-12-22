@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["ship"],
+	userPermissions: [],
+	botPermissions: [
+        "ATTACH_FILES"
+    ],
+	cooldown: 5e3,
+	description: "Ship some people!",
+	usage: "<@user1> [@user2]",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local) => { 
     if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
     local.channel.startTyping();

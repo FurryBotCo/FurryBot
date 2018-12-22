@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["e926","e9"],
+	userPermissions: [],
+	botPermissions: [
+        "ATTACH_FILES"
+    ],
+	cooldown: 0,
+	description: "Get some fur images from e926",
+	usage: "[tags]",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local) => {
     local.channel.startTyping();
     var tags = encodeURIComponent(local.args.join(" "));

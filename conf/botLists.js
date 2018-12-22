@@ -1,7 +1,7 @@
 module.exports = {
     "botlist.space": {
         name: "Botlist.space",
-        token: "8a09cda81645b5ca6c4046f22183fefe2865cacb8be439a40438385081d78f4e257b8f8e8a7f3110ff3f48702ba2a2c7242686638f2c28d93cfead2deac8fa8d",
+        token: "43555c5619f0ffd7ca2fd3be6b8b7ea3a428b5271d69c9a76a7faf2cde41293b",
         statusInterval: 3e5,
         supportsPerShard: false,
         url: "https://botlist.space/api/bots/398251412246495233",
@@ -11,7 +11,7 @@ module.exports = {
     },
     "botsfordiscord.com": {
         name: "Bots For Discord",
-        token: "3be45608d7a235554c6d6b5af46e80e8204b51d8ffb3edbb5403b10e239d73e49e83c6d4af72b3ddd0a6d10ab040cf4a619ddb7b5ceff799ee9f5628d8a6251d",
+        token: "4cf148ea94b113223b5504df7af53a34a4258f2edc39399da31b04581aa1dd005882d59a70bb6323e371ad9d5be2fc1fcf3412459a0a9996c56ff9ed90e2cd70",
         statusInterval: 3e5,
         supportsPerShard: false,
         url: "https://botsfordiscord.com/api/bot/398251412246495233",
@@ -21,7 +21,7 @@ module.exports = {
     },
     "discordbots.org": {
         name: "Discord Bot List",
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM5ODI1MTQxMjI0NjQ5NTIzMyIsImJvdCI6dHJ1ZSwiaWF0IjoxNTIzODEyNTExfQ.z0QbV-UK2ACJ6LSpFEZFft1iJO6fhdlEhs_shSvJHlU",
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM5ODI1MTQxMjI0NjQ5NTIzMyIsImJvdCI6dHJ1ZSwiaWF0IjoxNTQ0OTg1MDk5fQ.nJGlOZjqtx-tUPokO_jxYcurlFtqH37H_EqBgIErBRM",
         statusInterval: 3e5,
         supportsPerShard: true,
         url: "https://discordbots.org/api/bots/398251412246495233/stats",
@@ -31,7 +31,7 @@ module.exports = {
     },
     "discordbotlist.com": {
         name: "Discord Bot List (com)",
-        token: "d308dca8d49ad0bdab41fd1f7a9e20892d9ec51ab222c9112651f1e95560a728",
+        token: "eb47e2c37987d5e15cfb7351572b3dec2de92b21b43332fd95a509c1084eefea",
         statusInterval: 3e5,
         supportsPerShard: true,
         url: "https://discordbotlist.com/api/bots/398251412246495233/stats",
@@ -39,6 +39,7 @@ module.exports = {
         vote: true,
         alt: 1
     },
+    // compromised
     "discordbot.world": {
         name: "Discord Bot World",
         token: "5bc1c3ba8027565c88cde278ce93c583df85b953cc44f17638ac5c4294e62453de7a63cf86554ff64d544e72ab2ec399",
@@ -47,7 +48,8 @@ module.exports = {
         url: "https://discordbot.world/api/bot/398251412246495233/stats",
         page : "https://discordbot.world/bot/398251412246495233",
         vote: true
-    },
+    },/*
+    // compromised
     "discord.bots.gg": {
         name: "Discord Bots (bots.gg)",
         token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySUQiOiIyNDI4NDMzNDU0MDIwNjkwMDIiLCJyYW5kIjo5NDUsImlhdCI6MTUzNDA0ODE0NX0.QQsueDnCthkSFyXkiu8Stha7YAtTkLqsRXMzbf0PTbk",
@@ -56,10 +58,10 @@ module.exports = {
         url: "https://discord.bots.gg/api/bots/398251412246495233/stats",
         page : "https://discord.bots.gg/bots/398251412246495233",
         vote: true
-    },
+    },*/
     "discordbots.group": {
         name: "Discord Bots Group",
-        token: "l3BsAlbrCYHilnW13id6Jtl4y90HGeHT7IXUlUBvicKq4XdoZuBk5yHFf8XEJE8d4G9ifMgi3Y6FGNyxepFlrsHhEqjySCY0aEiKicCQyuuW77EACrag2iKgx8LIMvkmkznSIcYQwbdPOBQsFM3t4huTI5A",
+        token: "a11c691dc6d13899099070669766fe1597069b2c7736574d006350f549d0218ede12fc9fb023a65c8aed20d5f5351d0c27a16c46d89cf51a584cef568b230c6d",
         statusInterval: 3e5,
         supportsPerShard: false,
         url: "https://discordbots.group/api/bot/398251412246495233",
@@ -67,6 +69,7 @@ module.exports = {
         vote: true,
         emoji: "<:dbg:488604855150051328>"
     },
+    // compromised
     "bots.discordlist.app": {
         name: "Discord List App",
         token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6IjM5ODI1MTQxMjI0NjQ5NTIzMyJ9._COEBht5KwnuUf5stoqCrfq-QRC40xtXJhDDU2LSh2E",
@@ -78,7 +81,7 @@ module.exports = {
     },
     "discordsbestbots.xyz": {
         name: "Discords Best Bots",
-        token: "02d1d6a26b675b100388d1a2966b3b7a5afaa799",
+        token: "65e5466f4f6c729e681ac819f8233c22887ca849",
         statusInterval: 3e5,
         supportsPerShard: false,
         url: "https://discordsbestbots.xyz/api/bots/398251412246495233",
@@ -88,7 +91,7 @@ module.exports = {
     },
     "divinediscordbots.com": {
         name: "Divine Discord Bots",
-        token: "f84e8b44d97ddd9af23c0530332b57e920b23110ca61a4e0b296f2dca31a95442331aaff828b9bd592c1e7a4a961114a71f48267d35702a1160daadc46c96ca5",
+        token: "ed6a0b04cba43a299d881e105352fa86f5a9475dcd65819fac5f7aaf14e4d762608c439d2afa70c40790ba75ee96e03869922df6f20ada89e382b120dd444360",
         statusInterval: 3e5,
         supportsPerShard: false,
         url: "https://divinediscordbots.com/bots/398251412246495233/stats",
@@ -97,20 +100,20 @@ module.exports = {
     },
     "discordbotlist.xyz": {
         name: "Discord Bot List (xyz)",
-        token: "EpfhBh9bdAtLnfBvcVLi",
+        token: "2ghY9lX8jImZGyMMIncA",
         statusInterval: 3e5,
         supportsPerShard: false,
-        url: "https://discordbotlist.xyz/api/stats/${config.bot.ClientID}",
-        page: "https://discordbotlist.xyz/bots/${config.bot.ClientID}",
+        url: "https://discordbotlist.xyz/api/stats/398251412246495233",
+        page: "https://discordbotlist.xyz/bots/398251412246495233",
         vote: false
     },
     "discord.boats": {
         name: "Discord Boats",
-        token: "wBePHvWd9aPd3sTJH0s6sHmPIfikeAfxruEf7Ak48NQlGQoUQ2t5iW1OC706NEVTD0zL31uKodS4xDTdkL8Vi4OH8rV7NRPf6D2Ea6oYT7Bi9yNKlAKta37iSKFHHRTcOx8mQMi4pF9HxA5WK9I0Wj4yVBD",
+        token: "008wVr80TsEa0ZBj9SOThSmgRUjMbQv8msIOQtGExNArYdAJ4aSMx4Xl0Rm6QYu1lKl6V0bSrZUuii8q94H42Mc8A4ujywXAj1gkShCVuvG0daD424mda242JFLH7Y73Ss6woN3qJzN9F1AtJXjBOkIHC5OZQQc1",
         statusInterval: 3e5,
         supportsPerShard: false,
-        url: "https://discord.boats/api/bot/${config.bot.ClientID}",
-        page: "https://discord.boats/bot/${config.bot.ClientID}",
+        url: "https://discord.boats/api/bot/398251412246495233",
+        page: "https://discord.boats/bot/398251412246495233",
         vote: false,
         emoji: "<:discordboats:494919577655050251>"
     },/*
@@ -119,13 +122,14 @@ module.exports = {
         token: "ykbfhn8orpztvfirfmth7bpht3ymbw2mmrj9anb3wv04eh.kq2",
         statusInterval: 3e5,
         supportsPerShard: false,
-        url: "http://discord.services/api/bots/${config.bot.ClientID}",
+        url: "http://discord.services/api/bots/398251412246495233",
         page: "http://discord.services/bots",
         vote: false
     },*/
+    // compromised
     "discordboats.club": {
         name: "Discord Boats",
-        token: "EyyzIwrBgWDCnVPQz43hqBZUD7A0eB",
+        token: "v17tiRAAE7RSJEWkqPopErSAOA6Zdy",
         statusInterval: 3e5,
         supportsPerShard: false,
         url: "http://discordboats.club/api/public/bot/stats",

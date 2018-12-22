@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["sinfo","serverinfo"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 2e3,
+	description: "Get some info about the current server",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
 	var textChCount = 0,

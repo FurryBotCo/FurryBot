@@ -1,3 +1,19 @@
+module.exports = {
+	triggers: ["dog","doggo","puppy"],
+	userPermissions: [],
+	botPermissions: [
+		"ATTACH_FILES"
+	],
+	cooldown: 3e3,
+	description: "Get a picture of a doggo!",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	local.channel.startTyping();
 	var xhr = new self.XMLHttpRequest();

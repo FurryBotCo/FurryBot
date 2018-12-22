@@ -1,3 +1,21 @@
+module.exports = {
+	triggers: ["delcmds"],
+	userPermissions: [
+        "MANAGE_MESSAGES"
+    ],
+	botPermissions: [
+        "MANAGE_MESSAGES"
+    ],
+	cooldown: .75e3,
+	description: "Toggle command deletion",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
     
     switch(local.gConfig.deleteCommands) {

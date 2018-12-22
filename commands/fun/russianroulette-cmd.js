@@ -1,3 +1,17 @@
+module.exports = {
+	triggers: ["russionroulette","rr"],
+	userPermissions: [],
+	botPermissions: [],
+	cooldown: 2e3,
+	description: "Play russian roulette",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async (self,local) => {
 	
 	var val = Math.floor(Math.random()*6);

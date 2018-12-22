@@ -1,5 +1,22 @@
+module.exports = {
+	triggers: [],
+	userPermissions: [],
+	botPermissions: [
+        "ATTACH_FILES",
+        "EMBED_LINKS"
+    ],
+	cooldown: 2e3,
+	description: "Get a random image from InkBunny!",
+	usage: "",
+	nsfw: false,
+	devOnly: false,
+	betaOnly: false,
+	guildOwnerOnly: false,
+	run: ()=>{}
+};
+
 module.exports = (async(self,local)=>{
-    if(!self.config.furryArtAPIs.inkbunny.sid) {
+    if(!self.config.apis.inkbunny.sid) {
         await self.fsn.readFile(`${process.cwd()}/inkbunny-sid.txt`,"UTF8").then(async(sid)=>{
             if(sid === "") sid = "nosid";
             var req = await self.request(`https://inkbunny.net/api_userrating.php?sid=${sid}`,{
@@ -12,7 +29,7 @@ module.exports = (async(self,local)=>{
             if(typeof a.error_code !=="undefined" && typeof a.sid === "undefined") {
                 switch(a.error_code) {
                     case 2:
-                        var login = await self.request(`https://inkbunny.net/api_login.php?${self.config.furryArtAPIs.inkbunny.urlCredentials}`,{
+                        var login = await self.request(`https://inkbunny.net/api_login.php?${self.config.apis.inkbunny.urlCredentials}`,{
                             method: "GET",
                             headers: {
                                 "User-Agent": self.config.web.userAgent
@@ -30,7 +47,7 @@ module.exports = (async(self,local)=>{
                             }
                         } else {
                             await self.fsn.writeFile(`${process.cwd()}/inkbunny-sid.txt`,b.sid);
-                            self.config.furryArtAPIs.inkbunny.sid = b.sid;
+                            self.config.apis.inkbunny.sid = b.sid;
                             self.logger.log(`[CommandHandler:${local.command}][InkbunnyLogin]: Generated new SID`);
                         }
                         break;
@@ -39,11 +56,11 @@ module.exports = (async(self,local)=>{
                         self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
                 }
             } else {
-                self.config.furryArtAPIs.inkbunny.sid = a.sid;
+                self.config.apis.inkbunny.sid = a.sid;
             }
         }).catch(async(e)=>{
             if(e.code === "ENOENT") {
-                var a = await self.request(`https://inkbunny.net/api_login.php?${self.config.furryArtAPIs.inkbunny.urlCredentials}`,{
+                var a = await self.request(`https://inkbunny.net/api_login.php?${self.config.apis.inkbunny.urlCredentials}`,{
                     method: "GET",
                     headers: {
                         "User-Agent": self.config.web.userAgent
@@ -60,7 +77,7 @@ module.exports = (async(self,local)=>{
                     }
                 } else {
                     await self.fsn.writeFile(`${process.cwd()}/inkbunny-sid.txt`,a.sid);
-                    self.config.furryArtAPIs.inkbunny.sid = a.sid;
+                    self.config.apis.inkbunny.sid = a.sid;
                     self.logger.log(`[CommandHandler:${local.command}][InkbunnyLogin]: Generated new SID`);
                 }
             } else {
@@ -68,7 +85,7 @@ module.exports = (async(self,local)=>{
             }
         });
     } else {
-        var req = await self.request(`https://inkbunny.net/api_userrating.php?sid=${self.config.furryArtAPIs.inkbunny.sid}`,{
+        var req = await self.request(`https://inkbunny.net/api_userrating.php?sid=${self.config.apis.inkbunny.sid}`,{
                 method: "GET",
                 headers: {
                     "User-Agent": self.config.web.userAgent
@@ -78,7 +95,7 @@ module.exports = (async(self,local)=>{
             if(typeof a.error_code !=="undefined" && typeof a.sid === "undefined") {
                 switch(a.error_code) {
                     case 2:
-                        var login = await self.request(`https://inkbunny.net/api_login.php?${self.config.furryArtAPIs.inkbunny.urlCredentials}`,{
+                        var login = await self.request(`https://inkbunny.net/api_login.php?${self.config.apis.inkbunny.urlCredentials}`,{
                             method: "GET",
                             headers: {
                                 "User-Agent": self.config.web.userAgent
@@ -96,7 +113,7 @@ module.exports = (async(self,local)=>{
                             }
                         } else {
                             await self.fsn.writeFile(`${process.cwd()}/inkbunny-sid.txt`,b.sid);
-                            self.config.furryArtAPIs.inkbunny.sid = b.sid;
+                            self.config.apis.inkbunny.sid = b.sid;
                             self.logger.log(`[CommandHandler:${local.command}][InkbunnyLogin]: Generated new SID`);
                         }
                         break;
@@ -105,11 +122,11 @@ module.exports = (async(self,local)=>{
                         self.logger.error(`[CommandHandler:${local.command}][InkbunnyLogin]: ${e}`);
                 }
             } else {
-                self.config.furryArtAPIs.inkbunny.sid = a.sid;
+                self.config.apis.inkbunny.sid = a.sid;
             }
     }
     // blacklisted tags: cub, diaper, ass, upskirt, pantsu, incest, age_difference, boobhat
-    var req = await self.request(`https://inkbunny.net/api_search.php?sid=${self.config.furryArtAPIs.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=-cub%20-diaper%20-ass%20-upskirt%20-pantsu%20-incest%20-age_difference%20-boobhat&random=yes&get_rid=yes`,{
+    var req = await self.request(`https://inkbunny.net/api_search.php?sid=${self.config.apis.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=-cub%20-diaper%20-ass%20-upskirt%20-pantsu%20-incest%20-age_difference%20-boobhat&random=yes&get_rid=yes`,{
         method: "GET",
         headers: {
             "User-Agent": self.config.web.userAgent
