@@ -1,5 +1,7 @@
 module.exports = {
-	triggers: ["setname"],
+	triggers: [
+        "setname"
+    ],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,

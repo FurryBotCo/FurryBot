@@ -1,5 +1,8 @@
 module.exports = {
-	triggers: ["sudo"],
+	triggers: [
+        "sudo",
+        "runas"
+    ],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,

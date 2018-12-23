@@ -1,5 +1,7 @@
 module.exports = {
-	triggers: ["delcmds"],
+	triggers: [
+        "delcmds"
+    ],
 	userPermissions: [
         "MANAGE_MESSAGES"
     ],
@@ -13,20 +15,18 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: ()=>{}
-};
-
-module.exports = (async (self,local) => {
+	run: (async (self,local) => {
     
-    switch(local.gConfig.deleteCommands) {
-        case true:
-            self.db.updateGuild(local.guild.id, {deleteCommands: false});
-            local.message.reply("Disabled deleting command invocations.");
-            break;
-
-        case false:
-        self.db.updateGuild(local.guild.id, {deleteCommands: true});
-        local.message.reply("Enabled deleting command invocations.");
-            break;
-    }
-});
+        switch(local.gConfig.deleteCommands) {
+            case true:
+                self.db.updateGuild(local.guild.id, {deleteCommands: false});
+                local.message.reply("Disabled deleting command invocations.");
+                break;
+    
+            case false:
+            self.db.updateGuild(local.guild.id, {deleteCommands: true});
+            local.message.reply("Enabled deleting command invocations.");
+                break;
+        }
+    })
+};

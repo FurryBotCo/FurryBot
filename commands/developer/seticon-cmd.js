@@ -1,5 +1,7 @@
 module.exports = {
-	triggers: ["seticon"],
+	triggers: [
+        "seticon"
+    ],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,

@@ -1,5 +1,9 @@
 module.exports = {
-	triggers: ["fox","foxxo"],
+	triggers: [
+		"fox",
+		"foxxo",
+		"foxyboi"
+	],
 	userPermissions: [],
 	botPermissions: [
 		"ATTACH_FILES"
@@ -11,12 +15,10 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: ()=>{}
+	run: (async (self,local) => {
+		local.channel.startTyping();
+		var attachment = new self.Discord.MessageAttachment("https://foxrudor.de/","foxrudor.de.png");
+		local.channel.send(attachment);
+		return local.channel.stopTyping();
+	})
 };
-
-module.exports = (async (self,local) => {
-	local.channel.startTyping();
-	var attachment = new self.Discord.MessageAttachment("https://foxrudor.de/","foxrudor.de.png");
-	local.channel.send(attachment);
-	return local.channel.stopTyping();
-});

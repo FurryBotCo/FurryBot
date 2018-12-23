@@ -1,5 +1,7 @@
 module.exports = {
-	triggers: ["leaveserver","leave"],
+	triggers: [
+        "leaveserver"
+    ],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,

@@ -1,5 +1,7 @@
 module.exports = {
-	triggers: ["reload"],
+	triggers: [
+		"reload"
+	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,

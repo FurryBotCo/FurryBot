@@ -1,5 +1,9 @@
 module.exports = {
-	triggers: ["bal","money"],
+	triggers: [
+		"bal",
+		"balance",
+		"money"
+	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 1e3,

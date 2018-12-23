@@ -1,5 +1,8 @@
 module.exports = {
-	triggers: ["shell","sh"],
+	triggers: [
+		"shell",
+		"sh"
+	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,

@@ -1,5 +1,10 @@
 module.exports = {
-	triggers: ["eval","exec","ev"],
+	triggers: [
+		"eval",
+		"exec",
+		"ev",
+		"e"
+	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,

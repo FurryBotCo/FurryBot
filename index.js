@@ -61,6 +61,7 @@ class FurryBot extends Discord.Client {
 		this.child_process = require('child-process-promise');
 		this.shell = this.child_process.exec;
 		this.truncate = require("truncate");
+		this.wordGen = require("random-words");
 		/*this.webhooks = {};
 		for(let key in this.config.webhooks) {
 			this.webhooks[key] = new this.Discord.WebhookClient(this.config.webhooks[key].id,this.config.webhooks[key].token,{disableEveryone:true});
@@ -386,6 +387,39 @@ class FurryBot extends Discord.Client {
 		min = (min < 10 ? "0" : "") + min;
 		sec = (sec < 10 ? "0" : "") + sec;
 		return `${hour}:${min}:${sec}`;
+	}
+	gen(type,len=1) {
+			if(isNaN(len)) var len = 1;
+			var res = [];
+			switch(type.toLowerCase()) {
+				case "ip":
+					// (Math.floor(Math.random() * 255) + 1)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0);
+					for(let i = 0;i<=len;i++) {
+						res.push(`${Math.floor(Math.random()*250)+1}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}`);
+					}
+					break;
+		
+				case "word":
+				case "words":
+					for(let i = 0;i<=len;i++) {
+						res.push(this.wordGen({exactly:1,maxLength:Math.floor(Math.random()*7)+1,wordsPerString:Math.floor(Math.random()*4)+1}));
+					}
+					break;
+		
+				case "random":
+					var keyset = "abcdefghijklmnopqrstuvwxyz";
+					for(let i = 0;i<=len;i++) {
+						var tmp = "";
+						var rq = Math.floor(Math.random()*(32-5))+6;
+						for(let ii = 0;ii<rq;ii++) {
+							tmp += keyset.charAt(Math.floor(Math.random()*keyset.length));
+						}
+						res.push(tmp);
+					}
+					break;
+			}
+		
+			return res;
 	}
 	/*async rotatingStatus() {
 		this.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"});
