@@ -104,6 +104,27 @@ class FurryBotServer {
                 ping:Math.round(client.ws.ping)
             });
         })
+        .get("/commands",async(req,res)=>{
+            const commands = require("./commands");
+            var cmds = {};
+
+            commands.map(c=>c.name.toLowerCase()).forEach((c)=>{
+                cmds[c] = {};
+            });
+
+            commands.map(c=>c.commands).forEach((cmd)=>{
+                cmd.forEach((c)=>{
+
+                });
+            })
+            commands.forEach((category)=>{
+                category.commands.forEach((cmd)=>{
+                    delete cmd.run;
+                    cmds[category.name.toLowerCase()][cmd.triggers[0]] = cmd;
+                })
+            });
+            return res.status(200).json({success:true,list:cmds});
+        })
         .get("/status",async(req,res)=>{
             return res.status(200).json({
                 success: true,

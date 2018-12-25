@@ -1,31 +1,6 @@
 module.exports = (async(self) => {
     self.logger = new self.FurryBotLogger(self);
-    var resp = await self.request(self.config.bot.commandAPIURL, {
-        method: "GET",
-        headers: {
-            "User-Agent": self.config.web.userAgent
-        }
-    });
-    var response = JSON.parse(resp.body);
-    self.config.commandList = {fullList: response.return.fullList, all: response.return.all, response: response.return.response};
-    self.config.commandList.all.forEach((command)=>{
-        self.commandTimeout[command] = new Set();
-		self.commandTimeout.f=new Set();
-		self.commandTimeout.whatismyprefix=new Set();
-    });
-    self.logger.debug("Command Timeouts & Command List loaded");
     self.logger.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
-
-    /*self.rotatingStatus = self.setInterval(()=>{
-        for(let key in self.config.bot.rotatingStatus) {
-            var interval = key*15e3;
-            setTimeout((st)=>{
-                console.log(`Set to (${st.message}) ${eval(st.message)} ${st.type}`);
-                self.user.setActivity(eval(st.message),{type:st.type});
-            },interval,self.config.bot.rotatingStatus[key]);
-        }
-    }, self.config.bot.rotatingStatus.length*15e3);*/
-    //self.user.setActivity("🐾 Debugging! 🐾",{type: "PLAYING"});
     const rotatingStatus = (async()=>{
 		self.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"}).then(()=>{
             setTimeout(()=>{
@@ -82,14 +57,12 @@ module.exports = (async(self) => {
         //const ls = self.listStats(self);
         setInterval(self.listStats,3e5,self);
     }
-	
-	//self.db.getUser(self.user.id).then(u=>self.logger.log(u)).catch(e=>self.logger.error(e));
-	//self.db.getGuild(self.config.betaGuilds[0]).then(g=>self.logger.log(g)).catch(e=>self.logger.error(e));
+
 	setInterval(async()=>{
 		if(["00:00:00"].includes(self.getDateTime())) {
 			var date = new Date(),
 			d = `${date.getMonth()+1}-${date.getDate()-1}-${date.getFullYear()}`,
-			count = (await self.db.getStats("dailyjoins"))[date]||0;
+			count = (await self.db.getStats("dailyjoins"))[d]||0;
 			var data = {
 				author: {
 					name: "Donovan_DMC#1337",
@@ -103,13 +76,13 @@ module.exports = (async(self) => {
 				color: self.randomColor(),
 				timestamp: self.getCurrentTimestamp(),
 				thumbnail: {
-					url: "https://i.furrybot.me/furry-small.png"
+					url: "https://i.furry.bot/furry-small.png"
 				}
 			}
 			var embed = new self.Discord.MessageEmbed(data);
 			self.channels.get(self.config.bot.channels.daily).send(embed).then(n=>{
 				self.logger.log(`Posted daily stats, ${d}: ${count}, total: ${self.guilds.size}`);
-			}).catch(e=>self.logger.log(e));
+			}).catch(self.logger.log);
 		}
     },1e3);
     console.log("end of ready");

@@ -1,4 +1,4 @@
-mmodule.exports = {
+module.exports = {
 	triggers: [
 		"roll"
 	],

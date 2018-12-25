@@ -40,7 +40,6 @@ class FurryBot extends Discord.Client {
 		//this.ro = require("rethinkdbdash")(this.config.db.other);
 		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
 		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV3`);
-		this.commandTimeout = {};
 		this.varParse = require(`${process.cwd()}/util/varHandler`);
 		this.listStats = require("./util/listStats");
 		this.lang = require(`${process.cwd()}/lang`)(this);
@@ -62,6 +61,12 @@ class FurryBot extends Discord.Client {
 		this.shell = this.child_process.exec;
 		this.truncate = require("truncate");
 		this.wordGen = require("random-words");
+		this.commands = require("./commands");
+		this.commandList = this.commands.map(c=>c.commands.map(cc=>cc.triggers)).reduce((a,b)=>a.concat(b)).reduce((a,b)=>a.concat(b));
+		this.commandTimeout = {};
+		this.commands.map(c=>c.commands.map(cc=>cc.triggers)).reduce((a,b)=>a.concat(b)).reduce((a,b)=>a.concat(b)).forEach((cmd)=>{
+			this.commandTimeout[cmd] = new Set();
+		});
 		/*this.webhooks = {};
 		for(let key in this.config.webhooks) {
 			this.webhooks[key] = new this.Discord.WebhookClient(this.config.webhooks[key].id,this.config.webhooks[key].token,{disableEveryone:true});
@@ -103,7 +108,7 @@ class FurryBot extends Discord.Client {
 	async imageAPIRequest (safe=true,category=null,json=true,filetype=null) {
 		return new Promise(async(resolve, reject)=>{
 			if([undefined,null,""].includes(json)) json = true;
-			var s = await this.request(`https://api.furrybot.me/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?`/${filetype}`:""}`);
+			var s = await this.request(`https://api.furry.bot/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?`/${filetype}`:""}`);
 			try {
 				var j = JSON.parse(s.body);
 				resolve(j);
@@ -130,7 +135,7 @@ class FurryBot extends Discord.Client {
 	}
 
 	async reloadCommands () {
-		var resp = await this.request("https://api.furrybot.me/commands", {
+		var resp = await this.request("https://api.furry.bot/commands", {
 				method: "GET",
 				headers: {
 						Authorization: `Key ${this.config.apiKey}`
@@ -388,6 +393,7 @@ class FurryBot extends Discord.Client {
 		sec = (sec < 10 ? "0" : "") + sec;
 		return `${hour}:${min}:${sec}`;
 	}
+
 	gen(type,len=1) {
 			if(isNaN(len)) var len = 1;
 			var res = [];
@@ -421,21 +427,18 @@ class FurryBot extends Discord.Client {
 		
 			return res;
 	}
-	/*async rotatingStatus() {
-		this.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"});
-		setTimeout(()=>{
-			this.user.setActivity(`🐾 ${this.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"});
-		},15e3);
-		setTimeout(()=>{
-			this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.guilds.size} guilds! 🐾`,{type: "PLAYING"});
-		},3e4);
-		setTimeout(()=>{
-			this.user.setActivity(`🐾 ${this.config.defaultPrefix}help with ${this.users.size} users! 🐾`,{type: "WATCHING"});
-		},45e3);
-		setTimeout(()=>{
-			this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.channels.size} channels! 🐾`,{type: "LISTENING"});
-		},6e4);
-	}*/
+	
+	getCommandCategory(command) {
+		if(!command) throw new TypeError("missing command");
+		var a = this.commands.filter(c=>c.commands.map(cc=>cc.triggers).reduce((a,b)=>a.concat(b)).includes(command));
+		return a.length < 1 ? false : a[0];
+	}
+
+	getCommand(command) {
+		if(!command) throw new TypeError("missing command");
+		this.commands.map(c=>c.commands).reduce((a,b)=>a.concat(b)).filter(cc=>cc.triggers.includes(command));
+		return a.length < 1 ? false : a[0];
+	}
 }
 
 const client = new FurryBot(config.bot.clientOptions);

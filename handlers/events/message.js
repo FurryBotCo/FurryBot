@@ -131,7 +131,7 @@ module.exports = (async(self,message) => {
 			}
 		}
 
-		var command = self.config.commandList.fullList[local.command];
+		var command = self.getCommand(local.command);
 
 		if(local.message.content.toLowerCase() === "whatismyprefix") {
 			if(self.commandTimeout.whatismyprefix.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
@@ -146,6 +146,7 @@ module.exports = (async(self,message) => {
 			self.stats.commandTotalsSinceLastPost++;
 			return local.message.reply(`this guilds prefix is **${local.gConfig.prefix}**`);
 		}
+
 		if(["f","rip"].includes(local.message.content.toLowerCase()) && local.gConfig.fResponseEnabled) {
 			//if(self.gConfig.fResponseEnabled) {
 				if(self.commandTimeout.f.has(local.author.id) && !self.config.developers.includes(local.author.id)) {
@@ -163,6 +164,7 @@ module.exports = (async(self,message) => {
 				return local.channel.send(`<@!${local.author.id}> has paid respects.\n\nRespects paid total: ${parseInt(f.count)+1}`);
 			//}
 		}
+
 		try {
 			if(local.message.content === `<@${self.user.id}>` || local.message.content === `<@!${self.user.id}>`) {
 				/*var c = await require(`${process.cwd()}/commands/${self.config.commandList.fullList["help"].category}/help-cmd.js`)(self,local);
@@ -186,7 +188,7 @@ module.exports = (async(self,message) => {
 			return self.logger.error(`[${event}Event][Guild: ${local.guild.id}]: Command error:\n\tCommand: ${local.command}\n\tSupplied arguments: ${self.args.join(' ')}\n\tServer ID: ${local.guild.id}\n\t${e.stack}`);
 		}
 		if(!local.message.content.toLowerCase().startsWith(local.prefix)) return;
-		if(!self.config.commandList.all.includes(local.command)) return;
+		if(!self.commandList.includes(local.command)) return;
 		if(local.gConfig.deleteCommands) local.message.delete().catch(error=>local.channel.send(`Unable to delete command invocation: **${error}**\n\nCheck my permissions.`));
 		if(command.userPermissions.length > 0 && !local.user.isDeveloper) {
 			if(command.userPermissions.some(perm => !local.channel.permissionsFor(local.member).has(perm,true))) {
