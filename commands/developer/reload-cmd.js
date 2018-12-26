@@ -11,45 +11,45 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		local.channel.startTyping();
-		if (self.config.developers.indexOf(local.message.author.id) === -1) {
-			return local.message.reply("You cannot run this command as you are not a bot owner.");
+	run: (async (client,message) => {
+		message.channel.startTyping();
+		if (client.config.developers.indexOf(message.author.id) === -1) {
+			return message.reply("You cannot run this command as you are not a bot owner.");
 		}
 		var ty=new RegExp(/^(((command|cmd|c)?[s]?(module|m)?[s]?(list|l)?[s]?)||all)$/gi);
-		if(local.args.join("").length === 0) {
+		if(message.args.join("").length === 0) {
 			var type="cl";
 		} else {
-			if(!ty.test(local.args.join(""))) return local.message.reply("Invalid type");
-			var type = local.args.join("");
+			if(!ty.test(message.args.join(""))) return message.reply("Invalid type");
+			var type = message.args.join("");
 		}
 		switch(true) {
 			case new RegExp(/^(command|cmd|c)[s]?(list|l)?$/gi).test(type):
-				local.message.reply("Reloading command list..");
-				self.reloadCommands();
+				message.reply("Reloading command list..");
+				client.reloadCommands();
 				break;
 				
 			case new RegExp(/^((command|cmd|c)(module|m))[s]?$/gi).test(type):
-				local.message.reply("Reloading command/custom modules..");
-				self.reloadCommandModules();
+				message.reply("Reloading command/custom modules..");
+				client.reloadCommandModules();
 				break;
 				
 			case new RegExp(/^(module|m)[s]?$/gi).test(type):
-				local.message.reply("Reloading all modules");
-				self.reloadModules();
+				message.reply("Reloading all modules");
+				client.reloadModules();
 				break;
 				
 			case "all":
-				local.message.reply("Reloading everything..");
-				self.reloadAll();
+				message.reply("Reloading everything..");
+				client.reloadAll();
 				break;
 				
 			default:
-				return local.message.reply("Invalid reload type");
+				return message.reply("Invalid reload type");
 		}
 		setTimeout((msg) => {
-			msg.reply(`specified reloads finished ${self.config.emojis.furokaypaw}`);
+			msg.reply(`specified reloads finished ${client.config.emojis.furokaypaw}`);
 			msg.channel.stopTyping();
-		}, 1e3,local.message);
+		}, 1e3,message);
 	})
 };

@@ -13,9 +13,9 @@ module.exports = {
 	devOnly: true,
 	betaOnly: true,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		local.channel.startTyping();
-		local.message.reply(`Your balance is ${self.uConfig.bal}.`);
-		return local.channel.stopTyping();
+	run: (async (client,message) => {
+		message.channel.startTyping();
+		message.reply(`Your balance is ${client.uConfig.bal}.`);
+		return message.channel.stopTyping();
 	})
 };

@@ -1,34 +1,34 @@
-module.exports = (async(self)=>{
+module.exports = (async(client)=>{
     return new Promise(async(resolve,reject)=>{
         
-        var j = await self.r.table(self.config.db.tables.stats).get("messageCount");
+        var j = await client.r.table(client.config.db.tables.stats).get("messageCount");
         
         if(!j) {
-            await self.r.table(self.config.db.tables.stats).insert({
+            await client.r.table(client.config.db.tables.stats).insert({
                 id: "messageCount",
                 count: 0,
                 dmCount: 0,
             });
             
-            var j = await self.r.table(self.config.db.tables.stats).get("messageCount");
+            var j = await client.r.table(client.config.db.tables.stats).get("messageCount");
         }
         
-        await self.r.table(self.config.db.tables.stats).get("messageCount").update({
-            count: +j.count + self.stats.messagesSinceLastPost,
-            dmCount: +j.dmCount + self.stats.dmMessagesSinceLastPost
+        await client.r.table(client.config.db.tables.stats).get("messageCount").update({
+            count: +j.count + client.stats.messagesSinceLastPost,
+            dmCount: +j.dmCount + client.stats.dmMessagesSinceLastPost
         });
         
-        self.stats.messagesSinceLastPost = 0;
-        self.stats.dmMessagesSinceLastPost = 0;
-        //self.stats.commandTotalsSinceLastPost = 0;
+        client.stats.messagesSinceLastPost = 0;
+        client.stats.dmMessagesSinceLastPost = 0;
+        //client.stats.commandTotalsSinceLastPost = 0;
         
-        if(!self.logger) {
+        if(!client.logger) {
             console.debug("Posted db stats");
         } else {
-            self.logger.debug("Posted db stats");
+            client.logger.debug("Posted db stats");
         }
         
-       // return self.r.table("stats").get("general").without("id");
-        resolve(self.r.table(self.config.db.tables.stats).get("messageCount"));
+       // return client.r.table("stats").get("general").without("id");
+        resolve(client.r.table(client.config.db.tables.stats).get("messageCount"));
     });
 })

@@ -1,3 +1,3 @@
-module.exports = (async(self,error)=>{
-    self.logger.error(error);
+module.exports = (async(client,error)=>{
+    client.logger.error(error);
 })

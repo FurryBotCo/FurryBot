@@ -11,8 +11,8 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-        var req = await self.request(`https://api.furrybot.me/image-counts.php`,{
+	run: (async (client,message) => {
+        var req = await client.request(`https://api.furrybot.me/image-counts.php`,{
             method: "GET"
         });
         var counts = JSON.parse(req.body);
@@ -55,6 +55,6 @@ module.exports = {
                 }
             }
         }
-        return local.channel.send(content);
+        return message.channel.send(content);
     })
 };

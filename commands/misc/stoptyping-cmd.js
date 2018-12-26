@@ -13,10 +13,10 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(self,local)=>{
-		var channel = local.message.mentions.channels.first() ? local.message.mentions.channels.first() : local.channel;
-		if(!channel.typing) return local.message.reply("I don't seem to be typing here..?");
-		local.message.reply("I've sent a command to stop typing, let's see if this works!");
+	run: (async(client,message)=>{
+		var channel = message.mentions.channels.first() ? message.mentions.channels.first() : message.channel;
+		if(!channel.typing) return message.reply("I don't seem to be typing here..?");
+		message.reply("I've sent a command to stop typing, let's see if this works!");
 		return channel.stopTyping();
 	})
 };

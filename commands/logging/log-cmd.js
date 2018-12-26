@@ -13,38 +13,38 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
 	
-		if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
+		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
 		
-		if(typeof local.gConfig.logging === "undefined") self.db.updateGuild(local.guild.id, self.config.logging.def);
+		if(typeof message.gConfig.logging === "undefined") client.db.updateGuild(message.guild.id, client.config.logging.def);
 	
-		if(["enable","en","e","disable","dis","d"].indexOf(local.args[0]) !== -1) {
-			var type = [...local.args];
+		if(["enable","en","e","disable","dis","d"].indexOf(message.args[0]) !== -1) {
+			var type = [...message.args];
 			type.shift();
-			switch(local.args[0]) {
+			switch(message.args[0]) {
 				case "enable":
 				case "en":
 				case "e":
 					// enable
 					var a = type.join(" ").toLowerCase();
-					if(local.message.mentions.channels.first()) {
-						var a = a.replace(`<#${local.message.mentions.channels.first().id}>`,"");
-						var ch = local.message.mentions.channels.first();
+					if(message.mentions.channels.first()) {
+						var a = a.replace(`<#${message.mentions.channels.first().id}>`,"");
+						var ch = message.mentions.channels.first();
 					}
 					var event = a.replace(" ","");
-					if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
-					if([undefined,null,"",[],{}].includes(local.gConfig.logging[event])) {
-						self.logger.log(`Updated logging for ${local.guild.name} (${local.guild.id}), missing logging config`);
-						await self.db.updateGuild(local.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
-						local.gConfig = await self.db.getGuild(local.guild.id);
+					if(!client.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
+					if([undefined,null,"",[],{}].includes(message.gConfig.logging[event])) {
+						client.logger.log(`Updated logging for ${message.guild.name} (${message.guild.id}), missing logging config`);
+						await client.db.updateGuild(message.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
+						message.gConfig = await client.db.getGuild(message.guild.id);
 					}
-					if(!local.gConfig.logging[event].enabled === true) {
-						if(!ch) ch = local.channel;
-						self.db.updateGuild(local.guild.id,{logging:{[event]:{channel:ch.id,enabled:true}}});
-						return local.message.reply(`Now logging **${event}** in <#${ch.id}>!`);
+					if(!message.gConfig.logging[event].enabled === true) {
+						if(!ch) ch = message.channel;
+						client.db.updateGuild(message.guild.id,{logging:{[event]:{channel:ch.id,enabled:true}}});
+						return message.reply(`Now logging **${event}** in <#${ch.id}>!`);
 					} else {
-						return local.message.reply(`The event **${event}** is already being logged in <#${local.gConfig.logging[event].channel}>.`);
+						return message.reply(`The event **${event}** is already being logged in <#${message.gConfig.logging[event].channel}>.`);
 					}
 					break;
 					
@@ -53,50 +53,50 @@ module.exports = {
 				case "d":
 					// disable
 					var a = type.join(" ").toLowerCase();
-					if(local.message.mentions.channels.first()) {
-						var a = a.replace(`<#${local.message.mentions.channels.first().id}>`,"");
-						var ch = local.message.mentions.channels.first(); // lgtm [js/useless-assignment-to-local]
+					if(message.mentions.channels.first()) {
+						var a = a.replace(`<#${message.mentions.channels.first().id}>`,"");
+						var ch = message.mentions.channels.first(); // lgtm [js/useless-assignment-to-message]
 					}
 					var event = a.replace(" ","");
-					if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
-					if([undefined,null,"",[],{}].includes(local.gConfig.logging[event])) {
-						self.logger.log(`Updated logging for ${local.guild.name} (${local.guild.id}), missing logging config`);
-						await self.db.updateGuild(local.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
-						local.gConfig = await self.db.getGuild(local.guild.id);
+					if(!client.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
+					if([undefined,null,"",[],{}].includes(message.gConfig.logging[event])) {
+						client.logger.log(`Updated logging for ${message.guild.name} (${message.guild.id}), missing logging config`);
+						await client.db.updateGuild(message.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
+						message.gConfig = await client.db.getGuild(message.guild.id);
 					}
-					if(local.gConfig.logging[event].enabled === true) {
-						self.db.updateGuild(local.guild.id,{logging:{[event]:{channel:null,enabled:false}}});
-						return local.message.reply(`Stopped logging **${event}**!`);
+					if(message.gConfig.logging[event].enabled === true) {
+						client.db.updateGuild(message.guild.id,{logging:{[event]:{channel:null,enabled:false}}});
+						return message.reply(`Stopped logging **${event}**!`);
 					} else {
-						return local.message.reply(`The event **${event}** is not currently being logged.`);
+						return message.reply(`The event **${event}** is not currently being logged.`);
 					}
 					break;
 			}
 		} else {
-			var a = local.args.join(" ").toLowerCase();
-			if(local.message.mentions.channels.first()) {
-				var a = a.replace(`<#${local.message.mentions.channels.first().id}>`,"");
-				var ch = local.message.mentions.channels.first();
+			var a = message.args.join(" ").toLowerCase();
+			if(message.mentions.channels.first()) {
+				var a = a.replace(`<#${message.mentions.channels.first().id}>`,"");
+				var ch = message.mentions.channels.first();
 			}
 			var event = a.replace(" ","");
 			if(event === "all") {
 				var enabledCount = 0,
 				disabledCount = 0;
-				for(let ev in local.gConfig.logging) {
-					var log = local.gConfig.logging[ev];
+				for(let ev in message.gConfig.logging) {
+					var log = message.gConfig.logging[ev];
 					if(log.enabled) enabledCount++;
 					if(!log.enabled) disabledCount++;
 				}
 				if(enabledCount > disabledCount) {
 					// enable all
-					if(!ch) var ch = local.channel;
-					for(let ev in local.gConfig.logging) {
-						var log = local.gConfig.logging[ev];
+					if(!ch) var ch = message.channel;
+					for(let ev in message.gConfig.logging) {
+						var log = message.gConfig.logging[ev];
 						try {
-							var j = await self.db.updateGuild(local.guild.id,{logging:{[ev]:{enabled:true,channel:ch}}});
+							var j = await client.db.updateGuild(message.guild.id,{logging:{[ev]:{enabled:true,channel:ch}}});
 						}catch(e){
-							local.message.reply("There was an internal error while doing this.. My owner(s) have been notified!");
-							return self.logger.error(e);
+							message.reply("There was an internal error while doing this.. My owner(s) have been notified!");
+							return client.logger.error(e);
 						}
 					}
 				} else if (enabledCount < disabledCount) {
@@ -106,19 +106,19 @@ module.exports = {
 				}
 				return;
 			}
-			if(!self.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
-			if([undefined,null,"",[],{}].includes(local.gConfig.logging[event])) {
-				self.logger.log(`Updated logging for ${local.guild.name} (${local.guild.id}), missing logging config`);
-				await self.db.updateGuild(local.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
-				local.gConfig = await self.db.getGuild(local.guild.id);
+			if(!client.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
+			if([undefined,null,"",[],{}].includes(message.gConfig.logging[event])) {
+				client.logger.log(`Updated logging for ${message.guild.name} (${message.guild.id}), missing logging config`);
+				await client.db.updateGuild(message.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
+				message.gConfig = await client.db.getGuild(message.guild.id);
 			}
-			if(local.gConfig.logging[event].enabled === true && !ch) {
-				self.db.updateGuild(local.guild.id,{logging:{[event]:{channel:null,enabled:false}}});
-				return local.message.reply(`Stopped logging **${event}**!`);
+			if(message.gConfig.logging[event].enabled === true && !ch) {
+				client.db.updateGuild(message.guild.id,{logging:{[event]:{channel:null,enabled:false}}});
+				return message.reply(`Stopped logging **${event}**!`);
 			} else {
-				if(!ch) var ch = local.channel;
-				self.db.updateGuild(local.guild.id,{logging:{[event]:{channel:ch.id,enabled:true}}});
-				return local.message.reply(`Now logging **${event}** in <#${ch.id}>!`);
+				if(!ch) var ch = message.channel;
+				client.db.updateGuild(message.guild.id,{logging:{[event]:{channel:ch.id,enabled:true}}});
+				return message.reply(`Now logging **${event}** in <#${ch.id}>!`);
 			}
 		}
 	})

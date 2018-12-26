@@ -14,28 +14,28 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
 		// extra check, to be safe
-		if (!self.config.developers.includes(local.author.id)) {
-			return local.message.reply("You cannot run this command as you are not a developer of this bot.");
+		if (!client.config.developers.includes(message.author.id)) {
+			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
-		local.channel.startTyping();
-		const r = self.r;
-		var exec = local.args.join(" ");
-		var start = self.performance.now();
+		message.channel.startTyping();
+		const r = client.r;
+		var exec = message.args.join(" ");
+		var start = client.performance.now();
 		try {
 			var res = await eval(exec);
 		}catch(e){
-			//return local.message.reply(`Error evaluating: ${err}`);
-			var m = typeof e.message !== "string" ? self.util.inspect(e.message,{depth: 1}) : e.message;
-			console.log(self.util.inspect(e.message,{depth: 1}));
+			//return message.reply(`Error evaluating: ${err}`);
+			var m = typeof e.message !== "string" ? client.util.inspect(e.message,{depth: 1}) : e.message;
+			console.log(client.util.inspect(e.message,{depth: 1}));
 			var res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Evaluating:\n${e.name}: ${m}\`\`\``;
-			var end = self.performance.now();
+			var end = client.performance.now();
 			var data = {
 				title: `Evaluated - Time: \`\`${(end-start).toFixed(3)}ms\`\``,
 				author: {
-					name: local.author.tag,
-					icon_url: local.author.displayAvatarURL()
+					name: message.author.tag,
+					icon_url: message.author.displayAvatarURL()
 				},
 				color: 3322313,
 				fields: [
@@ -51,32 +51,32 @@ module.exports = {
 				]
 			}
 	
-			console.error(`[Eval]: ${self.util.inspect(e,{depth: 3,color:true})}`);
-			Object.assign(data,local.embed_defaults());
-			var embed = new self.Discord.MessageEmbed(data);
-			local.channel.send(embed).catch(err => {
-				local.channel.send(`I could not return the result: ${err}`).catch(error=>{
-					local.author.send(`I could not return the result: ${error}`).catch(noerr=>null);
+			console.error(`[Eval]: ${client.util.inspect(e,{depth: 3,color:true})}`);
+			Object.assign(data,message.embed_defaults());
+			var embed = new client.Discord.MessageEmbed(data);
+			message.channel.send(embed).catch(err => {
+				message.channel.send(`I could not return the result: ${err}`).catch(error=>{
+					message.author.send(`I could not return the result: ${error}`).catch(noerr=>null);
 				});
 			});
-			return local.channel.stopTyping();
+			return message.channel.stopTyping();
 		}
 		if([null,undefined,""].includes(res)) {
 			var res = "```fix\nfinished with no return```";
 		} else {
-			if(typeof res !== "string") res = self.util.inspect(res,{showHidden:true,depth: 3});
+			if(typeof res !== "string") res = client.util.inspect(res,{showHidden:true,depth: 3});
 			if(res.length > 1000) {
 				console.log(`[Eval]: ${res}`);
 				res = "Logged To Console";
 			}
 			res = "```js\n"+res+"```";
 		}
-		var end = self.performance.now();
+		var end = client.performance.now();
 		var data = {
 			title: `Evaluated - Time: \`${(end-start).toFixed(3)}ms\``,
 			author: {
-				name: local.author.tag,
-				icon_url: local.author.displayAvatarURL()
+				name: message.author.tag,
+				icon_url: message.author.displayAvatarURL()
 			},
 			color: 3322313,
 			fields: [
@@ -92,14 +92,14 @@ module.exports = {
 			]
 		}
 		
-		Object.assign(data,local.embed_defaults());
-		var embed = new self.Discord.MessageEmbed(data);
-		local.channel.send(embed).catch(err => {
+		Object.assign(data,message.embed_defaults());
+		var embed = new client.Discord.MessageEmbed(data);
+		message.channel.send(embed).catch(err => {
 			console.error(err);
-			local.channel.send(`I could not return the result: ${err}`).catch(error=>{
-				local.author.send(`I could not return the result: ${err}`).catch(noerr=>null);
+			message.channel.send(`I could not return the result: ${err}`).catch(error=>{
+				message.author.send(`I could not return the result: ${err}`).catch(noerr=>null);
 			});
 		});
-		return local.channel.stopTyping();
+		return message.channel.stopTyping();
 	})
 };

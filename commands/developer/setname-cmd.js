@@ -11,23 +11,23 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
     guildOwnerOnly: false,
-    run: (async(self,local) => {
-        local.channel.startTyping();
-        if(local.args.length < 1) {
-            local.channel.stopTyping();
+    run: (async(client,message) => {
+        message.channel.startTyping();
+        if(message.args.length < 1) {
+            message.channel.stopTyping();
             return new Error("ERR_INVALID_USAGE");
         }
-        var set = local.args.join("");
+        var set = message.args.join("");
         if(set.length < 2 || set.length > 32) {
-            local.message.reply(`Username must be between **2** and **32** characters.`);
-            return local.channel.stopTyping();
+            message.reply(`Username must be between **2** and **32** characters.`);
+            return message.channel.stopTyping();
         }
-        self.user.setUsername(set).then((user) => {
-            local.message.reply(`Set username to: ${user.username}`);
-            return local.channel.stopTyping();
+        client.user.setUsername(set).then((user) => {
+            message.reply(`Set username to: ${user.username}`);
+            return message.channel.stopTyping();
         }).catch((err) => {
-           local.channel.send(`There was an error while doing this: ${err}`) ;
-           return local.channel.stopTyping();
+           message.channel.send(`There was an error while doing this: ${err}`) ;
+           return message.channel.stopTyping();
         })
     })
 };

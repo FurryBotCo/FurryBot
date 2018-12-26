@@ -1,7 +1,7 @@
-module.exports = (async(self,info)=>{
-    if(!self.logger) {
+module.exports = (async(client,info)=>{
+    if(!client.logger) {
         console.debug(info);
     } else {
-        self.logger.debug(info);
+        client.logger.debug(info);
     }
 })

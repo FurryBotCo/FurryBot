@@ -12,31 +12,31 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(self,local)=>{
-		local.channel.startTyping();
-		if(local.args.length === 0 || !local.args) {
-			var user = local.member;
+	run: (async(client,message)=>{
+		message.channel.startTyping();
+		if(message.args.length === 0 || !message.args) {
+			var user = message.member;
 		} else {
 			// member mention
-			if(local.message.mentions.members.first()) {
-				var user = local.message.mentions.members.first();
+			if(message.mentions.members.first()) {
+				var user = message.mentions.members.first();
 			}
 			
 			// user ID
-			if(!isNaN(local.args[0]) && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
-				var user = local.guild.members.get(local.args[0]);
+			if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
+				var user = message.guild.members.get(message.args[0]);
 			}
 			
 			// username
-			if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
-				var usr = self.users.find(t=>t.username===local.args[0]);
-				if(usr instanceof self.Discord.User) var user = local.message.guild.members.get(usr.id);
+			if(isNaN(message.args[0]) && message.args[0].indexOf("#") === -1 && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
+				var usr = client.users.find(t=>t.username===message.args[0]);
+				if(usr instanceof client.Discord.User) var user = message.guild.members.get(usr.id);
 			}
 			
 			// user tag
-			if(isNaN(local.args[0]) && local.args[0].indexOf("#") !== -1 && !local.message.mentions.members.first()) {
-				var usr = self.users.find(t=>t.tag===local.args[0]);
-				if(usr instanceof self.Discord.User) var user = local.guild.members.get(usr.id);
+			if(isNaN(message.args[0]) && message.args[0].indexOf("#") !== -1 && !message.mentions.members.first()) {
+				var usr = client.users.find(t=>t.tag===message.args[0]);
+				if(usr instanceof client.Discord.User) var user = message.guild.members.get(usr.id);
 			}
 		}
 	
@@ -46,12 +46,12 @@ module.exports = {
 				title: "User not found",
 				description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
 			}
-			Object.assign(data, local.embed_defaults());
-			var embed = new self.Discord.MessageEmbed(data);
-			return local.channel.send(embed);
+			Object.assign(data, message.embed_defaults());
+			var embed = new client.Discord.MessageEmbed(data);
+			return message.channel.send(embed);
 		}
 		
-		var a = self.guilds.filter(g=>g.members.has(user.id));
+		var a = client.guilds.filter(g=>g.members.has(user.id));
 		var b = a.map(g=>`${g.name} (${g.id})`),
 		guilds = [],
 		fields = [],
@@ -77,8 +77,8 @@ module.exports = {
 			desciption: `I see this user in ${guilds.size} other guilds.`,
 			fields
 		}
-		var embed = new self.Discord.MessageEmbed(data);
-		local.channel.send(embed);
-		return local.channel.stopTyping();
+		var embed = new client.Discord.MessageEmbed(data);
+		message.channel.send(embed);
+		return message.channel.stopTyping();
 	})
 };

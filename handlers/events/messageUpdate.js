@@ -1,4 +1,4 @@
-module.exports = (async(self,oldMessage,newMessage)=>{
+module.exports = (async(client,oldMessage,newMessage)=>{
     if(oldMessage.equals(newMessage)) return;
-    return require(`${self.config.rootDir}/handlers/events/message.js`)(self,newMessage);
+    return require(`${client.config.rootDir}/handlers/events/message.js`)(client,newMessage);
 })

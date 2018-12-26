@@ -15,7 +15,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(self,local)=>{
+	run: (async(client,message)=>{
         const contentType = [
             "story",
             "art",
@@ -23,10 +23,10 @@ module.exports = {
             "journal",
             "photo"
         ]
-        var req = await self.request("https://api2.sofurry.com/browse/search?search=furry&format=json&minlevel=0&maxlevel=0",{
+        var req = await client.request("https://api2.sofurry.com/browse/search?search=furry&format=json&minlevel=0&maxlevel=0",{
             method: "GET",
             headers: {
-                "User-Agent": self.config.web.userAgent
+                "User-Agent": client.config.web.userAgent
             }
         });
         try {
@@ -35,23 +35,23 @@ module.exports = {
             var submission = jsn.data.entries[rr];
             if(typeof submission.contentLevel === "undefined") throw new Error("secondary");
             if(submission.contentLevel !== 0) {
-                self.logger.log(`unsafe image:\n${self.util.inspect(submission,{depth:3,showHidden:true})}`);
-                self.logger.log(`Body: ${self.inspect(jsn,{depth:null})}`);
-                return local.message.reply("Image API returned a non-safe image! Please try again later.");
+                client.logger.log(`unsafe image:\n${client.util.inspect(submission,{depth:3,showHidden:true})}`);
+                client.logger.log(`Body: ${client.inspect(jsn,{depth:null})}`);
+                return message.reply("Image API returned a non-safe image! Please try again later.");
             }
-            var short = await self.shortenUrl(`http://www.sofurry.com/view/${submission.id}`);
+            var short = await client.shortenUrl(`http://www.sofurry.com/view/${submission.id}`);
             var extra = short.new ? `**This is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
             if([1,4].includes(submission.contentType)) {
-                var attachment = new self.Discord.MessageAttachment(submission.full,"sofurry.png");
-                return local.channel.send(`${extra}${submission.title} (type ${self.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${local.author.tag}`,attachment);
+                var attachment = new client.Discord.MessageAttachment(submission.full,"sofurry.png");
+                return message.channel.send(`${extra}${submission.title} (type ${client.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${message.author.tag}`,attachment);
             } else {
-                return local.channel.send(`${extra}${submission.title} (type ${self.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${local.author.tag}`);
+                return message.channel.send(`${extra}${submission.title} (type ${client.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${message.author.tag}`);
             }
         }catch(e){
-            self.logger.error(`Error:\n${e}`);
-            self.logger.log(`Body: ${jsn}`);
-            var attachment = new self.Discord.MessageAttachment(self.config.images.serverError);
-            return local.channel.send("Unknown API Error",attachment);
+            client.logger.error(`Error:\n${e}`);
+            client.logger.log(`Body: ${jsn}`);
+            var attachment = new client.Discord.MessageAttachment(client.config.images.serverError);
+            return message.channel.send("Unknown API Error",attachment);
         }
     })
 };

@@ -11,20 +11,20 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
     guildOwnerOnly: false,
-    run: (async(self,local )=> {
-        local.channel.startTyping();
-        if(local.args.length < 1) {
-            local.channel.stopTyping();
+    run: (async(client,message )=> {
+        message.channel.startTyping();
+        if(message.args.length < 1) {
+            message.channel.stopTyping();
             return new Error("ERR_INVALID_USAGE");
         }
-        var set = local.args.join("%20");
-        self.user.setAvatar(set).then((user) => {
-            var attachment = new self.Discord.MessageAttachment(user.displayAvatarURL());
-            local.message.reply(`Set Avatar to (attachment)`,attachment);
-            return local.channel.stopTyping();
+        var set = message.args.join("%20");
+        client.user.setAvatar(set).then((user) => {
+            var attachment = new client.Discord.MessageAttachment(user.displayAvatarURL());
+            message.reply(`Set Avatar to (attachment)`,attachment);
+            return message.channel.stopTyping();
         }).catch((err) => {
-           local.channel.send(`There was an error while doing this: ${err}`) ;
-           return local.channel.stopTyping();
+           message.channel.send(`There was an error while doing this: ${err}`) ;
+           return message.channel.stopTyping();
         })
     })
 };

@@ -14,17 +14,17 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
     
-        switch(local.gConfig.commandImages) {
+        switch(message.gConfig.commandImages) {
             case true:
-                self.db.updateGuild(local.guild.id, {commandImages: false});
-                local.message.reply("Disabled command images.");
+                client.db.updateGuild(message.guild.id, {commandImages: false});
+                message.reply("Disabled command images.");
                 break;
     
             case false:
-            self.db.updateGuild(local.guild.id, {commandImages: true});
-            local.message.reply("Enabled command images.");
+            client.db.updateGuild(message.guild.id, {commandImages: true});
+            message.reply("Enabled command images.");
                 break;
         }
     })

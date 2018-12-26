@@ -12,27 +12,27 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
 	
 		var data = {
 			"title": "Invites",
 			"fields": [
 				{
 					name: "Discord Bot",
-					value: self.config.bot.inviteLink,
+					value: client.config.bot.inviteLink,
 					inline: false
 				},
 				{
 					name: "Discord Server",
-					value: self.config.bot.supportInvite,
+					value: client.config.bot.supportInvite,
 					inline: false
 				}
 			]
 		};
 		
-		Object.assign(data, local.embed_defaults());
+		Object.assign(data, message.embed_defaults());
 		
-		var embed = new self.Discord.MessageEmbed(data);
-		return local.channel.send(embed);
+		var embed = new client.Discord.MessageEmbed(data);
+		return message.channel.send(embed);
 	})
 };

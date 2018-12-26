@@ -11,23 +11,23 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	run: (async (client,message) => {
+		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
 		
-		var input = local.args.join(" ");
-		var text = self.varParse(local.c,{author:local.author,input:input});
-		if(local.gConfig.commandImages) {
-			if(!local.channel.permissionsFor(local.guild.me).has("ATTACH_FILES")) return local.message.reply("Hey, I require the `ATTACH_FILES` permission for images to work on these commands!");
-			var img = await self.imageAPIRequest(true,self.command);
-			if(!img.success) return local.message.reply(`Image API returned an error: ${img.error.description}`);
-			var attachment = new self.Discord.MessageAttachment(img.response.image);
-			local.channel.send(text,attachment);
+		var input = message.args.join(" ");
+		var text = client.varParse(message.c,{author:message.author,input:input});
+		if(message.gConfig.commandImages) {
+			if(!message.channel.permissionsFor(message.guild.me).has("ATTACH_FILES")) return message.reply("Hey, I require the `ATTACH_FILES` permission for images to work on these commands!");
+			var img = await client.imageAPIRequest(true,client.command);
+			if(!img.success) return message.reply(`Image API returned an error: ${img.error.description}`);
+			var attachment = new client.Discord.MessageAttachment(img.response.image);
+			message.channel.send(text,attachment);
 		} else {
-			local.channel.send(text);
+			message.channel.send(text);
 		}
 		
-		if(!local.gConfig.deleteCommands) {
-			local.message.delete().catch(noerr => {});
+		if(!message.gConfig.deleteCommands) {
+			message.delete().catch(noerr => {});
 		}
 	})
 };

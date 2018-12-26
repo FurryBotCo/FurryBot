@@ -15,25 +15,25 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		local.channel.startTyping();
-		var xhr = new self.XMLHttpRequest();
+	run: (async (client,message) => {
+		message.channel.startTyping();
+		var xhr = new client.XMLHttpRequest();
 		
 		xhr.open("GET","https://dog.ceo/api/breeds/image/random",false);
 		
 		xhr.send();
-		var req = await self.request("https://dog.ceo/api/breeds/image/random",{
+		var req = await client.request("https://dog.ceo/api/breeds/image/random",{
 			method: "GET",
 			headers: {
-				"User-Agent": self.config.web.userAgent
+				"User-Agent": client.config.web.userAgent
 			}
 		})
 		var j = JSON.parse(req.body);
 		var parts = j.message.replace("https://","").split("/");
 		
-		var attachment = new local.MessageAttachment(j.message,`${parts[2]}_${parts[3]}.png`);
+		var attachment = new messageAttachment(j.message,`${parts[2]}_${parts[3]}.png`);
 		
-		local.channel.send(`Breed: ${parts[2]}`,attachment);
-		return local.channel.stopTyping();
+		message.channel.send(`Breed: ${parts[2]}`,attachment);
+		return message.channel.stopTyping();
 	})
 };

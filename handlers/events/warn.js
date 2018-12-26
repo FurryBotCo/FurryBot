@@ -1,3 +1,3 @@
-module.exports = (async(self,info)=>{
-    self.logger.warn(info);
+module.exports = (async(client,info)=>{
+    client.logger.warn(info);
 })

@@ -13,17 +13,17 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
 	
 		var data = {
 			title: "Discord",
-			description: `[Join Our Discord Server!](${self.config.bot.supportInvite})`,
+			description: `[Join Our Discord Server!](${client.config.bot.supportInvite})`,
 			thumbnail: {
 				url: "https://cdn.discordapp.com/embed/avatars/0.png"
 			}
 		};
-		Object.assign(data,local.embed_defaults());
-		var embed = new self.Discord.MessageEmbed(data);
-		local.channel.send(embed);
+		Object.assign(data,message.embed_defaults());
+		var embed = new client.Discord.MessageEmbed(data);
+		message.channel.send(embed);
 	})
 };

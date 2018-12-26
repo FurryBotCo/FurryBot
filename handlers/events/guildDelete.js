@@ -1,7 +1,7 @@
-module.exports = (async(self,guild)=>{
-    await self.db.updateDailyCount(true);
-    await self.db.deleteGuild(guild.id);
-    self.logger.log(`Guild left: ${guild.name} (${guild.id}). This guild had ${guild.memberCount} members.`);
+module.exports = (async(client,guild)=>{
+    await client.db.updateDailyCount(true);
+    await client.db.deleteGuild(guild.id);
+    client.logger.log(`Guild left: ${guild.name} (${guild.id}). This guild had ${guild.memberCount} members.`);
     var textChCount = 0,
 	voiceChCount = 0,
     categoryChCount = 0;
@@ -28,9 +28,9 @@ module.exports = (async(self,guild)=>{
     }
     var data = {
         title: "Guild Left!",
-        description: `RIP Guild Number ${+self.guilds.size+1}`,
+        description: `RIP Guild Number ${+client.guilds.size+1}`,
         image: {
-            url: guild.iconURL()||self.config.bot.noGuildIcon
+            url: guild.iconURL()||client.config.bot.noGuildIcon
         },
         thumbnail: {
             url: guild.owner.user.displayAvatarURL()
@@ -46,7 +46,7 @@ module.exports = (async(self,guild)=>{
                 inline: false
             },{
                 name: "Members",
-                value: `Total: ${guild.memberCount}\n\n${self.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${self.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${self.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${self.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}\nUser Count: ${guild.members.filter(m=>m.user.bot===false).size}\nBot Count: ${guild.members.filter(m=>m.user.bot===true).size}`,
+                value: `Total: ${guild.memberCount}\n\n${client.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${client.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${client.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${client.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}\nUser Count: ${guild.members.filter(m=>m.user.bot===false).size}\nBot Count: ${guild.members.filter(m=>m.user.bot===true).size}`,
                 inline: false
             },{
                 name: "Large Guild (300+ Members)",
@@ -57,15 +57,15 @@ module.exports = (async(self,guild)=>{
                 value: `${guild.owner.user.tag} (${guild.owner.user.id})`
             }
         ],
-        timestamp: self.getCurrentTimestamp(),
-        color: self.randomColor(),
+        timestamp: client.getCurrentTimestamp(),
+        color: client.randomColor(),
         footer: {
-			text: `Shard ${![undefined,null].includes(guild.shard) ? `${+guild.shard.id+1}/${self.options.shardCount}`: "1/1"} | Bot Version ${self.config.bot.version}`
+			text: `Shard ${![undefined,null].includes(guild.shard) ? `${+guild.shard.id+1}/${client.options.shardCount}`: "1/1"} | Bot Version ${client.config.bot.version}`
 		},
     }
-    var embed = new self.Discord.MessageEmbed(data);
-    var ch = self.channels.get(self.config.bot.channels.joinLeave);
-    if(ch instanceof self.Discord.TextChannel) {
+    var embed = new client.Discord.MessageEmbed(data);
+    var ch = client.channels.get(client.config.bot.channels.joinLeave);
+    if(ch instanceof client.Discord.TextChannel) {
         ch.send(embed).catch(noerr=>null);
     }
 })

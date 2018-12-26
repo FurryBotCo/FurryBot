@@ -69,7 +69,7 @@ class FurryBotDatabase {
 	}
 	
 	async sweepGuilds(del=false) {
-		var j = self.guilds;
+		var j = client.guilds;
 		var g = [];
 		this.r.dbList().then((a) => {
 			a.forEach((b)=>{

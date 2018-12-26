@@ -17,10 +17,10 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(self,local)=>{
-        if(local.args.length < 1 || isNaN(local.args[0])) return new Error("ERR_INVALID_USAGE");
-        if(local.args[0] < 2 || local.args[0] > 100) return local.message.reply("Please provide a number between 2");
-        local.message.delete().catch(noerr=>null);
-        return local.channel.bulkDelete(local.args[0],true);
+	run: (async(client,message)=>{
+        if(message.args.length < 1 || isNaN(message.args[0])) return new Error("ERR_INVALID_USAGE");
+        if(message.args[0] < 2 || message.args[0] > 100) return message.reply("Please provide a number between 2");
+        message.delete().catch(noerr=>null);
+        return message.channel.bulkDelete(message.args[0],true);
     })
 };

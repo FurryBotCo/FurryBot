@@ -64,6 +64,8 @@ class FurryBot extends Discord.Client {
 		this.commands = require("./commands");
 		this.commandList = this.commands.map(c=>c.commands.map(cc=>cc.triggers)).reduce((a,b)=>a.concat(b)).reduce((a,b)=>a.concat(b));
 		this.commandTimeout = {};
+		this.commandTimeout.f = new Set();
+		this.commandTimeout.whatismyprefix = new Set();
 		this.commands.map(c=>c.commands.map(cc=>cc.triggers)).reduce((a,b)=>a.concat(b)).reduce((a,b)=>a.concat(b)).forEach((cmd)=>{
 			this.commandTimeout[cmd] = new Set();
 		});
@@ -428,15 +430,17 @@ class FurryBot extends Discord.Client {
 			return res;
 	}
 	
-	getCommandCategory(command) {
-		if(!command) throw new TypeError("missing command");
-		var a = this.commands.filter(c=>c.commands.map(cc=>cc.triggers).reduce((a,b)=>a.concat(b)).includes(command));
+	getCategory(category) {
+		if(!category) return false;
+		var a = this.commands.filter(c=>c.commands.map(cc=>cc.triggers).reduce((a,b)=>a.concat(b)).includes(category));
 		return a.length < 1 ? false : a[0];
 	}
 
 	getCommand(command) {
-		if(!command) throw new TypeError("missing command");
-		this.commands.map(c=>c.commands).reduce((a,b)=>a.concat(b)).filter(cc=>cc.triggers.includes(command));
+		if(!command) return false;
+		console.log(command);
+		var a = this.commands.map(c=>c.commands).reduce((a,b)=>a.concat(b)).filter(cc=>cc.triggers.includes(command));
+		console.log(a);
 		return a.length < 1 ? false : a[0];
 	}
 }

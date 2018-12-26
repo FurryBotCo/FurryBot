@@ -14,13 +14,13 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(self,local) => {
-        local.channel.startTyping();
-        var tags = encodeURIComponent(local.args.join(" "));
-        var req = await self.request(`https://e926.net/post/index.json?limit=50&tags=${tags}%20rating%3Asafe`,{
+	run: (async(client,message) => {
+        message.channel.startTyping();
+        var tags = encodeURIComponent(message.args.join(" "));
+        var req = await client.request(`https://e926.net/post/index.json?limit=50&tags=${tags}%20rating%3Asafe`,{
             method: "GET",
             headers: {
-                "User-Agent": self.config.web.userAgentExt("Donvan_DMC"),
+                "User-Agent": client.config.web.userAgentExt("Donvan_DMC"),
                 "Content-Type": "application/json"
             }
         });
@@ -30,22 +30,22 @@ module.exports = {
                 title: "No Posts Found",
                 description: `no posts were found with the tags "${decodeURIComponent(tags)}", try another query`
             }
-            Object.assign(data,local.embed_defaults());
-            var embed = new self.Discord.MessageEmbed(data);
-            return local.channel.send(embed);
+            Object.assign(data,message.embed_defaults());
+            var embed = new client.Discord.MessageEmbed(data);
+            return message.channel.send(embed);
         } 
         var postNumber = Math.floor(Math.random(0,res.length+1) * res.length);
         var post = res[postNumber];
         if(!post) post = res[0];
         var data = {
             title: "E926 Furs!",
-            description: `Tags: ${self.truncate(post.tags.replace("_","\\_"),1900)}\n\nLink: <https://e926.net/post/show/${post.id}>`,
+            description: `Tags: ${client.truncate(post.tags.replace("_","\\_"),1900)}\n\nLink: <https://e926.net/post/show/${post.id}>`,
             image: {
                 url: post.file_url
             }
         }
-        var embed = new self.Discord.MessageEmbed(data);
-        local.channel.send(embed);
-        return local.channel.stopTyping();
+        var embed = new client.Discord.MessageEmbed(data);
+        message.channel.send(embed);
+        return message.channel.stopTyping();
     })
 };

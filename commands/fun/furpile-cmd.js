@@ -13,43 +13,43 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
 	
-		if(local.args.length === 0 && !self.furpile[local.guild.id]) {
-			return local.message.reply(`A furpile is not currently active, or has timed out due to inactivity.${"\n"}start one by running the command **${gConfig.prefix}furpile <user>**${"\n"}(do not include the < >)`);
+		if(message.args.length === 0 && !client.furpile[message.guild.id]) {
+			return message.reply(`A furpile is not currently active, or has timed out due to inactivity.${"\n"}start one by running the command **${gConfig.prefix}furpile <user>**${"\n"}(do not include the < >)`);
 		}
-		if(local.args.length === 0 && typeof self.furpile[local.guild.id].fnc !== "undefined") {
-			if(self.furpile[local.guild.id].currentUsers.has(local.author.id) && self.config.developers.indexOf(local.author.id) === -1) {
-				return local.message.reply(`${self.config.emojis.cooldown}\nYou are already in this furpile, you cannot join again!`);
+		if(message.args.length === 0 && typeof client.furpile[message.guild.id].fnc !== "undefined") {
+			if(client.furpile[message.guild.id].currentUsers.has(message.author.id) && client.config.developers.indexOf(message.author.id) === -1) {
+				return message.reply(`${client.config.emojis.cooldown}\nYou are already in this furpile, you cannot join again!`);
 			}
-			clearTimeout(self.furpile[local.guild.id].fnc);
-			self.furpile[local.guild.id].currentUsers.add(local.author.id);
-			self.furpile[local.guild.id].number++;
-			local.channel.send(`<@!${local.member.id}> has joined a furpile on <@!${self.furpile[local.guild.id].user}>!${"\n"}<@!${self.furpile[local.guild.id].user}> Now has ${self.furpile[local.guild.id].number} furs on them!`);
-			if(self.furpile[local.guild.id].number === 7) {
-				message.channel.send(`Poor <@!${self.furpile[local.guild.id].user}>, you furs must be crushing them!`);
+			clearTimeout(client.furpile[message.guild.id].fnc);
+			client.furpile[message.guild.id].currentUsers.add(message.author.id);
+			client.furpile[message.guild.id].number++;
+			message.channel.send(`<@!${message.member.id}> has joined a furpile on <@!${client.furpile[message.guild.id].user}>!${"\n"}<@!${client.furpile[message.guild.id].user}> Now has ${client.furpile[message.guild.id].number} furs on them!`);
+			if(client.furpile[message.guild.id].number === 7) {
+				message.channel.send(`Poor <@!${client.furpile[message.guild.id].user}>, you furs must be crushing them!`);
 			}
-			self.furpile[local.guild.id].fnc=setTimeout(function(gid){self.furpile[gid]=undefined;}, 3e5, local.guild.id);
+			client.furpile[message.guild.id].fnc=setTimeout(function(gid){client.furpile[gid]=undefined;}, 3e5, message.guild.id);
 		} else {
-			if(!local.message.mentions) {
-				return local.message.reply("please mention a user");
+			if(!message.mentions) {
+				return message.reply("please mention a user");
 			}
-			var usr = local.message.mentions.members.first();
+			var usr = message.mentions.members.first();
 			if(!usr) {
-				return local.message.reply(`failed to fetch specified user.`);
+				return message.reply(`failed to fetch specified user.`);
 			}
 			
-			if(local.author.id === usr.id && self.config.developers.indexOf(local.author.id) === -1) {
-				return local.message.reply(`${self.config.emojis.cooldown}\nYou cannot start a furpile on yourself!`);
+			if(message.author.id === usr.id && client.config.developers.indexOf(message.author.id) === -1) {
+				return message.reply(`${client.config.emojis.cooldown}\nYou cannot start a furpile on yourclient!`);
 			}
-			self.furpile[local.guild.id]={};
-			self.furpile[local.guild.id].user=usr.id;
-			self.furpile[local.guild.id].currentUsers=new Set();
-			self.furpile[local.guild.id].currentUsers.add(local.author.id);
-			self.furpile[local.guild.id].currentUsers.add(usr.id);
-			self.furpile[local.guild.id].number=1;
-			self.furpile[local.guild.id].fnc=setTimeout(function(gid){self.furpile[gid]=undefined;}, 3e5, local.guild.id);
-			local.channel.send(`<@!${local.member.id}> has started a furpile on <@!${self.furpile[local.guild.id].user}>${"\n"}Join by using the command **${local.gConfig.prefix}furpile**!`);
+			client.furpile[message.guild.id]={};
+			client.furpile[message.guild.id].user=usr.id;
+			client.furpile[message.guild.id].currentUsers=new Set();
+			client.furpile[message.guild.id].currentUsers.add(message.author.id);
+			client.furpile[message.guild.id].currentUsers.add(usr.id);
+			client.furpile[message.guild.id].number=1;
+			client.furpile[message.guild.id].fnc=setTimeout(function(gid){client.furpile[gid]=undefined;}, 3e5, message.guild.id);
+			message.channel.send(`<@!${message.member.id}> has started a furpile on <@!${client.furpile[message.guild.id].user}>${"\n"}Join by using the command **${message.gConfig.prefix}furpile**!`);
 		}
 	})
 };

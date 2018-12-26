@@ -1,10 +1,10 @@
-module.exports = (async(self,channel)=>{
+module.exports = (async(client,channel)=>{
     if(!channel || !channel.guild || !["text","voice","category"].includes(channel.type)) return;
     var ev = "channelcreated";
-    var gConfig = await self.db.getGuild(channel.guild.id);
+    var gConfig = await client.db.getGuild(channel.guild.id);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = channel.guild.channels.get(gConfig.logging[ev].channel);
-    if(!logch) return self.db.updateGuild({logging:{[ev]:{enabled:false,channel:null}}});
+    if(!logch) return client.db.updateGuild({logging:{[ev]:{enabled:false,channel:null}}});
     switch(channel.type) {
         case "text":
             var typeText = ":pencil: Text";
@@ -27,9 +27,9 @@ module.exports = (async(self,channel)=>{
             icon_url: channel.guild.iconURL()
         },
         timestamp: channel.createdTimestamp,
-        color: self.randomColor(),
+        color: client.randomColor(),
         footer: {
-			text: `Shard ${![undefined,null].includes(channel.guild.shard) ? `${+channel.guild.shard.id+1}/${self.options.shardCount}`: "1/1"} | Bot Version ${self.config.bot.version}`
+			text: `Shard ${![undefined,null].includes(channel.guild.shard) ? `${+channel.guild.shard.id+1}/${client.options.shardCount}`: "1/1"} | Bot Version ${client.config.bot.version}`
 		},
         fields: [
             {
@@ -69,14 +69,14 @@ module.exports = (async(self,channel)=>{
     if(![undefined,null,"",[],{}].includes(log) && log.action === "CHANNEL_CREATE") {
         data.fields.push({
            name: "Executor",
-           value: log.executor instanceof self.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+           value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
            inline: false
         },{
             name: "Reason",
-            value: log.executor instanceof self.Discord.User && !log.executor.bot ? "Not Applicable" : [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
+            value: log.executor instanceof client.Discord.User && !log.executor.bot ? "Not Applicable" : [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
             inline: false
         });
     }
-    var embed = new self.Discord.MessageEmbed(data);
+    var embed = new client.Discord.MessageEmbed(data);
     return logch.send(embed);
 })

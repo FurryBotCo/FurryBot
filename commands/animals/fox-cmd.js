@@ -15,10 +15,10 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		local.channel.startTyping();
-		var attachment = new self.Discord.MessageAttachment("https://foxrudor.de/","foxrudor.de.png");
-		local.channel.send(attachment);
-		return local.channel.stopTyping();
+	run: (async (client,message) => {
+		message.channel.startTyping();
+		var attachment = new client.Discord.MessageAttachment("https://foxrudor.de/","foxrudor.de.png");
+		message.channel.send(attachment);
+		return message.channel.stopTyping();
 	})
 };

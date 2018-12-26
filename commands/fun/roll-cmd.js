@@ -11,11 +11,11 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
 	
-		var min = typeof local.args[0] !== "undefined" ? parseInt(local.args[0],10) : 1;
-		var max = typeof local.args[1] !== "undefined" ? parseInt(local.args[1],10) : 20;
+		var min = typeof message.args[0] !== "undefined" ? parseInt(message.args[0],10) : 1;
+		var max = typeof message.args[1] !== "undefined" ? parseInt(message.args[1],10) : 20;
 	
-		return local.message.reply(`you rolled a ${self._.random(min,max)}!`);
+		return message.reply(`you rolled a ${client._.random(min,max)}!`);
 	})
 };

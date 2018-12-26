@@ -16,27 +16,27 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(self,local)=>{
+	run: (async(client,message)=>{
         // member mention
-        if(local.message.mentions.members.first()) {
-           var user = local.message.mentions.users.first();
+        if(message.mentions.members.first()) {
+           var user = message.mentions.users.first();
        }
        
        // user ID
-       if(!isNaN(local.args[0]) && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
-           var user = await self.users.fetch(local.args[0]).catch(noerr=>null);
+       if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
+           var user = await client.users.fetch(message.args[0]).catch(noerr=>null);
        }
        
        // username
-       if(isNaN(local.args[0]) && local.args[0].indexOf("#") === -1 && !(local.args.length === 0 || !local.args || local.message.mentions.members.first())) {
-           var usr = self.users.find(t=>t.username===local.args[0]);
-           if(usr instanceof self.Discord.User) var user = usr;
+       if(isNaN(message.args[0]) && message.args[0].indexOf("#") === -1 && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
+           var usr = client.users.find(t=>t.username===message.args[0]);
+           if(usr instanceof client.Discord.User) var user = usr;
        }
        
        // user tag
-       if(isNaN(local.args[0]) && local.args[0].indexOf("#") !== -1 && !local.message.mentions.members.first()) {
-           var usr = self.users.find(t=>t.tag===local.args[0]);
-           if(usr instanceof self.Discord.User) var user = usr;
+       if(isNaN(message.args[0]) && message.args[0].indexOf("#") !== -1 && !message.mentions.members.first()) {
+           var usr = client.users.find(t=>t.tag===message.args[0]);
+           if(usr instanceof client.Discord.User) var user = usr;
        }
    
        if(!user) {
@@ -44,32 +44,32 @@ module.exports = {
                title: "User not found",
                description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
            }
-           Object.assign(data, local.embed_defaults());
-           var embed = new self.Discord.MessageEmbed(data);
-           return local.channel.send(embed);
+           Object.assign(data, message.embed_defaults());
+           var embed = new client.Discord.MessageEmbed(data);
+           return message.channel.send(embed);
        }
    
-       if((await local.guild.fetchBans()).has(user.id)) {
+       if((await message.guild.fetchBans()).has(user.id)) {
            var data = {
                title: "User already banned",
                description: `It looks like ${user.tag} is already banned here..`
            }
-           Object.assign(data, local.embed_defaults());
-           var embed = new self.Discord.MessageEmbed(data);
-           return local.channel.send(embed);
+           Object.assign(data, message.embed_defaults());
+           var embed = new client.Discord.MessageEmbed(data);
+           return message.channel.send(embed);
        }
    
-       if(user.id === local.member.id && !local.user.isDeveloper) return local.message.reply("Pretty sure you don't want to do this to yourself.");
-       var reason = local.args.length >= 2 ? local.args.splice(1).join(" ") : "No Reason Specified";
-       local.guild.members.ban(user.id,{reason:`Hackban: ${local.author.tag} -> ${reason}`}).then(()=>{
-           local.channel.send(`***User ${user.tag} was banned, ${reason}***`).catch(noerr=>null);
+       if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourclient.");
+       var reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";
+       message.guild.members.ban(user.id,{reason:`Hackban: ${message.author.tag} -> ${reason}`}).then(()=>{
+           message.channel.send(`***User ${user.tag} was banned, ${reason}***`).catch(noerr=>null);
        }).catch(async(err)=>{
-           local.message.reply(`I couldn't hackban **${user.tag}**, ${err}`);
+           message.reply(`I couldn't hackban **${user.tag}**, ${err}`);
            if(m !== undefined) {
                await m.delete();
            }
        });
    
-       if(!local.gConfig.delCmds && local.channel.permissionsFor(self.user.id).has("MANAGE_MESSAGES")) local.message.delete().catch(noerr=>null);
+       if(!message.gConfig.delCmds && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) message.delete().catch(noerr=>null);
    })
 };

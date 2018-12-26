@@ -1,6 +1,6 @@
-module.exports = ((self)=>{
+module.exports = ((client)=>{
 	var resp = {};
-	self.config.languages.forEach((lang)=>{
+	client.config.languages.forEach((lang)=>{
 		resp[lang] = require(`${process.cwd()}/lang/responses-${lang}`);
 	});
 	return resp;

@@ -13,13 +13,13 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(self,local)=>{
+	run: (async(client,message)=>{
         var l = "";
         var updateFields = {logging:{}};
-        for(let key in local.gConfig.logging) {
-            var log = local.gConfig.logging[key];
+        for(let key in message.gConfig.logging) {
+            var log = message.gConfig.logging[key];
             if(log.enabled) {
-                var s = local.guild.channels.get(log.channel);
+                var s = message.guild.channels.get(log.channel);
                 if(!s) {
                     updateFields.logging[key] = {
                         channel: null,
@@ -36,10 +36,10 @@ module.exports = {
         }
         var data = {
             title: "Server Logging Settings",
-            description: `You can change these with \`${local.gConfig.prefix}log <enable/disable> <event>\`\n${l}`
+            description: `You can change these with \`${message.gConfig.prefix}log <enable/disable> <event>\`\n${l}`
         }
-        Object.assign(data,local.embed_defaults());
-        var embed = new self.Discord.MessageEmbed(data);
-        return local.channel.send(embed);
+        Object.assign(data,message.embed_defaults());
+        var embed = new client.Discord.MessageEmbed(data);
+        return message.channel.send(embed);
     })
 };

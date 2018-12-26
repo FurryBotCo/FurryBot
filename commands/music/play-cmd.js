@@ -11,28 +11,28 @@ module.exports = {
 	devOnly: true,
 	betaOnly: true,
 	guildOwnerOnly: false,
-	run: (async(self,local)=>{
-        local.channel.startTyping();
-        if(!local.member.voice.channel) {
-            local.message.reply("You must be in a voice channel.");
-            return local.channel.stopTyping();
+	run: (async(client,message)=>{
+        message.channel.startTyping();
+        if(!message.member.voice.channel) {
+            message.reply("You must be in a voice channel.");
+            return message.channel.stopTyping();
         }
-        if(local.args.length === 0) {
-            local.message.reply("Please provide a query or youtube url.");
-            return local.channel.stopTyping();
+        if(message.args.length === 0) {
+            message.reply("Please provide a query or youtube url.");
+            return message.channel.stopTyping();
         }
-        if(/^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/.test(local.args[0])) {
-            var t = (await self.getSong(local.args[0])).tracks;
+        if(/^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/.test(message.args[0])) {
+            var t = (await client.getSong(message.args[0])).tracks;
             if(t.length === 0) {
-                local.message.reply("Nothing was found!");
-                return local.channel.stopTyping();
+                message.reply("Nothing was found!");
+                return message.channel.stopTyping();
             }
             var song = t[0];
         } else {
-            var t = (await self.songSearch(local.args.join(" "),"youtube")).tracks;
+            var t = (await client.songSearch(message.args.join(" "),"youtube")).tracks;
             if(t.length === 0) {
-                local.message.reply("Nothing was found!");
-                return local.channel.stopTyping();
+                message.reply("Nothing was found!");
+                return message.channel.stopTyping();
             }
             var songs={
                 tracks: {
@@ -44,29 +44,29 @@ module.exports = {
             };
             songs.tracks = t;
             if(t.length > 1) {
-            songs.list = self.chunk(songs.tracks,10);
+            songs.list = client.chunk(songs.tracks,10);
                 for(let key in songs.list) {
                     songs.list[key] = songs.list[key].map((t,i)=>`__**${i+1}**__ - **${t.info.title}** by *${t.info.author}* - Length: ${Math.floor(t.info.length/1000/60)}m${t.info.length/1000%60}s`);
                 }
                 var pageCount = songs.tracks.length;
                 var pageNumber = 1;
-                var song = await self.songMenu(pageNumber,pageCount,songs,local.message);
+                var song = await client.songMenu(pageNumber,pageCount,songs,message);
             } else {
                 var song = songs.tracks[0];
             }
         }
-        if(!song) return local.message.reply("Internal Error `play1`");
+        if(!song) return message.reply("Internal Error `play1`");
         if(song instanceof Error) {
             if(song.message === "CANCELED") {
-                local.message.reply("Command canceled.");
-                return local.channel.stopTyping();
+                message.reply("Command canceled.");
+                return message.channel.stopTyping();
             }
-            local.message.reply("Internal Error `play2`");
+            message.reply("Internal Error `play2`");
             console.error(err);
         }
-        if(song instanceof self.Discord.Collection) {
-            local.message.reply("Request timed out.");
-            return local.channel.stopTyping();
+        if(song instanceof client.Discord.Collection) {
+            message.reply("Request timed out.");
+            return message.channel.stopTyping();
         }
         if(song instanceof Object) {
             if(!song.song) {
@@ -74,27 +74,27 @@ module.exports = {
                     song.song = {};
                     song.song.info = song.info;
                 } else {
-                    return local.message.reply("Internal Error `play3`");
+                    return message.reply("Internal Error `play3`");
                 }
             }
-            if(song.song.info.length > 6e5 && !local.gConfig.premium) {
-                local.message.reply(`This is too long to be played! The maximum time for this guild is \`10 minutes (6000s)\, to increase this limit please donate, and mark this server as premium **${self.config.premiumLink}**.`);
-                return local.channel.stopTyping();
+            if(song.song.info.length > 6e5 && !message.gConfig.premium) {
+                message.reply(`This is too long to be played! The maximum time for this guild is \`10 minutes (6000s)\, to increase this limit please donate, and mark this server as premium **${client.config.premiumLink}**.`);
+                return message.channel.stopTyping();
             } 
             if(!song.msg) {
-                local.message.reply(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
+                message.reply(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
             } else {
                 
                 song.msg.edit(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
             }
-            var player = await self.playSong(local.member.voice.channel,song.song.info,"youtube");
+            var player = await client.playSong(message.member.voice.channel,song.song.info,"youtube");
         } else {
-            local.message.reply(`Now playing **${song.info.title}** by *${song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
-            var player = await self.playSong(local.member.voice.channel,song.info,"youtube");
+            message.reply(`Now playing **${song.info.title}** by *${song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
+            var player = await client.playSong(message.member.voice.channel,song.info,"youtube");
         }
         player.on("finish",()=>{
             console.log("finished");
         });
-        return local.channel.stopTyping();
+        return message.channel.stopTyping();
     })
 };

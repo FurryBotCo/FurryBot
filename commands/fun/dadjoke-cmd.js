@@ -12,18 +12,18 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		local.channel.startTyping();
-		var req = await self.request("https://icanhazdadjoke.com",{
+	run: (async (client,message) => {
+		message.channel.startTyping();
+		var req = await client.request("https://icanhazdadjoke.com",{
 			headers:{
 				Accept:"application/json",
-				"User-Agent": self.config.web.userAgent
+				"User-Agent": client.config.web.userAgent
 			}
 		});
 	
 		var j = JSON.parse(req.body);
 	
-		local.channel.send(j.joke);
-		return local.channel.stopTyping();
+		message.channel.send(j.joke);
+		return message.channel.stopTyping();
 	})
 };

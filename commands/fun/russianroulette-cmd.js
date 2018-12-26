@@ -1,7 +1,7 @@
 module.exports = {
 	triggers: [
 		"russionroulette",
-		"rr"
+		"roulette"
 	],
 	userPermissions: [],
 	botPermissions: [],
@@ -12,15 +12,15 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
 	
 		var val = Math.floor(Math.random()*6);
-		var bullets = typeof local.args[0] !== "undefined" ? parseInt(local.args[0],10) : 3;
+		var bullets = typeof message.args[0] !== "undefined" ? parseInt(message.args[0],10) : 3;
 		
 		if(val<=bullets-1) {
-			return local.message.reply("You died!");
+			return message.reply("You died!");
 		} else {
-			return local.message.reply("You lived!");
+			return message.reply("You lived!");
 		}
 	})
 };

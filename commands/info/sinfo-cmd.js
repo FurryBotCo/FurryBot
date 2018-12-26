@@ -13,25 +13,25 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		local.channel.startTyping();
+	run: (async (client,message) => {
+		message.channel.startTyping();
 		var textChCount = 0,
 		voiceChCount = 0,
 		categoryChCount = 0;
-		if(!isNaN(local.args[0]) && self.user.isDeveloper) {
-			var guild = local.guilds.get(local.args[0]);
+		if(!isNaN(message.args[0]) && client.user.isDeveloper) {
+			var guild = message.guilds.get(message.args[0]);
 			if(!guild) {
 				var data = {
 					title: "Guild Not Found"
 				}
-				Object.assign(data,local.embed_defaults());
-				var embed = new self.Discord.MessageEmbed(data);
-				return local.channel.send(embed);
+				Object.assign(data,message.embed_defaults());
+				var embed = new client.Discord.MessageEmbed(data);
+				return message.channel.send(embed);
 			}
 		} else {
-			var guild = local.guild;
+			var guild = message.guild;
 		}
-		var guildConfig = await self.db.getGuild(guild.id);
+		var guildConfig = await client.db.getGuild(guild.id);
 		guild.channels.forEach((ch) => {
 			switch (ch.type) {
 				case "text":
@@ -76,7 +76,7 @@ module.exports = {
 			"ELEVATED"
 		];
 		var roles = guild.roles.map(role=>{if(role.name!=="@everyone"){return `<@&${role.id}> `}else{return "@everyone "}}).toString();
-		var rr = roles.length > 1000 ? `Too many to list, please use \`${local.gConfig.prefix}roles server\`` : roles;
+		var rr = roles.length > 1000 ? `Too many to list, please use \`${message.gConfig.prefix}roles server\`` : roles;
 		var data = {
 			title: `Server Info - **${guild.name}**`,
 			image: {
@@ -95,7 +95,7 @@ module.exports = {
 				},
 				{
 					name: "Members",
-					value: `Total: ${guild.memberCount}\n\n${self.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${self.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${self.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${self.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}`,
+					value: `Total: ${guild.memberCount}\n\n${client.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${client.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${client.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${client.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}`,
 					inline: false
 				},
 				{
@@ -110,7 +110,7 @@ module.exports = {
 				},
 				{
 					name: "Region",
-					value: self.ucwords(guild.region),
+					value: client.ucwords(guild.region),
 					inline: false
 				},
 				{
@@ -120,16 +120,16 @@ module.exports = {
 				},
 				{
 					name: "Extra",
-					value: `**Large Guild**: ${self.ucwords(guild.large)}\n**Verification**: ${verificationLevel[guild.verificationLevel]}\n**2FA**: ${mfaLevel[guild.mfaLevel]}\n**Default Notifications**: ${guild.defaultMessageNotifications}\n**Features**:\n${features}`,
+					value: `**Large Guild**: ${client.ucwords(guild.large)}\n**Verification**: ${verificationLevel[guild.verificationLevel]}\n**2FA**: ${mfaLevel[guild.mfaLevel]}\n**Default Notifications**: ${guild.defaultMessageNotifications}\n**Features**:\n${features}`,
 					inline: false
 				}
 			]
 		};
 		
-		Object.assign(data, local.embed_defaults());
+		Object.assign(data, message.embed_defaults());
 		
-		var embed = new self.Discord.MessageEmbed(data);
-		local.channel.send(embed);
-		return local.channel.stopTyping();
+		var embed = new client.Discord.MessageEmbed(data);
+		message.channel.send(embed);
+		return message.channel.stopTyping();
 	})
 };

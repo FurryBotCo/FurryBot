@@ -11,21 +11,21 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	run: (async (client,message) => {
+		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
 		
-		var input = local.args.join(" ");
-		var text = self.varParse(local.c,{author:local.author,input:input});
-		if(local.gConfig.imageCommands) {
-			if(!local.channel.permissionsFor(local.guild.me).has("ATTACH_FILES")) return local.message.reply("Hey, I require the `ATTACH_FILES` permission for images to work on these commands!");
-			var attachment = new self.Discord.MessageAttachment("https://furrybot.furcdn.net/bap.gif");
-			local.channel.send(text,attachment);
+		var input = message.args.join(" ");
+		var text = client.varParse(message.c,{author:message.author,input:input});
+		if(message.gConfig.imageCommands) {
+			if(!message.channel.permissionsFor(message.guild.me).has("ATTACH_FILES")) return message.reply("Hey, I require the `ATTACH_FILES` permission for images to work on these commands!");
+			var attachment = new client.Discord.MessageAttachment("https://furrybot.furcdn.net/bap.gif");
+			message.channel.send(text,attachment);
 		} else {
-			local.channel.send(text);
+			message.channel.send(text);
 		}
-		if(!local.gConfig.deleteCommands) {
-			local.message.delete().catch(noerr => {});
+		if(!message.gConfig.deleteCommands) {
+			message.delete().catch(noerr => {});
 		}
-		return local.channel.stopTyping();
+		return message.channel.stopTyping();
 	})
 };

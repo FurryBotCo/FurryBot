@@ -14,14 +14,14 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		local.channel.startTyping();
+	run: (async (client,message) => {
+		message.channel.startTyping();
 		var userCount=0;
-		self.guilds.forEach((guild) => {
+		client.guilds.forEach((guild) => {
 			userCount+=guild.memberCount;
 		});
 		var largeGuildCount=0;
-		var srv=Array.from(self.guilds.values());
+		var srv=Array.from(client.guilds.values());
 		for(let i=0;i<srv.length;i++) {
 			if(!srv[i].unavailable) {
 				if(srv[i].large) {
@@ -36,23 +36,23 @@ module.exports = {
 			"fields": [
 				{
 					name: "Process Memory Usage",
-					value: `${self.getUsedMemoryMB()}MB/${self.getTotalMemoryMB()}MB`,
+					value: `${client.getUsedMemoryMB()}MB/${client.getTotalMemoryMB()}MB`,
 					inline: false
 				}, {
 					name: "Server Memory Usage",
-					value: `${self.getSYSUsedGB()}GB/${self.getSYSTotalGB()}GB`,
+					value: `${client.getSYSUsedGB()}GB/${client.getSYSTotalGB()}GB`,
 					inline: false
 				}, {
 					name: "Library",
-					value: self.config.bot.library,
+					value: client.config.bot.library,
 					inline: false
 				}, {
 					name: "Uptime",
-					value: `${self.parseTime(process.uptime())} (${self.secondsToHours(process.uptime())})`,
+					value: `${client.parseTime(process.uptime())} (${client.secondsToHours(process.uptime())})`,
 					inline: false
 				}, {
 					name: "Total Guilds",
-					value: self.guilds.size,
+					value: client.guilds.size,
 					inline: false
 				}, {
 					name: "Large Guilds (300+ Members)",
@@ -64,19 +64,19 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Commands",
-					value: self.config.commandList.all.length,
+					value: client.config.commandList.all.length,
 					inline: false
 				}, {
 					name: "API Version",
-					value: self.config.bot.apiVersion,
+					value: client.config.bot.apiVersion,
 					inline: false
 				}, {
 					name: "Bot Version",
-					value: self.config.bot.version,
+					value: client.config.bot.version,
 					inline: false
 				}, {
 					name: "Discord.JS Version",
-					value: self.Discord.version,
+					value: client.Discord.version,
 					inline: false
 				}, {
 					name: "Node.JS Version",
@@ -84,7 +84,7 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Support Server",
-					value: self.config.bot.supportInvite,
+					value: client.config.bot.supportInvite,
 					inline: false
 				}, {
 					name: "Bot Creator",
@@ -92,14 +92,14 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Trello Board",
-					value: self.config.apis.trello.board,
+					value: client.config.apis.trello.board,
 					inline: false
 				}
 				]
 			};
-		Object.assign(data, local.embed_defaults());
-		var embed = new self.Discord.MessageEmbed(data);
-		local.channel.send(embed);
-		return local.channel.stopTyping();
+		Object.assign(data, message.embed_defaults());
+		var embed = new client.Discord.MessageEmbed(data);
+		message.channel.send(embed);
+		return message.channel.stopTyping();
 	})
 };

@@ -11,13 +11,13 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		if(local.args.length < 1) return new Error("ERR_INVALID_USAGE");
-		var text = self.varParse(local.c,{author:local.author,input:local.args.join(" ")});
-		local.channel.send(text);
+	run: (async (client,message) => {
+		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
+		var text = client.varParse(message.c,{author:message.author,input:message.args.join(" ")});
+		message.channel.send(text);
 	
-		if(!local.gConfig.deleteCommands) {
-			local.message.delete().catch(noerr => {});
+		if(!message.gConfig.deleteCommands) {
+			message.delete().catch(noerr => {});
 		}
 	})
 };

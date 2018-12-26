@@ -1,18 +1,18 @@
-module.exports = (async(self) => {
-    self.logger = new self.FurryBotLogger(self);
-    self.logger.log(`Bot has started with ${self.users.size} users in ${self.channels.size} channels of ${self.guilds.size} guilds.`);
+module.exports = (async(client) => {
+    client.logger = new client.FurryBotLogger(client);
+    client.logger.log(`Bot has started with ${client.users.size} users in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
     const rotatingStatus = (async()=>{
-		self.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"}).then(()=>{
+		client.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"}).then(()=>{
             setTimeout(()=>{
-                self.user.setActivity(`🐾 ${self.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"}).then(()=>{
+                client.user.setActivity(`🐾 ${client.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"}).then(()=>{
                     setTimeout(()=>{
-                        self.user.setActivity(`🐾 ${self.config.defaultPrefix}help in ${self.guilds.size} guilds! 🐾`,{type: "PLAYING"}).then(()=>{
+                        client.user.setActivity(`🐾 ${client.config.defaultPrefix}help in ${client.guilds.size} guilds! 🐾`,{type: "PLAYING"}).then(()=>{
                             setTimeout(()=>{
-                                self.user.setActivity(`🐾 ${self.config.defaultPrefix}help with ${self.users.size} users! 🐾`,{type: "WATCHING"}).then(()=>{
+                                client.user.setActivity(`🐾 ${client.config.defaultPrefix}help with ${client.users.size} users! 🐾`,{type: "WATCHING"}).then(()=>{
                                     setTimeout(()=>{
-                                        self.user.setActivity(`🐾 ${self.config.defaultPrefix}help in ${self.channels.size} channels! 🐾`,{type: "LISTENING"}).then(()=>{
+                                        client.user.setActivity(`🐾 ${client.config.defaultPrefix}help in ${client.channels.size} channels! 🐾`,{type: "LISTENING"}).then(()=>{
                                             setTimeout(()=>{
-                                                self.user.setActivity(`🐾 ${self.config.defaultPrefix}help with ${self.options.shardCount} shard${self.options.shardCount>1?"s":""}! 🐾`,{type: "PLAYING"});
+                                                client.user.setActivity(`🐾 ${client.config.defaultPrefix}help with ${client.options.shardCount} shard${client.options.shardCount>1?"s":""}! 🐾`,{type: "PLAYING"});
                                             },15e3);
                                         });
                                     },15e3);
@@ -27,62 +27,62 @@ module.exports = (async(self) => {
 
     rotatingStatus();
     setInterval(rotatingStatus,75e3)
-   self.logger.log(`ready with ${self.options.shardCount} shard${self.options.shardCount>1?"s":""}!`);
+   client.logger.log(`ready with ${client.options.shardCount} shard${client.options.shardCount>1?"s":""}!`);
 
-     self.setInterval(()=>{
-        self.voiceConnections.forEach((vc)=>{
-            if(vc.channel.members.filter(m=>m.id!==self.user.id).size === 0) {
+     client.setInterval(()=>{
+        client.voiceConnections.forEach((vc)=>{
+            if(vc.channel.members.filter(m=>m.id!==client.user.id).size === 0) {
                 vc.channel.leave();
-                self.logger.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to inactivity.`);
+                client.logger.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to inactivity.`);
             }
         });
    },3e4);
    
-   self.db = new self.FurryBotDatabase(self);
+   client.db = new client.FurryBotDatabase(client);
    
-    await self.dbStats(self);
+    await client.dbStats(client);
     // post general stats to db every 60 seconds
-    self.setInterval(self.dbStats,6e4,self);
+    client.setInterval(client.dbStats,6e4,client);
     
     /*var webhookData = {
-        title: `Shard #${self.shard.id} is ready`,
-        timestamp: self.getCurrentTimestamp()
+        title: `Shard #${client.shard.id} is ready`,
+        timestamp: client.getCurrentTimestamp()
     }*/
     
-    //var webhookEmbed = new self.Discord.MessageEmbed(webhookData);
+    //var webhookEmbed = new client.Discord.MessageEmbed(webhookData);
     
-    //self.webhooks.shards.send(webhookEmbed);
-    self.srv = self.server.load(self);
-    if(!self.config.beta) {
-        //const ls = self.listStats(self);
-        setInterval(self.listStats,3e5,self);
+    //client.webhooks.shards.send(webhookEmbed);
+    client.srv = client.server.load(client);
+    if(!client.config.beta) {
+        //const ls = client.listStats(client);
+        setInterval(client.listStats,3e5,client);
     }
 
 	setInterval(async()=>{
-		if(["00:00:00"].includes(self.getDateTime())) {
+		if(["00:00:00"].includes(client.getDateTime())) {
 			var date = new Date(),
 			d = `${date.getMonth()+1}-${date.getDate()-1}-${date.getFullYear()}`,
-			count = (await self.db.getStats("dailyjoins"))[d]||0;
+			count = (await client.db.getStats("dailyjoins"))[d]||0;
 			var data = {
 				author: {
 					name: "Donovan_DMC#1337",
 					"icon_url": "https://i.donovand.info/Don.gif"
 				},
-				title: `Total Guilds Joined ${d}\t Current Total: ${self.guilds.size}`,
+				title: `Total Guilds Joined ${d}\t Current Total: ${client.guilds.size}`,
 				description: `Total Guilds Joined Today: **${count}**`,
 				footer: {
-					text: `Shard ${self.guilds.get(self.config.bot.mainGuild).shard.id}/${self.options.shardCount} | Bot Version ${self.config.bot.version}`
+					text: `Shard ${client.guilds.get(client.config.bot.mainGuild).shard.id}/${client.options.shardCount} | Bot Version ${client.config.bot.version}`
 				},
-				color: self.randomColor(),
-				timestamp: self.getCurrentTimestamp(),
+				color: client.randomColor(),
+				timestamp: client.getCurrentTimestamp(),
 				thumbnail: {
 					url: "https://i.furry.bot/furry-small.png"
 				}
 			}
-			var embed = new self.Discord.MessageEmbed(data);
-			self.channels.get(self.config.bot.channels.daily).send(embed).then(n=>{
-				self.logger.log(`Posted daily stats, ${d}: ${count}, total: ${self.guilds.size}`);
-			}).catch(self.logger.log);
+			var embed = new client.Discord.MessageEmbed(data);
+			client.channels.get(client.config.bot.channels.daily).send(embed).then(n=>{
+				client.logger.log(`Posted daily stats, ${d}: ${count}, total: ${client.guilds.size}`);
+			}).catch(client.logger.log);
 		}
     },1e3);
     console.log("end of ready");

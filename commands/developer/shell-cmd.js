@@ -12,24 +12,24 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
 		// extra check, to be safe
-		if (!self.config.developers.includes(local.author.id)) {
-			return local.message.reply("You cannot run this command as you are not a developer of this bot.");
+		if (!client.config.developers.includes(message.author.id)) {
+			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
-		local.channel.startTyping();
-		var exec = local.args.join(" ");
-		var start = self.performance.now();
+		message.channel.startTyping();
+		var exec = message.args.join(" ");
+		var start = client.performance.now();
 		try {
-			var res = await self.shell(exec);
+			var res = await client.shell(exec);
 		}catch(e){
 			var res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Executing:\n${typeof res !== "undefined" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}\`\`\``;
-			var end = self.performance.now();
+			var end = client.performance.now();
 			var data = {
 				title: `Executed - Time: \`\`${(+end-start).toFixed(3)}ms\`\``,
 				author: {
-					name: local.author.tag,
-					icon_url: local.author.displayAvatarURL()
+					name: message.author.tag,
+					icon_url: message.author.displayAvatarURL()
 				},
 				color: 3322313,
 				fields: [
@@ -45,15 +45,15 @@ module.exports = {
 				]
 			}
 	
-			self.logger.error(`[Eval]: ${typeof res !== "undefined" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}`);
-			Object.assign(data,local.embed_defaults());
-			var embed = new self.Discord.MessageEmbed(data);
-			local.channel.send(embed).catch(err => {
-				local.channel.send(`I could not return the result: ${err}`).catch(error=>{
-					local.author.send(`I could not return the result: ${error}`).catch(noerr=>null);
+			client.logger.error(`[Eval]: ${typeof res !== "undefined" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}`);
+			Object.assign(data,message.embed_defaults());
+			var embed = new client.Discord.MessageEmbed(data);
+			message.channel.send(embed).catch(err => {
+				message.channel.send(`I could not return the result: ${err}`).catch(error=>{
+					message.author.send(`I could not return the result: ${error}`).catch(noerr=>null);
 				});
 			});
-			return local.channel.stopTyping();
+			return message.channel.stopTyping();
 		}
 		if([null,undefined,""].includes(res.stdout)) {
 			var res = "```fix\nfinished with no return```";
@@ -64,12 +64,12 @@ module.exports = {
 			}
 			res = "```fix\n"+res.stdout+"```";
 		}
-		var end = self.performance.now();
+		var end = client.performance.now();
 		var data = {
 			title: `Executed - Time: \`${(+end-start).toFixed(3)}ms\``,
 			author: {
-				name: local.author.tag,
-				icon_url: local.author.displayAvatarURL()
+				name: message.author.tag,
+				icon_url: message.author.displayAvatarURL()
 			},
 			color: 3322313,
 			fields: [
@@ -85,14 +85,14 @@ module.exports = {
 			]
 		}
 		
-		Object.assign(data,local.embed_defaults());
-		var embed = new self.Discord.MessageEmbed(data);
-		local.channel.send(embed).catch(err => {
+		Object.assign(data,message.embed_defaults());
+		var embed = new client.Discord.MessageEmbed(data);
+		message.channel.send(embed).catch(err => {
 			console.error(err);
-			local.channel.send(`I could not return the result: ${err}`).catch(error=>{
-				local.author.send(`I could not return the result: ${err}`).catch(noerr=>null);
+			message.channel.send(`I could not return the result: ${err}`).catch(error=>{
+				message.author.send(`I could not return the result: ${err}`).catch(noerr=>null);
 			});
 		});
-		return local.channel.stopTyping();
+		return message.channel.stopTyping();
 	})
 };

@@ -12,15 +12,15 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
-		local.channel.startTyping();
+	run: (async (client,message) => {
+		message.channel.startTyping();
 		try {
-			var attachment = new self.Discord.MessageAttachment("https://random.birb.pw/tweet/random","random.bird.pw.png");
+			var attachment = new client.Discord.MessageAttachment("https://random.birb.pw/tweet/random","random.bird.pw.png");
 		}catch(e){
 			console.log(e);
-			var attachment = new self.Discord.MessageAttachment(self.config.images.serverError);
+			var attachment = new client.Discord.MessageAttachment(client.config.images.serverError);
 		}
-		local.channel.send(attachment);
-		return local.channel.stopTyping();
+		message.channel.send(attachment);
+		return message.channel.stopTyping();
 	})
 };

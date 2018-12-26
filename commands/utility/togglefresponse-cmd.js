@@ -16,17 +16,17 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (self,local) => {
+	run: (async (client,message) => {
     
-        switch(local.gConfig.fResponseEnabled) {
+        switch(message.gConfig.fResponseEnabled) {
             case true:
-                self.db.updateGuild(local.guild.id, {fResponseEnabled: false});
-                local.message.reply("Disabled f response.");
+                client.db.updateGuild(message.guild.id, {fResponseEnabled: false});
+                message.reply("Disabled f response.");
                 break;
     
             case false:
-            self.db.updateGuild(local.guild.id, {fModuleEnabled: true});
-            local.message.reply("Enabled f response.");
+            client.db.updateGuild(message.guild.id, {fModuleEnabled: true});
+            message.reply("Enabled f response.");
                 break;
         }
     })
