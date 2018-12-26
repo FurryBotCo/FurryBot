@@ -17,7 +17,7 @@ module.exports = {
 			return message.reply("You cannot run this command as you are not a bot owner.");
 		}
 		var ty=new RegExp(/^(((command|cmd|c)?[s]?(module|m)?[s]?(list|l)?[s]?)||all)$/gi);
-		if(message.args.join("").length === 0) {
+		if(message.rgs.join("").length === 0) {
 			var type="cl";
 		} else {
 			if(!ty.test(message.args.join(""))) return message.reply("Invalid type");

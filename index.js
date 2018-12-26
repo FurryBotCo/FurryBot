@@ -397,34 +397,33 @@ class FurryBot extends Discord.Client {
 	}
 
 	gen(type,len=1) {
-			if(isNaN(len)) var len = 1;
-			var res = [];
-			switch(type.toLowerCase()) {
-				case "ip":
-					// (Math.floor(Math.random() * 255) + 1)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0);
-					for(let i = 0;i<=len;i++) {
-						res.push(`${Math.floor(Math.random()*250)+1}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}`);
+		if(isNaN(len)) var len = 1;
+		var res = [];
+		switch(type.toLowerCase()) {
+			case "ip":
+				// (Math.floor(Math.random() * 255) + 1)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0);
+				for(let i = 0;i<len;i++) {
+					res.push(`${Math.floor(Math.random()*250)+1}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}`);
+				}
+				break;
+	
+			case "word":
+			case "words":
+				for(let i = 0;i<len;i++) {
+					res.push(this.wordGen({exactly:1,maxLength:Math.floor(Math.random()*7)+1,wordsPerString:Math.floor(Math.random()*4)+1}));
+				}
+				break;
+	
+			default:
+				var keyset = "abcdefghijklmnopqrstuvwxyz";
+				for(let i = 0;i<len;i++) {
+					var tmp = "";
+					var rq = Math.floor(Math.random()*(32-5))+6;
+					for(let ii = 0;ii<rq;ii++) {
+						tmp += keyset.charAt(Math.floor(Math.random()*keyset.length));
 					}
-					break;
-		
-				case "word":
-				case "words":
-					for(let i = 0;i<=len;i++) {
-						res.push(this.wordGen({exactly:1,maxLength:Math.floor(Math.random()*7)+1,wordsPerString:Math.floor(Math.random()*4)+1}));
-					}
-					break;
-		
-				case "random":
-					var keyset = "abcdefghijklmnopqrstuvwxyz";
-					for(let i = 0;i<=len;i++) {
-						var tmp = "";
-						var rq = Math.floor(Math.random()*(32-5))+6;
-						for(let ii = 0;ii<rq;ii++) {
-							tmp += keyset.charAt(Math.floor(Math.random()*keyset.length));
-						}
-						res.push(tmp);
-					}
-					break;
+					res.push(tmp);
+				}
 			}
 		
 			return res;
@@ -438,9 +437,7 @@ class FurryBot extends Discord.Client {
 
 	getCommand(command) {
 		if(!command) return false;
-		console.log(command);
 		var a = this.commands.map(c=>c.commands).reduce((a,b)=>a.concat(b)).filter(cc=>cc.triggers.includes(command));
-		console.log(a);
 		return a.length < 1 ? false : a[0];
 	}
 }

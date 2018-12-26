@@ -72,7 +72,7 @@ module.exports = (async(client,message)=>{
             },
             get args() {
                 try {
-                    return message.content.slice(message.prefix.length).trim().match(/\w+|('|")[^('|")]+('|")/g).map(s=>s.replace(/('|")/g,""));
+                    return message.content.slice(message.prefix.length).trim().match(/[^\s"]+|"[^"]+"/g).map(s=>s.replace(/\"/g,""));
                 }catch(e){
                     return message.content.slice(message.prefix.length).trim().split(/\s+/);
                 }
@@ -85,7 +85,7 @@ module.exports = (async(client,message)=>{
         client.logger.error(e);
         return;
     }
-    
+    message.ags.shift();
     if(!message.content.startsWith(message.prefix)) return;
     var command = client.getCommand(message.command);
     var category = client.getCategory(message.command);

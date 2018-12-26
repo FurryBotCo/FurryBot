@@ -7,7 +7,7 @@ module.exports = {
 	botPermissions: [],
 	cooldown: 0,
 	description: "Execute shell code (dev only)",
-	usage: "",
+	usage: "[args]",
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
