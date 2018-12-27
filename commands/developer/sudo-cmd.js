@@ -14,7 +14,7 @@ module.exports = {
     guildOwnerOnly: false,
     run: (async(client,message)=>{
         message.channel.startTyping();
-        if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
+        if(message.unparsedArgs.length < 1) return new Error("ERR_INVALID_USAGE");
         
         // member mention
         if(message.mentions.users.first()) {
@@ -22,18 +22,18 @@ module.exports = {
         }
         
         // user ID
-        if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.users.first())) {
-            var user = client.users.get(message.args[0]);
+        if(!isNaN(message.unparsedArgs[0]) && !(message.unparsedArgs.length === 0 || !message.unparsedArgs || message.mentions.users.first())) {
+            var user = client.users.get(message.unparsedArgs[0]);
         }
         
         // username
-        if(isNaN(message.args[0]) && message.args[0].indexOf("#") === -1 && !(message.args.length === 0 || !message.args || message.mentions.users.first())) {
-            var user = client.users.find(t=>t.username===message.args[0]);
+        if(isNaN(message.unparsedArgs[0]) && message.unparsedArgs[0].indexOf("#") === -1 && !(message.unparsedArgs.length === 0 || !message.unparsedArgs || message.mentions.users.first())) {
+            var user = client.users.find(t=>t.username===message.unparsedArgs[0]);
         }
         
         // user tag
-        if(isNaN(message.args[0]) && message.args[0].indexOf("#") !== -1 && !message.mentions.users.first()) {
-            var user = client.users.find(t=>t.tag===message.args[0]);
+        if(isNaN(message.unparsedArgs[0]) && message.unparsedArgs[0].indexOf("#") !== -1 && !message.mentions.users.first()) {
+            var user = client.users.find(t=>t.tag===message.unparsedArgs[0]);
         }
     
         if(!user || !(user instanceof client.Discord.User)) {
@@ -46,7 +46,7 @@ module.exports = {
             message.channel.send(embed);
             return message.channel.stopTyping();
         }
-        var toRun = [...message.args];
+        var toRun = [...message.unparsedArgs];
         toRun.shift();
         var runCommand = toRun[0];
         var runArgs = [...toRun];

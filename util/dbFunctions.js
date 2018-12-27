@@ -277,8 +277,8 @@ class FurryBotDatabase {
 	async isBlacklisted(id) {
 		if(!id) return new Error("ERR_MISSING_PARAM");
 		id = id.toString();
-		var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.guilds).getAll(gid);
-		var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(uid);
+		var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.guilds).getAll(id);
+		var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(id);
 		if(a.length>=1) return a[0].blacklisted ? {blacklisted: true, reason: a[0].reason, type: "guild"} : {blacklisted: false, reason: null, type: "guild"};
 		else if(b.length>=1) return b[0].blacklisted ? {blacklisted: true, reason: b[0].reason, type: "user"} : {blacklisted: false, reason: null, type: "user"};
 		else return false;

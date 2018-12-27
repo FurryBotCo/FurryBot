@@ -64,7 +64,7 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Commands",
-					value: client.config.commandList.all.length,
+					value: client.commandList.length,
 					inline: false
 				}, {
 					name: "API Version",

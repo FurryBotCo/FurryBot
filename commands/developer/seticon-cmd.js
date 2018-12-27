@@ -13,11 +13,11 @@ module.exports = {
     guildOwnerOnly: false,
     run: (async(client,message )=> {
         message.channel.startTyping();
-        if(message.args.length < 1) {
+        if(message.unparsedArgs.length < 1) {
             message.channel.stopTyping();
             return new Error("ERR_INVALID_USAGE");
         }
-        var set = message.args.join("%20");
+        var set = message.unparsedArgs.join("%20");
         client.user.setAvatar(set).then((user) => {
             var attachment = new client.Discord.MessageAttachment(user.displayAvatarURL());
             message.reply(`Set Avatar to (attachment)`,attachment);

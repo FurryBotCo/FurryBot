@@ -1,7 +1,7 @@
 module.exports = {
 	triggers: [
-		"seenon",
-		"seen"
+		"seen",
+		"seenon"
 	],
 	userPermissions: [],
 	botPermissions: [],

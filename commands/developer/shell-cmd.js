@@ -18,7 +18,7 @@ module.exports = {
 			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
 		message.channel.startTyping();
-		var exec = message.args.join(" ");
+		var exec = message.unparsedArgs.join(" ");
 		var start = client.performance.now();
 		try {
 			var res = await client.shell(exec);

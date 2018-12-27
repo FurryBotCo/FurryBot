@@ -19,7 +19,7 @@ module.exports = {
 		voiceChCount = 0,
 		categoryChCount = 0;
 		if(!isNaN(message.args[0]) && client.user.isDeveloper) {
-			var guild = message.guilds.get(message.args[0]);
+			var guild = client.guilds.get(message.args[0]);
 			if(!guild) {
 				var data = {
 					title: "Guild Not Found"

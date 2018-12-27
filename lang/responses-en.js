@@ -87,5 +87,8 @@ module.exports =
   ],
   get pet() {
 	  return this.pat;
-  }
+  },
+  sniff: [
+    "{author} sniffs {input}\nMaybe they smell good..?"
+  ]
 };

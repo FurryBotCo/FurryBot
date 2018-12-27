@@ -20,8 +20,8 @@ module.exports = {
 		if(message.rgs.join("").length === 0) {
 			var type="cl";
 		} else {
-			if(!ty.test(message.args.join(""))) return message.reply("Invalid type");
-			var type = message.args.join("");
+			if(!ty.test(message.unparsedArgs.join(""))) return message.reply("Invalid type");
+			var type = message.unparsedArgs.join("");
 		}
 		switch(true) {
 			case new RegExp(/^(command|cmd|c)[s]?(list|l)?$/gi).test(type):

@@ -19,7 +19,7 @@ module.exports = {
 			"fields": [
 				{
 					name: "Discord Bot",
-					value: client.config.bot.inviteLink,
+					value: client.config.bot.clientInvite,
 					inline: false
 				},
 				{

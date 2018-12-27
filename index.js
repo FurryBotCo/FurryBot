@@ -62,12 +62,15 @@ class FurryBot extends Discord.Client {
 		this.truncate = require("truncate");
 		this.wordGen = require("random-words");
 		this.commands = require("./commands");
+		this.responses = require("./responses");
 		this.commandList = this.commands.map(c=>c.commands.map(cc=>cc.triggers)).reduce((a,b)=>a.concat(b)).reduce((a,b)=>a.concat(b));
+		this.responseList = this.responses.map(r=>r.triggers).reduce((a,b)=>a.concat(b));
 		this.commandTimeout = {};
-		this.commandTimeout.f = new Set();
-		this.commandTimeout.whatismyprefix = new Set();
-		this.commands.map(c=>c.commands.map(cc=>cc.triggers)).reduce((a,b)=>a.concat(b)).reduce((a,b)=>a.concat(b)).forEach((cmd)=>{
+		this.commandList.forEach((cmd)=>{
 			this.commandTimeout[cmd] = new Set();
+		});
+		this.responseList.forEach((resp)=>{
+			this.commandTimeout[resp] = new Set();
 		});
 		/*this.webhooks = {};
 		for(let key in this.config.webhooks) {
@@ -438,6 +441,12 @@ class FurryBot extends Discord.Client {
 	getCommand(command) {
 		if(!command) return false;
 		var a = this.commands.map(c=>c.commands).reduce((a,b)=>a.concat(b)).filter(cc=>cc.triggers.includes(command));
+		return a.length < 1 ? false : a[0];
+	}
+
+	getResponse(response) {
+		if(!response) return false;
+		var a = this.responses.filter(r=>r.triggers.includes(response));
 		return a.length < 1 ? false : a[0];
 	}
 }

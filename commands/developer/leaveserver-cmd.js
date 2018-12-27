@@ -13,15 +13,15 @@ module.exports = {
     guildOwnerOnly: false,
     run: (async(client,message) => {
         message.channel.startTyping();
-        if(message.args.length < 1) {
+        if(message.unparsedArgs.length < 1) {
             message.channel.stopTyping();
             return new Error("ERR_INVALID_USAGE");
         }
-        if(!client.guilds.has(message.args[0])) {
+        if(!client.guilds.has(message.unparsedArgs[0])) {
             message.reply("Guild not found");
             return message.channel.stopTyping();
         }
-        client.guilds.get(message.args[0]).leave().then((guild) => {
+        client.guilds.get(message.unparsedArgs[0]).leave().then((guild) => {
             message.reply(`Left guild **${guild.name}** (${guild.id})`);
             return message.channel.stopTyping();
         }).catch((err) => {

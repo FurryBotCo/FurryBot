@@ -13,11 +13,11 @@ module.exports = {
     guildOwnerOnly: false,
     run: (async(client,message) => {
         message.channel.startTyping();
-        if(message.args.length < 1) {
+        if(message.unparsedArgs.length < 1) {
             message.channel.stopTyping();
             return new Error("ERR_INVALID_USAGE");
         }
-        var set = message.args.join("");
+        var set = message.unparsedArgs.join("");
         if(set.length < 2 || set.length > 32) {
             message.reply(`Username must be between **2** and **32** characters.`);
             return message.channel.stopTyping();

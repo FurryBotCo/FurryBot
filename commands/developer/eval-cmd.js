@@ -21,7 +21,7 @@ module.exports = {
 		}
 		message.channel.startTyping();
 		const r = client.r;
-		var exec = message.args.join(" ");
+		var exec = message.unparsedArgs.join(" ");
 		var start = client.performance.now();
 		try {
 			var res = await eval(exec);

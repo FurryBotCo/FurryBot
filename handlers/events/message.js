@@ -11,8 +11,8 @@ module.exports = (async(client,message)=>{
     client.messageCount++;
 	client.messageMessageCount++;
     if(message.author.bot || (client.config.devOnly && !client.config.developers.includes(message.author.id))) return;
-    if(message.type === "dm") {
-        await message.author.send(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://www.furrybot.me> to see our website, <https://docs.furrybot.me> to see my documentation, and join <${client.config.discordSupportInvite}> if you need more help!`);
+    if(message.channel.type === "dm") {
+        await message.author.send(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <${client.config.bot.websiteURL}> to see our website, <${client.config.bot.documentationURL}> to see my documentation, and join ${client.config.bot.supportInvite} if you need more help!`);
 		client.logger.log(`Direct message recieved from ${message.author.tag}: ${message.content}`);
 		client.mixpanel.track(`bot.directMessage`,{
 			distinct_id: message.author.id,
@@ -76,16 +76,47 @@ module.exports = (async(client,message)=>{
                 }catch(e){
                     return message.content.slice(message.prefix.length).trim().split(/\s+/);
                 }
-            },
-            get command() {
+			},
+			get unparsedArgs() {
+				return message.content.slice(message.prefix.length).trim().split(/\s+/);
+			},
+			get command() {
                 return message.args.shift().toLowerCase()
             },
         });
     }catch(e){
         client.logger.error(e);
         return;
-    }
-    message.ags.shift();
+	}
+	message.unparsedArgs.shift();
+
+	if(message.content === `<@${client.user.id}>` || message.content === `<@!${client.user.id}>`) {
+		/*var c = await require(`${process.cwd()}/commands/${client.config.commandList.fullList["help"].category}/help-cmd.js`)(client,message);
+		if(c instanceof Error) throw c;*/
+		var data = {
+			title: "Hewwo!",
+			description: `You can find out how to use me on my [docs page](${client.bot.config.documentationURL}), my current prefix here is: **${message.gConfig.prefix}**\n(this can be chanegd via \`${message.gConfig.prefix}prefix <newprefix>\`\nTo invite me to new servers, use [this link](https://discordapp.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=-1))`
+		}
+		Object.assign(data,message.embed_defaults());
+		var embed = new client.Discord.MessageEmbed(data);
+		if(!message.channel.permissionsFor(client.user).has("SEND_MESSAGES")) {
+			message.author.send("I couldn't send messages in the channel where I was mentioned, so I sent this directly to you!",embed).catch(noerr=>null);
+		} else if(!message.channel.permissionsFor(client.user).has("EMBED_LINKS")) {
+			return message.channel.send(`${embed.title}\n${embed.description}\n(If you give me permission to embed links this would look a lot nicer)`);
+		} else {
+			return message.channel.send(embed);
+		}
+	}
+
+	if(client.responseList.includes(message.content.toLowerCase())) {
+		var response = client.getResponse(message.content.toLowerCase());
+		client.logger.commandlog(`Response "${response.triggers[0]}" triggered by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
+		var start = client.performance.now();
+		var c = await response.run(client,message);
+		var end = client.performance.now();
+		client.logger.debug(`Response handler for "${response.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
+		return;
+	}
     if(!message.content.startsWith(message.prefix)) return;
     var command = client.getCommand(message.command);
     var category = client.getCategory(message.command);
@@ -212,7 +243,12 @@ module.exports = (async(client,message)=>{
 			var embed = new client.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
         }
-        
+		
+		if(Object.keys(client.lang[message.gConfig.locale]).includes(message.command)) {
+			message.cmd = client.lang[message.gConfig.locale][message.command];
+			message.c = message.cmd[Math.floor(Math.random()*message.cmd.length)];
+		}
+
         client.stats.commandTotalsSinceStart++;
         client.stats.commandTotalsSinceLastPost++;
         if(client.commandTimeout[command.triggers[0]].has(message.author.id) && !message.user.isDeveloper) {

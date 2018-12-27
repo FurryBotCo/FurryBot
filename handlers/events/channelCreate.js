@@ -1,7 +1,7 @@
 module.exports = (async(client,channel)=>{
     if(!channel || !channel.guild || !["text","voice","category"].includes(channel.type)) return;
     var ev = "channelcreated";
-    var gConfig = await client.db.getGuild(channel.guild.id);
+    var gConfig = await client.db.getGuild(channel.guild.id).catch(err=>client.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = channel.guild.channels.get(gConfig.logging[ev].channel);
     if(!logch) return client.db.updateGuild({logging:{[ev]:{enabled:false,channel:null}}});
