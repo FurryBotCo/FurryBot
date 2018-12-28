@@ -23,6 +23,7 @@
   "dependencies": {
     "async-request": "^1.2.0",
     "bfdapi.js": "^1.1.0",
+    "blapi": "^0.4.5",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
     "canvas": "^1.6.13",

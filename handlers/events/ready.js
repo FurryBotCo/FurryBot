@@ -55,7 +55,7 @@ module.exports = (async(client) => {
     client.srv = client.server.load(client);
     if(!client.config.beta) {
         //const ls = client.listStats(client);
-        setInterval(client.listStats,3e5,client);
+        setInterval(client.listStats,5e3,client);
     }
 
 	setInterval(async()=>{
