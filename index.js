@@ -484,27 +484,6 @@ class FurryBot extends Discord.Client {
 		})
 	}
 
-	async resolveUser (user) {
-		if(!user) return false;
-		if(user instanceof this.Discord.GuildMember) {
-			// can check permissions
-			var u = {
-				isDeveloper: this.config.developers.includes(user.id),
-				isServerModerator: user.permissions.has("MANAGE_GUILD"),
-				isServerAdministrator: user.permissions.has("ADMINISTRATOR")
-			}
-		} else if (user instanceof this.Discord.User) {
-			// only dev checking
-			var u = {
-				isDeveloper: this.config.developers.includes(user.id)
-			}
-		} else {
-			console.log(user);
-			throw new Error("Invalid user provided");
-		}
-		return u;
-	}
-
 	async runAs (messageContent,user,channel) {
 		if(!(user instanceof this.Discord.User)) user = this.users.get(user);
 		if(!(channel instanceof this.Discord.TextChannel)) channel = this.channels.get(channel);
