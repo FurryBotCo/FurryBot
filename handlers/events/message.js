@@ -26,7 +26,7 @@ module.exports = (async(client,message)=>{
     }
     try {
         Object.assign(message,{
-            user: await client.configureUser(),
+            user: await message.configureUser(),
             embed_defaults: ((without=[],ext)=>{
                 if(![undefined,null,""].includes(ext)) {
                     message = ext;
