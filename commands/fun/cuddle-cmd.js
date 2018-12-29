@@ -27,9 +27,5 @@ module.exports = {
 		} else {
 			message.channel.send(text);
 		}
-		
-		if(!message.gConfig.deleteCommands) {
-			message.delete().catch(noerr => {});
-		}
 	})
 };

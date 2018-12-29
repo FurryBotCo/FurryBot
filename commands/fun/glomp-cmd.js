@@ -15,9 +15,5 @@ module.exports = {
 		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
 		var text = client.varParse(message.c,{author:message.author,input:message.args.join(" ")});
 		message.channel.send(text);
-	
-		if(!message.gConfig.deleteCommands) {
-			message.delete().catch(noerr => {});
-		}
 	})
 };

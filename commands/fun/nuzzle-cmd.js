@@ -18,9 +18,5 @@ module.exports = {
 		var input = message.args.join(" ");
 		var text = client.varParse(message.c,{author:message.author,input:input});
 		message.channel.send(text);
-		
-		if(!message.gConfig.deleteCommands) {
-			message.delete().catch(noerr => {});
-		}
 	})
 };

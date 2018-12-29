@@ -143,10 +143,8 @@ module.exports = {
                 client.logger.log(`Body: ${jsn}`);
                 return message.reply("Image API returned a non-safe image! Please try again later.");
             }
-            var short = await client.shortenUrl(`https://inkbunny.net/s/${submission.submission_id}`);
-            var extra = short.new ? `**This is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
             var attachment = new client.Discord.MessageAttachment(submission.file_url_full,submission.file_name)
-            return message.channel.send(`${extra}${submission.title} (type ${submission.type_name}) by ${submission.username}\n<${short.url}>\nRequested By: ${message.author.tag}\nRID: ${jsn.rid}`,attachment)
+            return message.channel.send(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRequested By: ${message.author.tag}\nRID: ${jsn.rid}`,attachment)
         }catch(e){
             client.logger.error(`Error:\n${e}`);
             client.logger.log(`${client.util.inspect(jsn,{depth:3})}`);

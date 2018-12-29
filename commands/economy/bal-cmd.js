@@ -15,7 +15,7 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async (client,message) => {
 		message.channel.startTyping();
-		message.reply(`Your balance is ${client.uConfig.bal}.`);
+		message.reply(`Your balance is ${message.uConfig.bal}.`);
 		return message.channel.stopTyping();
 	})
 };

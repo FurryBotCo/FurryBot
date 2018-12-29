@@ -27,7 +27,7 @@ class FurryBot extends Discord.Client {
 		for(let key in this.config.overrides) this[this.config.overrides[key]] = false;
 		this.Discord = Discord;
 		Object.assign(this.Discord.Message.prototype,{
-			getUserFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+			getUserFromArgs: (async function(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
 				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
 				var argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
@@ -39,21 +39,21 @@ class FurryBot extends Discord.Client {
 				}
 				
 				// user mention
-				if(this.mentions.users.first()) return this.mentions.users.first();
+				if(this.mentions.users.size >= mentionPosition+1) return this.mentions.users.first(mentionPosition+1)[mentionPosition];
 				
 				// user ID
-				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.users.first())) return this.client.users.get(args[argPosition]);
+				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.users.size >= mentionPosition+1)) return this.client.users.get(args[argPosition]);
 				
 				// username
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.users.first())) return this.client.users.find(t=>t.username.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.users.size >= mentionPosition+1)) return this.client.users.find(t=>t.username.toLowerCase()===args[argPosition].toLowerCase());
 				
 				// user tag
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !this.mentions.users.first()) return this.client.users.find(t=>t.tag.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentions.users.size >= mentionPosition+1)) return this.client.users.find(t=>t.tag.toLowerCase()===args[argPosition].toLowerCase());
 
 				// nothing found
 				return false;
 			}),
-			getMemberFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+			getMemberFromArgs: (async function(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
 				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
 				var argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
@@ -66,21 +66,21 @@ class FurryBot extends Discord.Client {
 				if(!this.guild || !this.guild instanceof this.client.Discord.Guild) throw new TypeError("invalid or missing guild on this");
 				
 				// member mention
-				if(this.mentions.members.first()) return this.mentions.members.first();
+				if(this.mentions.members.size >= mentionPosition+1) return this.mentions.members.first(mentionPosition+1)[mentionPosition];
 				
 				// user ID
-				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.members.first())) return this.guild.members.get(args[argPosition]);
+				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.members.size >= mentionPosition+1)) return this.guild.members.get(args[argPosition]);
 				
 				// username
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.members.first())) return this.guild.members.find(m=>m.user.username.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.members.size >= mentionPosition+1)) return this.guild.members.find(m=>m.user.username.toLowerCase()===args[argPosition].toLowerCase());
 				
 				// user tag
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !this.mentions.members.first()) return this.guild.members.find(m=>m.user.tag.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentions.members.size >= mentionPosition+1)) return this.guild.members.find(m=>m.user.tag.toLowerCase()===args[argPosition].toLowerCase());
 
 				// nothing found
 				return false;
 			}),
-			getChannelFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+			getChannelFromArgs: (async function(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
 				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
 				var argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
@@ -93,7 +93,7 @@ class FurryBot extends Discord.Client {
 				if(!this.guild || !this.guild instanceof this.client.Discord.Guild) throw new TypeError("invalid or missing guild on this");
 				
 				// channel mention
-				if(this.mentions.channels.first()) return this.mentions.channels.first();
+				if(this.mentions.channels.first()) return this.mentions.channels.first(mentionPosition+1)[mentionPosition];
 				
 				// channel ID
 				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.channels.first())) return this.guild.channels.get(args[argPosition]);
@@ -104,7 +104,7 @@ class FurryBot extends Discord.Client {
 				// nothing found
 				return false;
 			}),
-			getRoleFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+			getRoleFromArgs: (async function(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
 				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
 				var argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
@@ -117,13 +117,13 @@ class FurryBot extends Discord.Client {
 				if(!this.guild || !this.guild instanceof this.client.Discord.Guild) throw new TypeError("invalid or missing guild on this");
 
 				// role mention
-				if(this.mentions.roles.first()) return this.mentions.roles.first();
+				if(this.mentions.roles.size >= mentionPosition+1) return this.mentions.roles.first(mentionPosition+1)[mentionPosition];
 				
 				// role ID
-				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.roles.first())) return this.guild.roles.get(args[argPosition]);
+				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.roles.size >= mentionPosition+1)) return this.guild.roles.get(args[argPosition]);
 				
 				// role name
-				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.roles.first())) return this.guild.roles.find(r=>r.name.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.roles.size >= mentionPosition+1)) return this.guild.roles.find(r=>r.name.toLowerCase()===args[argPosition].toLowerCase());
 
 				// nothing found
 				return false;
@@ -567,7 +567,7 @@ class FurryBot extends Discord.Client {
 
 	async memeRequest(path,avatars = [],text = "") {
 		var avatars = typeof avatars === "object" ? avatars: [avatars];
-		return this.request(`https://dankmemer.services/api/${path}`,{
+		return this.request(`https://dankmemer.services/api${path}`,{
             method: "POST",
             json: {avatars,text},
             headers: {

@@ -42,13 +42,14 @@ module.exports = {
 			if(message.author.id === usr.id && client.config.developers.indexOf(message.author.id) === -1) {
 				return message.reply(`${client.config.emojis.cooldown}\nYou cannot start a furpile on yourclient!`);
 			}
-			client.furpile[message.guild.id]={};
-			client.furpile[message.guild.id].user=usr.id;
-			client.furpile[message.guild.id].currentUsers=new Set();
+			client.furpile[message.guild.id]={
+				user: usr.id,
+				currentUsers: new Set(),
+				number: 1,
+				fnc: setTimeout(function(gid){client.furpile[gid]=undefined;}, 3e5, message.guild.id)
+			};
 			client.furpile[message.guild.id].currentUsers.add(message.author.id);
 			client.furpile[message.guild.id].currentUsers.add(usr.id);
-			client.furpile[message.guild.id].number=1;
-			client.furpile[message.guild.id].fnc=setTimeout(function(gid){client.furpile[gid]=undefined;}, 3e5, message.guild.id);
 			message.channel.send(`<@!${message.member.id}> has started a furpile on <@!${client.furpile[message.guild.id].user}>${"\n"}Join by using the command **${message.gConfig.prefix}furpile**!`);
 		}
 	})

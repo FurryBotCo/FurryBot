@@ -192,7 +192,7 @@ module.exports = (async(client,message)=>{
 					timestamp: new Date().toISOString(),
 					args: message.args.join(" "),
 					command: message.command,
-					message: message.message.id,
+					message: message.id,
 					guild: message.guild.id,
 					userId: message.author.id,
 					username: message.author.username,
@@ -244,8 +244,8 @@ module.exports = (async(client,message)=>{
 			return message.channel.send(embed);
         }
 		
-		if(Object.keys(client.lang[message.gConfig.locale]).includes(message.command)) {
-			message.cmd = client.lang[message.gConfig.locale][message.command];
+		if(Object.keys(client.lang[message.gConfig.locale]).includes(command.triggers[0])) {
+			message.cmd = client.lang[message.gConfig.locale][command.triggers[0]];
 			message.c = message.cmd[Math.floor(Math.random()*message.cmd.length)];
 		}
 
@@ -305,6 +305,10 @@ module.exports = (async(client,message)=>{
 					},{
 						name: "Description",
 						value: command.description,
+						inline: false
+					},{
+						name: "Category",
+						value: command.category||"Unknown",
 						inline: false
 					},{
 						name: "Arguments Provided",

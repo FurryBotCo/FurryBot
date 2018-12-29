@@ -25,7 +25,7 @@ module.exports = {
 		})
 		
 		try {
-			var json=JSON.parse(xhr.responseText);
+			var json = JSON.parse(req.body);
 			var attachment = new client.Discord.MessageAttachment(json.file);
 		}catch(e){
 			client.logger.error(e);
