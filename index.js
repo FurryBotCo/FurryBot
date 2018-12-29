@@ -26,6 +26,141 @@ class FurryBot extends Discord.Client {
 		};
 		for(let key in this.config.overrides) this[this.config.overrides[key]] = false;
 		this.Discord = Discord;
+		Object.assign(this.Discord.Message.prototype,{
+			getUserFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
+				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+				if(join) {
+					var args = [this[argObject].join(" ")];
+					var argPosition = 0;
+				} else {
+					var args = this[argObject];
+				}
+				
+				// user mention
+				if(this.mentions.users.first()) return this.mentions.users.first();
+				
+				// user ID
+				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.users.first())) return this.client.users.get(args[argPosition]);
+				
+				// username
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.users.first())) return this.client.users.find(t=>t.username.toLowerCase()===args[argPosition].toLowerCase());
+				
+				// user tag
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !this.mentions.users.first()) return this.client.users.find(t=>t.tag.toLowerCase()===args[argPosition].toLowerCase());
+
+				// nothing found
+				return false;
+			}),
+			getMemberFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
+				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+				if(join) {
+					var args = [this[argObject].join(" ")];
+					var argPosition = 0;
+				} else {
+					var args = this[argObject];
+				}
+				if(!this.guild || !this.guild instanceof this.client.Discord.Guild) throw new TypeError("invalid or missing guild on this");
+				
+				// member mention
+				if(this.mentions.members.first()) return this.mentions.members.first();
+				
+				// user ID
+				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.members.first())) return this.guild.members.get(args[argPosition]);
+				
+				// username
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.members.first())) return this.guild.members.find(m=>m.user.username.toLowerCase()===args[argPosition].toLowerCase());
+				
+				// user tag
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !this.mentions.members.first()) return this.guild.members.find(m=>m.user.tag.toLowerCase()===args[argPosition].toLowerCase());
+
+				// nothing found
+				return false;
+			}),
+			getChannelFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
+				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+				if(join) {
+					var args = [this[argObject].join(" ")];
+					var argPosition = 0;
+				} else {
+					var args = this[argObject];
+				}
+				if(!this.guild || !this.guild instanceof this.client.Discord.Guild) throw new TypeError("invalid or missing guild on this");
+				
+				// channel mention
+				if(this.mentions.channels.first()) return this.mentions.channels.first();
+				
+				// channel ID
+				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.channels.first())) return this.guild.channels.get(args[argPosition]);
+				
+				// channel name
+				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.channels.first())) return this.guild.channels.find(c=>c.name.toLowerCase()===args[argPosition].toLowerCase());
+
+				// nothing found
+				return false;
+			}),
+			getRoleFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
+				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+				if(join) {
+					var args = [this[argObject].join(" ")];
+					var argPosition = 0;
+				} else {
+					var args = this[argObject];
+				}
+				if(!this.guild || !this.guild instanceof this.client.Discord.Guild) throw new TypeError("invalid or missing guild on this");
+
+				// role mention
+				if(this.mentions.roles.first()) return this.mentions.roles.first();
+				
+				// role ID
+				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.roles.first())) return this.guild.roles.get(args[argPosition]);
+				
+				// role name
+				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.roles.first())) return this.guild.roles.find(r=>r.name.toLowerCase()===args[argPosition].toLowerCase());
+
+				// nothing found
+				return false;
+			}),
+			getServerFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
+				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+				if(join) {
+					var args = [this[argObject].join(" ")];
+					var argPosition = 0;
+				} else {
+					var args = this[argObject];
+				}
+
+				console.log(args);
+				console.log(argPosition);
+				console.log(args[argPosition]);
+				// server id
+				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.get(args[argPosition]);
+
+				// server name
+				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.find(g=>g.name.toLowerCase()===args[argPosition].toLowerCase());
+
+				// nothing found
+				return false;
+			}),
+			configureUser: async function(user = null) {
+				var member = ![undefined,null,""].includes(user) ? user instanceof this.client.Discord.User ? this.guild.members.get(user.id) : user instanceof this.client.Discord.GuildMember ? user : !isNaN(user) ? this.guild.members.get(user) : false : this.member;
+				if(!(member instanceof this.client.Discord.GuildMember)) throw new Drror("invalid member");
+				return {
+					isDeveloper: this.client.config.developers.includes(member.id),
+					isServerModerator: member.permissions.has("MANAGE_GUILD"),
+					isServerAdministrator: member.permissions.has("ADMINISTRATOR")
+				}
+			}
+		});
 		this.os = require("os");
 		this.request = this.util.promisify(require("request").defaults({encoding:null}));
 		this.Mixpanel = require("mixpanel");
@@ -63,6 +198,7 @@ class FurryBot extends Discord.Client {
 		this.wordGen = require("random-words");
 		this.commands = require("./commands");
 		this.responses = require("./responses");
+		this.categories = this.commands.map(c=>c.name.toLowerCase());
 		this.commandList = this.commands.map(c=>c.commands.map(cc=>cc.triggers)).reduce((a,b)=>a.concat(b)).reduce((a,b)=>a.concat(b));
 		this.responseList = this.responses.map(r=>r.triggers).reduce((a,b)=>a.concat(b));
 		this.commandTimeout = {};
@@ -448,6 +584,19 @@ class FurryBot extends Discord.Client {
 		if(!response) return false;
 		var a = this.responses.filter(r=>r.triggers.includes(response));
 		return a.length < 1 ? false : a[0];
+	}
+
+	async memeRequest(path,avatars = [],text = "") {
+		var avatars = typeof avatars === "object" ? avatars: [avatars];
+		return this.request(`https://dankmemer.services/api/${path}`,{
+            method: "POST",
+            json: {avatars,text},
+            headers: {
+                Authorization: this.config.apis.dankMemer.token,
+                "User-Agent": this.config.userAgent,
+                "Content-Type": "application/json"
+			}
+		});
 	}
 }
 

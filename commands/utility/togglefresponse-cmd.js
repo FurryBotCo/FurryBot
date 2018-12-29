@@ -1,8 +1,8 @@
 module.exports = {
 	triggers: [
+        "togglefresponse",
         "togglef",
         "togglerip",
-        "togglefresponse",
         "toggleripresponse"
     ],
 	userPermissions: [
@@ -25,7 +25,7 @@ module.exports = {
                 break;
     
             case false:
-            client.db.updateGuild(message.guild.id, {fModuleEnabled: true});
+            client.db.updateGuild(message.guild.id, {fResponseEnabled: true});
             message.reply("Enabled f response.");
                 break;
         }

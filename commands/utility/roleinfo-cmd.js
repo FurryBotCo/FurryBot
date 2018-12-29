@@ -13,63 +13,17 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
-        if(message.args.length === 0) {
-            var member = message.member;
-        } else if(message.args[0] === "server") {
-			var server = message.guild;
-		} else {
-			// try member first
-			console.log("Member check");
-			// member mention
-			if(message.mentions.members.first()) {
-				var member = message.mentions.members.first();
-			}
+        if(message.args.length === 0) var member = message.member;
+		else if(message.args[0] === "server") var server = message.guild;
+		// try member first
+		else var member = await message.getMemberFromArgs(0,false,true);
 			
-			// user ID
-			if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-				var member = message.guild.members.get(message.args[0]);
-			}
-			
-			// username
-			if(isNaN(message.args[0]) && message.args[0].indexOf("#") === -1 && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-				var usr = client.users.find(t=>t.username.toLowerCase()===message.args[0].toLowerCase());
-				if(usr instanceof client.Discord.User) var member = message.guild.members.get(usr.id);
-			}
-			
-			// user tag
-			if(isNaN(message.args[0]) && message.args[0].indexOf("#") !== -1 && !message.mentions.members.first()) {
-				var usr = client.users.find(t=>t.tag.toLowerCase()===message.args[0].toLowerCase());
-				if(usr instanceof client.Discord.User) var member = message.guild.members.get(usr.id);
-			}
-		}
-		
 		// if member failed try role
-		if(([undefined,null,""].includes(member) || !member instanceof client.Discord.GuildMember) && message.args[0] !== "server") {
-			console.log("Role check");
-			// role mention
-			if(message.mentions.roles.first()) {
-				var role = message.mentions.roles.first();
-			}
-			
-			// role ID
-			if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.roles.first())) {
-				var role = message.guild.roles.get(message.args[0]);
-			}
-			
-			// role name
-			if(isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.roles.first())) {
-				var rl = message.guild.roles.find(r=>r.name.toLowerCase()===message.args[0].toLowerCase());
-				if(rl instanceof client.Discord.Role) var role = message.guild.roles.get(rl.id);
-			}
-		}
+		if(([undefined,null,""].includes(member) || !(member instanceof client.Discord.GuildMember)) && message.args[0] !== "server") var role = await message.getRoleFromArgs(0,false,true);
 
 		//finally, try a server (if developer)
-		if(!isNaN(message.args[0]) && message.user.isDeveloper  && ([undefined,null,""].includes(member) || !member instanceof client.Discord.GuildMember) && ([undefined,null,""].includes(role) || !role instanceof client.Discord.Role) && message.args[0] !== "server") {
-			console.log("Server check");
-			var s = client.guilds.get(message.args[0]);
-			if(s instanceof client.Discord.Guild) var server = s;
-		}
-
+		if(message.user.isDeveloper  && ([undefined,null,""].includes(member) || !(member instanceof client.Discord.GuildMember)) && ([undefined,null,""].includes(role) || !(role instanceof client.Discord.Role)) && message.args[0] !== "server") var server = await message.getServerFromArgs(0,false,true).then(s=>{console.log(s.name);return s});
+		
 		if(server instanceof client.Discord.Guild) {
 			// server roles
 			var a = message.guild.roles.map(r=>`<@&${r.id}>`),
