@@ -159,6 +159,33 @@ class FurryBot extends Discord.Client {
 					isServerModerator: member.permissions.has("MANAGE_GUILD"),
 					isServerAdministrator: member.permissions.has("ADMINISTRATOR")
 				}
+			},
+			errorEmbed: async function(type = "", custom = false, title = "", description = "", fields = []) {
+				if(!custom) {
+					switch(type.toUpperCase()) {
+						case "INVALID_USER":
+							var title = "User Not Found",
+							description = "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag",
+							fields = [];
+							break;
+						
+						case "INVALID_ROLE":
+							var title = "Role Not Found",
+							description = "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
+							fields = [];
+							break;
+						
+						default:
+							var title = "Default Title",
+							description = "Default Description",
+							fields = [];
+					}
+				}
+				return this.channel.send(new this.client.Discord.MessageEmbed(Object.assign({
+					title,
+					description,
+					fields
+				},this.embed_defaults())));
 			}
 		});
 		this.os = require("os");

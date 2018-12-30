@@ -75,7 +75,7 @@ module.exports = {
 			"NONE",
 			"ELEVATED"
 		];
-		var roles = guild.roles.map(role=>{if(role.name!=="@everyone"){return `<@&${role.id}> `}else{return "@everyone "}}).toString();
+		var roles = guild.roles.map(role=>role.name==="@everyone"?"@everyone":`<@&${role.id}>`).toString();
 		var rr = roles.length > 1000 ? `Too many to list, please use \`${message.gConfig.prefix}roles server\`` : roles;
 		var data = {
 			title: `Server Info - **${guild.name}**`,
@@ -120,7 +120,7 @@ module.exports = {
 				},
 				{
 					name: "Extra",
-					value: `**Large Guild**: ${client.ucwords(guild.large)}\n**Verification**: ${verificationLevel[guild.verificationLevel]}\n**2FA**: ${mfaLevel[guild.mfaLevel]}\n**Default Notifications**: ${guild.defaultMessageNotifications}\n**Features**:\n${features}`,
+					value: `**Large Guild**: ${guild.large?"Yes":"No"}\n**Verification**: ${verificationLevel[guild.verificationLevel]}\n**2FA**: ${mfaLevel[guild.mfaLevel]}\n**Default Notifications**: ${guild.defaultMessageNotifications}\n**Features**:\n${features}`,
 					inline: false
 				}
 			]

@@ -12,7 +12,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async(client,message) => {
         message.channel.startTyping();
         var tags = encodeURIComponent(message.args.join(" "));
         var req = await client.request(`https://e621.net/post/index.json?limit=50&tags=${tags}%20rating%3Aexplict`,{

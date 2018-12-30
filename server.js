@@ -65,12 +65,12 @@ class FurryBotServer {
                 shardCount: client.options.shardCount,
                 memoryUsage: {
                     process: {
-                        used: client.getUsedMemory(),
-                        total: client.getTotalMemory()
+                        used: client.memory.process.getUsed(),
+                        total: client.memory.process.getTotal()
                     },
-                    server: {
-                        used: client.getSYSUsed(),
-                        total: client.getSYSTotal()
+                    system: {
+                        used: client.memory.system.getUsed(),
+                        total: client.memory.system.getTotal()
                     }
                 },
                 largeGuildCount,

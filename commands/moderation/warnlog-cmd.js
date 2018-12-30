@@ -39,16 +39,7 @@ module.exports = {
         }
     
         
-        if(!user) {
-            var data = {
-                title: "User not found",
-                description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag\n\n(tip: you can't use an id, username, or tag as the first agument, only a mention or page number)"
-            }
-            Object.assign(data, message.embed_defaults());
-            var embed = new client.Discord.MessageEmbed(data);
-            message.channel.send(embed);
-            return message.channel.stopTyping();
-        }
+        if(!user) return message.errorEmbed("INVALID_USER");
         
         var warnings = await client.db.getUserWarnings(user.id,message.guild.id).then(res=>res.sort((a,b)=>new Date(a.timestamp) - new Date(b.timestamp)));
         if(warnings.length <= 0) {

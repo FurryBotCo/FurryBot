@@ -21,29 +21,13 @@ module.exports = {
         // get role from message
         var role = await message.getRoleFromArgs();
 
-        if(!role) {
-			var data = {
-				title: "Role not found",
-				description: "The specified role was not found, please provide one of the following:\nRole mention, role name, role id"
-			}
-			Object.assign(data, message.embed_defaults());
-			var embed = new client.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
-        }
+        if(!role) return message.errorEmbed("INVALID_ROLE");
 
 
-        // get member from args
-        var member = await message.getMemberFromArgs();
+        // get member from message
+        var member = await message.getMemberFromArgs(1);
         
-        if(!member) {
-			var data = {
-				title: "User not found",
-				description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
-			}
-			Object.assign(data, message.embed_defaults());
-			var embed = new client.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
-        }
+        if(!member) return message.errorEmbed("INVALID_USER");
         
 
         if(member.roles.has(role.id)) return message.reply(`${member.user.tag} already has the role **${role.name}**.`);

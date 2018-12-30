@@ -21,48 +21,13 @@ module.exports = {
        // get role from message
        var role = await message.getRoleFromArgs();
 
-        if(!role) {
-			var data = {
-				title: "Role not found",
-				description: "The specified role was not found, please provide one of the following:\nRole mention, role name, role id"
-			}
-			Object.assign(data, message.embed_defaults());
-			var embed = new client.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
-        }
+       if(!role) return message.errorEmbed("INVALID_ROLE");
 
 
-        // member mention
-        if(message.mentions.members.first()) {
-            var member = message.mentions.members.first();
-        }
+        // get member from message
+        var user = await message.getMemberFromArgs(1);
         
-        // user ID
-        if(!isNaN(message.args[1]) && !(message.args.length === 1 || !message.args || message.mentions.members.first())) {
-            var member = message.guild.members.get(message.args[1]);
-        }
-        
-        // username
-        if(isNaN(message.args[1]) && message.args[1].indexOf("#") === -1 && !(message.args.length === 1 || !message.args || message.mentions.members.first())) {
-            var usr = client.users.find(t=>t.username.toLowerCase()===message.args[1].toLowerCase());
-            if(usr instanceof client.Discord.User) var member = message.guild.members.get(usr.id);
-        }
-        
-        // user tag
-        if(isNaN(message.args[1]) && message.args[1].indexOf("#") !== -1 && !message.mentions.members.first()) {
-            var usr = client.users.find(t=>t.tag.toLowerCase()===message.args[1].toLowerCase());
-            if(usr instanceof client.Discord.User) var member = message.guild.members.get(usr.id);
-        }
-        
-        if(!member) {
-			var data = {
-				title: "User not found",
-				description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
-			}
-			Object.assign(data, message.embed_defaults());
-			var embed = new client.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
-        }
+        if(!user) return message.errorEmbed("INVALID_USER");
         
 
         if(!member.roles.has(role.id)) return message.reply(`${member.user.tag} does not have the role **${role.name}**.`);

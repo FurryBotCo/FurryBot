@@ -36,11 +36,11 @@ module.exports = {
 			"fields": [
 				{
 					name: "Process Memory Usage",
-					value: `${client.getUsedMemoryMB()}MB/${client.getTotalMemoryMB()}MB`,
+					value: `${Math.round(client.memory.process.getUsed()/1024/1024)}MB/${Math.round(client.memory.process.getTotal()/1024/1024)}MB`,
 					inline: false
 				}, {
-					name: "Server Memory Usage",
-					value: `${client.getSYSUsedGB()}GB/${client.getSYSTotalGB()}GB`,
+					name: "System Memory Usage",
+					value: `${Math.round(client.memory.system.getUsed()/1024/1024/1024)}GB/${Math.round(client.memory.system.getTotal()/1024/1024/1024)}GB`,
 					inline: false
 				}, {
 					name: "Library",

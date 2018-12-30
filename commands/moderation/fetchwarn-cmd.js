@@ -20,15 +20,7 @@ module.exports = {
         // get member from message
         var user = await message.getMemberFromArgs();
         
-        if(!user) {
-            var data = {
-                title: "User not found",
-                description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag\n\n(tip: the user must be the first argument)"
-            }
-            Object.assign(data, message.embed_defaults());
-            var embed = new client.Discord.MessageEmbed(data);
-            message.channel.send(embed);
-        }
+        if(!user) return message.errorEmbed("INVALID_USER");
         if(isNaN(message.args[1])) return message.reply(`Please provide a valid warning id as the second argument.`);
     
         var w = await client.db.getUserWarning(user.id,message.guild.id,message.args[1]);

@@ -36,16 +36,7 @@ module.exports = {
         // get role from message
         var role = await message.getRoleFromArgs();
     
-        if(!role) {
-            var data = {
-                title: "Role not found",
-                description: "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
-                color: 15601937
-            };
-            Object.assign(data, message.embed_defaults("color"));
-            var embed = new client.Discord.MessageEmbed(data);
-            return message.channel.send(embed);
-        }
+        if(!role) return message.errorEmbed("INVALID_ROLE");
     
         if(role.managed || role.rawPosition === 0 || role.rawPosition >= message.guild.me.roles.highest.rawPosition) {
             var data = {

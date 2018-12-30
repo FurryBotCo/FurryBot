@@ -16,15 +16,7 @@ module.exports = {
 		// get member from message
 		var member = message.args.length <= 0 ? message.member : await message.getMemberFromArgs();
 		
-		if(!member) {
-			var data = {
-				title: "User not found",
-				description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
-			}
-			Object.assign(data, message.embed_defaults());
-			var embed = new client.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
-		}
+		if(!member) return message.errorEmbed("INVALID_USER");
 		var position = "1/2";
 		var level = message.uConfig.level;
 		var xp_left = message.uConfig.xp;

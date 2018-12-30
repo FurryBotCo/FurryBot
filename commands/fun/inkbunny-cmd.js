@@ -17,7 +17,7 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
         if(!client.config.apis.inkbunny.sid) {
-            await client.fsn.readFile(`${process.cwd()}/inkbunny-sid.txt`,"UTF8").then(async(sid)=>{
+            await client.fsn.readFile(`${process.cwd()}/inkbunny-sid.txt`,"UTF8").then(async(sid) => {
                 if(sid === "") sid = "nosid";
                 var req = await client.request(`https://inkbunny.net/api_userrating.php?sid=${sid}`,{
                     method: "GET",

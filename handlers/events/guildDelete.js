@@ -1,4 +1,4 @@
-module.exports = (async(client,guild)=>{
+module.exports = (async(client,guild) => {
     await client.db.updateDailyCount(true);
     await client.db.deleteGuild(guild.id);
     client.logger.log(`Guild left: ${guild.name} (${guild.id}). This guild had ${guild.memberCount} members.`);

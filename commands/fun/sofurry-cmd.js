@@ -22,7 +22,8 @@ module.exports = {
             "music",
             "journal",
             "photo"
-        ]
+        ];
+        
         var req = await client.request("https://api2.sofurry.com/browse/search?search=furry&format=json&minlevel=0&maxlevel=0",{
             method: "GET",
             headers: {

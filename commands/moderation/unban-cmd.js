@@ -20,15 +20,7 @@ module.exports = {
         // get member from message
         var user = await message.getMemberFromArgs();
     
-        if(!user) {
-            var data = {
-               title: "User not found",
-               description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
-            }
-            Object.assign(data, message.embed_defaults());
-            var embed = new client.Discord.MessageEmbed(data);
-            return message.channel.send(embed);
-        }
+        if(!user) return message.errorEmbed("INVALID_USER");
         if(!(await message.guild.fetchBans()).has(user.id)) {
             var data = {
                 title: "User not banned",
