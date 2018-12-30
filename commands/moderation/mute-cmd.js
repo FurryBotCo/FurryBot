@@ -61,7 +61,7 @@ module.exports = {
                 description: `This server does not have a mute role set, you can set this with \`${message.gConfig.prefix}setmuterole <role>\``,
                 color: 15601937
             }
-            Object.assign(data, message.embed_defaults()("color"));
+            Object.assign(data, message.embed_defaults("color"));
             var embed = new client.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }
@@ -72,7 +72,7 @@ module.exports = {
                 color: 15601937
             }
             await client.db.updateGuild(message.guild.id,{muteRole:null});
-            Object.assign(data, message.embed_defaults()("color"));
+            Object.assign(data, message.embed_defaults("color"));
             var embed = new client.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }

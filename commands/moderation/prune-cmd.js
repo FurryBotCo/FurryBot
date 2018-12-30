@@ -20,7 +20,7 @@ module.exports = {
 	run: (async(client,message)=>{
         if(message.args.length < 1 || isNaN(message.args[0])) return new Error("ERR_INVALID_USAGE");
         if(message.args[0] < 2 || message.args[0] > 100) return message.reply("Please provide a number between 2");
-        message.delete().catch(noerr=>null);
+        if(message.args[0] < 100) message.args[0]++;
         return message.channel.bulkDelete(message.args[0],true);
     })
 };

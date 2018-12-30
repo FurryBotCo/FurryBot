@@ -17,27 +17,8 @@ module.exports = {
 		if(message.args.length === 0 || !message.args) {
 			var user = message.member;
 		} else {
-			// member mention
-			if(message.mentions.members.first()) {
-				var user = message.mentions.members.first();
-			}
-			
-			// user ID
-			if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-				var user = message.guild.members.get(message.args[0]);
-			}
-			
-			// username
-			if(isNaN(message.args[0]) && message.args[0].indexOf("#") === -1 && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-				var usr = client.users.find(t=>t.username===message.args[0]);
-				if(usr instanceof client.Discord.User) var user = message.guild.members.get(usr.id);
-			}
-			
-			// user tag
-			if(isNaN(message.args[0]) && message.args[0].indexOf("#") !== -1 && !message.mentions.members.first()) {
-				var usr = client.users.find(t=>t.tag===message.args[0]);
-				if(usr instanceof client.Discord.User) var user = message.guild.members.get(usr.id);
-			}
+			// attempt to get from message
+			var user = await message.getMemberFromArgs();
 		}
 	
 		
@@ -74,7 +55,7 @@ module.exports = {
 					inline: true
 				},{
 					name: `Roles [${roles.length}]`,
-					value: roles.length > 15 ?`Too many roles to list, please use \`${message.gConfig.prefix}roles <@!${user.id}>\``:roles.toString(),
+					value: roles.length > 15 ?`Too many roles to list, please use \`${message.gConfig.prefix}roles ${user.user.id}\``:roles.toString(),
 					inline: false
 				}
 			]
@@ -118,7 +99,7 @@ module.exports = {
 				inline: false
 			},{
 				name: "Bot List",
-				value: list.length > 1000 ? `Output is too long, use \`${message.gConfig.prefix}botlistinfo <@!${user.id}>\`` : list.length === 0 ? "Not found on any." : list,
+				value: list.length > 1000 ? `Output is too long, use \`${message.gConfig.prefix}botlistinfo ${user.user.tag}\`` : list.length === 0 ? "Not found on any." : list,
 				inline: false
 			})
 		}

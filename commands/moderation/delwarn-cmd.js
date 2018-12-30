@@ -17,27 +17,8 @@ module.exports = {
 	run: (async(client,message)=>{
         if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
     
-        // member mention
-        if(message.mentions.members.first()) {
-            var user = message.mentions.members.first();
-        }
-        
-        // user ID
-        if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-            var user = message.guild.members.get(message.args[0]);
-        }
-        
-        // username
-        if(isNaN(message.args[0]) && message.args[0].indexOf("#") === -1 && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-            var usr = client.users.find(t=>t.username===message.args[0]);
-            if(usr instanceof client.Discord.User) var user = message.guild.members.get(usr.id);
-        }
-        
-        // user tag
-        if(isNaN(message.args[0]) && message.args[0].indexOf("#") !== -1 && !message.mentions.members.first()) {
-            var usr = client.users.find(t=>t.tag===message.args[0]);
-            if(usr instanceof client.Discord.User) var user = message.guild.members.get(usr.id);
-        }
+        // get member from args
+        var user = await message.getMemberFromArgs();
     
         if(!user) {
             var data = {
@@ -52,7 +33,7 @@ module.exports = {
         if(isNaN(message.args[1])) return message.reply(`Please provide a valid warning id as the second argument.`);
     
         var w = await client.db.deleteUserWarning(user.id,message.guild.id,message.args[1]);
-    
+        console.log(w);
         if(!w) {
             var data = {
                 title: "Failure",

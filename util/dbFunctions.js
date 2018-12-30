@@ -23,7 +23,7 @@ class FurryBotDatabase {
 	}
 
 	async getGuild(gid) {
-		if(!gid) return new Error("ERR_MISSING_PARAM");
+		if(!gid) return new TypeError("ERR_MISSING_PARAM");
 		gid = gid.toString();
 		var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.guilds).getAll(gid);
 		if(a.length <= 0) return this.createGuild(gid);
@@ -31,7 +31,7 @@ class FurryBotDatabase {
 	}
 
 	async deleteGuild(gid) {
-		if(!gid) return new Error("ERR_MISSING_PARAM");
+		if(!gid) return new TypeError("ERR_MISSING_PARAM");
 		gid = gid.toString();
 		var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.guilds).getAll(gid);
 		if(a.length <= 0) {
@@ -48,7 +48,7 @@ class FurryBotDatabase {
 	}
 
 	async updateGuild(gid,fields) {
-		if(!gid || !fields) return new Error("ERR_MISSING_PARAM");
+		if(!gid || !fields) return new TypeError("ERR_MISSING_PARAM");
 		gid = gid.toString();
 		var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.guilds).getAll(gid);
 		if(a.length<=0) {
@@ -96,7 +96,7 @@ class FurryBotDatabase {
 	}
 
 	async createUserWarning(uid,gid,blame,reason,bypassChecks=false) {
-		if(!uid || !gid || !blame || !reason) return new Error("ERR_MISSING_PARAM");
+		if(!uid || !gid || !blame || !reason) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
 		if(!bypassChecks) {
@@ -122,7 +122,7 @@ class FurryBotDatabase {
 	}
 
 	async getUserWarnings(uid,gid) {
-		if(!uid || !gid) return new Error("ERR_MISSING_PARAM");
+		if(!uid || !gid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
 		var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.guilds).getAll(gid);
@@ -139,7 +139,7 @@ class FurryBotDatabase {
 	}
 	
 	async getUserWarning(uid,gid,wid) {
-		if(!uid || !gid || !wid) return new Error("ERR_MISSING_PARAM");
+		if(!uid || !gid || !wid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
 		wid = parseInt(wid,10);
@@ -149,11 +149,11 @@ class FurryBotDatabase {
 			var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(uid);
 		}
 		
-		return b[0].warnings.filter(w=>w.id===wid&&w.gid===gid);
+		return b[0].warnings.filter(w=>w.wid===wid&&w.gid===gid)[0]||false;
 	}
 
 	async deleteUserWarning(uid,gid,wid) {
-		if(!uid || !wid || !gid) return new Error("ERR_MISSING_PARAM");
+		if(!uid || !wid || !gid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
 		wid = parseInt(wid,10);
@@ -168,12 +168,12 @@ class FurryBotDatabase {
 			var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(uid);
 		}
 		return (await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).get(uid).update((u)=>{
-			return {"warnings": u('warnings').filter((item)=>item('wid').ne(wid)&&item("wid").ne(gid))}
+			return {"warnings": u('warnings').filter((item)=>this.client.r.and(item("wid").eq(wid),item("gid").eq(gid)).not())}
 		})).replaced>=1;
 	}
 
 	async clearUserWarnings(uid,gid) {
-		if(!uid || !gid) return new Error("ERR_MISSING_PARAM");
+		if(!uid || !gid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		gid = gid.toString();
 		var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.guilds).getAll(gid);
@@ -195,7 +195,7 @@ class FurryBotDatabase {
 	}
 
 	async addDonator(uid,level) {
-		if(!uid || !level) return new Error("ERR_MISSING_PARAM");
+		if(!uid || !level) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		// level:
 		// -1 = freemium
@@ -212,7 +212,7 @@ class FurryBotDatabase {
 	}
 
 	async updateDonator(uid,level) {
-		if(!uid || !level) return new Error("ERR_MISSING_PARAM");
+		if(!uid || !level) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		// level:
 		// -1 = freemium
@@ -226,7 +226,7 @@ class FurryBotDatabase {
 	}
 
 	async removeDonor(uid) {
-		if(!uid) return new Error("ERR_MISSING_PARAM");
+		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(uid);
 		if(b.length<=0) await this.createUser(uid);
@@ -234,7 +234,7 @@ class FurryBotDatabase {
 	}
 
 	async isDonor(uid) {
-		if(!uid) return new Error("ERR_MISSING_PARAM");
+		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(uid);
 		if(b.length<=0) {
@@ -245,7 +245,7 @@ class FurryBotDatabase {
 	}
 
 	async addBlacklistEntry(id,type = "user",reason = "None Specified") {
-		if(!id || !type || !reason) return new Error("ERR_MISSING_PARAM");
+		if(!id || !type || !reason) return new TypeError("ERR_MISSING_PARAM");
 		if(!["guild","user"].includes(type)) return new Error("ERR_INVALID_TYPE");
 		id = id.toString();
 		var table = ["guild"].includes(type) ? this.config.db.tables.guilds : this.config.db.tables.users; 
@@ -255,7 +255,7 @@ class FurryBotDatabase {
 	}
 
 	async updateBlacklistEntry(id,type = "user",reason = "None Specified") {
-		if(!id || !type || !reason) return new Error("ERR_MISSING_PARAM");
+		if(!id || !type || !reason) return new TypeError("ERR_MISSING_PARAM");
 		if(!["guild","user"].includes(type)) return new Error("ERR_INVALID_TYPE");
 		id = id.toString();
 		var table = ["guild"].includes(type) ? this.config.db.tables.guilds : this.config.db.tables.users; 
@@ -265,7 +265,7 @@ class FurryBotDatabase {
 	}
 
 	async removeBlacklistEntry(id,type = "user") {
-		if(!id || !type) return new Error("ERR_MISSING_PARAM");
+		if(!id || !type) return new TypeError("ERR_MISSING_PARAM");
 		if(!["guild","user"].includes(type)) return new Error("ERR_INVALID_TYPE");
 		id = id.toString();
 		var table = ["guild"].includes(type) ? this.config.db.tables.guilds : this.config.db.tables.users; 
@@ -275,7 +275,7 @@ class FurryBotDatabase {
 	}
 
 	async isBlacklisted(id) {
-		if(!id) return new Error("ERR_MISSING_PARAM");
+		if(!id) return new TypeError("ERR_MISSING_PARAM");
 		id = id.toString();
 		var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.guilds).getAll(id);
 		var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(id);
@@ -322,7 +322,7 @@ class FurryBotDatabase {
 	}
 
 	async incrementCommandStats(command,amount=1) {
-		if(!command) return new Error("ERR_MISSING_PARAM");
+		if(!command) return new TypeError("ERR_MISSING_PARAM");
 		var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.stats).get("commands");
 		if(!a) var a = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.stats).insert({id:"commands"});
 		if(!a[command]) {
@@ -346,7 +346,7 @@ class FurryBotDatabase {
 	}
 
 	async createUser(uid,bypassChecks=false) {
-		if(!uid) return new Error("ERR_MISSING_PARAM");
+		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		if(!bypassChecks) {
 			var u = true/*this.client.users.has(uid)*//*||this.client.users.fetch(uid).then(u=>true).catch(u=>false)*/;
@@ -363,7 +363,7 @@ class FurryBotDatabase {
 	}
 
 	async getUser(uid) {
-		if(!uid) return new Error("ERR_MISSING_PARAM");
+		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(uid);
 		if(b.length<=0) {
@@ -374,7 +374,7 @@ class FurryBotDatabase {
 	}
 
 	async deleteUser(uid) {
-		if(!uid) return new Error("ERR_MISSING_PARAM");
+		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(uid);
 		if(b.length<=0) return false;
@@ -382,7 +382,7 @@ class FurryBotDatabase {
 	}
 
 	async updateUser(uid,fields) {
-		if(!uid || !fields) return new Error("ERR_MISSING_PARAM");
+		if(!uid || !fields) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		var b = await this.client.r.db(this.config.db.databases.main).table(this.config.db.tables.users).getAll(uid);
 		if(b.length<=0) {

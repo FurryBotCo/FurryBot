@@ -5,7 +5,9 @@ module.exports = {
 	userPermissions: [
         "MANAGE_GUILD"
     ],
-	botPermissions: [],
+	botPermissions: [
+        "MANAGE_CHANNELS"
+    ],
 	cooldown: 2.5e3,
 	description: "Set the role used to mute people",
 	usage: "<@role/role id/role name>",
@@ -31,20 +33,8 @@ module.exports = {
     
             return message.reply("Reset channel overwrites and mute role.");
         }
-        // role mention
-        if(message.mentions.roles.first()) {
-            var role = message.mentions.roles.first();
-        }
-        
-        // role ID
-        if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.roles.first())) {
-            var user = message.guild.roles.get(message.args[0]);
-        }
-        
-        // role name
-        if(isNaN(message.args[0]) && message.args[0].indexOf("#") === -1 && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-            var role = message.guild.roles.find(r=>r.name===message.args.join(" "));
-        }
+        // get role from message
+        var role = await message.getRoleFromArgs();
     
         if(!role) {
             var data = {
@@ -52,7 +42,7 @@ module.exports = {
                 description: "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
                 color: 15601937
             };
-            Object.assign(data, message.embed_defaults()("color"));
+            Object.assign(data, message.embed_defaults("color"));
             var embed = new client.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }
@@ -63,7 +53,7 @@ module.exports = {
                 description: `This role (<@&${role.id}>) cannot be used as the muted role, check that is not any of these:\n\t- The guilds \`everyone\` role\n\t- A bots role (generated when a bot is invited)\n\t- Higher than me`,
                 color: 15601937
             }
-            Object.assign(data, message.embed_defaults()("color"));
+            Object.assign(data, message.embed_defaults("color"));
             var embed = new client.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }

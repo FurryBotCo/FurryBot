@@ -35,28 +35,7 @@ module.exports = {
             
             if(!mn) var mn = 1;
     
-            // member mention
-            if(message.mentions.members.first()) {
-                var user = message.mentions.members.first();
-            } else {
-            
-                // user ID
-                if(!isNaN(message.args[mn]) && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-                    var user = message.guild.members.get(message.args[mn]);
-                }
-                
-                // username
-                if(isNaN(message.args[mn]) && message.args[mn].indexOf("#") === -1 && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-                    var usr = client.users.find(t=>t.username===message.args[mn]);
-                    if(usr instanceof client.Discord.User) var user = message.guild.members.get(usr.id);
-                }
-                
-                // user tag
-                if(isNaN(message.args[mn]) && message.args[mn].indexOf("#") !== -1 && !message.mentions.members.first()) {
-                    var usr = client.users.find(t=>t.tag===message.args[mn]);
-                    if(usr instanceof client.Discord.User) var user = message.guild.members.get(usr.id);
-                }
-            }
+            var user = await message.getMemberFromArgs(mn);
         }
     
         
@@ -71,7 +50,7 @@ module.exports = {
             return message.channel.stopTyping();
         }
         
-        var warnings = await client.db.getUserWarnings(user.id,message.guild.id);
+        var warnings = await client.db.getUserWarnings(user.id,message.guild.id).then(res=>res.sort((a,b)=>new Date(a.timestamp) - new Date(b.timestamp)));
         if(warnings.length <= 0) {
             var data = {
                 title: "No Warnings Found",

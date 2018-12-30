@@ -108,5 +108,6 @@
     "enabled": false,
     "channel": null
   },
-  "blacklisted": false
+  "blacklisted": false,
+  "locale": "en"
 }
