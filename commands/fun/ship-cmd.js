@@ -84,10 +84,11 @@ module.exports = {
             return message.channel.stopTyping();
         }
     
+        if(user1 instanceof client.Discord.GuildMember) var user1 = user1.user;
         if(!user2) var user2 = message.author;
     
         if(user1.id === user2.id) {
-            message.reply("That's a bit self centered, don't you think...");
+            message.reply("That's a bit self centered...");
             return message.channel.stopTyping();
         }
         rand1 = Math.floor(Math.random()*3),
@@ -100,8 +101,7 @@ module.exports = {
         r2 = Math.round(user2.username.length/rand2);
     
         var shipname = user1.username.substr(0,r1)+user2.username.substr(user2.username.length-r2,r2);
-        
-        var t = builtin.filter(b=>b.users.includes("242843345402069002")&&b.users.includes("398251412246495233"));
+        var t = builtin.filter(b=>b.users.includes(user1.id)).filter(b=>b.users.includes(user2.id));
         var amount = t.length > 0 ? t[0].percent : Math.floor(Math.random()*101);
     
         const heart = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "1" : amount >= 2 && amount < 19 ? "2-19" : amount >= 20 && amount < 39 ? "20-39" : amount >= 40 && amount < 59 ? "40-59" : amount >= 60 && amount < 79 ? "60-79" : amount >= 80 && amount < 99 ? "80-99" : amount === 100 ? "100" : "unknown";
