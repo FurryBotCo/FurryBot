@@ -14,7 +14,8 @@ module.exports = {
 	run: (async(client,message)=>{
         message.channel.startTyping();
         if(message.args.length >= 1) {
-            var user = await message.getUserFromArgs();
+            // get member from message
+        var user = await message.getMemberFromArgs();
             var imgurl = user instanceof client.Discord.User ? user.displayAvatarURL({format:"png"}) : message.unparsedArgs.join("%20");
         } else if (message.attachments.first()) {
             var imgurl = message.attachments.first().url;

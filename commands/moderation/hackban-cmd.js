@@ -17,27 +17,8 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
-        // member mention
-        if(message.mentions.members.first()) {
-           var user = message.mentions.users.first();
-       }
-       
-       // user ID
-       if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-           var user = await client.users.fetch(message.args[0]).catch(noerr=>null);
-       }
-       
-       // username
-       if(isNaN(message.args[0]) && message.args[0].indexOf("#") === -1 && !(message.args.length === 0 || !message.args || message.mentions.members.first())) {
-           var usr = client.users.find(t=>t.username===message.args[0]);
-           if(usr instanceof client.Discord.User) var user = usr;
-       }
-       
-       // user tag
-       if(isNaN(message.args[0]) && message.args[0].indexOf("#") !== -1 && !message.mentions.members.first()) {
-           var usr = client.users.find(t=>t.tag===message.args[0]);
-           if(usr instanceof client.Discord.User) var user = usr;
-       }
+        // get member from message
+        var user = await message.getMemberFromArgs();
    
        if(!user) {
            var data = {

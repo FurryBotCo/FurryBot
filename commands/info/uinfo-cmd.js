@@ -17,7 +17,7 @@ module.exports = {
 		if(message.args.length === 0 || !message.args) {
 			var user = message.member;
 		} else {
-			// attempt to get from message
+			// get member from message
 			var user = await message.getMemberFromArgs();
 		}
 	

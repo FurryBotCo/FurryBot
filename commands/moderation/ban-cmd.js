@@ -19,7 +19,7 @@ module.exports = {
 	run: (async(client,message)=>{
         if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
     
-        // get user from message
+        // get member from message
         var user = await message.getMemberFromArgs();
         
         if(!user) {

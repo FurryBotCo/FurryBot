@@ -13,6 +13,18 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async (client,message) => {
 		message.channel.startTyping();
+		// get member from message
+		var member = message.args.length <= 0 ? message.member : await message.getMemberFromArgs();
+		
+		if(!member) {
+			var data = {
+				title: "User not found",
+				description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
+			}
+			Object.assign(data, message.embed_defaults());
+			var embed = new client.Discord.MessageEmbed(data);
+			return message.channel.send(embed);
+		}
 		var position = "1/2";
 		var level = message.uConfig.level;
 		var xp_left = message.uConfig.xp;
@@ -32,18 +44,18 @@ module.exports = {
 			.setColor(rank.color)
 			.addText(rank.name, 445, 300)
 			.setColor("#F00");
-		if(message.member.nickname !== null) {
-			pr.setColor("#F00");
-			pr.addText(message.author.tag, 150, 220);
-			pr.setColor("#00F");
-			pr.addText(message.member.nickname, 150, 190);
+		if(member.nickname !== null) {
+			pr.setColor("#F00")
+			.addText(member.user.tag, 150, 220)
+			.setColor("#00F")
+			.addText(member.nickname, 150, 190);
 		} else {
-			pr.setColor("#00F");
-			pr.addText(message.author.tag, 150, 190);
+			pr.setColor("#00F")
+			.addText(member.user.tag, 150, 190);
 		}
-		var u = message.author.displayAvatarURL().split(".");
+		var u = member.user.displayAvatarURL().split(".");
 		u.pop();
-		var imgpath = `${client.config.rootDir}/tmp/${message.guild.id}-${message.channel.id}-${message.author.id}-profile.png`;
+		var imgpath = `${client.config.rootDir}/tmp/${message.guild.id}-${message.channel.id}-${member.user.id}-profile.png`;
 		await client.download(`${u.join(".")}.png`,imgpath);
 		var img = await client.fsn.readFile(imgpath);
 		pr.addImage(img, 18, 128, 119, 119);

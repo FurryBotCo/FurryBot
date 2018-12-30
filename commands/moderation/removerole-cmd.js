@@ -18,21 +18,8 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async (client,message) => {
         if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
-        // role mention
-        if(message.mentions.roles.first()) {
-            var role = message.mentions.roles.first();
-        }
-        
-        // role ID
-        if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.roles.first())) {
-            var role = message.guild.roles.get(message.args[0]);
-        }
-        
-        // role name
-        if(isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.roles.first())) {
-            var rl = message.guild.roles.find(r=>r.name.toLowerCase()===message.args[0].toLowerCase());
-            if(rl instanceof client.Discord.Role) var role = message.guild.roles.get(rl.id);
-        }
+       // get role from message
+       var role = await message.getRoleFromArgs();
 
         if(!role) {
 			var data = {

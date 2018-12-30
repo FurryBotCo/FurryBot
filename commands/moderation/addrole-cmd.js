@@ -18,21 +18,8 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async (client,message) => {
         if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
-        // role mention
-        if(message.mentions.roles.first()) {
-            var role = message.mentions.roles.first();
-        }
-        
-        // role ID
-        if(!isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.roles.first())) {
-            var role = message.guild.roles.get(message.args[0]);
-        }
-        
-        // role name
-        if(isNaN(message.args[0]) && !(message.args.length === 0 || !message.args || message.mentions.roles.first())) {
-            var rl = message.guild.roles.find(r=>r.name.toLowerCase()===message.args[0].toLowerCase());
-            if(rl instanceof client.Discord.Role) var role = message.guild.roles.get(rl.id);
-        }
+        // get role from message
+        var role = await message.getRoleFromArgs();
 
         if(!role) {
 			var data = {
@@ -45,27 +32,8 @@ module.exports = {
         }
 
 
-        // member mention
-        if(message.mentions.members.first()) {
-            var member = message.mentions.members.first();
-        }
-        
-        // user ID
-        if(!isNaN(message.args[1]) && !(message.args.length === 1 || !message.args || message.mentions.members.first())) {
-            var member = message.guild.members.get(message.args[1]);
-        }
-        
-        // username
-        if(isNaN(message.args[1]) && message.args[1].indexOf("#") === -1 && !(message.args.length === 1 || !message.args || message.mentions.members.first())) {
-            var usr = client.users.find(t=>t.username.toLowerCase()===message.args[1].toLowerCase());
-            if(usr instanceof client.Discord.User) var member = message.guild.members.get(usr.id);
-        }
-        
-        // user tag
-        if(isNaN(message.args[1]) && message.args[1].indexOf("#") !== -1 && !message.mentions.members.first()) {
-            var usr = client.users.find(t=>t.tag.toLowerCase()===message.args[1].toLowerCase());
-            if(usr instanceof client.Discord.User) var member = message.guild.members.get(usr.id);
-        }
+        // get member from args
+        var member = await message.getMemberFromArgs();
         
         if(!member) {
 			var data = {

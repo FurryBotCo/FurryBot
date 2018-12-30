@@ -19,6 +19,7 @@ module.exports = {
     
         // get member from message
         var user = await message.getMemberFromArgs();
+        
         if(!user) {
             var data = {
                 title: "User not found",
