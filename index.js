@@ -185,7 +185,12 @@ class FurryBot extends Discord.Client {
 					title,
 					description,
 					fields
-				},this.embed_defaults())));
+				},this.embed_defaults()))).then(()=>{
+					if(this.channel.typing) this.channel.stopTyping();
+				}).catch((e)=>{
+					if(this.channel.typing) this.channel.stopTyping();
+					throw e;
+				})
 			}
 		});
 		this.os = require("os");
