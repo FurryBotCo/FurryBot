@@ -74,7 +74,12 @@ module.exports = (async(client,guild)=>{
         author: {
             name: guild.name,
             icon: guild.iconURL()
-        }
+        },
+        timestamp: client.getCurrentTimestamp(),
+        color: client.randomColor(),
+        footer: {
+			text: `Shard ${![undefined,null].includes(guild.shard) ? `${+guild.shard.id+1}/${client.options.shardCount}`: "1/1"} | Bot Version ${client.config.bot.version}`
+		},
     }
     var em = new client.Discord.MessageEmbed(dt);
     var chn = guild.channels.filter(c=>c.type === "text" && c.permissionsFor(client.user.id).has("SEND_MESSAGES","EMBED_LINKS","VIEW_CHANNEL"));
