@@ -82,7 +82,7 @@ module.exports = (async(client) => {
 			var embed = new client.Discord.MessageEmbed(data);
 			client.channels.get(client.config.bot.channels.daily).send(embed).then(n=>{
 				client.logger.log(`Posted daily stats, ${d}: ${count}, total: ${client.guilds.size}`);
-			}).catch(client.logger.log);
+			}).catch(client.logger.error);
 		}
     },1e3);
     console.log("end of ready");
