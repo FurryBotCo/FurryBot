@@ -16,6 +16,34 @@ module.exports = {
 	run: (async(client,message) => { 
         if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
         message.channel.startTyping();
+        if(message.args[0] === "random") {
+            var user1 = message.guild.members.filter(u=>u.id!==message.author.id&&!u.user.bot).random();
+        } else {
+            var user1 = await message.getUserFromArgs(0,false,false,0);
+        }
+        
+        // 2
+        if(message.args.length > 1) {
+            if(message.args[1] === "random") {
+                if(!user1) {} else {
+                    var user2 = message.guild.members.filter(u=>u.id!==user1.id&&u.id!==message.author.id&&!u.user.bot).random();
+                }
+            } else {
+               var user2 = await message.getUserFromArgs(1,false,false,1);
+            }
+        }
+    
+        if(!user1) return message.errorEmbed("INVALID_USER");
+    
+        if(user1 instanceof client.Discord.GuildMember) var user1 = user1.user;
+        if(user2 instanceof client.Discord.GuildMember) var user2 = user2.user;
+        if(!user2) var user2 = message.author;
+    
+        if(user1.id === user2.id) {
+            message.reply("That's a bit self centered...");
+            return message.channel.stopTyping();
+        }
+
         const builtin = [
             {
                 users: [
@@ -54,43 +82,21 @@ module.exports = {
                     "398251412246495233" // Furry Bot#7119
                 ],
                 percent: 0
+            },{
+                users: [
+                    "348992216695439360",
+                    user2.id
+                ],
+                percent: 100
+            },{
+                users: [
+                    "348992216695439360",
+                    user1.id
+                ],
+                percent: 100
             }
         ];
-        if(message.args[0] === "random") {
-            var user1 = message.guild.members.filter(u=>u.id!==message.author.id&&!u.user.bot).random();
-        } else {
-            var user1 = await message.getUserFromArgs(0,false,false,0);
-        }
-        
-        // 2
-        if(message.args.length > 1) {
-            if(message.args[1] === "random") {
-                if(!user1) {} else {
-                    var user2 = message.guild.members.filter(u=>u.id!==user1.id&&u.id!==message.author.id&&!u.user.bot).random();
-                }
-            } else {
-               var user2 = await message.getUserFromArgs(1,false,false,1);
-            }
-        }
-    
-        if(!user1) {
-            var data = {
-                title: "User not found",
-                description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
-            }
-            Object.assign(data, message.embed_defaults());
-            var embed = new client.Discord.MessageEmbed(data);
-            message.channel.send(embed);
-            return message.channel.stopTyping();
-        }
-    
-        if(user1 instanceof client.Discord.GuildMember) var user1 = user1.user;
-        if(!user2) var user2 = message.author;
-    
-        if(user1.id === user2.id) {
-            message.reply("That's a bit self centered...");
-            return message.channel.stopTyping();
-        }
+
         rand1 = Math.floor(Math.random()*3),
         rand2 = Math.floor(Math.random()*3);
     
