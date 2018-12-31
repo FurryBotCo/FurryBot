@@ -1,6 +1,6 @@
 module.exports = (async(client)=>{
     const blapi = require("blapi");
-    blapi.manualPost(client.guilds.size,client.user.id,client.config.botLists);
+    blapi.manualPostSharded(client.guilds.size,client.user.id,client.config.botLists,0,client.options.shardCount);
     // botblock was blocked on discordbots.org
     const rq = await client.request(`https://discordbots.org/api/bots/${client.user.id}/stats`,{
         method: "POST",
