@@ -249,8 +249,8 @@ class FurryBotDatabase {
 		if(!["guild","user"].includes(type)) return new Error("ERR_INVALID_TYPE");
 		id = id.toString();
 		var table = ["guild"].includes(type) ? this.config.db.tables.guilds : this.config.db.tables.users; 
-		var c = await this.client.r.db(this.config.db.main.db).table(table).getAll(uid);
-		if(c.length<=0) await this[`create${type}`](id);
+		var c = await this.client.r.db(this.config.db.main.db).table(table).getAll(id);
+		if(c.length<=0) await this[`create${this.client.ucwords(type)}`](id);
 		return (await this.client.r.db(this.config.db.main.db).table(table).get(id).update({blacklisted:true,blacklistReason:reason})).replaced >= 1;
 	}
 
@@ -259,8 +259,8 @@ class FurryBotDatabase {
 		if(!["guild","user"].includes(type)) return new Error("ERR_INVALID_TYPE");
 		id = id.toString();
 		var table = ["guild"].includes(type) ? this.config.db.tables.guilds : this.config.db.tables.users; 
-		var c = await this.client.r.db(this.config.db.main.db).table(table).getAll(uid);
-		if(c.length<=0) await this[`create${type}`](id);
+		var c = await this.client.r.db(this.config.db.main.db).table(table).getAll(id);
+		if(c.length<=0) await this[`create${this.client.ucwords(type)}`](id);
 		return (await this.client.r.db(this.config.db.main.db).table(table).get(id).update({blacklisted:true,blacklistReason:reason})).replaced >= 1;
 	}
 
@@ -269,8 +269,8 @@ class FurryBotDatabase {
 		if(!["guild","user"].includes(type)) return new Error("ERR_INVALID_TYPE");
 		id = id.toString();
 		var table = ["guild"].includes(type) ? this.config.db.tables.guilds : this.config.db.tables.users; 
-		var c = await this.client.r.db(this.config.db.main.db).table(table).getAll(uid);
-		if(c.length<=0) await this[`create${type}`](id);
+		var c = await this.client.r.db(this.config.db.main.db).table(table).getAll(id);
+		if(c.length<=0) await this[`create${this.client.ucwords(type)}`](id);
 		return (await this.client.r.db(this.config.db.main.db).table(table).get(id.replace(r.row.without("blacklisted","blacklistReason").merge({blacklisted:false})))).replaced >= 1;
 	}
 
@@ -279,8 +279,8 @@ class FurryBotDatabase {
 		id = id.toString();
 		var a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).getAll(id);
 		var b = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).getAll(id);
-		if(a.length>=1) return a[0].blacklisted ? {blacklisted: true, reason: a[0].reason, type: "guild"} : {blacklisted: false, reason: null, type: "guild"};
-		else if(b.length>=1) return b[0].blacklisted ? {blacklisted: true, reason: b[0].reason, type: "user"} : {blacklisted: false, reason: null, type: "user"};
+		if(a.length>=1) return a[0].blacklisted ? {blacklisted: true, reason: a[0].blacklistReaso,  type: "guild"} : {blacklisted: false, reason: null, type: "guild"};
+		else if(b.length>=1) return b[0].blacklisted ? {blacklisted: true, reason: b[0].blacklistReason, type: "user"} : {blacklisted: false, reason: null, type: "user"};
 		else return false;
 	}
 
@@ -341,7 +341,7 @@ class FurryBotDatabase {
 		var j = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily).getAll(date);
 		if(j.length < 1) var j = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily).insert({id:date,count:0}).then(s=>this.client.r.db(this.config.db.main.db).table("dailyjoins").get(date));
 		if(j[0]) j = j[0];
-		var res = negative ? await this.client.r.db(this.config.db.main.db).db(this.config.db.main.db).table(this.config.db.tables.daily).get(date).update({count:+j.count-amount}) : await this.client.r.db(this.config.db.main.db).table("dailyjoins").get(date).update({count:+j.count+amount});
+		var res = negative ? await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily).get(date).update({count:+j.count-amount}) : await this.client.r.db(this.config.db.main.db).table("dailyjoins").get(date).update({count:+j.count+amount});
 		return (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily).get(date)).count;
 	}
 

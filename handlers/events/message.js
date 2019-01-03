@@ -89,8 +89,10 @@ module.exports = (async(client,message)=>{
         return;
 	}
 	message.unparsedArgs.shift();
-
-	if(message.content === `<@${client.user.id}>` || message.content === `<@!${client.user.id}>`) {
+	
+	var blacklist = (message.uConfig.blacklisted && !message.user.isDeveloper) || message.gConfig.blacklisted;
+	
+	if(message.content === `<@${client.user.id}>` || message.content === `<@!${client.user.id}>` && !blacklist) {
 		/*var c = await require(`${process.cwd()}/commands/${client.config.commandList.fullList["help"].category}/help-cmd.js`)(client,message);
 		if(c instanceof Error) throw c;*/
 		var data = {
@@ -108,7 +110,7 @@ module.exports = (async(client,message)=>{
 		}
 	}
 
-	if(client.responseList.includes(message.content.toLowerCase())) {
+	if(client.responseList.includes(message.content.toLowerCase()) && !blacklist) {
 		var response = client.getResponse(message.content.toLowerCase());
 		client.logger.commandlog(`Response "${response.triggers[0]}" triggered by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
 		var start = client.performance.now();
@@ -117,10 +119,18 @@ module.exports = (async(client,message)=>{
 		client.logger.debug(`Response handler for "${response.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
 		return;
 	}
-    if(!message.content.startsWith(message.prefix)) return;
+    if(!message.content.toLowerCase().startsWith(message.prefix.toLowerCase())) return;
     var command = client.getCommand(message.command);
     var category = client.getCategory(message.command);
 
+	if(blacklist) {
+		var g = await client.db.isBlacklisted(message.guild.id);
+		var u = await client.db.isBlacklisted(message.author.id);
+		var blacklistType = g.blacklisted ? "guild" : u.blacklisted ? "user" : "unknown";
+		var blReason = g.blacklisted ? g.reason : u.blacklisted ? u.reason : "unknown";
+		client.logger.info(`Skipped command "${command.triggers[0]}" with args "${message.unparsedArgs}" from ${message.author.tag} (${message.author.id}) in ${message.guild.name} (${message.guild.id}) because of ${blacklistType} blacklist, reason: ${blReason}`);
+		return;
+	}
     if(!command || !category) return;
 
     if(category.name.toLowerCase() === "custom" && message.guild.id !== client.config.bot.mainGuild) return;
@@ -269,7 +279,7 @@ module.exports = (async(client,message)=>{
 			discriminator: message.author.discriminator,
 			tag: message.author.tag
         });
-        client.logger.commandlog(`Command  "${command.triggers[0]}" ran with arguments "${message.args.join(" ")}" by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
+        client.logger.commandlog(`Command  "${command.triggers[0]}" ran with arguments "${message.unparsedArgs.join(" ")}" by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
 		var start = client.performance.now();
 		var c = await command.run(client,message);
 		var end = client.performance.now();

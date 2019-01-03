@@ -42,7 +42,7 @@ class FurryBotServer {
                 }
             });
             var st = JSON.parse(rq.body);
-            
+			
             var srv=Array.from(client.guilds.values());
             for(let i=0;i<srv.length;i++) {
                 if(!srv[i].unavailable) {
@@ -80,10 +80,10 @@ class FurryBotServer {
                 nodeVersion: process.version,
                 dailyJoins,
                 monitors: {
-                    website: st.monitors.filter(m=>m.id===parseInt(this.config.uptimeRobot.monitors.website),10)[0].status,
-                    cdn: st.monitors.filter(m=>m.id===parseInt(this.config.uptimeRobot.monitors.cdn,10))[0].status
+                    website: st.monitors.filter(m=>m.id===parseInt(this.config.apis.uptimeRobot.monitors.website),10)[0].status,
+                    cdn: st.monitors.filter(m=>m.id===parseInt(this.config.apis.uptimeRobot.monitors.cdn,10))[0].status
                 },
-				commandCount: Object.keys(this.config.commandList.fullList).length,
+				commandCount: client.commandList.length,
 				messageCount: await this.r.table("stats").get("messageCount")("count"),
 				dmMessageCount: await this.r.table("stats").get("messageCount")("dmCount")
             });

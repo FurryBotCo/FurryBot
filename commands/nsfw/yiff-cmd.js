@@ -35,7 +35,7 @@ module.exports = {
                     description: `The type you provided **${type}** is invalid, valid types are: **${client.config.yiff.types.join("**, **")}**.`
                 }
                 Object.assign(data,message.embed_defaults());
-                var embed = new client.Discord.RichEmbed(data);
+                var embed = new client.Discord.MessageEmbed(data);
                 return message.channel.send(embed);
             }
         }

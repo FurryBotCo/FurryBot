@@ -17,9 +17,10 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
-        // get member from message
-        var user = await message.getMemberFromArgs();
+        // get user from message
+        var user = await message.getUserFromArgs();
    
+		if(!user) var user = await client.users.fetch(message.args[0]).catch(u=>false);
         if(!user) return message.errorEmbed("INVALID_USER");
    
        if((await message.guild.fetchBans()).has(user.id)) {
