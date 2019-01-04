@@ -29,14 +29,20 @@ module.exports = (async(client,oldChannel,newChannel)=>{
         footer: {
 			text: `Shard ${![undefined,null].includes(newChannel.guild.shard) ? `${+newChannel.guild.shard.id+1}/${client.options.shardCount}`: "1/1"} | Bot Version ${client.config.bot.version}`
 		},
-        fields: []
+        fields: [
+            {
+                name: "Channel",
+                value: `${newChannel.name} (${newChannel.id})`,
+                inline: false
+            }
+        ]
     }
     var log = (await newChannel.guild.fetchAuditLogs({limit:1,type:"CHANNEL_UPDATE"})).entries.first();
     if(![undefined,null,"",[],{}].includes(log) && log.action === "CHANNEL_UPDATE") {
         var log_data = [{
-           name: "Executor",
-           value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
-           inline: false
+        name: "Executor",
+        value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+        inline: false
         },{
             name: "Reason",
             value: log.executor instanceof client.Discord.User && !log.executor.bot ? "Not Applicable" : [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
@@ -44,17 +50,9 @@ module.exports = (async(client,oldChannel,newChannel)=>{
         }];
     }
     if(!client._.isEqual(oldChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})),newChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})))) {
-        let data = Object.assign({},base);
+        var data = Object.assign({},base);
         data.fields = [{
-            name: "Channel",
-            value: `${newChannel.name} (${newChannel.id})`,
-            inline: false
-        },{
-            name: "Update Type",
-            value: "Permission Overwrites",
-            inline: false
-        },{
-            name: "Update",
+            name: "Permissions Overwrites Update",
             value: "Check Audit Log",
             inline: false
         }].concat(log_data);
@@ -62,21 +60,17 @@ module.exports = (async(client,oldChannel,newChannel)=>{
         logch.send(embed);
     }
     if(oldChannel.name !== newChannel.name) {
-        let data = Object.assign({},base);
+        var data = Object.assign({},base);
         data.fields = [{
             name: "Channel",
             value: `${newChannel.name} (${newChannel.id})`,
             inline: false
         },{
-            name: "Update Type",
-            value: "Name",
-            inline: false
-        },{
-            name: "Old Value",
+            name: "Old Name",
             value: oldChannel.name,
             inline: false
         },{
-            name: "New Value",
+            name: "New Name",
             value: newChannel.name,
             inline: false
         }].concat(log_data);
@@ -84,28 +78,42 @@ module.exports = (async(client,oldChannel,newChannel)=>{
         logch.send(embed);
     }
 
-    /*if(typeof channel.parent !== "undefined") {
-        data.fields.push({
-            name: "Parent Channel Name",
-            value: channel.parent.name,
-            inline: false
-        },{
-            name: "Parent Channel ID",
-            value: channel.parent.id,
-            inline: false
-        });
+    switch(newChannel.type) {
+        case "text":
+        // topic
+        // slowmode
+        // nsfw
+        break;
+
+    case "voice":
+        if(oldChannel.bitrate !== newChannel.bitrate) {
+            var data = Object.assign({},base);
+            data.fields = [{
+                name: "Old Bitrate",
+                value: `${oldChannel.bitrate/1000}kbps`,
+                inline: false
+            },{
+                name: "New Bitrate",
+                value: `${newChannel.bitrate/1000}kbps`,
+                inline: false
+            }].concat(log_data);
+            var embed = new client.Discord.MessageEmbed(data);
+            logch.send(embed);
+        }
+
+        if(oldChannel.userLimit !== newChannel.userLimit) {
+            var data = Object.assign({},base);
+            data.fields = [{
+                name: "Old User Limit",
+                value: `${oldChannel.userLimit === "0"?"UNLIMITED":oldChannel.userLimit}`,
+                inline: false
+            },{
+                name: "New User Limit",
+                value: `${newChannel.userLimit === "0"?"UNLIMITED":newChannel.userLimit}`,
+                inline: false
+            }].concat(log_data);
+            var embed = new client.Discord.MessageEmbed(data);
+            logch.send(embed);
+        }
     }
-    if(channel.type === "voice") {
-        data.fields.push({
-            name: "Bitrate",
-            value: `${channel.bitrate/1000}kbps`,
-            inline: false
-        },{
-            name: "Channel User Limit",
-            value: channel.userLimit === "0" ? "UNLIMITED" : channel.userLimit,
-            inline: false
-        });
-    }
-    var embed = new client.Discord.MessageEmbed(data);
-    return logch.send(embed);*/
 })

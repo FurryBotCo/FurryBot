@@ -46,7 +46,7 @@
       "channel": null,
       "enabled": false
     },
-    "channeldestroyed": {
+    "channeldeleted": {
       "channel": null,
       "enabled": false
     },

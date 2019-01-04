@@ -33,7 +33,7 @@ module.exports = {
 						var ch = message.mentions.channels.first();
 					}
 					var event = a.replace(" ","");
-					if(!client.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
+					if(!client.config.logTypes.includes(event)) return new Error("ERR_INVALID_USAGE");
 					if([undefined,null,"",[],{}].includes(message.gConfig.logging[event])) {
 						client.logger.log(`Updated logging for ${message.guild.name} (${message.guild.id}), missing logging config`);
 						await client.db.updateGuild(message.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
@@ -58,7 +58,7 @@ module.exports = {
 						var ch = message.mentions.channels.first(); // lgtm [js/useless-assignment-to-message]
 					}
 					var event = a.replace(" ","");
-					if(!client.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
+					if(!client.config.logTypes.includes(event)) return new Error("ERR_INVALID_USAGE");
 					if([undefined,null,"",[],{}].includes(message.gConfig.logging[event])) {
 						client.logger.log(`Updated logging for ${message.guild.name} (${message.guild.id}), missing logging config`);
 						await client.db.updateGuild(message.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
@@ -106,7 +106,7 @@ module.exports = {
 				}
 				return;
 			}
-			if(!client.config.logging.types.includes(event)) return new Error("ERR_INVALID_USAGE");
+			if(!client.config.logTypes.includes(event)) return new Error("ERR_INVALID_USAGE");
 			if([undefined,null,"",[],{}].includes(message.gConfig.logging[event])) {
 				client.logger.log(`Updated logging for ${message.guild.name} (${message.guild.id}), missing logging config`);
 				await client.db.updateGuild(message.guild.id,{logging:{[event]:{enabled:false,channel:null}}});
