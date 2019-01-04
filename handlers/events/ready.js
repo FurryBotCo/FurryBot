@@ -68,7 +68,7 @@ module.exports = (async(client) => {
 					name: "Donovan_DMC#1337",
 					"icon_url": "https://i.donovand.info/Don.gif"
 				},
-				title: `Total Guilds Joined ${d}\t Current Total: ${client.guilds.size}`,
+				title: `Total Guilds Joined ${count}\t Current Total: ${client.guilds.size}`,
 				description: `Total Guilds Joined Today: **${count}**`,
 				footer: {
 					text: `Shard ${client.guilds.get(client.config.bot.mainGuild).shard.id}/${client.options.shardCount} | Bot Version ${client.config.bot.version}`
