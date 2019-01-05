@@ -4,7 +4,7 @@ module.exports = (async(client,oldChannel,newChannel)=>{
     var gConfig = await client.db.getGuild(newChannel.guild.id).catch(err=>client.config.defaultGuildSettings);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = newChannel.guild.channels.get(gConfig.logging[ev].channel);
-    if(!logch) return client.db.updateGuild({logging:{[ev]:{enabled:false,channel:null}}});
+    if(!logch) return client.db.updateGuild(newChannel.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     if(newChannel.deleted) return;
 
     var base = {
