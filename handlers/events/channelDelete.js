@@ -12,7 +12,7 @@ module.exports = (async(client,channel)=>{
             name: channel.guild.name,
             icon_url: channel.guild.iconURL()
         },
-        timestamp: channel.createdTimestamp,
+        timestamp: new Date().toISOString(),
         color: client.randomColor(),
         footer: {
 			text: `Shard ${![undefined,null].includes(channel.guild.shard) ? `${+channel.guild.shard.id+1}/${client.options.shardCount}`: "1/1"} | Bot Version ${client.config.bot.version}`
