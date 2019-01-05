@@ -78,6 +78,12 @@ module.exports = (async(client,channel)=>{
                 inline: false
             });
         }
+    } else {
+        data.fields.push({
+            name: "Notice",
+            value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
+            inline: false
+        });
     }
 
     var embed = new client.Discord.MessageEmbed(data);

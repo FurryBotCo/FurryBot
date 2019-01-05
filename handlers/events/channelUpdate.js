@@ -41,6 +41,12 @@ module.exports = (async(client,oldChannel,newChannel)=>{
                 inline: false
             }];
         }
+    } else {
+        data.fields.push({
+            name: "Notice",
+            value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
+            inline: false
+        });
     }
 
     // parent
