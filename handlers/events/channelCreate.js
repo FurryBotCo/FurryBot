@@ -15,14 +15,10 @@ module.exports = (async(client,channel)=>{
         timestamp: channel.createdTimestamp,
         color: client.randomColor(),
         footer: {
-			text: `Shard ${![undefined,null].includes(channel.guild.shard) ? `${+channel.guild.shard.id+1}/${client.options.shardCount}`: "1/1"} | Bot Version ${client.config.bot.version}`
-		},
+            text: `Channel: ${channel.name} (${channel.id})`
+        },
         fields: [
             {
-                name: "Channel",
-                value: `${channel.name} (${channel.id})`,
-                inline: false
-            },{
                 name: "Parent Channel",
                 value: [undefined,null,""].includes(channel.parent) ? "None" : `${channel.parent.name} (${channel.parent.id})`,
                 inline: false

@@ -1,6 +1,6 @@
 module.exports = (async(client,guild,user) => {
     if(!guild || !user) return;
-    var ev = "userunbanned";
+    var ev = "memberunbanned";
     var gConfig = await client.db.getGuild(guild.id).catch(err=>client.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = guild.channels.get(gConfig.logging[ev].channel);
@@ -8,21 +8,16 @@ module.exports = (async(client,guild,user) => {
     var data = {
         title: `:scales: Member Unbanned`,
         author: {
-            name: guild.name,
-            icon_url: guild.iconURL()
+            name: `${user.tag} (${user.id})`,
+            icon_url: user.displayAvatarURL()
         },
         timestamp: new Date().toISOString(),
         color: client.randomColor(),
         footer: {
-			text: `Shard ${![undefined,null].includes(guild.shard) ? `${+guild.shard.id+1}/${client.options.shardCount}`: "1/1"} | Bot Version ${client.config.bot.version}`
+            text: guild.name,
+            icon_url: guild.iconURL()
 		},
-        fields: [
-            {
-                name: "User",
-                value: `${user.tag} (${user.id})`,
-                inline: false
-            }
-        ]
+        fields: []
     }
     
     // audit log check

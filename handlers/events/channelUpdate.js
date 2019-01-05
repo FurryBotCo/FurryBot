@@ -16,15 +16,9 @@ module.exports = (async(client,oldChannel,newChannel)=>{
         timestamp: new Date().toISOString(),
         color: client.randomColor(),
         footer: {
-            text: `Shard ${![undefined,null].includes(newChannel.guild.shard) ? `${+newChannel.guild.shard.id+1}/${client.options.shardCount}`: "1/1"} | Bot Version ${client.config.bot.version}`
+            text: `Channel: ${newChannel.name} (${newChannel.id})`
         },
-        fields: [
-            {
-                name: "Channel",
-                value: `${newChannel.name} (${newChannel.id})`,
-                inline: false
-            }
-        ]
+        fields: []
     }
 
     // audit log check
@@ -42,11 +36,11 @@ module.exports = (async(client,oldChannel,newChannel)=>{
             }];
         }
     } else {
-        data.fields.push({
+        var log_data = [{
             name: "Notice",
             value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
             inline: false
-        });
+        }];
     }
 
     // parent
