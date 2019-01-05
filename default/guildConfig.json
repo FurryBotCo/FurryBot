@@ -86,15 +86,15 @@
       "channel": null,
       "enabled": false
     },
-    "userbanned": {
+    "memberbanned": {
       "channel": null,
       "enabled": false
     },
-    "userunbanned": {
+    "memberunbanned": {
       "channel": null,
       "enabled": false
     },
-    "userupdated": {
+    "memberupdated": {
       "channel": null,
       "enabled": false
     }
