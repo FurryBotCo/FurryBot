@@ -1,12 +1,12 @@
 module.exports = (async(client,oldMember,newMember) => {
     if(!oldMember || !newMember || !newMember.guild) return;
-    var ev = "memberupdated";
+    var ev = "join";
     var gConfig = await client.db.getGuild(newMember.guild.id).catch(err=>client.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = newMember.guild.channels.get(gConfig.logging[ev].channel);
     if(!logch) return client.db.updateGuild(newMember.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     var base = {
-        title: `Member Updated`,
+        title: `Member Joined`,
         author: {
             name: `${newMember.user.tag} (${newMember.user.id})`,
             icon_url: newMember.user.displayAvatarURL()
