@@ -266,7 +266,7 @@ class FurryBot extends Discord.Client {
 		this.r = require("rethinkdbdash")(this.config.db.main);
 		//this.ro = require("rethinkdbdash")(this.config.db.other);
 		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
-		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV3`);
+		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV4`);
 		this.varParse = require(`${process.cwd()}/util/varHandler`);
 		this.listStats = require("./util/listStats");
 		this.lang = require(`${process.cwd()}/lang`)(this);

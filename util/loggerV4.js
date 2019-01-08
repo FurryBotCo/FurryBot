@@ -1,6 +1,6 @@
 /*
-Furry Bot™ Custom Logger V3
-11-14-18 - Trademark (™) Donovan_DMC & Furry Bot Limited 
+Furry Bot™ Custom Logger V4
+01-08-2019 - Trademark (™) Donovan_DMC & Furry Bot Limited 
 */
 
 const config = require("../config"),
@@ -53,7 +53,7 @@ class FurryBotLogger extends EventEmitter {
         this.on("log",async(args)=>{
             this.wss.broadcast(JSON.stringify({type:args.type||null,message:args.message||null,beta:this.config.beta,file:args.file||null,time:args.time||null,console:true}));
         });
-        this.server.listen(8888,this.config.serverOptions.bindIp);
+        this.server.listen(this.config.serverOptions.wsPort,this.config.serverOptions.bindIp);
         this.client = !client ? null : client;
         //this.isSharded = this.client !== null ? ![undefined,null].includes(this.client.shard) ? true : false : false;
         //this.shardID = this.isSharded ? this.client.shard.id : 0;
