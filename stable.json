@@ -1,5 +1,6 @@
 {
     "clientID": "398251412246495233",
     "name": "Furry Bot",
-    "beta": false
+    "beta": false,
+    "alpha": false
 }
