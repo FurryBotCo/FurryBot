@@ -68,7 +68,7 @@ module.exports = (async(client,message)=>{
             gConfig: await client.db.getGuild(message.guild.id).catch(err=>client.config.default.guildConfig),
             uConfig: await client.db.getUser(message.author.id).catch(err=>client.config.default.userConfig),
             get prefix() {
-                return message.content.startsWith(`<@${client.user.id}>`) ? `<@${client.user.id}` : message.content.startsWith(`<@!${client.user.id}>`) ? `<@!${client.user.id}>` : client.config.beta ? "fb!" : message.gConfig.prefix.toLowerCase();
+                return message.content.startsWith(`<@${client.user.id}>`) ? `<@${client.user.id}` : message.content.startsWith(`<@!${client.user.id}>`) ? `<@!${client.user.id}>` : client.config.beta || client.config.alpha ? client.config.defaultPrefix : message.gConfig.prefix.toLowerCase();
             },
             get args() {
                 try {
