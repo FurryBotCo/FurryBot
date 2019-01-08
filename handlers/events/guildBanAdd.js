@@ -23,7 +23,7 @@ module.exports = (async(client,guild,user) => {
     // audit log check
     if(guild.me.permissions.has("VIEW_AUDIT_LOG")) {
         var log = (await guild.fetchAuditLogs({limit:1,type:"MEMBER_BAN_ADD"})).entries.first();    
-        if(![undefined,null,"",[],{}].includes(log) && log.action === "MEMBER_BAN_ADD") {
+        if(![undefined,null,"",[],{}].includes(log) && log.action === "MEMBER_BAN_ADD" && log.target.id === user.id) {
             data.fields.push({
             name: "Executor",
             value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",

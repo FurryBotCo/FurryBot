@@ -22,8 +22,8 @@ module.exports = (async(client,oldMember,newMember) => {
     
     // audit log check
     if(newMember.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
-        var log = (await newMember.guild.fetchAuditLogs({limit:1,type:"CHANNEL_UPDATE"})).entries.first();
-        if(![undefined,null,"",[],{}].includes(log) && log.action === "CHANNEL_UPDATE") {
+        var log = (await newMember.guild.fetchAuditLogs({limit:1,type:"MEMBER_UPDATE"})).entries.first();
+        if(![undefined,null,"",[],{}].includes(log) && log.action === "MEMBER_UPDATE"  && log.target.id === newMember.id) {
             var log_data = [{
             name: "Executor",
             value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
