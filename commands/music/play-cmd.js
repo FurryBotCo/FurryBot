@@ -57,12 +57,12 @@ module.exports = {
         }
         if(!song) return message.reply("Internal Error `play1`");
         if(song instanceof Error) {
-            if(song.message === "CANCELED") {
+            if(song.message === "CANCEL") {
                 message.reply("Command canceled.");
                 return message.channel.stopTyping();
             }
             message.reply("Internal Error `play2`");
-            console.error(err);
+            console.error(song);
         }
         if(song instanceof client.Discord.Collection) {
             message.reply("Request timed out.");
@@ -78,23 +78,49 @@ module.exports = {
                 }
             }
             if(song.song.info.length > 6e5 && !message.gConfig.premium) {
-                message.reply(`This is too long to be played! The maximum time for this guild is \`10 minutes (6000s)\, to increase this limit please donate, and mark this server as premium **${client.config.premiumLink}**.`);
+                message.reply(`This is too long to be played! The maximum time for this guild is \`10 minutes (6000s)\`, to increase this limit please donate, and mark this server as premium **${client.config.bot.donationURL}**.`);
                 return message.channel.stopTyping();
             } 
-            if(!song.msg) {
-                message.reply(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
-            } else {
-                
-                song.msg.edit(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
+            var a = client.voiceConnections.filter(g=>g.channel.guild.id===message.guild.id);
+            var alreadyPlaying = a.size === 0 ? false : a.first().speaking.has("SPEAKING");
+            if(!alreadyPlaying) {
+                await client.r.table("guilds").get(message.guild.id).update({
+                    music: {
+                        textChannel: message.channel.id
+                    }
+                });
             }
-            var player = await client.playSong(message.member.voice.channel,song.song.info,"youtube");
+
+            await client.r.table("guilds").get(message.guild.id).update({
+                music: {
+                    queue: client.r.row("music")("queue").append({
+                        author: song.song.info.author,
+                        length: song.song.info.length,
+                        title: song.song.info.title,
+                        uri: song.song.info.uri,
+                        addedTimestamp: Date.now(),
+                        addedBy: message.member.id
+                    })
+                }
+            })
+            if(!song.msg) {
+               if(alreadyPlaying) message.reply(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await client.r.table("guilds").get(message.guild.id)("music")("queue")).length}`);
+               else message.reply(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
+            } else {
+                if(alreadyPlaying) message.reply(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await client.r.table("guilds").get(message.guild.id)("music")("queue")).length}`);
+               else song.msg.edit(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
+            }
+            if(!alreadyPlaying) {
+                var player = await client.playSong(message.member.voice.channel,song.song.info,"youtube");
+            }
         } else {
-            message.reply(`Now playing **${song.info.title}** by *${song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
-            var player = await client.playSong(message.member.voice.channel,song.info,"youtube");
+            if(alreadyPlaying) {
+                message.reply(`Added **${song.info.title}** by *${song.info.author}* (Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s) to the queue. Position: ${(await client.r.table("guilds").get(message.guild.id)("music")("queue")).length}`);
+            } else {
+                message.reply(`Now playing **${song.info.title}** by *${song.info.author}* - Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s`);
+                var player = await client.playSong(message.member.voice.channel,song.info,"youtube");
+            }
         }
-        player.on("finish",()=>{
-            console.log("finished");
-        });
         return message.channel.stopTyping();
     })
 };

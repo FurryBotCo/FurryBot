@@ -16,7 +16,6 @@
   "nsfwModuleEnabled": false,
   "premium": false,
   "prefix": "f!",
-  "messagee": "en",
   "autoYiff": {
     "enabled": false,
     "channel": null,
@@ -99,9 +98,6 @@
       "enabled": false
     }
   },
-  "musicQueue": {
-
-  },
   "muteRole": null,
   "djRole": null,
   "modlog": {
@@ -109,5 +105,10 @@
     "channel": null
   },
   "blacklisted": false,
-  "locale": "en"
+  "locale": "en",
+  "music": {
+    "queue": [],
+    "playing": false,
+    "textChannel": null
+  }
 }

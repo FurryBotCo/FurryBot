@@ -31,7 +31,7 @@ module.exports = {
         
         var c = client.voiceConnections.filter(g=>g.channel.guild.id===message.guild.id);
         if(c.size === 0) return message.reply("Please play something before using this!");
-        //if(!c.first().speaking.has("SPEAKING")) return message.reply("Nothing is playing.");
+        if(!c.first().speaking.has("SPEAKING")) return message.reply("Nothing is playing.");
         if(c.first().dispatcher.paused) return message.reply("Player is already paused.");
         c.first().dispatcher.pause();
         return message.reply(":pause_button: **Paused**");
