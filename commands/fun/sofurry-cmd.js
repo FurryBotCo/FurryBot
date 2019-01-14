@@ -23,7 +23,7 @@ module.exports = {
             "journal",
             "photo"
         ];
-        
+        const msg = await message.channel.send(`Fetching.. ${client.config.emojis.load}`);
         var req = await client.request("https://api2.sofurry.com/browse/search?search=furry&format=json&minlevel=0&maxlevel=0",{
             method: "GET",
             headers: {
@@ -38,21 +38,21 @@ module.exports = {
             if(submission.contentLevel !== 0) {
                 client.logger.log(`unsafe image:\n${client.util.inspect(submission,{depth:3,showHidden:true})}`);
                 client.logger.log(`Body: ${client.inspect(jsn,{depth:null})}`);
-                return message.reply("Image API returned a non-safe image! Please try again later.");
+                return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err=>message.channel.send(`Command failed: ${err}`));
             }
             var short = await client.shortenUrl(`http://www.sofurry.com/view/${submission.id}`);
             var extra = short.new ? `**This is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
             if([1,4].includes(submission.contentType)) {
                 var attachment = new client.Discord.MessageAttachment(submission.full,"sofurry.png");
-                return message.channel.send(`${extra}${submission.title} (type ${client.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${message.author.tag}`,attachment);
+                return msg.edit(`${extra}${submission.title} (type ${client.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${message.author.tag}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err=>message.channel.send(`Command failed: ${err}`)).then(()=>message.channel.send(attachment));
             } else {
-                return message.channel.send(`${extra}${submission.title} (type ${client.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${message.author.tag}`);
+                return msg.edit(`${extra}${submission.title} (type ${client.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${message.author.tag}\nIf something bad is returned, blame the service, not the bot author!`).catch(err=>message.channel.send(`Command failed: ${err}`));
             }
         }catch(e){
             client.logger.error(`Error:\n${e}`);
             client.logger.log(`Body: ${jsn}`);
             var attachment = new client.Discord.MessageAttachment(client.config.images.serverError);
-            return message.channel.send("Unknown API Error",attachment);
+            return msg.edit("Unknown API Error").then(()=>message.channel.send(attachment)).catch(err=>message.channel.send(`Command failed: ${err}`));
         }
     })
 };
