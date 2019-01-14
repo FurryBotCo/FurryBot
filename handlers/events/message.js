@@ -97,7 +97,7 @@ module.exports = (async(client,message)=>{
 		if(c instanceof Error) throw c;*/
 		var data = {
 			title: "Hewwo!",
-			description: `You can find out how to use me on my [docs page](${client.bot.config.documentationURL}), my current prefix here is: **${message.gConfig.prefix}**\n(this can be chanegd via \`${message.gConfig.prefix}prefix <newprefix>\`\nTo invite me to new servers, use [this link](https://discordapp.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=-1))`
+			description: `You can find out how to use me on my [docs page](${client.config.bot.documentationURL}), my current prefix here is: **${message.gConfig.prefix}**\n(this can be chanegd via \`${message.gConfig.prefix}prefix <newprefix>\`\nTo invite me to new servers, use [this link](https://discordapp.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=-1))`
 		}
 		Object.assign(data,message.embed_defaults());
 		var embed = new client.Discord.MessageEmbed(data);
