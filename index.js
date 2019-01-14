@@ -744,6 +744,22 @@ class FurryBot extends Discord.Client {
 			}
 		});
 	}
+
+	async getLogs(guild,type,target) {
+		if(!guild || !type || !target) throw new Error("missing params");
+		if(target instanceof this.Discord.User || target instanceof this.Discord.GuildMember) var target = target.id;
+		if(guild instanceof this.Discord.Guild) var guild = guild.id;
+		if(!this.guilds.has(guild)) throw new Error("invalid guild");
+		var g = this.guilds.get(guild);
+		if(!g.me.permissions.has("VIEW_AUDIT_LOG")) return false;
+		var log = await g.fetchAuditLogs({limit:1,type});
+		if(log.entries.size < 1) return false;
+		var log = log.entries.first();
+		if(!log.target === target) return false;
+		if(log.type !== type) return false;
+		if(!(log.executor instanceof this.Discord.User || log.executor instanceof this.Discord.GuildMember)) return false;
+		return {executor:log.executor,reason:log.executor.bot ? log.reson === null ? "None Provided" : log.reason : "Not Applicable"};
+	}
 }
 
 const client = new FurryBot(config.bot.clientOptions);

@@ -22,19 +22,17 @@ module.exports = (async(client,oldChannel,newChannel)=>{
     }
 
     // audit log check
-    if(newChannel.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
-        var log = (await newChannel.guild.fetchAuditLogs({limit:1,type:"CHANNEL_UPDATE"})).entries.first();
-        if(![undefined,null,"",[],{}].includes(log) && log.action === "CHANNEL_UPDATE") {
-            var log_data = [{
+    var log = await client.getLogs(newMember.guild.id,"CHANNEL_UPDATE",newMember.id);
+    if(log !== false) {
+         var log_data = [{
             name: "Executor",
             value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
-                value: log.executor instanceof client.Discord.User && !log.executor.bot ? "Not Applicable" : [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
+                value: log.reason,
                 inline: false
             }];
-        }
     } else {
         var log_data = [{
             name: "Notice",

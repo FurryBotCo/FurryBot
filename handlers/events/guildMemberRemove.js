@@ -21,20 +21,18 @@ module.exports = (async(client,member) => {
     }
 
     // audit log check
-    if(member.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
-        var log = (await member.guild.fetchAuditLogs({limit:1,type:"MEMBER_KICK"})).entries.first();    
-        if(![undefined,null,"",[],{}].includes(log) && log.action === "MEMBER_KICK" && log.target.id === member.id) {
-            data.title = "Member Kicked";
-            data.fields.push({
-            name: "Executor",
-            value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+    var log = await client.getLogs(member.guild.id,"MEMBER_UPDATE",member.id);
+    if(log !== false) {
+        data.title = "Member Kicked";
+        data.fields.push({
+        name: "Executor",
+        value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+        inline: false
+        },{
+            name: "Reason",
+            value: log.reason,
             inline: false
-            },{
-                name: "Reason",
-                value: log.executor instanceof client.Discord.User && [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
-                inline: false
-            });
-        }
+        });
     } else {
         data.fields.push({
             name: "Notice",

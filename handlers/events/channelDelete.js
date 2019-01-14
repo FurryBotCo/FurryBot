@@ -59,25 +59,23 @@ module.exports = (async(client,channel)=>{
     }
 
     // audit log check
-    if(channel.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
-        var log = (await channel.guild.fetchAuditLogs({limit:1,type:"CHANNEL_DELETE"})).entries.first();
-        if(![undefined,null,"",[],{}].includes(log) && log.action === "CHANNEL_DELETE") {
-            data.fields.push({
+    var log = await client.getLogs(newMember.guild.id,"CHANNEL_DELETE",newMember.id);
+    if(log !== false) {
+         var log_data = [{
             name: "Executor",
             value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
-                value: log.executor instanceof client.Discord.User && !log.executor.bot ? "Not Applicable" : [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
+                value: log.reason,
                 inline: false
-            });
-        }
+            }];
     } else {
-        data.fields.push({
+        var log_data = [{
             name: "Notice",
             value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
             inline: false
-        });
+        }];
     }
 
     var embed = new client.Discord.MessageEmbed(data);

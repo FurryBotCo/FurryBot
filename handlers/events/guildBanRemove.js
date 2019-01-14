@@ -21,19 +21,17 @@ module.exports = (async(client,guild,user) => {
     }
     
     // audit log check
-    if(guild.me.permissions.has("VIEW_AUDIT_LOG")) {
-        var log = (await guild.fetchAuditLogs({limit:1,type:"MEMBER_BAN_REMOVE"})).entries.first();    
-        if(![undefined,null,"",[],{}].includes(log) && log.action === "MEMBER_BAN_REMOVE" && log.target.id === user.id) {
-            data.fields.push({
+    var log = await client.getLogs(guild.id,"MEMBER_BAN_REMOVE",user.id);
+    if(log !== false) {
+         data.fields.push({
             name: "Executor",
             value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
-                value: log.executor instanceof client.Discord.User && !log.executor.bot ? "Not Applicable" : [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
+                value: log.reason,
                 inline: false
             });
-        }
     } else {
         data.fields.push({
             name: "Notice",

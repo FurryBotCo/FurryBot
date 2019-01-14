@@ -21,19 +21,17 @@ module.exports = (async(client,oldMember,newMember) => {
     }
     
     // audit log check
-    if(newMember.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
-        var log = (await newMember.guild.fetchAuditLogs({limit:1,type:"MEMBER_UPDATE"})).entries.first();
-        if(![undefined,null,"",[],{}].includes(log) && log.action === "MEMBER_UPDATE"  && log.target.id === newMember.id) {
-            var log_data = [{
+    var log = await client.getLogs(newMember.guild.id,"MEMBER_UPDATE",newMember.id);
+    if(log !== false) {
+         var log_data = [{
             name: "Executor",
             value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
-                value: log.executor instanceof client.Discord.User && !log.executor.bot ? "Not Applicable" : [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
+                value: log.reason,
                 inline: false
             }];
-        }
     } else {
         var log_data = [{
             name: "Notice",
@@ -64,28 +62,42 @@ module.exports = (async(client,oldMember,newMember) => {
     var added = or.filter(r=>!nr.map(rr=>rr.id).includes(r.id));
     var removed = nr.filter(r=>!or.map(rr=>rr.id).includes(r.id));
     if(added.length > 0) {
-        added.forEach((r)=>{
-            var data = Object.assign({description: "Role added to member"},base);
-            data.fields = [{
-                name: "Role",
-                value: `${r.name} (${r.id})`,
-                inline: false
-            }].concat(log_data);
-            var embed = new client.Discord.MessageEmbed(data);
-            logch.send(embed);
-        })
+        try {
+            added.forEach((r)=>{
+                var data = Object.assign({description: "Role added to member"},base);
+                data.fields = [{
+                    name: "Role",
+                    value: `${r.name} (${r.id})`,
+                    inline: false
+                }].concat(log_data);
+                console.log(data);
+                console.log(log_data);
+                var embed = new client.Discord.MessageEmbed(data);
+                logch.send(embed);
+            })
+        }catch(e){
+            console.error(e);
+            console.log(added);
+        }
     }
 
     if(removed.length > 0) {
-        removed.forEach((r)=>{
-            var data = Object.assign({description: "Role removed from member"},base);
-            data.fields = [{
-                name: "Role",
-                value: `${r.name} (${r.id})`,
-                inline: false
-            }].concat(log_data);
-            var embed = new client.Discord.MessageEmbed(data);
-            logch.send(embed);
-        })
+        try {
+            removed.forEach((r)=>{
+                var data = Object.assign({description: "Role removed from member"},base);
+                data.fields = [{
+                    name: "Role",
+                    value: `${r.name} (${r.id})`,
+                    inline: false
+                }].concat(log_data);
+                console.log(data);
+                console.log(log_data);
+                var embed = new client.Discord.MessageEmbed(data);
+                logch.send(embed);
+            })
+        }catch(e){
+            console.error(e);
+            console.log(removed);
+        }
     }
 });

@@ -39,6 +39,7 @@ module.exports = {
 	}),
 	ucwords: ((str)=> str.toString().toLowerCase().replace(/^(.)|\s+(.)/g,(r)=>r.toUpperCase())),
 	toReadableDate: ((date)=>{
+		if(!(date instanceof Date)) throw new Error("must provide javascript Date object.");
 		var a = date.toISOString().replace("Z","").split("T");
         return `${a[0]} ${a[1].split(".")[0]} UTC`;
 	}),
