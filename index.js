@@ -532,7 +532,8 @@ class FurryBot extends Discord.Client {
 							this.playSong(channel,queue[0]);
 							await this.r.table("guilds").get(channel.guild.id).update({
 								music: {
-									queue
+									queue,
+									playing: true
 								}
 							});
 							var user = this.users.has(queue[0].addedBy) ? this.users.get(queue[0].addedBy) : await this.users.fetch(queue[0].addedBy);
@@ -576,6 +577,11 @@ class FurryBot extends Discord.Client {
 							if(chn !== null && chn instanceof this.Discord.TextChannel) {
 								chn.send(embed);
 							}
+							await client.r.table("guilds").get(channel.guild.id).update({
+								music: {
+									queue: []
+								}
+							});
 							channel.leave();
 						}
 					});

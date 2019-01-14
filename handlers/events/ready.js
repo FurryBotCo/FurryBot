@@ -58,6 +58,35 @@ module.exports = (async(client) => {
         setInterval(client.listStats,3e5,client);
     }
 
+    // if ever needed, auto leave voice channels
+    /*setInterval(async()=>{
+        client.voiceConnections.filter(v=>!v.speaking.has("SPEAKING")).forEach(async(v)=>{
+            v.channel.leave();
+            var data = {
+                "title": "Left Voice Channel",
+                "description": `Left voice channel ${v.channel.name} due to inactivity.`,
+                "color": 2424780,
+                "timestamp": new Date().toISOString()
+            }
+            var embed = new client.Discord.MessageEmbed(data);
+            var a = await client.r.table("guilds").get(v.channel.guild.id);
+            if(a.music.textChannel !== null) {
+                var chn = client.channels.get(a.music.textChannel);
+                if(!chn || !(chn instanceof client.Discord.TextChannel)) var chn = null;
+            }
+            if(chn !== null && chn instanceof client.Discord.TextChannel) {
+                chn.send(embed);
+                await client.r.table("guilds").get(v.channel.guild.id).update({
+                    music: {
+                        queue: [],
+                        playing: false,
+                        textChannel: null
+                    }
+                })
+            }
+        })
+    },3e5);*/
+
 	setInterval(async()=>{
 		if(["00:00:00"].includes(client.getDateTime())) {
 			var date = new Date(),
