@@ -9,8 +9,8 @@ module.exports = {
 	description: "Get the current music queue",
 	usage: "",
 	nsfw: false,
-	devOnly: true,
-	betaOnly: true,
+	devOnly: false,
+	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
         var queue = await client.r.table("guilds").get(message.guild.id)("music")("queue");

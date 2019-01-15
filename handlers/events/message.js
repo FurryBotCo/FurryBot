@@ -112,6 +112,7 @@ module.exports = (async(client,message)=>{
 
 	if(client.responseList.includes(message.content.toLowerCase()) && !blacklist) {
 		var response = client.getResponse(message.content.toLowerCase());
+		if(response.triggers.includes("f") && !message.gConfig.fResponseEnabled) return;
 		client.logger.commandlog(`Response "${response.triggers[0]}" triggered by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
 		var start = client.performance.now();
 		var c = await response.run(client,message);

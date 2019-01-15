@@ -8,8 +8,8 @@ module.exports = {
 	description: "Resume whatever was playing",
 	usage: "",
 	nsfw: false,
-	devOnly: true,
-	betaOnly: true,
+	devOnly: false,
+	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
     

@@ -1,7 +1,8 @@
 module.exports = {
 	triggers: [
 		"uinfo",
-		"userinfo"
+		"userinfo",
+		"ui"
 	],
 	userPermissions: [],
 	botPermissions: [],
