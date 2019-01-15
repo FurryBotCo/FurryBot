@@ -282,7 +282,6 @@ module.exports = (async(client,message)=>{
         });
         client.logger.commandlog(`Command  "${command.triggers[0]}" ran with arguments "${message.unparsedArgs.join(" ")}" by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
 		var start = client.performance.now();
-		console.log(command);
 		var c = await command.run(client,message);
 		var end = client.performance.now();
 		client.logger.debug(`Command handler for "${command.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
