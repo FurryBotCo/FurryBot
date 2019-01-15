@@ -34,28 +34,28 @@ module.exports = {
                 description: `This server does not have a mute role set, you can set this with \`${message.gConfig.prefix}setmuterole <role>\``,
                 color: 15601937
             }
-            Object.assign(data, message.embed_defaults()("color"));
+            Object.assign(data, message.embed_defaults("color"));
             var embed = new client.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }
         if(!message.guild.roles.has(message.gConfig.muteRole)) {
             var data = {
                 title: "Mute role not found",
-                description: `The mute role specified for this server <@&${message.gConfig.id}> (${message.gConfig.id}) was not found, it has been reset. You can set a new one with \`${message.gConfig.prefix}setmuterole <role>\``,
+                description: `The mute role specified for this server <@&${message.gConfig.muteRole}> (${message.guild.id}) was not found, it has been reset. You can set a new one with \`${message.gConfig.prefix}setmuterole <role>\``,
                 color: 15601937
             }
             await client.db.updateGuild(message.guild.id,{muteRole:null});
-            Object.assign(data, message.embed_defaults()("color"));
+            Object.assign(data, message.embed_defaults("color"));
             var embed = new client.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }
         if(message.guild.roles.get(message.gConfig.muteRole).rawPosition >= message.guild.me.roles.highest.rawPositon) {
             var data = {
                 title: "Invalid mute role",
-                description: `The current mute role <@&${message.gConfig.id}> (${message.gConfig.id}) seems to be higher than me, please move it below me. You can set a new one with \`${message.gConfig.prefix}setmuterole <role>\``,
+                description: `The current mute role <@&${message.gConfig.muteRole}> (${message.guild.id}) seems to be higher than me, please move it below me. You can set a new one with \`${message.gConfig.prefix}setmuterole <role>\``,
                 color: 15601937
             }
-            Object.assign(data, message.embed_defaults()("color"));
+            Object.assign(data, message.embed_defaults("color"));
             var embed = new client.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }
@@ -66,7 +66,7 @@ module.exports = {
                 description: `The user **${user.user.tag}** doesn't seem to be muted.. You can mute them with \`${message.gConfig.prefix}mute @${user.user.tag} [reason]\``,
                 color: 15601937
             }
-            Object.assign(data, message.embed_defaults()("color"));
+            Object.assign(data, message.embed_defaults("color"));
             var embed = new client.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }

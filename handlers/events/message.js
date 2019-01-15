@@ -68,7 +68,7 @@ module.exports = (async(client,message)=>{
             gConfig: await client.db.getGuild(message.guild.id).catch(err=>client.config.default.guildConfig),
             uConfig: await client.db.getUser(message.author.id).catch(err=>client.config.default.userConfig),
             get prefix() {
-                return message.content.startsWith(`<@${client.user.id}>`) ? `<@${client.user.id}` : message.content.startsWith(`<@!${client.user.id}>`) ? `<@!${client.user.id}>` : client.config.beta ? "fb!" : message.gConfig.prefix.toLowerCase();
+                return message.content.startsWith(`<@${client.user.id}>`) ? `<@${client.user.id}` : message.content.startsWith(`<@!${client.user.id}>`) ? `<@!${client.user.id}>` : client.config.beta || client.config.alpha ? client.config.defaultPrefix : message.gConfig.prefix.toLowerCase();
             },
             get args() {
                 try {
@@ -97,7 +97,7 @@ module.exports = (async(client,message)=>{
 		if(c instanceof Error) throw c;*/
 		var data = {
 			title: "Hewwo!",
-			description: `You can find out how to use me on my [docs page](${client.bot.config.documentationURL}), my current prefix here is: **${message.gConfig.prefix}**\n(this can be chanegd via \`${message.gConfig.prefix}prefix <newprefix>\`\nTo invite me to new servers, use [this link](https://discordapp.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=-1))`
+			description: `You can find out how to use me on my [docs page](${client.config.bot.documentationURL}), my current prefix here is: **${message.gConfig.prefix}**\n(this can be chanegd via \`${message.gConfig.prefix}prefix <newprefix>\`\nTo invite me to new servers, use [this link](https://discordapp.com/oauth2/authorize?client_id=${client.user.id}&scope=bot&permissions=-1))`
 		}
 		Object.assign(data,message.embed_defaults());
 		var embed = new client.Discord.MessageEmbed(data);

@@ -14,7 +14,7 @@ class FurryBotServer {
 
     load(client) {
         this.server = this.express();
-        this.checkAuth = ((req,res,next)=>{
+        const checkAuth = ((req,res,next)=>{
             if(!next) return !((!req.headers.authorization || req.headers.authorization !== this.config.serverOptions.apiKey) && (!req.query.auth || req.query.auth !== this.config.serverOptions.apiKey));
             if((!req.headers.authorization || req.headers.authorization !== this.config.serverOptions.apiKey) && (!req.query.auth || req.query.auth !== this.config.serverOptions.apiKey)) return res.status(401).json({
                 success: false,
@@ -88,16 +88,6 @@ class FurryBotServer {
 				dmMessageCount: await this.r.table("stats").get("messageCount")("dmCount")
             });
         })
-        .get("/stats/guilds",async(req,res)=>{
-            var jsn = {
-                success: true,
-                guildCount: client.guilds.size
-            }
-            if(this.checkAuth(req,res,false)) {
-                jsn.guilds = client.guilds.map(g=>({[g.id]:{name:g.name,memberCount:g.memberCount}}));
-            }
-            res.status(200).json(jsn);
-        })
         .get("/stats/ping",async(req,res)=>{
             return res.status(200).json({
                 success: true,
@@ -131,8 +121,31 @@ class FurryBotServer {
                 clientStatus: client.user.presence.status
             });
         })
-        .get("/checkauth",this.checkAuth,async(req,res)=>{
+        .get("/checkauth",checkAuth,async(req,res)=>{
             res.status(200).json({success:true});
+        })
+
+        // guilds section
+        .get("/guilds",async(req,res)=>{
+            var jsn = {
+                success: true,
+                guildCount: client.guilds.size
+            }
+            if(checkAuth(req,res,false)) {
+                jsn.guilds = client.guilds.map(g=>({[g.id]:{name:g.name,memberCount:g.memberCount}}));
+            }
+            res.status(200).json(jsn);
+        })
+        .get("/guilds/:id/shard",checkAuth,async(req,res) => {
+            if(!client.guilds.has(req.params.id)) return res.status(404).json({
+                success: false,
+                error: "invalid guild id"
+            });
+            return res.status(200).json({
+                success: true,
+                shardId: client.guilds.get(req.params.id).shardID,
+                shardCount: client.options.shardCount
+            });
         })
         if(![undefined,null,""].includes(this.cnf.ssl) && this.cnf.ssl === true) {
             if(this.cnf.port === 80) throw new Error("ssl server cannot be ran on insecure port");

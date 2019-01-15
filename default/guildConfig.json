@@ -16,7 +16,6 @@
   "nsfwModuleEnabled": false,
   "premium": false,
   "prefix": "f!",
-  "messagee": "en",
   "autoYiff": {
     "enabled": false,
     "channel": null,
@@ -46,7 +45,7 @@
       "channel": null,
       "enabled": false
     },
-    "channeldestroyed": {
+    "channeldeleted": {
       "channel": null,
       "enabled": false
     },
@@ -86,21 +85,18 @@
       "channel": null,
       "enabled": false
     },
-    "userbanned": {
+    "memberbanned": {
       "channel": null,
       "enabled": false
     },
-    "userunbanned": {
+    "memberunbanned": {
       "channel": null,
       "enabled": false
     },
-    "userupdated": {
+    "memberupdated": {
       "channel": null,
       "enabled": false
     }
-  },
-  "musicQueue": {
-
   },
   "muteRole": null,
   "djRole": null,
@@ -109,5 +105,10 @@
     "channel": null
   },
   "blacklisted": false,
-  "locale": "en"
+  "locale": "en",
+  "music": {
+    "queue": [],
+    "playing": false,
+    "textChannel": null
+  }
 }

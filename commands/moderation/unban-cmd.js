@@ -18,7 +18,9 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
         // get member from message
-        var user = await message.getMemberFromArgs();
+        if(isNaN(message.args[0])) return message.reply("Please provide a user id.");
+        
+        var user = client.users.has(message.args[0]) ? client.users.get(message.args[0]) : await client.users.fetch(message.args[0]).catch(e=>false);
     
         if(!user) return message.errorEmbed("INVALID_USER");
         if(!(await message.guild.fetchBans()).has(user.id)) {

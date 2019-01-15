@@ -16,6 +16,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
+        const msg = await message.channel.send(`Fetching.. ${client.config.emojis.load}`);
         if(!client.config.apis.inkbunny.sid) {
             await client.fsn.readFile(`${process.cwd()}/inkbunny-sid.txt`,"UTF8").then(async(sid) => {
                 if(sid === "") sid = "nosid";
@@ -125,8 +126,8 @@ module.exports = {
                     client.config.apis.inkbunny.sid = a.sid;
                 }
         }
-        // blacklisted tags: cub, diaper, ass, upskirt, pantsu, incest, age_difference, boobhat
-        var req = await client.request(`https://inkbunny.net/api_search.php?sid=${client.config.apis.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=-cub%20-diaper%20-ass%20-upskirt%20-pantsu%20-incest%20-age_difference%20-boobhat&random=yes&get_rid=yes`,{
+        // blacklisted tags: cub, diaper, ass, upskirt, pantsu, incest, age_difference, boobhat, vore
+        var req = await client.request(`https://inkbunny.net/api_search.php?sid=${client.config.apis.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=-cub%20-diaper%20-ass%20-upskirt%20-pantsu%20-incest%20-age_difference%20-boobhat%20-vore&random=yes&get_rid=yes`,{
             method: "GET",
             headers: {
                 "User-Agent": client.config.web.userAgent
@@ -141,15 +142,15 @@ module.exports = {
             if(submission.rating_id !== "0") {
                 client.logger.log(`unsafe image:\n${client.util.inspect(submission,{depth:3,showHidden:true})}`);
                 client.logger.log(`Body: ${jsn}`);
-                return message.reply("Image API returned a non-safe image! Please try again later.");
+                return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err=>message.channel.send(`Command failed: ${err}`));
             }
             var attachment = new client.Discord.MessageAttachment(submission.file_url_full,submission.file_name)
-            return message.channel.send(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRequested By: ${message.author.tag}\nRID: ${jsn.rid}`,attachment)
+            return msg.edit(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRequested By: ${message.author.tag}\nRID: ${jsn.rid}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err=>message.channel.send(`Command failed: ${err}`)).then(()=>message.channel.send(attachment)).catch(err=>message.channel.send(`Command failed: ${err}`));
         }catch(e){
             client.logger.error(`Error:\n${e}`);
             client.logger.log(`${client.util.inspect(jsn,{depth:3})}`);
             var attachment = new client.Discord.MessageAttachment(client.config.images.serverError);
-            return message.channel.send("Unknown API Error",attachment);
+            return msg.edit("Unknown API Error").then(()=>message.channel.send(attachment)).catch(err=>message.channel.send(`Command failed: ${err}`));
         }
     })
 };

@@ -14,18 +14,17 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async (client,message) => {
-	
+		const types = [
+			"boop",
+			"cuddle",
+			"fursuit",
+			"hold",
+			"hug",
+			"kiss",
+			"lick",
+			"propose"
+		];
 		if(message.args.length === 0 ) {
-			const types = [
-				"boop",
-				"cuddle",
-				"fursuit",
-				"hold",
-				"hug",
-				"kiss",
-				"lick",
-				"propose"
-			];
 			var ln = Math.floor(Math.random()*(types.length));
 			// 0 (1) - 25: Inkbunny
 			var type = types[Math.floor(ln/25)];

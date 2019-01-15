@@ -266,12 +266,11 @@ class FurryBot extends Discord.Client {
 		this.r = require("rethinkdbdash")(this.config.db.main);
 		//this.ro = require("rethinkdbdash")(this.config.db.other);
 		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
-		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV3`);
+		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV4`);
 		this.varParse = require(`${process.cwd()}/util/varHandler`);
 		this.listStats = require("./util/listStats");
 		this.lang = require(`${process.cwd()}/lang`)(this);
 		this.colors = require("console-colors-2");
-		this.Canvas = require("canvas-constructor").Canvas;
 		this.fsn = require("fs-nextra");
 		this.chalk = require("chalk");
 		this.chunk = require("chunk");
@@ -404,21 +403,15 @@ class FurryBot extends Discord.Client {
 			}
 		});
 		const create = (async(url)=>{
-			var count = await this.r.table("shorturl").count();
-			var c = count;
-			if(c === 0) c = 1;
-			c = Math.floor(c/62);
-			/*62 = 26 (a-z) + 26 (A-Z) + 10 (0-9)*/
-			if(c === count) c++;
-			if(c < 5) c = c+Math.abs(c-5);
-			var rand = await this.random(Math.ceil(c));
-			var createdTimestamp = Date.now();
-			var created = new Date().toISOString();
-			var a = await this.r.table("shorturl").insert({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:c,link:`https://furry.services/r/${rand}`});
+			const rand = await this.random(this.config.shortLength),
+			 createdTimestamp = Date.now(),
+			 created = new Date().toISOString(),
+			 count = await this.r.table("shorturl").count(),
+			 a = await this.r.table("shorturl").insert({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:url.length,link:`https://furry.services/r/${rand}`});
 			if(a.errors === 1) {
 				return create(url);
 			} else {
-				return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,linkNumber:count+1,createdTimestamp,created,length:c};
+				return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,linkNumber:count+1,createdTimestamp,created,length:url.length};
 			}
 		});
 
@@ -482,10 +475,10 @@ class FurryBot extends Discord.Client {
 			if(!strSearch) reject(new Error("Missing parameters"));
 			switch(platform) {
 				case "youtube":
-					var res = await this.request(`http://${this.config.musicPlayer.restnode.host}:${this.config.musicPlayer.restnode.port}/loadtracks?identifier=ytsearch:${strSearch}`,{
+					var res = await this.request(`http://${this.config.lavalink.host}:${this.config.lavalink.port}/loadtracks?identifier=ytsearch:${strSearch}`,{
 						method: "GET",
 						headers: {
-							Authorization: this.config.musicPlayer.restnode.secret
+							Authorization: this.config.lavalink.secret
 						}
 					});
 					resolve(JSON.parse(res.body));
@@ -497,31 +490,107 @@ class FurryBot extends Discord.Client {
 		});
 	}
 
-	async playSong (channel,song,platform="youtube") {
-		return new Promise(async(resolve,reject)=>{
-			if(!channel || !song) reject(new Error("Missing parameters"));
-		
-			channel.join().catch((e)=>{
-				reject(e);
+	async joinChannel(channel) {
+		if(this.voiceConnections.filter(g=>g.channel.guild.id===channel.guild.id).size < 1) {
+			return channel.join().catch((e)=>{
+				return e;
 			}).then(async(ch)=>{
-				switch(platform) {
-					case "youtube":
-						try {
-							resolve(ch.play(this.ytdl(song.uri, { quality: 'highestaudio' })));
-						}catch(err){
-							ch.disconnect().then(()=>{
-								channel.leave()
-							}).then(()=>{
-								reject(err);
-							});
-						}
-						break;
+				return ch;
+			});
+		} else {
+			return this.voiceConnections.filter(g=>g.channel.guild.id===channel.guild.id).first();
+		}
+	}
 
-					default:
-						reject("invalid platform");
-				}
-			})
-		});
+	//client.voiceConnections.filter(g=>g.channel.guild.id===message.guild.id).first().dispatcher.streamTime
+
+	async playSong (channel,song,platform="youtube") {
+		if(!channel || !(channel instanceof this.Discord.VoiceChannel)) return new Error("Missing/invalid channel");
+		if(!song) return new Error("Missing song");
+	
+		var ch = await this.joinChannel(channel);
+		switch(platform) {
+			case "youtube":
+				//try {
+					var player = ch.play(this.ytdl(song.uri, { quality: 'highestaudio' }));
+					await this.r.table("guilds").get(channel.guild.id).update({
+						music: {
+							playing: true
+						}
+					});
+					player.once("finish",async()=>{
+						console.log("finished");
+						var queue = await this.r.table("guilds").get(channel.guild.id)("music")("queue");
+						queue.shift();
+						if(queue.length >= 1) {
+							this.playSong(channel,queue[0]);
+							await this.r.table("guilds").get(channel.guild.id).update({
+								music: {
+									queue,
+									playing: true
+								}
+							});
+							var user = this.users.has(queue[0].addedBy) ? this.users.get(queue[0].addedBy) : await this.users.fetch(queue[0].addedBy);
+							var data = {
+								title: "Now Playing",
+								description: `**${queue[0].title}** by *${queue[0].author}* is now playing in ${channel.name}`,
+								color: 2424780,
+								timestamp: new Date().toISOString(),
+								footer: {
+									icon_url: user.displayAvatarURL(),
+									text: `Added by ${user.tag}`
+								}
+							}
+							var embed = new this.Discord.MessageEmbed(data);
+							var a = await this.r.table("guilds").get(channel.guild.id);
+							if(a.music.textChannel !== null) {
+								var chn = this.channels.get(a.music.textChannel);
+								if(!chn || !(chn instanceof this.Discord.TextChannel)) var chn = null;
+							}
+							if(chn !== null && chn instanceof this.Discord.TextChannel) {
+								chn.send(embed);
+							}
+						} else {
+							await this.r.table("guilds").get(channel.guild.id).update({
+								music: {
+									playing: false
+								}
+							});
+							var data = {
+								"title": "Queue Empty",
+								"description": `The queue for ${channel.name} is now empty.`,
+								"color": 2424780,
+								"timestamp": new Date().toISOString()
+							}
+							var embed = new this.Discord.MessageEmbed(data);
+							var a = await this.r.table("guilds").get(channel.guild.id);
+							if(a.music.textChannel !== null) {
+								var chn = this.channels.get(a.music.textChannel);
+								if(!chn || !(chn instanceof this.Discord.TextChannel)) var chn = null;
+							}
+							if(chn !== null && chn instanceof this.Discord.TextChannel) {
+								chn.send(embed);
+							}
+							await client.r.table("guilds").get(channel.guild.id).update({
+								music: {
+									queue: []
+								}
+							});
+							channel.leave();
+						}
+					});
+					return player;
+				/*}catch(err){
+					this.logger.error(err);
+					channel.leave();
+					//ch.disconnect();
+					return err;
+				}*/
+				break;
+
+			default:
+				return new Error("invalid platform");
+		}
 	}
 
 	async songMenu (pageNumber,pageCount,songs,msg,ma,mb) {
@@ -566,9 +635,9 @@ class FurryBot extends Discord.Client {
 	async getSong (strIdentifier) {
 		return new Promise(async(resolve,reject)=>{
 			if(!strIdentifier) reject(new Error("Missing parameters"));
-			var res = await this.request(`http://${config.musicPlayer.restnode.host}:${config.musicPlayer.restnode.port}/loadtracks?identifier=${strIdentifier}`,{
+			var res = await this.request(`http://${config.lavalink.host}:${config.lavalink.port}/loadtracks?identifier=${strIdentifier}`,{
 				headers: {
-					Authorization: config.musicPlayer.restnode.secret
+					Authorization: config.lavalink.secret
 				}
 			});
 			if(res.body.length === 0) return resolve(res.body);
@@ -668,6 +737,22 @@ class FurryBot extends Discord.Client {
                 "Content-Type": "application/json"
 			}
 		});
+	}
+
+	async getLogs(guild,action,target,skipChecks = {target: false,action: false,executor: false}) {
+		if(!guild || !action || !target) throw new Error("missing params");
+		if(target instanceof this.Discord.Base) var target = target.id;
+		if(guild instanceof this.Discord.Guild) var guild = guild.id;
+		if(!this.guilds.has(guild)) throw new Error("invalid guild");
+		var g = this.guilds.get(guild);
+		if(!g.me.permissions.has("VIEW_AUDIT_LOG")) return null;
+		var log = await g.fetchAuditLogs({limit:1,action});
+		if(log.entries.size < 1) return false;
+		var log = log.entries.first();
+		if(!(![undefined,null,""].includes(skipChecks.target) && skipChecks.target === true) && log.target.id !== target) return false;
+		if(!(![undefined,null,""].includes(skipChecks.action) && skipChecks.action === true) && log.action !== action) return false;
+		if(!(![undefined,null,""].includes(skipChecks.executor) && skipChecks.executor === true) && !(log.executor instanceof this.Discord.User || log.executor instanceof this.Discord.GuildMember)) return false;
+		return {executor:log.executor,reason:log.executor.bot ? log.reson === null ? "None Provided" : log.reason : "Not Applicable"};
 	}
 }
 
