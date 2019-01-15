@@ -109,8 +109,9 @@ class FurryBotServer {
             })
             commands.forEach((category)=>{
                 category.commands.forEach((cmd)=>{
-                    delete cmd.run;
-                    cmds[category.name.toLowerCase()][cmd.triggers[0]] = cmd;
+                    var cc = Object.assign({},cmd);;
+					delete cc.run;
+                    cmds[category.name.toLowerCase()][cmd.triggers[0]] = cc;
                 })
             });
             return res.status(200).json({success:true,list:cmds});
