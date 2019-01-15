@@ -91,13 +91,13 @@ module.exports = (async(client) => {
 		if(["00:00:00"].includes(client.getDateTime())) {
 			var date = new Date(),
 			d = `${date.getMonth()+1}-${date.getDate()-1}-${date.getFullYear()}`,
-			count = (await client.db.getStats("dailyjoins"))[d]||0;
+			count = (await client.db.getStats("dailyjoins").get(d)).count||0;
 			var data = {
 				author: {
 					name: "Donovan_DMC#1337",
 					"icon_url": "https://i.donovand.info/Don.gif"
 				},
-				title: `Total Guilds Joined ${count}\t Current Total: ${client.guilds.size}`,
+				title: `Total Guilds Joined ${date}\t Current Total: ${client.guilds.size}`,
 				description: `Total Guilds Joined Today: **${count}**`,
 				footer: {
 					text: `Shard ${client.guilds.get(client.config.bot.mainGuild).shard.id}/${client.options.shardCount} | Bot Version ${client.config.bot.version}`
