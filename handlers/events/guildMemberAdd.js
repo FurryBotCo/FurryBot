@@ -33,7 +33,7 @@ module.exports = (async(client,member) => {
     logch.send(embed);
 
     var d = new Date();
-    if(d.getDate() - 3.6e5 < member.user.createdTimestamp) {
+    if(d.getDate() - 3.6e5 > member.user.createdTimestamp) {
         // one hour
         return logch.send(new client.Discord.MessageEmbed({
             title: "Account Age Warning",
@@ -45,7 +45,7 @@ module.exports = (async(client,member) => {
                 }
             ]
         }));
-    } else if(d.getDate() - 8.64e7 < member.user.createdTimestamp) {
+    } else if(d.getDate() - 8.64e7 > member.user.createdTimestamp) {
         // one day (24 hours)
         return logch.send(new client.Discord.MessageEmbed({
             title: "Account Age Warning",
@@ -57,7 +57,7 @@ module.exports = (async(client,member) => {
                 }
             ]
         }));
-    } else if(d.getDate() - 6.048e8 < member.user.createdTimestamp) {
+    } else if(d.getDate() - 6.048e8 > member.user.createdTimestamp) {
         // one week (seven days)
         return logch.send(new client.Discord.MessageEmbed({
             title: "Account Age Warning",
