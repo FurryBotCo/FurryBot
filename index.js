@@ -403,21 +403,15 @@ class FurryBot extends Discord.Client {
 			}
 		});
 		const create = (async(url)=>{
-			var count = await this.r.table("shorturl").count();
-			var c = count;
-			if(c === 0) c = 1;
-			c = Math.floor(c/62);
-			/*62 = 26 (a-z) + 26 (A-Z) + 10 (0-9)*/
-			if(c === count) c++;
-			if(c < 5) c = c+Math.abs(c-5);
-			var rand = await this.random(Math.ceil(c));
-			var createdTimestamp = Date.now();
-			var created = new Date().toISOString();
-			var a = await this.r.table("shorturl").insert({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:c,link:`https://furry.services/r/${rand}`});
+			const rand = await this.random(this.config.shortLength),
+			 createdTimestamp = Date.now(),
+			 created = new Date().toISOString(),
+			 count = await this.r.table("shorturl").count(),
+			 a = await this.r.table("shorturl").insert({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:url.length,link:`https://furry.services/r/${rand}`});
 			if(a.errors === 1) {
 				return create(url);
 			} else {
-				return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,linkNumber:count+1,createdTimestamp,created,length:c};
+				return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,linkNumber:count+1,createdTimestamp,created,length:url.length};
 			}
 		});
 
@@ -745,19 +739,19 @@ class FurryBot extends Discord.Client {
 		});
 	}
 
-	async getLogs(guild,type,target) {
-		if(!guild || !type || !target) throw new Error("missing params");
-		if(target instanceof this.Discord.User || target instanceof this.Discord.GuildMember) var target = target.id;
+	async getLogs(guild,action,target,skipChecks = {target: false,action: false,executor: false}) {
+		if(!guild || !action || !target) throw new Error("missing params");
+		if(target instanceof this.Discord.Base) var target = target.id;
 		if(guild instanceof this.Discord.Guild) var guild = guild.id;
 		if(!this.guilds.has(guild)) throw new Error("invalid guild");
 		var g = this.guilds.get(guild);
-		if(!g.me.permissions.has("VIEW_AUDIT_LOG")) return false;
-		var log = await g.fetchAuditLogs({limit:1,type});
+		if(!g.me.permissions.has("VIEW_AUDIT_LOG")) return null;
+		var log = await g.fetchAuditLogs({limit:1,action});
 		if(log.entries.size < 1) return false;
 		var log = log.entries.first();
-		if(!log.target === target) return false;
-		if(log.type !== type) return false;
-		if(!(log.executor instanceof this.Discord.User || log.executor instanceof this.Discord.GuildMember)) return false;
+		if(!(![undefined,null,""].includes(skipChecks.target) && skipChecks.target === true) && log.target.id !== target) return false;
+		if(!(![undefined,null,""].includes(skipChecks.action) && skipChecks.action === true) && log.action !== action) return false;
+		if(!(![undefined,null,""].includes(skipChecks.executor) && skipChecks.executor === true) && !(log.executor instanceof this.Discord.User || log.executor instanceof this.Discord.GuildMember)) return false;
 		return {executor:log.executor,reason:log.executor.bot ? log.reson === null ? "None Provided" : log.reason : "Not Applicable"};
 	}
 }
