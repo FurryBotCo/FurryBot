@@ -1,5 +1,5 @@
 module.exports = (async(client,message)=>{
-    if(!message) return;
+    if(!message || !client.db) return;
     if(!message.channel.guild || !["text","voice","category"].includes(message.channel.type)) return;
     var ev = "messagedeleted";
     var gConfig = await client.db.getGuild(message.guild.id).catch(err=>client.config.defaultGuildSettings);

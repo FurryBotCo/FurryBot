@@ -1,5 +1,5 @@
 module.exports = (async(client,guild,user) => {
-    if(!guild || !user) return;
+    if(!guild || !user || !client.db) return;
     var ev = "memberunbanned";
     var gConfig = await client.db.getGuild(guild.id).catch(err=>client.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
@@ -32,13 +32,13 @@ module.exports = (async(client,guild,user) => {
                 value: log.reason,
                 inline: false
             });
-    } else {
-        data.fields.push({
-            name: "Notice",
-            value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
-            inline: false
-        });
-    }
+        } else if (log === null) {
+            data.fields.push({
+                name: "Notice",
+                value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
+                inline: false
+            });
+        } else {}
 
     var embed = new client.Discord.MessageEmbed(data);
     return logch.send(embed);

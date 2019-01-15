@@ -1,5 +1,5 @@
 module.exports = (async(client,oldGuild,newGuild)=>{
-    if(!newGuild) return;
+    if(!newGuild || !client.db) return;
     var ev = "guildupdated";
     var gConfig = await client.db.getGuild(newGuild.id).catch(err=>client.config.defaultGuildSettings);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
@@ -38,26 +38,26 @@ module.exports = (async(client,oldGuild,newGuild)=>{
         "required"      // 1
     ]
     // audit log check
-    if(newGuild.me.permissions.has("VIEW_AUDIT_LOG")) {
-        var log = (await newGuild.fetchAuditLogs({limit:1,type:"GUILD_UPDATE"})).entries.first();
-        if(![undefined,null,"",[],{}].includes(log) && log.action === "GUILD_UPDATE"  && log.target.id === newGuild.id) {
-            var log_data = [{
+    var log = await client.getLogs(newGuild.id,"GUILD_UPDATE",newGuild.id);
+    if(log !== false) {
+         var log_data = [{
             name: "Executor",
             value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
-                value: log.executor instanceof client.Discord.User && !log.executor.bot ? "Not Applicable" : [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
+                value: log.reason,
                 inline: false
             }];
+        } else if (log === null) {
+            var log_data = [{
+                name: "Notice",
+                value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
+                inline: false
+            }];
+        } else {
+            var log_data = [];
         }
-    } else {
-        var log_data = [{
-            name: "Notice",
-            value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
-            inline: false
-        }];
-    }
 
 
     // name
@@ -97,13 +97,19 @@ module.exports = (async(client,oldGuild,newGuild)=>{
         var data = Object.assign({},base);
         data.fields = [{
             name: "Old Icon",
-            value: oldGuild.iconURL(),
+            value: oldGuild.iconURL() === null ? "none" : `[url](${oldGuild.iconURL()})\nalso see thumbnail`,
             inline: false
         },{
             name: "New Icon",
-            value: newGuild.iconURL(),
+            value: newGuild.iconURL() === null ? "none" : `[url](${newGuild.iconURL()})\nalso see image`,
             inline: false
         }].concat(log_data);
+        if(oldGuild.iconURL() !== null) data.thumbnail = {
+            url: oldGuild.iconURL()
+        };
+        if(newGuild.iconURL() !== null) data.image = {
+            url: newGuild.iconURL()
+        };
         var embed = new client.Discord.MessageEmbed(data);
         logch.send(embed);
     }

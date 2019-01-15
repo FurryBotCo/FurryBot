@@ -1,13 +1,13 @@
 module.exports = (async(client,oldRole,newRole)=>{
-    if(!newRole || !newRole.guild || !["text","voice","category"].includes(newRole.type)) return;
+    if(!oldRole || !oldRole.guild || !newRole || !newRole.guild || newRole.id === newRole.guild.id || !client.db) return;
     var ev = "roleupdated";
     var gConfig = await client.db.getGuild(newRole.guild.id).catch(err=>client.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
-    var logch = newRole.guild.roles.get(gConfig.logging[ev].channel);
+    var logch = newRole.guild.channels.get(gConfig.logging[ev].channel);
     if(!logch) return client.db.updateGuild(newRole.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     if(newRole.deleted) return;
     var base = {
-        title: `${client.ucwords(newRole.type)} Role Updated`,
+        title: `Role Updated`,
         author: {
             name: newRole.guild.name,
             icon_url: newRole.guild.iconURL()
@@ -21,25 +21,25 @@ module.exports = (async(client,oldRole,newRole)=>{
     }
 
     // audit log check
-    if(newRole.guild.me.permissions.has("VIEW_AUDIT_LOG")) {
-        var log = (await newRole.guild.fetchAuditLogs({limit:1,type:"ROLE_UPDATE"})).entries.first();
-        if(![undefined,null,"",[],{}].includes(log) && log.action === "ROLE_UPDATE"  && log.target.id === newRole.id) {
-            var log_data = [{
+    var log = await client.getLogs(newRole.guild.id,"ROLE_UPDATE",newRole.id);
+    if(log !== false) {
+         var log_data = [{
             name: "Executor",
             value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
-                value: log.executor instanceof client.Discord.User && !log.executor.bot ? "Not Applicable" : [undefined,null,""].includes(log.reason) ? "None Specified" : log.reason,
+                value: log.reason,
                 inline: false
             }];
-        }
-    } else {
+    } else if (log === null) {
         var log_data = [{
             name: "Notice",
             value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
             inline: false
         }];
+    } else {
+        var log_data = [];
     }
 
     // name
@@ -59,16 +59,18 @@ module.exports = (async(client,oldRole,newRole)=>{
     }
 
     // permission overwrites
-    if(!client._.isEqual(oldRole.permissions.map(j=>({allow:j.allow,deny:j.deny})),newRole.permissions.map(j=>({allow:j.allow,deny:j.deny})))) {
-        var data = Object.assign({},base);
-        data.fields = [{
-            name: "Permissions Update",
-            value: "Check Audit Log",
-            inline: false
-        }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
-        logch.send(embed);
-    }
+    try {
+        if((!([undefined,null,""].includes(oldRole.permissions) || oldRole.permissions.length === 0) && !([undefined,null,""].includes(newRole.permissions) || newRole.permissions.length === 0)) && !client._.isEqual(oldRole.permissions.map(j=>({allow:j.allow,deny:j.deny})),newRole.permissions.map(j=>({allow:j.allow,deny:j.deny})))) {
+            var data = Object.assign({},base);
+            data.fields = [{
+                name: "Permissions Update",
+                value: "Check Audit Log",
+                inline: false
+            }].concat(log_data);
+            var embed = new client.Discord.MessageEmbed(data);
+            logch.send(embed);
+        }
+    }catch(e){}
     
     if(oldRole.mentionable !== newRole.mentionable) {
         var data = Object.assign({},base);
@@ -104,7 +106,7 @@ module.exports = (async(client,oldRole,newRole)=>{
         var data = Object.assign({},base);
         data.fields = [{
             name: "Old Hoist",
-            value: oldRole.hoisted ? "Yes" : "No",
+            value: oldRole.hoist ? "Yes" : "No",
             inline: false
         },{
             name: "New Hoist",
@@ -115,7 +117,7 @@ module.exports = (async(client,oldRole,newRole)=>{
         logch.send(embed);
     }
 
-    if(oldRole.rawPosition !== newRole.rawPosition) {
+    /*if(oldRole.rawPosition !== newRole.rawPosition) {
         var belowo = newRole.guild.roles.find(r=>r.rawPosition === oldRole.rawPosition - 1);
         var belown = newRole.guild.roles.find(r=>r.rawPosition === newRole.rawPosition - 1);
         var aboveo = newRole.guild.roles.find(r=>r.rawPosition === oldRole.rawPosition + 1);
@@ -136,6 +138,6 @@ module.exports = (async(client,oldRole,newRole)=>{
         }].concat(log_data);
         var embed = new client.Discord.MessageEmbed(data);
         logch.send(embed);
-    }
+    }*/
     
 })

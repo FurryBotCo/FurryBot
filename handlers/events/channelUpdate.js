@@ -1,5 +1,5 @@
 module.exports = (async(client,oldChannel,newChannel)=>{
-    if(!newChannel || !newChannel.guild || !["text","voice","category"].includes(newChannel.type)) return;
+    if(!newChannel || !newChannel.guild || !["text","voice","category"].includes(newChannel.type) || !client.db) return;
     var ev = "channelupdated";
     var gConfig = await client.db.getGuild(newChannel.guild.id).catch(err=>client.config.defaultGuildSettings);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
@@ -22,7 +22,7 @@ module.exports = (async(client,oldChannel,newChannel)=>{
     }
 
     // audit log check
-    var log = await client.getLogs(newMember.guild.id,"CHANNEL_UPDATE",newMember.id);
+    var log = await client.getLogs(newChannel.guild.id,"CHANNEL_UPDATE",newChannel.id);
     if(log !== false) {
          var log_data = [{
             name: "Executor",
@@ -33,13 +33,15 @@ module.exports = (async(client,oldChannel,newChannel)=>{
                 value: log.reason,
                 inline: false
             }];
-    } else {
-        var log_data = [{
-            name: "Notice",
-            value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
-            inline: false
-        }];
-    }
+        } else if (log === null) {
+            var log_data = [{
+                name: "Notice",
+                value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
+                inline: false
+            }];
+        } else {
+            var log_data = [];
+        }
 
     // parent
     if(oldChannel.parent !== newChannel.parent) {

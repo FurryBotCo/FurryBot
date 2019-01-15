@@ -1,5 +1,5 @@
 module.exports = (async(client,channel)=>{
-    if(!channel || !channel.guild || !["text","voice","category"].includes(channel.type)) return;
+    if(!channel || !channel.guild || !["text","voice","category"].includes(channel.type) || !client.db) return;
     var ev = "channelcreated";
     var gConfig = await client.db.getGuild(channel.guild.id).catch(err=>client.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
@@ -61,9 +61,9 @@ module.exports = (async(client,channel)=>{
 
     
     // audit log check
-    var log = await client.getLogs(newMember.guild.id,"CHANNEL_CREATE",newMember.id);
+    var log = await client.getLogs(channel.guild.id,"CHANNEL_CREATE",channel.id);
     if(log !== false) {
-         var log_data = [{
+         data.fields.push({
             name: "Executor",
             value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
@@ -71,14 +71,14 @@ module.exports = (async(client,channel)=>{
                 name: "Reason",
                 value: log.reason,
                 inline: false
-            }];
-    } else {
-        var log_data = [{
-            name: "Notice",
-            value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
-            inline: false
-        }];
-    }
+            });
+        } else if (log === null) {
+            data.fields.push({
+                name: "Notice",
+                value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
+                inline: false
+            });
+        } else {}
 
     var embed = new client.Discord.MessageEmbed(data);
     return logch.send(embed);

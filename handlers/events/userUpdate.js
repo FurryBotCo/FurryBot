@@ -1,5 +1,5 @@
 module.exports = (async(client,oldUser,newUser) => {
-    if(!oldUser || !newUser) return;
+    if(!oldUser || !newUser || !client.db) return;
     var ev = "memberupdated";
     var base = {
         title: `Member Updated`,

@@ -32,13 +32,15 @@ module.exports = (async(client,oldMember,newMember) => {
                 value: log.reason,
                 inline: false
             }];
-    } else {
-        var log_data = [{
-            name: "Notice",
-            value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
-            inline: false
-        }];
-    }
+        } else if (log === null) {
+            var log_data = [{
+                name: "Notice",
+                value: "To get audit log info here, give me the `VIEW_AUDIT_LOG` permission.",
+                inline: false
+            }];
+        } else {
+            var log_data = [];
+        }
 
     // nickname
     if(oldMember.nickname !== newMember.nickname && !([undefined,null,""].includes(oldMember.nickname) && [undefined,null,""].includes(newMember.nickname))) {
@@ -70,14 +72,11 @@ module.exports = (async(client,oldMember,newMember) => {
                     value: `${r.name} (${r.id})`,
                     inline: false
                 }].concat(log_data);
-                console.log(data);
-                console.log(log_data);
                 var embed = new client.Discord.MessageEmbed(data);
                 logch.send(embed);
             })
         }catch(e){
             console.error(e);
-            console.log(added);
         }
     }
 
@@ -90,14 +89,11 @@ module.exports = (async(client,oldMember,newMember) => {
                     value: `${r.name} (${r.id})`,
                     inline: false
                 }].concat(log_data);
-                console.log(data);
-                console.log(log_data);
                 var embed = new client.Discord.MessageEmbed(data);
                 logch.send(embed);
             })
         }catch(e){
             console.error(e);
-            console.log(removed);
         }
     }
 });
