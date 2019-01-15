@@ -728,7 +728,7 @@ class FurryBot extends Discord.Client {
 	}
 
 	async memeRequest(path,avatars = [],text = "") {
-		var avatars = typeof avatars === "object" ? avatars: [avatars];
+		var avatars = typeof avatars === "string" ? [avatars] : avatars;
 		return this.request(`https://dankmemer.services/api${path}`,{
             method: "POST",
             json: {avatars,text},
