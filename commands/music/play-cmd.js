@@ -8,8 +8,8 @@ module.exports = {
 	description: "Play some music",
 	usage: "<search/link>",
 	nsfw: false,
-	devOnly: true,
-	betaOnly: true,
+	devOnly: false,
+	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
         message.channel.startTyping();

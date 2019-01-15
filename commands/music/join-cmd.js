@@ -8,8 +8,8 @@ module.exports = {
 	description: "Make the bot join your current voice channel",
 	usage: "",
 	nsfw: false,
-	devOnly: true,
-	betaOnly: true,
+	devOnly: false,
+	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
     

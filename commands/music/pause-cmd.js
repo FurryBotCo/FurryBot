@@ -8,8 +8,8 @@ module.exports = {
 	description: "Pause whatever is playing",
 	usage: "",
 	nsfw: false,
-	devOnly: true,
-	betaOnly: true,
+	devOnly: false,
+	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(client,message)=>{
     
