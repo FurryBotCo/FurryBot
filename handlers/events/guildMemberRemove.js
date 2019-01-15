@@ -1,7 +1,7 @@
 module.exports = (async(client,member) => {
     if(!member || !member || !member.guild || !client.db) return;
     var ev = "leave";
-    var gConfig = await client.db.fgetGuild(member.guild.id).catch(err=>client.config.default.guildConfig);
+    var gConfig = await client.db.getGuild(member.guild.id).catch(err=>client.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = member.guild.channels.get(gConfig.logging[ev].channel);
     if(!logch) return client.db.updateGuild(member.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});

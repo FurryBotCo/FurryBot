@@ -112,6 +112,7 @@ module.exports = (async(client,message)=>{
 
 	if(client.responseList.includes(message.content.toLowerCase()) && !blacklist) {
 		var response = client.getResponse(message.content.toLowerCase());
+		if(response.triggers.includes("f") && !message.gConfig.fResponseEnabled) return;
 		client.logger.commandlog(`Response "${response.triggers[0]}" triggered by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
 		var start = client.performance.now();
 		var c = await response.run(client,message);
@@ -281,6 +282,7 @@ module.exports = (async(client,message)=>{
         });
         client.logger.commandlog(`Command  "${command.triggers[0]}" ran with arguments "${message.unparsedArgs.join(" ")}" by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
 		var start = client.performance.now();
+		console.log(command);
 		var c = await command.run(client,message);
 		var end = client.performance.now();
 		client.logger.debug(`Command handler for "${command.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
