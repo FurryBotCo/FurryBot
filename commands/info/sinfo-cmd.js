@@ -2,7 +2,8 @@ module.exports = {
 	triggers: [
 		"sinfo",
 		"serverinfo",
-		"server"
+		"server",
+		"si"
 	],
 	userPermissions: [],
 	botPermissions: [],
