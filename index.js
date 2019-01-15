@@ -271,6 +271,7 @@ class FurryBot extends Discord.Client {
 		this.listStats = require("./util/listStats");
 		this.lang = require(`${process.cwd()}/lang`)(this);
 		this.colors = require("console-colors-2");
+		this.Canvas = require("canvas-constructor");
 		this.fsn = require("fs-nextra");
 		this.chalk = require("chalk");
 		this.chunk = require("chunk");
