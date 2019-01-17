@@ -90,5 +90,8 @@ module.exports =
   },
   sniff: [
     "{author} sniffs {input}\nMaybe they smell good..?"
+  ],
+  poke: [
+    "{author} pokes {input}\nDon't make them mad.."
   ]
 };
