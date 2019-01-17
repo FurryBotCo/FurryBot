@@ -32,9 +32,21 @@ module.exports = {
         var c = client.voiceConnections.filter(g=>g.channel.guild.id===message.guild.id);
         if(c.size === 0) return message.reply("Nothing is currently playing.");
         if(c.first().speaking.has("SPEAKING")) {
-            c.first().disconnect()
+            await client.r.table("guilds").get(message.guild.id).update({
+                music: {
+                    queue: [],
+                    channel: null
+                }
+            });
+            c.first().disconnect();
             return message.reply("Ended playback and left the channel.");
         } else {
+            await client.r.table("guilds").get(message.guild.id).update({
+                music: {
+                    queue: [],
+                    channel: null
+                }
+            });
             c.first().channel.leave();
             return message.reply("Left the voice channel.");
         }
