@@ -12,6 +12,10 @@ module.exports = {
 	betaOnly: false,
     guildOwnerOnly: false,
     run: (async(client,message) => {
+		// extra check, to be safe
+		if (!client.config.developers.includes(message.author.id)) {
+			return message.reply("You cannot run client command as you are not a developer of this bot.");
+		}
         message.channel.startTyping();
         if(message.unparsedArgs.length < 1) {
             message.channel.stopTyping();

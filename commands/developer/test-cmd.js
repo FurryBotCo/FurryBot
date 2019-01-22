@@ -12,6 +12,9 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async (client,message) => {
+		if (!client.config.developers.includes(message.author.id)) {
+			return message.reply("You cannot run client command as you are not a developer of this bot.");
+		}
 		return message.reply("Tested!");
 	})
 };

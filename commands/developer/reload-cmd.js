@@ -12,6 +12,10 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async (client,message) => {
+		// extra check, to be safe
+		if (!client.config.developers.includes(message.author.id)) {
+			return message.reply("You cannot run client command as you are not a developer of this bot.");
+		}
 		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
 		if(!client.commandList.includes(message.args[0])) return message.reply("Invalid command");
 		var cmd = client.getCommand(message.args[0]);
