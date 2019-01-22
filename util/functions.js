@@ -15,18 +15,18 @@ module.exports = {
 		},
 		system: {
 			getTotal: (()=>os.totalmem()),
-			getUsed: (()=>os.freemem() - os.totalmem()),
+			getUsed: (()=>os.totalmem() - os.freemem()),
 			getFree: (()=>os.freemem()),
 			getAll: (()=>({
 				total: os.totalmem(),
-				used: os.freemem() - os.totalmem(),
+				used: os.totalmem() - os.freemem(),
 				free: os.freemem()
 			}))
 		}
 	},
 	checkSemVer: ((ver)=>require("semver").valid(ver) === ver),
 	getCurrentTimestamp: (()=>new Date().toISOString()),
-	secondsToHours: (()=>{
+	secondsToHours: ((seconds)=>{
 		var sec_num = parseInt(seconds, 10);
 		var hours   = Math.floor(sec_num / 3600);
 		var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
