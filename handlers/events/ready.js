@@ -91,7 +91,7 @@ module.exports = (async(client) => {
 		if(["00:00:00"].includes(client.getDateTime())) {
 			var date = new Date(),
 			d = `${date.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${date.getMonth()+1}`}-${(date.getDate()-1).toString().length > 1 ? date.getDate() -1: `0${date.getDate()-1}`}-${date.getFullYear()}`,
-			count = (await client.db.table("dailyjoins").get(d)).count||0;
+			count = (await client.r.table("dailyjoins").get(d)("count"))||0;
 			var data = {
 				author: {
 					name: "Donovan_DMC#1337",
