@@ -14,7 +14,7 @@ module.exports = {
 	run: (async(client,message)=>{
     
         if(!message.member.voice.channel) return message.reply("You must be in a voice channel to use this.");
-        if(message.member.voice.channel.members.filter(m=>m.id!==client.user.id).size !== 1) {
+        if(message.member.voice.channel.members.filter(m=>m.id!==client.user.id).size !== 1 && !client.config.developers.includes(message.author.id)) {
             if(!message.gConfig.djRole)  {
                 if(!message.member.permissions.has("MANAGE_SERVER")) return message.reply(":x: Missing permissions or DJ role.");
             } else {
