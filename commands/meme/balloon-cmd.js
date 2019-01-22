@@ -26,7 +26,7 @@ module.exports = {
             console.log(`text: ${text}`);
             return message.channel.stopTyping();
         }
-        var attachment = new client.Discord.MessageAttachment(req.body,"armor.png");
+        var attachment = new client.Discord.MessageAttachment(req.body,"balloon.png");
         message.channel.send(attachment).catch(err => message.reply(`Error sending: ${err}`));
         return message.channel.stopTyping();
     })
