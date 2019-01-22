@@ -1,11 +1,11 @@
 module.exports = {
-	triggers: ["gay","homo"],
+	triggers: ["affect"],
 	userPermissions: [],
 	botPermissions: [
         "ATTACH_FILES"
     ],
 	cooldown: 5e3,
-	description: "Gay up an image",
+    description: "My baby won't be affected.",
 	usage: "[image]",
 	nsfw: false,
 	devOnly: false,
@@ -28,7 +28,7 @@ module.exports = {
             message.reply("please either attach an image or provide a url");
             return message.channel.stopTyping();
         }
-        var req = await client.memeRequest("/gay",[imgurl]);
+        var req = await client.memeRequest("/affect",[imgurl]);
         if(req.statusCode !== 200) {
             try {
                 var j = {status:req.statusCode,message:JSON.stringify(req.body)};
@@ -39,7 +39,7 @@ module.exports = {
             console.log(`imgurl: ${imgurl}`);
             return message.channel.stopTyping();
         }
-        var attachment = new client.Discord.MessageAttachment(req.body,"gay.png");
+        var attachment = new client.Discord.MessageAttachment(req.body,"affect.png");
         message.channel.send(attachment).catch(err => message.reply(`Error sending: ${err}`));
         return message.channel.stopTyping();
     })

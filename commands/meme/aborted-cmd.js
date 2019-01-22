@@ -1,11 +1,11 @@
 module.exports = {
-	triggers: ["gay","homo"],
+	triggers: ["aborted","abort"],
 	userPermissions: [],
 	botPermissions: [
         "ATTACH_FILES"
     ],
 	cooldown: 5e3,
-	description: "Gay up an image",
+	description: "Why someone should've been aborted",
 	usage: "[image]",
 	nsfw: false,
 	devOnly: false,
@@ -28,7 +28,7 @@ module.exports = {
             message.reply("please either attach an image or provide a url");
             return message.channel.stopTyping();
         }
-        var req = await client.memeRequest("/gay",[imgurl]);
+        var req = await client.memeRequest("/aborted",[imgurl]);
         if(req.statusCode !== 200) {
             try {
                 var j = {status:req.statusCode,message:JSON.stringify(req.body)};
@@ -39,7 +39,7 @@ module.exports = {
             console.log(`imgurl: ${imgurl}`);
             return message.channel.stopTyping();
         }
-        var attachment = new client.Discord.MessageAttachment(req.body,"gay.png");
+        var attachment = new client.Discord.MessageAttachment(req.body,"abort.png");
         message.channel.send(attachment).catch(err => message.reply(`Error sending: ${err}`));
         return message.channel.stopTyping();
     })
