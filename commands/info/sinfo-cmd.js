@@ -96,7 +96,7 @@ module.exports = {
 				},
 				{
 					name: "Members",
-					value: `Total: ${guild.memberCount}\n\n${client.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${client.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${client.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${client.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}`,
+					value: `Total: ${guild.memberCount}\n\n${client.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${client.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${client.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${client.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}\n\nNon Bots: ${message.guild.memberCount - message.guild.members.filter(m=>!m.user.bot).size}\nBots: ${message.guild.members.filter(m=>m.user.bot).size}`,
 					inline: false
 				},
 				{
