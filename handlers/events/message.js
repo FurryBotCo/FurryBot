@@ -229,18 +229,20 @@ module.exports = (async(client,message)=>{
 				var embed = new client.Discord.MessageEmbed(data);
 				return message.channel.send(embed);
 			}
-			if(client.config.yiff.disableStatements.some(t=>message.channel.topic.indexOf(t) !== -1)) {
-                for(let key of client.config.yiff.disableStatements) {
-                    if(message.channel.topic.indexOf(key) !== -1) var st = key;
-                }
-				var data = {
-					title: "NSFW commands are explicitly disabled in this channel.",
-					description: `Ask a staff member to re-enabled them by removing \`${st}\` from the channel topic`
-				};
-				
-				Object.assign(data, message.embed_defaults());
-				var embed = new client.Discord.MessageEmbed(data);
-				return message.channel.send(embed);
+			if(![undefined,null,""].includes(message.channel.topic)) {
+				if(client.config.yiff.disableStatements.some(t=>message.channel.topic.indexOf(t) !== -1)) {
+					for(let key of client.config.yiff.disableStatements) {
+						if(message.channel.topic.indexOf(key) !== -1) var st = key;
+					}
+					var data = {
+						title: "NSFW commands are explicitly disabled in this channel.",
+						description: `Ask a staff member to re-enabled them by removing \`${st}\` from the channel topic`
+					};
+					
+					Object.assign(data, message.embed_defaults());
+					var embed = new client.Discord.MessageEmbed(data);
+					return message.channel.send(embed);
+				}
 			}
         }
         
