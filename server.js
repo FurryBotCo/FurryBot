@@ -9,6 +9,7 @@ class FurryBotServer {
         this.https = require("https");
         this.fs = require("fs");
         this.r = require("rethinkdbdash")(this.config.db.main);
+        this.bodyParser = require("body-parser");
         //this.ro = require("rethinkdbdash")(this.config.db.other);
     }
 
@@ -27,32 +28,13 @@ class FurryBotServer {
             next();
         })
         .use(this.logger("dev"))
+        .use(this.bodyParser.json())
+        .use(this.bodyParser.urlencoded({
+            extended: true
+        }))
         .get("/stats",async(req,res)=>{
             var userCount = 0;
-            var largeGuildCount=0;
-            var rq = await client.request(`https://api.uptimerobot.com/v2/getMonitors`,{
-                method: "POST",
-                headers: {
-                    "Cache-Control": "no-cache",
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                form: {
-                    api_key: this.config.apis.uptimeRobot.apiKey,
-                    format: "json"
-                }
-            });
-            var st = JSON.parse(rq.body);
-			
-            var srv=Array.from(client.guilds.values());
-            for(let i=0;i<srv.length;i++) {
-                if(!srv[i].unavailable) {
-                    if(srv[i].large) {
-                        largeGuildCount++;
-                    }
-                } else {
-                    console.log(`Guild Unavailable: ${srv[i].name} (${srv[i].id})`);
-                }
-            }
+			var largeGuildCount = client.guilds.filter(g=>g.large).size;
             client.guilds.forEach((g)=>userCount+=g.memberCount);
             var d = new Date();
             var date = `${d.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${d.getMonth()+1}`}-${d.getDate().toString().length > 1 ? d.getDate() : `0${d.getDate()}`}-${d.getFullYear()}`;
@@ -79,10 +61,6 @@ class FurryBotServer {
                 discordjsVersion: client.Discord.version,
                 nodeVersion: process.version,
                 dailyJoins,
-                monitors: {
-                    website: st.monitors.filter(m=>m.id===parseInt(this.config.apis.uptimeRobot.monitors.website),10)[0].status,
-                    cdn: st.monitors.filter(m=>m.id===parseInt(this.config.apis.uptimeRobot.monitors.cdn,10))[0].status
-                },
 				commandCount: client.commandList.length,
 				messageCount: await this.r.table("stats").get("messageCount")("count"),
 				dmMessageCount: await this.r.table("stats").get("messageCount")("dmCount")
@@ -148,6 +126,17 @@ class FurryBotServer {
                 shardCount: client.options.shardCount
             });
         })
+        .post("/dev/eval",checkAuth,async(req,res)=>{
+            console.log(req.body);
+            if(!req.body.code) return res.status(400).json({ success: false, message: "missing code" });
+            for(let b of  this.config.evalBlacklist) {
+                if(b.test(req.body.code)) return res.status(400).json({ success: false, message: "blacklisted code found"});
+            }
+            const start = client.performance.now(),
+            result = await eval(req.body.code),
+            end = client.performance.now();
+            return res.status(200).json({ success: true, result, time: (end-start).toFixed(3) });
+        });
         if(![undefined,null,""].includes(this.cnf.ssl) && this.cnf.ssl === true) {
             if(this.cnf.port === 80) throw new Error("ssl server cannot be ran on insecure port");
             var privateKey = this.fs.readFileSync(`${this.config.rootDir}/ssl/ssl.key`);

@@ -90,17 +90,17 @@ module.exports = (async(client) => {
 	setInterval(async()=>{
 		if(["00:00:00"].includes(client.getDateTime())) {
 			var date = new Date(),
-			d = `${date.getMonth()+1}-${date.getDate()-1}-${date.getFullYear()}`,
-			count = (await client.db.getStats("dailyjoins").get(d)).count||0;
+			d = `${date.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${date.getMonth()+1}`}-${(date.getDate()-1).toString().length > 1 ? date.getDate() -1: `0${date.getDate()-1}`}-${date.getFullYear()}`,
+			count = (await client.r.table("dailyjoins").get(d)("count"))||0;
 			var data = {
 				author: {
 					name: "Donovan_DMC#1337",
 					"icon_url": "https://i.donovand.info/Don.gif"
 				},
-				title: `Total Guilds Joined ${date}\t Current Total: ${client.guilds.size}`,
+				title: `Total Guilds Joined ${d}\t Current Total: ${client.guilds.size}`,
 				description: `Total Guilds Joined Today: **${count}**`,
 				footer: {
-					text: `Shard ${client.guilds.get(client.config.bot.mainGuild).shard.id}/${client.options.shardCount} | Bot Version ${client.config.bot.version}`
+					text: `Shard ${client.guilds.get(client.config.bot.mainGuild).shard.id+1}/${client.options.shardCount} | Bot Version ${client.config.bot.version}`
 				},
 				color: client.randomColor(),
 				timestamp: client.getCurrentTimestamp(),

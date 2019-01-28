@@ -69,9 +69,9 @@ db.*
 # test directory
 test/
 
-# tokens
+# tokens & secrets 
 *token*
-
+*secret*
 # mkdocs
 docs/
 

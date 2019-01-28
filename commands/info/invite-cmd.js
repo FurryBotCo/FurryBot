@@ -14,12 +14,36 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async (client,message) => {
 	
+		var botInvite = await client.generateInvite([
+			"VIEW_AUDIT_LOG",
+			"MANAGE_SERVER",
+			"MANAGE_ROLES",
+			"MANAGE_CHANNELS",
+			"KICK_MEMBERS",
+			"BAN_MEMBERS",
+			"CHANGE_NICKNAME",
+			"MANAGE_NICKNAMES",
+			"EMBED_LINKS",
+			"READ_MESSAGE_HISTORY",
+			"USE_EXTERNAL_EMOJIS",
+			"SEND_MESSAGES",
+			"ATTACH_FILES",
+			"ADD_REACTIONS",
+			"VIEW_CHANNEL",
+			"CONNECT",
+			"MUTE_MEMBERS",
+			"MOVE_MEMBERS",
+			"SPEAK",
+			"DEAFEN_MEMBERS",
+			"USE_VAD",
+			"PRIORITY_SPEAKER"
+		]);
 		var data = {
 			"title": "Invites",
 			"fields": [
 				{
 					name: "Discord Bot",
-					value: client.config.bot.clientInvite,
+					value: botInvite,
 					inline: false
 				},
 				{

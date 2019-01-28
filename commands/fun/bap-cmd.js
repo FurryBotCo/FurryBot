@@ -18,7 +18,7 @@ module.exports = {
 		var text = client.varParse(message.c,{author:message.author,input:input});
 		if(message.gConfig.commandImages) {
 			if(!message.channel.permissionsFor(message.guild.me).has("ATTACH_FILES")) return message.reply("Hey, I require the `ATTACH_FILES` permission for images to work on these commands!");
-			var attachment = new client.Discord.MessageAttachment("https://fb.furcdn.net/bap.gif");
+			var attachment = new client.Discord.MessageAttachment("https://i.fb.furcdn.net/bap.gif");
 			message.channel.send(text,attachment);
 		} else {
 			message.channel.send(text);

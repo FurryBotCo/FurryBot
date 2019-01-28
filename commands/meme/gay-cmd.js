@@ -20,7 +20,7 @@ module.exports = {
         } else if (message.attachments.first()) {
             var imgurl = message.attachments.first().url;
         } else if((m = message.channel.messages.filter(m=>m.attachments.size>=1)) && m.size >= 1) {
-            var imgurl = m.last().url;
+            var imgurl = m.last().attachments.first().url;
         } else {
             var imgurl = message.author.displayAvatarURL({format:"png"});
         }
