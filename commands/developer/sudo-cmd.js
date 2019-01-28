@@ -15,30 +15,13 @@ module.exports = {
     run: (async(client,message)=>{
 		// extra check, to be safe
 		if (!client.config.developers.includes(message.author.id)) {
-			return message.reply("You cannot run client command as you are not a developer of this bot.");
+			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
         message.channel.startTyping();
         if(message.unparsedArgs.length < 1) return new Error("ERR_INVALID_USAGE");
         
-        // member mention
-        if(message.mentions.users.first()) {
-            var user = message.mentions.users.first();
-        }
-        
-        // user ID
-        if(!isNaN(message.unparsedArgs[0]) && !(message.unparsedArgs.length === 0 || !message.unparsedArgs || message.mentions.users.first())) {
-            var user = client.users.get(message.unparsedArgs[0]);
-        }
-        
-        // username
-        if(isNaN(message.unparsedArgs[0]) && message.unparsedArgs[0].indexOf("#") === -1 && !(message.unparsedArgs.length === 0 || !message.unparsedArgs || message.mentions.users.first())) {
-            var user = client.users.find(t=>t.username===message.unparsedArgs[0]);
-        }
-        
-        // user tag
-        if(isNaN(message.unparsedArgs[0]) && message.unparsedArgs[0].indexOf("#") !== -1 && !message.mentions.users.first()) {
-            var user = client.users.find(t=>t.tag===message.unparsedArgs[0]);
-        }
+        // get user from message
+        var user = await message.getUserFromArgs();
     
         if(!user || !(user instanceof client.Discord.User)) {
             var data = {

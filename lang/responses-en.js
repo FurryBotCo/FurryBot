@@ -2,7 +2,7 @@ module.exports =
 {
   bap: [
 	"{author} smacks {input} hard on the snoot with a rolled up news paper!",
-    "{author} goes to smack {input} on the snoot with a news paper, but missed and hit themclient!"
+    "{author} goes to smack {input} on the snoot with a news paper, but missed and hit themselves!"
   ],
   boop: [
     "{author} has booped {input}!\nOwO",
