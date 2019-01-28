@@ -61,7 +61,7 @@ typings/
 .next
 
 # Config files
-config.*
+*config*
 db.*
 *.protected
 *.hidden
@@ -103,6 +103,5 @@ tmp/*
 !tmp/placeholder
 
 docs/ssl
-commandList.js
-config-testing.js
 conf/
+dashboard/
