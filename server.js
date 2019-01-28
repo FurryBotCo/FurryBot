@@ -34,30 +34,7 @@ class FurryBotServer {
         }))
         .get("/stats",async(req,res)=>{
             var userCount = 0;
-            var largeGuildCount=0;
-            var rq = await client.request(`https://api.uptimerobot.com/v2/getMonitors`,{
-                method: "POST",
-                headers: {
-                    "Cache-Control": "no-cache",
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                form: {
-                    api_key: this.config.apis.uptimeRobot.apiKey,
-                    format: "json"
-                }
-            });
-            var st = JSON.parse(rq.body);
-			
-            var srv=Array.from(client.guilds.values());
-            for(let i=0;i<srv.length;i++) {
-                if(!srv[i].unavailable) {
-                    if(srv[i].large) {
-                        largeGuildCount++;
-                    }
-                } else {
-                    console.log(`Guild Unavailable: ${srv[i].name} (${srv[i].id})`);
-                }
-            }
+			var largeGuildCount = client.guilds.filter(g=>g.large).size;
             client.guilds.forEach((g)=>userCount+=g.memberCount);
             var d = new Date();
             var date = `${d.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${d.getMonth()+1}`}-${d.getDate().toString().length > 1 ? d.getDate() : `0${d.getDate()}`}-${d.getFullYear()}`;
@@ -84,10 +61,6 @@ class FurryBotServer {
                 discordjsVersion: client.Discord.version,
                 nodeVersion: process.version,
                 dailyJoins,
-                monitors: {
-                    website: st.monitors.filter(m=>m.id===parseInt(this.config.apis.uptimeRobot.monitors.website),10)[0].status,
-                    cdn: st.monitors.filter(m=>m.id===parseInt(this.config.apis.uptimeRobot.monitors.cdn,10))[0].status
-                },
 				commandCount: client.commandList.length,
 				messageCount: await this.r.table("stats").get("messageCount")("count"),
 				dmMessageCount: await this.r.table("stats").get("messageCount")("dmCount")
