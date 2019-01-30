@@ -87,7 +87,7 @@ class FurryBotServer {
             })
             commands.forEach((category)=>{
                 category.commands.forEach((cmd)=>{
-                    var cc = Object.assign({},cmd);;
+                    var cc = Object.assign({},cmd);
 					delete cc.run;
                     cmds[category.name.toLowerCase()][cmd.triggers[0]] = cc;
                 })
