@@ -259,9 +259,6 @@ class FurryBot extends Discord.Client {
 		this.uuid = require("uuid/v4");
 		this.fetch = require("node-fetch");
 		this.postStats = require("./util/listStats");
-		this.mixpanel = this.Mixpanel.init(this.config.apis.mixpanel.token, {
-			protocol: "https"
-		});
     	this.fs = require("fs");
 		this.r = require("rethinkdbdash")(this.config.db.main);
 		//this.ro = require("rethinkdbdash")(this.config.db.other);
@@ -305,11 +302,6 @@ class FurryBot extends Discord.Client {
 			this.webhooks[key] = new this.Discord.WebhookClient(this.config.webhooks[key].id,this.config.webhooks[key].token,{disableEveryone:true});
 			console.debug(`Setup ${key} webhook`);
 		}*/
-		this.mixpanel.track('bot.setup', {
-			distinct_id: this.uuid(),
-			timestamp: new Date().toISOString(),
-			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
-		});
     	this.load.apply(this);
 	}
 	
@@ -318,11 +310,6 @@ class FurryBot extends Discord.Client {
 	  */
 	load() {
 		console.log("[loadEvent]: start load");
-		this.mixpanel.track("bot.load.start", {
-			distinct_id: this.uuid(),
-			timestamp: new Date().toISOString(),
-			filename: __filename.indexOf("/") === 0 ? __filename.split("/").reverse()[0] : __filename.split("\\").reverse()[0]
-		});
 		this.fs.readdir(`${process.cwd()}/handlers/events/`, (err, files) => {
 		    if (err) return console.error(err);
 		    files.forEach(file => {
@@ -338,10 +325,10 @@ class FurryBot extends Discord.Client {
 		console.log("[loadEvent]: end of load");
 	}
 
-	async imageAPIRequest (safe=true,category=null,json=true,filetype=null) {
+	async imageAPIRequest (safe=true,category=null,json=true) {
 		return new Promise(async(resolve, reject)=>{
 			if([undefined,null,""].includes(json)) json = true;
-			var s = await this.request(`https://api.furry.bot/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}/${json?"json":"image"}${filetype?`/${filetype}`:""}`);
+			var s = await this.request(`https://api.furry.bot/furry/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}${json?"":"/image"}`);
 			try {
 				var j = JSON.parse(s.body);
 				resolve(j);
