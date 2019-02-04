@@ -3,6 +3,7 @@
   "version": "3.2.0-Stable.1.1.0",
   "description": "Furry bot for Discord!",
   "main": "index.js",
+  "bin": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -74,5 +75,13 @@
     "xmlhttprequest": "^1.8.0",
     "ytdl-core": "^0.28.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "pgk": {
+    "scripts": [
+
+    ],
+    "assets": [
+      
+    ]
+  }
 }
