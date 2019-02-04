@@ -1,12 +1,12 @@
 module.exports = {
 	triggers: [
-		"test"
+		"say"
 	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,
-	description: "",
-	usage: "",
+	description: "Make the bot say something",
+	usage: "<text>",
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
@@ -16,6 +16,6 @@ module.exports = {
 		if (!client.config.developers.includes(message.author.id)) {
 			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
-		return message.reply("Tested!");
+		return message.channel.send(message.unparseArgs);
 	})
 };

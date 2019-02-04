@@ -17,7 +17,7 @@ module.exports = {
 	run: (async (client,message) => {
 		// extra check, to be safe
 		if (!client.config.developers.includes(message.author.id)) {
-			return message.reply("You cannot run client command as you are not a developer of this bot.");
+			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
 		message.channel.startTyping();
 		const r = client.r;
@@ -55,8 +55,8 @@ module.exports = {
 			Object.assign(data,message.embed_defaults());
 			var embed = new client.Discord.MessageEmbed(data);
 			message.channel.send(embed).catch(err => {
-				message.channel.send(`I could not return the result: ${err}`).catch(error=>{
-					message.author.send(`I could not return the result: ${error}`).catch(noerr=>null);
+				message.channel.send(`I could not return the result: ${err}`).catch(error => {
+					message.author.send(`I could not return the result: ${error}`).catch(noerr => null);
 				});
 			});
 			return message.channel.stopTyping();
@@ -90,14 +90,14 @@ module.exports = {
 					inline: false
 				}
 			]
-		}
+		};
 		
 		Object.assign(data,message.embed_defaults());
 		var embed = new client.Discord.MessageEmbed(data);
 		message.channel.send(embed).catch(err => {
 			console.error(err);
-			message.channel.send(`I could not return the result: ${err}`).catch(error=>{
-				message.author.send(`I could not return the result: ${err}`).catch(noerr=>null);
+			message.channel.send(`I could not return the result: ${err}`).catch(error => {
+				message.author.send(`I could not return the result: ${err}`).catch(noerr => null);
 			});
 		});
 		return message.channel.stopTyping();

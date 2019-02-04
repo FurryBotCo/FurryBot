@@ -36,7 +36,7 @@ class FurryBot extends Discord.Client {
 			 * @param {Number=0} mentionPosition which mention to look for
 			 * @returns {(User|Boolean)} user that was found, or false if none were found
 			 */
-			getUserFromArgs: (async function(argPosition = 0,unparsed = false,join = false,mentionPosition = 0) {
+			async getUserFromArgs(argPosition = 0,unparsed = false,join = false,mentionPosition = 0) {
 				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
 				var argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
@@ -61,7 +61,7 @@ class FurryBot extends Discord.Client {
 
 				// nothing found
 				return false;
-			}),
+			},
 			/**
 			 * Get a member from message args
 			 * @async
@@ -71,7 +71,7 @@ class FurryBot extends Discord.Client {
 			 * @param {Number=0} mentionPosition which mention to look for
 			 * @returns {(GuildMember|Boolean)} guild member that was found, or false if none were found
 			 */
-			getMemberFromArgs: (async function(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
+			async getMemberFromArgs(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
 				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
 				var argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
@@ -97,7 +97,7 @@ class FurryBot extends Discord.Client {
 
 				// nothing found
 				return false;
-			}),
+			},
 			/**
 			 * Get a channel from message args
 			 * @async
@@ -107,7 +107,7 @@ class FurryBot extends Discord.Client {
 			 * @param {Number=0} mentionPosition which mention to look for
 			 * @returns {(Channel|Boolean)} channel that was found, or false if none were found
 			 */
-			getChannelFromArgs: (async function(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
+			async getChannelFromArgs(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
 				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
 				var argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
@@ -130,7 +130,7 @@ class FurryBot extends Discord.Client {
 
 				// nothing found
 				return false;
-			}),
+			},
 			/**
 			 * Get a role from message args
 			 * @async
@@ -140,7 +140,7 @@ class FurryBot extends Discord.Client {
 			 * @param {Number=0} mentionPosition which mention to look for
 			 * @returns {(Role|Boolean)} role that was found, or false if none were found
 			 */
-			getRoleFromArgs: (async function(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
+			async getRoleFromArgs(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
 				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
 				var argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
@@ -163,7 +163,7 @@ class FurryBot extends Discord.Client {
 
 				// nothing found
 				return false;
-			}),
+			},
 			/**
 			 * Get a server from message args
 			 * @async
@@ -172,7 +172,7 @@ class FurryBot extends Discord.Client {
 			 * @param {Boolean=false} join join together all args before running
 			 * @returns {(Guild|Boolean)} guild that was found, or false if none were found
 			 */
-			getServerFromArgs: (async function(argPosition = 0,unparsed = false,join = false){
+			async getServerFromArgs(argPosition = 0,unparsed = false,join = false){
 				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
 				var argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
@@ -194,14 +194,14 @@ class FurryBot extends Discord.Client {
 
 				// nothing found
 				return false;
-			}),
+			},
 			/**
 			 * Configure user
 			 * @async
 			 * @param {(User=null|GuildMember=null)} user the user to configure 
 			 * @returns {Object} configured user properties
 			 */
-			configureUser: async function(user = null) {
+			async configureUser(user = null) {
 				var member = ![undefined,null,""].includes(user) ? user instanceof this.client.Discord.User ? this.guild.members.get(user.id) : user instanceof this.client.Discord.GuildMember ? user : !isNaN(user) ? this.guild.members.get(user) : false : this.member;
 				if(!(member instanceof this.client.Discord.GuildMember)) throw new Drror("invalid member");
 				return {
@@ -220,7 +220,7 @@ class FurryBot extends Discord.Client {
 			 * @param {Array=[]} fields fields for custom error embed
 			 * @returns {Message} message that was sent to channel
 			 */
-			errorEmbed: async function(type = "", custom = false, title = "", description = "", fields = []) {
+			async errorEmbed(type = "", custom = false, title = "", description = "", fields = []) {
 				if(!custom) {
 					switch(type.toUpperCase()) {
 						case "INVALID_USER":

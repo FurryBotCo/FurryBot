@@ -39,7 +39,7 @@ module.exports = {
             console.log(`imgurl: ${imgurl}`);
             return message.channel.stopTyping();
         }
-        var attachment = new client.Discord.MessageAttachment(req.body,"abort.png");
+        var attachment = new client.Discord.MessageAttachment(req.body,"aborted.png");
         message.channel.send(attachment).catch(err => message.reply(`Error sending: ${err}`));
         return message.channel.stopTyping();
     })
