@@ -22,7 +22,6 @@
   },
   "homepage": "https://www.furrybot.me",
   "dependencies": {
-    "async-request": "^1.2.0",
     "bfdapi.js": "^1.1.0",
     "blapi": "^0.4.5",
     "bluebird": "^3.5.3",
@@ -42,7 +41,6 @@
     "expect-ct": "^0.1.1",
     "express": "^4.16.4",
     "express-rate-limit": "^3.3.2",
-    "ffmpeg-binaries": "^4.0.0",
     "file-type": "^9.0.0",
     "fs": "0.0.1-security",
     "fs-nextra": "^0.3.7",
@@ -77,11 +75,7 @@
   },
   "devDependencies": {},
   "pgk": {
-    "scripts": [
-
-    ],
-    "assets": [
-      
-    ]
+    "scripts": [],
+    "assets": []
   }
 }
