@@ -253,6 +253,8 @@ class FurryBot extends Discord.Client {
 				})
 			}
 		});
+		this.Trello = require("trello");
+		this.tclient = new this.Trello(this.config.apis.trello.apiKey,this.config.apis.trello.apiToken);
 		this.os = require("os");
 		this.request = this.util.promisify(require("request").defaults({encoding:null}));
 		this.Mixpanel = require("mixpanel");
