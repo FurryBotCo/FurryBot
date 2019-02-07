@@ -17,7 +17,23 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async (client,message) => {
         if(message.args.length === 0 || message.args[0] === "help") {
-
+            var data = {
+                title: "Help with role command.",
+                description: `\
+                **${message.prefix}${message.command}** add <user> <role>\n\
+                **${message.prefix}${message.command}** remove <user> <role>\n\
+                **${message.prefix}${message.command}** removeall <role>\n\
+                **${message.prefix}${message.command}** all <role>\n\
+                **${message.prefix}${message.command}** bots [+/-]<role>\n\
+                **${message.prefix}${message.command}** humans [+/-]<role>\n\
+                **${message.prefix}${message.command}** in <role> [role to add]\n\
+                [] = optional, <> = required\n\
+                + = add, - = remove, only usable on **humans**, and **bots**\n\
+                brackets are just for placeholders, do not add them when running commands!\n\
+                if you use them, do not put a space between them and the role name/mention/id`
+            }
+            var embed = new client.Discord.MessageEmbed(data);
+            return message.channel.send(embed);
         }
 
         var member = await message.getMemberFromArgs();
