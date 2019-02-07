@@ -82,19 +82,21 @@ module.exports = {
 		}
 		return cooldown;
 	}),
-	parseTime: ((time) => {
+	parseTime: ((time,full = false,ms = false) => {
+		if(ms) var time = time / 1000;
         const methods = [
-          { name: 'd', count: 86400 },
-          { name: 'h', count: 3600 },
-          { name: 'm', count: 60 },
-          { name: 's', count: 1 }
+          { name: full ? " day" : "d", count: 86400 },
+          { name: full ? " hour": "h", count: 3600 },
+          { name: full ? " minute" : "m", count: 60 },
+          { name: full ? " second" : "s", count: 1 }
         ]
 
-        const timeStr = [ Math.floor(time / methods[0].count).toString() + methods[0].name ]
+        const timeStr = [`${Math.floor(time / methods[0].count).toString()}${methods[0].name}${Math.floor(time / methods[0].count) > 1 && full? "s" : ""}`]
         for (let i = 0; i < 3; i++) {
-          timeStr.push(Math.floor(time % methods[i].count / methods[i + 1].count).toString() + methods[i + 1].name)
+          timeStr.push(`${Math.floor(time % methods[i].count / methods[i + 1].count).toString()}${methods[i + 1].name}${Math.floor(time % methods[i].count / methods[i + 1].count) > 1 && full ? "s" : ""}`)
         }
-
-        return timeStr.filter(g => !g.startsWith('0')).join(', ')
+		var j = timeStr.filter(g => !g.startsWith("0")).join(", ");
+		if(j.length === 0) var j = `no time`;
+        return j;
     })
 }
