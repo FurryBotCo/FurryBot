@@ -15,6 +15,8 @@ module.exports = {
 	run: (async(client,message) => {
         message.channel.startTyping();
         var tags = encodeURIComponent(message.args.join(" "));
+        var bl = tags.match(client.config.tagBlacklist);
+        if(bl !== null && bl.length > 0) return message.reply(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
         var req = await client.request(`https://e621.net/post/index.json?limit=50&tags=${tags}%20rating%3Aexplict`,{
             method: "GET",
             headers: {

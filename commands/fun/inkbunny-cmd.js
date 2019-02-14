@@ -127,7 +127,22 @@ module.exports = {
                 }
         }
         // blacklisted tags: cub, diaper, ass, upskirt, pantsu, incest, age_difference, boobhat, vore
-        var req = await client.request(`https://inkbunny.net/api_search.php?sid=${client.config.apis.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=-cub%20-diaper%20-ass%20-upskirt%20-pantsu%20-incest%20-age_difference%20-boobhat%20-vore&random=yes&get_rid=yes`,{
+        var tagBlacklist = [
+            "cub",
+            "diaper",
+            "ass",
+            "upskirt",
+            "pantsu",
+            "incest",
+            "age_difference",
+            "boobhat",
+            "vore"
+        ]
+        var tags = message.unparseArgs.length > 0 ? `${message.unparseArgs.join("%20").toLowerCase()}%20-${tagBlacklist.join("%20-")}` : `furry%20-${tagBlacklist.join("%20-")}`;
+        
+        var bl = message.unparseArgs.join(" ").match(client.config.tagBlacklist);
+        if(bl !== null && bl.length > 0) return message.reply(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
+        var req = await client.request(`https://inkbunny.net/api_search.php?sid=${client.config.apis.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=${tags}&random=yes&get_rid=yes`,{
             method: "GET",
             headers: {
                 "User-Agent": client.config.web.userAgent

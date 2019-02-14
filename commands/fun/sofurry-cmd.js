@@ -23,8 +23,11 @@ module.exports = {
             "journal",
             "photo"
         ];
+        var tags = message.unparseArgs.length > 0 ? message.unparseArgs.join("%20") : "furry";
+        var bl = tags.match(client.config.tagBlacklist);
+        if(bl !== null && bl.length > 0) return message.reply(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
         const msg = await message.channel.send(`Fetching.. ${client.config.emojis.load}`);
-        var req = await client.request("https://api2.sofurry.com/browse/search?search=furry&format=json&minlevel=0&maxlevel=0",{
+        var req = await client.request(`https://api2.sofurry.com/browse/search?search=${tags}&format=json&minlevel=0&maxlevel=0`,{
             method: "GET",
             headers: {
                 "User-Agent": client.config.web.userAgent
