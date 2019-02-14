@@ -34,31 +34,31 @@ module.exports =
     8: "{author} joins a furpile on {user}!\nThey now have {count} furs on them!",
 	else: "{author} joins a furpile on {user}!\nThey now have {count} furs on them!",
 	text: ((count)=>{
-		if(isNaN(count)) return false;
+    if(isNaN(count)) return false;
 		switch(count) {
 			case 0:
-				return lang.en.furpile[0];
+				return this.furpile[0];
 				break;
 			case 1:
 			case 2:
-				return lang.en.furpile[1];
+				return this.furpile[1];
 				break;
 			case 3:
 			case 4:
-				return lang.en.furpile[3];
+				return this.furpile[3];
 				break;
 			case 5:
 			case 6:
-				return lang.en.furpile[5];
+				return this.furpile[5];
 				break;
 			case 7:
-				return lang.en.furpile[7];
+				return this.furpile[7];
 				break;
 			case 8:
-				return lang.en.furpile[8];
+				return this.furpile[8];
 				break;
 			default: 
-				return lang.en.furpile.else;
+				return this.furpile.else;
 		}
 	})
   },
@@ -93,5 +93,8 @@ module.exports =
   ],
   poke: [
     "{author} pokes {input}\nDon't make them mad.."
+  ],
+  nap: [
+    "I don't know what this said, so I'll just add this placeholder here"
   ]
 };
