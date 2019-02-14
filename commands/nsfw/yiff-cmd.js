@@ -15,7 +15,7 @@ module.exports = {
         message.channel.startTyping();
         var extra = "";
         if(message.args.length === 0) {
-            for(let ytype in client.config.yiff.types) {
+            for(let ytype of client.config.yiff.types) {
                 if(message.channel.name.indexOf(ytype) !== -1) var type = ytype;
             }
     
