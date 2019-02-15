@@ -1,6 +1,6 @@
-// add: client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").append("role")})
-// remove: client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").difference(["role"])})
-// get: client.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
+// add: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").append("role")})
+// remove: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").difference(["role"])})
+// get: this.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
 
 module.exports = {
 	triggers: [
@@ -16,19 +16,19 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
-        var roles = await client.r.table("guilds").get(message.guild.id)("selfAssignableRoles");
+	run: (async function(message) {
+        var roles = await this.r.table("guilds").get(message.guild.id)("selfAssignableRoles");
         var page = message.args.length > 0 ? parseInt(message.args[0],10) : 1;
-        var c = client.chunk(roles,10);
+        var c = this.chunk(roles,10);
         if(!page || page > c.length) return message.reply("Invalid page.");
         var remove = [];
         var rl = roles.map(a => {
             var b = message.guild.roles.get(a);
             if(!b) {
                 remove.push(a);
-                retur// add: client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").append("role")})
-// remove: client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").difference(["role"])})
-// get: client.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
+                retur// add: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").append("role")})
+// remove: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").difference(["role"])})
+// get: this.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
 
 module.exports = {
 	triggers: [
@@ -44,10 +44,10 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
-        var roles = await client.r.table("guilds").get(message.guild.id)("selfAssignableRoles");
+	run: (async function(message) {
+        var roles = await this.r.table("guilds").get(message.guild.id)("selfAssignableRoles");
         var page = message.args.length > 0 ? parseInt(message.args[0],10) : 1;
-        var c = client.chunk(roles,10);
+        var c = this.chunk(roles,10);
         if(!page || page > c.length) return message.reply("Invalid page.");
         var remove = [];
         var rl = roles.map(a => {
@@ -58,7 +58,7 @@ module.exports = {
             }
             return b.name;
         }).join("\n");
-        if(remove.length > 0) await client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").difference(remove)});;
+        if(remove.length > 0) await this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").difference(remove)});;
         var data = {
             title: "Self Assignable Roles",
             description: `To gain a role, use the command \`${message.gConfig.prefix}iam <role name>\`\nTo go to the next page, use \`${message.gConfig.prefix}\`lsar [page].\nPage ${page}/${c.length}`,
@@ -71,14 +71,14 @@ module.exports = {
             ]
         }
         Object.assign(data,message.embed_defaults());
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         return message.channel.send(embed);
     })
 };n `Role Not Found - \`${a}\``;
             }
             return b.name;
         }).join("\n");
-        if(remove.length > 0) await client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").difference(remove)});;
+        if(remove.length > 0) await this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").difference(remove)});;
         var data = {
             title: "Self Assignable Roles",
             description: `To gain a role, use the command \`${message.gConfig.prefix}iam <role name>\`\nTo go to the next page, use \`${message.gConfig.prefix}\`lsar [page].\nPage ${page}/${c.length}`,
@@ -91,7 +91,7 @@ module.exports = {
             ]
         }
         Object.assign(data,message.embed_defaults());
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         return message.channel.send(embed);
     })
 };

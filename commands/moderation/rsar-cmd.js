@@ -1,6 +1,6 @@
-// add: client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").append("role")})
-// remove: client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").difference(["role"])})
-// get: client.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
+// add: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").append("role")})
+// remove: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").difference(["role"])})
+// get: this.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
 
 module.exports = {
 	triggers: [
@@ -20,14 +20,14 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async function(message) {
         if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
         var role = await message.getRoleFromArgs();
         if(!role) return message.errorEmbed("INVALID_ROLE");
-        var roles = await client.r.table("guilds").get(message.guild.id)("selfAssignableRoles");
+        var roles = await this.r.table("guilds").get(message.guild.id)("selfAssignableRoles");
         if(!roles.includes(role.id)) return message.reply("This role is not listed as a self assignable role.");
-        await client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: r.row("selfAssignableRoles").difference([role.id])})
+        await this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: r.row("selfAssignableRoles").difference([role.id])})
         return message.reply(`Removed **${role.name}** from the list of self assignable roles.`);
     })
 };

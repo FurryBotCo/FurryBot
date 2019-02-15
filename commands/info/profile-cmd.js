@@ -11,7 +11,7 @@ module.exports = {
 	devOnly: true,
 	betaOnly: true,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 		message.channel.startTyping();
 		// get member from message
 		var member = message.args.length <= 0 ? message.member : await message.getMemberFromArgs();
@@ -20,10 +20,10 @@ module.exports = {
 		var position = "1/2";
 		var level = message.uConfig.level;
 		var xp_left = message.uConfig.xp;
-		var rank = client.config.levels.getRank(level);
-		var image = await client.fsn.readFile(`${client.config.rootDir}/images/profile.png`);
+		var rank = this.config.levels.getRank(level);
+		var image = await this.fsn.readFile(`${this.config.rootDir}/images/profile.png`);
 		//var corners = await fsn.readFile(`${config.rootDir}/images/corners.png`);
-		var pr = new client.Canvas(593, 348)
+		var pr = new this.Canvas(593, 348)
 			.addImage(image, 0, 0, 593, 348)
 			//.addImage(profile, 18, 128, 119, 119)
 			//.addImage(corners, 18, 128, 119, 119)
@@ -47,14 +47,14 @@ module.exports = {
 		}
 		var u = member.user.displayAvatarURL().split(".");
 		u.pop();
-		var imgpath = `${client.config.rootDir}/tmp/${message.guild.id}-${message.channel.id}-${member.user.id}-profile.png`;
-		await client.download(`${u.join(".")}.png`,imgpath);
-		var img = await client.fsn.readFile(imgpath);
+		var imgpath = `${this.config.rootDir}/tmp/${message.guild.id}-${message.channel.id}-${member.user.id}-profile.png`;
+		await this.download(`${u.join(".")}.png`,imgpath);
+		var img = await this.fsn.readFile(imgpath);
 		pr.addImage(img, 18, 128, 119, 119);
 		var a = await pr.toBufferAsync();
-		var at = new client.Discord.MessageAttachment(a);
+		var at = new this.Discord.MessageAttachment(a);
 		await message.channel.send(at);
-		await client.fsn.unlink(imgpath);
+		await this.fsn.unlink(imgpath);
 		message.channel.stopTyping();
 	})
 };

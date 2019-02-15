@@ -11,9 +11,9 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 		// extra check, to be safe
-		if (!client.config.developers.includes(message.author.id)) {
+		if (!this.config.developers.includes(message.author.id)) {
 			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
 		return message.channel.send(message.unparseArgs);

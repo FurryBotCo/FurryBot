@@ -12,13 +12,13 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
         if(message.unparsedArgs.length < 1) return new Error("ERR_INVALID_USAGE");
-        if(client.config.apis.ipinfo.regex.ipv4.test(message.unparsedArgs.join(" ")) || client.config.apis.ipinfo.regex.ipv6.test(message.unparsedArgs.join(" "))) {
-            const req = await client.request(`https://ipapi.co/${message.unparsedArgs.join(" ")}/json`,{
+        if(this.config.apis.ipinfo.regex.ipv4.test(message.unparsedArgs.join(" ")) || this.config.apis.ipinfo.regex.ipv6.test(message.unparsedArgs.join(" "))) {
+            const req = await this.request(`https://ipapi.co/${message.unparsedArgs.join(" ")}/json`,{
                 method: "GET",
                 headers: {
-                    "User-Agent": client.config.web.userAgent
+                    "User-Agent": this.config.web.userAgent
                 }
             }).then(rq=>JSON.parse(rq.body));
             if(req.error || req.reserved) {
@@ -45,7 +45,7 @@ module.exports = {
                     }
                 ]
             }
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         } else {
             return message.reply("Invalid ip address.");

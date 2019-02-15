@@ -1,20 +1,34 @@
-module.exports = (async(client,oldChannel,newChannel)=>{
-    if(!newChannel || !newChannel.guild || !["text","voice","category"].includes(newChannel.type) || !client.db) return;
+module.exports = (async function(oldChannel,newChannel) {
+    if(!newChannel || !newChannel.guild || !["text","voice","category"].includes(newChannel.type) || !this.db) return;
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.channelUpdate",
+        properties: {
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            },
+            type: newChannel.type,
+            nsfw: newChannel.nsfw
+        }
+    });
     var ev = "channelupdated";
-    var gConfig = await client.db.getGuild(newChannel.guild.id).catch(err=>client.config.defaultGuildSettings);
+    var gConfig = await this.db.getGuild(newChannel.guild.id).catch(err=>this.config.defaultGuildSettings);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = newChannel.guild.channels.get(gConfig.logging[ev].channel);
-    if(!logch) return client.db.updateGuild(newChannel.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
+    if(!logch) return this.db.updateGuild(newChannel.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     if(newChannel.deleted) return;
 
     var base = {
-        title: `${client.ucwords(newChannel.type)} Channel Updated`,
+        title: `${this.ucwords(newChannel.type)} Channel Updated`,
         author: {
             name: newChannel.guild.name,
             icon_url: newChannel.guild.iconURL()
         },
         timestamp: new Date().toISOString(),
-        color: client.randomColor(),
+        color: this.randomColor(),
         footer: {
             text: `Channel: ${newChannel.name} (${newChannel.id})`
         },
@@ -22,11 +36,11 @@ module.exports = (async(client,oldChannel,newChannel)=>{
     }
 
     // audit log check
-    var log = await client.getLogs(newChannel.guild.id,"CHANNEL_UPDATE",newChannel.id);
+    var log = await this.getLogs(newChannel.guild.id,"CHANNEL_UPDATE",newChannel.id);
     if(log !== false) {
          var log_data = [{
             name: "Executor",
-            value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+            value: log.executor instanceof this.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
@@ -55,19 +69,19 @@ module.exports = (async(client,oldChannel,newChannel)=>{
             value: [undefined,null,""].includes(newChannel.parent) ? "None" : `${newChannel.parent.name} (${newChannel.parent.id})`,
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
     // permission overwrites
-    if(!client._.isEqual(oldChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})),newChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})))) {
+    if(!this._.isEqual(oldChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})),newChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})))) {
         var data = Object.assign({},base);
         data.fields = [{
             name: "Permissions Overwrites Update",
             value: "Check Audit Log",
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -83,7 +97,7 @@ module.exports = (async(client,oldChannel,newChannel)=>{
             value: newChannel.name,
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -101,7 +115,7 @@ module.exports = (async(client,oldChannel,newChannel)=>{
                 value: [undefined,null,""].includes(newChannel.topic) ? "None" : newChannel.topic,
                 inline: false
             }].concat(log_data);
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             logch.send(embed);
         }
 
@@ -117,7 +131,7 @@ module.exports = (async(client,oldChannel,newChannel)=>{
                 value: newChannel.nsfw ? "Yes" : "No",
                 inline: false
             }].concat(log_data);
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             logch.send(embed);
         }
 
@@ -133,7 +147,7 @@ module.exports = (async(client,oldChannel,newChannel)=>{
                 value: newChannel.rateLimitPerUser === 0 ? "None" : `${newChannel.rateLimitPerUser} Seconds`,
                 inline: false
             }].concat(log_data);
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             logch.send(embed);
         }
         break;
@@ -151,7 +165,7 @@ module.exports = (async(client,oldChannel,newChannel)=>{
                 value: `${newChannel.bitrate/1000}kbps`,
                 inline: false
             }].concat(log_data);
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             logch.send(embed);
         }
 
@@ -167,8 +181,8 @@ module.exports = (async(client,oldChannel,newChannel)=>{
                 value: `${newChannel.userLimit === 0?"UNLIMITED":newChannel.userLimit}`,
                 inline: false
             }].concat(log_data);
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             logch.send(embed);
         }
     }
-})
+});

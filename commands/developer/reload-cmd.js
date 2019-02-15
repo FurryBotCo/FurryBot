@@ -11,19 +11,19 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 		// extra check, to be safe
-		if (!client.config.developers.includes(message.author.id)) {
+		if (!this.config.developers.includes(message.author.id)) {
 			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
 		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
-		if(!client.commandList.includes(message.args[0])) return message.reply("Invalid command");
-		var cmd = client.getCommand(message.args[0]);
+		if(!this.commandList.includes(message.args[0])) return message.reply("Invalid command");
+		var cmd = this.getCommand(message.args[0]);
 		var newcmd = require(cmd.path);
 		var changes = [];
-		Reflect.ownKeys(cmd).forEach((key)=>{
+		Reflect.ownKeys(cmd).forEach((key) {
 			if(["path","category"].includes(key)) return;
-			if(!client._.isEqual(cmd[key],newcmd[key]) && cmd[key].toString() !== newcmd[key].toString()) {
+			if(!this._.isEqual(cmd[key],newcmd[key]) && cmd[key].toString() !== newcmd[key].toString()) {
 				changes.push(key);
 				cmd[key] = newcmd[key];
 			}

@@ -1,6 +1,6 @@
-// add: client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").append("role")})
-// remove: client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: client.r.row("selfAssignableRoles").difference(["role"])})
-// get: client.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
+// add: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").append("role")})
+// remove: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").difference(["role"])})
+// get: this.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
 
 module.exports = {
 	triggers: [
@@ -17,9 +17,9 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async function(message) {
         if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
-        var roles = await client.r.table("guilds").get(message.guild.id)("selfAssignableRoles").then(r => r.map(a => {
+        var roles = await this.r.table("guilds").get(message.guild.id)("selfAssignableRoles").then(r => r.map(a => {
 			var b = message.guild.roles.get(a);
 			if(!b) return {id: null,name: null};
 			return {name: b.name.toLowerCase(), id: a};

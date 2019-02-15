@@ -1,19 +1,33 @@
-module.exports = (async(client,channel)=>{
-    if(!channel || !channel.guild || !["text","voice","category"].includes(channel.type) || !client.db) return;
+module.exports = (async function(channel) {
+    if(!channel || !channel.guild || !["text","voice","category"].includes(channel.type) || !this.db) return;
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.channelCreate",
+        properties: {
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            },
+            type: channel.type,
+            nsfw: channel.nsfw
+        }
+    });
     var ev = "channelcreated";
-    var gConfig = await client.db.getGuild(channel.guild.id).catch(err=>client.config.default.guildConfig);
+    var gConfig = await this.db.getGuild(channel.guild.id).catch(err=>this.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = channel.guild.channels.get(gConfig.logging[ev].channel);
-    if(!logch) return client.db.updateGuild(channel.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
+    if(!logch) return this.db.updateGuild(channel.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     if(channel.deleted) return;
     var data = {
-        title: `:new: ${client.ucwords(channel.type)} Channel Created`,
+        title: `:new: ${this.ucwords(channel.type)} Channel Created`,
         author: {
             name: channel.guild.name,
             icon_url: channel.guild.iconURL()
         },
         timestamp: channel.createdTimestamp,
-        color: client.randomColor(),
+        color: this.randomColor(),
         footer: {
             text: `Channel: ${channel.name} (${channel.id})`
         },
@@ -61,11 +75,11 @@ module.exports = (async(client,channel)=>{
 
     
     // audit log check
-    var log = await client.getLogs(channel.guild.id,"CHANNEL_CREATE",channel.id);
+    var log = await this.getLogs(channel.guild.id,"CHANNEL_CREATE",channel.id);
     if(log !== false) {
          data.fields.push({
             name: "Executor",
-            value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+            value: log.executor instanceof this.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
@@ -80,6 +94,6 @@ module.exports = (async(client,channel)=>{
             });
         } else {}
 
-    var embed = new client.Discord.MessageEmbed(data);
+    var embed = new this.Discord.MessageEmbed(data);
     return logch.send(embed);
 })

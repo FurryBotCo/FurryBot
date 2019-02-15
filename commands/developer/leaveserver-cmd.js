@@ -11,9 +11,9 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
     guildOwnerOnly: false,
-    run: (async(client,message) => {
+    run: (async function(message) {
 		// extra check, to be safe
-		if (!client.config.developers.includes(message.author.id)) {
+		if (!this.config.developers.includes(message.author.id)) {
       return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
         message.channel.startTyping();
@@ -21,14 +21,14 @@ module.exports = {
             message.channel.stopTyping();
             return new Error("ERR_INVALID_USAGE");
         }
-        if(!client.guilds.has(message.unparsedArgs[0])) {
+        if(!this.guilds.has(message.unparsedArgs[0])) {
             message.reply("Guild not found");
             return message.channel.stopTyping();
         }
-        client.guilds.get(message.unparsedArgs[0]).leave().then((guild) => {
+        this.guilds.get(message.unparsedArgs[0]).leave().then((guild) {
             message.reply(`Left guild **${guild.name}** (${guild.id})`);
             return message.channel.stopTyping();
-        }).catch((err) => {
+        }).catch((err) {
             message.channel.send(`There was an error while doing this: ${err}`) ;
             return message.channel.stopTyping();
          })

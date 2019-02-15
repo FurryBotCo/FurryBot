@@ -12,19 +12,19 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 		// extra check, to be safe
-		if (!client.config.developers.includes(message.author.id)) {
+		if (!this.config.developers.includes(message.author.id)) {
 			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
 		message.channel.startTyping();
 		var exec = message.unparsedArgs.join(" ");
-		var start = client.performance.now();
+		var start = this.performance.now();
 		try {
-			var res = await client.shell(exec);
+			var res = await this.shell(exec);
 		}catch(e){
 			var res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Executing:\n${typeof res !== "undefined" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}\`\`\``;
-			var end = client.performance.now();
+			var end = this.performance.now();
 			var data = {
 				title: `Executed - Time: \`\`${(+end-start).toFixed(3)}ms\`\``,
 				author: {
@@ -45,9 +45,9 @@ module.exports = {
 				]
 			}
 	
-			client.logger.error(`[Eval]: ${typeof res !== "undefined" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}`);
+			this.logger.error(`[Eval]: ${typeof res !== "undefined" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}`);
 			Object.assign(data,message.embed_defaults());
-			var embed = new client.Discord.MessageEmbed(data);
+			var embed = new this.Discord.MessageEmbed(data);
 			message.channel.send(embed).catch(err => {
 				message.channel.send(`I could not return the result: ${err}`).catch(error=>{
 					message.author.send(`I could not return the result: ${error}`).catch(noerr=>null);
@@ -64,7 +64,7 @@ module.exports = {
 			}
 			res = "```fix\n"+res.stdout+"```";
 		}
-		var end = client.performance.now();
+		var end = this.performance.now();
 		var data = {
 			title: `Executed - Time: \`${(+end-start).toFixed(3)}ms\``,
 			author: {
@@ -86,7 +86,7 @@ module.exports = {
 		}
 		
 		Object.assign(data,message.embed_defaults());
-		var embed = new client.Discord.MessageEmbed(data);
+		var embed = new this.Discord.MessageEmbed(data);
 		message.channel.send(embed).catch(err => {
 			console.error(err);
 			message.channel.send(`I could not return the result: ${err}`).catch(error=>{

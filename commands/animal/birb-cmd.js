@@ -12,14 +12,14 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 		return message.reply("Sorry, the api we used was shutdown, so this is temporarily disabled!");
 		/*message.channel.startTyping();
 		try {
-			var attachment = new client.Discord.MessageAttachment("https://random.birb.pw/tweet/random","random.bird.pw.png");
+			var attachment = new this.Discord.MessageAttachment("https://random.birb.pw/tweet/random","random.bird.pw.png");
 		}catch(e){
 			console.log(e);
-			var attachment = new client.Discord.MessageAttachment(client.config.images.serverError);
+			var attachment = new this.Discord.MessageAttachment(this.config.images.serverError);
 		}
 		message.channel.send(attachment);
 		return message.channel.stopTyping();*/

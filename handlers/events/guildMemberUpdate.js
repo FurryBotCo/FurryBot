@@ -1,10 +1,22 @@
-module.exports = (async(client,oldMember,newMember) => {
+module.exports = (async function(oldMember,newMember) {
     if(!oldMember || !newMember || !newMember.guild) return;
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.guildMemberUpdate",
+        properties: {
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            }
+        }
+    });
     var ev = "memberupdated";
-    var gConfig = await client.db.getGuild(newMember.guild.id).catch(err=>client.config.default.guildConfig);
+    var gConfig = await this.db.getGuild(newMember.guild.id).catch(err=>this.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = newMember.guild.channels.get(gConfig.logging[ev].channel);
-    if(!logch) return client.db.updateGuild(newMember.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
+    if(!logch) return this.db.updateGuild(newMember.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     var base = {
         title: `Member Updated`,
         author: {
@@ -12,7 +24,7 @@ module.exports = (async(client,oldMember,newMember) => {
             icon_url: newMember.user.displayAvatarURL()
         },
         timestamp: new Date().toISOString(),
-        color: client.randomColor(),
+        color: this.randomColor(),
         footer: {
             text: newMember.guild.name,
             icon_url: newMember.guild.iconURL()
@@ -21,11 +33,11 @@ module.exports = (async(client,oldMember,newMember) => {
     }
     
     // audit log check
-    var log = await client.getLogs(newMember.guild.id,"MEMBER_UPDATE",newMember.id);
+    var log = await this.getLogs(newMember.guild.id,"MEMBER_UPDATE",newMember.id);
     if(log !== false) {
          var log_data = [{
             name: "Executor",
-            value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+            value: log.executor instanceof this.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
@@ -54,7 +66,7 @@ module.exports = (async(client,oldMember,newMember) => {
             value: [undefined,null,""].includes(newMember.nickname) ? "None" : newMember.nickname,
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -72,7 +84,7 @@ module.exports = (async(client,oldMember,newMember) => {
                     value: `${r.name} (${r.id})`,
                     inline: false
                 }].concat(log_data);
-                var embed = new client.Discord.MessageEmbed(data);
+                var embed = new this.Discord.MessageEmbed(data);
                 logch.send(embed);
             })
         }catch(e){
@@ -89,7 +101,7 @@ module.exports = (async(client,oldMember,newMember) => {
                     value: `${r.name} (${r.id})`,
                     inline: false
                 }].concat(log_data);
-                var embed = new client.Discord.MessageEmbed(data);
+                var embed = new this.Discord.MessageEmbed(data);
                 logch.send(embed);
             })
         }catch(e){

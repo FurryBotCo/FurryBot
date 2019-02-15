@@ -11,7 +11,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async function(message) {
         var data = {
             title: "Module Status",
             description: "Enabled/disabled modules on this server.",
@@ -48,7 +48,7 @@ module.exports = {
             ]
         }
         Object.assign(data,message.embed_defaults());
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         return message.channel.send(embed);
     })
 };

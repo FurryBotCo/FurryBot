@@ -12,7 +12,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 	
 		var val = Math.floor(Math.random()*6);
 		var bullets = typeof message.args[0] !== "undefined" ? parseInt(message.args[0],10) : 3;

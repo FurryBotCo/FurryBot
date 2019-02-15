@@ -1,11 +1,23 @@
-module.exports = (async(client,message)=>{
-    if(!message || !client.db) return;
+module.exports = (async function(message) {
+    if(!message || !this.db) return;
     if(!message.channel.guild || !["text","voice","category"].includes(message.channel.type)) return;
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.messageDelete",
+        properties: {
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            }
+        }
+    });
     var ev = "messagedeleted";
-    var gConfig = await client.db.getGuild(message.guild.id).catch(err=>client.config.defaultGuildSettings);
+    var gConfig = await this.db.getGuild(message.guild.id).catch(err=>this.config.defaultGuildSettings);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = message.guild.channels.get(gConfig.logging[ev].channel);
-    if(!logch) return client.db.updateGuild(message.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
+    if(!logch) return this.db.updateGuild(message.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     var data = {
         title: `Message Deleted in ${message.channel.name} (${message.channel.id})`,
         author: {
@@ -13,9 +25,9 @@ module.exports = (async(client,message)=>{
             icon_url: message.guild.iconURL()
         },
         timestamp: new Date().toISOString(),
-        color: client.randomColor(),
+        color: this.randomColor(),
         footer: {
-			text: `Shard ${![undefined,null].includes(message.guild.shard) ? `${+message.guild.shard.id+1}/${client.options.shardCount}`: "1/1"} | Bot Version ${client.config.bot.version}`
+			text: `Shard ${![undefined,null].includes(message.guild.shard) ? `${+message.guild.shard.id+1}/${this.options.shardCount}`: "1/1"} | Bot Version ${this.config.bot.version}`
 		},
         fields: [
             {
@@ -33,6 +45,6 @@ module.exports = (async(client,message)=>{
             }
         ]
     }
-    var embed = new client.Discord.MessageEmbed(data);
+    var embed = new this.Discord.MessageEmbed(data);
     return logch.send(embed);
 })

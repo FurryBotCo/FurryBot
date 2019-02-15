@@ -22,6 +22,7 @@
   },
   "homepage": "https://furry.bot",
   "dependencies": {
+    "analytics-node": "^3.3.0",
     "bfdapi.js": "^1.1.0",
     "blapi": "^0.4.5",
     "bluebird": "^3.5.3",

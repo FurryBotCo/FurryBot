@@ -15,7 +15,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
         if(message.args.length === 0 || message.args[0] === "help") {
             var data = {
                 title: "Help with role command.",
@@ -32,7 +32,7 @@ module.exports = {
                 brackets are just for placeholders, do not add them when running commands!\n\
                 if you use them, do not put a space between them and the role name/mention/id`
             }
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }
 
@@ -64,33 +64,33 @@ module.exports = {
             switch(operation) {
                 case 1:
                     if(member.roles.has(role.id)) return message.reply(`No action was taken, as **${member.user.tag}** already has the role **${role.name}**`);
-                    return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() => {
+                    return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() {
                         return message.reply(`Added role **${role.name}** to **${member.user.tag}**`);
-                    }).catch((e) => {
+                    }).catch((e) {
                         return message.reply(`Command failed: ${e}`);
                     });
                     break;
 
                 case 2:
                     if(!member.roles.has(role.id)) return message.reply(`No action was taken, as **${member.user.tag}** does not have the role **${role.name}**`);
-                    return member.roles.add(role.id,`Command: ${message.author.tag} -> Remove role ${role.name} from ${member.user.tag}`).then(() => {
+                    return member.roles.add(role.id,`Command: ${message.author.tag} -> Remove role ${role.name} from ${member.user.tag}`).then(() {
                         return message.reply(`Removed role **${role.name}** from **${member.user.tag}**`);
-                    }).catch((e) => {
+                    }).catch((e) {
                         return message.reply(`Command failed: ${e}`);
                     });
                     break;
 
                 default:
                     if(member.roles.has(role.id)) {
-                        return member.roles.remove(role.id,`Command: ${message.author.tag} -> Remove role ${role.name} from ${member.user.tag}`).then(() => {
+                        return member.roles.remove(role.id,`Command: ${message.author.tag} -> Remove role ${role.name} from ${member.user.tag}`).then(() {
                             return message.reply(`Removed role **${role.name}** from **${member.user.tag}**`);
-                        }).catch((e) => {
+                        }).catch((e) {
                             return message.reply(`Command failed: ${e}`);
                         });
                     } else {
-                        return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() => {
+                        return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() {
                             return message.reply(`Added role **${role.name}** to **${member.user.tag}**`);
-                        }).catch((e) => {
+                        }).catch((e) {
                             return message.reply(`Command failed: ${e}`);
                         });
                     }
@@ -121,7 +121,7 @@ module.exports = {
                     }
                 ]
             }
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }
 
@@ -136,7 +136,7 @@ module.exports = {
                 }
                 var role2 = await message.getRoleFromArgs(2);
                 if(!role2) return message.reply("Second role not found.");
-                role.members.forEach(async(m) => {
+                role.members.forEach(async(m) {
                     await m.roles.add(role2.id,`Command: ${message.author.tag} -> Add role ${role2.name} to users in role ${role.name}`).catch(noerr => null);
                 });
                 var count = role.guild.members.filter(m=>m.roles.has(role.id)).size;
@@ -156,7 +156,7 @@ module.exports = {
                 var rl = [...message.args].splice(1);
                 for(let i = 0;i<rl.length;i++) {
                     var l = await message.getRoleFromArgs(i + 2);
-                    if(l instanceof client.Discord.Role) roles.push(l.id);
+                    if(l instanceof this.Discord.Role) roles.push(l.id);
                 }
                 */
                 if(!member) return message.reply("User not found.");
@@ -165,9 +165,9 @@ module.exports = {
                 if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("This role is higher than, or as high as me, I cannot remove or assign it.");
                 if(role.managed) return message.reply("This role is managed (likely permissions for a bot), these cannot be removed or assigned.");
                 if(member.roles.has(role.id)) return message.reply(`**${member.user.tag}** already has the role ${role.name}.`);
-                return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() => {
+                return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() {
                     return message.reply(`Added role ${role.name} to **${member.user.tag}**.`);
-                }).catch((e) => {
+                }).catch((e) {
                     return message.reply(`Command failed: ${e}`);
                 });
                 break;
@@ -185,9 +185,9 @@ module.exports = {
                 if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("This role is higher than, or as high as me, I cannot remove or assign it.");
                 if(role.managed) return message.reply("This role is managed (likely permissions for a bot), these cannot be removed or assigned.");
                 if(!member.roles.has(role.id)) return message.reply(`**${member.user.tag}** does not have the role ${role.name}.`);
-                return member.roles.remove(role.id,`Command: ${message.author.tag} -> remove role ${role.name} from ${member.user.tag}`).then(() => {
+                return member.roles.remove(role.id,`Command: ${message.author.tag} -> remove role ${role.name} from ${member.user.tag}`).then(() {
                     return message.reply(`Removed role ${role.name} from **${member.user.tag}**.`);
-                }).catch((e) => {
+                }).catch((e) {
                     return message.reply(`Command failed: ${e}`);
                 });
                 break;
@@ -206,7 +206,7 @@ module.exports = {
                     skip: 0,
                     before: message.guild.members.filter(m => m.roles.has(role.id)).size
                 };
-                message.channel.send(`Changing roles for ${members.length} members.\nThis should take about ${client.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id)).size, true, true)}.`);
+                message.channel.send(`Changing roles for ${members.length} members.\nThis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id)).size, true, true)}.`);
                 for(let m of members) {
                     var member = message.guild.members.get(m);
                     if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ALL.`)
@@ -230,7 +230,7 @@ module.exports = {
                     skip: 0,
                     before: message.guild.members.filter(m => m.roles.has(role.id)).size
                 };
-                message.channel.send(`Changing roles for ${members.length} members.\nThis should take about ${client.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id)).size, true, true)}.`);
+                message.channel.send(`Changing roles for ${members.length} members.\nThis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id)).size, true, true)}.`);
                 for(let m of members) {
                     var member = message.guild.members.get(m);
                     if(member.roles.has(role.id)) await member.roles.remove(role.id,`Command: ${message.author.tag} -> Remove role ${role.name} from ALL.`)
@@ -263,7 +263,7 @@ module.exports = {
                         skip: 0,
                         before: message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size
                     };
-                    message.channel.send(`Changing roles for ${members.length} humans.\nThis should take about ${client.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
+                    message.channel.send(`Changing roles for ${members.length} humans.\nThis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
                     for(let m of members) {
                         var member = message.guild.members.get(m);
                         if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all humans.`)
@@ -285,7 +285,7 @@ module.exports = {
                         skip: 0,
                         before: message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size
                     };
-                    message.channel.send(`Changing roles for ${members.length} humans.\nThis should take about ${client.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
+                    message.channel.send(`Changing roles for ${members.length} humans.\nThis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
                     for(let m of members) {
                         var member = message.guild.members.get(m);
                         if(member.roles.has(role.id)) await member.roles.remove(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all humans.`)
@@ -319,7 +319,7 @@ module.exports = {
                         skip: 0,
                         before: message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size
                     };
-                    message.channel.send(`Changing roles for ${members.length} bots.\nThis should take about ${client.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
+                    message.channel.send(`Changing roles for ${members.length} bots.\nThis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
                     for(let m of members) {
                         var member = message.guild.members.get(m);
                         if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all bots.`)
@@ -341,7 +341,7 @@ module.exports = {
                         skip: 0,
                         before: message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size
                     };
-                    message.channel.send(`Changing roles for ${members.length} bots.\nThis should take about ${client.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
+                    message.channel.send(`Changing roles for ${members.length} bots.\nThis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
                     for(let m of members) {
                         var member = message.guild.members.get(m);
                         if(member.roles.has(role.id)) await member.roles.remove(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all bots.`)

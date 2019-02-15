@@ -16,11 +16,11 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async function(message) {
         // get user from message
         var user = await message.getUserFromArgs();
    
-		if(!user) var user = await client.users.fetch(message.args[0]).catch(u=>false);
+		if(!user) var user = await this.users.fetch(message.args[0]).catch(u=>false);
         if(!user) return message.errorEmbed("INVALID_USER");
    
        if((await message.guild.fetchBans()).has(user.id)) {
@@ -29,21 +29,21 @@ module.exports = {
                description: `It looks like ${user.tag} is already banned here..`
            }
            Object.assign(data, message.embed_defaults());
-           var embed = new client.Discord.MessageEmbed(data);
+           var embed = new this.Discord.MessageEmbed(data);
            return message.channel.send(embed);
        }
    
-       if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourclient.");
+       if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourthis.");
        var reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";
-       message.guild.members.ban(user.id,{reason:`Hackban: ${message.author.tag} -> ${reason}`}).then(()=>{
+       message.guild.members.ban(user.id,{reason:`Hackban: ${message.author.tag} -> ${reason}`}).then(() {
            message.channel.send(`***User ${user.tag} was banned, ${reason}***`).catch(noerr=>null);
-       }).catch(async(err)=>{
+       }).catch(async(err) {
            message.reply(`I couldn't hackban **${user.tag}**, ${err}`);
            if(m !== undefined) {
                await m.delete();
            }
        });
    
-       if(!message.gConfig.delCmds && message.channel.permissionsFor(client.user.id).has("MANAGE_MESSAGES")) message.delete().catch(noerr=>null);
+       if(!message.gConfig.delCmds && message.channel.permissionsFor(this.user.id).has("MANAGE_MESSAGES")) message.delete().catch(noerr=>null);
    })
 };

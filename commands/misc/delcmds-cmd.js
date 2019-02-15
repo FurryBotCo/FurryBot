@@ -15,16 +15,16 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
     
         switch(message.gConfig.deleteCommands) {
             case true:
-                client.db.updateGuild(message.guild.id, {deleteCommands: false});
+                this.db.updateGuild(message.guild.id, {deleteCommands: false});
                 message.reply("Disabled deleting command invocations.");
                 break;
     
             case false:
-            client.db.updateGuild(message.guild.id, {deleteCommands: true});
+            this.db.updateGuild(message.guild.id, {deleteCommands: true});
             message.reply("Enabled deleting command invocations.");
                 break;
         }

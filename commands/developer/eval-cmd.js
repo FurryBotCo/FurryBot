@@ -14,23 +14,23 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 		// extra check, to be safe
-		if (!client.config.developers.includes(message.author.id)) {
+		if (!this.config.developers.includes(message.author.id)) {
 			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
 		message.channel.startTyping();
-		const r = client.r;
+		const r = this.r;
 		var exec = message.unparsedArgs.join(" ");
-		var start = client.performance.now();
+		var start = this.performance.now();
 		try {
 			var res = await eval(exec);
 		}catch(e){
 			//return message.reply(`Error evaluating: ${err}`);
-			var m = typeof e.message !== "string" ? client.util.inspect(e.message,{depth: 1}) : e.message;
-			console.log(client.util.inspect(e.message,{depth: 1}));
+			var m = typeof e.message !== "string" ? this.util.inspect(e.message,{depth: 1}) : e.message;
+			console.log(this.util.inspect(e.message,{depth: 1}));
 			var res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Evaluating:\n${e.name}: ${m}\`\`\``;
-			var end = client.performance.now();
+			var end = this.performance.now();
 			var data = {
 				title: `Evaluated - Time: \`\`${(end-start).toFixed(3)}ms\`\``,
 				author: {
@@ -51,9 +51,9 @@ module.exports = {
 				]
 			}
 	
-			console.error(`[Eval]: ${client.util.inspect(e,{depth: 3,color:true})}`);
+			console.error(`[Eval]: ${this.util.inspect(e,{depth: 3,color:true})}`);
 			Object.assign(data,message.embed_defaults());
-			var embed = new client.Discord.MessageEmbed(data);
+			var embed = new this.Discord.MessageEmbed(data);
 			message.channel.send(embed).catch(err => {
 				message.channel.send(`I could not return the result: ${err}`).catch(error => {
 					message.author.send(`I could not return the result: ${error}`).catch(noerr => null);
@@ -64,14 +64,14 @@ module.exports = {
 		if([null,undefined,""].includes(res)) {
 			var res = "```fix\nfinished with no return```";
 		} else {
-			if(typeof res !== "string") res = client.util.inspect(res,{showHidden:true,depth: 3});
+			if(typeof res !== "string") res = this.util.inspect(res,{showHidden:true,depth: 3});
 			if(res.length > 1000) {
 				console.log(`[Eval]: ${res}`);
 				res = "Logged To Console";
 			}
 			res = "```js\n"+res+"```";
 		}
-		var end = client.performance.now();
+		var end = this.performance.now();
 		var data = {
 			title: `Evaluated - Time: \`${(end-start).toFixed(3)}ms\``,
 			author: {
@@ -93,7 +93,7 @@ module.exports = {
 		};
 		
 		Object.assign(data,message.embed_defaults());
-		var embed = new client.Discord.MessageEmbed(data);
+		var embed = new this.Discord.MessageEmbed(data);
 		message.channel.send(embed).catch(err => {
 			console.error(err);
 			message.channel.send(`I could not return the result: ${err}`).catch(error => {

@@ -1,10 +1,22 @@
-module.exports = (async(client,role)=>{
+module.exports = (async function(role) {
+    if(!role || !role.guild || !this.db) return;
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.roleDelete",
+        properties: {
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            }
+        }
+    });
     var ev = "roledeleted";
-    if(!client.db) return;
-    var gConfig = await client.db.getGuild(role.guild.id).catch(err=>client.config.default.guildConfig);
+    var gConfig = await this.db.getGuild(role.guild.id).catch(err=>this.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = role.guild.channels.get(gConfig.logging[ev].channel);
-    if(!logch) return client.db.updateGuild(role.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
+    if(!logch) return this.db.updateGuild(role.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     if(!role.deleted) return;
     var data = {
         title: `:wastebasket: Role Deleted`,
@@ -13,7 +25,7 @@ module.exports = (async(client,role)=>{
             icon_url: role.guild.iconURL()
         },
         timestamp: role.createdTimestamp,
-        color: client.randomColor(),
+        color: this.randomColor(),
         footer: {
             text: `Role: ${role.name} (${role.id})`
         },
@@ -35,11 +47,11 @@ module.exports = (async(client,role)=>{
     }
     
     // audit log check
-    var log = await client.getLogs(role.guild.id,"ROLE_DELETE",role.id);
+    var log = await this.getLogs(role.guild.id,"ROLE_DELETE",role.id);
     if(log !== false) {
         data.fields.push({
             name: "Executor",
-            value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+            value: log.executor instanceof this.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
@@ -54,6 +66,6 @@ module.exports = (async(client,role)=>{
             });
         } else {}
 
-    var embed = new client.Discord.MessageEmbed(data);
+    var embed = new this.Discord.MessageEmbed(data);
     return logch.send(embed);
 })

@@ -13,7 +13,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 		message.channel.startTyping();
 		if(message.args.length === 0 || !message.args) {
 			var user = message.member;
@@ -53,14 +53,14 @@ module.exports = {
 			]
 		};
 		if(!user.user.bot) {
-			const req = await client.request(`https://discord.services/api/ban/${user.id}`,{
+			const req = await this.request(`https://discord.services/api/ban/${user.id}`,{
 				method: "GET"
 			});
 	
 			var x = JSON.parse(req.body);
 			var ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";
 			var db = "Down until further notice";
-			var l = await client.db.isBlacklisted(user.id);
+			var l = await this.db.isBlacklisted(user.id);
 			var ll = l ? `Reason: ${l.reason}` : "No";
 			data.fields.push({
 				name: "Blacklist",
@@ -73,14 +73,14 @@ module.exports = {
 			})
 		} else {
 			// botlist lookup
-			const req = await client.request(`https://botblock.org/api/bots/${user.id}`,{
+			const req = await this.request(`https://botblock.org/api/bots/${user.id}`,{
 				method: "GET"
 			});
 			try {
 				var rs = JSON.parse(req.body);
-				var list = Object.keys(client._.pickBy(rs.list_data,((val,key)=>{try{if([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) return false;}catch(e){return false;}return val[1] === 200}))).map(list=>({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
+				var list = Object.keys(this._.pickBy(rs.list_data,((val,key) {try{if([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) return false;}catch(e){return false;}return val[1] === 200}))).map(list=>({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			}catch(e){
-				client.logger.error(e);
+				this.logger.error(e);
 				var rs = req.body;
 				var list = "Lookup Failed.";
 			}
@@ -97,7 +97,7 @@ module.exports = {
 		}
 		Object.assign(data, message.embed_defaults());
 		data.thumbnail={url: user.user.displayAvatarURL()};
-		var embed = new client.Discord.MessageEmbed(data);
+		var embed = new this.Discord.MessageEmbed(data);
 		message.channel.send(embed);
 		return message.channel.stopTyping();
 	})

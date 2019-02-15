@@ -11,23 +11,23 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
         var member = await message.getMemberFromArgs();
         if(!member) return message.errorEmbed("INVALID_USER");
-        var m = await client.db.getUser(member.id);
+        var m = await this.db.getUser(member.id);
         if(m.married !== true) {
-            message.channel.send(`<@!${message.author.id}> has proposed to <@!${member.id}>!\n<@!${member.id}> do you accept? **yes** or **no**.`).then(() => {
+            message.channel.send(`<@!${message.author.id}> has proposed to <@!${member.id}>!\n<@!${member.id}> do you accept? **yes** or **no**.`).then(() {
                 message.channel.awaitMessages(msg => msg.author.id === member.id && ["yes","no"].includes(msg.content.toLowerCase()),{
                     max: 1,
                     time: 6e4
-                }).then(async(c) => {
+                }).then(async(c) {
                     switch(c.first().content.toLowerCase()) {
                         case "yes":
-                            await client.r.table("users").get(message.author.id).update({
+                            await this.r.table("users").get(message.author.id).update({
                                 married: true,
                                 marriagePartner: member.id
                             });
-                            await client.r.table("users").get(member.id).update({
+                            await this.r.table("users").get(member.id).update({
                                 married: true,
                                 marriagePartner: message.author.id
                             });
@@ -38,9 +38,9 @@ module.exports = {
                             return message.reply("Better luck next time!");
                             break;
                     }
-                }).catch(async(c) => {
-                    if(c instanceof client.Discord.Collection && c.size === 0) return message.channel.send("User did not reply in time, canceled!");
-                    client.logger.error(c);
+                }).catch(async(c) {
+                    if(c instanceof this.Discord.Collection && c.size === 0) return message.channel.send("User did not reply in time, canceled!");
+                    this.logger.error(c);
                     return message.channel.send("unknown error");
                 })
             })

@@ -12,7 +12,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async function(message) {
         return message.reply("Yip! Yip! I am! I am! :fox:");
     })
 };

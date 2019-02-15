@@ -1,10 +1,22 @@
-module.exports = (async(client,oldRole,newRole)=>{
-    if(!oldRole || !oldRole.guild || !newRole || !newRole.guild || newRole.id === newRole.guild.id || !client.db) return;
+module.exports = (async function(oldRole,newRole) {
+    if(!oldRole || !oldRole.guild || !newRole || !newRole.guild || newRole.id === newRole.guild.id || !this.db) return;
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.roleUpdate",
+        properties: {
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            }
+        }
+    });
     var ev = "roleupdated";
-    var gConfig = await client.db.getGuild(newRole.guild.id).catch(err=>client.config.default.guildConfig);
+    var gConfig = await this.db.getGuild(newRole.guild.id).catch(err=>this.config.default.guildConfig);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = newRole.guild.channels.get(gConfig.logging[ev].channel);
-    if(!logch) return client.db.updateGuild(newRole.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
+    if(!logch) return this.db.updateGuild(newRole.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     if(newRole.deleted) return;
     var base = {
         title: `Role Updated`,
@@ -13,7 +25,7 @@ module.exports = (async(client,oldRole,newRole)=>{
             icon_url: newRole.guild.iconURL()
         },
         timestamp: new Date().toISOString(),
-        color: client.randomColor(),
+        color: this.randomColor(),
         footer: {
             text: `Role: ${newRole.name} (${newRole.id})`
         },
@@ -21,11 +33,11 @@ module.exports = (async(client,oldRole,newRole)=>{
     }
 
     // audit log check
-    var log = await client.getLogs(newRole.guild.id,"ROLE_UPDATE",newRole.id);
+    var log = await this.getLogs(newRole.guild.id,"ROLE_UPDATE",newRole.id);
     if(log !== false) {
          var log_data = [{
             name: "Executor",
-            value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+            value: log.executor instanceof this.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
@@ -54,20 +66,20 @@ module.exports = (async(client,oldRole,newRole)=>{
             value: newRole.name,
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
     // permission overwrites
     try {
-        if((!([undefined,null,""].includes(oldRole.permissions) || oldRole.permissions.length === 0) && !([undefined,null,""].includes(newRole.permissions) || newRole.permissions.length === 0)) && !client._.isEqual(oldRole.permissions.map(j=>({allow:j.allow,deny:j.deny})),newRole.permissions.map(j=>({allow:j.allow,deny:j.deny})))) {
+        if((!([undefined,null,""].includes(oldRole.permissions) || oldRole.permissions.length === 0) && !([undefined,null,""].includes(newRole.permissions) || newRole.permissions.length === 0)) && !this._.isEqual(oldRole.permissions.map(j=>({allow:j.allow,deny:j.deny})),newRole.permissions.map(j=>({allow:j.allow,deny:j.deny})))) {
             var data = Object.assign({},base);
             data.fields = [{
                 name: "Permissions Update",
                 value: "Check Audit Log",
                 inline: false
             }].concat(log_data);
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             logch.send(embed);
         }
     }catch(e){}
@@ -83,7 +95,7 @@ module.exports = (async(client,oldRole,newRole)=>{
             value: newRole.mentionable ? "Yes" : "No",
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -98,7 +110,7 @@ module.exports = (async(client,oldRole,newRole)=>{
             value: newRole.hexColor,
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -113,7 +125,7 @@ module.exports = (async(client,oldRole,newRole)=>{
             value: newRole.hoist ? "Yes" : "No",
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -129,14 +141,14 @@ module.exports = (async(client,oldRole,newRole)=>{
             inline: false
         },{
             name: "Below",
-            value: `Old: ${belowo instanceof client.Discord.Role ? `${belowo.name} (${belowo.id})` : "None below."}\nNew: ${belown instanceof client.Discord.Role ? `${belown.name} (${belown.id})` : "None below."}`,
+            value: `Old: ${belowo instanceof this.Discord.Role ? `${belowo.name} (${belowo.id})` : "None below."}\nNew: ${belown instanceof this.Discord.Role ? `${belown.name} (${belown.id})` : "None below."}`,
             inline: false
         },{
             name: "Above",
-            value: `Old: ${aboveo instanceof client.Discord.Role ? `${aboveo.name} (${aboveo.id})` : "None below."}\nNew: ${aboven instanceof client.Discord.Role ? `${aboven.name} (${aboven.id})` : "None below."}`,
+            value: `Old: ${aboveo instanceof this.Discord.Role ? `${aboveo.name} (${aboveo.id})` : "None below."}\nNew: ${aboven instanceof this.Discord.Role ? `${aboven.name} (${aboven.id})` : "None below."}`,
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }*/
     

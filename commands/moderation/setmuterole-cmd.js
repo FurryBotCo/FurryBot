@@ -15,11 +15,11 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async function(message) {
         if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
     
         if(message.args[0] === "reset") {
-            message.guild.channels.forEach(async(ch)=>{
+            message.guild.channels.forEach(async(ch) {
                 if(![null,undefined,""].includes(message.gConfig.muteRole) && ch.permissionOverwrites.has(message.gConfig.muteRole)) {
                     if(ch.permissionOverwrites.get(message.gConfig.muteRole).allow.bitfield === 0 && ch.permissionOverwrites.get(message.gConfig.muteRole).deny.bitfield === 2048) {
                         await ch.permissionOverwrites.get(message.gConfig.muteRole).delete();
@@ -29,7 +29,7 @@ module.exports = {
                 }
             })
             
-            await client.db.updateGuild(message.guild.id,{muteRole:null});
+            await this.db.updateGuild(message.guild.id,{muteRole:null});
     
             return message.reply("Reset channel overwrites and mute role.");
         }
@@ -45,18 +45,18 @@ module.exports = {
                 color: 15601937
             }
             Object.assign(data, message.embed_defaults("color"));
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }
-        var g = await client.db.updateGuild(message.guild.id,{muteRole:role.id});
+        var g = await this.db.updateGuild(message.guild.id,{muteRole:role.id});
         if(!g) {
             message.reply("There was an internal error while doing this, please try again");
-            return client.logger.log(g);
+            return this.logger.log(g);
         }
     
         message.reply(`Set the new muted role to **${role.name}**`);
     
-        message.guild.channels.forEach(async(ch)=>{
+        message.guild.channels.forEach(async(ch) {
             if(![null,undefined,""].includes(message.gConfig.muteRole) && ch.permissionOverwrites.has(message.gConfig.muteRole)) {
                 if(ch.permissionOverwrites.get(message.gConfig.muteRole).allow.bitfield === 0 && ch.permissionOverwrites.get(message.gConfig.muteRole).deny.bitfield === 2048) {
                     await ch.permissionOverwrites.get(message.gConfig.muteRole).delete();

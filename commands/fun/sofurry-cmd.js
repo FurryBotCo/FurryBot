@@ -15,7 +15,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async function(message) {
         const contentType = [
             "story",
             "art",
@@ -24,13 +24,13 @@ module.exports = {
             "photo"
         ];
         var tags = message.unparseArgs.length > 0 ? message.unparseArgs.join("%20") : "furry";
-        var bl = tags.match(client.config.tagBlacklist);
+        var bl = tags.match(this.config.tagBlacklist);
         if(bl !== null && bl.length > 0) return message.reply(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
-        const msg = await message.channel.send(`Fetching.. ${client.config.emojis.load}`);
-        var req = await client.request(`https://api2.sofurry.com/browse/search?search=${tags}&format=json&minlevel=0&maxlevel=0`,{
+        const msg = await message.channel.send(`Fetching.. ${this.config.emojis.load}`);
+        var req = await this.request(`https://api2.sofurry.com/browse/search?search=${tags}&format=json&minlevel=0&maxlevel=0`,{
             method: "GET",
             headers: {
-                "User-Agent": client.config.web.userAgent
+                "User-Agent": this.config.web.userAgent
             }
         });
         try {
@@ -39,22 +39,22 @@ module.exports = {
             var submission = jsn.data.entries[rr];
             if(typeof submission.contentLevel === "undefined") throw new Error("secondary");
             if(submission.contentLevel !== 0) {
-                client.logger.log(`unsafe image:\n${client.util.inspect(submission,{depth:3,showHidden:true})}`);
-                client.logger.log(`Body: ${client.inspect(jsn,{depth:null})}`);
+                this.logger.log(`unsafe image:\n${this.util.inspect(submission,{depth:3,showHidden:true})}`);
+                this.logger.log(`Body: ${this.inspect(jsn,{depth:null})}`);
                 return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err=>message.channel.send(`Command failed: ${err}`));
             }
-            var short = await client.shortenUrl(`http://www.sofurry.com/view/${submission.id}`);
+            var short = await this.shortenUrl(`http://www.sofurry.com/view/${submission.id}`);
             var extra = short.new ? `**This is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
             if([1,4].includes(submission.contentType)) {
-                var attachment = new client.Discord.MessageAttachment(submission.full,"sofurry.png");
-                return msg.edit(`${extra}${submission.title} (type ${client.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${message.author.tag}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err=>message.channel.send(`Command failed: ${err}`)).then(()=>message.channel.send(attachment));
+                var attachment = new this.Discord.MessageAttachment(submission.full,"sofurry.png");
+                return msg.edit(`${extra}${submission.title} (type ${this.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${message.author.tag}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err=>message.channel.send(`Command failed: ${err}`)).then(()=>message.channel.send(attachment));
             } else {
-                return msg.edit(`${extra}${submission.title} (type ${client.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${message.author.tag}\nIf something bad is returned, blame the service, not the bot author!`).catch(err=>message.channel.send(`Command failed: ${err}`));
+                return msg.edit(`${extra}${submission.title} (type ${this.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${message.author.tag}\nIf something bad is returned, blame the service, not the bot author!`).catch(err=>message.channel.send(`Command failed: ${err}`));
             }
         }catch(e){
-            client.logger.error(`Error:\n${e}`);
-            client.logger.log(`Body: ${jsn}`);
-            var attachment = new client.Discord.MessageAttachment(client.config.images.serverError);
+            this.logger.error(`Error:\n${e}`);
+            this.logger.log(`Body: ${jsn}`);
+            var attachment = new this.Discord.MessageAttachment(this.config.images.serverError);
             return msg.edit("Unknown API Error").then(()=>message.channel.send(attachment)).catch(err=>message.channel.send(`Command failed: ${err}`));
         }
     })

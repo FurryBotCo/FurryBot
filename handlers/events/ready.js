@@ -1,18 +1,33 @@
-module.exports = (async(client) => {
-    client.logger = new client.FurryBotLogger(client);
-    client.logger.log(`Bot has started with ${client.users.size} users in ${client.channels.size} channels of ${client.guilds.size} guilds.`);
+module.exports = (async function() {
+    this.logger = new this.FurryBotLogger(this);
+    this.logger.log(`Bot has started with ${this.users.size} users in ${this.channels.size} channels of ${this.guilds.size} guilds.`);
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.ready",
+        properties: {
+            userCount: this.users.size,
+            channelCount: this.channels.size,
+            guildCount: this.channels.size,
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            }
+        }
+    });
     const rotatingStatus = (async()=>{
-		client.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"}).then(()=>{
+		this.user.setActivity(`🐾 Debugging! 🐾`,{type: "PLAYING"}).then(()=>{
             setTimeout(()=>{
-                client.user.setActivity(`🐾 ${client.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"}).then(()=>{
+                this.user.setActivity(`🐾 ${this.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"}).then(()=>{
                     setTimeout(()=>{
-                        client.user.setActivity(`🐾 ${client.config.defaultPrefix}help in ${client.guilds.size} guilds! 🐾`,{type: "PLAYING"}).then(()=>{
+                        this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.guilds.size} guilds! 🐾`,{type: "PLAYING"}).then(()=>{
                             setTimeout(()=>{
-                                client.user.setActivity(`🐾 ${client.config.defaultPrefix}help with ${client.users.size} users! 🐾`,{type: "WATCHING"}).then(()=>{
+                                this.user.setActivity(`🐾 ${this.config.defaultPrefix}help with ${this.users.size} users! 🐾`,{type: "WATCHING"}).then(()=>{
                                     setTimeout(()=>{
-                                        client.user.setActivity(`🐾 ${client.config.defaultPrefix}help in ${client.channels.size} channels! 🐾`,{type: "LISTENING"}).then(()=>{
+                                        this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.channels.size} channels! 🐾`,{type: "LISTENING"}).then(()=>{
                                             setTimeout(()=>{
-                                                client.user.setActivity(`🐾 ${client.config.defaultPrefix}help with ${client.options.shardCount} shard${client.options.shardCount>1?"s":""}! 🐾`,{type: "PLAYING"});
+                                                this.user.setActivity(`🐾 ${this.config.defaultPrefix}help with ${this.options.shardCount} shard${this.options.shardCount>1?"s":""}! 🐾`,{type: "PLAYING"});
                                             },15e3);
                                         });
                                     },15e3);
@@ -27,40 +42,40 @@ module.exports = (async(client) => {
 
     rotatingStatus();
     setInterval(rotatingStatus,75e3)
-   client.logger.log(`ready with ${client.options.shardCount} shard${client.options.shardCount>1?"s":""}!`);
+   this.logger.log(`ready with ${this.options.shardCount} shard${this.options.shardCount>1?"s":""}!`);
 
-     client.setInterval(()=>{
-        client.voiceConnections.forEach((vc)=>{
-            if(vc.channel.members.filter(m=>m.id!==client.user.id).size === 0) {
+     this.setInterval(()=>{
+        this.voiceConnections.forEach((vc)=>{
+            if(vc.channel.members.filter(m=>m.id!==this.user.id).size === 0) {
                 vc.channel.leave();
-                client.logger.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to inactivity.`);
+                this.logger.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to inactivity.`);
             }
         });
    },3e4);
    
-   client.db = new client.FurryBotDatabase(client);
+   this.db = new this.FurryBotDatabase(this);
    
-    await client.dbStats(client);
+    await this.dbStats(this);
     // post general stats to db every 60 seconds
-    client.setInterval(client.dbStats,6e4,client);
+    this.setInterval(this.dbStats,6e4,this);
     
     /*var webhookData = {
-        title: `Shard #${client.shard.id} is ready`,
-        timestamp: client.getCurrentTimestamp()
+        title: `Shard #${this.shard.id} is ready`,
+        timestamp: this.getCurrentTimestamp()
     }*/
     
-    //var webhookEmbed = new client.Discord.MessageEmbed(webhookData);
+    //var webhookEmbed = new this.Discord.MessageEmbed(webhookData);
     
-    //client.webhooks.shards.send(webhookEmbed);
-    client.srv = client.server.load(client);
-    if(!client.config.beta) {
-        //const ls = client.listStats(client);
-        setInterval(client.listStats,3e5,client);
+    //this.webhooks.shards.send(webhookEmbed);
+    this.srv = this.server.load(this);
+    if(!this.config.beta) {
+        //const ls = this.listStats(this);
+        setInterval(this.listStats,3e5,this);
     }
 
     // if ever needed, auto leave voice channels
     /*setInterval(async()=>{
-        client.voiceConnections.filter(v=>!v.speaking.has("SPEAKING")).forEach(async(v)=>{
+        this.voiceConnections.filter(v=>!v.speaking.has("SPEAKING")).forEach(async(v)=>{
             v.channel.leave();
             var data = {
                 "title": "Left Voice Channel",
@@ -68,15 +83,15 @@ module.exports = (async(client) => {
                 "color": 2424780,
                 "timestamp": new Date().toISOString()
             }
-            var embed = new client.Discord.MessageEmbed(data);
-            var a = await client.r.table("guilds").get(v.channel.guild.id);
+            var embed = new this.Discord.MessageEmbed(data);
+            var a = await this.r.table("guilds").get(v.channel.guild.id);
             if(a.music.textChannel !== null) {
-                var chn = client.channels.get(a.music.textChannel);
-                if(!chn || !(chn instanceof client.Discord.TextChannel)) var chn = null;
+                var chn = this.channels.get(a.music.textChannel);
+                if(!chn || !(chn instanceof this.Discord.TextChannel)) var chn = null;
             }
-            if(chn !== null && chn instanceof client.Discord.TextChannel) {
+            if(chn !== null && chn instanceof this.Discord.TextChannel) {
                 chn.send(embed);
-                await client.r.table("guilds").get(v.channel.guild.id).update({
+                await this.r.table("guilds").get(v.channel.guild.id).update({
                     music: {
                         queue: [],
                         playing: false,
@@ -88,30 +103,30 @@ module.exports = (async(client) => {
     },3e5);*/
 
 	setInterval(async()=>{
-		if(["00:00:00"].includes(client.getDateTime())) {
+		if(["00:00:00"].includes(this.getDateTime())) {
 			var date = new Date(),
 			d = `${date.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${date.getMonth()+1}`}-${(date.getDate()-1).toString().length > 1 ? date.getDate() -1: `0${date.getDate()-1}`}-${date.getFullYear()}`,
-			count = (await client.r.table("dailyjoins").get(d)("count"))||0;
+			count = (await this.r.table("dailyjoins").get(d)("count"))||0;
 			var data = {
 				author: {
 					name: "Donovan_DMC#1337",
 					"icon_url": "https://i.donovand.info/Don.gif"
 				},
-				title: `Total Guilds Joined ${d}\t Current Total: ${client.guilds.size}`,
+				title: `Total Guilds Joined ${d}\t Current Total: ${this.guilds.size}`,
 				description: `Total Guilds Joined Today: **${count}**`,
 				footer: {
-					text: `Shard ${client.guilds.get(client.config.bot.mainGuild).shard.id+1}/${client.options.shardCount} | Bot Version ${client.config.bot.version}`
+					text: `Shard ${this.guilds.get(this.config.bot.mainGuild).shard.id+1}/${this.options.shardCount} | Bot Version ${this.config.bot.version}`
 				},
-				color: client.randomColor(),
-				timestamp: client.getCurrentTimestamp(),
+				color: this.randomColor(),
+				timestamp: this.getCurrentTimestamp(),
 				thumbnail: {
 					url: "https://i.furry.bot/furry-small.png"
 				}
 			}
-			var embed = new client.Discord.MessageEmbed(data);
-			client.channels.get(client.config.bot.channels.daily).send(embed).then(n=>{
-				client.logger.log(`Posted daily stats, ${d}: ${count}, total: ${client.guilds.size}`);
-			}).catch(client.logger.error);
+			var embed = new this.Discord.MessageEmbed(data);
+			this.channels.get(this.config.bot.channels.daily).send(embed).then(n=>{
+				this.logger.log(`Posted daily stats, ${d}: ${count}, total: ${this.guilds.size}`);
+			}).catch(this.logger.error);
 		}
     },1e3);
     console.log("end of ready");

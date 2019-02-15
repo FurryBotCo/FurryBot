@@ -12,9 +12,9 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
     guildOwnerOnly: false,
-    run: (async(client,message)=>{
+    run: (async function(message) {
 		// extra check, to be safe
-		if (!client.config.developers.includes(message.author.id)) {
+		if (!this.config.developers.includes(message.author.id)) {
 			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
         message.channel.startTyping();
@@ -23,13 +23,13 @@ module.exports = {
         // get user from message
         var user = await message.getUserFromArgs();
     
-        if(!user || !(user instanceof client.Discord.User)) {
+        if(!user || !(user instanceof this.Discord.User)) {
             var data = {
                 title: "User not found",
                 description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
             }
             Object.assign(data, message.embed_defaults());
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             message.channel.send(embed);
             return message.channel.stopTyping();
         }
@@ -38,13 +38,13 @@ module.exports = {
         var runCommand = toRun[0];
         var runArgs = [...toRun];
         runArgs.shift();
-        await client.runAs(`${message.gConfig.prefix}${runCommand} ${runArgs.join(" ")}`,user,message.channel);
+        await this.runAs(`${message.gConfig.prefix}${runCommand} ${runArgs.join(" ")}`,user,message.channel);
         var data = {
             title: "Sudo Command",
             description: `Ran command **${runCommand}** with args "${runArgs.join(" ")}" as ${user.tag}`
         }
         Object.assign(data,message.embed_defaults());
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         message.channel.send(embed);
         return message.channel.stopTyping();
     })

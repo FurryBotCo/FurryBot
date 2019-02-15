@@ -13,17 +13,17 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
     
         // nsfwModuleEnabled
         switch(message.gConfig.nsfwModuleEnabled) {
             case true:
-                client.db.updateGuild(message.guild.id, {nsfwModuleEnabled: false});
+                this.db.updateGuild(message.guild.id, {nsfwModuleEnabled: false});
                 message.reply("Disabled NSFW commands.");
                 break;
     
             case false:
-            client.db.updateGuild(message.guild.id, {nsfwModuleEnabled: true});
+            this.db.updateGuild(message.guild.id, {nsfwModuleEnabled: true});
             message.reply("Enabled NSFW commands.");
                 break;
         }

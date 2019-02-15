@@ -13,7 +13,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async function(message) {
         var l = "";
         var updateFields = {logging:{}};
         for(let key in message.gConfig.logging) {
@@ -39,7 +39,7 @@ module.exports = {
             description: `You can change these with \`${message.gConfig.prefix}log <enable/disable> <event>\`\n${l}`
         }
         Object.assign(data,message.embed_defaults());
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         return message.channel.send(embed);
     })
 };

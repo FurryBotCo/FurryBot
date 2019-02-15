@@ -14,7 +14,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
+	run: (async function(message) {
         if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
     
         // get member from message
@@ -24,7 +24,7 @@ module.exports = {
     
         if(isNaN(message.args[1])) return message.reply(`Please provide a valid warning id as the second argument.`);
     
-        var w = await client.db.deleteUserWarning(user.id,message.guild.id,message.args[1]);
+        var w = await this.db.deleteUserWarning(user.id,message.guild.id,message.args[1]);
         console.log(w);
         if(!w) {
             var data = {
@@ -33,7 +33,7 @@ module.exports = {
                 color: 15601937
             }
             Object.assign(data,message.embed_defaults("color"));
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         } else {
             var data = {
@@ -42,7 +42,7 @@ module.exports = {
                 color: 41728
             }
             Object.assign(data,message.embed_defaults("color"));
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             return message.channel.send(embed);
         }
     })

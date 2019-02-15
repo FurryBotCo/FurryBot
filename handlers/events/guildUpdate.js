@@ -1,10 +1,22 @@
-module.exports = (async(client,oldGuild,newGuild)=>{
-    if(!newGuild || !client.db) return;
+module.exports = (async function(oldGuild,newGuild) {
+    if(!newGuild || !this.db) return;
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.guildUpdate",
+        properties: {
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            }
+        }
+    });
     var ev = "guildupdated";
-    var gConfig = await client.db.getGuild(newGuild.id).catch(err=>client.config.defaultGuildSettings);
+    var gConfig = await this.db.getGuild(newGuild.id).catch(err=>this.config.defaultGuildSettings);
     if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
     var logch = newGuild.channels.get(gConfig.logging[ev].channel);
-    if(!logch) return client.db.updateGuild(newGuild.id,{logging:{[ev]:{enabled:false,channel:null}}});
+    if(!logch) return this.db.updateGuild(newGuild.id,{logging:{[ev]:{enabled:false,channel:null}}});
     if(newGuild.deleted) return;
 
     var base = {
@@ -14,7 +26,7 @@ module.exports = (async(client,oldGuild,newGuild)=>{
             icon_url: newGuild.iconURL()
         },
         timestamp: new Date().toISOString(),
-        color: client.randomColor(),
+        color: this.randomColor(),
         footer: {
             text: `Channel: ${newGuild.name} (${newGuild.id})`
         },
@@ -38,11 +50,11 @@ module.exports = (async(client,oldGuild,newGuild)=>{
         "required"      // 1
     ]
     // audit log check
-    var log = await client.getLogs(newGuild.id,"GUILD_UPDATE",newGuild.id);
+    var log = await this.getLogs(newGuild.id,"GUILD_UPDATE",newGuild.id);
     if(log !== false) {
          var log_data = [{
             name: "Executor",
-            value: log.executor instanceof client.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
+            value: log.executor instanceof this.Discord.User ? `${log.executor.username}#${log.executor.discriminator} (${log.executor.id})` : "Unknown",
             inline: false
             },{
                 name: "Reason",
@@ -72,7 +84,7 @@ module.exports = (async(client,oldGuild,newGuild)=>{
             value: newGuild.name,
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -81,14 +93,14 @@ module.exports = (async(client,oldGuild,newGuild)=>{
         var data = Object.assign({},base);
         data.fields = [{
             name: "Old Region",
-            value: client.ucwords(oldGuild.region),
+            value: this.ucwords(oldGuild.region),
             inline: false
         },{
             name: "New Region",
-            value: client.ucwords(newGuild.region),
+            value: this.ucwords(newGuild.region),
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -110,7 +122,7 @@ module.exports = (async(client,oldGuild,newGuild)=>{
         if(newGuild.iconURL() !== null) data.image = {
             url: newGuild.iconURL()
         };
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -126,7 +138,7 @@ module.exports = (async(client,oldGuild,newGuild)=>{
             value: `${newGuild.owner.tag} (${newGuild.owner.id})`,
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -142,7 +154,7 @@ module.exports = (async(client,oldGuild,newGuild)=>{
             value: contentFilters[newGuild.explicitContentFilter],
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -158,7 +170,7 @@ module.exports = (async(client,oldGuild,newGuild)=>{
             value: newGuild.defaultMessageNotifications === "ALL" ? "All Message Notifications" : "Mentions Only",
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -167,14 +179,14 @@ module.exports = (async(client,oldGuild,newGuild)=>{
         var data = Object.assign({},base);
         data.fields = [{
             name: "Old AFK Channel",
-            value: oldGuild.afkChannel instanceof client.Discord.VoiceChannel ? `${oldGuild.afkChannel.name} (${oldGuild.afkChannel.id})` : "None",
+            value: oldGuild.afkChannel instanceof this.Discord.VoiceChannel ? `${oldGuild.afkChannel.name} (${oldGuild.afkChannel.id})` : "None",
             inline: false
         },{
             name: "New AFK Channel",
-            value: newGuild.afkChannel instanceof client.Discord.VoiceChannel ? `${newGuild.afkChannel.name} (${newGuild.afkChannel.id})` : "None",
+            value: newGuild.afkChannel instanceof this.Discord.VoiceChannel ? `${newGuild.afkChannel.name} (${newGuild.afkChannel.id})` : "None",
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -183,14 +195,14 @@ module.exports = (async(client,oldGuild,newGuild)=>{
         var data = Object.assign({},base);
         data.fields = [{
             name: "Old AFK Timeout",
-            value: oldGuild.afkTimeout === null ? "None" : client.ms(oldGuild.afkTimeout*1000),
+            value: oldGuild.afkTimeout === null ? "None" : this.ms(oldGuild.afkTimeout*1000),
             inline: false
         },{
             name: "New AFK Timeout",
-            value: newGuild.afkTimeout === null ? "None" : client.ms(newGuild.afkTimeout*1000),
+            value: newGuild.afkTimeout === null ? "None" : this.ms(newGuild.afkTimeout*1000),
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -206,7 +218,7 @@ module.exports = (async(client,oldGuild,newGuild)=>{
             value: mfaLevels[newGuild.mfaLevel],
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
@@ -222,12 +234,12 @@ module.exports = (async(client,oldGuild,newGuild)=>{
             value: verificationLevels[newGuild.verificationLevel],
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 
     // features
-    if(!client._.isEqual(oldGuild.features,newGuild.features)) {
+    if(!this._.isEqual(oldGuild.features,newGuild.features)) {
         var data = Object.assign({},base);
         data.fields = [{
             name: "Old Features List",
@@ -238,7 +250,7 @@ module.exports = (async(client,oldGuild,newGuild)=>{
             value: newGuild.features.join(", "),
             inline: false
         }].concat(log_data);
-        var embed = new client.Discord.MessageEmbed(data);
+        var embed = new this.Discord.MessageEmbed(data);
         logch.send(embed);
     }
 })

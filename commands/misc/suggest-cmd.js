@@ -11,20 +11,20 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 		if(message.unparsedArgs.length < 1 || !message.unparsedArgs[0]) return new Error("ERR_INVALID_USAGE");
 		try {
-			var card = await client.tclient.addCard(message.unparsedArgs.join(" "),`Suggestion by ${message.author.tag} (${message.author.id}) from guild ${message.guild.name} (${message.guild.id})`,client.config.apis.trello.list);
+			var card = await this.tthis.addCard(message.unparsedArgs.join(" "),`Suggestion by ${message.author.tag} (${message.author.id}) from guild ${message.guild.name} (${message.guild.id})`,this.config.apis.trello.list);
 		}catch(e) {
 			return message.reply(`Failed to create card: **${e.message}**`);
 		}
-		await client.tclient.addLabelToCard(card.id,client.config.apis.trello.labels.approval).catch(error=>{return error;});
-		//await tclient.addMemberToCard(card.id,config.trello.members.donovan_dmc).catch(error=>{return error;});
+		await this.tthis.addLabelToCard(card.id,this.config.apis.trello.labels.approval).catch(error=>{return error;});
+		//await tthis.addMemberToCard(card.id,config.trello.members.donovan_dmc).catch(error=>{return error;});
 		message.reply(`Suggestion posted!\nView it here: ${card.shortUrl}`);
 		
 		var data = {
 			title: `Suggestion by ${message.author.tag} (${message.author.id}) from guild ${message.guild.name} (${message.guild.id})`,
-			description: client.truncate(message.unparsedArgs.join(" "),950),
+			description: this.truncate(message.unparsedArgs.join(" "),950),
 			thumbnail: message.author.displayAvatarURL(),
 			fields: [
 				{
@@ -35,8 +35,8 @@ module.exports = {
 			]
 		};
 		Object.assign(data,message.embed_defaults());
-		var embed = new client.Discord.MessageEmbed(data);
-		return client.channels.get(client.config.bot.channels.suggestion).send(embed).then(async(msg) => {
+		var embed = new this.Discord.MessageEmbed(data);
+		return this.channels.get(this.config.bot.channels.suggestion).send(embed).then(async(msg) {
 			await msg.react("542963565150208001");
 			await msg.react("542963565238288384");
 			await msg.react("❌");

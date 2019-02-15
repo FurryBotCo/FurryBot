@@ -1,7 +1,21 @@
-module.exports = (async(client,rateLimitInfo)=>{
-    client.logger.warn(`Ratelimit: ${client.util.inspect(rateLimitInfo,{showHidden: true, depth: null, color: true})}`);
+module.exports = (async function(rateLimitInfo) {
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.rateLimit",
+        properties: {
+            rateLimitInfo,
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            }
+        }
+    });
+    if(!this.logger) console.log(`Ratelimit: ${this.util.inspect(rateLimitInfo,{showHidden: true, depth: null, color: true})}`);
+    else this.logger.warn(`Ratelimit: ${this.util.inspect(rateLimitInfo,{showHidden: true, depth: null, color: true})}`);
     var data = {
-        title: `Ratelimited - Timeout: ${client.ms(rateLimitInfo.timeout)}`,
+        title: `Ratelimited - Timeout: ${this.ms(rateLimitInfo.timeout)}`,
         fields: [
             {
                 name: "Limit",
@@ -24,6 +38,6 @@ module.exports = (async(client,rateLimitInfo)=>{
         timestamp: new Date().toISOString(),
         color: 16762455
     }
-    var embed = new client.Discord.MessageEmbed(data);
-    return client.channels.get(client.config.bot.channels.rateLimit).send(embed).catch(noerr => null);
+    var embed = new this.Discord.MessageEmbed(data);
+    return this.channels.get(this.config.bot.channels.rateLimit).send(embed).catch(noerr => null);
 });

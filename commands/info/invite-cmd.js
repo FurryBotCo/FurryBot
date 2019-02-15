@@ -12,9 +12,9 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async function(message) {
 	
-		var botInvite = await client.generateInvite([
+		var botInvite = await this.generateInvite([
 			"VIEW_AUDIT_LOG",
 			"MANAGE_SERVER",
 			"MANAGE_ROLES",
@@ -48,7 +48,7 @@ module.exports = {
 				},
 				{
 					name: "Discord Server",
-					value: client.config.bot.supportInvite,
+					value: this.config.bot.supportInvite,
 					inline: false
 				}
 			]
@@ -56,7 +56,7 @@ module.exports = {
 		
 		Object.assign(data, message.embed_defaults());
 		
-		var embed = new client.Discord.MessageEmbed(data);
+		var embed = new this.Discord.MessageEmbed(data);
 		return message.channel.send(embed);
 	})
 };

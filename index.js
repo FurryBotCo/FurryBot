@@ -281,7 +281,7 @@ class FurryBot extends Discord.Client {
 		this._ = require("lodash");
 		this.perf = require("perf_hooks");
 		this.dbStats = require(`${this.config.rootDir}/util/dbStats`);
-   		this.performance = this.perf.performance;
+   	this.performance = this.perf.performance;
 		this.PerformanceObserver = this.perf.PerformanceObserver;
 		this.child_process = require('child-process-promise');
 		this.shell = this.child_process.exec;
@@ -299,6 +299,7 @@ class FurryBot extends Discord.Client {
 		this.responseList.forEach((resp)=>{
 			this.commandTimeout[resp] = new Set();
 		});
+		this.analytics = new (require("analytics-node"))(this.config.apis.segment.writeKey);
 		/*this.webhooks = {};
 		for(let key in this.config.webhooks) {
 			this.webhooks[key] = new this.Discord.WebhookClient(this.config.webhooks[key].id,this.config.webhooks[key].token,{disableEveryone:true});
@@ -312,13 +313,37 @@ class FurryBot extends Discord.Client {
 	  */
 	load() {
 		console.log("[loadEvent]: start load");
+		this.analytics.track({
+			userId: "CLIENT",
+			event: "client.load",
+			properties: {
+				bot: {
+					version: this.config.bot.version,
+					beta: this.config.beta,
+					alpha: this.config.alpha,
+					server: this.os.hostname()
+				}
+			}
+		});
 		this.fs.readdir(`${process.cwd()}/handlers/events/`, (err, files) => {
 		    if (err) return console.error(err);
 		    files.forEach(file => {
 				if (!file.endsWith(".js")) return;
 				const event = require(`./handlers/events/${file}`),
 				 eventName = file.split(".")[0];
-				this.on(eventName, event.bind(null,this));
+				this.on(eventName, event.bind(this));
+				this.analytics.track({
+					userId: "CLIENT",
+					event: `events.${eventName}.load`,
+					properties: {
+						bot: {
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: this.os.hostname()
+						}
+					}
+				})
 				console.log(`[EventManager]: Loaded ${eventName} event`);
 				delete require.cache[require.resolve(`./handlers/events/${file}`)];
 		    });

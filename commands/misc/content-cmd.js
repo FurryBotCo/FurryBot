@@ -11,8 +11,8 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
-        var req = await client.request(`https://api.furrybot.me/image-counts.php`,{
+	run: (async function(message) {
+        var req = await this.request(`https://api.furrybot.me/image-counts.php`,{
             method: "GET"
         });
         var counts = JSON.parse(req.body);

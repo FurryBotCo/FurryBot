@@ -1,5 +1,17 @@
-module.exports = (async(client,oldUser,newUser) => {
-    if(!oldUser || !newUser || !client.db) return;
+module.exports = (async function(oldUser,newUser) {
+    if(!oldUser || !newUser || !this.db) return;
+    this.analytics.track({
+        userId: "CLIENT",
+        event: "client.events.userUpdate",
+        properties: {
+            bot: {
+                version: this.config.bot.version,
+                beta: this.config.beta,
+                alpha: this.config.alpha,
+                server: this.os.hostname()
+            }
+        }
+    });
     var ev = "memberupdated";
     var base = {
         title: `Member Updated`,
@@ -8,14 +20,14 @@ module.exports = (async(client,oldUser,newUser) => {
             icon_url: newUser.avatarURL()
         },
         timestamp: new Date().toISOString(),
-        color: client.randomColor(),
+        color: this.randomColor(),
         fields: []
     }
-    client.guilds.filter(g=>g.members.has(newUser.id)).forEach(async(guild)=>{
-        var gConfig = await client.db.getGuild(guild.id).catch(err=>client.config.default.guildConfig);
+    this.guilds.filter(g=>g.members.has(newUser.id)).forEach(async(guild)=>{
+        var gConfig = await this.db.getGuild(guild.id).catch(err=>this.config.default.guildConfig);
         if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
         var logch = guild.channels.get(gConfig.logging[ev].channel);
-        if(!logch) return client.db.updateGuild(guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
+        if(!logch) return this.db.updateGuild(guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
 
         // username
         if(oldUser.username !== newUser.username) {
@@ -36,7 +48,7 @@ module.exports = (async(client,oldUser,newUser) => {
                 inline: false
             }];
 
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             logch.send(embed);
         }
 
@@ -59,7 +71,7 @@ module.exports = (async(client,oldUser,newUser) => {
                 inline: false
             }];
             
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             logch.send(embed);
         }
 
@@ -82,7 +94,7 @@ module.exports = (async(client,oldUser,newUser) => {
                 inline: false
             }];
             
-            var embed = new client.Discord.MessageEmbed(data);
+            var embed = new this.Discord.MessageEmbed(data);
             logch.send(embed);
         }
     });

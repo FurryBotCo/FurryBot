@@ -11,9 +11,9 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
     guildOwnerOnly: false,
-    run: (async(client,message )=> {
+    run: (async function(message )=> {
 		// extra check, to be safe
-		if (!client.config.developers.includes(message.author.id)) {
+		if (!this.config.developers.includes(message.author.id)) {
 			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
         message.channel.startTyping();
@@ -22,11 +22,11 @@ module.exports = {
             return new Error("ERR_INVALID_USAGE");
         }
         var set = message.unparsedArgs.join("%20");
-        client.user.setAvatar(set).then((user) => {
-            var attachment = new client.Discord.MessageAttachment(user.displayAvatarURL());
+        this.user.setAvatar(set).then((user) {
+            var attachment = new this.Discord.MessageAttachment(user.displayAvatarURL());
             message.reply(`Set Avatar to (attachment)`,attachment);
             return message.channel.stopTyping();
-        }).catch((err) => {
+        }).catch((err) {
            message.channel.send(`There was an error while doing this: ${err}`) ;
            return message.channel.stopTyping();
         })
