@@ -128,8 +128,8 @@ module.exports = {
         var embed = new this.Discord.MessageEmbed(data);
         embed.attachFiles(attch);
         await message.channel.send(embed);
-        await this.fsn.unlink(imgpath1);
-        await this.fsn.unlink(imgpath2);
+        //await this.fsn.unlink(imgpath1);
+        //await this.fsn.unlink(imgpath2);
         return message.channel.stopTyping();
     })
 };

@@ -129,5 +129,17 @@ module.exports = (async function() {
 			}).catch(this.logger.error);
 		}
     },1e3);
+
+    setInterval(() => {
+        this.fs.readdir(`${this.config.rootDir}/tmp`, (err, files) => {
+            if (err) throw err;
+            for (const file of files) {
+                this.fs.unlink(this.path.join(directory, file), err => {
+                if (err) throw err;
+                });
+            }
+            this.logger.debug(`Cleared Temporary Directory`);
+        });
+    },3e5);
     console.log("end of ready");
 });
