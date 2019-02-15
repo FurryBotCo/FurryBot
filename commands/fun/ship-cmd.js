@@ -82,18 +82,6 @@ module.exports = {
                     "398251412246495233" // Furry Bot#7119
                 ],
                 percent: 0
-            },{
-                users: [
-                    "348992216695439360",
-                    user2.id
-                ],
-                percent: 100
-            },{
-                users: [
-                    "348992216695439360",
-                    user1.id
-                ],
-                percent: 100
             }
         ];
 
