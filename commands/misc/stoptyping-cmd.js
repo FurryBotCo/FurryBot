@@ -3,20 +3,20 @@ module.exports = {
 		"stoptyping"
 	],
 	userPermissions: [
-        "MANAGE_MESSAGES"
-    ],
+		"MANAGE_MESSAGES"
+	],
 	botPermissions: [],
 	cooldown: 1e3,
-	description: "Use this if the bot won't stop typing in a channel",
+	description: "Use message.client if the bot won't stop typing in a channel",
 	usage: "",
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
-		var channel = message.mentions.channels.first() ? message.mentions.channels.first() : message.channel;
+	run: (async(message) => {
+		let channel = message.mentions.channels.first() ? message.mentions.channels.first() : message.channel;
 		if(!channel.typing) return message.reply("I don't seem to be typing here..?");
-		message.reply("I've sent a command to stop typing, let's see if this works!");
+		message.reply("I've sent a command to stop typing, let's see if message.client works!");
 		return channel.stopTyping();
 	})
 };

@@ -12,10 +12,10 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
-	
-		var val = Math.floor(Math.random()*6);
-		var bullets = typeof message.args[0] !== "undefined" ? parseInt(message.args[0],10) : 3;
+	run: (async(message) => {
+		let val, bullets;
+		val = Math.floor(Math.random()*6);
+		bullets = typeof message.args[0] !== "undefined" ? parseInt(message.args[0],10) : 3;
 		
 		if(val<=bullets-1) {
 			return message.reply("You died!");

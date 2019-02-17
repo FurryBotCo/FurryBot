@@ -1,7 +1,7 @@
 module.exports = {
 	triggers: [
-        "modules"
-    ],
+		"modules"
+	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 1e3,
@@ -11,44 +11,45 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(client,message)=>{
-        var data = {
-            title: "Module Status",
-            description: "Enabled/disabled modules on this server.",
-            fields: [
-                {
-                    name: "Fun Module",
-                    value: message.gConfig.funModuleEnabled ? "Enabled" : "Disabled",
-                    inline: true
-                },{
-                    name: "Moderation Module",
-                    value: message.gConfig.moderationModuleEnabled ? "Enabled" : "Disabled",
-                    inline: true
-                },{
-                    name: "Info Module",
-                    value: message.gConfig.infoModuleEnabled ? "Enabled" : "Disabled",
-                    inline: true
-                },{
-                    name: "Miscellaneous Module",
-                    value: message.gConfig.miscModuleEnabled ? "Enabled" : "Disabled",
-                    inline: true
-                },{
-                    name: "Utility Module",
-                    value: message.gConfig.utilityModuleEnabled ? "Enabled" : "Disabled",
-                    inline: true
-                },{
-                    name: "NSFW Module",
-                    value: message.gConfig.nsfwModuleEnabled ? "Enabled" : "Disabled",
-                    inline: true
-                },{
-                    name: "F Response",
-                    value: message.gConfig.fResponseEnabled ? "Enabled" : "Disabled",
-                    inline: true
-                }
-            ]
-        }
-        Object.assign(data,message.embed_defaults());
-        var embed = new client.Discord.MessageEmbed(data);
-        return message.channel.send(embed);
-    })
+	run: (async(message) => {
+		let data, embed;
+		data = {
+			title: "Module Status",
+			description: "Enabled/disabled modules on message.client server.",
+			fields: [
+				{
+					name: "Fun Module",
+					value: message.gConfig.funModuleEnabled ? "Enabled" : "Disabled",
+					inline: true
+				},{
+					name: "Moderation Module",
+					value: message.gConfig.moderationModuleEnabled ? "Enabled" : "Disabled",
+					inline: true
+				},{
+					name: "Info Module",
+					value: message.gConfig.infoModuleEnabled ? "Enabled" : "Disabled",
+					inline: true
+				},{
+					name: "Miscellaneous Module",
+					value: message.gConfig.miscModuleEnabled ? "Enabled" : "Disabled",
+					inline: true
+				},{
+					name: "Utility Module",
+					value: message.gConfig.utilityModuleEnabled ? "Enabled" : "Disabled",
+					inline: true
+				},{
+					name: "NSFW Module",
+					value: message.gConfig.nsfwModuleEnabled ? "Enabled" : "Disabled",
+					inline: true
+				},{
+					name: "F Response",
+					value: message.gConfig.fResponseEnabled ? "Enabled" : "Disabled",
+					inline: true
+				}
+			]
+		};
+		Object.assign(data,message.embed_defaults());
+		embed = new message.client.Discord.MessageEmbed(data);
+		return message.channel.send(embed);
+	})
 };

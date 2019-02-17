@@ -15,20 +15,21 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async(message) => {
 		message.channel.startTyping();
+		let req, response, attachment;
 		try {
-			var req = await client.request("https://api.bunnies.io/v2/loop/random/?media=gif",{
-			method: "GET",
-			headers: {
-				"User-Agent": client.config.web.userAgent
-			}
-		});
-		var response = JSON.parse(req.body);
-		var attachment = new client.Discord.MessageAttachment(response.media.gif,`${response.id}.gif`);
-		}catch(e){
-			console.log(e);
-			var attachment = new client.Discord.MessageAttachment(client.config.images.serverError);
+			req = await message.client.request("https://api.bunnies.io/v2/loop/random/?media=gif",{
+				method: "GET",
+				headers: {
+					"User-Agent": message.client.config.web.userAgent
+				}
+			});
+			response = JSON.parse(req.body);
+			attachment = new message.client.Discord.MessageAttachment(response.media.gif,`${response.id}.gif`);
+		}catch(error){
+			console.log(error);
+			attachment = new message.client.Discord.MessageAttachment(message.client.config.images.serverError);
 		}
 		message.channel.send(attachment);
 		return message.channel.stopTyping();

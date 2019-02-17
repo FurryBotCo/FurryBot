@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "3.2.0-Stable.1.1.0",
+  "version": "3.2.121",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "bin": "index.js",
@@ -20,9 +20,9 @@
   "bugs": {
     "url": "https://github.com/FurryBotCo/FurryBot/issues"
   },
-  "homepage": "https://www.furrybot.me",
+  "homepage": "https://furry.bot",
   "dependencies": {
-    "async-request": "^1.2.0",
+    "analytics-node": "^3.3.0",
     "bfdapi.js": "^1.1.0",
     "blapi": "^0.4.5",
     "bluebird": "^3.5.3",
@@ -37,12 +37,12 @@
     "cookie-parser": "^1.4.3",
     "cookie-session": "^2.0.0-beta.3",
     "cors": "^2.8.5",
-    "discord.js": "github:discordjs/discord.js#d92ee2ff999954899c891c093f5f107dd686b64f",
+    "discord.js": "github:discordjs/discord.js#0564c5c777cfd2391261417a2047d4d7f92474ca",
     "ejs": "^2.6.1",
+    "eslint-plugin-json": "^1.4.0",
     "expect-ct": "^0.1.1",
     "express": "^4.16.4",
     "express-rate-limit": "^3.3.2",
-    "ffmpeg-binaries": "^4.0.0",
     "file-type": "^9.0.0",
     "fs": "0.0.1-security",
     "fs-nextra": "^0.3.7",
@@ -77,11 +77,7 @@
   },
   "devDependencies": {},
   "pgk": {
-    "scripts": [
-
-    ],
-    "assets": [
-      
-    ]
+    "scripts": [],
+    "assets": []
   }
 }

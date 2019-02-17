@@ -13,7 +13,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async(message) => {
 		const types = [
 			"boop",
 			"cuddle",
@@ -24,25 +24,26 @@ module.exports = {
 			"lick",
 			"propose"
 		];
+		let ln, type, req, short, extra, attachment, jsn;
 		if(message.args.length === 0 ) {
-			var ln = Math.floor(Math.random()*(types.length));
+			ln = Math.floor(Math.random()*(types.length));
 			// 0 (1) - 25: Inkbunny
-			var type = types[Math.floor(ln/25)];
+			type = types[Math.floor(ln/25)];
 		} else {
-			var type = message.args[0].toLowerCase();
+			type = message.args[0].toLowerCase();
 			if(type === "list") return message.reply(`Valid Values:\n**${types.join("**\n**")}**.`);
 		}
 		try {
 			if(!type) type = "hug";
-			var req = await client.imageAPIRequest(true,type);
-			var short = await client.shortenUrl(req.response.image);
-			var extra = short.new ? `**This is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
-			var attachment = new client.Discord.MessageAttachment(req.response.image);
-			return message.channel.send(`${extra}Short URL: <${short.link}>\nRequested By: ${message.author.tag}\nType: ${client.ucwords(type)}`,attachment);
-		}catch(e){
-			client.logger.error(`Error:\n${e}`);
-			client.logger.log(`Body: ${jsn}`);
-			var attachment = new client.Discord.MessageAttachment("https://fb.furcdn.net/NotFound.png");
+			req = await message.client.imageAPIRequest(false,type,true,true);
+			short = await message.client.shortenUrl(req.response.image);
+			extra = short.new ? `**message.client is the first time message.client has been viewed! Image #${short.linkNumber}**\n` : "";
+			attachment = new message.client.Discord.MessageAttachment(req.response.image);
+			return message.channel.send(`${extra}Short URL: <${short.link}>\nRequested By: ${message.author.tag}\nType: ${message.client.ucwords(type)}`,attachment);
+		}catch(error){
+			message.client.logger.error(`Error:\n${error}`);
+			message.client.logger.log(`Body: ${jsn}`);
+			attachment = new message.client.Discord.MessageAttachment("https://fb.furcdn.net/NotFound.png");
 			return message.channel.send("Unknown API Error",attachment);
 		}
 			

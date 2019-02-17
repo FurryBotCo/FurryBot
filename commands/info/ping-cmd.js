@@ -12,12 +12,12 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async(message) => {
 		message.channel.startTyping();
-		var m = await message.channel.send("Checking Ping..");
+		let m = await message.channel.send("Checking Ping..");
 		m.edit("Ping Calculated!");
-		m.delete().catch(noerr=>{});
-		message.channel.send(`Bot Ping: ${(m.createdTimestamp - message.createdTimestamp)}ms${"\n"}API Ping: ${Math.round(client.ws.ping)}ms`);
+		m.delete().catch(noerr => null);
+		message.channel.send(`Bot Ping: ${(m.createdTimestamp - message.createdTimestamp)}ms${"\n"}API Ping: ${Math.round(message.client.ws.ping)}ms`);
 		return message.channel.stopTyping();
 	})
 };

@@ -15,9 +15,9 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async (client,message) => {
+	run: (async(message) => {
 		message.channel.startTyping();
-		var attachment = new client.Discord.MessageAttachment("https://foxrudor.de/","foxrudor.de.png");
+		let attachment = new message.client.Discord.MessageAttachment("https://foxrudor.de/","foxrudor.de.png");
 		message.channel.send(attachment);
 		return message.channel.stopTyping();
 	})
