@@ -14,57 +14,58 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async function(message) {
+	run: (async(message) => {
 		message.channel.startTyping();
-		var textChCount = 0,
+		let textChCount, voiceChCount, categoryChCount, guild, data, embed, guildConfig, o, owner, features, mfaLevel, verificationLevel, roles, rr;
+		textChCount = 0,
 		voiceChCount = 0,
 		categoryChCount = 0;
-		if(!isNaN(message.args[0]) && this.user.isDeveloper) {
-			var guild = this.guilds.get(message.args[0]);
+		if(!isNaN(message.args[0]) && message.client.user.isDeveloper) {
+			guild = message.client.guilds.get(message.args[0]);
 			if(!guild) {
-				var data = {
+				data = {
 					title: "Guild Not Found"
-				}
+				};
 				Object.assign(data,message.embed_defaults());
-				var embed = new this.Discord.MessageEmbed(data);
+				embed = new message.client.Discord.MessageEmbed(data);
 				return message.channel.send(embed);
 			}
 		} else {
-			var guild = message.guild;
+			guild = message.guild;
 		}
-		var guildConfig = await this.db.getGuild(guild.id);
-		guild.channels.forEach((ch) {
+		guildConfig = await message.client.db.getGuild(guild.id);
+		guild.channels.forEach((ch) => {
 			switch (ch.type) {
-				case "text":
-					textChCount++;
-					break;
+			case "text":
+				textChCount++;
+				break;
 	
-				case "voice":
-					voiceChCount++;
-					break;
+			case "voice":
+				voiceChCount++;
+				break;
 					
-				case "category":
-					categoryChCount++;
-					break;
+			case "category":
+				categoryChCount++;
+				break;
 			}
 		});
 		
-		var o = guild.members.find(m=>m.id===guild.owner.id);
+		o = guild.members.find(m => m.id === guild.owner.id);
 		if(!o) {
-			var owner="Unknown";
+			owner="Unknown";
 		} else {
 			owner = `${o.user.tag} (${o.id})`;
 		}
 		
-		var features = "";
-	if(guild.verified) features+="Verified\n";
+		features = "";
+		if(guild.verified) features+="Verified\n";
 		if(guild.features.indexOf("VIP_REGIONS") !== -1) features+="VIP Voice Vegions\n";
 		// if fetching vanity url fails return discord-api
-		if(guild.features.indexOf("VANITY_URL") !== -1) features+=`Vanity URL: https://discord.gg/${guild.fetchVanityCode().catch(noerr=>"discord-api")}\n`;
+		if(guild.features.indexOf("VANITY_URL") !== -1) features+=`Vanity URL: https://discord.gg/${guild.fetchVanityCode().catch(noerr => "discord-api")}\n`;
 		if(guild.features.indexOf("INVITE_SPLASH") !== -1) features+=`[Invite Splash](${guild.inviteSplash()})\n`;
 	
 		if(features === "") features = "NONE";
-		var verificationLevel = [
+		verificationLevel = [
 			"**NONE** - unrestricted",
 			"**LOW** - 	must have verified email on account",
 			"**MEDIUM** - 	must be registered on Discord for longer than 5 minutes",
@@ -72,13 +73,13 @@ module.exports = {
 			"**VERY HIGH** - ┻━┻ミヽ(ಠ益ಠ)ﾉ彡┻━┻ - must have a verified phone number"
 		];
 	
-		var mfaLevel = [
+		mfaLevel = [
 			"NONE",
 			"ELEVATED"
 		];
-		var roles = guild.roles.map(role=>role.name==="@everyone"?"@everyone":`<@&${role.id}>`).toString();
-		var rr = roles.length > 1000 ? `Too many to list, please use \`${message.gConfig.prefix}roles server\`` : roles;
-		var data = {
+		roles = guild.roles.map(role=>role.name==="@everyone"?"@everyone":`<@&${role.id}>`).toString();
+		rr = roles.length > 1000 ? `Too many to list, please use \`${message.gConfig.prefix}roles server\`` : roles;
+		data = {
 			title: `Server Info - **${guild.name}**`,
 			image: {
 				url: guild.iconURL()
@@ -96,7 +97,7 @@ module.exports = {
 				},
 				{
 					name: "Members",
-					value: `Total: ${guild.memberCount}\n\n${this.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${this.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${this.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${this.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}\n\nNon Bots: ${message.guild.memberCount - message.guild.members.filter(m=>!m.user.bot).size}\nBots: ${message.guild.members.filter(m=>m.user.bot).size}`,
+					value: `Total: ${guild.memberCount}\n\n${message.client.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${message.client.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${message.client.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${message.client.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}\n\nNon Bots: ${message.guild.memberCount - message.guild.members.filter(m=>!m.user.bot).size}\nBots: ${message.guild.members.filter(m=>m.user.bot).size}`,
 					inline: false
 				},
 				{
@@ -111,7 +112,7 @@ module.exports = {
 				},
 				{
 					name: "Region",
-					value: this.ucwords(guild.region),
+					value: message.client.ucwords(guild.region),
 					inline: false
 				},
 				{
@@ -129,7 +130,7 @@ module.exports = {
 		
 		Object.assign(data, message.embed_defaults());
 		
-		var embed = new this.Discord.MessageEmbed(data);
+		embed = new message.client.Discord.MessageEmbed(data);
 		message.channel.send(embed);
 		return message.channel.stopTyping();
 	})

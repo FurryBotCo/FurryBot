@@ -12,16 +12,17 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async function(message) {
+	run: (async(message) => {
 		message.channel.startTyping();
-		var req = await this.request("https://icanhazdadjoke.com",{
+		let req, j;
+		req = await message.client.request("https://icanhazdadjoke.com",{
 			headers:{
 				Accept:"application/json",
-				"User-Agent": this.config.web.userAgent
+				"User-Agent": message.client.config.web.userAgent
 			}
 		});
 	
-		var j = JSON.parse(req.body);
+		j = JSON.parse(req.body);
 	
 		message.channel.send(j.joke);
 		return message.channel.stopTyping();

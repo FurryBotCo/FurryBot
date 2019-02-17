@@ -14,14 +14,15 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async function(message) {
+	run: (async(message) => {
 		message.channel.startTyping();
-		var userCount=0;
-		this.guilds.forEach((guild) {
+		let userCount, largeGuildCount, srv, data, embed;
+		userCount = 0;
+		message.client.guilds.forEach((guild) => {
 			userCount+=guild.memberCount;
 		});
-		var largeGuildCount=0;
-		var srv=Array.from(this.guilds.values());
+		largeGuildCount = 0;
+		srv = [...message.client.guilds.values()];
 		for(let i=0;i<srv.length;i++) {
 			if(!srv[i].unavailable) {
 				if(srv[i].large) {
@@ -31,28 +32,28 @@ module.exports = {
 				console.log(`Guild Unavailable: ${srv[i].name} (${srv[i].id})`);
 			}
 		}
-		var data = {
+		data = {
 			"title": "Bot Info!",
 			"fields": [
 				{
 					name: "Process Memory Usage",
-					value: `${Math.round(this.memory.process.getUsed()/1024/1024)}MB/${Math.round(this.memory.process.getTotal()/1024/1024)}MB`,
+					value: `${Math.round(message.client.memory.process.getUsed()/1024/1024)}MB/${Math.round(message.client.memory.process.getTotal()/1024/1024)}MB`,
 					inline: false
 				}, {
 					name: "System Memory Usage",
-					value: `${Math.round(this.memory.system.getUsed()/1024/1024/1024)}GB/${Math.round(this.memory.system.getTotal()/1024/1024/1024)}GB`,
+					value: `${Math.round(message.client.memory.system.getUsed()/1024/1024/1024)}GB/${Math.round(message.client.memory.system.getTotal()/1024/1024/1024)}GB`,
 					inline: false
 				}, {
 					name: "Library",
-					value: this.config.bot.library,
+					value: message.client.config.bot.library,
 					inline: false
 				}, {
 					name: "Uptime",
-					value: `${this.parseTime(process.uptime())} (${this.secondsToHours(process.uptime())})`,
+					value: `${message.client.parseTime(process.uptime())} (${message.client.secondsToHours(process.uptime())})`,
 					inline: false
 				}, {
 					name: "Total Guilds",
-					value: this.guilds.size,
+					value: message.client.guilds.size,
 					inline: false
 				}, {
 					name: "Large Guilds (300+ Members)",
@@ -64,19 +65,19 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Commands",
-					value: this.commandList.length,
+					value: message.client.commandList.length,
 					inline: false
 				}, {
 					name: "API Version",
-					value: this.config.bot.apiVersion,
+					value: message.client.config.bot.apiVersion,
 					inline: false
 				}, {
 					name: "Bot Version",
-					value: this.config.bot.version,
+					value: message.client.config.bot.version,
 					inline: false
 				}, {
 					name: "Discord.JS Version",
-					value: this.Discord.version,
+					value: message.client.Discord.version,
 					inline: false
 				}, {
 					name: "Node.JS Version",
@@ -84,7 +85,7 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Support Server",
-					value: this.config.bot.supportInvite,
+					value: message.client.config.bot.supportInvite,
 					inline: false
 				}, {
 					name: "Bot Creator",
@@ -92,13 +93,13 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Trello Board",
-					value: this.config.apis.trello.board,
+					value: message.client.config.apis.trello.board,
 					inline: false
 				}
-				]
-			};
+			]
+		};
 		Object.assign(data, message.embed_defaults());
-		var embed = new this.Discord.MessageEmbed(data);
+		embed = new message.client.Discord.MessageEmbed(data);
 		message.channel.send(embed);
 		return message.channel.stopTyping();
 	})

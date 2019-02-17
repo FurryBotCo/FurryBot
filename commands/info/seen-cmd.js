@@ -12,20 +12,21 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async function(message) {
+	run: (async(message) => {
+		let user, a, b, guilds, fields, data, embed, i;
 		message.channel.startTyping();
 		if(message.args.length === 0 || !message.args) {
-			var user = message.member;
+			user = message.member;
 		} else {
 			// get member from message
-			var user = await message.getMemberFromArgs();
+			user = await message.getMemberFromArgs();
 		}
 	
 		
 		if(!user) return message.errorEmbed("INVALID_USER");
 		
-		var a = this.guilds.filter(g=>g.members.has(user.id));
-		var b = a.map(g=>`${g.name} (${g.id})`),
+		a = message.client.guilds.filter(g=>g.members.has(user.id));
+		b = a.map(g=>`${g.name} (${g.id})`),
 		guilds = [],
 		fields = [],
 		i = 0;
@@ -38,19 +39,19 @@ module.exports = {
 				guilds[i]+=`\n${b[key]}`;
 			}
 		}
-		guilds.forEach((g,c) {
+		guilds.forEach((g,c) => {
 			fields.push({
 				name: `Server List #${+c+1}`,
 				value: g,
 				inline: false
-			})
+			});
 		});
-		var data = {
+		data = {
 			title: `Seen On ${b.length} Servers - ${user.user.tag} (${user.id})`,
-			desciption: `I see this user in ${guilds.size} other guilds.`,
+			desciption: `I see message.client user in ${guilds.size} other guilds.`,
 			fields
-		}
-		var embed = new this.Discord.MessageEmbed(data);
+		};
+		embed = new message.client.Discord.MessageEmbed(data);
 		message.channel.send(embed);
 		return message.channel.stopTyping();
 	})

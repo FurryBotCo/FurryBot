@@ -13,7 +13,7 @@ module.exports = {
 	devOnly: true,
 	betaOnly: true,
 	guildOwnerOnly: false,
-	run: (async function(message) {
+	run: (async(message) => {
 		message.channel.startTyping();
 		message.reply(`Your balance is ${message.uConfig.bal}.`);
 		return message.channel.stopTyping();

@@ -12,8 +12,8 @@ const config = require("./config");
 class FurryBot extends Discord.Client {
 	constructor(options) {
 		var opt = options || {};
-   		super(opt);
-    	Object.assign(this, /*require(`${process.cwd()}/util/logger`), */require(`${process.cwd()}/util/misc`), require(`${process.cwd()}/util/functions`));
+		super(opt);
+		Object.assign(this,require(`${process.cwd()}/util/functions`));
 		this.util = require("util");
 		this.config = config;
 		this.stats = {
@@ -37,14 +37,15 @@ class FurryBot extends Discord.Client {
 			 * @returns {(User|Boolean)} user that was found, or false if none were found
 			 */
 			async getUserFromArgs(argPosition = 0,unparsed = false,join = false,mentionPosition = 0) {
-				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
-				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!(this instanceof this.client.Discord.Message)) throw new TypeError("invalid message");
+				let argObject, args;
+				argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
 				if(join) {
-					var args = [this[argObject].join(" ")];
-					var argPosition = 0;
+					args = [this[argObject].join(" ")];
+					argPosition = 0;
 				} else {
-					var args = this[argObject];
+					args = this[argObject];
 				}
 				
 				// user mention
@@ -72,16 +73,17 @@ class FurryBot extends Discord.Client {
 			 * @returns {(GuildMember|Boolean)} guild member that was found, or false if none were found
 			 */
 			async getMemberFromArgs(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
-				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
-				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!(this instanceof this.client.Discord.Message)) throw new TypeError("invalid message");
+				let argObject, args;
+				argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
 				if(join) {
-					var args = [this[argObject].join(" ")];
-					var argPosition = 0;
+					args = [this[argObject].join(" ")];
+					argPosition = 0;
 				} else {
-					var args = this[argObject];
+					args = this[argObject];
 				}
-				if(!this.guild || !this.guild instanceof this.client.Discord.Guild) throw new TypeError("invalid or missing guild on this");
+				if(!this.guild || !(this.guild instanceof this.client.Discord.Guild)) throw new TypeError("invalid or missing guild on this");
 				
 				// member mention
 				if(this.mentions.members.size >= mentionPosition+1) return this.mentions.members.first(mentionPosition+1)[mentionPosition];
@@ -108,16 +110,17 @@ class FurryBot extends Discord.Client {
 			 * @returns {(Channel|Boolean)} channel that was found, or false if none were found
 			 */
 			async getChannelFromArgs(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
-				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
-				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!(this instanceof this.client.Discord.Message)) throw new TypeError("invalid message");
+				let argObject, args;
+				argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
 				if(join) {
-					var args = [this[argObject].join(" ")];
-					var argPosition = 0;
+					args = [this[argObject].join(" ")];
+					argPosition = 0;
 				} else {
-					var args = this[argObject];
+					args = this[argObject];
 				}
-				if(!this.guild || !this.guild instanceof this.client.Discord.Guild) throw new TypeError("invalid or missing guild on this");
+				if(!this.guild || !(this.guild instanceof this.client.Discord.Guild)) throw new TypeError("invalid or missing guild on this");
 				
 				// channel mention
 				if(this.mentions.channels.first()) return this.mentions.channels.first(mentionPosition+1)[mentionPosition];
@@ -141,16 +144,17 @@ class FurryBot extends Discord.Client {
 			 * @returns {(Role|Boolean)} role that was found, or false if none were found
 			 */
 			async getRoleFromArgs(argPosition = 0,unparsed = false,join = false,mentionPosition = 0){
-				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
-				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!(this instanceof this.client.Discord.Message)) throw new TypeError("invalid message");
+				let argObject, args;
+				argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
 				if(join) {
-					var args = [this[argObject].join(" ")];
-					var argPosition = 0;
+					args = [this[argObject].join(" ")];
+					argPosition = 0;
 				} else {
-					var args = this[argObject];
+					args = this[argObject];
 				}
-				if(!this.guild || !this.guild instanceof this.client.Discord.Guild) throw new TypeError("invalid or missing guild on this");
+				if(!this.guild || !(this.guild instanceof this.client.Discord.Guild)) throw new TypeError("invalid or missing guild on this");
 
 				// role mention
 				if(this.mentions.roles.size >= mentionPosition+1) return this.mentions.roles.first(mentionPosition+1)[mentionPosition];
@@ -173,19 +177,16 @@ class FurryBot extends Discord.Client {
 			 * @returns {(Guild|Boolean)} guild that was found, or false if none were found
 			 */
 			async getServerFromArgs(argPosition = 0,unparsed = false,join = false){
-				if(!this instanceof this.client.Discord.Message) throw new TypeError("invalid message");
-				var argObject = unparsed ? "unparsedArgs" : "args"; 
+				if(!(this instanceof this.client.Discord.Message)) throw new TypeError("invalid message");
+				let argObject, args;
+				argObject = unparsed ? "unparsedArgs" : "args"; 
 				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
 				if(join) {
-					var args = [this[argObject].join(" ")];
-					var argPosition = 0;
+					args = [this[argObject].join(" ")];
+					argPosition = 0;
 				} else {
-					var args = this[argObject];
+					args = this[argObject];
 				}
-
-				console.log(args);
-				console.log(argPosition);
-				console.log(args[argPosition]);
 				// server id
 				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.get(args[argPosition]);
 
@@ -202,13 +203,13 @@ class FurryBot extends Discord.Client {
 			 * @returns {Object} configured user properties
 			 */
 			async configureUser(user = null) {
-				var member = ![undefined,null,""].includes(user) ? user instanceof this.client.Discord.User ? this.guild.members.get(user.id) : user instanceof this.client.Discord.GuildMember ? user : !isNaN(user) ? this.guild.members.get(user) : false : this.member;
-				if(!(member instanceof this.client.Discord.GuildMember)) throw new Drror("invalid member");
+				let member = ![undefined,null,""].includes(user) ? user instanceof this.client.Discord.User ? this.guild.members.get(user.id) : user instanceof this.client.Discord.GuildMember ? user : !isNaN(user) ? this.guild.members.get(user) : false : this.member;
+				if(!(member instanceof this.client.Discord.GuildMember)) throw new Error("invalid member");
 				return {
 					isDeveloper: this.client.config.developers.includes(member.id),
 					isServerModerator: member.permissions.has("MANAGE_GUILD"),
 					isServerAdministrator: member.permissions.has("ADMINISTRATOR")
-				}
+				};
 			},
 			/**
 			 * send an error embed to a channel
@@ -223,34 +224,34 @@ class FurryBot extends Discord.Client {
 			async errorEmbed(type = "", custom = false, title = "", description = "", fields = []) {
 				if(!custom) {
 					switch(type.toUpperCase()) {
-						case "INVALID_USER":
-							var title = "User Not Found",
-							description = "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag",
-							fields = [];
-							break;
+					case "INVALID_USER":
+						title = "User Not Found",
+						description = "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag",
+						fields = [];
+						break;
 						
-						case "INVALID_ROLE":
-							var title = "Role Not Found",
-							description = "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
-							fields = [];
-							break;
+					case "INVALID_ROLE":
+						title = "Role Not Found",
+						description = "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
+						fields = [];
+						break;
 						
-						default:
-							var title = "Default Title",
-							description = "Default Description",
-							fields = [];
+					default:
+						title = "Default Title",
+						description = "Default Description",
+						fields = [];
 					}
 				}
 				return this.channel.send(new this.client.Discord.MessageEmbed(Object.assign({
 					title,
 					description,
 					fields
-				},this.embed_defaults()))).then(()=>{
+				},this.embed_defaults()))).then(() => {
 					if(this.channel.typing) this.channel.stopTyping();
-				}).catch((e)=>{
+				}).catch((e) => {
 					if(this.channel.typing) this.channel.stopTyping();
 					throw e;
-				})
+				});
 			}
 		});
 		this.Trello = require("trello");
@@ -261,7 +262,7 @@ class FurryBot extends Discord.Client {
 		this.uuid = require("uuid/v4");
 		this.fetch = require("node-fetch");
 		this.postStats = require("./util/listStats");
-    	this.fs = require("fs");
+		this.fs = require("fs");
 		this.r = require("rethinkdbdash")(this.config.db.main);
 		//this.ro = require("rethinkdbdash")(this.config.db.other);
 		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
@@ -269,6 +270,7 @@ class FurryBot extends Discord.Client {
 		this.varParse = require(`${process.cwd()}/util/varHandler`);
 		this.listStats = require("./util/listStats");
 		this.lang = require(`${process.cwd()}/lang`)(this);
+		this.path = require("path");
 		this.colors = require("console-colors-2");
 		this.Canvas = require("canvas-constructor").Canvas;
 		this.fsn = require("fs-nextra");
@@ -281,9 +283,9 @@ class FurryBot extends Discord.Client {
 		this._ = require("lodash");
 		this.perf = require("perf_hooks");
 		this.dbStats = require(`${this.config.rootDir}/util/dbStats`);
-   	this.performance = this.perf.performance;
+		this.performance = this.perf.performance;
 		this.PerformanceObserver = this.perf.PerformanceObserver;
-		this.child_process = require('child-process-promise');
+		this.child_process = require("child-process-promise");
 		this.shell = this.child_process.exec;
 		this.truncate = require("truncate");
 		this.wordGen = require("random-words");
@@ -305,7 +307,7 @@ class FurryBot extends Discord.Client {
 			this.webhooks[key] = new this.Discord.WebhookClient(this.config.webhooks[key].id,this.config.webhooks[key].token,{disableEveryone:true});
 			console.debug(`Setup ${key} webhook`);
 		}*/
-    	this.load.apply(this);
+		this.load.apply(this);
 	}
 	
 	/**
@@ -326,11 +328,11 @@ class FurryBot extends Discord.Client {
 			}
 		});
 		this.fs.readdir(`${process.cwd()}/handlers/events/`, (err, files) => {
-		    if (err) return console.error(err);
-		    files.forEach(file => {
+			if (err) return console.error(err);
+			files.forEach(file => {
 				if (!file.endsWith(".js")) return;
 				const event = require(`./handlers/events/${file}`),
-				 eventName = file.split(".")[0];
+					eventName = file.split(".")[0];
 				this.on(eventName, event.bind(this));
 				this.analytics.track({
 					userId: "CLIENT",
@@ -343,36 +345,37 @@ class FurryBot extends Discord.Client {
 							server: this.os.hostname()
 						}
 					}
-				})
+				});
 				console.log(`[EventManager]: Loaded ${eventName} event`);
 				delete require.cache[require.resolve(`./handlers/events/${file}`)];
-		    });
+			});
 		});
 		
 		console.log("[loadEvent]: end of load");
 	}
 
-	async imageAPIRequest (safe=true,category=null,json=true) {
+	async imageAPIRequest (animal = true,category = null,json = true, safe = false) {
 		return new Promise(async(resolve, reject)=>{
+			let s, j;
 			if([undefined,null,""].includes(json)) json = true;
-			var s = await this.request(`https://api.furry.bot/furry/${safe?"sfw":"nsfw"}/${category?category.toLowerCase():safe?"hug":"bulge"}${json?"":"/image"}`);
+			s = await this.request(`https://api.furry.bot/${animal ? "animals" : `furry/${safe?"sfw":"nsfw"}`}/${category?category.toLowerCase():safe?"hug":"bulge"}${json?"":"/image"}`);
 			try {
-				var j = JSON.parse(s.body);
+				j = JSON.parse(s.body);
 				resolve(j);
-			} catch(e) {
-				reject({error:e,response:s.body});
+			} catch(error) {
+				reject({error:error,response:s.body});
 			}
 		});
 	}
 
 	async download (url, filename) {
 		return new Promise((resolve,reject)=>{
-			require("request")(url).pipe(this.fsn.createWriteStream(filename)).on('close', resolve)
+			require("request")(url).pipe(this.fsn.createWriteStream(filename)).on("close", resolve);
 		});
 	}
 
 	async reloadModules () {
-		for(var key in require.cache){
+		for(let key in require.cache){
 			if(key.indexOf("\\node_modules") !== -1){
 				delete require.cache[key];
 			}
@@ -381,31 +384,15 @@ class FurryBot extends Discord.Client {
 		return true;
 	}
 
-	async reloadCommands () {
-		var resp = await this.request("https://api.furry.bot/commands", {
-				method: "GET",
-				headers: {
-						Authorization: `Key ${this.config.apiKey}`
-				}
-		});
-		var response = JSON.parse(resp.body);
-		this.config.commandList = {fullList: response.return.fullList, all: response.return.all};
-		this.config.commandList.all.forEach((command)=>{
-				this.commandTimeout[command] = new Set();
-		});
-		this.debug("Command Timeouts & Command List reloaded");
-	}
-
 	async reloadAll () {
-		this.reloadCommands();
 		this.reloadModules();
 	}
 
 	async random (len=10,keyset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
 		if(len > 500 && !this[this.config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
-		let rand = ""
+		let rand = "";
 		for (var i = 0; i < len; i++)
-		rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
+			rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
 
 		return rand;
 	}
@@ -414,15 +401,15 @@ class FurryBot extends Discord.Client {
 		this.r.tableList().then((list)=>{
 			if(!list.includes("shorturl")) {
 				this.r.tableCreate("shorturl");
-				console.log(`[ShortURL]: Created Short URL table`);
+				console.log("[ShortURL]: Created Short URL table");
 			}
 		});
 		const create = (async(url)=>{
 			const rand = await this.random(this.config.shortLength),
-			 createdTimestamp = Date.now(),
-			 created = new Date().toISOString(),
-			 count = await this.r.table("shorturl").count(),
-			 a = await this.r.table("shorturl").insert({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:url.length,link:`https://furry.services/r/${rand}`});
+				createdTimestamp = Date.now(),
+				created = new Date().toISOString(),
+				count = await this.r.table("shorturl").count(),
+				a = await this.r.table("shorturl").insert({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:url.length,link:`https://furry.services/r/${rand}`});
 			if(a.errors === 1) {
 				return create(url);
 			} else {
@@ -430,27 +417,27 @@ class FurryBot extends Discord.Client {
 			}
 		});
 
-		var res = await this.r.table("shorturl").filter({url});
+		let res = await this.r.table("shorturl").filter({url});
 		
 		switch(res.length) {
-			case 0:
-				// create
-				return create(url);
-				break;
+		case 0:
+			// create
+			return create(url);
+			break; // eslint-disable-line no-unreachable
 
-			case 1:
-				// return
-				var a = res[0];
-				return {code:a.id,url,link:`https://furry.services/r/${a.id}`,new:false};
-				break;
+		case 1:
+			// return
+			var a = res[0];
+			return {code:a.id,url,link:`https://furry.services/r/${a.id}`,new:false};
+			break; // eslint-disable-line no-unreachable
 
-			default:
-				// delete & recreate
-				console.log("[ShortURL]: Duplicate records found, deleting");
-				this.r.table("shorturl").filter({url}).forEach((short)=>{
-					return this.r.table("shorturl").get(short("id")).delete();
-				});
-				return create(url);
+		default:
+			// delete & recreate
+			console.log("[ShortURL]: Duplicate records found, deleting");
+			this.r.table("shorturl").filter({url}).forEach((short)=>{
+				return this.r.table("shorturl").get(short("id")).delete();
+			});
+			return create(url);
 		}
 	}
 
@@ -458,15 +445,15 @@ class FurryBot extends Discord.Client {
 		if(["rethinkdb"].includes(database)) throw new Error("{code:2,error:'ERR_ILLEGAL_DB',description:'illegal database'}");
 		if(["guilds","users"].includes(table)) throw new Error("{code:1,error:'ERR_ILLEGAL_TABLE',description:'illegal database'}");
 		var dbList = await this.r.dbList();
-		if(!dbList.includes(database)) throw new Error(`{code:3,error:"ERR_INVALID_DB",description:"invalid database"}`);
+		if(!dbList.includes(database)) throw new Error("{code:3,error:\"ERR_INVALID_DB\",description:\"invalid database\"}");
 		var tableList = await this.r.db(database).tableList();
-		if(!tableList.includes(table)) throw new Error(`{code:4,error:"ERR_INVALID_TABLE",description:"invalid table"}`);
+		if(!tableList.includes(table)) throw new Error("{code:4,error:\"ERR_INVALID_TABLE\",description:\"invalid table\"}");
 		return this.r.db(database).table(table).delete();/*.forEach((entry)=>{
 			return this.r.db(database).table(table).get(entry("id")).delete();
 		});*/
 	}
 
-	get clearTable() {return this.deleteAll}
+	get clearTable() {return this.deleteAll;}
 
 	async getSong (str) {
 		const res = await this.request(`http://${this.config.restnode.host}:${this.config.restnode.port}/loadtracks`,{
@@ -481,7 +468,7 @@ class FurryBot extends Discord.Client {
 			return null;
 		});
 		if (!res) throw "There was an error, try again";
-		if (res.body.length === 0) throw `No tracks found`;
+		if (res.body.length === 0) throw "No tracks found";
 		return JSON.parse(res.body);
 	}
 
@@ -489,27 +476,27 @@ class FurryBot extends Discord.Client {
 		return new Promise(async(resolve,reject)=>{
 			if(!strSearch) reject(new Error("Missing parameters"));
 			switch(platform) {
-				case "youtube":
-					var res = await this.request(`http://${this.config.lavalink.host}:${this.config.lavalink.port}/loadtracks?identifier=ytsearch:${strSearch}`,{
-						method: "GET",
-						headers: {
-							Authorization: this.config.lavalink.secret
-						}
-					});
-					resolve(JSON.parse(res.body));
-					break;
+			case "youtube":
+				var res = await this.request(`http://${this.config.lavalink.host}:${this.config.lavalink.port}/loadtracks?identifier=ytsearch:${strSearch}`,{
+					method: "GET",
+					headers: {
+						Authorization: this.config.lavalink.secret
+					}
+				});
+				resolve(JSON.parse(res.body));
+				break;
 				
-				default:
-					reject(new Error("Invalid platform"));
+			default:
+				reject(new Error("Invalid platform"));
 			}
 		});
 	}
 
 	async joinChannel(channel) {
 		if(this.voiceConnections.filter(g=>g.channel.guild.id===channel.guild.id).size < 1) {
-			return channel.join().catch((e)=>{
-				return e;
-			}).then(async(ch)=>{
+			return channel.join().catch((err) => {
+				return err;
+			}).then(async(ch) => {
 				return ch;
 			});
 		} else {
@@ -523,105 +510,107 @@ class FurryBot extends Discord.Client {
 		if(!channel || !(channel instanceof this.Discord.VoiceChannel)) return new Error("Missing/invalid channel");
 		if(!song) return new Error("Missing song");
 	
-		var ch = await this.joinChannel(channel);
+		let queue, user, data, embed, a, chn, ch, player;
+		ch = await this.joinChannel(channel);
 		switch(platform) {
-			case "youtube":
-				//try {
-					var player = ch.play(this.ytdl(song.uri, { quality: 'highestaudio' }));
+		case "youtube":
+			//try {
+			player = ch.play(this.ytdl(song.uri, { quality: "highestaudio" }));
+			await this.r.table("guilds").get(channel.guild.id).update({
+				music: {
+					playing: true
+				}
+			});
+			player.once("finish",async()=>{
+				console.log("finished");
+				queue = await this.r.table("guilds").get(channel.guild.id)("music")("queue");
+				queue.shift();
+				if(queue.length >= 1) {
+					this.playSong(channel,queue[0]);
 					await this.r.table("guilds").get(channel.guild.id).update({
 						music: {
+							queue,
 							playing: true
 						}
 					});
-					player.once("finish",async()=>{
-						console.log("finished");
-						var queue = await this.r.table("guilds").get(channel.guild.id)("music")("queue");
-						queue.shift();
-						if(queue.length >= 1) {
-							this.playSong(channel,queue[0]);
-							await this.r.table("guilds").get(channel.guild.id).update({
-								music: {
-									queue,
-									playing: true
-								}
-							});
-							var user = this.users.has(queue[0].addedBy) ? this.users.get(queue[0].addedBy) : await this.users.fetch(queue[0].addedBy);
-							var data = {
-								title: "Now Playing",
-								description: `**${queue[0].title}** by *${queue[0].author}* is now playing in ${channel.name}`,
-								color: 2424780,
-								timestamp: new Date().toISOString(),
-								footer: {
-									icon_url: user.displayAvatarURL(),
-									text: `Added by ${user.tag}`
-								}
-							}
-							var embed = new this.Discord.MessageEmbed(data);
-							var a = await this.r.table("guilds").get(channel.guild.id);
-							if(a.music.textChannel !== null) {
-								var chn = this.channels.get(a.music.textChannel);
-								if(!chn || !(chn instanceof this.Discord.TextChannel)) var chn = null;
-							}
-							if(chn !== null && chn instanceof this.Discord.TextChannel) {
-								chn.send(embed);
-							}
-						} else {
-							await this.r.table("guilds").get(channel.guild.id).update({
-								music: {
-									playing: false
-								}
-							});
-							var data = {
-								"title": "Queue Empty",
-								"description": `The queue for ${channel.name} is now empty.`,
-								"color": 2424780,
-								"timestamp": new Date().toISOString()
-							}
-							var embed = new this.Discord.MessageEmbed(data);
-							var a = await this.r.table("guilds").get(channel.guild.id);
-							if(a.music.textChannel !== null) {
-								var chn = this.channels.get(a.music.textChannel);
-								if(!chn || !(chn instanceof this.Discord.TextChannel)) var chn = null;
-							}
-							if(chn !== null && chn instanceof this.Discord.TextChannel) {
-								chn.send(embed);
-							}
-							await client.r.table("guilds").get(channel.guild.id).update({
-								music: {
-									queue: []
-								}
-							});
-							channel.leave();
+					user = this.users.has(queue[0].addedBy) ? this.users.get(queue[0].addedBy) : await this.users.fetch(queue[0].addedBy);
+					data = {
+						title: "Now Playing",
+						description: `**${queue[0].title}** by *${queue[0].author}* is now playing in ${channel.name}`,
+						color: 2424780,
+						timestamp: new Date().toISOString(),
+						footer: {
+							icon_url: user.displayAvatarURL(),
+							text: `Added by ${user.tag}`
+						}
+					};
+					embed = new this.Discord.MessageEmbed(data);
+					a = await this.r.table("guilds").get(channel.guild.id);
+					if(a.music.textChannel !== null) {
+						chn = this.channels.get(a.music.textChannel);
+						if(!chn || !(chn instanceof this.Discord.TextChannel)) chn = null;
+					}
+					if(chn !== null && chn instanceof this.Discord.TextChannel) {
+						chn.send(embed);
+					}
+				} else {
+					await this.r.table("guilds").get(channel.guild.id).update({
+						music: {
+							playing: false
 						}
 					});
-					return player;
-				/*}catch(err){
+					data = {
+						"title": "Queue Empty",
+						"description": `The queue for ${channel.name} is now empty.`,
+						"color": 2424780,
+						"timestamp": new Date().toISOString()
+					};
+					embed = new this.Discord.MessageEmbed(data);
+					a = await this.r.table("guilds").get(channel.guild.id);
+					if(a.music.textChannel !== null) {
+						chn = this.channels.get(a.music.textChannel);
+						if(!chn || !(chn instanceof this.Discord.TextChannel)) chn = null;
+					}
+					if(chn !== null && chn instanceof this.Discord.TextChannel) {
+						chn.send(embed);
+					}
+					await client.r.table("guilds").get(channel.guild.id).update({
+						music: {
+							queue: []
+						}
+					});
+					channel.leave();
+				}
+			});
+			return player;
+			/*}catch(err){
 					this.logger.error(err);
 					channel.leave();
 					//ch.disconnect();
 					return err;
 				}*/
-				break;
+			break; // eslint-disable-line no-unreachable
 
-			default:
-				return new Error("invalid platform");
+		default:
+			return new Error("invalid platform");
 		}
 	}
 
 	async songMenu (pageNumber,pageCount,songs,msg,ma,mb) {
 		return new Promise(async(resolve,reject)=>{
 			if(!pageNumber || !pageCount || !songs || !msg) reject(new Error("missing parameters."));
+			let mid, res, resultCount, s, song;
 			if(typeof ma !== "undefined" && typeof mb !== "undefined") {
-				ma.edit(`Multiple songs found, please specify the number you would like to play\n\n${rt[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
+				ma.edit(`Multiple songs found, please specify the number you would like to play\n\n${songs.list[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
 			} else {
-				var mid = await msg.channel.send(`Multiple songs found, please specify the number you would like to play\n\n${songs.list[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
-				var ma = mid;
-				var mb = msg;
+				mid = await msg.channel.send(`Multiple songs found, please specify the number you would like to play\n\n${songs.list[pageNumber-1].join("\n")}\n\nPage ${pageNumber}/${pageCount}\nTotal: **${songs.tracks.length}**`);
+				ma = mid;
+				mb = msg;
 			}
-			ma.channel.awaitMessages(m=>m.author.id === mb.author.id,{max:1,time: 1e4,errors:["time"]}).then(async(m)=>{
-				var res = songs.list[pageNumber];
-				var resultCount = songs.list.length;
-				var s = m.first().content.split(" ");
+			ma.channel.awaitMessages(m => m.author.id === mb.author.id,{max:1,time: 1e4,errors:["time"]}).then(async(m) => {
+				res = songs.list[pageNumber];
+				resultCount = songs.list.length;
+				s = m.first().content.split(" ");
 				if(s[0] === "cancel") throw new Error("CANCEL");
 				if(s[0] === "page") {
 					if(pageNumber === s[1]) {
@@ -639,7 +628,7 @@ class FurryBot extends Discord.Client {
 						m.first().reply("Invalid Selection!");
 						resolve(this.songMenu(pageNumber,pageCount,songs,m,ma,mb));
 					} else {
-						var song = songs.tracks[pageNumber * 10 - Math.abs(s[0]-10) - 1];
+						song = songs.tracks[pageNumber * 10 - Math.abs(s[0]-10) - 1];
 						resolve({song,msg:ma});
 					}
 				}
@@ -647,24 +636,11 @@ class FurryBot extends Discord.Client {
 		});
 	}
 
-	async getSong (strIdentifier) {
-		return new Promise(async(resolve,reject)=>{
-			if(!strIdentifier) reject(new Error("Missing parameters"));
-			var res = await this.request(`http://${config.lavalink.host}:${config.lavalink.port}/loadtracks?identifier=${strIdentifier}`,{
-				headers: {
-					Authorization: config.lavalink.secret
-				}
-			});
-			if(res.body.length === 0) return resolve(res.body);
-			return resolve(JSON.parse(res.body));
-		})
-	}
-
 	async runAs (messageContent,user,channel) {
 		if(!(user instanceof this.Discord.User)) user = this.users.get(user);
 		if(!(channel instanceof this.Discord.TextChannel)) channel = this.channels.get(channel);
 		if(!messageContent || !channel || !user) return;
-		var msg = new this.Discord.Message(this,{
+		let msg = new this.Discord.Message(this,{
 			type: 0,
 			content: messageContent,
 			author: user,
@@ -676,94 +652,97 @@ class FurryBot extends Discord.Client {
 			mention_roles: [],
 			mention_everyone: false
 		},channel);
-		return require(`${this.config.rootDir}/handlers/events/message.js`)(this,msg);
+		return require(`${this.config.rootDir}/handlers/events/message.js`)(msg);
 	}
 
 	getDateTime() {
-		var date = new Date();
-		var hour = date.getHours();
-		var min = date.getMinutes();
-		var sec = date.getSeconds();
+		let date, hour, min, sec;
+		date = new Date();
+		hour = date.getHours();
+		min = date.getMinutes();
+		sec = date.getSeconds();
 		hour = (hour < 10 ? "0" : "") + hour;
 		min = (min < 10 ? "0" : "") + min;
 		sec = (sec < 10 ? "0" : "") + sec;
 		return `${hour}:${min}:${sec}`;
 	}
 
-	gen(type,len=1) {
-		if(isNaN(len)) var len = 1;
-		var res = [];
+	gen(type,len = 1) {
+		let res, keyset, tmp, rq;
+		if(isNaN(len)) len = 1;
+		res = [];
 		switch(type.toLowerCase()) {
-			case "ip":
-				// (Math.floor(Math.random() * 255) + 1)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0);
-				for(let i = 0;i<len;i++) {
-					res.push(`${Math.floor(Math.random()*250)+1}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}`);
-				}
-				break;
-	
-			case "word":
-			case "words":
-				for(let i = 0;i<len;i++) {
-					res.push(this.wordGen({exactly:1,maxLength:Math.floor(Math.random()*7)+1,wordsPerString:Math.floor(Math.random()*4)+1}));
-				}
-				break;
-	
-			default:
-				var keyset = "abcdefghijklmnopqrstuvwxyz";
-				for(let i = 0;i<len;i++) {
-					var tmp = "";
-					var rq = Math.floor(Math.random()*(32-5))+6;
-					for(let ii = 0;ii<rq;ii++) {
-						tmp += keyset.charAt(Math.floor(Math.random()*keyset.length));
-					}
-					res.push(tmp);
-				}
+		case "ip":
+			// (Math.floor(Math.random() * 255) + 1)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0)+"."+(Math.floor(Math.random() * 255) + 0);
+			for(let i = 0;i<len;i++) {
+				res.push(`${Math.floor(Math.random()*250)+1}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}.${Math.floor(Math.random()*250)+0}`);
 			}
+			break;
+	
+		case "word":
+		case "words":
+			for(let i = 0;i<len;i++) {
+				res.push(this.wordGen({exactly:1,maxLength:Math.floor(Math.random()*7)+1,wordsPerString:Math.floor(Math.random()*4)+1}));
+			}
+			break;
+	
+		default:
+			keyset = "abcdefghijklmnopqrstuvwxyz";
+			for(let i = 0;i<len;i++) {
+				tmp = "";
+				rq = Math.floor(Math.random()*(32-5))+6;
+				for(let ii = 0;ii<rq;ii++) {
+					tmp += keyset.charAt(Math.floor(Math.random()*keyset.length));
+				}
+				res.push(tmp);
+			}
+		}
 		
-			return res;
+		return res;
 	}
 	
 	getCategory(category) {
 		if(!category) return false;
-		var a = this.commands.filter(c=>c.commands.map(cc=>cc.triggers).reduce((a,b)=>a.concat(b)).includes(category));
-		return a.length < 1 ? false : a[0];
+		let a = this.commands.filter(c=>c.commands.map(cc=>cc.triggers).reduce((a,b)=>a.concat(b)).includes(category));
+		return a.length === 0 ? false : a[0];
 	}
 
 	getCommand(command) {
 		if(!command) return false;
-		var a = this.commands.map(c=>c.commands).reduce((a,b)=>a.concat(b)).filter(cc=>cc.triggers.includes(command));
-		return a.length < 1 ? false : a[0];
+		let a = this.commands.map(c=>c.commands).reduce((a,b)=>a.concat(b)).filter(cc=>cc.triggers.includes(command));
+		return a.length === 0 ? false : a[0];
 	}
 
 	getResponse(response) {
 		if(!response) return false;
-		var a = this.responses.filter(r=>r.triggers.includes(response));
-		return a.length < 1 ? false : a[0];
+		let a = this.responses.filter(r=>r.triggers.includes(response));
+		return a.length === 0 ? false : a[0];
 	}
 
 	async memeRequest(path,avatars = [],text = "") {
-		var avatars = typeof avatars === "string" ? [avatars] : avatars;
+		avatars = typeof avatars === "string" ? [avatars] : avatars;
 		return this.request(`https://dankmemer.services/api${path}`,{
-            method: "POST",
-            json: {avatars,text},
-            headers: {
-                Authorization: this.config.apis.dankMemer.token,
-                "User-Agent": this.config.userAgent,
-                "Content-Type": "application/json"
+			method: "POST",
+			json: {avatars,text},
+			headers: {
+				Authorization: this.config.apis.dankMemer.token,
+				"User-Agent": this.config.userAgent,
+				"Content-Type": "application/json"
 			}
 		});
 	}
 
 	async getLogs(guild,action,target,skipChecks = {target: false,action: false,executor: false}) {
 		if(!guild || !action || !target) throw new Error("missing params");
-		if(target instanceof this.Discord.Base) var target = target.id;
-		if(guild instanceof this.Discord.Guild) var guild = guild.id;
+		let g, log;
+		if(target instanceof this.Discord.Base) target = target.id;
+		if(guild instanceof this.Discord.Guild) guild = guild.id;
 		if(!this.guilds.has(guild)) throw new Error("invalid guild");
-		var g = this.guilds.get(guild);
+		g = this.guilds.get(guild);
 		if(!g.me.permissions.has("VIEW_AUDIT_LOG")) return null;
-		var log = await g.fetchAuditLogs({limit:1,action});
+		log = await g.fetchAuditLogs({limit:1,action});
 		if(log.entries.size < 1) return false;
-		var log = log.entries.first();
+		log = log.entries.first();
 		if(!(![undefined,null,""].includes(skipChecks.target) && skipChecks.target === true) && log.target.id !== target) return false;
 		if(!(![undefined,null,""].includes(skipChecks.action) && skipChecks.action === true) && log.action !== action) return false;
 		if(!(![undefined,null,""].includes(skipChecks.executor) && skipChecks.executor === true) && !(log.executor instanceof this.Discord.User || log.executor instanceof this.Discord.GuildMember)) return false;
@@ -796,7 +775,7 @@ process.on("SIGINT", async () => {
 	}
 });
 
-process.on('unhandledRejection', (p) => {
+process.on("unhandledRejection", (p) => {
 	if(client.logger !== undefined) {
 		client.logger.error("Unhandled Promise Rejection:");
 		client.logger.error(p);

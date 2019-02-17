@@ -1,8 +1,8 @@
 module.exports = {
 	triggers: [
-        "whosagoodboy",
-        "whosagoodboi"
-    ],
+		"whosagoodboy",
+		"whosagoodboi"
+	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 2e3,
@@ -12,7 +12,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async function(message) {
-        return message.reply("Yip! Yip! I am! I am! :fox:");
-    })
+	run: (async(message) => {
+		return message.reply("Yip! Yip! I am! I am! :fox:");
+	})
 };

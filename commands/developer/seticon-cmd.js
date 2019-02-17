@@ -1,7 +1,7 @@
 module.exports = {
 	triggers: [
-        "seticon"
-    ],
+		"seticon"
+	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,
@@ -10,25 +10,24 @@ module.exports = {
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
-    guildOwnerOnly: false,
-    run: (async function(message )=> {
+	guildOwnerOnly: false,
+	run: (async(message) => {
 		// extra check, to be safe
-		if (!this.config.developers.includes(message.author.id)) {
-			return message.reply("You cannot run this command as you are not a developer of this bot.");
+		if (!message.client.config.developers.includes(message.author.id)) return message.reply("You cannot run message.client command as you are not a developer of message.client bot.");
+		message.channel.startTyping();
+		if(message.unparsedArgs.length === 0) {
+			message.channel.stopTyping();
+			return new Error("ERR_INVALID_USAGE");
 		}
-        message.channel.startTyping();
-        if(message.unparsedArgs.length < 1) {
-            message.channel.stopTyping();
-            return new Error("ERR_INVALID_USAGE");
-        }
-        var set = message.unparsedArgs.join("%20");
-        this.user.setAvatar(set).then((user) {
-            var attachment = new this.Discord.MessageAttachment(user.displayAvatarURL());
-            message.reply(`Set Avatar to (attachment)`,attachment);
-            return message.channel.stopTyping();
-        }).catch((err) {
-           message.channel.send(`There was an error while doing this: ${err}`) ;
-           return message.channel.stopTyping();
-        })
-    })
+		let set, attachment;
+		set = message.unparsedArgs.join("%20");
+		message.client.user.setAvatar(set).then((user) => {
+			attachment = new message.client.Discord.MessageAttachment(user.displayAvatarURL());
+			message.reply("Set Avatar to (attachment)",attachment);
+			return message.channel.stopTyping();
+		}).catch((err) => {
+			message.channel.send(`There was an error while doing message.client: ${err}`) ;
+			return message.channel.stopTyping();
+		});
+	})
 };

@@ -39,6 +39,7 @@
     "cors": "^2.8.5",
     "discord.js": "github:discordjs/discord.js#0564c5c777cfd2391261417a2047d4d7f92474ca",
     "ejs": "^2.6.1",
+    "eslint-plugin-json": "^1.4.0",
     "expect-ct": "^0.1.1",
     "express": "^4.16.4",
     "express-rate-limit": "^3.3.2",

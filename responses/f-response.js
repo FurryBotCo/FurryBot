@@ -1,7 +1,7 @@
 module.exports = {
 	triggers: [
-        "f",
-        "rip"
+		"f",
+		"rip"
 	],
 	userPermissions: [],
 	botPermissions: [],

@@ -13,20 +13,21 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async function(message) {
+	run: (async(message) => {
 		message.channel.startTyping();
+		let user, roles, data, req, x, ds, db, l, ll, rs, list, embed;
 		if(message.args.length === 0 || !message.args) {
-			var user = message.member;
+			user = message.member;
 		} else {
 			// get member from message
-			var user = await message.getMemberFromArgs();
+			user = await message.getMemberFromArgs();
 		}
 
 		if(!user) return message.errorEmbed("INVALID_USER");
 		
-		var roles = user.roles.map(role=>{if(role.name!=="@everyone"){return `<@&${role.id}>`}else{return "@everyone"}});
+		roles = user.roles.map(role => role.name !== "@everyone" ? `<@&${role.id}>` : "@everyone");
 		
-		var data = {
+		data = {
 			name: "User info",
 			fields: [
 				{
@@ -53,15 +54,15 @@ module.exports = {
 			]
 		};
 		if(!user.user.bot) {
-			const req = await this.request(`https://discord.services/api/ban/${user.id}`,{
+			req = await message.client.request(`https://discord.services/api/ban/${user.id}`,{
 				method: "GET"
 			});
 	
-			var x = JSON.parse(req.body);
-			var ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";
-			var db = "Down until further notice";
-			var l = await this.db.isBlacklisted(user.id);
-			var ll = l ? `Reason: ${l.reason}` : "No";
+			x = JSON.parse(req.body);
+			ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";
+			db = "Down until further notice";
+			l = await message.client.db.isBlacklisted(user.id);
+			ll = l ? `Reason: ${l.reason}` : "No";
 			data.fields.push({
 				name: "Blacklist",
 				value: `Discord.Services: **${ds}**\nDiscord Bans: **${db}**\nlocal: **${ll}**`,
@@ -70,21 +71,21 @@ module.exports = {
 				name: "Bot List",
 				value: "Humans are not listed on (most) bot lists.",
 				inline: false
-			})
+			});
 		} else {
 			// botlist lookup
-			const req = await this.request(`https://botblock.org/api/bots/${user.id}`,{
+			const req = await message.client.request(`https://botblock.org/api/bots/${user.id}`,{
 				method: "GET"
 			});
 			try {
-				var rs = JSON.parse(req.body);
-				var list = Object.keys(this._.pickBy(rs.list_data,((val,key) {try{if([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) return false;}catch(e){return false;}return val[1] === 200}))).map(list=>({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
+				rs = JSON.parse(req.body);
+				list = Object.keys(message.client._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list=>({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			}catch(e){
-				this.logger.error(e);
-				var rs = req.body;
-				var list = "Lookup Failed.";
+				message.client.logger.error(e);
+				rs = req.body;
+				list = "Lookup Failed.";
 			}
-			var list = typeof list === "object" ? list.map(ls=>`[${ls.name}](${ls.url})`).join("\n") : list;
+			list = typeof list === "object" ? list.map(ls=>`[${ls.name}](${ls.url})`).join("\n") : list;
 			data.fields.push({
 				name: "Blacklist",
 				value: "Bots cannot be blacklisted.",
@@ -93,11 +94,11 @@ module.exports = {
 				name: "Bot List",
 				value: list.length > 1000 ? `Output is too long, use \`${message.gConfig.prefix}botlistinfo ${user.user.tag}\`` : list.length === 0 ? "Not found on any." : list,
 				inline: false
-			})
+			});
 		}
 		Object.assign(data, message.embed_defaults());
 		data.thumbnail={url: user.user.displayAvatarURL()};
-		var embed = new this.Discord.MessageEmbed(data);
+		embed = new message.client.Discord.MessageEmbed(data);
 		message.channel.send(embed);
 		return message.channel.stopTyping();
 	})

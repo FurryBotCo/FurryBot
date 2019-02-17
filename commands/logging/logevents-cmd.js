@@ -1,10 +1,10 @@
 module.exports = {
 	triggers: [
-        "logevents"
-    ],
+		"logevents"
+	],
 	userPermissions: [
-        "MANAGE_GUILD"
-    ],
+		"MANAGE_GUILD"
+	],
 	botPermissions: [],
 	cooldown: 1e3,
 	description: "List the loggable events, and their current state",
@@ -13,33 +13,34 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async function(message) {
-        var l = "";
-        var updateFields = {logging:{}};
-        for(let key in message.gConfig.logging) {
-            var log = message.gConfig.logging[key];
-            if(log.enabled) {
-                var s = message.guild.channels.get(log.channel);
-                if(!s) {
-                    updateFields.logging[key] = {
-                        channel: null,
-                        enabled: false
-                    }
-                    var c = "Disabled (Invalid Channel)";
-                } else {
-                    var c = `<#${s.id}>`;
-                }
-            } else {
-                var c = "Not Enabled";
-            }
-            l+=`**${key}** - ${c}\n`;
-        }
-        var data = {
-            title: "Server Logging Settings",
-            description: `You can change these with \`${message.gConfig.prefix}log <enable/disable> <event>\`\n${l}`
-        }
-        Object.assign(data,message.embed_defaults());
-        var embed = new this.Discord.MessageEmbed(data);
-        return message.channel.send(embed);
-    })
+	run: (async(message) => {
+		let l, updateFields, log, s, c, data, embed;
+		l = "";
+		updateFields = {logging:{}};
+		for(let key in message.gConfig.logging) {
+			log = message.gConfig.logging[key];
+			if(log.enabled) {
+				s = message.guild.channels.get(log.channel);
+				if(!s) {
+					updateFields.logging[key] = {
+						channel: null,
+						enabled: false
+					};
+					c = "Disabled (Invalid Channel)";
+				} else {
+					c = `<#${s.id}>`;
+				}
+			} else {
+				c = "Not Enabled";
+			}
+			l+=`**${key}** - ${c}\n`;
+		}
+		data = {
+			title: "Server Logging Settings",
+			description: `You can change these with \`${message.gConfig.prefix}log <enable/disable> <event>\`\n${l}`
+		};
+		Object.assign(data,message.embed_defaults());
+		embed = new message.client.Discord.MessageEmbed(data);
+		return message.channel.send(embed);
+	})
 };

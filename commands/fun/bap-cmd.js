@@ -11,14 +11,14 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async function(message) {
-		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
-		
-		var input = message.args.join(" ");
-		var text = this.varParse(message.c,{author:message.author,input:input});
+	run: (async(message) => {
+		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
+		let input, text, attachment;
+		input = message.args.join(" ");
+		text = message.client.varParse(message.c,{author:message.author,input:input});
 		if(message.gConfig.commandImages) {
 			if(!message.channel.permissionsFor(message.guild.me).has("ATTACH_FILES")) return message.reply("Hey, I require the `ATTACH_FILES` permission for images to work on these commands!");
-			var attachment = new this.Discord.MessageAttachment("https://i.fb.furcdn.net/bap.gif");
+			attachment = new message.client.Discord.MessageAttachment("https://i.fb.furcdn.net/bap.gif");
 			message.channel.send(text,attachment);
 		} else {
 			message.channel.send(text);

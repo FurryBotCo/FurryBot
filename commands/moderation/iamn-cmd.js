@@ -1,13 +1,13 @@
-// add: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").append("role")})
-// remove: this.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: this.r.row("selfAssignableRoles").difference(["role"])})
-// get: this.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
+// add: message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").append("role")})
+// remove: message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").difference(["role"])})
+// get: message.client.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
 
 module.exports = {
 	triggers: [
-        "iamn",
+		"iamn",
 		"iamnot",
-        "rolemenot"
-    ],
+		"rolemenot"
+	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 5e3,
@@ -17,10 +17,11 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async function(message) {
-        if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
-        var roles = await this.r.table("guilds").get(message.guild.id)("selfAssignableRoles").then(r => r.map(a => {
-			var b = message.guild.roles.get(a);
+	run: (async(message) => {
+		let roles, b, role;
+		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
+		roles = await message.client.r.table("guilds").get(message.guild.id)("selfAssignableRoles").then(r => r.map(a => {
+			b = message.guild.roles.get(a);
 			if(!b) return {id: null,name: null};
 			return {name: b.name.toLowerCase(), id: a};
 		}));
@@ -28,11 +29,11 @@ module.exports = {
 			if(message.guild.roles.find(r => r.name.toLowerCase() === message.args.join(" ").toLowerCase())) return message.reply("That role is not self assignable.");
 			return message.reply("Role not found.");
 		}
-		var role = roles.filter(r => r.name === message.args.join(" ").toLowerCase());
+		role = roles.filter(r => r.name === message.args.join(" ").toLowerCase());
 		if(!role) return message.reply("Role not found.");
-		if(!message.member.roles.has(role.id)) return message.reply("You don't have this role.");
+		if(!message.member.roles.has(role.id)) return message.reply("You don't have message.client role.");
 		if(message.guild.me.roles.highest.rawPosition <= message.guild.roles.get(role.id).rawPosition) return message.reply("That role is higher than, or as high as my highest role.");
 		await message.member.roles.add(role.id,"iamnot command");
 		return message.reply(`You no longer have the **${role.name}** role.`);
-    })
+	})
 };
