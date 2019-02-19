@@ -110,5 +110,6 @@
     "queue": [],
     "playing": false,
     "textChannel": null
-  }
+  },
+  "selfAssignableRoles": []
 }
