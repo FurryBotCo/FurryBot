@@ -135,6 +135,7 @@ module.exports = (async function() {
 		this.fs.readdir(`${this.config.rootDir}/tmp`, (err, files) => {
 			if (err) throw err;
 			for (const file of files) {
+				if(file === "placeholder") continue;
 				this.fs.unlink(this.path.join(`${this.config.rootDir}/tmp`, file), err => {
 					if (err) throw err;
 				});
