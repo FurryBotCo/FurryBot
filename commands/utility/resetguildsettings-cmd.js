@@ -16,7 +16,7 @@ module.exports = {
 	guildOwnerOnly: true,
 	run: (async(message) => {
 		let choice;
-		message.channel.send("message.client will erase ALL guild (server) settings, are you sure you want to do message.client?\nType **yes** or **no**.");
+		message.channel.send("this will erase ALL guild (server) settings, are you sure you want to do message.client?\nType **yes** or **no**.");
 		message.channel.awaitMessages(m => ["yes","no"].includes(m.content.toLowerCase()) && m.author.id === message.author.id,{max:1,time:6e4,errors:["time"]}).then(async(m) => {
 			choice = m.first().content.toLowerCase() === "yes" ? true : false;
 			if(!choice) {
