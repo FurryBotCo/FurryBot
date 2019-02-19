@@ -20,7 +20,7 @@ module.exports = {
 		}
 		if(message.args.length === 0 && typeof message.client.furpile[message.guild.id].fnc !== "undefined") {
 			if(message.client.furpile[message.guild.id].currentUsers.has(message.author.id) && message.client.config.developers.indexOf(message.author.id) === -1) {
-				return message.reply(`${message.client.config.emojis.cooldown}\nYou are already in message.client furpile, you cannot join again!`);
+				return message.reply(`${message.client.config.emojis.cooldown}\nYou are already in this furpile, you cannot join again!`);
 			}
 			clearTimeout(message.client.furpile[message.guild.id].fnc);
 			message.client.furpile[message.guild.id].currentUsers.add(message.author.id);

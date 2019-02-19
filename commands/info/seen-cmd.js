@@ -48,7 +48,7 @@ module.exports = {
 		});
 		data = {
 			title: `Seen On ${b.length} Servers - ${user.user.tag} (${user.id})`,
-			desciption: `I see message.client user in ${guilds.size} other guilds.`,
+			desciption: `I see this user in ${guilds.size} other guilds.`,
 			fields
 		};
 		embed = new message.client.Discord.MessageEmbed(data);

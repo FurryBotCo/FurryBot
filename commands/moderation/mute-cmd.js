@@ -27,7 +27,7 @@ module.exports = {
 		if(message.gConfig.muteRole === null) {
 			data = {
 				title: "No mute role",
-				description: `message.client server does not have a mute role set, you can set message.client with \`${message.gConfig.prefix}setmuterole <role>\``,
+				description: `message.client server does not have a mute role set, you can set this with \`${message.gConfig.prefix}setmuterole <role>\``,
 				color: 15601937
 			};
 			Object.assign(data, message.embed_defaults("color"));
@@ -37,7 +37,7 @@ module.exports = {
 		if(!message.guild.roles.has(message.gConfig.muteRole)) {
 			data = {
 				title: "Mute role not found",
-				description: `The mute role specified for message.client server <@&${message.gConfig.muteRole}> (${message.guild.id}) was not found, it has been reset. You can set a new one with \`${message.gConfig.prefix}setmuterole <role>\``,
+				description: `The mute role specified for this server <@&${message.gConfig.muteRole}> (${message.guild.id}) was not found, it has been reset. You can set a new one with \`${message.gConfig.prefix}setmuterole <role>\``,
 				color: 15601937
 			};
 			await message.client.db.updateGuild(message.guild.id,{muteRole:null});
@@ -67,7 +67,7 @@ module.exports = {
 			return message.channel.send(embed);
 		}
         
-		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do message.client to yourmessage.client.");
+		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourmessage.client.");
 		if(user.roles.highest.rawPosition >= message.member.roles.highest.rawPosition && message.author.id !== message.guild.owner.id) return message.reply(`You cannot mute ${user.user.tag} as their highest role is higher than yours!`);
 		if(user.permissions.has("ADMINISTRATOR")) return message.reply("That user has `ADMINISTRATOR`, that would literally do nothing.");
 		reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";

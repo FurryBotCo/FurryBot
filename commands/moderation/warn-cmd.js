@@ -22,7 +22,7 @@ module.exports = {
         
 		if(!user) return message.errorEmbed("INVALID_USER");
     
-		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do message.client to yourmessage.client.");
+		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourmessage.client.");
 		if(user.roles.highest.rawPosition >= message.member.roles.highest.rawPosition && message.author.id !== message.guild.owner.id && !message.user.isDeveloper) return message.reply(`You cannot warn ${user.user.tag} as their highest role is higher than yours!`);
 		reason = message.args.slice(1).join(" ");
     

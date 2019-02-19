@@ -20,6 +20,7 @@ module.exports = {
 		let roles, page, c, remove, rl, b, data, embed, n;
 		roles = await message.client.r.table("guilds").get(message.guild.id)("selfAssignableRoles");
 		page = message.args.length > 0 ? parseInt(message.args[0],10) : 1;
+		if(roles.length === 0) return message.reply("There are no roles set as self assignable.");
 		c = message.client.chunk(roles,10);
 		if(!page || page > c.length) return message.reply("Invalid page.");
 		remove = [];

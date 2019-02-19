@@ -31,7 +31,7 @@ module.exports = {
 		}
 		role = roles.filter(r => r.name === message.args.join(" ").toLowerCase());
 		if(!role) return message.reply("Role not found.");
-		if(!message.member.roles.has(role.id)) return message.reply("You don't have message.client role.");
+		if(!message.member.roles.has(role.id)) return message.reply("You don't have this role.");
 		if(message.guild.me.roles.highest.rawPosition <= message.guild.roles.get(role.id).rawPosition) return message.reply("That role is higher than, or as high as my highest role.");
 		await message.member.roles.add(role.id,"iamnot command");
 		return message.reply(`You no longer have the **${role.name}** role.`);
