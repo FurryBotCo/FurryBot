@@ -8,7 +8,7 @@ module.exports = {
 		"ATTACH_FILES"
 	],
 	cooldown: 5e3,
-	description: "message.client is an old meme of ours, carried down for months.",
+	description: "this is an old meme of ours, carried down for months.",
 	usage: "[@user]",
 	nsfw: false,
 	devOnly: false,

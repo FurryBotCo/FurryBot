@@ -60,8 +60,8 @@ module.exports = {
 				role = r;
 			}
 			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("message.client role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("message.client role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
+			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
 			switch(operation) {
 			case 1:
 				if(member.roles.has(role.id)) return message.reply(`No action was taken, as **${member.user.tag}** already has the role **${role.name}**`);
@@ -163,8 +163,8 @@ module.exports = {
 			if(!member) return message.reply("User not found.");
 			if(!role) return message.reply("Role not found.");
 			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("message.client role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("message.client role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
+			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
 			if(member.roles.has(role.id)) return message.reply(`**${member.user.tag}** already has the role ${role.name}.`);
 			return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() => {
 				return message.reply(`Added role ${role.name} to **${member.user.tag}**.`);
@@ -183,8 +183,8 @@ module.exports = {
 			if(!member) return message.reply("User not found.");
 			if(!role) return message.reply("Role not found.");
 			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("message.client role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("message.client role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
+			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
 			if(!member.roles.has(role.id)) return message.reply(`**${member.user.tag}** does not have the role ${role.name}.`);
 			return member.roles.remove(role.id,`Command: ${message.author.tag} -> remove role ${role.name} from ${member.user.tag}`).then(() => {
 				return message.reply(`Removed role ${role.name} from **${member.user.tag}**.`);
@@ -198,8 +198,8 @@ module.exports = {
 			role = await message.getRoleFromArgs(1);
 			if(!role) return message.reply("Role not found.");
 			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("message.client role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("message.client role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
+			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
 			members = message.guild.members.filter(m => !m.roles.has(role.id)).map(m => m.id);
 			counts = {
 				success: 0,
@@ -222,8 +222,8 @@ module.exports = {
 			role = await message.getRoleFromArgs(1);
 			if(!role) return message.reply("Role not found.");
 			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("message.client role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("message.client role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
+			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
 			members = message.guild.members.filter(m => m.roles.has(role.id)).map(m => m.id);
 			counts = {
 				success: 0,
@@ -255,8 +255,8 @@ module.exports = {
 				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
 				if(!role) return message.reply("Role not found.");
 				if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("message.client role is higher than, or as high as me, I cannot remove or assign it.");
-				if(role.managed) return message.reply("message.client role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
+				if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
 				members = message.guild.members.filter(m => !m.user.bot).map(m => m.id);
 				counts = {
 					success: 0,
@@ -277,8 +277,8 @@ module.exports = {
 				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
 				if(!role) return message.reply("Role not found.");
 				if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("message.client role is higher than, or as high as me, I cannot remove or assign it.");
-				if(role.managed) return message.reply("message.client role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
+				if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
 				members = message.guild.members.filter(m => !m.user.bot).map(m => m.id);
 				counts = {
 					success: 0,
@@ -311,8 +311,8 @@ module.exports = {
 				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
 				if(!role) return message.reply("Role not found.");
 				if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("message.client role is higher than, or as high as me, I cannot remove or assign it.");
-				if(role.managed) return message.reply("message.client role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
+				if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
 				members = message.guild.members.filter(m => m.user.bot).map(m => m.id);
 				counts = {
 					success: 0,
@@ -333,8 +333,8 @@ module.exports = {
 				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
 				if(!role) return message.reply("Role not found.");
 				if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("message.client role is higher than, or as high as me, I cannot remove or assign it.");
-				if(role.managed) return message.reply("message.client role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
+				if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
 				members = message.guild.members.filter(m => m.user.bot).map(m => m.id);
 				counts = {
 					success: 0,
