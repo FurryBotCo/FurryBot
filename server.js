@@ -54,7 +54,7 @@ class FurryBotServer {
 				d = new Date();
 				date = `${d.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${d.getMonth()+1}`}-${d.getDate().toString().length > 1 ? d.getDate() : `0${d.getDate()}`}-${d.getFullYear()}`;
 				a = await this.mdb.collection("dailyjoins").findOne({id: date});
-				dailyJoins = a.count || null;
+				dailyJoins = a !== null ? a.count : null|| null;
 				return res.status(200).json({
 					success:true,
 					clientStatus: client.user.presence.status,
@@ -212,6 +212,23 @@ class FurryBotServer {
 					shardId: client.guilds.get(req.params.id).shardID,
 					shardCount: client.options.shardCount
 				});
+			})
+			.get("/shorturl/:identifier",async(req,res) => {
+				client.analytics.track({
+					userId: "WEBSERVER",
+					event: "web.request.shorturl",
+					properties: {
+						bot: {
+							version: client.config.bot.version,
+							beta: client.config.beta,
+							alpha: client.config.alpha,
+							server: client.os.hostname()
+						}
+					}
+				});
+				const s = await client.mdb.collection("shorturl").findOne({id: req.params.identifier});
+				if(!s) return res.status(404).json({success: false, error: "invalid short code"});
+				return res.status(200).json(s);
 			})
 			.post("/dev/eval",checkAuth,async(req,res) => {
 				client.analytics.track({
