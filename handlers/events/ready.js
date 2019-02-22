@@ -134,9 +134,19 @@ module.exports = (async function() {
 	},1e3);
 
 	setInterval(() => {
+		if(!this.fs.existsSync(`${this.config.rootDir}/tmp`)) {
+			this.fs.mkdirSync(`${this.config.rootDir}/tmp`);
+			this.fs.writeFileSync(`${this.config.rootDir}/tmp/placeholder`,"");
+			this.logger.debug("Made temporary folder, and added placeholder file");
+		}
+		if(!this.fs.existsSync(`${this.config.rootDir}/tmp/placeholder`)) {
+			this.fs.writeFileSync(`${this.config.rootDir}/tmp/placeholder`,"");
+			this.logger.debug("Recreated placeholder file in temporary directory");
+		}
 		this.fs.readdir(`${this.config.rootDir}/tmp`, (err, files) => {
 			if (err) throw err;
-			for (const file of files) {
+			for (let file of files) {
+				if(file === "placeholder") continue;
 				this.fs.unlink(this.path.join(`${this.config.rootDir}/tmp`, file), err => {
 					if (err) throw err;
 				});
