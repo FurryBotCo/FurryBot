@@ -47,7 +47,7 @@ module.exports = {
 		}
 		attachment = new message.client.Discord.MessageAttachment(img.response.image);
 		short = await message.client.shortenUrl(img.response.image);
-		extra+= short.new ? `**message.client is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
+		extra+= short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
 		message.channel.send(`${extra}Short URL: <${short.link}>\n\nType: ${type}\n\nRequested By: ${message.author.tag}`,attachment);
 		return message.channel.stopTyping();
 	})

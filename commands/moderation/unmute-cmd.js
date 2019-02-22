@@ -32,7 +32,7 @@ module.exports = {
 		if(message.gConfig.muteRole === null) {
 			data = {
 				title: "No mute role",
-				description: `message.client server does not have a mute role set, you can set this with \`${message.gConfig.prefix}setmuterole <role>\``,
+				description: `this server does not have a mute role set, you can set this with \`${message.gConfig.prefix}setmuterole <role>\``,
 				color: 15601937
 			};
 			Object.assign(data, message.embed_defaults("color"));

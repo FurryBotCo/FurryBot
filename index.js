@@ -399,9 +399,9 @@ class FurryBot extends Discord.Client {
 	}
 
 	async shortenUrl (url) {
-		this.mdb.listCollections().toArray().then(res => res.map(c => c.name)).then((list) => {
+		this.mdb.listCollections().toArray().then(res => res.map(c => c.name)).then(async(list) => {
 			if(!list.includes("shorturl")) {
-				this.mdb.createCollection("shorturl");
+				await this.mdb.createCollection("shorturl");
 				console.log("[ShortURL]: Created Short URL table");
 			}
 		});
@@ -418,7 +418,7 @@ class FurryBot extends Discord.Client {
 			}
 		});
 
-		let res = await this.mdb.collection("shorturl").find({url});
+		let res = await this.mdb.collection("shorturl").find({url}).toArray();
 		
 		switch(res.length) {
 		case 0:
@@ -435,7 +435,7 @@ class FurryBot extends Discord.Client {
 		default:
 			// delete & recreate
 			console.log("[ShortURL]: Duplicate records found, deleting");
-			this.mdb.collection("shorturl").filter({url}).forEach((short) => {
+			this.mdb.collection("shorturl").find({url}).forEach((short) => {
 				return this.mdb.collection("shorturl").deleteOne({id: short.id});
 			});
 			return create(url);

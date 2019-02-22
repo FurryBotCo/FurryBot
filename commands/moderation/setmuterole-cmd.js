@@ -41,7 +41,7 @@ module.exports = {
 		if(role.managed || role.rawPosition === 0 || role.rawPosition >= message.guild.me.roles.highest.rawPosition) {
 			data = {
 				title: "Invalid Role",
-				description: `message.client role (<@&${role.id}>) cannot be used as the muted role, check that is not any of these:\n\t- The guilds \`everyone\` role\n\t- A bots role (generated when a bot is invited)\n\t- Higher than me`,
+				description: `this role (<@&${role.id}>) cannot be used as the muted role, check that is not any of these:\n\t- The guilds \`everyone\` role\n\t- A bots role (generated when a bot is invited)\n\t- Higher than me`,
 				color: 15601937
 			};
 			Object.assign(data, message.embed_defaults("color"));

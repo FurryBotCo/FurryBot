@@ -40,7 +40,7 @@ module.exports = {
 			
 		attachment = new messageAttachment(i);
 		
-		message.channel.send(`Here you go!\n(message.client is an inside joke from ${message.client.users.fetch("185938944460980224").tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
+		message.channel.send(`Here you go!\n(this is an inside joke from ${message.client.users.fetch("185938944460980224").tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
 		return message.channel.stopTyping();
 	})
 };

@@ -207,7 +207,7 @@ module.exports = {
 				skip: 0,
 				before: message.guild.members.filter(m => m.roles.has(role.id)).size
 			};
-			message.channel.send(`Changing roles for ${members.length} members.\nmessage.client should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id)).size, true, true)}.`);
+			message.channel.send(`Changing roles for ${members.length} members.\nthis should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id)).size, true, true)}.`);
 			for(let m of members) {
 				member = message.guild.members.get(m);
 				if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ALL.`)
@@ -231,7 +231,7 @@ module.exports = {
 				skip: 0,
 				before: message.guild.members.filter(m => m.roles.has(role.id)).size
 			};
-			message.channel.send(`Changing roles for ${members.length} members.\nmessage.client should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id)).size, true, true)}.`);
+			message.channel.send(`Changing roles for ${members.length} members.\nthis should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id)).size, true, true)}.`);
 			for(let m of members) {
 				member = message.guild.members.get(m);
 				if(member.roles.has(role.id)) await member.roles.remove(role.id,`Command: ${message.author.tag} -> Remove role ${role.name} from ALL.`)
@@ -264,7 +264,7 @@ module.exports = {
 					skip: 0,
 					before: message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size
 				};
-				message.channel.send(`Changing roles for ${members.length} humans.\nmessage.client should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
+				message.channel.send(`Changing roles for ${members.length} humans.\nthis should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
 				for(let m of members) {
 					member = message.guild.members.get(m);
 					if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all humans.`)
@@ -286,7 +286,7 @@ module.exports = {
 					skip: 0,
 					before: message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size
 				};
-				message.channel.send(`Changing roles for ${members.length} humans.\nmessage.client should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
+				message.channel.send(`Changing roles for ${members.length} humans.\nthis should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
 				for(let m of members) {
 					member = message.guild.members.get(m);
 					if(member.roles.has(role.id)) await member.roles.remove(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all humans.`)
@@ -320,7 +320,7 @@ module.exports = {
 					skip: 0,
 					before: message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size
 				};
-				message.channel.send(`Changing roles for ${members.length} bots.\nmessage.client should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
+				message.channel.send(`Changing roles for ${members.length} bots.\nthis should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
 				for(let m of members) {
 					member = message.guild.members.get(m);
 					if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all bots.`)
@@ -342,7 +342,7 @@ module.exports = {
 					skip: 0,
 					before: message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size
 				};
-				message.channel.send(`Changing roles for ${members.length} bots.\nmessage.client should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
+				message.channel.send(`Changing roles for ${members.length} bots.\nthis should take about ${message.client.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
 				for(let m of members) {
 					member = message.guild.members.get(m);
 					if(member.roles.has(role.id)) await member.roles.remove(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all bots.`)
