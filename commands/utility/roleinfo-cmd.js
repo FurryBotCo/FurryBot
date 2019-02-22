@@ -111,7 +111,7 @@ module.exports = {
 						value: role.rawPosition,
 						inline: false
 					},{
-						name: "Members With message.client Role",
+						name: "Members With this Role",
 						value: role.members.size,
 						inline: false
 					},{

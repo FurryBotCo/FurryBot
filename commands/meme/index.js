@@ -9,6 +9,6 @@ module.exports = {
 		return a;
 	}),
 	name: "Meme",
-	description: "Let's get message.client bread.",
+	description: "Let's get this bread.",
 	path: __dirname
 };

@@ -13,7 +13,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(message) => {
-		//return message.reply("Sorry, the api we used was shutdown, so message.client is temporarily disabled!");]
+		//return message.reply("Sorry, the api we used was shutdown, so this is temporarily disabled!");]
 		message.channel.startTyping();
 		let img, attachment;
 		img = await message.client.imageAPIRequest(true, "birb");

@@ -15,7 +15,7 @@ module.exports = {
 	run: (async(message) => {
 		// extra check, to be safe
 		if (!message.client.config.developers.includes(message.author.id)) {
-			return message.reply("You cannot run message.client command as you are not a developer of message.client bot.");
+			return message.reply("You cannot run this command as you are not a developer of this bot.");
 		}
 		message.channel.startTyping();
 		if(message.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");

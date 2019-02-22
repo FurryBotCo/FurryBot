@@ -37,7 +37,7 @@ module.exports = {
 			if(!type) type = "hug";
 			req = await message.client.imageAPIRequest(false,type,true,true);
 			short = await message.client.shortenUrl(req.response.image);
-			extra = short.new ? `**message.client is the first time message.client has been viewed! Image #${short.linkNumber}**\n` : "";
+			extra = short.new ? `**message.client is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
 			attachment = new message.client.Discord.MessageAttachment(req.response.image);
 			return message.channel.send(`${extra}Short URL: <${short.link}>\nRequested By: ${message.author.tag}\nType: ${message.client.ucwords(type)}`,attachment);
 		}catch(error){

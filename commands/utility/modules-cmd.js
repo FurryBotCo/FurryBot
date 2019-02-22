@@ -15,7 +15,7 @@ module.exports = {
 		let data, embed;
 		data = {
 			title: "Module Status",
-			description: "Enabled/disabled modules on message.client server.",
+			description: "Enabled/disabled modules on this server.",
 			fields: [
 				{
 					name: "Fun Module",

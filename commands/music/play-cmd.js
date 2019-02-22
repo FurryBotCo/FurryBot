@@ -79,7 +79,7 @@ module.exports = {
 				}
 			}
 			if(song.song.info.length > 6e5 && !message.gConfig.premium) {
-				message.reply(`message.client is too long to be played! The maximum time for message.client guild is \`10 minutes (6000s)\`, to increase message.client limit please donate, and mark message.client server as premium **${message.client.config.bot.donationURL}**.`);
+				message.reply(`message.client is too long to be played! The maximum time for this guild is \`10 minutes (6000s)\`, to increase this limit please donate, and mark this server as premium **${message.client.config.bot.donationURL}**.`);
 				return message.channel.stopTyping();
 			} 
 			a = message.client.voiceConnections.filter(g => g.channel.guild.id === message.guild.id);

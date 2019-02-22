@@ -16,7 +16,7 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async(message) => {
 		// extra check, to be safe
-		if (!message.client.config.developers.includes(message.author.id)) return message.reply("You cannot run message.client command as you are not a developer of message.client bot.");
+		if (!message.client.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
 		let exec, start, res, m, end, data, embed;
 		message.channel.startTyping();
 		const r = message.client.r;

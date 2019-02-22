@@ -7,7 +7,7 @@ module.exports = {
 	],
 	botPermissions: [],
 	cooldown: 1e3,
-	description: "Use message.client if the bot won't stop typing in a channel",
+	description: "Use this if the bot won't stop typing in a channel",
 	usage: "",
 	nsfw: false,
 	devOnly: false,
@@ -16,7 +16,7 @@ module.exports = {
 	run: (async(message) => {
 		let channel = message.mentions.channels.first() ? message.mentions.channels.first() : message.channel;
 		if(!channel.typing) return message.reply("I don't seem to be typing here..?");
-		message.reply("I've sent a command to stop typing, let's see if message.client works!");
+		message.reply("I've sent a command to stop typing, let's see if this works!");
 		return channel.stopTyping();
 	})
 };

@@ -34,7 +34,7 @@ module.exports = {
 			return message.channel.send(embed);
 		}
    
-		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do message.client to yourmessage.client.");
+		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourmessage.client.");
 		reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";
 		message.guild.members.ban(user.id,{reason:`Hackban: ${message.author.tag} -> ${reason}`}).then(() => {
 			message.channel.send(`***User ${user.tag} was banned, ${reason}***`).catch(noerr => null);

@@ -13,7 +13,7 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async(message) => {
 		// extra check, to be safe
-		if (!message.client.config.developers.includes(message.author.id)) return message.reply("You cannot run message.client command as you are not a developer of message.client bot.");
+		if (!message.client.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		if(!message.client.commandList.includes(message.args[0])) return message.reply("Invalid command");
 		let cmd = message.client.getCommand(message.args[0]),
