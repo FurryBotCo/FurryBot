@@ -14,8 +14,32 @@ module.exports = {
 	betaOnly: true,
 	guildOwnerOnly: false,
 	run: (async(message) => {
+		let embed, data, u;
+		u = await message.client.db.getUser(message.author.id);
+		if(!u.bal) {
+			await message.client.mdb.collection("users").findOneAndUpdate({id: message.author.id},{
+				$set: {
+					bal: 100
+				}
+			});
+			u.bal = 100;
+		}
+		if(!u.bank) {
+			await message.client.mdb.collection("users").findOneAndUpdate({id: message.author.id},{
+				$set: {
+					bank: 0
+				}
+			});
+			u.bank = 0;
+		}
 		message.channel.startTyping();
-		message.reply(`Your balance is ${message.uConfig.bal}.`);
+		data = {
+			title: `${message.author.tag}'s Balance`,
+			description: `**Pocket**: ${u.bal}\n**Bank**: ${u.bank}`
+		};
+		Object.assign(data, message.embed_defaults());
+		embed = new message.client.Discord.MessageEmbed(data);
+		message.channel.send(embed);
 		return message.channel.stopTyping();
 	})
 };

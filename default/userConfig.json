@@ -10,5 +10,8 @@
     "xp": 0,
     "level": 0,
     "warnings": [],
-    "blacklisted": false
+	"blacklisted": false,
+	"bal": 100,
+	"bank": 0,
+	"inv": []
 }
