@@ -1,6 +1,7 @@
 /*
 Furry Bot™ Custom Logger V4
-01-08-2019 - Trademark (™) Donovan_DMC & Furry Bot Limited 
+02-22-2019 - Trademark (™) Donovan_DMC & Furry Bot Limited
+Original.
 */
 
 const config = require("../config"),
