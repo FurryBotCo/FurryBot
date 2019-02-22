@@ -45,7 +45,7 @@ module.exports = {
 				return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err => message.channel.send(`Command failed: ${err}`));
 			}
 			short = await message.client.shortenUrl(`http://www.sofurry.com/view/${submission.id}`);
-			extra = short.new ? `**message.client is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
+			extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
 			if([1,4].includes(submission.contentType)) {
 				attachment = new message.client.Discord.MessageAttachment(submission.full,"sofurry.png");
 				return msg.edit(`${extra}${submission.title} (type ${message.client.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${message.author.tag}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => message.channel.send(`Command failed: ${err}`)).then(() => message.channel.send(attachment));

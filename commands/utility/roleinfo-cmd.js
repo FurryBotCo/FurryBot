@@ -48,7 +48,7 @@ module.exports = {
 				});
 			});
 			data = {
-				title: `message.client server has ${a.length} Roles`,
+				title: `this server has ${a.length} Roles`,
 				desciption: `You can use \`${message.prefix}roleinfo <rolename>\` to get more info on a single role`,
 				fields
 			};
