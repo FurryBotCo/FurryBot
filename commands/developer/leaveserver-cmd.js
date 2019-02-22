@@ -27,7 +27,7 @@ module.exports = {
 			message.reply(`Left guild **${guild.name}** (${guild.id})`);
 			return message.channel.stopTyping();
 		}).catch((err) => {
-			message.channel.send(`There was an error while doing message.client: ${err}`) ;
+			message.channel.send(`There was an error while doing this: ${err}`) ;
 			return message.channel.stopTyping();
 		});
 	})

@@ -24,7 +24,7 @@ module.exports = {
 				type = message.client.config.yiff.defaultType;
 				if(!message.client.yiffNoticeViewed.has(message.guild.id)) {
 					message.client.yiffNoticeViewed.add(message.guild.id);
-					extra+=`Showing default yiff type **${type}**\nTo change message.client, add one of these values somewhere in the channel __name__: **${message.client.config.yiff.types.join("**, **")}**.\n\n`;
+					extra+=`Showing default yiff type **${type}**\nTo change this, add one of these values somewhere in the channel __name__: **${message.client.config.yiff.types.join("**, **")}**.\n\n`;
 				}
 			}
     

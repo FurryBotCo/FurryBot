@@ -29,7 +29,7 @@ module.exports = {
 			message.reply(`Set username to: ${user.username}`);
 			return message.channel.stopTyping();
 		}).catch((err) => {
-			message.channel.send(`There was an error while doing message.client: ${err}`) ;
+			message.channel.send(`There was an error while doing this: ${err}`) ;
 			return message.channel.stopTyping();
 		});
 	})

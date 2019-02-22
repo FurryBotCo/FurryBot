@@ -5,7 +5,7 @@ module.exports = {
 		"ATTACH_FILES"
 	],
 	cooldown: 5e3,
-	description: "Nothing will pop message.client",
+	description: "Nothing will pop this",
 	usage: "<text>",
 	nsfw: false,
 	devOnly: false,
