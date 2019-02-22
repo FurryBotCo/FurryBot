@@ -14,7 +14,7 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async(message) => {
 		let queue, ql, pages, page, fields, i, q, usr, addedBy, data, embed;
-		queue = await message.client.r.table("guilds").get(message.guild.id)("music")("queue");
+		queue = await message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.music.queue);
 		ql = message.client.chunk(queue,10);
 		if(ql.length >= 1) {
 			pages = ql.length;

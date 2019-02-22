@@ -1,6 +1,6 @@
-// add: message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").append("role")})
-// remove: message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").difference(["role"])})
-// get: message.client.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
+// add: message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id}, {$push: {selfAssignableRoles: "role"}});
+// remove: message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{$pull: {selfAssignableRoles: "role"}})
+// get: message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles);
 
 module.exports = {
 	triggers: [
@@ -25,9 +25,9 @@ module.exports = {
 		let role, roles;
 		role = await message.getRoleFromArgs();
 		if(!role) return message.errorEmbed("INVALID_ROLE");
-		roles = await message.client.r.table("guilds").get(message.guild.id)("selfAssignableRoles");
+		roles = await message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles);
 		if(!roles.includes(role.id)) return message.reply("this role is not listed as a self assignable role.");
-		await message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").difference([role.id])});
+		await message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{$pull: {selfAssignableRoles: role.id}});
 		return message.reply(`Removed **${role.name}** from the list of self assignable roles.`);
 	})
 };

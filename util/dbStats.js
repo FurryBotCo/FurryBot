@@ -1,21 +1,23 @@
-module.exports = (async(client)=>{
-	return new Promise(async(resolve,reject)=>{
+module.exports = (async(client) => {
+	return new Promise(async(resolve,reject) => {
         
-		let j = await client.r.table(client.config.db.tables.stats).get("messageCount");
+		let j = await client.mdb.collection(client.config.db.collections.stats).findOne({id: "messageCount"});
         
 		if(!j) {
-			await client.r.table(client.config.db.tables.stats).insert({
+			await client.mdb.collection(client.config.db.collections.stats).insertOne({
 				id: "messageCount",
 				count: 0,
 				dmCount: 0,
 			});
             
-			j = await client.r.table(client.config.db.tables.stats).get("messageCount");
+			j = await client.mdb.collection(client.config.db.collections.stats).findOne({id: "messageCount"});
 		}
         
-		await client.r.table(client.config.db.tables.stats).get("messageCount").update({
-			count: +j.count + client.stats.messagesSinceLastPost,
-			dmCount: +j.dmCount + client.stats.dmMessagesSinceLastPost
+		await client.mdb.collection(client.config.db.collections.stats).findOneAndUpdate({id: "messageCount"},{
+			$set: {
+				count: +j.count + client.stats.messagesSinceLastPost,
+				dmCount: +j.dmCount + client.stats.dmMessagesSinceLastPost
+			}
 		});
         
 		client.stats.messagesSinceLastPost = 0;
@@ -28,7 +30,7 @@ module.exports = (async(client)=>{
 			client.logger.debug("Posted db stats");
 		}
         
-		// return client.r.table("stats").get("general").without("id");
-		resolve(client.r.table(client.config.db.tables.stats).get("messageCount"));
+		// return client.mdb.collection("stats").findOne({id: "general"});
+		resolve(client.mdb.collection(client.config.db.collections.stats).findOne({id: "messageCount"}));
 	});
 });

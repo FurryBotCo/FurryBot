@@ -3,11 +3,11 @@ const os = require("os");
 module.exports = {
 	memory: {
 		process: {
-			getTotal: (()=>process.memoryUsage().heapTotal),
-			getUsed: (()=>process.memoryUsage().heapUsed),
-			getRSS: (()=>process.memoryUsage().rss),
-			getExternal: (()=>process.memoryUsage().external),
-			getAll: (()=>({
+			getTotal: (() => process.memoryUsage().heapTotal),
+			getUsed: (() => process.memoryUsage().heapUsed),
+			getRSS: (() => process.memoryUsage().rss),
+			getExternal: (() => process.memoryUsage().external),
+			getAll: (() => ({
 				total: process.memoryUsage().heapTotal,
 				used: process.memoryUsage().heapUsed,
 				rss: process.memoryUsage().rss,
@@ -15,19 +15,19 @@ module.exports = {
 			}))
 		},
 		system: {
-			getTotal: (()=>os.totalmem()),
-			getUsed: (()=>os.totalmem() - os.freemem()),
-			getFree: (()=>os.freemem()),
-			getAll: (()=>({
+			getTotal: (() => os.totalmem()),
+			getUsed: (() => os.totalmem() - os.freemem()),
+			getFree: (() => os.freemem()),
+			getAll: (() => ({
 				total: os.totalmem(),
 				used: os.totalmem() - os.freemem(),
 				free: os.freemem()
 			}))
 		}
 	},
-	checkSemVer: ((ver)=>require("semver").valid(ver) === ver),
-	getCurrentTimestamp: (()=>new Date().toISOString()),
-	secondsToHours: ((sec)=>{
+	checkSemVer: ((ver) => require("semver").valid(ver) === ver),
+	getCurrentTimestamp: (() => new Date().toISOString()),
+	secondsToHours: ((sec) => {
 		let sec_num = parseInt(sec, 10);
 		let hours   = Math.floor(sec_num / 3600);
 		let minutes = Math.floor((sec_num - (hours * 3600)) / 60);
@@ -38,14 +38,14 @@ module.exports = {
 		if (seconds < 10) seconds = `0${seconds}`;
 		return `${hours}:${minutes}:${seconds}`;
 	}),
-	ucwords: ((str)=> str.toString().toLowerCase().replace(/^(.)|\s+(.)/g,(r)=>r.toUpperCase())),
-	toReadableDate: ((date)=>{
+	ucwords: ((str)=> str.toString().toLowerCase().replace(/^(.)|\s+(.)/g,(r) => r.toUpperCase())),
+	toReadableDate: ((date) => {
 		if(!(date instanceof Date)) throw new Error("must provide javascript Date object.");
 		var a = date.toISOString().replace("Z","").split("T");
 		return `${a[0]} ${a[1].split(".")[0]} UTC`;
 	}),
-	makeSafe: ((msg)=>msg.replace(/\@everyone/,"@\u200Beveryone").replace(/\@here/,"@\u200Bhere")), // eslint-disable-line no-useless-escape
-	ms: ((ms)=>{
+	makeSafe: ((msg) => msg.replace(/\@everyone/,"@\u200Beveryone").replace(/\@here/,"@\u200Bhere")), // eslint-disable-line no-useless-escape
+	ms: ((ms) => {
 		var cd = ms/1000;
 		if(cd === 1) {
 			var cooldown = `${cd} second`;

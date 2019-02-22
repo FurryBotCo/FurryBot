@@ -77,7 +77,7 @@ module.exports = {
 			"NONE",
 			"ELEVATED"
 		];
-		roles = guild.roles.map(role=>role.name==="@everyone"?"@everyone":`<@&${role.id}>`).toString();
+		roles = guild.roles.map(role => role.name==="@everyone"?"@everyone":`<@&${role.id}>`).toString();
 		rr = roles.length > 1000 ? `Too many to list, please use \`${message.gConfig.prefix}roles server\`` : roles;
 		data = {
 			title: `Server Info - **${guild.name}**`,
@@ -97,7 +97,7 @@ module.exports = {
 				},
 				{
 					name: "Members",
-					value: `Total: ${guild.memberCount}\n\n${message.client.config.emojis.online}: ${guild.members.filter(m=>m.user.presence.status==="online").size}\n${message.client.config.emojis.idle}: ${guild.members.filter(m=>m.user.presence.status==="idle").size}\n${message.client.config.emojis.dnd}: ${guild.members.filter(m=>m.user.presence.status==="dnd").size}\n${message.client.config.emojis.offline}: ${guild.members.filter(m=>m.user.presence.status==="offline").size}\n\nNon Bots: ${message.guild.memberCount - message.guild.members.filter(m=>!m.user.bot).size}\nBots: ${message.guild.members.filter(m=>m.user.bot).size}`,
+					value: `Total: ${guild.memberCount}\n\n${message.client.config.emojis.online}: ${guild.members.filter(m => m.user.presence.status==="online").size}\n${message.client.config.emojis.idle}: ${guild.members.filter(m => m.user.presence.status==="idle").size}\n${message.client.config.emojis.dnd}: ${guild.members.filter(m => m.user.presence.status==="dnd").size}\n${message.client.config.emojis.offline}: ${guild.members.filter(m => m.user.presence.status==="offline").size}\n\nNon Bots: ${message.guild.memberCount - message.guild.members.filter(m => !m.user.bot).size}\nBots: ${message.guild.members.filter(m => m.user.bot).size}`,
 					inline: false
 				},
 				{

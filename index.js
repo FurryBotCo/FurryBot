@@ -55,10 +55,10 @@ class FurryBot extends Discord.Client {
 				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.users.size >= mentionPosition+1)) return this.client.users.get(args[argPosition]);
 				
 				// username
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.users.size >= mentionPosition+1)) return this.client.users.find(t=>t.username.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.users.size >= mentionPosition+1)) return this.client.users.find(t => t.username.toLowerCase()===args[argPosition].toLowerCase());
 				
 				// user tag
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentions.users.size >= mentionPosition+1)) return this.client.users.find(t=>t.tag.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentions.users.size >= mentionPosition+1)) return this.client.users.find(t => t.tag.toLowerCase()===args[argPosition].toLowerCase());
 
 				// nothing found
 				return false;
@@ -92,10 +92,10 @@ class FurryBot extends Discord.Client {
 				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.members.size >= mentionPosition+1)) return this.guild.members.get(args[argPosition]);
 				
 				// username
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.members.size >= mentionPosition+1)) return this.guild.members.find(m=>m.user.username.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.members.size >= mentionPosition+1)) return this.guild.members.find(m => m.user.username.toLowerCase()===args[argPosition].toLowerCase());
 				
 				// user tag
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentions.members.size >= mentionPosition+1)) return this.guild.members.find(m=>m.user.tag.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentions.members.size >= mentionPosition+1)) return this.guild.members.find(m => m.user.tag.toLowerCase()===args[argPosition].toLowerCase());
 
 				// nothing found
 				return false;
@@ -129,7 +129,7 @@ class FurryBot extends Discord.Client {
 				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.channels.first())) return this.guild.channels.get(args[argPosition]);
 				
 				// channel name
-				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.channels.first())) return this.guild.channels.find(c=>c.name.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.channels.first())) return this.guild.channels.find(c => c.name.toLowerCase()===args[argPosition].toLowerCase());
 
 				// nothing found
 				return false;
@@ -163,7 +163,7 @@ class FurryBot extends Discord.Client {
 				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.roles.size >= mentionPosition+1)) return this.guild.roles.get(args[argPosition]);
 				
 				// role name
-				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.roles.size >= mentionPosition+1)) return this.guild.roles.find(r=>r.name.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.roles.size >= mentionPosition+1)) return this.guild.roles.find(r => r.name.toLowerCase()===args[argPosition].toLowerCase());
 
 				// nothing found
 				return false;
@@ -191,7 +191,7 @@ class FurryBot extends Discord.Client {
 				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.get(args[argPosition]);
 
 				// server name
-				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.find(g=>g.name.toLowerCase()===args[argPosition].toLowerCase());
+				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.find(g => g.name.toLowerCase()===args[argPosition].toLowerCase());
 
 				// nothing found
 				return false;
@@ -263,8 +263,7 @@ class FurryBot extends Discord.Client {
 		this.fetch = require("node-fetch");
 		this.postStats = require("./util/listStats");
 		this.fs = require("fs");
-		this.r = require("rethinkdbdash")(this.config.db.main);
-		//this.ro = require("rethinkdbdash")(this.config.db.other);
+		this.MongoClient = require("mongodb").MongoClient;
 		this.FurryBotDatabase = require(`${process.cwd()}/util/dbFunctions`);
 		this.FurryBotLogger = require(`${this.config.rootDir}/util/loggerV4`);
 		this.varParse = require(`${process.cwd()}/util/varHandler`);
@@ -291,14 +290,14 @@ class FurryBot extends Discord.Client {
 		this.wordGen = require("random-words");
 		this.commands = require("./commands");
 		this.responses = require("./responses");
-		this.categories = this.commands.map(c=>c.name.toLowerCase());
-		this.commandList = this.commands.map(c=>c.commands.map(cc=>cc.triggers)).reduce((a,b)=>a.concat(b)).reduce((a,b)=>a.concat(b));
-		this.responseList = this.responses.map(r=>r.triggers).reduce((a,b)=>a.concat(b));
+		this.categories = this.commands.map(c => c.name.toLowerCase());
+		this.commandList = this.commands.map(c => c.commands.map(cc => cc.triggers)).reduce((a,b) => a.concat(b)).reduce((a,b) => a.concat(b));
+		this.responseList = this.responses.map(r => r.triggers).reduce((a,b) => a.concat(b));
 		this.commandTimeout = {};
-		this.commandList.forEach((cmd)=>{
+		this.commandList.forEach((cmd) => {
 			this.commandTimeout[cmd] = new Set();
 		});
-		this.responseList.forEach((resp)=>{
+		this.responseList.forEach((resp) => {
 			this.commandTimeout[resp] = new Set();
 		});
 		this.analytics = new (require("analytics-node"))(this.config.apis.segment.writeKey);
@@ -313,7 +312,9 @@ class FurryBot extends Discord.Client {
 	/**
 	  * Load Function
 	  */
-	load() {
+	async load() {
+		this.mongo = await this.MongoClient.connect(`mongodb://${this.config.db.main.host}:${this.config.db.main.port}/${this.config.db.main.database}`,this.config.db.main.opt);
+		this.mdb = this.mongo.db(this.config.db.main.database);
 		console.log("[loadEvent]: start load");
 		this.analytics.track({
 			userId: "CLIENT",
@@ -355,7 +356,7 @@ class FurryBot extends Discord.Client {
 	}
 
 	async imageAPIRequest (animal = true,category = null,json = true, safe = false) {
-		return new Promise(async(resolve, reject)=>{
+		return new Promise(async(resolve, reject) => {
 			let s, j;
 			if([undefined,null,""].includes(json)) json = true;
 			s = await this.request(`https://api.furry.bot/${animal ? "animals" : `furry/${safe?"sfw":"nsfw"}`}/${category?category.toLowerCase():safe?"hug":"bulge"}${json?"":"/image"}`);
@@ -369,7 +370,7 @@ class FurryBot extends Discord.Client {
 	}
 
 	async download (url, filename) {
-		return new Promise((resolve,reject)=>{
+		return new Promise((resolve,reject) => {
 			require("request")(url).pipe(this.fsn.createWriteStream(filename)).on("close", resolve);
 		});
 	}
@@ -398,18 +399,18 @@ class FurryBot extends Discord.Client {
 	}
 
 	async shortenUrl (url) {
-		this.r.tableList().then((list)=>{
+		this.mdb.listCollections().toArray().then(res => res.map(c => c.name)).then((list) => {
 			if(!list.includes("shorturl")) {
-				this.r.tableCreate("shorturl");
+				this.mdb.createCollection("shorturl");
 				console.log("[ShortURL]: Created Short URL table");
 			}
 		});
-		const create = (async(url)=>{
+		const create = (async(url) => {
 			const rand = await this.random(this.config.shortLength),
 				createdTimestamp = Date.now(),
 				created = new Date().toISOString(),
-				count = await this.r.table("shorturl").count(),
-				a = await this.r.table("shorturl").insert({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:url.length,link:`https://furry.services/r/${rand}`});
+				count = await this.mdb.collection("shorturl").stats().then(res => res.count),
+				a = await this.mdb.collection("shorturl").insertOne({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:url.length,link:`https://furry.services/r/${rand}`});
 			if(a.errors === 1) {
 				return create(url);
 			} else {
@@ -417,7 +418,7 @@ class FurryBot extends Discord.Client {
 			}
 		});
 
-		let res = await this.r.table("shorturl").filter({url});
+		let res = await this.mdb.collection("shorturl").find({url});
 		
 		switch(res.length) {
 		case 0:
@@ -434,8 +435,8 @@ class FurryBot extends Discord.Client {
 		default:
 			// delete & recreate
 			console.log("[ShortURL]: Duplicate records found, deleting");
-			this.r.table("shorturl").filter({url}).forEach((short)=>{
-				return this.r.table("shorturl").get(short("id")).delete();
+			this.mdb.collection("shorturl").filter({url}).forEach((short) => {
+				return this.mdb.collection("shorturl").deleteOne({id: short.id});
 			});
 			return create(url);
 		}
@@ -444,13 +445,11 @@ class FurryBot extends Discord.Client {
 	async deleteAll (table,database = "furrybot") {
 		if(["rethinkdb"].includes(database)) throw new Error("{code:2,error:'ERR_ILLEGAL_DB',description:'illegal database'}");
 		if(["guilds","users"].includes(table)) throw new Error("{code:1,error:'ERR_ILLEGAL_TABLE',description:'illegal database'}");
-		var dbList = await this.r.dbList();
+		var dbList = await this.mdb.admin().listDatabases().then(res => res.databases.map(d => d.name));
 		if(!dbList.includes(database)) throw new Error("{code:3,error:\"ERR_INVALID_DB\",description:\"invalid database\"}");
-		var tableList = await this.r.db(database).tableList();
+		var tableList = await this.mongo.db(database).listCollections().then(res => res.map(c => c.name));
 		if(!tableList.includes(table)) throw new Error("{code:4,error:\"ERR_INVALID_TABLE\",description:\"invalid table\"}");
-		return this.r.db(database).table(table).delete();/*.forEach((entry)=>{
-			return this.r.db(database).table(table).get(entry("id")).delete();
-		});*/
+		return this.mongo.db(database).collection(table).remove({});
 	}
 
 	get clearTable() {return this.deleteAll;}
@@ -473,7 +472,7 @@ class FurryBot extends Discord.Client {
 	}
 
 	async songSearch (strSearch,platform="youtube") {
-		return new Promise(async(resolve,reject)=>{
+		return new Promise(async(resolve,reject) => {
 			if(!strSearch) reject(new Error("Missing parameters"));
 			switch(platform) {
 			case "youtube":
@@ -493,18 +492,18 @@ class FurryBot extends Discord.Client {
 	}
 
 	async joinChannel(channel) {
-		if(this.voiceConnections.filter(g=>g.channel.guild.id===channel.guild.id).size < 1) {
+		if(this.voiceConnections.filter(g => g.channel.guild.id === channel.guild.id).size < 1) {
 			return channel.join().catch((err) => {
 				return err;
 			}).then(async(ch) => {
 				return ch;
 			});
 		} else {
-			return this.voiceConnections.filter(g=>g.channel.guild.id===channel.guild.id).first();
+			return this.voiceConnections.filter(g => g.channel.guild.id === channel.guild.id).first();
 		}
 	}
 
-	//client.voiceConnections.filter(g=>g.channel.guild.id===message.guild.id).first().dispatcher.streamTime
+	//client.voiceConnections.filter(g => g.channel.guild.id===message.guild.id).first().dispatcher.streamTime
 
 	async playSong (channel,song,platform="youtube") {
 		if(!channel || !(channel instanceof this.Discord.VoiceChannel)) return new Error("Missing/invalid channel");
@@ -516,21 +515,21 @@ class FurryBot extends Discord.Client {
 		case "youtube":
 			//try {
 			player = ch.play(this.ytdl(song.uri, { quality: "highestaudio" }));
-			await this.r.table("guilds").get(channel.guild.id).update({
-				music: {
-					playing: true
+			await this.mdb.collection("guilds").findOneAndUpdate({id: channel.guild.id},{
+				$set: {
+					"music.playing": true
 				}
 			});
-			player.once("finish",async()=>{
+			player.once("finish",async() => {
 				console.log("finished");
-				queue = await this.r.table("guilds").get(channel.guild.id)("music")("queue");
+				queue = await this.mdb.collection("guilds").findOne({id: channel.guild.id}).then(res => res.music.queue);
 				queue.shift();
 				if(queue.length >= 1) {
 					this.playSong(channel,queue[0]);
-					await this.r.table("guilds").get(channel.guild.id).update({
-						music: {
-							queue,
-							playing: true
+					await this.mdb.collection("guilds").findOneAndUpdate({id: channel.guild.id},{
+						$set: {
+							"music.queue": queue,
+							"music.playing": true
 						}
 					});
 					user = this.users.has(queue[0].addedBy) ? this.users.get(queue[0].addedBy) : await this.users.fetch(queue[0].addedBy);
@@ -545,7 +544,7 @@ class FurryBot extends Discord.Client {
 						}
 					};
 					embed = new this.Discord.MessageEmbed(data);
-					a = await this.r.table("guilds").get(channel.guild.id);
+					a = await this.mdb.collection("guilds").findOne({id: channel.guild.id});
 					if(a.music.textChannel !== null) {
 						chn = this.channels.get(a.music.textChannel);
 						if(!chn || !(chn instanceof this.Discord.TextChannel)) chn = null;
@@ -554,9 +553,9 @@ class FurryBot extends Discord.Client {
 						chn.send(embed);
 					}
 				} else {
-					await this.r.table("guilds").get(channel.guild.id).update({
-						music: {
-							playing: false
+					await this.mdb.collection("guilds").findOneAndUpdate({id: channel.guild.id},{
+						$set: {
+							"music.playing": false
 						}
 					});
 					data = {
@@ -566,7 +565,7 @@ class FurryBot extends Discord.Client {
 						"timestamp": new Date().toISOString()
 					};
 					embed = new this.Discord.MessageEmbed(data);
-					a = await this.r.table("guilds").get(channel.guild.id);
+					a = await this.mdb.collection("guilds").findOne({id: channel.guild.id});
 					if(a.music.textChannel !== null) {
 						chn = this.channels.get(a.music.textChannel);
 						if(!chn || !(chn instanceof this.Discord.TextChannel)) chn = null;
@@ -574,9 +573,9 @@ class FurryBot extends Discord.Client {
 					if(chn !== null && chn instanceof this.Discord.TextChannel) {
 						chn.send(embed);
 					}
-					await client.r.table("guilds").get(channel.guild.id).update({
-						music: {
-							queue: []
+					await client.mdb.collection("guilds").findOneAndUpdate({id: channel.guild.id},{
+						$set: {
+							"music.queue": []
 						}
 					});
 					channel.leave();
@@ -597,7 +596,7 @@ class FurryBot extends Discord.Client {
 	}
 
 	async songMenu (pageNumber,pageCount,songs,msg,ma,mb) {
-		return new Promise(async(resolve,reject)=>{
+		return new Promise(async(resolve,reject) => {
 			if(!pageNumber || !pageCount || !songs || !msg) reject(new Error("missing parameters."));
 			let mid, res, resultCount, s, song;
 			if(typeof ma !== "undefined" && typeof mb !== "undefined") {
@@ -703,19 +702,19 @@ class FurryBot extends Discord.Client {
 	
 	getCategory(category) {
 		if(!category) return false;
-		let a = this.commands.filter(c=>c.commands.map(cc=>cc.triggers).reduce((a,b)=>a.concat(b)).includes(category));
+		let a = this.commands.filter(c => c.commands.map(cc => cc.triggers).reduce((a,b) => a.concat(b)).includes(category));
 		return a.length === 0 ? false : a[0];
 	}
 
 	getCommand(command) {
 		if(!command) return false;
-		let a = this.commands.map(c=>c.commands).reduce((a,b)=>a.concat(b)).filter(cc=>cc.triggers.includes(command));
+		let a = this.commands.map(c => c.commands).reduce((a,b) => a.concat(b)).filter(cc => cc.triggers.includes(command));
 		return a.length === 0 ? false : a[0];
 	}
 
 	getResponse(response) {
 		if(!response) return false;
-		let a = this.responses.filter(r=>r.triggers.includes(response));
+		let a = this.responses.filter(r => r.triggers.includes(response));
 		return a.length === 0 ? false : a[0];
 	}
 
@@ -762,11 +761,11 @@ process.on("SIGINT", async () => {
 	} else {
 		if(!client.logger) {
 			console.debug("Started termination via CTRL+C");
-			client.voiceConnections.forEach((v)=>v.disconnect());
+			client.voiceConnections.forEach((v) => v.disconnect());
 			console.debug("Terminated all voice connections");
 		} else {
 			client.logger.debug("Started termination via CTRL+C");
-			client.voiceConnections.forEach((v)=>v.disconnect());
+			client.voiceConnections.forEach((v) => v.disconnect());
 			client.logger.debug("Terminated all voice connections");
 		}
 		client.destroy();

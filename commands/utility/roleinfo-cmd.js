@@ -85,8 +85,8 @@ module.exports = {
 			return message.channel.send(embed);
 		} else if (role instanceof message.client.Discord.Role) {
 			// single role info
-			allow = Object.keys(message.client._.pickBy(role.permissions.serialize(),((val,key) =>{return val;}))),
-			deny = Object.keys(message.client._.pickBy(role.permissions.serialize(),((val,key) =>{return !val;}))),
+			allow = Object.keys(message.client._.pickBy(role.permissions.serialize(),((val,key)  => {return val;}))),
+			deny = Object.keys(message.client._.pickBy(role.permissions.serialize(),((val,key)  => {return !val;}))),
 			data = {
 				title: `**${role.name}**`,
 				fields: [

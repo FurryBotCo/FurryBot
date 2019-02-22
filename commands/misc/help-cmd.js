@@ -42,14 +42,14 @@ module.exports = {
 			embed = new message.client.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		} else if (message.client.categories.includes(message.args[0])) {
-			category = message.client.commands.filter(n=>n.name.toLowerCase()===message.args[0].toLowerCase())[0];
+			category = message.client.commands.filter(n => n.name.toLowerCase()===message.args[0].toLowerCase())[0];
 
 			data = {
 				title: "Category Info",
 				description: `\
 				Name: ${category.name}\
 				Description: ${category.description}\
-				Commands: ${category.commands.map(c=>c.triggers[0]).join(", ")}`
+				Commands: ${category.commands.map(c => c.triggers[0]).join(", ")}`
 			};
 			if(message.user.isDeveloper) data.description+=`\nPath (dev): **${category.path}**`;
 

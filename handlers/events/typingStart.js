@@ -12,7 +12,7 @@ module.exports = (async function(channel,user) {
 			}
 		}
 	});
-	setTimeout((ch)=>{
+	setTimeout((ch) => {
 		if(ch.typing) {
 			this.analytics.track({
 				userId: "CLIENT",

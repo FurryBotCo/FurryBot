@@ -16,37 +16,29 @@ module.exports = (async function() {
 			}
 		}
 	});
-	const rotatingStatus = (async()=>{
-		this.user.setActivity("🐾 Debugging! 🐾",{type: "PLAYING"}).then(()=>{
-			setTimeout(()=>{
-				this.user.setActivity(`🐾 ${this.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"}).then(()=>{
-					setTimeout(()=>{
-						this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.guilds.size} guilds! 🐾`,{type: "PLAYING"}).then(()=>{
-							setTimeout(()=>{
-								this.user.setActivity(`🐾 ${this.config.defaultPrefix}help with ${this.users.size} users! 🐾`,{type: "WATCHING"}).then(()=>{
-									setTimeout(()=>{
-										this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.channels.size} channels! 🐾`,{type: "LISTENING"}).then(()=>{
-											setTimeout(()=>{
-												this.user.setActivity(`🐾 ${this.config.defaultPrefix}help with ${this.options.shardCount} shard${this.options.shardCount>1?"s":""}! 🐾`,{type: "PLAYING"});
-											},15e3);
-										});
-									},15e3);
-								});
-							},15e3);
-						});
-					},15e3);
-				});
-			},15e3);
-		});
-	});
 
-	rotatingStatus();
-	setInterval(rotatingStatus,75e3);
+	const statuses = [
+			{status: `🐾 ${this.config.defaultPrefix}help for help! 🐾`, type: "PLAYING"},
+			{status: `🐾 ${this.config.defaultPrefix}help in ${this.guilds.size} guilds! 🐾`, type: "PLAYING"},
+			{status: `🐾 ${this.config.defaultPrefix}help with ${this.users.size} users! 🐾`, type: "WATCHING"},
+			{status: `🐾 ${this.config.defaultPrefix}help in ${this.channels.size} channels! 🐾`, type: "LISTENING"},
+			{status: `🐾 ${this.config.defaultPrefix}help with ${this.options.shardCount} shard${this.options.shardCount>1?"s":""}! 🐾`, type: "PLAYING"}
+		],
+		rotateStatus = (() => {
+			for(let i = 0;i<statuses.length;i++) {
+				//setTimeout(this.user.setActivity,i * 15e3, statuses[i].status,{type: statuses[i].type});
+				setTimeout(() => this.user.setActivity(statuses[i].status,{type: statuses[i].type}), i * 15e3);
+			}
+		});
+
+	rotateStatus();
+	setInterval(rotateStatus,(statuses.length -1) * 15e3);
+
 	this.logger.log(`ready with ${this.options.shardCount} shard${this.options.shardCount>1?"s":""}!`);
 
-	this.setInterval(()=>{
-		this.voiceConnections.forEach((vc)=>{
-			if(vc.channel.members.filter(m=>m.id!==this.user.id).size === 0) {
+	this.setInterval(() => {
+		this.voiceConnections.forEach((vc) => {
+			if(vc.channel.members.filter(m => m.id!==this.user.id).size === 0) {
 				vc.channel.leave();
 				this.logger.log(`Left voice channel ${vc.channel.name} (${vc.channel.id}) due to inactivity.`);
 			}
@@ -74,8 +66,8 @@ module.exports = (async function() {
 	}
 
 	// if ever needed, auto leave voice channels
-	/*setInterval(async()=>{
-        this.voiceConnections.filter(v=>!v.speaking.has("SPEAKING")).forEach(async(v)=>{
+	/*setInterval(async() => {
+        this.voiceConnections.filter(v => !v.speaking.has("SPEAKING")).forEach(async(v) => {
             v.channel.leave();
             var data = {
                 "title": "Left Voice Channel",
@@ -84,30 +76,32 @@ module.exports = (async function() {
                 "timestamp": new Date().toISOString()
             }
             var embed = new this.Discord.MessageEmbed(data);
-            var a = await this.r.table("guilds").get(v.channel.guild.id);
+            var a = await this.db.collection("guilds").findOne({id: v.channel.guild.id});
             if(a.music.textChannel !== null) {
                 var chn = this.channels.get(a.music.textChannel);
                 if(!chn || !(chn instanceof this.Discord.TextChannel)) var chn = null;
             }
             if(chn !== null && chn instanceof this.Discord.TextChannel) {
                 chn.send(embed);
-                await this.r.table("guilds").get(v.channel.guild.id).update({
-                    music: {
-                        queue: [],
-                        playing: false,
-                        textChannel: null
-                    }
-                })
+                await this.db.collection("guilds").findOneAndUpdate({id: v.channel.guild.id},{
+                    $set: {
+						music: {
+							queue: [],
+							playing: false,
+							textChannel: null
+						}
+					}
+                });
             }
         })
     },3e5);*/
 
-	setInterval(async()=>{
+	setInterval(async() => {
 		if(["00:00:00"].includes(this.getDateTime())) {
 			let date, data, embed, d, count;
 			date = new Date(),
 			d = `${date.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${date.getMonth()+1}`}-${(date.getDate()-1).toString().length > 1 ? date.getDate() -1: `0${date.getDate()-1}`}-${date.getFullYear()}`,
-			count = (await this.r.table("dailyjoins").get(d)("count"))||0;
+			count = await this.db.collection("dailyjoins").findOne({id: d}).then(res => res.count) || 0;
 			data = {
 				author: {
 					name: "Donovan_DMC#1337",
@@ -125,16 +119,25 @@ module.exports = (async function() {
 				}
 			};
 			embed = new this.Discord.MessageEmbed(data);
-			this.channels.get(this.config.bot.channels.daily).send(embed).then(n=>{
+			this.channels.get(this.config.bot.channels.daily).send(embed).then(n => {
 				this.logger.log(`Posted daily stats, ${d}: ${count}, total: ${this.guilds.size}`);
 			}).catch(this.logger.error);
 		}
 	},1e3);
 
 	setInterval(() => {
+		if(!this.fs.existsSync(`${this.config.rootDir}/tmp`)) {
+			this.fs.mkdirSync(`${this.config.rootDir}/tmp`);
+			this.fs.writeFileSync(`${this.config.rootDir}/tmp/placeholder`,"");
+			this.logger.debug("Made temporary folder, and added placeholder file");
+		}
+		if(!this.fs.existsSync(`${this.config.rootDir}/tmp/placeholder`)) {
+			this.fs.writeFileSync(`${this.config.rootDir}/tmp/placeholder`,"");
+			this.logger.debug("Recreated placeholder file in temporary directory");
+		}
 		this.fs.readdir(`${this.config.rootDir}/tmp`, (err, files) => {
-			if (err) throw err;
-			for (const file of files) {
+			if (err) this.logger.error(err);
+			for (let file of files) {
 				if(file === "placeholder") continue;
 				this.fs.unlink(this.path.join(`${this.config.rootDir}/tmp`, file), err => {
 					if (err) throw err;

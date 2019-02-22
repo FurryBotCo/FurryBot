@@ -14,7 +14,7 @@ module.exports = (async function(guild,user) {
 	});
 	let ev, gConfig, logch, data, embed, log;
 	ev = "memberbanned";
-	gConfig = await this.db.getGuild(guild.id).catch(error=>this.config.default.guildConfig);
+	gConfig = await this.db.getGuild(guild.id).catch(error => this.config.default.guildConfig);
 	if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
 	logch = guild.channels.get(gConfig.logging[ev].channel);
 	if(!logch) return this.db.updateGuild(guild.id,{logging:{[ev]:{enabled:false,channel:null}}});

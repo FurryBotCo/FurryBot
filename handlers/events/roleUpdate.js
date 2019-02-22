@@ -14,7 +14,7 @@ module.exports = (async function(oldRole,newRole) {
 	});
 	let ev, gConfig, logch, log, data, embed, base, log_data/*, belowo, belown, aboveo, aboven*/;
 	ev = "roleupdated";
-	gConfig = await this.db.getGuild(newRole.guild.id).catch(error=>this.config.default.guildConfig);
+	gConfig = await this.db.getGuild(newRole.guild.id).catch(error => this.config.default.guildConfig);
 	if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
 	logch = newRole.guild.channels.get(gConfig.logging[ev].channel);
 	if(!logch) return this.db.updateGuild(newRole.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
@@ -73,7 +73,7 @@ module.exports = (async function(oldRole,newRole) {
 
 	// permission overwrites
 	try {
-		if((!([undefined,null,""].includes(oldRole.permissions) || oldRole.permissions.length === 0) && !([undefined,null,""].includes(newRole.permissions) || newRole.permissions.length === 0)) && !this._.isEqual(oldRole.permissions.map(j=>({allow:j.allow,deny:j.deny})),newRole.permissions.map(j=>({allow:j.allow,deny:j.deny})))) {
+		if((!([undefined,null,""].includes(oldRole.permissions) || oldRole.permissions.length === 0) && !([undefined,null,""].includes(newRole.permissions) || newRole.permissions.length === 0)) && !this._.isEqual(oldRole.permissions.map(j => ({allow:j.allow,deny:j.deny})),newRole.permissions.map(j => ({allow:j.allow,deny:j.deny})))) {
 			data = Object.assign({},base);
 			data.fields = [{
 				name: "Permissions Update",
@@ -131,10 +131,10 @@ module.exports = (async function(oldRole,newRole) {
 	}
 
 	/*if(oldRole.rawPosition !== newRole.rawPosition) {
-        belowo = newRole.guild.roles.find(r=>r.rawPosition === oldRole.rawPosition - 1);
-        belown = newRole.guild.roles.find(r=>r.rawPosition === newRole.rawPosition - 1);
-        aboveo = newRole.guild.roles.find(r=>r.rawPosition === oldRole.rawPosition + 1);
-        aboven = newRole.guild.roles.find(r=>r.rawPosition === newRole.rawPosition + 1);
+        belowo = newRole.guild.roles.find(r => r.rawPosition === oldRole.rawPosition - 1);
+        belown = newRole.guild.roles.find(r => r.rawPosition === newRole.rawPosition - 1);
+        aboveo = newRole.guild.roles.find(r => r.rawPosition === oldRole.rawPosition + 1);
+        aboven = newRole.guild.roles.find(r => r.rawPosition === newRole.rawPosition + 1);
         data = Object.assign({},base);
         data.fields = [{
             name: "Position",

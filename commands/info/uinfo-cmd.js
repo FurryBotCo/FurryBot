@@ -79,13 +79,13 @@ module.exports = {
 			});
 			try {
 				rs = JSON.parse(req.body);
-				list = Object.keys(message.client._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list=>({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
+				list = Object.keys(message.client._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			}catch(e){
 				message.client.logger.error(e);
 				rs = req.body;
 				list = "Lookup Failed.";
 			}
-			list = typeof list === "object" ? list.map(ls=>`[${ls.name}](${ls.url})`).join("\n") : list;
+			list = typeof list === "object" ? list.map(ls => `[${ls.name}](${ls.url})`).join("\n") : list;
 			data.fields.push({
 				name: "Blacklist",
 				value: "Bots cannot be blacklisted.",

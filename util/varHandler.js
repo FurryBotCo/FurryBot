@@ -1,4 +1,4 @@
-module.exports = ((input="",rplc={},ext={})=>{
+module.exports = ((input="",rplc={},ext={}) => {
 	if(!input) input = "";
 	var after = input;
 	if(rplc !== undefined) {
@@ -35,10 +35,10 @@ module.exports = ((input="",rplc={},ext={})=>{
 			if(input.indexOf("{server.id}") !== -1) after = after.replace(/{server.id}/g,rplc.guild.id);
 			if(input.indexOf("{server.memberCount}") !== -1) after = after.replace(/{server.memberCount}/g,rplc.guild.memberCount);
 			if(rplc.guild.members !== undefined) {
-				if(input.indexOf("{server.onlineCount}") !== -1) after = after.replace(/{server.onlineCount}/g,rplc.guild.members.filter(m=>m.user.presence.status==="online").size);
-				if(input.indexOf("{server.idleCount}") !== -1) after = after.replace(/{server.offlineCount}/g,rplc.guild.members.filter(m=>m.user.presence.status==="idle").size);
-				if(input.indexOf("{server.dndCount}") !== -1) after = after.replace(/{server.dndCount}/g,rplc.guild.members.filter(m=>m.user.presence.status==="dnd").size);
-				if(input.indexOf("{server.offlineCount}") !== -1) after = after.replace(/{server.offlineCount}/g,rplc.guild.members.filter(m=>m.user.presence.status==="offline").size);
+				if(input.indexOf("{server.onlineCount}") !== -1) after = after.replace(/{server.onlineCount}/g,rplc.guild.members.filter(m => m.user.presence.status==="online").size);
+				if(input.indexOf("{server.idleCount}") !== -1) after = after.replace(/{server.offlineCount}/g,rplc.guild.members.filter(m => m.user.presence.status==="idle").size);
+				if(input.indexOf("{server.dndCount}") !== -1) after = after.replace(/{server.dndCount}/g,rplc.guild.members.filter(m => m.user.presence.status==="dnd").size);
+				if(input.indexOf("{server.offlineCount}") !== -1) after = after.replace(/{server.offlineCount}/g,rplc.guild.members.filter(m => m.user.presence.status==="offline").size);
 			}
 		}
 		if(typeof ext.noMention !== "undefined" && ext.noMention === true) {

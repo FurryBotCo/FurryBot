@@ -20,7 +20,7 @@ module.exports = {
 			imgurl = user instanceof message.client.Discord.User ? user.displayAvatarURL({format:"png"}) : message.unparsedArgs.join("%20");
 		} else if (message.attachments.first()) {
 			imgurl = message.attachments.first().url;
-		} else if((m = message.channel.messages.filter(m=>m.attachments.size>=1)) && m.size >= 1) {
+		} else if((m = message.channel.messages.filter(m => m.attachments.size>=1)) && m.size >= 1) {
 			imgurl = m.last().attachments.first().url;
 		} else {
 			imgurl = message.author.displayAvatarURL({format:"png"});

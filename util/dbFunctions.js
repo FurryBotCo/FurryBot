@@ -31,7 +31,7 @@ class FurryBotDatabase {
 			});
 			return new Error("ERR_INVALID_GUILD");
 		}
-		a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid);
+		a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		if(a !== null) return this.getGuild(gid);
 		this.logger.info(`[createGuild]: Added guild "${gid}"`);
 		this.analytics.track({
@@ -46,17 +46,17 @@ class FurryBotDatabase {
 					server: this.client.os.hostname()
 				},
 				disableCheck,
-				totalEntries: await this.client.r.table("guilds").count()
+				totalEntries: await this.client.mdb.collection("guilds").stats().then(res => res.count)
 			}
 		});
-		await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).insert(Object.assign({id:gid},this.config.default.guildConfig));
+		await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).insertOne(Object.assign({id:gid},this.config.default.guildConfig));
 		return this.getGuild(gid);
 	}
 
 	async getGuild(gid) {
 		if(!gid) return new TypeError("ERR_MISSING_PARAM");
 		gid = gid.toString();
-		let a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid);
+		let a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		if(!a) return this.createGuild(gid);
 		this.analytics.track({
 			userId: "DB",
@@ -69,7 +69,7 @@ class FurryBotDatabase {
 					alpha: this.config.alpha,
 					server: this.client.os.hostname()
 				},
-				totalEntries: await this.client.r.table("guilds").count()
+				totalEntries: await this.client.mdb.collection("guilds").stats().then(res => res.count)
 			}
 		});
 		return a.id === gid ? a : new Error("ERR_INVALID_GUILD_RETURN");
@@ -79,7 +79,7 @@ class FurryBotDatabase {
 		if(!gid) return new TypeError("ERR_MISSING_PARAM");
 		gid = gid.toString();
 		let a, b;
-		a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid);
+		a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		if(!a) {
 			this.logger.info(`[deleteGuild]: Attempted to delete a non-existent guild entry "${gid}"`);
 			this.analytics.track({
@@ -94,13 +94,13 @@ class FurryBotDatabase {
 						server: this.client.os.hostname()
 					},
 					error: "ERR_NONEXISTENT_ENTRY",
-					totalEntries: await this.client.r.table("guilds").count()
+					totalEntries: await this.client.mdb.collection("guilds").stats().then(res => res.count)
 				}
 			});
 			return false;
 		} 
-		b = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid).delete();
-		if(typeof b.deleted !== "undefined" && b.deleted > 0) {
+		b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).deleteOne({id: gid});
+		if(typeof b.deletedCount !== "undefined" && b.deletedCount > 0) {
 			this.logger.info(`[deleteGuild]: Deleted entry for guild "${gid}"`);
 			this.analytics.track({
 				userId: "DB",
@@ -113,7 +113,7 @@ class FurryBotDatabase {
 						alpha: this.config.alpha,
 						server: this.client.os.hostname()
 					},
-					totalEntries: await this.client.r.table("guilds").count()
+					totalEntries: await this.client.mdb.collection("guilds").stats().then(res => res.count)
 				}
 			});
 			return true;
@@ -130,7 +130,7 @@ class FurryBotDatabase {
 						server: this.client.os.hostname()
 					},
 					error: "ERR_UNKNOWN",
-					totalEntries: await this.client.r.table("guilds").count()
+					totalEntries: await this.client.mdb.collection("guilds").stats().then(res => res.count)
 				}
 			});
 			return new Error("ERR_DEL_GUILD_UNKNOWN");
@@ -141,10 +141,10 @@ class FurryBotDatabase {
 		if(!gid || !fields) return new TypeError("ERR_MISSING_PARAM");
 		gid = gid.toString();
 		let a;
-		a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid);
+		a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		if(!a) {
 			await this.createGuild(gid);
-			a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid);
+			a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		}
 		this.analytics.track({
 			userId: "DB",
@@ -158,16 +158,16 @@ class FurryBotDatabase {
 					alpha: this.config.alpha,
 					server: this.client.os.hostname()
 				},
-				totalEntries: await this.client.r.table("guilds").count()
+				totalEntries: await this.client.mdb.collection("guilds").stats().then(res => res.count)
 			}
 		});
-		await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid).update(fields);
+		await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOneAndUpdate({id: gid},{$set: fields});
 		return this.getGuild(gid);
 	}
 
 	async resetGuild(gid,bypassChecks) {
 		gid = gid.toString();
-		let a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid);
+		let a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		if(!a) return false;
 		await this.deleteGuild(gid);
 		await this.createGuild(gid,bypassChecks);
@@ -191,17 +191,17 @@ class FurryBotDatabase {
 	async sweepGuilds(del=false) {
 		let g = [],
 			g2 = [];
-		this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).then(j => j.map(g=>g.id)).then((a) => {
-			a.forEach((b)=>{
+		this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).then(j => j.map(g => g.id)).then((a) => {
+			a.forEach((b) => {
 				if(b.match(".{17,18}")) g.push(b);
 			});
 		});
-		g.forEach((guild)=>{
+		g.forEach((guild) => {
 			if(!this.client.guilds.includes(guild)) {
 				g2.push(guild);
 				this.logger.warn(`Found guild "${guild}" in "guilds" table, which the bot is not in`);
-				if(del) this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(guild).delete().then((r)=>{
-					if(r.deleted !== 1) this.logger.error(`[sweepGuilds]: Failed deleting guild "${guild}"`);
+				if(del) this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).deleteOne({id: guild}).then((r) => {
+					if(r.deletedCount !== 1) this.logger.error(`[sweepGuilds]: Failed deleting guild "${guild}"`);
 					this.logger.info(`[sweepGuilds]: deleted guild "${guild}"`);
 				});
 			}
@@ -294,11 +294,11 @@ class FurryBotDatabase {
 				return new Error("ERR_INVALID_USER");
 			}
 		}
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid))) await this.createGuild(gid);
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid))) await this.createUser(uid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid}))) await this.createGuild(gid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
 		wid = (await this.getUserWarnings(uid,gid)).length+1;
 		if(isNaN(wid)) wid = 1;
-		await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid).update({warnings:this.client.r.row("warnings").append({wid,blame,reason,timestamp:Date.now(),gid})});
+		await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOneAndUpdate({id: uid},{$push: {warnings: {wid,blame,reason,timestamp:Date.now(),gid}}});
 		this.analytics.track({
 			userId: "DB",
 			event: "db.createUserWarning",
@@ -324,11 +324,11 @@ class FurryBotDatabase {
 		uid = uid.toString(),
 		gid = gid.toString();
 		let b;
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid))) await this.createUser(uid);
-		b = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
+		b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid});
 		if(!b) {
 			await this.createUser(uid);
-			b = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid);
+			b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid});
 		}
 		this.analytics.track({
 			userId: "DB",
@@ -344,7 +344,7 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return b.warnings.sort((s,g)=>s.id < g.id ? -1 : s.id > g.id ? 1 : 0);
+		return b.warnings.sort((s,g) => s.id < g.id ? -1 : s.id > g.id ? 1 : 0);
 	}
 	
 	async getUserWarning(uid,gid,wid) {
@@ -353,10 +353,10 @@ class FurryBotDatabase {
 		gid = gid.toString(),
 		wid = parseInt(wid,10);
 		let b;
-		b = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid);
+		b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid});
 		if(!b) {
 			await this.createUser(uid);
-			b = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid);
+			b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).find({id: uid});
 		}
 		this.analytics.track({
 			userId: "DB",
@@ -373,7 +373,7 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return b.warnings.filter(w=>w.wid===wid&&w.gid===gid)[0]||false;
+		return b.warnings.filter(w => w.wid === wid && w.gid === gid)[0]||false;
 	}
 
 	async deleteUserWarning(uid,gid,wid) {
@@ -381,8 +381,8 @@ class FurryBotDatabase {
 		uid = uid.toString(),
 		gid = gid.toString(),
 		wid = parseInt(wid,10);
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid))) await this.createGuild(gid);
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid))) await this.createUser(uid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid}))) await this.createGuild(gid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
 		this.analytics.track({
 			userId: "DB",
 			event: "db.deleteUserWarning",
@@ -398,29 +398,21 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid).update((u)=>{
-			return {"warnings": u("warnings").filter((item)=>this.client.r.and(item("wid").eq(wid),item("gid").eq(gid)).not())};
-		})).replaced>=1;
+		return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOneAndUpdate({id: uid},{$pull: {warnings: {wid,gid}}}).then(res => res.ok);
 	}
 
 	async clearUserWarnings(uid,gid) {
 		if(!uid || !gid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString(),
 		gid = gid.toString();
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(gid))) await this.createGuild(gid);
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid))) await this.createUser(uid);
-		let j = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid).update((row)=>{
-			return {
-				warnings: row("warnings").filter((item)=>item("gid").ne(gid))
-			};
-		});
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid}))) await this.createGuild(gid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
 		this.analytics.track({
 			userId: "DB",
 			event: "db.clearUserWarnings",
 			properties: {
 				guildId: gid,
 				userId: uid,
-				count: j.replaced,
 				bot: {
 					version: this.config.bot.version,
 					beta: this.config.beta,
@@ -429,7 +421,7 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return j.replaced >= 1;
+		return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOneAndUpdate({id: uid},{$pull: {warnings: {gid}}}).then(res => res.ok);
 	}
 
 	async addDonator(uid,level) {
@@ -441,7 +433,7 @@ class FurryBotDatabase {
 		// 1 = $2-$3
 		// 2 = $5
 		// 3 = $10
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid))) await this.createUser(uid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
 		this.analytics.track({
 			userId: "DB",
 			event: "db.addDonator",
@@ -456,7 +448,7 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid).update({donator:true,level})).replaced >= 1;
+		return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOneAndUpdate({id: uid},{$set: {donator:true,level}}).then(res => res.ok);
 	}
 
 	async updateDonator(uid,level) {
@@ -468,7 +460,7 @@ class FurryBotDatabase {
 		// 1 = $2-$3
 		// 2 = $5
 		// 3 = $10
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid))) await this.createUser(uid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
 		this.analytics.track({
 			userId: "DB",
 			event: "db.updateDonator",
@@ -483,13 +475,13 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid).update({donator:true,level})).replaced >= 1;
+		return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOneAndUpdate({id: uid},{$set: {donator:true,level}}).then(res => res.ok);
 	}
 
 	async removeDonator(uid) {
 		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid))) await this.createUser(uid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
 		this.analytics.track({
 			userId: "DB",
 			event: "db.removeDonator",
@@ -503,13 +495,13 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid).update({donator:false,level:0})).replaced >= 1;
+		return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOneAndUpdate({id: uid},{$set: {donator:false,level:0}}).then(res => res.ok);
 	}
 
 	async isDonator(uid) {
 		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		let b = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid);
+		let b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid});
 		this.analytics.track({
 			userId: "DB",
 			event: "db.isDonator",
@@ -535,8 +527,8 @@ class FurryBotDatabase {
 		if(!id || !type || !reason) return new TypeError("ERR_MISSING_PARAM");
 		if(!["guild","user"].includes(type)) return new Error("ERR_INVALID_TYPE");
 		id = id.toString();
-		var table = ["guild"].includes(type) ? this.config.db.tables.guilds : this.config.db.tables.users,
-			c = await this.client.r.db(this.config.db.main.db).table(table).get(id);
+		var table = ["guild"].includes(type) ? this.config.db.collections.guilds : this.config.db.collections.users,
+			c = await this.client.mongo.db(this.config.db.main.db).collection(table).findOne({id});
 		if(!c) await this[`create${this.client.ucwords(type)}`](id);
 		this.analytics.track({
 			userId: "DB",
@@ -553,15 +545,15 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return (await this.client.r.db(this.config.db.main.db).table(table).get(id).update({blacklisted:true,blacklistReason:reason})).replaced >= 1;
+		return this.client.mongo.db(this.config.db.main.db).collection(table).findOneAndUpdate({id},{$set: {blacklisted:true,blacklistReason:reason}}).then(res => res.ok);
 	}
 
 	async updateBlacklistEntry(id,type = "user",reason = "None Specified") {
 		if(!id || !type || !reason) return new TypeError("ERR_MISSING_PARAM");
 		if(!["guild","user"].includes(type)) return new Error("ERR_INVALID_TYPE");
 		id = id.toString();
-		let table = ["guild"].includes(type) ? this.config.db.tables.guilds : this.config.db.tables.users,
-			c = await this.client.r.db(this.config.db.main.db).table(table).get(id);
+		let table = ["guild"].includes(type) ? this.config.db.collections.guilds : this.config.db.collections.users,
+			c = await this.client.mongo.db(this.config.db.main.db).collection(table).findOne({id});
 		if(!c) await this[`create${this.client.ucwords(type)}`](id);
 		this.analytics.track({
 			userId: "DB",
@@ -578,15 +570,15 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return (await this.client.r.db(this.config.db.main.db).table(table).get(id).update({blacklisted:true,blacklistReason:reason})).replaced >= 1;
+		return this.client.mongo.db(this.config.db.main.db).collection(table).findOneAndUpdate({id},{$set: {blacklisted:true,blacklistReason:reason}}).then(res => res.ok);
 	}
 
 	async removeBlacklistEntry(id,type = "user") {
 		if(!id || !type) return new TypeError("ERR_MISSING_PARAM");
 		if(!["guild","user"].includes(type)) return new Error("ERR_INVALID_TYPE");
 		id = id.toString();
-		let table = ["guild"].includes(type) ? this.config.db.tables.guilds : this.config.db.tables.users,
-			c = await this.client.r.db(this.config.db.main.db).table(table).get(id);
+		let table = ["guild"].includes(type) ? this.config.db.collections.guilds : this.config.db.collections.users,
+			c = await this.client.mongo.db(this.config.db.main.db).collection(table).findOne({id});
 		if(!c) await this[`create${this.client.ucwords(type)}`](id);
 		this.analytics.track({
 			userId: "DB",
@@ -602,14 +594,14 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return (await this.client.r.db(this.config.db.main.db).table(table).get(id.replace(this.client.r.row.without("blacklisted","blacklistReason").merge({blacklisted:false})))).replaced >= 1;
+		return this.client.mongo.db(this.config.db.main.db).collection(table).findOneAndUpdate({id},{$set: {blacklisted: false},$unset: {blacklistReason: ""}}).then(res => res.ok);
 	}
 
 	async isBlacklisted(id) {
 		if(!id) return new TypeError("ERR_MISSING_PARAM");
 		id = id.toString();
-		let a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.guilds).get(id),
-			b = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(id);
+		let a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id}),
+			b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id});
 		this.analytics.track({
 			userId: "DB",
 			event: "db.isBlacklisted",
@@ -649,23 +641,23 @@ class FurryBotDatabase {
 			switch(type.toLowerCase()) {
 			case "fcount":
 			case "f":
-				return (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("fCount")).count;
+				return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "fCount"}).then(res => res.count);
 				break; // eslint-disable-line no-unreachable
 
 			case "commands":
-				return this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("commands");
+				return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "commands"});
 				break; // eslint-disable-line no-unreachable
 
 			case "general":
-				return this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("general");
+				return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "general"});
 				break; // eslint-disable-line no-unreachable
 
 			case "dailyjoins":
-				return await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily).then(res=>res.map(day=>({[day.id]:day.count}))).reduce((a,b)=>{a[Object.keys(b)[0]] = Object.values(b)[0];return a;},{});
+				return await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.daily).then(res => res.map(day => ({[day.id]:day.count}))).reduce((a,b) => {a[Object.keys(b)[0]] = Object.values(b)[0];return a;},{});
 				break; // eslint-disable-line no-unreachable
 					
 			case "messagecount":
-				return (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("messageCount")).count;
+				return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "messageCount"}).then(res => res.count);
 				break; // eslint-disable-line no-unreachable
 			}
 		} else {
@@ -683,19 +675,19 @@ class FurryBotDatabase {
 				}
 			});
 			return {
-				fCount: (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("fCount")).count,
-				commands: await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("commands"),
-				general: await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("general"),
-				dailyjoins: (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily)).map(day=>({[day.id]:day.count})),
-				messageCount: (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("messageCount")).count
+				fCount: await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "fCount"}).then(res => res.count),
+				commands: await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "commands"}),
+				general: await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "general"}),
+				dailyjoins: await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.daily).map(day => ({[day.id]:day.count})),
+				messageCount: await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "messageCount"}).then(res => res.count)
 			};
 		}
 	}
 
 	async incrementCommandStats(command,amount=1) {
 		if(!command) return new TypeError("ERR_MISSING_PARAM");
-		let a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("commands");
-		if(!a) a = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).insert({id:"commands"});
+		let a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "commands"});
+		if(!a) a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).insertOne({id:"commands"});
 		this.analytics.track({
 			userId: "DB",
 			event: "db.incrementCommandStats",
@@ -711,10 +703,10 @@ class FurryBotDatabase {
 			}
 		});
 		if(!a[command]) {
-			await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("commands").update({[command]:amount});
+			await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOneAndUpdate({id: "commands"},{$set:{ [command]:amount}});
 			return amount;
 		} else {
-			await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.stats).get("commands").update({[command]:+a[command]+amount});
+			await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOneAndUpdate({id: "commands"},{$set: {[command]:+a[command]+amount}});
 			return +a[command]+amount;
 		}
 	}
@@ -722,9 +714,9 @@ class FurryBotDatabase {
 	async updateDailyCount(negative = false, amount = 1) {
 		let d = new Date(),
 			date = `${d.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${d.getMonth()+1}`}-${d.getDate().toString().length > 1 ? d.getDate() : `0${d.getDate()}`}-${d.getFullYear()}`,
-			j = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily).get(date);
-		if(!j) j = await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily).insert({id:date,count:0}).then(s=>this.client.r.db(this.config.db.main.db).table("dailyjoins").get(date));
-		let res = negative ? await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily).get(date).update({count:+j.count-amount}) : await this.client.r.db(this.config.db.main.db).table("dailyjoins").get(date).update({count:+j.count+amount});
+			j = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.daily).findOne({id: date});
+		if(!j) j = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.daily).insertOne({id:date,count:0}).then(s => this.client.mongo.db(this.config.db.main.db).collection("dailyjoins").findOne({id: date}));
+		negative ? await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.daily).findOneAndUpdate({id: date},{$set: {count: +j.count-amount}}) : await this.client.mongo.db(this.config.db.main.db).collection("dailyjoins").findOneAndUpdate({id: date},{$set:{count:+j.count+amount}});
 		this.analytics.track({
 			userId: "DB",
 			event: "db.updateDailyCounts",
@@ -739,14 +731,14 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return (await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.daily).get(date)).count;
+		return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.daily).findOne({id: date}).then(res => res.count);
 	}
 
-	async createUser(uid,bypassChecks=false) {
+	async createUser(uid, bypassChecks = false) {
 		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		if(!bypassChecks) {
-			let u = true/*this.client.users.has(uid)*//*||this.client.users.fetch(uid).then(u=>true).catch(u=>false)*/;
+			let u = true/*this.client.users.has(uid)*//*||this.client.users.fetch(uid).then(u => true).catch(u => false)*/;
 			if(!u) {
 				this.logger.info(`[createUser]: Attempted to create an entry for a user that was not found "${uid}"`);
 				this.analytics.track({
@@ -779,8 +771,8 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		if((await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid)) !== null) return this.getUser(uid);
-		await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).insert(Object.assign({id:uid},this.config.default.userConfig));
+		if((await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid})) !== null) return this.getUser(uid);
+		await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).insertOne(Object.assign({id:uid},this.config.default.userConfig));
 		this.logger.info(`[createUser]: Added user "${uid}" with default configuration`);
 		return this.getUser(uid);
 	}
@@ -801,22 +793,22 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid))) return this.createUser(uid);
-		return this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid);
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) return this.createUser(uid);
+		return this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid});
 	}
 
 	async deleteUser(uid) {
 		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		if(!(await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid))) return false;
-		return (await this.client.r.db(this.config.db.main.db).table("users").get(uid).delete()).deleted>=1;
+		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) return false;
+		return this.client.mongo.db(this.config.db.main.db).collection("users").deleteOne({id: uid}).then(res => res.deletedCount >= 1);
 	}
 
 	async updateUser(uid,fields) {
 		if(!uid || !fields) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		if((await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid)) !== null) await this.createUser(uid);
-		await this.client.r.db(this.config.db.main.db).table(this.config.db.tables.users).get(uid).update(fields);
+		if((await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid})) !== null) await this.createUser(uid);
+		await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOneAndUpdate({id: uid},{$set: fields});
 		this.analytics.track({
 			userId: "DB",
 			event: "db.updateUser",
