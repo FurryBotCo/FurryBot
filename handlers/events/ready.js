@@ -16,32 +16,24 @@ module.exports = (async function() {
 			}
 		}
 	});
-	const rotatingStatus = (async() => {
-		this.user.setActivity("🐾 Debugging! 🐾",{type: "PLAYING"}).then(() => {
-			setTimeout(() => {
-				this.user.setActivity(`🐾 ${this.config.defaultPrefix}help for help! 🐾`,{type: "PLAYING"}).then(() => {
-					setTimeout(() => {
-						this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.guilds.size} guilds! 🐾`,{type: "PLAYING"}).then(() => {
-							setTimeout(() => {
-								this.user.setActivity(`🐾 ${this.config.defaultPrefix}help with ${this.users.size} users! 🐾`,{type: "WATCHING"}).then(() => {
-									setTimeout(() => {
-										this.user.setActivity(`🐾 ${this.config.defaultPrefix}help in ${this.channels.size} channels! 🐾`,{type: "LISTENING"}).then(() => {
-											setTimeout(() => {
-												this.user.setActivity(`🐾 ${this.config.defaultPrefix}help with ${this.options.shardCount} shard${this.options.shardCount>1?"s":""}! 🐾`,{type: "PLAYING"});
-											},15e3);
-										});
-									},15e3);
-								});
-							},15e3);
-						});
-					},15e3);
-				});
-			},15e3);
-		});
-	});
 
-	rotatingStatus();
-	setInterval(rotatingStatus,75e3);
+	const statuses = [
+			{status: `🐾 ${this.config.defaultPrefix}help for help! 🐾`, type: "PLAYING"},
+			{status: `🐾 ${this.config.defaultPrefix}help in ${this.guilds.size} guilds! 🐾`, type: "PLAYING"},
+			{status: `🐾 ${this.config.defaultPrefix}help with ${this.users.size} users! 🐾`, type: "WATCHING"},
+			{status: `🐾 ${this.config.defaultPrefix}help in ${this.channels.size} channels! 🐾`, type: "LISTENING"},
+			{status: `🐾 ${this.config.defaultPrefix}help with ${this.options.shardCount} shard${this.options.shardCount>1?"s":""}! 🐾`, type: "PLAYING"}
+		],
+		rotateStatus = (() => {
+			for(let i = 0;i<statuses.length;i++) {
+				//setTimeout(this.user.setActivity,i * 15e3, statuses[i].status,{type: statuses[i].type});
+				setTimeout((name,type) => this.user.setActivity(name,type), i * 15e3);
+			}
+		});
+
+	rotateStatus();
+	setInterval(rotateStatus,(statuses.length -1) * 15e3);
+
 	this.logger.log(`ready with ${this.options.shardCount} shard${this.options.shardCount>1?"s":""}!`);
 
 	this.setInterval(() => {
@@ -144,7 +136,7 @@ module.exports = (async function() {
 			this.logger.debug("Recreated placeholder file in temporary directory");
 		}
 		this.fs.readdir(`${this.config.rootDir}/tmp`, (err, files) => {
-			if (err) throw err;
+			if (err) this.logger.error(err);
 			for (let file of files) {
 				if(file === "placeholder") continue;
 				this.fs.unlink(this.path.join(`${this.config.rootDir}/tmp`, file), err => {
