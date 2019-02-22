@@ -41,6 +41,7 @@ module.exports = (async function(message){
 		this.logger.log(`Direct message recieved from ${message.author.tag}: ${message.content}`);
 		this.stats.dmMessagesSinceStart++;
 		this.stats.dmMessagesSinceLastPost++;
+		return;
 	}
 
 	try {
