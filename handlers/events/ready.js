@@ -27,7 +27,7 @@ module.exports = (async function() {
 		rotateStatus = (() => {
 			for(let i = 0;i<statuses.length;i++) {
 				//setTimeout(this.user.setActivity,i * 15e3, statuses[i].status,{type: statuses[i].type});
-				setTimeout((name,type) => this.user.setActivity(name,type), i * 15e3);
+				setTimeout(() => this.user.setActivity(statuses[i].status,{type: statuses[i].type}), i * 15e3);
 			}
 		});
 
