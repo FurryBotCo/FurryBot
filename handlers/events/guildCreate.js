@@ -71,7 +71,7 @@ module.exports = (async function(guild) {
 	embed = new this.Discord.MessageEmbed(data);
 	ch = this.channels.get(this.config.bot.channels.joinLeave);
 	if(ch instanceof this.Discord.TextChannel) {
-		ch.send(embed).catch(error=>null);
+		ch.send(embed).catch(error => null);
 	}
 	dt = {
 		description: this.config.bot.intro.text,
@@ -89,5 +89,5 @@ module.exports = (async function(guild) {
 	em = new this.Discord.MessageEmbed(dt);
 	chn = guild.channels.filter(c => c.type === "text" && c.permissionsFor(this.user.id).has("SEND_MESSAGES","EMBED_LINKS","VIEW_CHANNEL"));
 	if(chn.size === 0) return;
-	return chn.first().send(em).catch(error=>null);
+	return chn.first().send(em).catch(error => null);
 });

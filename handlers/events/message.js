@@ -59,7 +59,7 @@ module.exports = (async function(message){
 					color: this.randomColor(),
 					timestamp: this.getCurrentTimestamp()
 				};
-				without.forEach((wth)=>{
+				without.forEach((wth) => {
 					if(typeof def[wth] !== "undefined") delete def[wth];
 				});
 				return def;
@@ -73,13 +73,13 @@ module.exports = (async function(message){
 					color: this.randomColor(),
 					timestamp: this.getCurrentTimestamp()
 				};
-				without.forEach((wth)=>{
+				without.forEach((wth) => {
 					if(typeof def[wth] !== "undefined") delete def[wth];
 				});
 				return def;
 			}),
-			gConfig: await this.db.getGuild(message.guild.id).catch(error=>this.config.default.guildConfig),
-			uConfig: await this.db.getUser(message.author.id).catch(error=>this.config.default.userConfig),
+			gConfig: await this.db.getGuild(message.guild.id).catch(error => this.config.default.guildConfig),
+			uConfig: await this.db.getUser(message.author.id).catch(error => this.config.default.userConfig),
 			get prefix() {
 				return message.content.startsWith(`<@${client.user.id}>`) ? `<@${client.user.id}` : message.content.startsWith(`<@!${client.user.id}>`) ? `<@!${client.user.id}>` : client.config.beta || client.config.alpha ? client.config.defaultPrefix : message.gConfig.prefix.toLowerCase();
 			},
@@ -115,7 +115,7 @@ module.exports = (async function(message){
 		Object.assign(data,message.embed_defaults());
 		embed = new this.Discord.MessageEmbed(data);
 		if(!message.channel.permissionsFor(this.user).has("SEND_MESSAGES")) {
-			message.author.send("I couldn't send messages in the channel where I was mentioned, so I sent this directly to you!",embed).catch(error=>null);
+			message.author.send("I couldn't send messages in the channel where I was mentioned, so I sent this directly to you!",embed).catch(error => null);
 		} else if(!message.channel.permissionsFor(this.user).has("EMBED_LINKS")) {
 			return message.channel.send(`${embed.title}\n${embed.description}\n(If you give me permission to embed links this would look a lot nicer)`);
 		} else {
@@ -162,7 +162,7 @@ module.exports = (async function(message){
 			}
 		});
 		start = this.performance.now();
-		c = await response.run(this,message);
+		c = await response.run(message);
 		end = this.performance.now();
 		this.logger.debug(`Response handler for "${response.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
 		return;
@@ -379,7 +379,7 @@ module.exports = (async function(message){
 				return message.channel.send(embed);
 			}
 			if(![undefined,null,""].includes(message.channel.topic)) {
-				if(this.config.yiff.disableStatements.some(t=>message.channel.topic.indexOf(t) !== -1)) {
+				if(this.config.yiff.disableStatements.some(t => message.channel.topic.indexOf(t) !== -1)) {
 					for(let key of this.config.yiff.disableStatements) {
 						if(message.channel.topic.indexOf(key) !== -1) st = key;
 					}

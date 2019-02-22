@@ -18,7 +18,7 @@ module.exports = {
 		message.channel.startTyping();
 		let user1, user2, rand1, rand2, r1, r2, shipname, t, amount, u1, u2, imgpath1, imgpath2, profile1, profile2, attch, data, embed;
 		if(message.args[0] === "random") {
-			user1 = message.guild.members.filter(u=>u.id!==message.author.id&&!u.user.bot).random();
+			user1 = message.guild.members.filter(u => u.id!==message.author.id&&!u.user.bot).random();
 		} else {
 			user1 = await message.getUserFromArgs(0,false,false,0);
 		}
@@ -27,7 +27,7 @@ module.exports = {
 		if(message.args.length > 1) {
 			if(message.args[1] === "random") {
 				if(!user1) {} else {
-					user2 = message.guild.members.filter(u=>u.id!==user1.id&&u.id!==message.author.id&&!u.user.bot).random();
+					user2 = message.guild.members.filter(u => u.id!==user1.id&&u.id!==message.author.id&&!u.user.bot).random();
 				}
 			} else {
 				user2 = await message.getUserFromArgs(1,false,false,1);
@@ -96,7 +96,7 @@ module.exports = {
 		r2 = Math.round(user2.username.length/rand2);
     
 		shipname = user1.username.substr(0,r1)+user2.username.substr(user2.username.length-r2,r2);
-		t = builtin.filter(b=>b.users.includes(user1.id)).filter(b=>b.users.includes(user2.id));
+		t = builtin.filter(b => b.users.includes(user1.id)).filter(b => b.users.includes(user2.id));
 		amount = t.length > 0 ? t[0].percent : Math.floor(Math.random()*101);
     
 		const heart = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "1" : amount >= 2 && amount < 19 ? "2-19" : amount >= 20 && amount < 39 ? "20-39" : amount >= 40 && amount < 59 ? "40-59" : amount >= 60 && amount < 79 ? "60-79" : amount >= 80 && amount < 99 ? "80-99" : amount === 100 ? "100" : "unknown";

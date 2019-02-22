@@ -117,7 +117,7 @@ module.exports = {
 						inline: false
 					},{
 						name: "Members With Role",
-						value: r.guild.members.filter(m=>m.roles.has(r.id)).size,
+						value: r.guild.members.filter(m => m.roles.has(r.id)).size,
 						inline: false
 					}
 				]
@@ -132,7 +132,7 @@ module.exports = {
 			role = await message.getRoleFromArgs(1);
 			if(!role) return message.reply("Role not found.");
 			if(message.args.length === 2) {
-				count = role.guild.members.filter(m=>m.roles.has(role.id)).size;
+				count = role.guild.members.filter(m => m.roles.has(role.id)).size;
 				return message.reply(`${count} users have the role ${role.name}.`);
 			}
 			role2 = await message.getRoleFromArgs(2);
@@ -140,8 +140,8 @@ module.exports = {
 			role.members.forEach(async(m) => {
 				await m.roles.add(role2.id,`Command: ${message.author.tag} -> Add role ${role2.name} to users in role ${role.name}`).catch(noerr => null);
 			});
-			count = role.guild.members.filter(m=>m.roles.has(role.id)).size;
-			skipCount = role.guild.members.filter(m=>m.roles.has(role2.id)).size;
+			count = role.guild.members.filter(m => m.roles.has(role.id)).size;
+			skipCount = role.guild.members.filter(m => m.roles.has(role2.id)).size;
 			return message.reply(`Changed roles for ${count} users (skipped ${skipCount - count})`);
 			break; // eslint-disable-line no-unreachable
 

@@ -14,7 +14,7 @@ module.exports = (async function(member) {
 	});
 	let ev, gConfig, logch, log, data, embed;
 	ev = "leave";
-	gConfig = await this.db.getGuild(member.guild.id).catch(error=>this.config.default.guildConfig);
+	gConfig = await this.db.getGuild(member.guild.id).catch(error => this.config.default.guildConfig);
 	if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
 	logch = member.guild.channels.get(gConfig.logging[ev].channel);
 	if(!logch) return this.db.updateGuild(member.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});

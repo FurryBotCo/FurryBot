@@ -1,6 +1,6 @@
-// add: message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").append("role")})
-// remove: message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").difference(["role"])})
-// get: message.client.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
+// add: message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id}, {$push: {selfAssignableRoles: "role"}});
+// remove: message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{$pull: {selfAssignableRoles: "role"}})
+// get: message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles);
 
 module.exports = {
 	triggers: [
@@ -20,12 +20,12 @@ module.exports = {
 	run: (async(message) => {
 		let roles, b, role;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
-		roles = await message.client.r.table("guilds").get(message.guild.id)("selfAssignableRoles").then(r => r.map(a => {
+		roles = await message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles).then(r => r.map(a => {
 			b = message.guild.roles.get(a);
 			if(!b) return {id: null,name: null};
 			return {name: b.name.toLowerCase(), id: a};
 		}));
-		if(!roles.map(r=>r.name).includes(message.args.join(" ").toLowerCase())) {
+		if(!roles.map(r => r.name).includes(message.args.join(" ").toLowerCase())) {
 			if(message.guild.roles.find(r => r.name.toLowerCase() === message.args.join(" ").toLowerCase())) return message.reply("That role is not self assignable.");
 			return message.reply("Role not found.");
 		}

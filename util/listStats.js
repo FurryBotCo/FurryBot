@@ -1,4 +1,4 @@
-module.exports = (async(client)=>{
+module.exports = (async(client) => {
 	const blapi = require("blapi");
 	blapi.manualPostSharded(client.guilds.size,client.user.id,client.config.botLists,0,client.options.shardCount);
 	// botblock was blocked on discordbots.org
@@ -13,7 +13,7 @@ module.exports = (async(client)=>{
 			Authorization: client.config.botLists["discordbots.org"]
 		}
 	})
-		.then(req=>JSON.parse(req.body));
+		.then(req => JSON.parse(req.body));
 	client.logger.log(`Posted guild counts: ${client.guilds.size}`);
 	return {count:client.guilds.size};
 });

@@ -105,3 +105,5 @@ tmp/*
 docs/ssl
 conf/
 dashboard/
+mongo.js
+mongodb.js

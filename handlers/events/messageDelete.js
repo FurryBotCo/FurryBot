@@ -15,7 +15,7 @@ module.exports = (async function(message) {
 	});
 	let ev, gConfig, logch, data, embed;
 	ev = "messagedeleted";
-	gConfig = await this.db.getGuild(message.guild.id).catch(error=>this.config.defaultGuildSettings);
+	gConfig = await this.db.getGuild(message.guild.id).catch(error => this.config.defaultGuildSettings);
 	if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
 	logch = message.guild.channels.get(gConfig.logging[ev].channel);
 	if(!logch) return this.db.updateGuild(message.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});

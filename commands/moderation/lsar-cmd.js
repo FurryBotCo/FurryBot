@@ -1,6 +1,6 @@
-// add: message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").append("role")})
-// remove: message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").difference(["role"])})
-// get: message.client.r.table("guilds").get(message.guild.id)("selfAssignableRoles")
+// add: message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id}, {$push: {selfAssignableRoles: "role"}});
+// remove: message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{$pull: {selfAssignableRoles: "role"}})
+// get: message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles);
 
 module.exports = {
 	triggers: [
@@ -18,7 +18,7 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async(message) => {
 		let roles, page, c, remove, rl, b, data, embed, n;
-		roles = await message.client.r.table("guilds").get(message.guild.id)("selfAssignableRoles");
+		roles = message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles);
 		page = message.args.length > 0 ? parseInt(message.args[0],10) : 1;
 		c = message.client.chunk(roles,10);
 		if(!page || page > c.length) return message.reply("Invalid page.");
@@ -31,7 +31,7 @@ module.exports = {
 			}
 			return b.name;
 		}).join("\n");
-		if(remove.length > 0) await message.client.r.table("guilds").get(message.guild.id).update({selfAssignableRoles: message.client.r.row("selfAssignableRoles").difference(remove)});
+		if(remove.length > 0) await message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{$pull: {selfAssignableRoles: {$each: remove}}});
 		data = {
 			title: "Self Assignable Roles",
 			description: `To gain a role, use the command \`${message.gConfig.prefix}iam <role name>\`\nTo go to the next page, use \`${message.gConfig.prefix}\`lsar [page].\nPage ${page}/${c.length}`,

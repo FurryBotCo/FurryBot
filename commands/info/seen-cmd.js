@@ -25,8 +25,8 @@ module.exports = {
 		
 		if(!user) return message.errorEmbed("INVALID_USER");
 		
-		a = message.client.guilds.filter(g=>g.members.has(user.id));
-		b = a.map(g=>`${g.name} (${g.id})`),
+		a = message.client.guilds.filter(g => g.members.has(user.id));
+		b = a.map(g => `${g.name} (${g.id})`),
 		guilds = [],
 		fields = [],
 		i = 0;

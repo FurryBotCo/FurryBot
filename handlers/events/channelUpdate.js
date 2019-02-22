@@ -16,7 +16,7 @@ module.exports = (async function(oldChannel,newChannel) {
 	});
 	let ev, gConfig, logch, data, embed, log, base, log_data;
 	ev = "channelupdated";
-	gConfig = await this.db.getGuild(newChannel.guild.id).catch(error=>this.config.defaultGuildSettings);
+	gConfig = await this.db.getGuild(newChannel.guild.id).catch(error => this.config.defaultGuildSettings);
 	if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
 	logch = newChannel.guild.channels.get(gConfig.logging[ev].channel);
 	if(!logch) return this.db.updateGuild(newChannel.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
@@ -75,7 +75,7 @@ module.exports = (async function(oldChannel,newChannel) {
 	}
 
 	// permission overwrites
-	if(!this._.isEqual(oldChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})),newChannel.permissionOverwrites.map(j=>({allow:j.allow,deny:j.deny})))) {
+	if(!this._.isEqual(oldChannel.permissionOverwrites.map(j => ({allow:j.allow,deny:j.deny})),newChannel.permissionOverwrites.map(j => ({allow:j.allow,deny:j.deny})))) {
 		data = Object.assign({},base);
 		data.fields = [{
 			name: "Permissions Overwrites Update",

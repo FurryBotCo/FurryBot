@@ -47,7 +47,7 @@ module.exports = {
 			if(t.length > 1) {
 				songs.list = message.client.chunk(songs.tracks,10);
 				for(let key in songs.list) {
-					songs.list[key] = songs.list[key].map((t,i)=>`__**${i+1}**__ - **${t.info.title}** by *${t.info.author}* - Length: ${Math.floor(t.info.length/1000/60)}m${t.info.length/1000%60}s`);
+					songs.list[key] = songs.list[key].map((t,i) => `__**${i+1}**__ - **${t.info.title}** by *${t.info.author}* - Length: ${Math.floor(t.info.length/1000/60)}m${t.info.length/1000%60}s`);
 				}
 				pageCount = songs.tracks.length;
 				pageNumber = 1;
@@ -82,33 +82,34 @@ module.exports = {
 				message.reply(`message.client is too long to be played! The maximum time for message.client guild is \`10 minutes (6000s)\`, to increase message.client limit please donate, and mark message.client server as premium **${message.client.config.bot.donationURL}**.`);
 				return message.channel.stopTyping();
 			} 
-			a = message.client.voiceConnections.filter(g=>g.channel.guild.id===message.guild.id);
+			a = message.client.voiceConnections.filter(g => g.channel.guild.id === message.guild.id);
 			alreadyPlaying = a.size === 0 ? false : a.first().speaking.has("SPEAKING");
-			if(!alreadyPlaying) {
-				await message.client.r.table("guilds").get(message.guild.id).update({
+			if(!alreadyPlaying) await message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{
+				$set: {
 					music: {
 						textChannel: message.channel.id
 					}
-				});
-			}
-
-			await message.client.r.table("guilds").get(message.guild.id).update({
-				music: {
-					queue: message.client.r.row("music")("queue").append({
-						author: song.song.info.author,
-						length: song.song.info.length,
-						title: song.song.info.title,
-						uri: song.song.info.uri,
-						addedTimestamp: Date.now(),
-						addedBy: message.member.id
-					})
+				}
+			});
+			await message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{
+				$push: {
+					music: {
+						queue: {
+							author: song.song.info.author,
+							length: song.song.info.length,
+							title: song.song.info.title,
+							uri: song.song.info.uri,
+							addedTimestamp: Date.now(),
+							addedBy: message.member.id
+						}
+					}
 				}
 			});
 			if(!song.msg) {
-				if(alreadyPlaying) message.reply(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await message.client.r.table("guilds").get(message.guild.id)("music")("queue")).length}`);
+				if(alreadyPlaying) message.reply(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.music.queue)).length}`);
 				else message.reply(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
 			} else {
-				if(alreadyPlaying) message.reply(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await message.client.r.table("guilds").get(message.guild.id)("music")("queue")).length}`);
+				if(alreadyPlaying) message.reply(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.music.queue)).length}`);
 				else song.msg.edit(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
 			}
 			if(!alreadyPlaying) {
@@ -116,7 +117,7 @@ module.exports = {
 			}
 		} else {
 			if(alreadyPlaying) {
-				message.reply(`Added **${song.info.title}** by *${song.info.author}* (Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s) to the queue. Position: ${(await message.client.r.table("guilds").get(message.guild.id)("music")("queue")).length}`);
+				message.reply(`Added **${song.info.title}** by *${song.info.author}* (Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s) to the queue. Position: ${(await message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.music.queue)).length}`);
 			} else {
 				message.reply(`Now playing **${song.info.title}** by *${song.info.author}* - Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s`);
 				player = await message.client.playSong(message.member.voice.channel,song.info,"youtube");

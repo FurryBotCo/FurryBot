@@ -33,7 +33,7 @@ module.exports =
 		],
 		8: "{author} joins a furpile on {user}!\nThey now have {count} furs on them!",
 		else: "{author} joins a furpile on {user}!\nThey now have {count} furs on them!",
-		text: ((count)=>{
+		text: ((count) => {
 			if(isNaN(count)) return false;
 			switch(count) {
 			case 0:

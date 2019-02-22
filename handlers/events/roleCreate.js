@@ -14,13 +14,13 @@ module.exports = (async function(role) {
 	});
 	let ev, gConfig, logch, log, data, embed, above, below;
 	ev = "rolecreated";
-	gConfig = await this.db.getGuild(role.guild.id).catch(error=>this.config.default.guildConfig);
+	gConfig = await this.db.getGuild(role.guild.id).catch(error => this.config.default.guildConfig);
 	if(!gConfig || [undefined,null,"",{},[]].includes(gConfig.logging) || [undefined,null,"",{},[]].includes(gConfig.logging[ev]) || !gConfig.logging[ev].enabled || [undefined,null,""].includes(gConfig.logging[ev].channel)) return;
 	logch = role.guild.channels.get(gConfig.logging[ev].channel);
 	if(!logch) return this.db.updateGuild(role.guild.id,{logging:{[ev]:{enabled:false,channel:null}}});
 	if(role.deleted) return;
-	below = role.guild.roles.find(r=>r.rawPosition === role.rawPosition - 1);
-	above = role.guild.roles.find(r=>r.rawPosition === role.rawPosition + 1);
+	below = role.guild.roles.find(r => r.rawPosition === role.rawPosition - 1);
+	above = role.guild.roles.find(r => r.rawPosition === role.rawPosition + 1);
 	data = {
 		title: ":new: Role Created",
 		author: {

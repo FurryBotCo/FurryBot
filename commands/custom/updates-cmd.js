@@ -14,7 +14,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(message) => {
-		let role = message.client.guilds.get(message.client.config.bot.mainGuild).roles.find(r=>r.name.toLowerCase()==="announcement notified");
+		let role = message.client.guilds.get(message.client.config.bot.mainGuild).roles.find(r => r.name.toLowerCase()==="announcement notified");
 		if(!role) return message.reply("Announcement Notified role was not found, please notify an admin.");
 		if(message.member.roles.has(role.id)) {
 			return message.member.roles.remove(role.id).then(() => {

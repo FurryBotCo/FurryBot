@@ -24,11 +24,11 @@ module.exports = {
 				}).then(async(c) => {
 					switch(c.first().content.toLowerCase()) {
 					case "yes":
-						await message.client.r.table("users").get(message.author.id).update({
+						await message.client.mdb.collection("users").updateOne({id: message.author.id},{
 							married: true,
 							marriagePartner: member.id
 						});
-						await message.client.r.table("users").get(member.id).update({
+						await message.client.mdb.collection("users").updateOne({id:member.id},{
 							married: true,
 							marriagePartner: message.author.id
 						});

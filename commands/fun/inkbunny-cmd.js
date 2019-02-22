@@ -161,7 +161,7 @@ module.exports = {
 				return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err => message.channel.send(`Command failed: ${err}`));
 			}
 			attachment = new message.client.Discord.MessageAttachment(submission.file_url_full,submission.file_name);
-			return msg.edit(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRequested By: ${message.author.tag}\nRID: ${jsn.rid}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => message.channel.send(`Command failed: ${err}`)).then(() => message.channel.send(attachment)).catch(err=>message.channel.send(`Command failed: ${err}`));
+			return msg.edit(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRequested By: ${message.author.tag}\nRID: ${jsn.rid}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => message.channel.send(`Command failed: ${err}`)).then(() => message.channel.send(attachment)).catch(err => message.channel.send(`Command failed: ${err}`));
 		}catch(e){
 			message.client.logger.error(`Error:\n${e}`);
 			message.client.logger.log(`${message.client.util.inspect(jsn,{depth:3})}`);

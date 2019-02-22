@@ -1,4 +1,4 @@
-module.exports = (async(guildCount = 0,shardCount = 1)=>{
+module.exports = (async(guildCount = 0,shardCount = 1) => {
 	const client = {
 		guilds: {
 			size: guildCount,
@@ -28,7 +28,7 @@ module.exports = (async(guildCount = 0,shardCount = 1)=>{
 			Authorization: client.config.botLists["discordbots.org"]
 		}
 	})
-		.then(req=>JSON.parse(req.body));
+		.then(req => JSON.parse(req.body));
 	client.logger.log(`Posted guild counts: ${client.guilds.size}`);
 	return {count:client.guilds.size};
 });

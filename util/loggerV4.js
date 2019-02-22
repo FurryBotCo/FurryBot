@@ -23,13 +23,13 @@ class FurryBotLogger extends EventEmitter {
 			key: this.fs.readFileSync(`${this.config.rootDir}/ssl/ssl.key`)
 		});
 		this.wss = new this.WebSocket.Server({server:this.server});
-		this.wss.broadcast = ((data)=>{
-			this.wss.clients.forEach((client)=>{
+		this.wss.broadcast = ((data) => {
+			this.wss.clients.forEach((client) => {
 				if(client.readyState === this.WebSocket.OPEN) client.send(data);
 			});
 			return true;
 		});   
-		this.wss.on("connection",async(socket,req)=>{
+		this.wss.on("connection",async(socket,req) => {
 			const url = {
 				host: req.headers.host.split(":")[0],
 				port: req.headers.host.split(":")[1],
@@ -38,7 +38,7 @@ class FurryBotLogger extends EventEmitter {
 			};
 			var a = req.url.split("?")[1]||"";
 			var b = a.split("&");
-			if(b.length !== 0 && b[0] !== "") b.forEach((p)=>{
+			if(b.length !== 0 && b[0] !== "") b.forEach((p) => {
 				var j = p.split("=");
 				url.params[j[0]]=j[1]||null;
 			});
@@ -50,7 +50,7 @@ class FurryBotLogger extends EventEmitter {
 			}
 			if(this.wss.readyState === this.WebSocket.OPEN) socket.send(JSON.stringify({success:true,message:"Connection Accepted, Authorization Valid",wsType:"EHELLO",type:"IDENTIFY"}));
 		});
-		this.on("log",async(args)=>{
+		this.on("log",async(args) => {
 			this.wss.broadcast(JSON.stringify({type:args.type||null,message:args.message||null,beta:this.config.beta,file:args.file||null,time:args.time||null,console:true}));
 		});
 		this.server.listen(this.config.serverOptions.wsPort,this.config.serverOptions.bindIp);
@@ -58,7 +58,7 @@ class FurryBotLogger extends EventEmitter {
 		//this.isSharded = this.client !== null ? ![undefined,null].includes(this.client.shard) ? true : false : false;
 		//this.shardID = this.isSharded ? this.client.shard.id : 0;
 		//this.shardCount = this.isSharded ? this.client.shard.count : 1;
-		this._getCallerFile = (()=>{
+		this._getCallerFile = (() => {
 			try {
 				var err = new Error();
 				var callerfile;
@@ -177,7 +177,7 @@ class FurryBotLogger extends EventEmitter {
 
 	async _log(msg) {
 		if(process.stdout.writable) process.stdout.write(msg);
-		await this.fsn.pathExists(`${this.config.rootDir}/logs`).then(async()=>{
+		await this.fsn.pathExists(`${this.config.rootDir}/logs`).then(async() => {
 			await this.fsn.appendFile(`${this.config.rootDir}/logs/${this._getDate()}.txt`,msg.replace(/\[\d(\d)?m/g,""));
 		}).catch(e => {
 			process.stdout.write(`Error logging to file: ${e}`);
