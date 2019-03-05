@@ -102,7 +102,7 @@ lavalink/
 tmp/*
 !tmp/placeholder
 
-docs/ssl
+*ssl*
 conf/
 dashboard/
 mongo.js

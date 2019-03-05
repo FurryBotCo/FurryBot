@@ -15,8 +15,9 @@ module.exports = {
 	run: (async(message) => {
 		message.channel.startTyping();
 		let img, attachment, short, extra;
-		img = await message.client.imageAPIRequest(false,"bulge",true,true);
+		img = await message.client.imageAPIRequest(false,"bulge",true,false);
 		if(img.success !== true) {
+			message.client.logger.error(img);
 			return message.reply(`API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 		}
 		attachment = new message.client.Discord.MessageAttachment(img.response.image);

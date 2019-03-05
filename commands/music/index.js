@@ -9,6 +9,6 @@ module.exports = {
 		return a;
 	}),
 	name: "Music",
-	description: "Chill with some nice vibes 'n' tunes.",
+	description: "Chill with some nice vibes 'n' tunes. Temporarily disabled due to degraded server performance.",
 	path: __dirname
 };

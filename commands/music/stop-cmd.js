@@ -8,7 +8,7 @@ module.exports = {
 	description: "Stop whatever is playing",
 	usage: "",
 	nsfw: false,
-	devOnly: false,
+	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(message) => {
