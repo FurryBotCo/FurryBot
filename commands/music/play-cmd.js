@@ -8,7 +8,7 @@ module.exports = {
 	description: "Play some music",
 	usage: "<search/link>",
 	nsfw: false,
-	devOnly: false,
+	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(message) => {

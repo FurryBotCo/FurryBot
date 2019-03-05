@@ -9,7 +9,7 @@ module.exports = {
 	description: "Get the current music queue",
 	usage: "",
 	nsfw: false,
-	devOnly: false,
+	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(message) => {

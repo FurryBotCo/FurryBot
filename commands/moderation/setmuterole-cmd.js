@@ -50,7 +50,7 @@ module.exports = {
 		}
 		g = await message.client.db.updateGuild(message.guild.id,{muteRole:role.id});
 		if(!g) {
-			message.reply("There was an internal error while doing message.client, please try again");
+			message.reply("There was an internal error while doing this, please try again");
 			return message.client.logger.log(g);
 		}
 	

@@ -40,7 +40,7 @@ module.exports = {
 			}
 			
 			if(message.author.id === usr.id && message.client.config.developers.indexOf(message.author.id) === -1) {
-				return message.reply(`${message.client.config.emojis.cooldown}\nYou cannot start a furpile on yourmessage.client!`);
+				return message.reply(`${message.client.config.emojis.cooldown}\nYou cannot start a furpile on yourthis!`);
 			}
 			message.client.furpile[message.guild.id]={
 				user: usr.id,

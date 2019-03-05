@@ -8,7 +8,7 @@ module.exports = {
 	description: "Resume whatever was playing",
 	usage: "",
 	nsfw: false,
-	devOnly: false,
+	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async(message) => {
@@ -30,7 +30,7 @@ module.exports = {
 		}
     
 		c = message.client.voiceConnections.filter(g => g.channel.guild.id===message.guild.id);
-		if(c.size === 0) return message.reply("Please play something before using message.client!");
+		if(c.size === 0) return message.reply("Please play something before using this!");
 		if(c.first().speaking.has("SPEAKING")) return message.reply("Player is not paused.");
 		if(!c.first().dispatcher.paused) return message.reply("Player is not paused.");
 		c.first().dispatcher.resume();
