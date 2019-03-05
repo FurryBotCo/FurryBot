@@ -16,7 +16,7 @@ module.exports = {
 	run: (async(message) => {
 		let embed, data, u;
 		u = await message.client.db.getUser(message.author.id);
-		if(!u.bal) {
+		if([undefined,null].includes(u.bal)) {
 			await message.client.mdb.collection("users").findOneAndUpdate({id: message.author.id},{
 				$set: {
 					bal: 100
@@ -35,7 +35,7 @@ module.exports = {
 		message.channel.startTyping();
 		data = {
 			title: `${message.author.tag}'s Balance`,
-			description: `**Pocket**: ${u.bal}\n**Bank**: ${u.bank}`
+			description: `**Pocket**: ${u.bal} ${message.client.config.emojis.owo}\n**Bank**: ${u.bank} ${message.client.config.emojis.owo}`
 		};
 		Object.assign(data, message.embed_defaults());
 		embed = new message.client.Discord.MessageEmbed(data);
