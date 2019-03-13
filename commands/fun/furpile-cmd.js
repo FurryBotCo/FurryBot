@@ -25,7 +25,7 @@ module.exports = {
 			inPile.push(message.author.id,member.id);
 			message.channel.furpileActive = true;
 			const awaitJoin = (async(msg) => {
-				const a = await msg.channel.awaitMessages(m => !m.author.bot && (msg.client.config.developers.includes(m.author.id) || !inPile.includes(m.author.id)),{max: 1, time: 6e5, errors: ["time"]}).then(c => {
+				const a = await msg.channel.awaitMessages(m => !m.author.bot && m.content.toLowerCase() === `${message.gConfig.prefix}furpile` && (msg.client.config.developers.includes(m.author.id) || !inPile.includes(m.author.id)),{max: 1, time: 6e5, errors: ["time"]}).then(c => {
 					inPile.push(c.first().author.id);
 					return c.first().channel.send(`<@!${c.first().author.id}> joined a furpile on <@!${member.id}>!\n<@!${member.id}> now has ${inPile.length} furs on them!\nJoin in using \`${message.gConfig.prefix}furpile\`.`).then(true).catch(false);
 				}).catch(false);

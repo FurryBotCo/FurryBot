@@ -16,7 +16,7 @@ module.exports = {
 	run: (async function(message) {
 		let lnk, command, data, embed, category;
 		if(!message.args[0]) {
-			lnk = message.gConfig.prefix !== "f!"?`${this.config.documentationURL}?prefix=${message.gConfig.prefix}${this.config.beta?"&beta":""}`:`${this.config.bot.documentationURL}${this.config.beta?"?beta":""}`;
+			lnk = message.gConfig.prefix !== "f!" ? `${this.config.bot.documentationURL}prefix=${message.gConfig.prefix}` : this.config.bot.documentationURL;
 			return message.channel.send(`You can view our full command documentation here: ${lnk}\n\nMake sure to check the Trello board regularly: <${this.config.apis.trello.board}>\nYou can use **${message.gConfig.prefix}help <command>** to get help with a specific command.\nMake sure to check out our official Twitter account: ${this.config.bot.twitterURL}.\n\nJoin can join our support server here: ${this.config.bot.supportInvite}`);
 		}
 		

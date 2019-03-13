@@ -559,7 +559,7 @@ module.exports = (async function(message){
 		this.setTimeout((cmd,user) => {this.commandTimeout[cmd].delete(user);}, command.cooldown,command.triggers[0],message.author.id);
 		this.logger.commandlog(`Command  "${command.triggers[0]}" ran with arguments "${message.unparsedArgs.join(" ")}" by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
 		start = this.performance.now();
-		c = await command.run.apply(this,message);
+		c = await command.run.call(this,message);
 		end = this.performance.now();
 		this.logger.debug(`Command handler for "${command.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
 		if(c instanceof Error) throw c;
