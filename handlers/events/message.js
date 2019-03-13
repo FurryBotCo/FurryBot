@@ -111,7 +111,7 @@ module.exports = (async function(message){
 		if(c instanceof Error) throw c;*/
 		data = {
 			title: "Hewwo!",
-			description: `You can find out how to use me on my [docs page](${this.config.bot.documentationURL}), my current prefix here is: **${message.gConfig.prefix}**\n(this can be chanegd via \`${message.gConfig.prefix}prefix <newprefix>\`\nTo invite me to new servers, use [this link](https://discordapp.com/oauth2/authorize?this_id=${this.user.id}&scope=bot&permissions=-1))`
+			description: `You can find out how to use me on my [docs page](${this.config.bot.documentationURL}), my current prefix here is: **${message.gConfig.prefix}**\n(this can be changed via \`${message.gConfig.prefix}prefix <newprefix>\`\nTo invite me to new servers, use [this link](https://discordapp.com/oauth2/authorize?this_id=${this.user.id}&scope=bot&permissions=-1))`
 		};
 		Object.assign(data,message.embed_defaults());
 		embed = new this.Discord.MessageEmbed(data);
@@ -163,7 +163,7 @@ module.exports = (async function(message){
 			}
 		});
 		start = this.performance.now();
-		c = await response.run(message);
+		c = await response.run.apply(this,message);
 		end = this.performance.now();
 		this.logger.debug(`Response handler for "${response.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
 		return;
@@ -559,7 +559,7 @@ module.exports = (async function(message){
 		this.setTimeout((cmd,user) => {this.commandTimeout[cmd].delete(user);}, command.cooldown,command.triggers[0],message.author.id);
 		this.logger.commandlog(`Command  "${command.triggers[0]}" ran with arguments "${message.unparsedArgs.join(" ")}" by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
 		start = this.performance.now();
-		c = await command.run(message);
+		c = await command.run.apply(this,message);
 		end = this.performance.now();
 		this.logger.debug(`Command handler for "${command.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
 		if(c instanceof Error) throw c;

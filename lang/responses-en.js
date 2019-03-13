@@ -22,7 +22,7 @@ module.exports =
 		"{author} lays on {input}.. owo",
 		"{author} jumps onto {input}!\nYikes! Hopefully they aren't too heavy!"
 	],
-	furpile: {
+	/*furpile: {
 		0: "{author} starts a furpile on {user}!\nTo join type `{prefix}furpile`!",
 		1: "{author} joins a furpile on {user}!\nThey now have {count} fur on them!",
 		3: "{author} climbs onto the furs ontop of {user}!\nThey now have {count} furs on them!",
@@ -61,7 +61,7 @@ module.exports =
 				return this.furpile.else;
 			}
 		})
-	},
+	},*/
 	glomp: [
 		"{author} pounces onto {input}, tackling them to the floor in a giant hug! {author} whispers \"I love you~\" quitely into {input}'s ear."
 	],

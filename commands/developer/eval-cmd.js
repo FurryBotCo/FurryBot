@@ -14,28 +14,28 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		// extra check, to be safe
-		if (!message.client.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
+		if (!this.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
 		let exec, start, res, m, end, data, embed;
 		message.channel.startTyping();
-		const r = message.client.r;
+		const r = this.r;
 		exec = message.unparsedArgs.join(" ");
-		start = message.client.performance.now();
+		start = this.performance.now();
 		try {
 			res = await eval(exec);
 		}catch(e){
 			//return message.reply(`Error evaluating: ${err}`);
-			m = typeof e.message !== "string" ? message.client.util.inspect(e.message,{depth: 1}) : e.message;
-			console.log(message.client.util.inspect(e.message,{depth: 1}));
+			m = typeof e.message !== "string" ? this.util.inspect(e.message,{depth: 1}) : e.message;
+			console.log(this.util.inspect(e.message,{depth: 1}));
 			res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Evaluating:\n${e.name}: ${m}\`\`\``;
-			end = message.client.performance.now();
+			end = this.performance.now();
 			if(e.length > 6000) {
-				const req = await message.client.request("https://pastebin.com/api/api_post.php",{
+				const req = await this.request("https://pastebin.com/api/api_post.php",{
 					method: "POST",
 					form: {
-						"api_dev_key": message.client.config.apis.pastebin.devKey,
-						"api_user_key": message.client.config.apis.pastebin.userKey,
+						"api_dev_key": this.config.apis.pastebin.devKey,
+						"api_user_key": this.config.apis.pastebin.userKey,
 						"api_option": "paste",
 						"api_paste_code": e,
 						"api_paste_private": 2,
@@ -65,9 +65,9 @@ module.exports = {
 				]
 			};
 	
-			console.error(`[Eval]: ${message.client.util.inspect(e,{depth: 3,color:true})}`);
+			console.error(`[Eval]: ${this.util.inspect(e,{depth: 3,color:true})}`);
 			Object.assign(data,message.embed_defaults());
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			message.channel.send(embed).catch(err => {
 				message.channel.send(`I could not return the result: ${err}`).catch(error => {
 					message.author.send(`I could not return the result: ${error}`).catch(noerr => null);
@@ -78,13 +78,13 @@ module.exports = {
 		if([null,undefined,""].includes(res)) {
 			res = "```fix\nfinished with no return```";
 		} else {
-			if(typeof res !== "string") res = message.client.util.inspect(res,{showHidden:true,depth: 3});
+			if(typeof res !== "string") res = this.util.inspect(res,{showHidden:true,depth: 3});
 			if(res.length > 6000) {
-				const req = await message.client.request("https://pastebin.com/api/api_post.php",{
+				const req = await this.request("https://pastebin.com/api/api_post.php",{
 					method: "POST",
 					form: {
-						"api_dev_key": message.client.config.apis.pastebin.devKey,
-						"api_user_key": message.client.config.apis.pastebin.userKey,
+						"api_dev_key": this.config.apis.pastebin.devKey,
+						"api_user_key": this.config.apis.pastebin.userKey,
 						"api_option": "paste",
 						"api_paste_code": res,
 						"api_paste_private": 2,
@@ -99,7 +99,7 @@ module.exports = {
 			}
 			res = "```js\n"+res+"```";
 		}
-		end = message.client.performance.now();
+		end = this.performance.now();
 		data = {
 			title: `Evaluated - Time: \`${(end-start).toFixed(3)}ms\``,
 			author: {
@@ -121,7 +121,7 @@ module.exports = {
 		};
 		
 		Object.assign(data,message.embed_defaults());
-		embed = new message.client.Discord.MessageEmbed(data);
+		embed = new this.Discord.MessageEmbed(data);
 		message.channel.send(embed).catch(err => {
 			console.error(err);
 			message.channel.send(`I could not return the result: ${err}`).catch(error => {

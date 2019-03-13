@@ -16,12 +16,12 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		let user, reason, data, embed, m;
 		// get user from message
 		user = await message.getUserFromArgs();
    
-		if(!user) user = await message.client.users.fetch(message.args[0]).catch(error => false);
+		if(!user) user = await this.users.fetch(message.args[0]).catch(error => false);
 		if(!user) return message.errorEmbed("INVALID_USER");
    
 		if((await message.guild.fetchBans()).has(user.id)) {
@@ -30,11 +30,11 @@ module.exports = {
 				description: `It looks like ${user.tag} is already banned here..`
 			};
 			Object.assign(data, message.embed_defaults());
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		}
    
-		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourmessage.client.");
+		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourthis.");
 		reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";
 		message.guild.members.ban(user.id,{reason:`Hackban: ${message.author.tag} -> ${reason}`}).then(() => {
 			message.channel.send(`***User ${user.tag} was banned, ${reason}***`).catch(noerr => null);
@@ -45,6 +45,6 @@ module.exports = {
 			}
 		});
    
-		if(!message.gConfig.delCmds && message.channel.permissionsFor(message.client.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
+		if(!message.gConfig.delCmds && message.channel.permissionsFor(this.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
 	})
 };

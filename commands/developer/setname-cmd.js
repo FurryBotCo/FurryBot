@@ -11,9 +11,9 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		// extra check, to be safe
-		if (!message.client.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
+		if (!this.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
 		message.channel.startTyping();
 		if(message.unparsedArgs.length === 0) {
 			message.channel.stopTyping();
@@ -25,7 +25,7 @@ module.exports = {
 			message.reply("Username must be between **2** and **32** characters.");
 			return message.channel.stopTyping();
 		}
-		message.client.user.setUsername(set).then((user) => {
+		this.user.setUsername(set).then((user) => {
 			message.reply(`Set username to: ${user.username}`);
 			return message.channel.stopTyping();
 		}).catch((err) => {

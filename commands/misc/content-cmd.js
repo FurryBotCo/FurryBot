@@ -11,11 +11,11 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		return message.reply("this has been temporarily disabled.");
 		/*let req, counts, txt, content;
 
-		req = await message.client.request("https://api.furrybot.me/image-counts.php",{
+		req = await this.request("https://api.furrybot.me/image-counts.php",{
 			method: "GET"
 		});
 		counts = JSON.parse(req.body);

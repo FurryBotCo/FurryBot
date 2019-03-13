@@ -13,7 +13,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		let channel = message.mentions.channels.first() ? message.mentions.channels.first() : message.channel;
 		if(!channel.typing) return message.reply("I don't seem to be typing here..?");
 		message.reply("I've sent a command to stop typing, let's see if this works!");

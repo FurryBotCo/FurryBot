@@ -14,26 +14,26 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		message.channel.startTyping();
 		let textChCount, voiceChCount, categoryChCount, guild, data, embed, guildConfig, o, owner, features, mfaLevel, verificationLevel, roles, rr;
 		textChCount = 0,
 		voiceChCount = 0,
 		categoryChCount = 0;
-		if(!isNaN(message.args[0]) && message.client.user.isDeveloper) {
-			guild = message.client.guilds.get(message.args[0]);
+		if(!isNaN(message.args[0]) && this.user.isDeveloper) {
+			guild = this.guilds.get(message.args[0]);
 			if(!guild) {
 				data = {
 					title: "Guild Not Found"
 				};
 				Object.assign(data,message.embed_defaults());
-				embed = new message.client.Discord.MessageEmbed(data);
+				embed = new this.Discord.MessageEmbed(data);
 				return message.channel.send(embed);
 			}
 		} else {
 			guild = message.guild;
 		}
-		guildConfig = await message.client.db.getGuild(guild.id);
+		guildConfig = await this.db.getGuild(guild.id);
 		guild.channels.forEach((ch) => {
 			switch (ch.type) {
 			case "text":
@@ -97,7 +97,7 @@ module.exports = {
 				},
 				{
 					name: "Members",
-					value: `Total: ${guild.memberCount}\n\n${message.client.config.emojis.online}: ${guild.members.filter(m => m.user.presence.status==="online").size}\n${message.client.config.emojis.idle}: ${guild.members.filter(m => m.user.presence.status==="idle").size}\n${message.client.config.emojis.dnd}: ${guild.members.filter(m => m.user.presence.status==="dnd").size}\n${message.client.config.emojis.offline}: ${guild.members.filter(m => m.user.presence.status==="offline").size}\n\nNon Bots: ${message.guild.memberCount - message.guild.members.filter(m => !m.user.bot).size}\nBots: ${message.guild.members.filter(m => m.user.bot).size}`,
+					value: `Total: ${guild.memberCount}\n\n${this.config.emojis.online}: ${guild.members.filter(m => m.user.presence.status==="online").size}\n${this.config.emojis.idle}: ${guild.members.filter(m => m.user.presence.status==="idle").size}\n${this.config.emojis.dnd}: ${guild.members.filter(m => m.user.presence.status==="dnd").size}\n${this.config.emojis.offline}: ${guild.members.filter(m => m.user.presence.status==="offline").size}\n\nNon Bots: ${message.guild.memberCount - message.guild.members.filter(m => !m.user.bot).size}\nBots: ${message.guild.members.filter(m => m.user.bot).size}`,
 					inline: false
 				},
 				{
@@ -112,7 +112,7 @@ module.exports = {
 				},
 				{
 					name: "Region",
-					value: message.client.ucwords(guild.region),
+					value: this.ucwords(guild.region),
 					inline: false
 				},
 				{
@@ -130,7 +130,7 @@ module.exports = {
 		
 		Object.assign(data, message.embed_defaults());
 		
-		embed = new message.client.Discord.MessageEmbed(data);
+		embed = new this.Discord.MessageEmbed(data);
 		message.channel.send(embed);
 		return message.channel.stopTyping();
 	})

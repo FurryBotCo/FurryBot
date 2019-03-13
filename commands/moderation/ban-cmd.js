@@ -16,7 +16,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		let user, data, embed, reason, m;
 		// get member from message
@@ -30,11 +30,11 @@ module.exports = {
 				description: `It looks like ${user.tag} is already banned here..`
 			};
 			Object.assign(data, message.embed_defaults());
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		}
     
-		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourmessage.client.");
+		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourthis.");
 		if(user.roles.highest.rawPosition >= message.member.roles.highest.rawPosition && message.author.id !== message.guild.owner.id) return message.reply(`You cannot ban ${user.user.tag} as their highest role is higher than yours!`);
 		if(!user.bannable) return message.reply(`I cannot ban ${user.tag}! Do they have a higher role than me? Do I have ban permissions?`);
 		reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";
@@ -47,6 +47,6 @@ module.exports = {
 				await m.delete();
 			}
 		});
-		if(!message.gConfig.delCmds && message.channel.permissionsFor(message.client.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
+		if(!message.gConfig.delCmds && message.channel.permissionsFor(this.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
 	})
 };

@@ -15,7 +15,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
 		let role, data, embed, g;
 		if(message.args[0] === "reset") {
@@ -29,7 +29,7 @@ module.exports = {
 				}
 			});
 			
-			await message.client.db.updateGuild(message.guild.id,{muteRole:null});
+			await this.db.updateGuild(message.guild.id,{muteRole:null});
 	
 			return message.reply("Reset channel overwrites and mute role.");
 		}
@@ -45,13 +45,13 @@ module.exports = {
 				color: 15601937
 			};
 			Object.assign(data, message.embed_defaults("color"));
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		}
-		g = await message.client.db.updateGuild(message.guild.id,{muteRole:role.id});
+		g = await this.db.updateGuild(message.guild.id,{muteRole:role.id});
 		if(!g) {
 			message.reply("There was an internal error while doing this, please try again");
-			return message.client.logger.log(g);
+			return this.logger.log(g);
 		}
 	
 		message.reply(`Set the new muted role to **${role.name}**`);

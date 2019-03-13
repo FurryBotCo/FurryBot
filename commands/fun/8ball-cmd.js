@@ -11,7 +11,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		let responses = [
 				"It is certain",
