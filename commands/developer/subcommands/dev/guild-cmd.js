@@ -1,18 +1,18 @@
 module.exports = {
 	triggers: [
-		"whosagoodboy",
-		"whosagoodboi"
+		"g",
+		"guild"
 	],
 	userPermissions: [],
 	botPermissions: [],
-	cooldown: 2e3,
-	description: "Who's a good boy?!",
+	cooldown: 0,
+	description: "Guild Managment Commands",
 	usage: "",
 	nsfw: false,
-	devOnly: false,
+	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		return message.reply("Yip! Yip! I am! I am! :fox:");
+
 	})
-};
+}

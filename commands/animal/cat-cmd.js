@@ -15,22 +15,22 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		message.channel.stopTyping();
 		let req, json, attachment;
-		req = await message.client.request("https://aws.random.cat/meow",{
+		req = await this.request("https://aws.random.cat/meow",{
 			method: "GET",
 			headers: {
-				"User-Agent": message.client.config.web.userAgent
+				"User-Agent": this.config.web.userAgent
 			}
 		});
 		
 		try {
 			json = JSON.parse(req.body);
-			attachment = new message.client.Discord.MessageAttachment(json.file);
+			attachment = new this.Discord.MessageAttachment(json.file);
 		}catch(error){
-			message.client.logger.error(error);
-			attachment = new message.client.Discord.MessageAttachment(message.client.config.images.serverError);
+			this.logger.error(error);
+			attachment = new this.Discord.MessageAttachment(this.config.images.serverError);
 		}
 		message.channel.send(attachment);
 		return message.channel.stopTyping();

@@ -12,7 +12,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		let user, a, b, guilds, fields, data, embed, i;
 		message.channel.startTyping();
 		if(message.args.length === 0 || !message.args) {
@@ -25,7 +25,7 @@ module.exports = {
 		
 		if(!user) return message.errorEmbed("INVALID_USER");
 		
-		a = message.client.guilds.filter(g => g.members.has(user.id));
+		a = this.guilds.filter(g => g.members.has(user.id));
 		b = a.map(g => `${g.name} (${g.id})`),
 		guilds = [],
 		fields = [],
@@ -51,7 +51,7 @@ module.exports = {
 			desciption: `I see this user in ${guilds.size} other guilds.`,
 			fields
 		};
-		embed = new message.client.Discord.MessageEmbed(data);
+		embed = new this.Discord.MessageEmbed(data);
 		message.channel.send(embed);
 		return message.channel.stopTyping();
 	})

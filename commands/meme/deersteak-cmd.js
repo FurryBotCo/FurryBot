@@ -14,18 +14,18 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
-		if(!message.client.config.beta) message.reply("temporarily disabled");
+	run: (async function(message) {
+		if(!this.config.beta) message.reply("temporarily disabled");
 		message.channel.startTyping();
 		let image, profile, d, time, i, attachment, messageAttachment;
-		image = await message.client.fsn.readFile(`${process.cwd()}/images/deersteak.png`);
-		await message.client.download(`https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png`,`${message.client.config.rootDir}/tmp/${message.author.id}.png`);
-		profile = await message.client.fsn.readFile(`${process.cwd()}/tmp/${message.author.id}.png`);
+		image = await this.fsn.readFile(`${process.cwd()}/images/deersteak.png`);
+		await this.download(`https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png`,`${this.config.rootDir}/tmp/${message.author.id}.png`);
+		profile = await this.fsn.readFile(`${process.cwd()}/tmp/${message.author.id}.png`);
 		
 		d = new Date();
 		time = d.getHours() < 10?d.getMinutes() < 10?`0${d.getHours()}:0${d.getMinutes()}`:`0${d.getHours()}:${d.getMinutes()}`:`${d.getHours()}:${d.getMinutes()}`;
 		
-		i = new message.client.Canvas(376, 79)
+		i = new this.Canvas(376, 79)
 			.addImage(profile, 1, 12, 50, 50)
 			.addImage(image, 0, 0, 376, 79)
 			.setColor("#36393F")
@@ -40,7 +40,7 @@ module.exports = {
 			
 		attachment = new messageAttachment(i);
 		
-		message.channel.send(`Here you go!\n(this is an inside joke from ${message.client.users.fetch("185938944460980224").tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
+		message.channel.send(`Here you go!\n(this is an inside joke from ${this.users.fetch("185938944460980224").tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
 		return message.channel.stopTyping();
 	})
 };

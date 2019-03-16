@@ -11,9 +11,9 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		// extra check, to be safe
-		if (!message.client.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
+		if (!this.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
 		message.channel.startTyping();
 		if(message.unparsedArgs.length === 0) {
 			message.channel.stopTyping();
@@ -21,8 +21,8 @@ module.exports = {
 		}
 		let set, attachment;
 		set = message.unparsedArgs.join("%20");
-		message.client.user.setAvatar(set).then((user) => {
-			attachment = new message.client.Discord.MessageAttachment(user.displayAvatarURL());
+		this.user.setAvatar(set).then((user) => {
+			attachment = new this.Discord.MessageAttachment(user.displayAvatarURL());
 			message.reply("Set Avatar to (attachment)",attachment);
 			return message.channel.stopTyping();
 		}).catch((err) => {

@@ -11,12 +11,12 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		let c;
-		if(!message.member.voice.channel) return message.reply("You must be in a voice channel to use message.client.");
-		c = message.client.voiceConnections.filter(g => g.channel.guild.id===message.guild.id);
+		if(!message.member.voice.channel) return message.reply("You must be in a voice channel to use this.");
+		c = this.voiceConnections.filter(g => g.channel.guild.id===message.guild.id);
         
-		if(c.size !== 0 && c.first().members.filter(m => m.id!==message.client.user.id).size !== 0) {
+		if(c.size !== 0 && c.first().members.filter(m => m.id!==this.user.id).size !== 0) {
 			if(!message.gConfig.djRole)  {
 				if(!message.member.permissions.has("MANAGE_SERVER")) return message.reply(":x: Missing permissions or DJ role.");
 			} else {

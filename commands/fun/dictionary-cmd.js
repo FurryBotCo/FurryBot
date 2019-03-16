@@ -12,12 +12,12 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		let input, text;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		
 		input = message.args.join(" ");
-		text = message.client.varParse(message.c,{author:message.author,input:input});
+		text = this.varParse(message.c,{author:message.author,input:input});
 		message.channel.send(text);
 	})
 };

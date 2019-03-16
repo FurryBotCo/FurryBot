@@ -13,7 +13,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		message.channel.startTyping();
 		let user, roles, data, req, x, ds, db, l, ll, rs, list, embed;
 		if(message.args.length === 0 || !message.args) {
@@ -54,14 +54,14 @@ module.exports = {
 			]
 		};
 		if(!user.user.bot) {
-			req = await message.client.request(`https://discord.services/api/ban/${user.id}`,{
+			req = await this.request(`https://discord.services/api/ban/${user.id}`,{
 				method: "GET"
 			});
 	
 			x = JSON.parse(req.body);
 			ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";
 			db = "Down until further notice";
-			l = await message.client.db.isBlacklisted(user.id);
+			l = await this.db.isBlacklisted(user.id);
 			ll = l ? `Reason: ${l.reason}` : "No";
 			data.fields.push({
 				name: "Blacklist",
@@ -74,14 +74,14 @@ module.exports = {
 			});
 		} else {
 			// botlist lookup
-			const req = await message.client.request(`https://botblock.org/api/bots/${user.id}`,{
+			const req = await this.request(`https://botblock.org/api/bots/${user.id}`,{
 				method: "GET"
 			});
 			try {
 				rs = JSON.parse(req.body);
-				list = Object.keys(message.client._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
+				list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			}catch(e){
-				message.client.logger.error(e);
+				this.logger.error(e);
 				rs = req.body;
 				list = "Lookup Failed.";
 			}
@@ -98,7 +98,7 @@ module.exports = {
 		}
 		Object.assign(data, message.embed_defaults());
 		data.thumbnail={url: user.user.displayAvatarURL()};
-		embed = new message.client.Discord.MessageEmbed(data);
+		embed = new this.Discord.MessageEmbed(data);
 		message.channel.send(embed);
 		return message.channel.stopTyping();
 	})

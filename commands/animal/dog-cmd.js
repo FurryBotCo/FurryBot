@@ -15,19 +15,19 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		message.channel.startTyping();
 		let req, j, parts, attachment;
-		req = await message.client.request("https://dog.ceo/api/breeds/image/random",{
+		req = await this.request("https://dog.ceo/api/breeds/image/random",{
 			method: "GET",
 			headers: {
-				"User-Agent": message.client.config.web.userAgent
+				"User-Agent": this.config.web.userAgent
 			}
 		});
 		j = JSON.parse(req.body);
 		parts = j.message.replace("https://","").split("/");
 		
-		attachment = new message.client.Discord.MessageAttachment(j.message,`${parts[2]}_${parts[3]}.png`);
+		attachment = new this.Discord.MessageAttachment(j.message,`${parts[2]}_${parts[3]}.png`);
 		
 		message.channel.send(`Breed: ${parts[2]}`,attachment);
 		return message.channel.stopTyping();

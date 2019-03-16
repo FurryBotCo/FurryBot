@@ -11,7 +11,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		let data, embed;
 		data = {
 			title: "Module Status",
@@ -49,7 +49,7 @@ module.exports = {
 			]
 		};
 		Object.assign(data,message.embed_defaults());
-		embed = new message.client.Discord.MessageEmbed(data);
+		embed = new this.Discord.MessageEmbed(data);
 		return message.channel.send(embed);
 	})
 };

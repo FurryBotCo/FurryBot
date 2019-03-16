@@ -1,6 +1,6 @@
-// add: message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id}, {$push: {selfAssignableRoles: "role"}});
-// remove: message.client.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{$pull: {selfAssignableRoles: "role"}})
-// get: message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles);
+// add: this.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id}, {$push: {selfAssignableRoles: "role"}});
+// remove: this.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{$pull: {selfAssignableRoles: "role"}})
+// get: this.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles);
 
 module.exports = {
 	triggers: [
@@ -17,10 +17,10 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		let roles, b, role;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
-		roles = await message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles).then(r => r.map(a => {
+		roles = await this.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles).then(r => r.map(a => {
 			b = message.guild.roles.get(a);
 			if(!b) return {id: null,name: null};
 			return {name: b.name.toLowerCase(), id: a};

@@ -14,7 +14,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
 		let user, w, data, embed, usr, blame;
 		// get member from message
@@ -23,7 +23,7 @@ module.exports = {
 		if(!user) return message.errorEmbed("INVALID_USER");
 		if(isNaN(message.args[1])) return message.reply("Please provide a valid warning id as the second argument.");
     
-		w = await message.client.db.getUserWarning(user.id,message.guild.id,message.args[1]);
+		w = await this.db.getUserWarning(user.id,message.guild.id,message.args[1]);
 		if(!w) {
 			data = {
 				title: "Failure",
@@ -31,10 +31,10 @@ module.exports = {
 				color: 15601937
 			};
 			Object.assign(data,message.embed_defaults("color"));
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		} else {
-			usr = await message.client.users.fetch(w.blame).catch(error => null);
+			usr = await this.users.fetch(w.blame).catch(error => null);
 			blame = !usr ? "Unknown#0000" : usr.tag;
 			data = {
 				title: `**${user.user.tag}** - Warning #${w.wid}`,
@@ -42,7 +42,7 @@ module.exports = {
 				color: 41728
 			};
 			Object.assign(data,message.embed_defaults("color"));
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		}
 	})

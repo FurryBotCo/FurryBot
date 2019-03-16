@@ -11,19 +11,19 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		// extra check, to be safe
-		if (!message.client.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
+		if (!this.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
 		message.channel.startTyping();
 		if(message.unparsedArgs.length === 0) {
 			message.channel.stopTyping();
 			return new Error("ERR_INVALID_USAGE");
 		}
-		if(!message.client.guilds.has(message.unparsedArgs[0])) {
+		if(!this.guilds.has(message.unparsedArgs[0])) {
 			message.reply("Guild not found");
 			return message.channel.stopTyping();
 		}
-		message.client.guilds.get(message.unparsedArgs[0]).leave().then((guild) => {
+		this.guilds.get(message.unparsedArgs[0]).leave().then((guild) => {
 			message.reply(`Left guild **${guild.name}** (${guild.id})`);
 			return message.channel.stopTyping();
 		}).catch((err) => {

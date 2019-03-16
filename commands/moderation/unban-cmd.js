@@ -16,12 +16,12 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		let user, data, embed, reason, m;
 		// get member from message
 		if(isNaN(message.args[0])) return message.reply("Please provide a user id.");
         
-		user = message.client.users.has(message.args[0]) ? message.client.users.get(message.args[0]) : await message.client.users.fetch(message.args[0]).catch(error => false);
+		user = this.users.has(message.args[0]) ? this.users.get(message.args[0]) : await this.users.fetch(message.args[0]).catch(error => false);
     
 		if(!user) return message.errorEmbed("INVALID_USER");
 		if(!(await message.guild.fetchBans()).has(user.id)) {
@@ -30,7 +30,7 @@ module.exports = {
 				description: `It doesn't look like ${user.tag} is banned here..`
 			};
 			Object.assign(data, message.embed_defaults());
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		}
     
@@ -44,6 +44,6 @@ module.exports = {
 			}
 		});
     
-		if(!message.gConfig.delCmds && message.channel.permissionsFor(message.client.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
+		if(!message.gConfig.delCmds && message.channel.permissionsFor(this.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
 	})
 };

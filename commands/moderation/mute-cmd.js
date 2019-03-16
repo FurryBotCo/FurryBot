@@ -16,7 +16,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		let user, data, embed, reason, m;
 		// get member from message
@@ -31,7 +31,7 @@ module.exports = {
 				color: 15601937
 			};
 			Object.assign(data, message.embed_defaults("color"));
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		}
 		if(!message.guild.roles.has(message.gConfig.muteRole)) {
@@ -40,9 +40,9 @@ module.exports = {
 				description: `The mute role specified for this server <@&${message.gConfig.muteRole}> (${message.guild.id}) was not found, it has been reset. You can set a new one with \`${message.gConfig.prefix}setmuterole <role>\``,
 				color: 15601937
 			};
-			await message.client.db.updateGuild(message.guild.id,{muteRole:null});
+			await this.db.updateGuild(message.guild.id,{muteRole:null});
 			Object.assign(data, message.embed_defaults("color"));
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		}
 		if(message.guild.roles.get(message.gConfig.muteRole).rawPosition >= message.guild.me.roles.highest.rawPositon) {
@@ -52,7 +52,7 @@ module.exports = {
 				color: 15601937
 			};
 			Object.assign(data, message.embed_defaults("color"));
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		}
     
@@ -63,11 +63,11 @@ module.exports = {
 				color: 15601937
 			};
 			Object.assign(data, message.embed_defaults()("color"));
-			embed = new message.client.Discord.MessageEmbed(data);
+			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
 		}
         
-		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourmessage.client.");
+		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourthis.");
 		if(user.roles.highest.rawPosition >= message.member.roles.highest.rawPosition && message.author.id !== message.guild.owner.id) return message.reply(`You cannot mute ${user.user.tag} as their highest role is higher than yours!`);
 		if(user.permissions.has("ADMINISTRATOR")) return message.reply("That user has `ADMINISTRATOR`, that would literally do nothing.");
 		reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";
@@ -80,6 +80,6 @@ module.exports = {
 				await m.delete();
 			}
 		});
-		if(!message.gConfig.delCmds && message.channel.permissionsFor(message.client.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
+		if(!message.gConfig.delCmds && message.channel.permissionsFor(this.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
 	})
 };

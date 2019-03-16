@@ -12,10 +12,10 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		let queue, ql, pages, page, fields, i, q, usr, addedBy, data, embed;
-		queue = await message.client.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.music.queue);
-		ql = message.client.chunk(queue,10);
+		queue = await this.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.music.queue);
+		ql = this.chunk(queue,10);
 		if(ql.length >= 1) {
 			pages = ql.length;
 			if([undefined,null,""].includes(page)) page = 1;
@@ -24,7 +24,7 @@ module.exports = {
 			i = 0;
 			for(let key in ql[page-1]) {
 				q = ql[page-1][key];
-				usr = await message.client.users.fetch(q.addedBy);
+				usr = await this.users.fetch(q.addedBy);
 				addedBy = !usr ? "Unknown" : usr.tag;
 				if(i === 0) {
 					fields.push({
@@ -54,7 +54,7 @@ module.exports = {
 			fields,
 			color: 2424780
 		};
-		embed = new message.client.Discord.MessageEmbed(data);
+		embed = new this.Discord.MessageEmbed(data);
 		return message.channel.send(embed);
 	})
 };

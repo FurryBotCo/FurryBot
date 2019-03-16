@@ -11,13 +11,13 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => {
+	run: (async function(message) {
 		message.channel.startTyping();
 		let user, imgurl, m, req, j, attachment;
 		if(message.args.length >= 1) {
 			// get member from message
 			user = await message.getUserFromArgs();
-			imgurl = user instanceof message.client.Discord.User ? user.displayAvatarURL({format:"png"}) : message.unparsedArgs.join("%20");
+			imgurl = user instanceof this.Discord.User ? user.displayAvatarURL({format:"png"}) : message.unparsedArgs.join("%20");
 		} else if (message.attachments.first()) {
 			imgurl = message.attachments.first().url;
 		} else if((m = message.channel.messages.filter(m => m.attachments.size>=1)) && m.size >= 1) {
@@ -29,7 +29,7 @@ module.exports = {
 			message.reply("please either attach an image or provide a url");
 			return message.channel.stopTyping();
 		}
-		req = await message.client.memeRequest("/gay",[imgurl]);
+		req = await this.memeRequest("/gay",[imgurl]);
 		if(req.statusCode !== 200) {
 			try {
 				j = {status:req.statusCode,message:JSON.stringify(req.body)};
@@ -40,7 +40,7 @@ module.exports = {
 			console.log(`imgurl: ${imgurl}`);
 			return message.channel.stopTyping();
 		}
-		attachment = new message.client.Discord.MessageAttachment(req.body,"gay.png");
+		attachment = new this.Discord.MessageAttachment(req.body,"gay.png");
 		message.channel.send(attachment).catch(err => message.reply(`Error sending: ${err}`));
 		return message.channel.stopTyping();
 	})

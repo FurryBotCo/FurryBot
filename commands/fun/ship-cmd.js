@@ -13,7 +13,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
-	run: (async(message) => { 
+	run: (async function(message) { 
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		message.channel.startTyping();
 		let user1, user2, rand1, rand2, r1, r2, shipname, t, amount, u1, u2, imgpath1, imgpath2, profile1, profile2, attch, data, embed;
@@ -36,8 +36,8 @@ module.exports = {
     
 		if(!user1) return message.errorEmbed("INVALID_USER");
     
-		if(user1 instanceof message.client.Discord.GuildMember) user1 = user1.user;
-		if(user2 instanceof message.client.Discord.GuildMember) user2 = user2.user;
+		if(user1 instanceof this.Discord.GuildMember) user1 = user1.user;
+		if(user2 instanceof this.Discord.GuildMember) user2 = user2.user;
 		if(!user2) user2 = message.author;
     
 		if(user1.id === user2.id) {
@@ -101,23 +101,23 @@ module.exports = {
     
 		const heart = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "1" : amount >= 2 && amount < 19 ? "2-19" : amount >= 20 && amount < 39 ? "20-39" : amount >= 40 && amount < 59 ? "40-59" : amount >= 60 && amount < 79 ? "60-79" : amount >= 80 && amount < 99 ? "80-99" : amount === 100 ? "100" : "unknown";
 		const shiptext = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "Not Happening.." : amount >= 2 && amount < 19 ? "Unlikely.." : amount >= 20 && amount < 39 ? "Maybe?" : amount >= 40 && amount < 59 ? "Hopeful!" : amount >= 60 && amount < 79 ? "Good!" : amount >= 80 && amount < 99 ? "Amazing!" : amount === 100 ? "Epic!" : "unknown";
-		const heartIcon = await message.client.fsn.readFile(`${message.client.config.rootDir}/assets/images/ship/ship-${heart}-percent.png`);
+		const heartIcon = await this.fsn.readFile(`${this.config.rootDir}/assets/images/ship/ship-${heart}-percent.png`);
 		u1 = user1.displayAvatarURL().split(".");
 		u1.pop();
-		imgpath1 = `${message.client.config.rootDir}/tmp/${message.guild.id}-${message.channel.id}-${message.author.id}-ship-u1.png`;
-		await message.client.download(`${u1.join(".")}.png`,imgpath1);
-		profile1 = await message.client.fsn.readFile(imgpath1);
+		imgpath1 = `${this.config.rootDir}/tmp/${message.guild.id}-${message.channel.id}-${message.author.id}-ship-u1.png`;
+		await this.download(`${u1.join(".")}.png`,imgpath1);
+		profile1 = await this.fsn.readFile(imgpath1);
 		u2 = user2.displayAvatarURL().split(".");
 		u2.pop();
-		imgpath2 = `${message.client.config.rootDir}/tmp/${message.guild.id}-${message.channel.id}-${message.author.id}-ship-u2.png`;
-		await message.client.download(`${u2.join(".")}.png`,imgpath2);
-		profile2 = await message.client.fsn.readFile(imgpath2);
-		const img = new message.client.Canvas(384,128)
+		imgpath2 = `${this.config.rootDir}/tmp/${message.guild.id}-${message.channel.id}-${message.author.id}-ship-u2.png`;
+		await this.download(`${u2.join(".")}.png`,imgpath2);
+		profile2 = await this.fsn.readFile(imgpath2);
+		const img = new this.Canvas(384,128)
 			.addImage(profile1,0,0,128,128)
 			.addImage(heartIcon,128,0,128,128)
 			.addImage(profile2,256,0,128,128);
 		const shiph = await img.toBufferAsync();
-		attch = new message.client.Discord.MessageAttachment(shiph,"ship.png");
+		attch = new this.Discord.MessageAttachment(shiph,"ship.png");
 		data = {
 			title: ":heart: **Shipping!** :heart:",
 			description: `Shipping **${user1.tag}** with **${user2.tag}**\n**${amount}%** - ${shiptext}\nShipname: ${shipname}`,
@@ -126,11 +126,11 @@ module.exports = {
 			}
 		};
 		Object.assign(data,message.embed_defaults());
-		embed = new message.client.Discord.MessageEmbed(data);
+		embed = new this.Discord.MessageEmbed(data);
 		embed.attachFiles(attch);
 		await message.channel.send(embed);
-		//await message.client.fsn.unlink(imgpath1);
-		//await message.client.fsn.unlink(imgpath2);
+		//await this.fsn.unlink(imgpath1);
+		//await this.fsn.unlink(imgpath2);
 		return message.channel.stopTyping();
 	})
 };
