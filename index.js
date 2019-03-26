@@ -15,7 +15,7 @@ class FurryBot extends BaseClient {
 		super(opt);
 		this.commands = require("./commands");
 		this.responses = require("./responses");
-		this.categories = require("./commands")
+		this.categories = require("./commands");
 		this.commandList = this.commands.map(c => c.commands.map(cc => cc.triggers)).reduce((a,b) => a.concat(b)).reduce((a,b) => a.concat(b));
 		this.responseList = this.responses.map(r => r.triggers).reduce((a,b) => a.concat(b));
 		this.categoryList = this.categories.map(c => c.name);
@@ -45,7 +45,7 @@ class FurryBot extends BaseClient {
 				this.config.bot.webhooks[w].token,
 				{
 					disableEveryone: true
-				})
+				});
 		}
 		this.mongo = await this.MongoClient.connect(`mongodb://${this.config.db.main.host}:${this.config.db.main.port}/${this.config.db.main.database}`,this.config.db.main.opt);
 		this.mdb = this.mongo.db(this.config.db.main.database);
@@ -81,7 +81,7 @@ class FurryBot extends BaseClient {
 						}
 					}
 				});
-				console.log(`[EventManager]: Loaded Client#${eventName} event`);
+				console.log("[EventManager]: Loaded Client#${eventName} event");
 				delete require.cache[require.resolve(`./handlers/events/Client/${file}`)];
 			});
 		});

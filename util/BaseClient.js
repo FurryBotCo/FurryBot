@@ -4,7 +4,7 @@ const Discord = require("discord.js"),
 class BaseClient extends Discord.Client {
 	constructor(ClientOptions) {
 		super(ClientOptions);
-		Object.assign(this,require(`./functions`));
+		Object.assign(this,require("./functions"));
 		this.util = require("util");
 		this.config = require("../config");
 		this.stats = {
@@ -29,11 +29,11 @@ class BaseClient extends Discord.Client {
 			postStats: require("./listStats"),
 			fs: require("fs"),
 			MongoClient: require("mongodb").MongoClient,
-			FurryBotDatabase: require(`./dbFunctions`),
-			FurryBotLogger: require(`./loggerV4`),
-			varParse: require(`./varHandler`),
+			FurryBotDatabase: require("./dbFunctions"),
+			FurryBotLogger: require("./loggerV4"),
+			varParse: require("./varHandler"),
 			listStats: require("./listStats"),
-			lang: require(`../lang`)(this),
+			lang: require("../lang")(this),
 			path: require("path"),
 			colors: require("console-colors-2"),
 			Canvas: require("canvas-constructor").Canvas,
@@ -46,7 +46,7 @@ class BaseClient extends Discord.Client {
 			yiffNoticeViewed: new Set(),
 			_: require("lodash"),
 			perf,
-			dbStats: require(`./dbStats`),
+			dbStats: require("./dbStats"),
 			performance: perf.performance,
 			PerformanceObserver: perf.PerformanceObserver,
 			child_process,
@@ -276,7 +276,7 @@ class BaseClient extends Discord.Client {
 					if(chn !== null && chn instanceof this.Discord.TextChannel) {
 						chn.send(embed);
 					}
-					await client.mdb.collection("guilds").findOneAndUpdate({id: channel.guild.id},{
+					await this.mdb.collection("guilds").findOneAndUpdate({id: channel.guild.id},{
 						$set: {
 							"music.queue": []
 						}
