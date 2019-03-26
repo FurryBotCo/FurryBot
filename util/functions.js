@@ -38,7 +38,7 @@ module.exports = {
 		if (seconds < 10) seconds = `0${seconds}`;
 		return `${hours}:${minutes}:${seconds}`;
 	}),
-	ucwords: ((str)=> str.toString().toLowerCase().replace(/^(.)|\s+(.)/g,(r) => r.toUpperCase())),
+	ucwords: ((str) => str.toString().toLowerCase().replace(/^(.)|\s+(.)/g,(r) => r.toUpperCase())),
 	toReadableDate: ((date) => {
 		if(!(date instanceof Date)) throw new Error("must provide javascript Date object.");
 		var a = date.toISOString().replace("Z","").split("T");

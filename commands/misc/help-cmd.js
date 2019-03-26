@@ -29,7 +29,7 @@ module.exports = {
 			data = {
 				title: "Command Help",
 				fields: categories.map(c => ({name: `${c.displayName}`,value:`\`${message.gConfig.prefix}help ${c.name}\`\n[Hover for more info](https://google.com '${c.description}\n${c.commands.length} Commands Total')`,inline: true}))
-			}
+			};
 			Object.assign(data,message.embed_defaults());
 			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
