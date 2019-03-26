@@ -54,15 +54,25 @@ module.exports = {
 			]
 		};
 		if(!user.user.bot) {
-			req = await this.request(`https://discord.services/api/ban/${user.id}`,{
-				method: "GET"
-			});
-	
-			x = JSON.parse(req.body);
-			ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";
+			try {
+				req = await this.request(`https://discord.services/api/ban/${user.id}`,{
+					method: "GET"
+				});
+		
+				x = JSON.parse(req.body);
+				ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";
+			} catch(e) {
+				ds = "Lookup failed.";
+				this.logger.log(e);
+				this.logger.log({
+					headers: req.headers,
+					body: req.body,
+					statusCode: req.statusCode
+				});
+			}
 			db = "Down until further notice";
 			l = await this.db.isBlacklisted(user.id);
-			ll = l ? `Reason: ${l.reason}` : "No";
+			ll = l.blacklisted ? `Reason: ${l.reason}` : "No";
 			data.fields.push({
 				name: "Blacklist",
 				value: `Discord.Services: **${ds}**\nDiscord Bans: **${db}**\nlocal: **${ll}**`,
@@ -82,6 +92,11 @@ module.exports = {
 				list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			}catch(e){
 				this.logger.error(e);
+				this.logger.log({
+					headers: req.headers,
+					body: req.body,
+					statusCode: req.statusCode
+				});
 				rs = req.body;
 				list = "Lookup Failed.";
 			}

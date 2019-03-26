@@ -8,7 +8,7 @@ module.exports = {
 	botPermissions: [],
 	cooldown: .5e3,
 	description: "Enable or disable the logging of an event",
-	usage: "log [e/d] <event>",
+	usage: "[e/d] <event>",
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,

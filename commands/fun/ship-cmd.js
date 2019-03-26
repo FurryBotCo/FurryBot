@@ -18,7 +18,7 @@ module.exports = {
 		message.channel.startTyping();
 		let user1, user2, rand1, rand2, r1, r2, shipname, t, amount, u1, u2, imgpath1, imgpath2, profile1, profile2, attch, data, embed;
 		if(message.args[0] === "random") {
-			user1 = message.guild.members.filter(u => u.id!==message.author.id&&!u.user.bot).random();
+			user1 = message.guild.members.filter(u => u.id !== message.author.id && !u.user.bot).random();
 		} else {
 			user1 = await message.getUserFromArgs(0,false,false,0);
 		}
@@ -27,7 +27,7 @@ module.exports = {
 		if(message.args.length > 1) {
 			if(message.args[1] === "random") {
 				if(!user1) {} else {
-					user2 = message.guild.members.filter(u => u.id!==user1.id&&u.id!==message.author.id&&!u.user.bot).random();
+					user2 = message.guild.members.filter(u => u.id !== user1.id && u.id !== message.author.id && !u.user.bot).random();
 				}
 			} else {
 				user2 = await message.getUserFromArgs(1,false,false,1);
@@ -48,7 +48,7 @@ module.exports = {
 		const builtin = [
 			{
 				users: [
-					"365255872181567489", // ❄w❄pup#7756
+					"365255872181567489", // owopup#7756
 					"398251412246495233"  // Furry Bot#7119
 				],
 				percent: 100
@@ -60,20 +60,20 @@ module.exports = {
 				percent: 100
 			},{
 				users: [
-					"242843345402069002", // Donovan_DMC#1337
+					"242843345402069002", // Donovan_DMC#3621
 					"434662676547764244"  // Jinjin#1806
 				],
 				percent: 100
 			},{
 				users: [
 					"158750488563679232", // Skullbite#5245
-					"242843345402069002"  // Donovan_DMC#1337
+					"242843345402069002"  // Donovan_DMC#3621
 				],
 				percent: 100
 			},{
 				users: [
                     
-					"242843345402069002", // Donovan_DMC#1337
+					"242843345402069002", // Donovan_DMC#3621
 					"398251412246495233"  // Furry Bot#7119
 				],
 				percent: 100
@@ -95,7 +95,7 @@ module.exports = {
 		r1 = Math.round(user1.username.length/rand1),
 		r2 = Math.round(user2.username.length/rand2);
     
-		shipname = user1.username.substr(0,r1)+user2.username.substr(user2.username.length-r2,r2);
+		shipname = user1.username.substr(0,r1) + user2.username.substr(user2.username.length - r2,r2);
 		t = builtin.filter(b => b.users.includes(user1.id)).filter(b => b.users.includes(user2.id));
 		amount = t.length > 0 ? t[0].percent : Math.floor(Math.random()*101);
     

@@ -9,6 +9,7 @@ module.exports = {
 		return a;
 	}),
 	name: "Meme",
+	displayName: ":joy: Memey",
 	description: "Let's get this bread.",
 	path: __dirname
 };

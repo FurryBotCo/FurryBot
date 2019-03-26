@@ -1,8 +1,7 @@
 module.exports = {
 	triggers: [
 		"d",
-		"dev",
-		"developer"
+		"dev"
 	],
 	userPermissions: [],
 	botPermissions: [],

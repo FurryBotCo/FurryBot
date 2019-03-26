@@ -14,7 +14,6 @@ module.exports = (async function(message){
 	});
 	let blacklist, data, embed, response, start, c, end, command, category, g, u, blacklistType, blReason, neededPerms, st;
 	const client = this;
-	global.this = this;
 	this.messageCount++;
 	this.messageMessageCount++;
 	if(message.author.bot || (this.config.devOnly && !this.config.developers.includes(message.author.id))) return;
@@ -477,8 +476,8 @@ module.exports = (async function(message){
 		}
 		
 		if(Object.keys(this.lang[message.gConfig.locale]).includes(command.triggers[0])) {
-			message.command = this.lang[message.gConfig.locale][command.triggers[0]];
-			message.c = message.command[Math.floor(Math.random()*message.command.length)];
+			message.cmd = this.lang[message.gConfig.locale][command.triggers[0]];
+			message.c = message.cmd[Math.floor(Math.random()*message.command.length)];
 		}
 
 		this.analytics.track({

@@ -1,7 +1,7 @@
 module.exports = (async function(oldMessage,newMessage) {
 	if(!oldMessage || !newMessage || oldMessage.content === newMessage.content) return;
 	try{
-		require(`${this.config.rootDir}/handlers/events/message.js`)(newMessage);
+		this.emit("message",newMessage);
 	}catch(error){}
 	if(!newMessage.guild || !["text","voice","category"].includes(newMessage.channel.type)) return;
 	this.analytics.track({

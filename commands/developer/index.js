@@ -8,7 +8,8 @@ module.exports = {
 		delete require.cache[require.resolve(`${__dirname}/${c}`)];
 		return a;
 	}),
-	name: "Developer",
+	name: "developer",
+	displayName: ":tools: Developer",
 	description: "Developers only, no normies allowed.",
 	path: __dirname
 };

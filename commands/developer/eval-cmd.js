@@ -28,9 +28,9 @@ module.exports = {
 			//return message.reply(`Error evaluating: ${err}`);
 			m = typeof e.message !== "string" ? this.util.inspect(e.message,{depth: 1}) : e.message;
 			console.log(this.util.inspect(e.message,{depth: 1}));
-			res = e.length > 1000 ? "Logged To Console" : `\`\`\`fix\nError Evaluating:\n${e.name}: ${m}\`\`\``;
+	
 			end = this.performance.now();
-			if(e.length > 6000) {
+			if(e.length > 1000) {
 				const req = await this.request("https://pastebin.com/api/api_post.php",{
 					method: "POST",
 					form: {
@@ -79,7 +79,7 @@ module.exports = {
 			res = "```fix\nfinished with no return```";
 		} else {
 			if(typeof res !== "string") res = this.util.inspect(res,{showHidden:true,depth: 3});
-			if(res.length > 6000) {
+			if(res.length > 1000) {
 				const req = await this.request("https://pastebin.com/api/api_post.php",{
 					method: "POST",
 					form: {
@@ -93,9 +93,6 @@ module.exports = {
 					}
 				});
 				res = `Uploaded ${req.body.toString()}`;
-			} else if(res.length > 1000) {
-				console.log(`[Eval]: ${res}`);
-				res = "Logged To Console";
 			}
 			res = "```js\n"+res+"```";
 		}

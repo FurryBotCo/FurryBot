@@ -18,16 +18,16 @@ module.exports = (async function() {
 	});
 
 	const statuses = [
-			{status: `🐾 ${this.config.defaultPrefix}help for help! 🐾`, type: "PLAYING"},
-			{status: `🐾 ${this.config.defaultPrefix}help in ${this.guilds.size} guilds! 🐾`, type: "PLAYING"},
-			{status: `🐾 ${this.config.defaultPrefix}help with ${this.users.size} users! 🐾`, type: "WATCHING"},
-			{status: `🐾 ${this.config.defaultPrefix}help in ${this.channels.size} channels! 🐾`, type: "LISTENING"},
-			{status: `🐾 ${this.config.defaultPrefix}help with ${this.options.shardCount} shard${this.options.shardCount>1?"s":""}! 🐾`, type: "PLAYING"}
+			{status: "🐾 ${this.config.defaultPrefix}help for help! 🐾", type: "PLAYING"},
+			{status: "🐾 ${this.config.defaultPrefix}help in ${this.guilds.size} guilds! 🐾", type: "PLAYING"},
+			{status: "🐾 ${this.config.defaultPrefix}help with ${this.users.size} users! 🐾", type: "WATCHING"},
+			{status: "🐾 ${this.config.defaultPrefix}help in ${this.channels.size} channels! 🐾", type: "LISTENING"},
+			{status: "🐾 ${this.config.defaultPrefix}help with ${this.options.shardCount} shard${this.options.shardCount>1?\"s\":\"\"}! 🐾", type: "PLAYING"}
 		],
 		rotateStatus = (() => {
 			for(let i = 0;i<statuses.length;i++) {
 				//setTimeout(this.user.setActivity,i * 15e3, statuses[i].status,{type: statuses[i].type});
-				setTimeout(() => this.user.setActivity(statuses[i].status,{type: statuses[i].type}), i * 15e3);
+				setTimeout(() => this.user.setActivity(eval(`\`${statuses[i].status}\``),{type: statuses[i].type}), i * 15e3);
 			}
 		});
 
