@@ -20,7 +20,7 @@ module.exports = (async function(error) {
 			title: "Client Error",
 			description: error,
 			timestamp: new Date().toISOString()
-		}
+		};
 		let embed = new this.Discord.MessageEmbed(data);
 		await this.config.bot.webhooks.errors.hook.send(embed);
 	} catch(e) {

@@ -19,7 +19,7 @@ module.exports = (async function(id) {
 			title: "Shard Status Update",
 			description: `Shard ${id} is ready!`,
 			timestamp: new Date().toISOString()
-		}
+		};
 		let embed = new this.Discord.MessageEmbed(data);
 		this.config.bot.webhooks.shards.hook.send(embed);
 	} catch(e) {

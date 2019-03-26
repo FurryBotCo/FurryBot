@@ -324,8 +324,8 @@ module.exports = {
 				for(let m of members) {
 					member = message.guild.members.get(m);
 					if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all bots.`)
-						.then(() => counts.success++)
-						.catch(() => counts.fail++);
+						.then(counts.success++)
+						.catch(counts.fail++);
 					else counts.skip++;
 				}
 				return message.channel.send(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before + counts.success}**\nSkipped: **${counts.skip}**`);

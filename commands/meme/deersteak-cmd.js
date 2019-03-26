@@ -17,7 +17,7 @@ module.exports = {
 	run: (async function(message) {
 		if(!this.config.beta) message.reply("temporarily disabled");
 		message.channel.startTyping();
-		let image, profile, d, time, i, attachment, messageAttachment;
+		let image, profile, d, time, i, attachment;
 		image = await this.fsn.readFile(`${process.cwd()}/images/deersteak.png`);
 		await this.download(`https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png`,`${this.config.rootDir}/tmp/${message.author.id}.png`);
 		profile = await this.fsn.readFile(`${process.cwd()}/tmp/${message.author.id}.png`);
@@ -38,9 +38,9 @@ module.exports = {
 			.addText(message.member.displayName, 77, 33)
 			.toBufferAsync();
 			
-		attachment = new messageAttachment(i);
-		
-		message.channel.send(`Here you go!\n(this is an inside joke from ${this.users.fetch("185938944460980224").tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
+		attachment = new this.Discord.MessageAttachment(i);
+		const u = await this.users.fetch("185938944460980224");
+		message.channel.send(`Here you go!\n(this is an inside joke from ${u.tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
 		return message.channel.stopTyping();
 	})
 };

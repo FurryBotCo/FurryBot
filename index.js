@@ -81,13 +81,13 @@ class FurryBot extends BaseClient {
 						}
 					}
 				});
-				console.log("[EventManager]: Loaded Client#${eventName} event");
+				console.log(`[EventManager]: Loaded Client#${eventName} event`);
 				delete require.cache[require.resolve(`./handlers/events/Client/${file}`)];
 			});
 		});
 		this.ws.shards.map(s => s.on("ready",require("./handlers/events/WebSocketShard/ready").bind(this,s.id)));
 		delete require.cache[require.resolve("./handlers/events/WebSocketShard/ready")];
-		console.log(`[EventManager]: Loaded WebSocketManager#ready event`);
+		console.log("[EventManager]: Loaded WebSocketManager#ready event");
 		console.log("[loadEvent]: end of load");
 	}
 

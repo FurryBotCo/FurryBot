@@ -225,4 +225,4 @@ module.exports = {
 			throw e;
 		});
 	}
-}
+};

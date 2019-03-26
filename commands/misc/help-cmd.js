@@ -25,7 +25,7 @@ module.exports = {
 			});
 			categories.forEach((c) => {
 				if((c.name.toLowerCase() === "developer" && !this.config.developers.includes(message.author.id)) || (c.name.toLowerCase() === "custom" && message.guild.id !== this.config.bot.mainGuild)) categories.splice(categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()),categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()));
-			})
+			});
 			data = {
 				title: "Command Help",
 				fields: categories.map(c => ({name: `${c.displayName}`,value:`\`${message.gConfig.prefix}help ${c.name}\`\n[Hover for more info](https://google.com '${c.description}\n${c.commands.length} Commands Total')`,inline: true}))
@@ -67,7 +67,7 @@ module.exports = {
 						inline: false
 					}
 				]
-			}
+			};
 			if(this.config.developers.includes(message.author.id)) data.fields.push({
 				name: "Path (dev)",
 				value: command.path,

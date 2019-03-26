@@ -18,7 +18,7 @@ class FurryBotLogger {
 		//this.isSharded = this.client !== null ? ![undefined,null].includes(this.client.shard) ? true : false : false;
 		//this.shardID = this.isSharded ? this.client.shard.id : 0;
 		//this.shardCount = this.isSharded ? this.client.shard.count : 1;
-		this._getCallerFile = (()=>{
+		this._getCallerFile = (() => {
 			try {
 				var err = new Error();
 				var callerfile;
