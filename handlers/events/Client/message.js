@@ -162,7 +162,7 @@ module.exports = (async function(message){
 			}
 		});
 		start = this.performance.now();
-		c = await response.run.apply(this,message);
+		c = await response.run.call(this,message);
 		end = this.performance.now();
 		this.logger.debug(`Response handler for "${response.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
 		return;

@@ -354,7 +354,7 @@ class BaseClient extends Discord.Client {
 			mention_roles: [],
 			mention_everyone: false
 		},channel);
-		return require(`${this.config.rootDir}/handlers/events/message.js`)(msg);
+		return this.emit("message",msg);
 	}
 
 	getDateTime() {

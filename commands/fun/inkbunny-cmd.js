@@ -139,9 +139,9 @@ module.exports = {
 			"boobhat",
 			"vore"
 		];
-		tags = message.unparseArgs.length > 0 ? `${message.unparseArgs.join("%20").toLowerCase()}%20-${tagBlacklist.join("%20-")}` : `furry%20-${tagBlacklist.join("%20-")}`;
+		tags = message.unparsedArgs.length > 0 ? `${message.unparsedArgs.join("%20").toLowerCase()}%20-${tagBlacklist.join("%20-")}` : `furry%20-${tagBlacklist.join("%20-")}`;
         
-		bl = message.unparseArgs.join(" ").match(this.config.tagBlacklist);
+		bl = message.unparsedArgs.join(" ").match(this.config.tagBlacklist);
 		if(bl !== null && bl.length > 0) return message.reply(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
 		req = await this.request(`https://inkbunny.net/api_search.php?sid=${this.config.apis.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=${tags}&random=yes&get_rid=yes`,{
 			method: "GET",
@@ -161,7 +161,7 @@ module.exports = {
 				return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err => message.channel.send(`Command failed: ${err}`));
 			}
 			attachment = new this.Discord.MessageAttachment(submission.file_url_full,submission.file_name);
-			return msg.edit(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRequested By: ${message.author.tag}\nRID: ${jsn.rid}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => message.channel.send(`Command failed: ${err}`)).then(() => message.channel.send(attachment)).catch(err => message.channel.send(`Command failed: ${err}`));
+			return msg.edit(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRequested By: ${message.author.tag}\nRID: ${jsn.rid}\nIf a bad image is returned, blame the service, not the bot or its author!`).catch(err => message.channel.send(`Command failed: ${err}`)).then(() => message.channel.send(attachment)).catch(err => message.channel.send(`Command failed: ${err}`));
 		}catch(e){
 			this.logger.error(`Error:\n${e}`);
 			this.logger.log(`${this.util.inspect(jsn,{depth:3})}`);

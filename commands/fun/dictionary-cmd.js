@@ -1,7 +1,8 @@
 module.exports = {
 	triggers: [
 		"dictionary",
-		"dict"
+		"dict",
+		"throw_dict"
 	],
 	userPermissions: [],
 	botPermissions: [],

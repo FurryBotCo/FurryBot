@@ -16,18 +16,10 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.stopTyping();
-		let req, json, attachment;
-		req = await this.request("https://aws.random.cat/meow",{
-			method: "GET",
-			headers: {
-				"User-Agent": this.config.web.userAgent
-			}
-		});
-		
+		message.channel.startTyping();
+		let attachment;
 		try {
-			json = JSON.parse(req.body);
-			attachment = new this.Discord.MessageAttachment(json.file);
+			attachment = new this.Discord.MessageAttachment("https://cataas.com/cat/gif","cat.gif");
 		}catch(error){
 			this.logger.error(error);
 			attachment = new this.Discord.MessageAttachment(this.config.images.serverError);
