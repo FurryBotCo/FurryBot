@@ -3,7 +3,7 @@ module.exports = (async function(role) {
 	this.trackEvent({
 		group: "EVENTS",
 		roleId: role.id,
-		guildId: guild.id,
+		guildId: role.guild.id,
 		event: "client.events.roleDelete",
 		properties: {
 			bot: {
