@@ -1,6 +1,6 @@
 module.exports = (async function(id) {
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
 		event: "client.events.shardReady",
 		properties: {
 			bot: {

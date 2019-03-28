@@ -1,7 +1,8 @@
 module.exports = (async function(message){
 	if(!this.db || !message) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "MESSAGE",
+		userId: message.author.id,
 		event: "client.events.message",
 		properties: {
 			bot: {
@@ -18,8 +19,9 @@ module.exports = (async function(message){
 	this.messageMessageCount++;
 	if(message.author.bot || (this.config.devOnly && !this.config.developers.includes(message.author.id))) return;
 	if(message.channel.type === "dm") {
-		this.analytics.track({
-			userId: "CLIENT",
+		this.trackEvent({
+			group: "DM",
+			userId: message.author.id,
 			event: "client.events.message.directMessage",
 			properties: {
 				bot: {
@@ -127,8 +129,9 @@ module.exports = (async function(message){
 		response = this.getResponse(message.content.toLowerCase());
 		if(response.triggers.includes("f") && !message.gConfig.fResponseEnabled) return;
 		this.logger.commandlog(`Response "${response.triggers[0]}" triggered by user ${message.author.tag} (${message.author.id}) in guild ${message.guild.name} (${message.guild.id})`);
-		this.analytics.track({
-			userId: "CLIENT",
+		this.trackEvent({
+			group: "RESPONSE",
+			userId: message.author.id,
 			event: `responses.${response.triggers[0]}`,
 			properties: {
 				bot: {
@@ -192,8 +195,9 @@ module.exports = (async function(message){
 			if(command.userPermissions.some(perm => !message.channel.permissionsFor(message.member).has(perm,true))) {
 				neededPerms = command.userPermissions.filter(perm => !message.channel.permissionsFor(message.member).has(perm,true));
 				neededPerms = neededPerms.length > 1 ? neededPerms.join(", ") : neededPerms;
-				this.analytics.track({
-					userId: "CLIENT",
+				this.trackEvent({
+					group: "COMMANDS",
+					userId: message.author.id,
 					event: `commands.${message.command}.missingPermissions`,
 					properties: {
 						type: "user",
@@ -243,8 +247,9 @@ module.exports = (async function(message){
 			if(command.botPermissions.some(perm => !message.channel.permissionsFor(message.guild.me).has(perm,true))) {
 				neededPerms = command.botPermissions.filter(perm => !message.channel.permissionsFor(message.guild.me).has(perm,true));
 				neededPerms = neededPerms.length > 1 ? neededPerms.join(", ") : neededPerms;
-				this.analytics.track({
-					userId: "CLIENT",
+				this.trackEvent({
+					group: "COMMANDS",
+					userId: message.author.id,
 					event: `commands.${message.command}.missingPermissions`,
 					properties: {
 						type: "bot",
@@ -292,8 +297,9 @@ module.exports = (async function(message){
 		
 		if(command.nsfw === true) {
 			if(!message.channel.nsfw) {
-				this.analytics.track({
-					userId: "CLIENT",
+				this.trackEvent({
+					group: "COMMANDS",
+					userId: message.author.id,
 					event: `commands.${message.command}.errors.channelNotNSFW`,
 					properties: {
 						bot: {
@@ -336,8 +342,9 @@ module.exports = (async function(message){
 			}
 
 			if(!message.gConfig.nsfwModuleEnabled) {
-				this.analytics.track({
-					userId: "CLIENT",
+				this.trackEvent({
+					group: "COMMANDS",
+					userId: message.author.id,
 					event: `commands.${message.command}.errors.nsfwNotEnabled`,
 					properties: {
 						bot: {
@@ -384,8 +391,9 @@ module.exports = (async function(message){
 					for(let key of this.config.yiff.disableStatements) {
 						if(message.channel.topic.indexOf(key) !== -1) st = key;
 					}
-					this.analytics.track({
-						userId: "CLIENT",
+					this.trackEvent({
+						group: "COMMANDS",
+						userId: message.author.id,
 						event: `commands.${message.command}.errors.channelDisabled`,
 						properties: {
 							bot: {
@@ -432,8 +440,9 @@ module.exports = (async function(message){
 		}
 		
 		if(command.guildOwnerOnly === true && message.author.id !== message.guild.owner.id && !message.user.isDeveloper) {
-			this.analytics.track({
-				userId: "CLIENT",
+			this.trackEvent({
+				group: "COMMANDS",
+				userId: message.author.id,
 				event: `commands.${message.command}.errors.guildOwnerOnly`,
 				properties: {
 					bot: {
@@ -481,8 +490,9 @@ module.exports = (async function(message){
 			message.c = message.cmd[Math.floor(Math.random()*message.cmd.length)];
 		}
 
-		this.analytics.track({
-			userId: "CLIENT",
+		this.trackEvent({
+			group: "COMMANDS",
+			userId: message.author.id,
 			event: `commands.${message.command}`,
 			properties: {
 				bot: {
@@ -519,8 +529,9 @@ module.exports = (async function(message){
 		this.stats.commandTotalsSinceLastPost++;
 		if(this.commandTimeout[command.triggers[0]].has(message.author.id) && !message.user.isDeveloper) {
 			this.logger.log(`Command timeout encountered by user ${message.author.tag} (${message.author.id}) on command "${message.command}" in guild ${message.guild.name} (${message.guild.id})`);
-			this.analytics.track({
-				userId: "CLIENT",
+			this.trackEvent({
+				group: "COMMANDS",
+				userId: message.author.id,
 				event: `commands.${message.command}.errors.timeout`,
 				properties: {
 					bot: {
@@ -596,8 +607,9 @@ module.exports = (async function(message){
 					}
 				]
 			};
-			this.analytics.track({
-				userId: "CLIENT",
+			this.trackEvent({
+				group: "COMMANDS",
+				userId: message.author.id,
 				event: `commands.${message.command}.invalidUsage`,
 				properties: {
 					bot: {
@@ -635,8 +647,9 @@ module.exports = (async function(message){
 			return message.channel.send(embed);
 		} else {
 			this.logger.error(`[CommandHandler] e1: ${error.name}: ${error.message}\n${error.stack}`);
-			this.analytics.track({
-				userId: "CLIENT",
+			this.trackEvent({
+				group: "ERRORS",
+				userId: message.author.id,
 				event: "client.errors",
 				properties: {
 					command: message.command,

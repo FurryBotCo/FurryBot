@@ -8,8 +8,8 @@ app.post("/vote/dbl",async(req,res) => {
 	let data, embed, user;
 	switch(req.body.type.toLowerCase()) {
 	case "upvote":
-		client.analytics.track({
-			userId: "VOTE",
+		client.trackEvent({
+			group: "WEBSERVER",
 			event: "upvote.dbl",
 			properties: {
 				bot: req.body.bot,
@@ -40,8 +40,8 @@ app.post("/vote/dbl",async(req,res) => {
 		break;
 
 	case "test":
-		client.analytics.track({
-			userId: "VOTE",
+		client.trackEvent({
+			group: "WEBSERVER",
 			event: "upvote.dbl.test",
 			properties: {
 				bot: req.body.bot,

@@ -4,7 +4,8 @@ module.exports = (async function(oldMessage,newMessage) {
 		this.emit("message",newMessage);
 	}catch(error){}
 	if(!newMessage.guild || !["text","voice","category"].includes(newMessage.channel.type)) return;
-	this.analytics.track({
+	this.trackEvent({
+		group: "EVENTS",
 		userId: "CLIENT",
 		event: "client.events.messageUpdate",
 		properties: {

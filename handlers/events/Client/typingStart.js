@@ -1,7 +1,9 @@
 module.exports = (async function(channel,user) {
 	if(user.id !== this.user.id) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		userId: user.id,
+		channelId: channel.id,
 		event: "client.events.typingStart",
 		properties: {
 			bot: {
@@ -14,8 +16,10 @@ module.exports = (async function(channel,user) {
 	});
 	setTimeout((ch) => {
 		if(ch.typing) {
-			this.analytics.track({
-				userId: "CLIENT",
+			this.trackEvent({
+				group: "EVENTS",
+				guildId: ch.guild.id,
+				channelId: ch.id,
 				event: "client.typingStart.manualStop",
 				properties: {
 					bot: {
@@ -24,9 +28,7 @@ module.exports = (async function(channel,user) {
 						alpha: this.config.alpha,
 						server: this.os.hostname()
 					},
-					channelId: ch.id,
 					channelName: ch.name,
-					guildId: ch.guild.id,
 					guildName: ch.guild.name
 
 				}

@@ -3,8 +3,8 @@ const express = require("express"),
 	client = require("../../");
 
 app.get("/stats",async(req,res) => {
-	client.analytics.track({
-		userId: "WEBSERVER",
+	client.trackEvent({
+		group: "WEBSERVER",
 		event: "web.request.stats",
 		properties: {
 			bot: {
@@ -49,8 +49,8 @@ app.get("/stats",async(req,res) => {
 		dmMessageCount: await this.mdb.collection("stats").findOne({id: "messageCount"}).then(res => res.dmCount)
 	});
 }).get("/stats/ping",async(req,res) => {
-	client.analytics.track({
-		userId: "WEBSERVER",
+	client.trackEvent({
+		group: "WEBSERVER",
 		event: "web.request.stats.ping",
 		properties: {
 			bot: {

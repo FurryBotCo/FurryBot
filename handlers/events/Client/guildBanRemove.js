@@ -1,7 +1,9 @@
 module.exports = (async function(guild,user) {
 	if(!guild || !user || !this.db) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		guildId: guild.id,
+		userId: user.id,
 		event: "client.events.guildBanRemove",
 		properties: {
 			bot: {

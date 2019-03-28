@@ -15,8 +15,8 @@ class FurryBotDatabase {
 		gid = gid.toString();
 		if(!this.client.guilds.has(gid) && !disableCheck) {
 			this.logger.warn("[createGuild]: Attempted to add guild that the bot is not in");
-			this.analytics.track({
-				userId: "DB",
+			this.client.trackEvent({
+				group: "DATABASE",
 				event: "errors.db.createGuild",
 				properties: {
 					guildId: gid,
@@ -34,8 +34,8 @@ class FurryBotDatabase {
 		a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		if(a !== null) return this.getGuild(gid);
 		this.logger.info(`[createGuild]: Added guild "${gid}"`);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.createGuild",
 			properties: {
 				guildId: gid,
@@ -58,8 +58,8 @@ class FurryBotDatabase {
 		gid = gid.toString();
 		let a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		if(!a) return this.createGuild(gid);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.getGuild",
 			properties: {
 				guildId: gid,
@@ -82,8 +82,8 @@ class FurryBotDatabase {
 		a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		if(!a) {
 			this.logger.info(`[deleteGuild]: Attempted to delete a non-existent guild entry "${gid}"`);
-			this.analytics.track({
-				userId: "DB",
+			this.client.trackEvent({
+				group: "DATABASE",
 				event: "errors.db.deleteGuild",
 				properties: {
 					guildId: gid,
@@ -102,8 +102,8 @@ class FurryBotDatabase {
 		b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).deleteOne({id: gid});
 		if(typeof b.deletedCount !== "undefined" && b.deletedCount > 0) {
 			this.logger.info(`[deleteGuild]: Deleted entry for guild "${gid}"`);
-			this.analytics.track({
-				userId: "DB",
+			this.client.trackEvent({
+				group: "DATABASE",
 				event: "db.deleteGuild",
 				properties: {
 					guildId: gid,
@@ -118,8 +118,8 @@ class FurryBotDatabase {
 			});
 			return true;
 		} else {
-			this.analytics.track({
-				userId: "DB",
+			this.client.trackEvent({
+				group: "DATABASE",
 				event: "errors.db.deleteGuild",
 				properties: {
 					guildId: gid,
@@ -146,8 +146,8 @@ class FurryBotDatabase {
 			await this.createGuild(gid);
 			a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid});
 		}
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.updateGuild",
 			properties: {
 				guildId: gid,
@@ -171,8 +171,8 @@ class FurryBotDatabase {
 		if(!a) return false;
 		await this.deleteGuild(gid);
 		await this.createGuild(gid,bypassChecks);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.resetGuild",
 			properties: {
 				guildId: gid,
@@ -208,8 +208,8 @@ class FurryBotDatabase {
 		});
 
 		if(del) {
-			this.analytics.track({
-				userId: "DB",
+			this.client.trackEvent({
+				group: "DATABASE",
 				event: "db.sweepGuilds",
 				properties: {
 					delete: true,
@@ -224,8 +224,8 @@ class FurryBotDatabase {
 			});
 			this.logger.warn(`Purged ${g2.length} guild${g2.length!==1?"s":""} in "guilds" table that were not in the bot`);
 		} else {
-			this.analytics.track({
-				userId: "DB",
+			this.client.trackEvent({
+				group: "DATABASE",
 				event: "db.sweepGuilds",
 				properties: {
 					delete: false,
@@ -251,12 +251,11 @@ class FurryBotDatabase {
 		if(!bypassChecks) {
 			if(!this.client.guilds.has(gid)) {
 				this.logger.warn("[createUserWarning]: Attempted to add warning to a guild that the bot is not in");
-				this.analytics.track({
-					userId: "DB",
+				this.client.trackEvent({
+					group: "DATABASE",
 					event: "errors.db.createUserWarning",
 					properties: {
 						guildId: gid,
-						userId: uid,
 						warningId: wid,
 						blame,
 						reason,
@@ -273,12 +272,11 @@ class FurryBotDatabase {
 			}
 			if(!this.client.guilds.get(gid).members.has(uid)) {
 				this.logger.warn("[createUserWarning]: Attempted to add warning to a member that is not in the guild");
-				this.analytics.track({
-					userId: "DB",
+				this.client.trackEvent({
+					group: "DATABASE",
 					event: "errors.db.createUserWarning",
 					properties: {
 						guildId: gid,
-						userId: uid,
 						warningId: wid,
 						blame,
 						reason,
@@ -299,12 +297,11 @@ class FurryBotDatabase {
 		wid = (await this.getUserWarnings(uid,gid)).length+1;
 		if(isNaN(wid)) wid = 1;
 		await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOneAndUpdate({id: uid},{$push: {warnings: {wid,blame,reason,timestamp:Date.now(),gid}}});
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.createUserWarning",
 			properties: {
 				guildId: gid,
-				userId: uid,
 				warningId: wid,
 				blame,
 				reason,
@@ -330,12 +327,11 @@ class FurryBotDatabase {
 			await this.createUser(uid);
 			b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid});
 		}
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.getUserWarnings",
 			properties: {
 				guildId: gid,
-				userId: uid,
 				bot: {
 					version: this.config.bot.version,
 					beta: this.config.beta,
@@ -358,12 +354,11 @@ class FurryBotDatabase {
 			await this.createUser(uid);
 			b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).find({id: uid});
 		}
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.getUserWarning",
 			properties: {
 				guildId: gid,
-				userId: uid,
 				warningId: wid,
 				bot: {
 					version: this.config.bot.version,
@@ -383,12 +378,11 @@ class FurryBotDatabase {
 		wid = parseInt(wid,10);
 		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid}))) await this.createGuild(gid);
 		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.deleteUserWarning",
 			properties: {
 				guildId: gid,
-				userId: uid,
 				warnId: wid,
 				bot: {
 					version: this.config.bot.version,
@@ -407,12 +401,11 @@ class FurryBotDatabase {
 		gid = gid.toString();
 		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id: gid}))) await this.createGuild(gid);
 		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.clearUserWarnings",
 			properties: {
 				guildId: gid,
-				userId: uid,
 				bot: {
 					version: this.config.bot.version,
 					beta: this.config.beta,
@@ -434,11 +427,10 @@ class FurryBotDatabase {
 		// 2 = $5
 		// 3 = $10
 		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.addDonator",
 			properties: {
-				userId: uid,
 				level,
 				bot: {
 					version: this.config.bot.version,
@@ -461,11 +453,10 @@ class FurryBotDatabase {
 		// 2 = $5
 		// 3 = $10
 		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.updateDonator",
 			properties: {
-				userId: uid,
 				level,
 				bot: {
 					version: this.config.bot.version,
@@ -482,11 +473,10 @@ class FurryBotDatabase {
 		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		if(!(await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid}))) await this.createUser(uid);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.removeDonator",
 			properties: {
-				userId: uid,
 				bot: {
 					version: this.config.bot.version,
 					beta: this.config.beta,
@@ -502,11 +492,10 @@ class FurryBotDatabase {
 		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
 		let b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid});
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.isDonator",
 			properties: {
-				userId: uid,
 				result: b !== null ? b.donator : false,
 				bot: {
 					version: this.config.bot.version,
@@ -530,8 +519,8 @@ class FurryBotDatabase {
 		var table = ["guild"].includes(type) ? this.config.db.collections.guilds : this.config.db.collections.users,
 			c = await this.client.mongo.db(this.config.db.main.db).collection(table).findOne({id});
 		if(!c) await this[`create${this.client.ucwords(type)}`](id);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.addBlacklistEntry",
 			properties: {
 				id,
@@ -555,8 +544,8 @@ class FurryBotDatabase {
 		let table = ["guild"].includes(type) ? this.config.db.collections.guilds : this.config.db.collections.users,
 			c = await this.client.mongo.db(this.config.db.main.db).collection(table).findOne({id});
 		if(!c) await this[`create${this.client.ucwords(type)}`](id);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.updateBlacklistEntry",
 			properties: {
 				id,
@@ -580,8 +569,8 @@ class FurryBotDatabase {
 		let table = ["guild"].includes(type) ? this.config.db.collections.guilds : this.config.db.collections.users,
 			c = await this.client.mongo.db(this.config.db.main.db).collection(table).findOne({id});
 		if(!c) await this[`create${this.client.ucwords(type)}`](id);
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.removeBlacklistEntry",
 			properties: {
 				id,
@@ -602,8 +591,8 @@ class FurryBotDatabase {
 		id = id.toString();
 		let a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.guilds).findOne({id}),
 			b = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id});
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.isBlacklisted",
 			properties: {
 				id,
@@ -625,8 +614,8 @@ class FurryBotDatabase {
 		var types = ["f","fcount","commands","general","dailyjoins"];
 		if(![undefined,null,""].includes(type)) {
 			if(!types.includes(type.toLowerCase())) return new Error("ERR_INVALID_TYPE");
-			this.analytics.track({
-				userId: "DB",
+			this.client.trackEvent({
+				group: "DATABASE",
 				event: "db.getStats",
 				properties: {
 					type,
@@ -661,8 +650,8 @@ class FurryBotDatabase {
 				break; // eslint-disable-line no-unreachable
 			}
 		} else {
-			this.analytics.track({
-				userId: "DB",
+			this.client.trackEvent({
+				group: "DATABASE",
 				event: "db.getStats",
 				properties: {
 					type: "all",
@@ -688,8 +677,8 @@ class FurryBotDatabase {
 		if(!command) return new TypeError("ERR_MISSING_PARAM");
 		let a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).findOne({id: "commands"});
 		if(!a) a = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.stats).insertOne({id:"commands"});
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.incrementCommandStats",
 			properties: {
 				command,
@@ -717,8 +706,8 @@ class FurryBotDatabase {
 			j = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.daily).findOne({id: date});
 		if(!j) j = await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.daily).insertOne({id:date,count:0}).then(s => this.client.mongo.db(this.config.db.main.db).collection("dailyjoins").findOne({id: date}));
 		negative ? await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.daily).findOneAndUpdate({id: date},{$set: {count: +j.count-amount}}) : await this.client.mongo.db(this.config.db.main.db).collection("dailyjoins").findOneAndUpdate({id: date},{$set:{count:+j.count+amount}});
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.updateDailyCounts",
 			properties: {
 				amount: negative ? `-${amount}` : `+${amount}`,
@@ -741,11 +730,10 @@ class FurryBotDatabase {
 			let u = true/*this.client.users.has(uid)*//*||this.client.users.fetch(uid).then(u => true).catch(u => false)*/;
 			if(!u) {
 				this.logger.info(`[createUser]: Attempted to create an entry for a user that was not found "${uid}"`);
-				this.analytics.track({
-					userId: "DB",
+				this.client.trackEvent({
+					group: "DATABASE",
 					event: "errors.db.createUser",
 					properties: {
-						userId: uid,
 						bot: {
 							version: this.config.bot.version,
 							beta: this.config.beta,
@@ -758,11 +746,10 @@ class FurryBotDatabase {
 				return new Error("ERR_INVALID_USER");
 			}
 		}
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.createUser",
 			properties: {
-				userId: uid,
 				bot: {
 					version: this.config.bot.version,
 					beta: this.config.beta,
@@ -780,11 +767,10 @@ class FurryBotDatabase {
 	async getUser(uid) {
 		if(!uid) return new TypeError("ERR_MISSING_PARAM");
 		uid = uid.toString();
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.getUser",
 			properties: {
-				userId: uid,
 				bot: {
 					version: this.config.bot.version,
 					beta: this.config.beta,
@@ -809,11 +795,10 @@ class FurryBotDatabase {
 		uid = uid.toString();
 		if((await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOne({id: uid})) !== null) await this.createUser(uid);
 		await this.client.mongo.db(this.config.db.main.db).collection(this.config.db.collections.users).findOneAndUpdate({id: uid},{$set: fields});
-		this.analytics.track({
-			userId: "DB",
+		this.client.trackEvent({
+			group: "DATABASE",
 			event: "db.updateUser",
 			properties: {
-				userId: uid,
 				fields,
 				bot: {
 					version: this.config.bot.version,

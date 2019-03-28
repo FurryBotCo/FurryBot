@@ -1,7 +1,8 @@
 module.exports = (async function(oldUser,newUser) {
 	if(!oldUser || !newUser || !this.db) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		userId: newUser.id,
 		event: "client.events.userUpdate",
 		properties: {
 			bot: {

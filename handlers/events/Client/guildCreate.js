@@ -1,11 +1,11 @@
 module.exports = (async function(guild) {
 	await this.db.updateDailyCount();
 	await this.db.createGuild(guild.id);
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		guildId: guild.id,
 		event: "client.events.guildCreate",
 		properties: {
-			guildId: guild.id,
 			name: guild.name,
 			owner: guild.owner.tag,
 			ownderId: guild.owner.id,

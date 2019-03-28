@@ -1,8 +1,8 @@
 module.exports = (async function(info) {
 	if(!this.logger) console.warn(info);
 	else this.logger.warn(info);
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
 		event: "client.events.warn",
 		properties: {
 			info,

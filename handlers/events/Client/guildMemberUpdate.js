@@ -1,7 +1,9 @@
 module.exports = (async function(oldMember,newMember) {
 	if(!oldMember || !newMember || !newMember.guild) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		userId: newMember.id,
+		guildId: newMember.guild.id,
 		event: "client.events.guildMemberUpdate",
 		properties: {
 			bot: {

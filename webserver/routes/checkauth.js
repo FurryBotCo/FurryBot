@@ -4,8 +4,8 @@ const express = require("express"),
 	{ checkAuth } = require("../functions"); 
 
 app.get("/checkauth",checkAuth,async(req,res) => {
-	client.analytics.track({
-		userId: "WEBSERVER",
+	client.trackEvent({
+		group: "WEBSERVER",
 		event: "web.request.checkauth",
 		properties: {
 			bot: {

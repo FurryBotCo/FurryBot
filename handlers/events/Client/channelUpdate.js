@@ -1,7 +1,8 @@
 module.exports = (async function(oldChannel,newChannel) {
 	if(!newChannel || !newChannel.guild || !["text","voice","category"].includes(newChannel.type) || !this.db) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		channelId: newChannel.id,
 		event: "client.events.channelUpdate",
 		properties: {
 			bot: {

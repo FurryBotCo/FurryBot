@@ -1,7 +1,8 @@
 module.exports = (async function(channel) {
 	if(!channel || !channel.guild || !["text","voice","category"].includes(channel.type) || !this.db) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		channelId: channel.id,
 		event: "client.events.channelCreate",
 		properties: {
 			bot: {

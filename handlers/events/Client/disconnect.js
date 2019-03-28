@@ -1,6 +1,6 @@
 module.exports = (async function() {
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
 		event: "client.events.disconnect",
 		properties: {
 			bot: {

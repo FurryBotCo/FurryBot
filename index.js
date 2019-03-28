@@ -50,8 +50,8 @@ class FurryBot extends BaseClient {
 		this.mongo = await this.MongoClient.connect(`mongodb://${this.config.db.main.host}:${this.config.db.main.port}/${this.config.db.main.database}`,this.config.db.main.opt);
 		this.mdb = this.mongo.db(this.config.db.main.database);
 		console.log("[loadEvent]: start load");
-		this.analytics.track({
-			userId: "CLIENT",
+		this.trackEvent({
+			group: "LOAD",
 			event: "client.load",
 			properties: {
 				bot: {
@@ -69,8 +69,8 @@ class FurryBot extends BaseClient {
 				const event = require(`./handlers/events/Client/${file}`),
 					eventName = file.split(".")[0];
 				this.on(eventName, event.bind(this));
-				this.analytics.track({
-					userId: "CLIENT",
+				this.trackEvent({
+					group: "LOAD",
 					event: `events.${eventName}.load`,
 					properties: {
 						bot: {

@@ -35,8 +35,8 @@ class FurryBotServer {
 				extended: true
 			}))
 			.get("/stats",async(req,res) => {
-				client.analytics.track({
-					userId: "WEBSERVER",
+				client.trackEvent({
+					group: "WEBSERVER",
 					event: "web.request.stats",
 					properties: {
 						bot: {
@@ -82,8 +82,8 @@ class FurryBotServer {
 				});
 			})
 			.get("/stats/ping",async(req,res) => {
-				client.analytics.track({
-					userId: "WEBSERVER",
+				client.trackEvent({
+					group: "WEBSERVER",
 					event: "web.request.stats.ping",
 					properties: {
 						bot: {
@@ -100,8 +100,8 @@ class FurryBotServer {
 				});
 			})
 			.get("/commands",async(req,res) => {
-				client.analytics.track({
-					userId: "WEBSERVER",
+				client.trackEvent({
+					group: "WEBSERVER",
 					event: "web.request.commands",
 					properties: {
 						bot: {
@@ -134,8 +134,8 @@ class FurryBotServer {
 				return res.status(200).json({success:true,list:cmds});
 			})
 			.get("/status",async(req,res) => {
-				client.analytics.track({
-					userId: "WEBSERVER",
+				client.trackEvent({
+					group: "WEBSERVER",
 					event: "web.request.status",
 					properties: {
 						bot: {
@@ -152,8 +152,8 @@ class FurryBotServer {
 				});
 			})
 			.get("/checkauth",checkAuth,async(req,res) => {
-				client.analytics.track({
-					userId: "WEBSERVER",
+				client.trackEvent({
+					group: "WEBSERVER",
 					event: "web.request.checkauth",
 					properties: {
 						bot: {
@@ -169,8 +169,8 @@ class FurryBotServer {
 
 		// guilds section
 			.get("/guilds",async(req,res) => {
-				client.analytics.track({
-					userId: "WEBSERVER",
+				client.trackEvent({
+					group: "WEBSERVER",
 					event: "web.request.guilds",
 					properties: {
 						bot: {
@@ -191,8 +191,8 @@ class FurryBotServer {
 				res.status(200).json(jsn);
 			})
 			.get("/guilds/:id/shard",checkAuth,async(req,res) => {
-				client.analytics.track({
-					userId: "WEBSERVER",
+				client.trackEvent({
+					group: "WEBSERVER",
 					event: "web.request.guilds.id.shard",
 					properties: {
 						bot: {
@@ -214,8 +214,8 @@ class FurryBotServer {
 				});
 			})
 			.get("/shorturl/:identifier",async(req,res) => {
-				client.analytics.track({
-					userId: "WEBSERVER",
+				client.trackEvent({
+					group: "WEBSERVER",
 					event: "web.request.shorturl",
 					properties: {
 						bot: {
@@ -236,8 +236,8 @@ class FurryBotServer {
 				let data, embed, user;
 				switch(req.body.type.toLowerCase()) {
 				case "upvote":
-					client.analytics.track({
-						userId: "VOTE",
+					client.trackEvent({
+						group: "WEBSERVER",
 						event: "upvote.dbl",
 						properties: {
 							bot: req.body.bot,
@@ -268,8 +268,8 @@ class FurryBotServer {
 					break;
 
 				case "test":
-					client.analytics.track({
-						userId: "VOTE",
+					client.trackEvent({
+						group: "WEBSERVER",
 						event: "upvote.dbl.test",
 						properties: {
 							bot: req.body.bot,
@@ -284,8 +284,8 @@ class FurryBotServer {
 				}
 			})
 			.post("/dev/eval",checkAuth,async(req,res) => {
-				client.analytics.track({
-					userId: "WEBSERVER",
+				client.trackEvent({
+					group: "WEBSERVER",
 					event: "web.request.dev.eval",
 					properties: {
 						bot: {

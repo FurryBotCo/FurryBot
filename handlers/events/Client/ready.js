@@ -1,8 +1,8 @@
 module.exports = (async function() {
 	this.logger = new this.FurryBotLogger(this);
 	this.logger.log(`Bot has started with ${this.users.size} users in ${this.channels.size} channels of ${this.guilds.size} guilds.`);
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
 		event: "client.events.ready",
 		properties: {
 			userCount: this.users.size,

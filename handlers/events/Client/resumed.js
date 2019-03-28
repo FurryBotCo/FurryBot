@@ -1,8 +1,8 @@
 module.exports = (async function(replayed) {
 	if(!this.logger) console.log(`Resumed ${replayed} events.`);
 	else this.logger.debug(`Resumed ${replayed} events.`);
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
 		event: "client.events.resumed",
 		properties: {
 			replayed,

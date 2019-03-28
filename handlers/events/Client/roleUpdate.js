@@ -1,7 +1,9 @@
 module.exports = (async function(oldRole,newRole) {
 	if(!oldRole || !oldRole.guild || !newRole || !newRole.guild || newRole.id === newRole.guild.id || !this.db) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		roleId: role.id,
+		guildId: guild.id,
 		event: "client.events.roleUpdate",
 		properties: {
 			bot: {

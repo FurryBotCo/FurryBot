@@ -1,8 +1,12 @@
 module.exports = (async function(message) {
 	if(!message || !this.db) return;
 	if(!message.channel.guild || !["text","voice","category"].includes(message.channel.type)) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		userId: message.author.id,
+		messageId: message.id,
+		channelId: message.channel.id,
+		guildId: message.guild.id,
 		event: "client.events.messageDelete",
 		properties: {
 			bot: {

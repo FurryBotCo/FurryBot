@@ -1,6 +1,6 @@
 module.exports = (async function(rateLimitInfo) {
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
 		event: "client.events.rateLimit",
 		properties: {
 			rateLimitInfo,

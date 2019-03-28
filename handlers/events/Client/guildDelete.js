@@ -1,11 +1,11 @@
 module.exports = (async function(guild) {
 	await this.db.updateDailyCount(true);
 	await this.db.deleteGuild(guild.id);
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		guildId: guild.id,
 		event: "client.events.guildDelete",
 		properties: {
-			guildId: guild.id,
 			name: guild.name,
 			owner: guild.owner.tag,
 			ownderId: guild.owner.id,

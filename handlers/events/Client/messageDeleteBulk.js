@@ -1,8 +1,10 @@
 module.exports = (async function(messages) {
 	if(!messages || !this.db) return;
 	if(messages.size < 1) return;
-	this.analytics.track({
-		userId: "CLIENT",
+	this.trackEvent({
+		group: "EVENTS",
+		channelId: messages.first().channel.id,
+		guildId: messages.first().guild.id,
 		event: "client.events.messageDeleteBulk",
 		properties: {
 			bot: {

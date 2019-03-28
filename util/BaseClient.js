@@ -58,6 +58,43 @@ class BaseClient extends Discord.Client {
 		Object.assign(this.Discord.Message.prototype,require("./messageAddons"));
 	}
 
+	/**
+	 * 
+	 * @param {Object} props - tracking properties 
+	 * @param {Number} [props.userId=null] - analytics user id
+	 * @param {Number} [props.guildId=null] - analytics guild id
+	 * @param {Number} [props.channelId=null] - analytics channel id
+	 * @param {Number} [props.messageId=null] - analytics message id
+	 * @param {Number} [props.roleId=null] - analytics role id
+	 * @param {String} props.group - analytics group
+	 * @param {String} props.event - event name
+	 * @param {Object} props.properties - event properties
+	 */
+	async trackEvent(props) {
+		if(!props) throw new TypeError("missing properties");
+		if(!props.event) throw new TypeError("missing event");
+		if(!props.group) throw new TypeError("missing group");
+		if(!props.properties) props.properties = {};
+		let type = this.config.beta ? "furrybotbeta" : "furrybot";
+		return this.request(`https://yiff.guru/track/${type}`,{
+			method: "POST",
+			headers: {
+				Authorization: this.config.universalKey
+			},
+			json: {
+				timestamp: new Date().toISOString(),
+				userId: props.userId || null,
+				guildId: props.guildId || null,
+				channelId: props.channelId || null,
+				messageId: props.messageId || null,
+				roleId: props.roleId || null,
+				event: props.event,
+				group: props.group,
+				properties: props.properties
+			}
+		});
+	}
+
 	async imageAPIRequest (animal = true,category = null,json = true, safe = false) {
 		return new Promise(async(resolve, reject) => {
 			let s, j;
