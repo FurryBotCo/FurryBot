@@ -27,7 +27,7 @@ module.exports = {
 		if(!w) {
 			data = {
 				title: "Failure",
-				description: `Either you provided an invalid warning id, or there was an internal error. Make sure the user **${user.user.tag}** has a warning with the id ${message.args[1]}.\n\n(tip: to list warnings use \`${message.gConfig.prefix}warnlog <@${user.id}>\`)`,
+				description: `Either you provided an invalid warning id, or there was an internal error. Make sure the user **${user.user.tag}** has a warning with the id ${message.args[1]}, and that the warning is for this server.\n\n(tip: to list warnings use \`${message.gConfig.prefix}warnlog ${user.user.tag}\`)`,
 				color: 15601937
 			};
 			Object.assign(data,message.embed_defaults("color"));

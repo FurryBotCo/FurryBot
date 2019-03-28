@@ -11,7 +11,7 @@ module.exports = {
 	description: "this is an old meme of ours, carried down for months.",
 	usage: "[@user]",
 	nsfw: false,
-	devOnly: false,
+	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
@@ -25,7 +25,7 @@ module.exports = {
 		d = new Date();
 		time = d.getHours() < 10?d.getMinutes() < 10?`0${d.getHours()}:0${d.getMinutes()}`:`0${d.getHours()}:${d.getMinutes()}`:`${d.getHours()}:${d.getMinutes()}`;
 		
-		i = new this.Canvas(376, 79)
+		i = await new this.Canvas(376, 79)
 			.addImage(profile, 1, 12, 50, 50)
 			.addImage(image, 0, 0, 376, 79)
 			.setColor("#36393F")
@@ -40,7 +40,7 @@ module.exports = {
 			
 		attachment = new this.Discord.MessageAttachment(i);
 		const u = await this.users.fetch("185938944460980224");
-		message.channel.send(`Here you go!\n(this is an inside joke from ${u.tag} <https://assets.mcprocdn.com/images/deersteak.png>)`,attachment);
+		message.channel.send(`Here you go!\n(this is an inside joke from ${u.tag} <https://assets.furry.bot/deersteak.png>)`,attachment);
 		return message.channel.stopTyping();
 	})
 };

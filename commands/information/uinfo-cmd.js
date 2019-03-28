@@ -59,14 +59,14 @@ module.exports = {
 					method: "GET"
 				});
 		
-				x = JSON.parse(req.body);
+				x = JSON.parse(req.body.toString());
 				ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";
 			} catch(e) {
 				ds = "Lookup failed.";
 				this.logger.log(e);
 				this.logger.log({
 					headers: req.headers,
-					body: req.body,
+					body: req.body.toString(),
 					statusCode: req.statusCode
 				});
 			}
@@ -88,15 +88,25 @@ module.exports = {
 				method: "GET"
 			});
 			try {
-				rs = JSON.parse(req.body);
-				list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
+				rs = JSON.parse(req.body.toString());
+				list = "(all links redirect from our api to make keeping links up to date easier)\n";
+				for(let ls in rs.list_data) {
+					const ll = rs.list_data[ls];
+					if(ll[1] !== 200) continue;
+					list += `[${ls}](https://api.furry.bot/botlistgo/${encodeURIComponent(ls)}/${encodeURIComponent(user.id)
+				
+				})\n`;
+
+				}
+
+				//list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			}catch(e){
-				this.logger.error(e);
 				this.logger.log({
 					headers: req.headers,
-					body: req.body,
+					body: req.body.toString(),
 					statusCode: req.statusCode
 				});
+				this.logger.error(e);
 				rs = req.body;
 				list = "Lookup Failed.";
 			}

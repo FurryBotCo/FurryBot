@@ -15,7 +15,7 @@ module.exports = {
 	run: (async function(message) {
 		if(message.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
 		let req, data, embed;
-		if(this.config.apis.ipinfo.regex.ipv4.test(message.unparsedArgs.join(" ")) || this.config.apis.ipinfo.regex.ipv6.test(message.unparsedArgs.join(" "))) {
+//		if(this.config.apis.ipinfo.regex.ipv4.test(message.unparsedArgs.join(" ")) || this.config.apis.ipinfo.regex.ipv6.test(message.unparsedArgs.join(" "))) {
 			req = await this.request(`https://ipapi.co/${message.unparsedArgs.join(" ")}/json`,{
 				method: "GET",
 				headers: {
@@ -24,7 +24,7 @@ module.exports = {
 			}).then(rq => JSON.parse(rq.body));
 			if(req.error || req.reserved) {
 				console.log(req);
-				if(![undefined,null,""].includes(req.message)) return message.reply(`Error processing request: ${req.reason}.`);
+				if(![undefined,null,""].includes(req.reason)) return message.reply(`Error processing request: ${req.reason}.`);
 				if(req.reserved) return message.reply("The supplied ip is a reserved ip, these have no specific information associated with them.");
 			}
 
@@ -48,8 +48,8 @@ module.exports = {
 			};
 			embed = new this.Discord.MessageEmbed(data);
 			return message.channel.send(embed);
-		} else {
-			return message.reply("Invalid ip address.");
-		}
+//		} else {
+//			return message.reply("Invalid ip address.");
+//		}
 	})
 };

@@ -89,7 +89,7 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Bot Creator",
-					value: "Donovan_DMC#1337, [@Donovan_DMC](https://twitter.com/Donovan_DMC)",
+					value: "Donovan_DMC#3621, [@Donovan_DMC](https://twitter.com/Donovan_DMC)",
 					inline: false
 				}, {
 					name: "Trello Board",

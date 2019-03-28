@@ -344,7 +344,7 @@ class FurryBotDatabase {
 				}
 			}
 		});
-		return b.warnings.sort((s,g) => s.id < g.id ? -1 : s.id > g.id ? 1 : 0);
+		return b.warnings.filter(w => w.gid === gid).sort((s,g) => s.id < g.id ? -1 : s.id > g.id ? 1 : 0);
 	}
 	
 	async getUserWarning(uid,gid,wid) {

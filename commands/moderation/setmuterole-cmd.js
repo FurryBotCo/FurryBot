@@ -17,6 +17,7 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		if(message.args.length < 1) return new Error("ERR_INVALID_USAGE");
+		message.channel.startTyping();
 		let role, data, embed, g;
 		if(message.args[0] === "reset") {
 			message.guild.channels.forEach(async(ch) => {
@@ -30,7 +31,7 @@ module.exports = {
 			});
 			
 			await this.db.updateGuild(message.guild.id,{muteRole:null});
-	
+			await message.channel.stopTyping();
 			return message.reply("Reset channel overwrites and mute role.");
 		}
 		// get role from message
@@ -46,16 +47,18 @@ module.exports = {
 			};
 			Object.assign(data, message.embed_defaults("color"));
 			embed = new this.Discord.MessageEmbed(data);
+			await message.channel.stopTyping();
 			return message.channel.send(embed);
 		}
 		g = await this.db.updateGuild(message.guild.id,{muteRole:role.id});
 		if(!g) {
 			message.reply("There was an internal error while doing this, please try again");
+			await message.channel.stopTyping();
 			return this.logger.log(g);
 		}
-	
-		message.reply(`Set the new muted role to **${role.name}**`);
-	
+		await message.channel.stopTyping();
+		await message.reply(`Set the new muted role to **${role.name}**`);
+		
 		message.guild.channels.forEach(async(ch) => {
 			if(![null,undefined,""].includes(message.gConfig.muteRole) && ch.permissionOverwrites.has(message.gConfig.muteRole)) {
 				if(ch.permissionOverwrites.get(message.gConfig.muteRole).allow.bitfield === 0 && ch.permissionOverwrites.get(message.gConfig.muteRole).deny.bitfield === 2048) {

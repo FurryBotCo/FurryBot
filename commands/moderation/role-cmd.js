@@ -55,7 +55,7 @@ module.exports = {
 					operation = 0;
 				}
 				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
-				if(!role) return message.reply("Role not found.");
+				if(!role) return message.reply(`Role ${l} not found.`);
 			} else {
 				role = r;
 			}

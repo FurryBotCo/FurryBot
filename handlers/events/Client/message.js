@@ -186,6 +186,7 @@ module.exports = (async function(message){
 	try {
 		if(message.gConfig.deleteCommands) message.delete().catch(err => message.channel.send(`Unable to delete command invocation:\n**${err}**`));
 
+		if(command.devOnly && !this.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer.");
 		// user permission check
 		if(command.userPermissions.length > 0 && !message.user.isDeveloper) {
 			if(command.userPermissions.some(perm => !message.channel.permissionsFor(message.member).has(perm,true))) {
@@ -477,7 +478,7 @@ module.exports = (async function(message){
 		
 		if(Object.keys(this.lang[message.gConfig.locale]).includes(command.triggers[0])) {
 			message.cmd = this.lang[message.gConfig.locale][command.triggers[0]];
-			message.c = message.cmd[Math.floor(Math.random()*message.command.length)];
+			message.c = message.cmd[Math.floor(Math.random()*message.cmd.length)];
 		}
 
 		this.analytics.track({

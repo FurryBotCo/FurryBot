@@ -15,7 +15,7 @@ module.exports = {
 		let card, data, embed;
 		if(message.unparsedArgs.length === 0 || !message.unparsedArgs[0]) return new Error("ERR_INVALID_USAGE");
 		try {
-			card = await this.tthis.addCard(message.unparsedArgs.join(" "),`Suggestion by ${message.author.tag} (${message.author.id}) from guild ${message.guild.name} (${message.guild.id})`,this.config.apis.trello.list);
+			card = await this.tclient.addCard(message.unparsedArgs.join(" "),`Suggestion by ${message.author.tag} (${message.author.id}) from guild ${message.guild.name} (${message.guild.id})`,this.config.apis.trello.list);
 		}catch(error) {
 			return message.reply(`Failed to create card: **${error.message}**`);
 		}

@@ -23,11 +23,12 @@ module.exports = {
 		if(([undefined,null,""].includes(member) || !(member instanceof this.Discord.GuildMember)) && message.args[0] !== "server") role = await message.getRoleFromArgs(0,false,true);
 
 		//finally, try a server (if developer)
-		if(message.user.isDeveloper  && ([undefined,null,""].includes(member) || !(member instanceof this.Discord.GuildMember)) && ([undefined,null,""].includes(role) || !(role instanceof this.Discord.Role)) && message.args[0] !== "server") server = await message.getServerFromArgs(0,false,true).then(s => {console.log(s.name);return s;});
+		//if(message.user.isDeveloper  && ([undefined,null,""].includes(member) || !(member instanceof this.Discord.GuildMember)) && ([undefined,null,""].includes(role) || !(role instanceof this.Discord.Role)) && message.args[0] !== "server") server = await message.getServerFromArgs(0,false,true).then(s => s);
+		server = null;
 		
 		if(server instanceof this.Discord.Guild) {
 			// server roles
-			a = message.guild.roles.map(r => `<@&${r.id}>`),
+			a = server.roles.map(r => `<@&${r.id}>`),
 			roles = [],
 			fields = [],
 			i = 0;

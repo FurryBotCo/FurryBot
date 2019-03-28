@@ -1,7 +1,8 @@
 module.exports = {
 	triggers: [
 		"whosagoodboy",
-		"whosagoodboi"
+		"whosagoodboi",
+		"goodboi"
 	],
 	userPermissions: [],
 	botPermissions: [],

@@ -1,7 +1,8 @@
 module.exports = {
 	triggers: [
 		"russianroulette",
-		"roulette"
+		"roulette",
+		"rr"
 	],
 	userPermissions: [],
 	botPermissions: [],

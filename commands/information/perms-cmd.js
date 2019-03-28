@@ -28,11 +28,12 @@ module.exports = {
 			fields: [
 				{
 					name: "User",
-					value: `__Allow__:\n**${au}**\n\n\n__Deny__:\n**${du}**`,
+					value: `__Allow__:\n**${au.length === 0 ? "NONE" : au
+				}**\n\n\n__Deny__:\n**${du.length === 0 ? "NONE" : du}**`,
 					inline: false
 				},{
 					name: "Bot",
-					value: `__Allow__:\n**${ab}**\n\n\n__Deny__:\n**${db}**`,
+					value: `__Allow__:\n**${ab.length === 0 ? "NONE" : ab}**\n\n\n__Deny__:\n**${db.length === 0 ? "NONE" : db}**`,
 					inline: false
 				}
 			]

@@ -16,6 +16,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		return message.reply("Sorry, sofurry is having issues right now, and we cannot fetch anything from their api.\n(if it's back, and I haven't noticed, let me know in my support server - https://discord.gg/SuccpZw)");
 		const contentType = [
 			"story",
 			"art",
@@ -24,7 +25,7 @@ module.exports = {
 			"photo"
 		];
 		let tags, bl, req, jsn, rr, submission, short, extra, attachment;
-		tags = message.unparseArgs.length > 0 ? message.unparseArgs.join("%20") : "furry";
+		tags = message.unparsedArgs.length > 0 ? message.unparsedArgs.join("%20") : "furry";
 		bl = tags.match(this.config.tagBlacklist);
 		if(bl !== null && bl.length > 0) return message.reply(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
 		const msg = await message.channel.send(`Fetching.. ${this.config.emojis.load}`);
@@ -54,7 +55,7 @@ module.exports = {
 			}
 		}catch(e){
 			this.logger.error(`Error:\n${e}`);
-			this.logger.log(`Body: ${jsn}`);
+			this.logger.log(`Body: ${req.body}`);
 			attachment = new this.Discord.MessageAttachment(this.config.images.serverError);
 			return msg.edit("Unknown API Error").then(() => message.channel.send(attachment)).catch(err => message.channel.send(`Command failed: ${err}`));
 		}

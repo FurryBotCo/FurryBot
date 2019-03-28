@@ -18,10 +18,11 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		let roles, page, c, remove, rl, b, data, embed, n;
-		roles = this.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles);
+		roles = await this.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.selfAssignableRoles);
 		page = message.args.length > 0 ? parseInt(message.args[0],10) : 1;
 		if(roles.length === 0) return message.reply("There are no roles set as self assignable.");
 		c = this.chunk(roles,10);
+		if(c.length === 0) return message.reply("There are no roles set as self assignable.");
 		if(!page || page > c.length) return message.reply("Invalid page.");
 		remove = [];
 		rl = roles.map(a => {

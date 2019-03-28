@@ -20,7 +20,7 @@ module.exports = {
 		textChCount = 0,
 		voiceChCount = 0,
 		categoryChCount = 0;
-		if(!isNaN(message.args[0]) && this.user.isDeveloper) {
+		if(!isNaN(message.args[0]) && this.config.developers.includes(message.author.id)) {
 			guild = this.guilds.get(message.args[0]);
 			if(!guild) {
 				data = {

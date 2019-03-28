@@ -24,7 +24,7 @@ module.exports = {
 		if(this.mentions.users.size >= mentionPosition+1) return this.mentions.users.first(mentionPosition+1)[mentionPosition];
 		
 		// user ID
-		if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.users.size >= mentionPosition+1)) return this.client.users.get(args[argPosition]);
+		if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentions.users.size >= mentionPosition+1)) return this.client.users.fetch(args[argPosition]);
 		
 		// username
 		if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentions.users.size >= mentionPosition+1)) return this.client.users.find(t => t.username.toLowerCase()===args[argPosition].toLowerCase());
