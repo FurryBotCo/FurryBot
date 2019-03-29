@@ -1,5 +1,4 @@
 module.exports = (async function(oldMember,newMember) {
-	console.log("presence update");
 	if(!oldMember || !newMember) return;
 	if(!newMember.guild) return;
 	this.trackEvent({
