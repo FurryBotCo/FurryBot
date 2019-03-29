@@ -207,6 +207,12 @@ module.exports = {
 				description = "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
 				fields = [];
 				break;
+
+			case "INVALID_CHANNEL":
+				title = "Channel Not Found",
+				description = "The specified channel was not found, please provide one of the following:\nFULL channel ID, FULL channel name, or channel mention",
+				fields = [];
+				break;
 				
 			default:
 				title = "Default Title",
