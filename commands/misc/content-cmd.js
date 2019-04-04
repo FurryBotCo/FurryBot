@@ -12,7 +12,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		//return message.reply("this has been temporarily disabled.");
+		//return message.channel.createMessage("this has been temporarily disabled.");
 		let req, counts, txt, content;
 
 		req = await this.request("https://api.furry.bot/counts",{
@@ -37,6 +37,6 @@ module.exports = {
 				}
 			}
 		}
-		return message.channel.send(content);
+		return message.channel.createMessage(content);
 	})
 };

@@ -6,7 +6,7 @@ module.exports = {
 	],
 	userPermissions: [],
 	botPermissions: [
-		"ATTACH_FILES"
+		"attachFiles" // 32768
 	],
 	cooldown: 3e3,
 	description: "Get a picture of a foxxo!",
@@ -16,9 +16,17 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let attachment = new this.Discord.MessageAttachment("https://foxrudor.de/","foxrudor.de.png");
-		message.channel.send(attachment);
-		return message.channel.stopTyping();
+		try {
+			return message.channel.createMessage("",{
+				file: await this.getImageFromURL("https://foxrudor.de/"),
+				name: "foxrudor.de.png"
+			});
+		} catch(e) {
+			this.logger.error(e);
+			return message.channel.createMessage("unknown api error",{
+				file: await this.getImageFromURL(this.config.images.serverError),
+				name: "error.png"
+			});
+		}
 	})
 };

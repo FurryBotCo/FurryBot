@@ -4,7 +4,9 @@ module.exports = {
 		"inv"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks" // 16384
+	],
 	cooldown: 2e3,
 	description: "Get some invite links for the bot",
 	usage: "",
@@ -13,32 +15,34 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let botInvite, data, embed;
-		botInvite = await this.generateInvite([
-			"VIEW_AUDIT_LOG",
-			"MANAGE_SERVER",
-			"MANAGE_ROLES",
-			"MANAGE_CHANNELS",
-			"KICK_MEMBERS",
-			"BAN_MEMBERS",
-			"CHANGE_NICKNAME",
-			"MANAGE_NICKNAMES",
-			"EMBED_LINKS",
-			"READ_MESSAGE_HISTORY",
-			"USE_EXTERNAL_EMOJIS",
-			"SEND_MESSAGES",
-			"ATTACH_FILES",
-			"ADD_REACTIONS",
-			"VIEW_CHANNEL",
-			"CONNECT",
-			"MUTE_MEMBERS",
-			"MOVE_MEMBERS",
-			"SPEAK",
-			"DEAFEN_MEMBERS",
-			"USE_VAD",
-			"PRIORITY_SPEAKER"
-		]);
-		data = {
+		let botInvite, perms, embed;
+		perms = [
+			"KICK_MEMBERS",          // 2
+			"BAN_MEMBERS",           // 4
+			"MANAGE_CHANNELS",       // 16
+			"MANAGE_GUILD",         // 32
+			"ADD_REACTIONS",         // 64
+			"VIEW_AUDIT_LOG",        // 128
+			"PRIORITY_SPEAKER",      // 256
+			"READ_MESSAGES",         // 1024
+			"SEND_MESSAGES",         // 2048
+			"MANAGE_MESSAGES",       // 8192
+			"EMBED_LINKS",           // 16384
+			"ATTACH_FILES",          // 32768
+			"READ_MESSAGE_HISTORY",  // 65536
+			"USE_EXTERNAL_EMOJIS",   // 262144
+			"CONNECT",               // 1048576
+			"SPEAK",                 // 2097152
+			"MUTE_MEMBERS",          // 4194304
+			"DEAFEN_MEMBERS",        // 8388608
+			"MOVE_MEMBERS",          // 16777216
+			"USE_VAD",               // 33554432
+			"CHANGE_NICKNAME",       // 67108864
+			"MANAGE_NICKNAMES",      // 134217728
+			"MANAGE_ROLES"          // 268435456
+		];
+		botInvite = perms.map(p => this.config.Permissions.constant[p]).reduce((a,b) => a + b);
+		embed = {
 			"title": "Invites",
 			"fields": [
 				{
@@ -54,9 +58,7 @@ module.exports = {
 			]
 		};
 		
-		Object.assign(data, message.embed_defaults());
-		
-		embed = new this.Discord.MessageEmbed(data);
-		return message.channel.send(embed);
+		Object.assign(embed, message.embed_defaults());
+		return message.channel.createMessage({ embed });
 	})
 };

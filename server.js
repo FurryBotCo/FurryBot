@@ -40,26 +40,24 @@ class FurryBotServer {
 					event: "web.request.stats",
 					properties: {
 						bot: {
-							version: client.config.bot.version,
-							beta: client.config.beta,
-							alpha: client.config.alpha,
-							server: client.os.hostname()
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: require("os").hostname()
 						}
 					}
 				});
-				let userCount, d, date, a, dailyJoins, largeGuildCount;
-				userCount = 0;
-				largeGuildCount = client.guilds.filter(g => g.large).size;
-				client.guilds.forEach((g) => userCount+=g.memberCount);
+				let d, date, a, dailyJoins;
 				d = new Date();
 				date = `${d.getMonth().toString().length > 1 ? d.getMonth()+1 : `0${d.getMonth()+1}`}-${d.getDate().toString().length > 1 ? d.getDate() : `0${d.getDate()}`}-${d.getFullYear()}`;
 				a = await this.mdb.collection("dailyjoins").findOne({id: date});
 				dailyJoins = a !== null ? a.count : null|| null;
 				return res.status(200).json({
-					success:true,
-					clientStatus: client.user.presence.status,
-					guildCount: client.guilds.size,userCount,
-					shardCount: client.options.shardCount,
+					success: true,
+					clientStatus: client.guilds.get(this.config.bot.mainGuild).members.get(client.user.id).status,
+					guildCount: client.guilds.size,
+					userCount: client.guilds.map(g => g.memberCount).reduce((a,b) => a + b),
+					shardCount: client.shards.size,
 					memoryUsage: {
 						process: {
 							used: client.memory.process.getUsed(),
@@ -70,15 +68,16 @@ class FurryBotServer {
 							total: client.memory.system.getTotal()
 						}
 					},
-					largeGuildCount,
+					largeGuildCount: client.guilds.filter(g => g.large).length,
 					apiVersion: this.config.bot.apiVersion,
 					botVersion: this.config.bot.version,
-					discordjsVersion: client.Discord.version,
+					library: this.config.bot.library,
+					libraryVersion: this.config.bot.libraryVersion,
 					nodeVersion: process.version,
 					dailyJoins,
 					commandCount: client.commandList.length,
-					messageCount: await this.mdb.collection("stats").findOne({id: "messageCount"}).then(res => res.count),
-					dmMessageCount: await this.mdb.collection("stats").findOne({id: "messageCount"}).then(res => res.dmCount)
+					messageCount: await client.mongo.db("analytics").collection(this.config.db.main.database).find({event:"client.events.message"}).count(),
+					dmMessageCount: await client.mongo.db("analytics").collection(this.config.db.main.database).find({event:"client.events.message.directMessage"}).count()
 				});
 			})
 			.get("/stats/ping",async(req,res) => {
@@ -87,16 +86,16 @@ class FurryBotServer {
 					event: "web.request.stats.ping",
 					properties: {
 						bot: {
-							version: client.config.bot.version,
-							beta: client.config.beta,
-							alpha: client.config.alpha,
-							server: client.os.hostname()
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: require("os").hostname()
 						}
 					}
 				});
 				return res.status(200).json({
 					success: true,
-					ping:Math.round(client.ws.ping)
+					ping: Math.floor(client.shards.map(s => s.latency).reduce((a,b) => a + b) / client.shards.size)
 				});
 			})
 			.get("/commands",async(req,res) => {
@@ -105,10 +104,10 @@ class FurryBotServer {
 					event: "web.request.commands",
 					properties: {
 						bot: {
-							version: client.config.bot.version,
-							beta: client.config.beta,
-							alpha: client.config.alpha,
-							server: client.os.hostname()
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: require("os").hostname()
 						}
 					}
 				});
@@ -139,16 +138,16 @@ class FurryBotServer {
 					event: "web.request.status",
 					properties: {
 						bot: {
-							version: client.config.bot.version,
-							beta: client.config.beta,
-							alpha: client.config.alpha,
-							server: client.os.hostname()
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: require("os").hostname()
 						}
 					}
 				});
 				return res.status(200).json({
 					success: true,
-					clientStatus: client.user.presence.status
+					clientStatus: client.guilds.get(this.config.bot.mainGuild).members.get(client.user.id).status
 				});
 			})
 			.get("/checkauth",checkAuth,async(req,res) => {
@@ -157,10 +156,10 @@ class FurryBotServer {
 					event: "web.request.checkauth",
 					properties: {
 						bot: {
-							version: client.config.bot.version,
-							beta: client.config.beta,
-							alpha: client.config.alpha,
-							server: client.os.hostname()
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: require("os").hostname()
 						}
 					}
 				});
@@ -174,10 +173,10 @@ class FurryBotServer {
 					event: "web.request.guilds",
 					properties: {
 						bot: {
-							version: client.config.bot.version,
-							beta: client.config.beta,
-							alpha: client.config.alpha,
-							server: client.os.hostname()
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: require("os").hostname()
 						}
 					}
 				});
@@ -196,10 +195,10 @@ class FurryBotServer {
 					event: "web.request.guilds.id.shard",
 					properties: {
 						bot: {
-							version: client.config.bot.version,
-							beta: client.config.beta,
-							alpha: client.config.alpha,
-							server: client.os.hostname()
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: require("os").hostname()
 						}
 					}
 				});
@@ -209,8 +208,8 @@ class FurryBotServer {
 				});
 				return res.status(200).json({
 					success: true,
-					shardId: client.guilds.get(req.params.id).shardID,
-					shardCount: client.options.shardCount
+					shardId: client.guilds.get(req.params.id).shard.id,
+					shardCount: client.shards.size
 				});
 			})
 			.get("/shorturl/:identifier",async(req,res) => {
@@ -219,10 +218,10 @@ class FurryBotServer {
 					event: "web.request.shorturl",
 					properties: {
 						bot: {
-							version: client.config.bot.version,
-							beta: client.config.beta,
-							alpha: client.config.alpha,
-							server: client.os.hostname()
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: require("os").hostname()
 						}
 					}
 				});
@@ -231,7 +230,7 @@ class FurryBotServer {
 				return res.status(200).json(s);
 			})
 			.post("/vote/dbl",async(req,res) => {
-				if(!req.headers["authorization"] || req.headers["authorization"] !== client.config.universalKey) return res.status(401).json({success: false, error: "unauthorized"});
+				if(!req.headers["authorization"] || req.headers["authorization"] !== this.config.universalKey) return res.status(401).json({success: false, error: "unauthorized"});
 				if(req.body.bot !== "398251412246495233") return res.status(400).json({success: false, error: "invalid bot"});
 				let data, embed, user;
 				switch(req.body.type.toLowerCase()) {
@@ -252,14 +251,14 @@ class FurryBotServer {
 						await client.mdb.collections("users").findOneAndUpdate({id: req.body.user},{$set:{bal: user.bal + 1000}});
 						data = {
 							title: "Thanks For Upvoting!",
-							description: `As a reward for upvoting on Discord Bots, you earned 1000 ${client.config.emojis.owo}\nWeekend Voting, Double ${client.config.emojis.owo}!`,
+							description: `As a reward for upvoting on Discord Bots, you earned 1000 ${this.config.emojis.owo}\nWeekend Voting, Double ${this.config.emojis.owo}!`,
 							color: 65535
 						};
 					} else {
 						await client.mdb.collections("users").findOneAndUpdate({id: req.body.user},{$set:{bal: user.bal + 500}});
 						data = {
 							title: "Thanks For Upvoting!",
-							description: `As a reward for upvoting on Discord Bots, you earned 500 ${client.config.emojis.owo}`,
+							description: `As a reward for upvoting on Discord Bots, you earned 500 ${this.config.emojis.owo}`,
 							color: 65535
 						};
 					}
@@ -289,10 +288,10 @@ class FurryBotServer {
 					event: "web.request.dev.eval",
 					properties: {
 						bot: {
-							version: client.config.bot.version,
-							beta: client.config.beta,
-							alpha: client.config.alpha,
-							server: client.os.hostname()
+							version: this.config.bot.version,
+							beta: this.config.beta,
+							alpha: this.config.alpha,
+							server: require("os").hostname()
 						}
 					}
 				});
@@ -314,9 +313,9 @@ class FurryBotServer {
 			return this.https.createServer({
 				key: privateKey,
 				cert: certificate
-			}, this.server).listen(this.cnf.port,this.cnf.bindIp,(() => {client.logger.log("listening");}));
+			}, this.server).listen(this.cnf.port,this.cnf.bindIp,(() => client.logger.log("webserver listening")));
 		} else {
-			return this.server.listen(this.cnf.port,this.cnf.bindIp,(() => {client.logger.log("listening");}));
+			return this.server.listen(this.cnf.port,this.cnf.bindIp,(() => client.logger.log("webserver listening")));
 		}
 	}
 }

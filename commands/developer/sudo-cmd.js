@@ -4,7 +4,9 @@ module.exports = {
 		"runas"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks" // 16384
+	],
 	cooldown: 0,
 	description: "Force another user to run a comand (dev only)",
 	usage: "<user> <command> [args]",
@@ -14,38 +16,28 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		// extra check, to be safe
-		if (!this.config.developers.includes(message.author.id)) {
-			return message.reply("You cannot run this command as you are not a developer of this bot.");
-		}
-		message.channel.startTyping();
+		if (!this.config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer of this bot.`);
 		if(message.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
-		let user, data, toRun, runCommand, runArgs, embed;
+		let user, toRun, embed;
 		// get user from message
 		user = await message.getUserFromArgs();
     
-		if(!user || !(user instanceof this.Discord.User)) {
-			data = {
+		if(!user || !(user instanceof this.Eris.User)) {
+			embed = {
 				title: "User not found",
 				description: "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag"
 			};
-			Object.assign(data, message.embed_defaults());
-			embed = new this.Discord.MessageEmbed(data);
-			message.channel.send(embed);
-			return message.channel.stopTyping();
+			Object.assign(embed, message.embed_defaults());
+			message.channel.createMessage({ embed });
 		}
 		toRun = [...message.unparsedArgs];
 		toRun.shift();
-		runCommand = toRun[0];
-		runArgs = [...toRun];
-		runArgs.shift();
-		await this.runAs(`${message.gConfig.prefix}${runCommand} ${runArgs.join(" ")}`,user,message.channel);
-		data = {
+		await this.runAs(toRun,user,message.channel);
+		embed = {
 			title: "Sudo Command",
-			description: `Ran command **${runCommand}** with args "${runArgs.join(" ")}" as ${user.tag}`
+			description: `Sent message event with "${toRun}" as ${user.username}#${user.discriminator}`
 		};
-		Object.assign(data,message.embed_defaults());
-		embed = new this.Discord.MessageEmbed(data);
-		message.channel.send(embed);
-		return message.channel.stopTyping();
+		Object.assign(embed,message.embed_defaults());
+		message.channel.createMessage({ embed });
 	})
 };

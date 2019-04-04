@@ -16,6 +16,6 @@ module.exports = {
 		min = typeof message.args[0] !== "undefined" ? parseInt(message.args[0],10) : 1;
 		max = typeof message.args[1] !== "undefined" ? parseInt(message.args[1],10) : 20;
 	
-		return message.reply(`you rolled a ${this._.random(min,max)}!`);
+		return message.channel.createMessage(`<@!${message.author.id}>, you rolled a ${this._.random(min,max)}!`);
 	})
 };

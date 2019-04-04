@@ -3,7 +3,7 @@ module.exports = {
 		"log"
 	],
 	userPermissions: [
-		"MANAGE_GUILD"
+		"manageGuild" // 32
 	],
 	botPermissions: [],
 	cooldown: .5e3,
@@ -16,8 +16,8 @@ module.exports = {
 	run: (async function(message) {
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		const event = message.args[0].replace(/\s/g,"").toLowerCase();
-		if(event === "list") return message.reply(`The valid logging types are:\n**${this.config.logTypes.join("**, **")}**.`);
-		if(!this.config.logTypes.includes(event)) return message.reply(`Invalid log type, you can do \`${message.gConfig.prefix}log list\` to list all available types!`);
+		if(event === "list") return message.channel.createMessage(`<@!${message.author.id}>, The valid logging types are:\n**${this.config.logTypes.join("**, **")}**.`);
+		if(!this.config.logTypes.includes(event)) return message.channel.createMessage(`<@!${message.author.id}>, Invalid log type, you can do \`${message.gConfig.prefix}log list\` to list all available types!`);
 		let ch;
 		if(message.args.length === 1) ch = message.channel;
 		else {
@@ -26,10 +26,10 @@ module.exports = {
 			else ch = t;
 		}
 		if(!message.gConfig.logging) {
-			this.logger.warn(`Updating logging for ${message.guild.name} (${message.guild.id}), missing log config.`);
+			this.logger.warn(`Updating logging for ${message.channel.guild.name} (${message.channel.guild.id}), missing log config.`);
 			this.trackEvent({
 				group: "ERRORS",
-				guildId: message.guild.id,
+				guildId: message.channel.guild.id,
 				userId: message.author.id,
 				channelId: message.channel.id,
 				messageId: message.id,
@@ -44,7 +44,7 @@ module.exports = {
 				}
 			});
 			await this.mdb.collection("guilds").findOneAndUpdate({
-				id: message.guild.id
+				id: message.channel.guild.id
 			},{
 				$set: {
 					logging: this.config.default.loggingConfig
@@ -54,10 +54,10 @@ module.exports = {
 		}
 
 		if(!message.gConfig.logging[event]) {
-			this.logger.warn(`Updating logging for ${message.guild.name} (${message.guild.id}), missing log event.`);
+			this.logger.warn(`Updating logging for ${message.channel.guild.name} (${message.channel.guild.id}), missing log event.`);
 			this.trackEvent({
 				group: "ERRORS",
-				guildId: message.guild.id,
+				guildId: message.channel.guild.id,
 				userId: message.author.id,
 				channelId: message.channel.id,
 				messageId: message.id,
@@ -73,7 +73,7 @@ module.exports = {
 				}
 			});
 			await this.mdb.collection("guilds").findOneAndUpdate({
-				id: message.guild.id
+				id: message.channel.guild.id
 			},{
 				$set: {
 					[`logging.${event}`]: this.config.default.loggingConfig[event]
@@ -83,10 +83,10 @@ module.exports = {
 		}
 
 		if(message.gConfig.logging[event].enabled) {
-			const cl = message.guild.channels.get(message.gConfig.logging[event].channel);
+			const cl = message.channel.guild.channels.get(message.gConfig.logging[event].channel);
 			if(cl.id === ch.id) {
 				await this.mdb.collection("guilds").findOneAndUpdate({
-					id: message.guild.id
+					id: message.channel.guild.id
 				},{
 					$set: {
 						[`logging.${event}`]: {
@@ -95,10 +95,10 @@ module.exports = {
 						}
 					}
 				});
-				return message.reply(`Disabled logging of ${event} in <#${ch.id}>.`);
+				return message.channel.createMessage(`<@!${message.author.id}>, Disabled logging of ${event} in <#${ch.id}>.`);
 			} else {
 				await this.mdb.collection("guilds").findOneAndUpdate({
-					id: message.guild.id
+					id: message.channel.guild.id
 				},{
 					$set: {
 						[`logging.${event}`]: {
@@ -107,11 +107,11 @@ module.exports = {
 						}
 					}
 				});
-				return message.reply(`Enabled logging of ${event} in <#${ch.id}>.`);
+				return message.channel.createMessage(`<@!${message.author.id}>, Enabled logging of ${event} in <#${ch.id}>.`);
 			}
 		} else {
 			await this.mdb.collection("guilds").findOneAndUpdate({
-				id: message.guild.id
+				id: message.channel.guild.id
 			},{
 				$set: {
 					[`logging.${event}`]: {
@@ -120,9 +120,9 @@ module.exports = {
 					}
 				}
 			});
-			return message.reply(`Enabled logging of ${event} in <#${ch.id}>.`);
+			return message.channel.createMessage(`<@!${message.author.id}>, Enabled logging of ${event} in <#${ch.id}>.`);
 		}
 
-		return message.reply("Not sure how you got here.."); // eslint-disable no-unreachable
+		return message.channel.createMessage(`<@!${message.author.id}>, Not sure how you got here..`); // eslint-disable-line no-unreachable
 	})
 };

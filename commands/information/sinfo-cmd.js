@@ -6,7 +6,9 @@ module.exports = {
 		"si"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks" // 16384
+	],
 	cooldown: 2e3,
 	description: "Get some info about the current server",
 	usage: "",
@@ -15,54 +17,23 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let textChCount, voiceChCount, categoryChCount, guild, data, embed, guildConfig, o, owner, features, mfaLevel, verificationLevel, roles, rr;
-		textChCount = 0,
-		voiceChCount = 0,
-		categoryChCount = 0;
-		if(!isNaN(message.args[0]) && this.config.developers.includes(message.author.id)) {
-			guild = this.guilds.get(message.args[0]);
-			if(!guild) {
-				data = {
-					title: "Guild Not Found"
-				};
-				Object.assign(data,message.embed_defaults());
-				embed = new this.Discord.MessageEmbed(data);
-				return message.channel.send(embed);
-			}
-		} else {
-			guild = message.guild;
-		}
-		guildConfig = await this.db.getGuild(guild.id);
-		guild.channels.forEach((ch) => {
-			switch (ch.type) {
-			case "text":
-				textChCount++;
-				break;
-	
-			case "voice":
-				voiceChCount++;
-				break;
-					
-			case "category":
-				categoryChCount++;
-				break;
-			}
-		});
-		
-		o = guild.members.find(m => m.id === guild.owner.id);
+		let textChCount = message.guild.channels.filter(c => c.type === 0).length,
+			voiceChCount = message.guild.channels.filter(c => c.type === 2).length,
+			categoryChCount = message.guild.channels.filter(c => c.type === 4).length,
+			embed, o, owner, features, mfaLevel, verificationLevel, defaultNotifications, roles, rr;
+
+		o = message.guild.members.find(m => m.id === message.guild.ownerID);
 		if(!o) {
-			owner="Unknown";
+			owner = "Unknown";
 		} else {
-			owner = `${o.user.tag} (${o.id})`;
+			owner = `${o.user.username}#${o.user.discriminator} (${o.id})`;
 		}
-		
 		features = "";
-		if(guild.verified) features+="Verified\n";
-		if(guild.features.indexOf("VIP_REGIONS") !== -1) features+="VIP Voice Vegions\n";
+		if(message.channel.guild.verified) features+="Verified\n";
+		if(message.channel.guild.features.indexOf("VIP_REGIONS") !== -1) features+="VIP Voice Vegions\n";
 		// if fetching vanity url fails return discord-api
-		if(guild.features.indexOf("VANITY_URL") !== -1) features+=`Vanity URL: https://discord.gg/${guild.fetchVanityCode().catch(noerr => "discord-api")}\n`;
-		if(guild.features.indexOf("INVITE_SPLASH") !== -1) features+=`[Invite Splash](${guild.inviteSplash()})\n`;
+		if(message.channel.guild.features.indexOf("VANITY_URL") !== -1) features += "Vanity URL\n"; // features+=`Vanity URL: https://discord.gg/${message.guild.fetchVanityCode().catch(noerr => "discord-api")}\n`;
+		if(message.channel.guild.features.indexOf("INVITE_SPLASH") !== -1) features += "Invite Splash\n"; // features+=`[Invite Splash](${message.guild.inviteSplash()})\n`;
 	
 		if(features === "") features = "NONE";
 		verificationLevel = [
@@ -77,17 +48,22 @@ module.exports = {
 			"NONE",
 			"ELEVATED"
 		];
-		roles = guild.roles.map(role => role.name==="@everyone"?"@everyone":`<@&${role.id}>`).toString();
+
+		defaultNotifications = [
+			"All Messages",
+			"Only Mentions"
+		];
+		roles = message.guild.roles.map(role => role.name === "@everyone" ? "@everyone" : `<@&${role.id}>`).join(",");
 		rr = roles.length > 1000 ? `Too many to list, please use \`${message.gConfig.prefix}roles server\`` : roles;
-		data = {
-			title: `Server Info - **${guild.name}**`,
+		embed = {
+			title: `Server Info - **${message.guild.name}**`,
 			image: {
-				url: guild.iconURL()
+				url: message.guild.iconURL
 			},
 			fields: [
 				{
 					name: "Guild ID",
-					value: guild.id,
+					value: message.channel.guild.id,
 					inline: false
 				},
 				{
@@ -97,41 +73,46 @@ module.exports = {
 				},
 				{
 					name: "Members",
-					value: `Total: ${guild.memberCount}\n\n${this.config.emojis.online}: ${guild.members.filter(m => m.user.presence.status==="online").size}\n${this.config.emojis.idle}: ${guild.members.filter(m => m.user.presence.status==="idle").size}\n${this.config.emojis.dnd}: ${guild.members.filter(m => m.user.presence.status==="dnd").size}\n${this.config.emojis.offline}: ${guild.members.filter(m => m.user.presence.status==="offline").size}\n\nNon Bots: ${message.guild.memberCount - message.guild.members.filter(m => !m.user.bot).size}\nBots: ${message.guild.members.filter(m => m.user.bot).size}`,
+					value: `Total: ${message.guild.memberCount}\n\n\
+					${this.config.emojis.online}: ${message.guild.members.filter(m => m.status === "online").length}\n\
+					${this.config.emojis.idle}: ${message.guild.members.filter(m => m.status === "idle").length}\n\
+					${this.config.emojis.dnd}: ${message.guild.members.filter(m => m.status === "dnd").length}\n\
+					${this.config.emojis.offline}: ${message.guild.members.filter(m => m.status === "offline").length}\n\n\
+					Non Bots: ${message.channel.guild.members.filter(m => !m.bot).length}\n\
+					Bots: ${message.channel.guild.members.filter(m => m.bot).length}`,
 					inline: false
 				},
 				{
 					name: "Channels",
-					value: `Total: ${guild.channels.size}\nText: ${textChCount}\nVoice: ${voiceChCount}\nCategory: ${categoryChCount}`,
+					value: `Total: ${message.guild.channels.size}\n\
+					Text: ${textChCount}\n\
+					Voice: ${voiceChCount}\n\
+					Category: ${categoryChCount}`,
 					inline: false
 				},
 				{
 					name: "Guild Creation Date",
-					value: guild.createdAt.toString().split("GMT")[0],
+					value: new Date(message.guild.createdAt).toString().split("GMT")[0],
 					inline: false
 				},
 				{
 					name: "Region",
-					value: this.ucwords(guild.region),
+					value: message.guild.region,
 					inline: false
 				},
 				{
-					name: `Roles [${guild.roles.size-1}]`,
+					name: `Roles [${message.guild.roles.size-1}]`,
 					value: rr,
 					inline: false
 				},
 				{
 					name: "Extra",
-					value: `**Large Guild**: ${guild.large?"Yes":"No"}\n**Verification**: ${verificationLevel[guild.verificationLevel]}\n**2FA**: ${mfaLevel[guild.mfaLevel]}\n**Default Notifications**: ${guild.defaultMessageNotifications}\n**Features**:\n${features}`,
+					value: `**Large Guild**: ${message.guild.large?"Yes":"No"}\n**Verification**: ${verificationLevel[message.guild.verificationLevel]}\n**2FA**: ${mfaLevel[message.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[message.guild.defaultNotifications]}\n**Features**:\n${features}`,
 					inline: false
 				}
 			]
 		};
-		
-		Object.assign(data, message.embed_defaults());
-		
-		embed = new this.Discord.MessageEmbed(data);
-		message.channel.send(embed);
-		return message.channel.stopTyping();
+		Object.assign(embed, message.embed_defaults());
+		return message.channel.createMessage({ embed });
 	})
 };

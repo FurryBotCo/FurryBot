@@ -3,7 +3,10 @@ module.exports = {
 		"profile"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"attachFiles", // 32768
+		"embedLinks" // 16384
+	],
 	cooldown: 2e3,
 	description: "Get your user profile",
 	usage: "[@member/id]",
@@ -12,7 +15,7 @@ module.exports = {
 	betaOnly: true,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
+		
 		let member, position, level, xp_left, rank, image, pr, u, imgpath, img, a, at;
 		// get member from message
 		member = message.args.length <= 0 ? message.member : await message.getMemberFromArgs();
@@ -37,25 +40,26 @@ module.exports = {
 			.setColor(rank.color)
 			.addText(rank.name, 445, 300)
 			.setColor("#F00");
-		if(member.nickname !== null) {
+		if(member.nick !== null) {
 			pr.setColor("#F00")
-				.addText(member.user.tag, 150, 220)
+				.addText(`${member.user.username}#${member.user.discriminator}`, 150, 220)
 				.setColor("#00F")
-				.addText(member.nickname, 150, 190);
+				.addText(member.nick, 150, 190);
 		} else {
 			pr.setColor("#00F")
-				.addText(member.user.tag, 150, 190);
+				.addText(`${member.user.username}#${member.user.discriminator}`, 150, 190);
 		}
-		u = member.user.displayAvatarURL().split(".");
+		u = member.user.avatarURL.split(".");
 		u.pop();
-		imgpath = `${this.config.rootDir}/tmp/${message.guild.id}-${message.channel.id}-${member.user.id}-profile.png`;
+		imgpath = `${this.config.rootDir}/tmp/${message.channel.guild.id}-${message.channel.id}-${member.user.id}-profile.png`;
 		await this.download(`${u.join(".")}.png`,imgpath);
 		img = await this.fsn.readFile(imgpath);
 		pr.addImage(img, 18, 128, 119, 119);
 		a = await pr.toBufferAsync();
-		at = new this.Discord.MessageAttachment(a);
-		await message.channel.send(at);
+		await message.channel.createMessage("",{
+			file: a,
+			name: "profile.png"
+		});
 		await this.fsn.unlink(imgpath);
-		message.channel.stopTyping();
 	})
 };

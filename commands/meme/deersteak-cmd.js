@@ -5,19 +5,17 @@ module.exports = {
 	],
 	userPermissions: [],
 	botPermissions: [
-		"ATTACH_FILES"
+		"attachFiles" // 32768
 	],
 	cooldown: 5e3,
 	description: "this is an old meme of ours, carried down for months.",
 	usage: "[@user]",
 	nsfw: false,
 	devOnly: true,
-	betaOnly: false,
+	betaOnly: true,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		if(!this.config.beta) message.reply("temporarily disabled");
-		message.channel.startTyping();
-		let image, profile, d, time, i, attachment;
+		let image, profile, d, time, i;
 		image = await this.fsn.readFile(`${process.cwd()}/images/deersteak.png`);
 		await this.download(`https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png`,`${this.config.rootDir}/tmp/${message.author.id}.png`);
 		profile = await this.fsn.readFile(`${process.cwd()}/tmp/${message.author.id}.png`);
@@ -35,12 +33,13 @@ module.exports = {
 			.setTextFont("0.75em Whitney")
 			.addText(`Today at ${time}`, 253, 33)
 			.setColor("#FFF")
-			.addText(message.member.displayName, 77, 33)
+			.addText(message.member.nick || message.member.username, 77, 33)
 			.toBufferAsync();
 			
-		attachment = new this.Discord.MessageAttachment(i);
-		const u = await this.users.fetch("185938944460980224");
-		message.channel.send(`Here you go!\n(this is an inside joke from ${u.tag} <https://assets.furry.bot/deersteak.png>)`,attachment);
-		return message.channel.stopTyping();
+		const u = await this.bot.getRESTUser("185938944460980224");
+		return message.channel.createMessage(`Here you go!\n(this is an inside joke from ${u.username}#${u.discriminator} <https://assets.furry.bot/deersteak.png>)`,{
+			file: i,
+			name: "deersteak.png"
+		});
 	})
 };

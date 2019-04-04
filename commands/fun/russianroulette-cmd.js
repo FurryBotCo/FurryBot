@@ -18,10 +18,7 @@ module.exports = {
 		val = Math.floor(Math.random()*6);
 		bullets = typeof message.args[0] !== "undefined" ? parseInt(message.args[0],10) : 3;
 		
-		if(val<=bullets-1) {
-			return message.reply("You died!");
-		} else {
-			return message.reply("You lived!");
-		}
+		if(val<=bullets-1) return message.channel.createMessage(`<@!${message.author.id}>, You died!`);
+		return message.channel.createMessage(`<@!${message.author.id}>, You lived!`);
 	})
 };

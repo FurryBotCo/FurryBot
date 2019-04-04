@@ -10,7 +10,7 @@ module.exports = ((input="",rplc={},ext={}) => {
 			}
 			if(input.indexOf("{author.id}") !== -1 ) after = after.replace(/{author.id}/g,rplc.author.id);
 			if(rplc.author.user !== undefined) {
-				if(input.indexOf("{author.tag}") !== -1 ) after = after.replace(/{author.tag}/g,rplc.user.tag);
+				if(input.indexOf("{author.tag}") !== -1 ) after = after.replace(/{author.tag}/g,`${rplc.user.username}#${rplc.user.discriminator}`);
 				if(input.indexOf("{author.username}") !== -1 ) after = after.replace(/{author.username}/g,rplc.user.username);         //
 				if(input.indexOf("{author.discriminator}") !== -1 ) after = after.replace(/{author.discriminator}/g,rplc.user.discriminator);
 				if(input.indexOf("{author.status}") !== -1 ) after = after.replace(/{author.status}/g,rplc.user.presence.status);
@@ -24,7 +24,7 @@ module.exports = ((input="",rplc={},ext={}) => {
 			}
 			if(input.indexOf("{user.id}") !== -1 ) after = after.replace(/{user.id}/g,rplc.user.id);
 			if(rplc.user.user !== undefined) {
-				if(input.indexOf("{user.tag}") !== -1 ) after = after.replace(/{user.tag}/g,rplc.user.tag);
+				if(input.indexOf("{user.tag}") !== -1 ) after = after.replace(/{user.tag}/g,`${rplc.user.username}#${rplc.user.discriminator}`);
 				if(input.indexOf("{user.username}") !== -1 ) after = after.replace(/{user.username}/g,rplc.user.username);
 				if(input.indexOf("{user.discriminator}") !== -1 ) after = after.replace(/{user.discriminator}/g,rplc.user.discriminator);
 				if(input.indexOf("{user.status}") !== -1 ) after = after.replace(/{user.status}/g,rplc.user.presence.status);

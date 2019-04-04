@@ -13,7 +13,6 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
 		let req, j;
 		req = await this.request("https://icanhazdadjoke.com",{
 			headers:{
@@ -24,7 +23,6 @@ module.exports = {
 	
 		j = JSON.parse(req.body);
 	
-		message.channel.send(j.joke);
-		return message.channel.stopTyping();
+		message.channel.createMessage(j.joke);
 	})
 };

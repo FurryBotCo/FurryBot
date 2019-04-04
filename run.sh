@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /FurryBot
+cd /root/bots/FurryBot
 
 while true;
 do

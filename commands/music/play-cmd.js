@@ -13,27 +13,27 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		let t, song, songs, pageCount, pageNumber, a, alreadyPlaying, player;
-		message.channel.startTyping();
+		
 		if(!message.member.voice.channel) {
-			message.reply("You must be in a voice channel.");
-			return message.channel.stopTyping();
+			message.channel.createMessage("You must be in a voice channel.");
+			
 		}
 		if(message.args.length === 0) {
-			message.reply("Please provide a query or youtube url.");
-			return message.channel.stopTyping();
+			message.channel.createMessage("Please provide a query or youtube url.");
+			
 		}
 		if(/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/.test(message.args[0])) {
 			t = (await this.getSong(message.args[0])).tracks;
 			if(t.length === 0) {
-				message.reply("Nothing was found!");
-				return message.channel.stopTyping();
+				message.channel.createMessage("Nothing was found!");
+				
 			}
 			song = t[0];
 		} else {
 			t = (await this.songSearch(message.args.join(" "),"youtube")).tracks;
 			if(t.length === 0) {
-				message.reply("Nothing was found!");
-				return message.channel.stopTyping();
+				message.channel.createMessage("Nothing was found!");
+				
 			}
 			songs={
 				tracks: {
@@ -56,18 +56,18 @@ module.exports = {
 				song = songs.tracks[0];
 			}
 		}
-		if(!song) return message.reply("Internal Error `play1`");
+		if(!song) return message.channel.createMessage("Internal Error `play1`");
 		if(song instanceof Error) {
 			if(song.message === "CANCEL") {
-				message.reply("Command canceled.");
-				return message.channel.stopTyping();
+				message.channel.createMessage("Command canceled.");
+				
 			}
-			message.reply("Internal Error `play2`");
-			console.error(song);
+			message.channel.createMessage("Internal Error `play2`");
+			this.logger.error(song);
 		}
 		if(song instanceof this.Discord.Collection) {
-			message.reply("Request timed out.");
-			return message.channel.stopTyping();
+			message.channel.createMessage("Request timed out.");
+			
 		}
 		if(song instanceof Object) {
 			if(!song.song) {
@@ -75,23 +75,23 @@ module.exports = {
 					song.song = {};
 					song.song.info = song.info;
 				} else {
-					return message.reply("Internal Error `play3`");
+					return message.channel.createMessage("Internal Error `play3`");
 				}
 			}
 			if(song.song.info.length > 6e5 && !message.gConfig.premium) {
-				message.reply(`this is too long to be played! The maximum time for this guild is \`10 minutes (6000s)\`, to increase this limit please donate, and mark this server as premium **${this.config.bot.donationURL}**.`);
-				return message.channel.stopTyping();
+				message.channel.createMessage(`this is too long to be played! The maximum time for this guild is \`10 minutes (6000s)\`, to increase this limit please donate, and mark this server as premium **${this.config.bot.donationURL}**.`);
+				
 			} 
-			a = this.voiceConnections.filter(g => g.channel.guild.id === message.guild.id);
+			a = this.voiceConnections.filter(g => g.channel.guild.id === message.channel.guild.id);
 			alreadyPlaying = a.size === 0 ? false : a.first().speaking.has("SPEAKING");
-			if(!alreadyPlaying) await this.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{
+			if(!alreadyPlaying) await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
 				$set: {
 					music: {
 						textChannel: message.channel.id
 					}
 				}
 			});
-			await this.mdb.collection("guilds").findOneAndUpdate({id: message.guild.id},{
+			await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
 				$push: {
 					music: {
 						queue: {
@@ -106,10 +106,10 @@ module.exports = {
 				}
 			});
 			if(!song.msg) {
-				if(alreadyPlaying) message.reply(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await this.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.music.queue)).length}`);
-				else message.reply(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
+				if(alreadyPlaying) message.channel.createMessage(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue)).length}`);
+				else message.channel.createMessage(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
 			} else {
-				if(alreadyPlaying) message.reply(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await this.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.music.queue)).length}`);
+				if(alreadyPlaying) message.channel.createMessage(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue)).length}`);
 				else song.msg.edit(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
 			}
 			if(!alreadyPlaying) {
@@ -117,12 +117,12 @@ module.exports = {
 			}
 		} else {
 			if(alreadyPlaying) {
-				message.reply(`Added **${song.info.title}** by *${song.info.author}* (Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s) to the queue. Position: ${(await this.mdb.collection("guilds").findOne({id: message.guild.id}).then(res => res.music.queue)).length}`);
+				message.channel.createMessage(`Added **${song.info.title}** by *${song.info.author}* (Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s) to the queue. Position: ${(await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue)).length}`);
 			} else {
-				message.reply(`Now playing **${song.info.title}** by *${song.info.author}* - Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s`);
+				message.channel.createMessage(`Now playing **${song.info.title}** by *${song.info.author}* - Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s`);
 				player = await this.playSong(message.member.voice.channel,song.info,"youtube");
 			}
 		}
-		return message.channel.stopTyping();
+		
 	})
 };

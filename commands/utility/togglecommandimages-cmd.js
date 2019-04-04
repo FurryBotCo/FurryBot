@@ -4,7 +4,7 @@ module.exports = {
 		"togglecommandimages"
 	],
 	userPermissions: [
-		"MANAGE_GUILD"
+		"manageGuild"
 	],
 	botPermissions: [],
 	cooldown: 3e3,
@@ -18,13 +18,21 @@ module.exports = {
     
 		switch(message.gConfig.commandImages) {
 		case true:
-			this.db.updateGuild(message.guild.id, {commandImages: false});
-			message.reply("Disabled command images.");
+			await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
+				$set: {
+					commandImages: false
+				}
+			});
+			message.channel.createMessage("Disabled command images.");
 			break;
     
 		case false:
-			this.db.updateGuild(message.guild.id, {commandImages: true});
-			message.reply("Enabled command images.");
+			await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
+				$set: {
+					commandImages: true
+				}
+			});
+			message.channel.createMessage("Enabled command images.");
 			break;
 		}
 	})

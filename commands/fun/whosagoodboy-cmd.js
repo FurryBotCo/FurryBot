@@ -14,6 +14,6 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		return message.reply("Yip! Yip! I am! I am! :fox:");
+		return message.channel.createMessage(`<@!${message.author.id}>, Yip! Yip! I am! I am! :fox:`);
 	})
 };

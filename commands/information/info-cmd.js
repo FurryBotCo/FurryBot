@@ -5,7 +5,7 @@ module.exports = {
 	],
 	userPermissions: [],
 	botPermissions: [
-		"EMBED_LINKS"
+		"embedLinks" // 16384
 	],
 	cooldown: 2e3,
 	description: "Get some info about the bot",
@@ -15,26 +15,10 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let userCount, largeGuildCount, srv, data, embed;
-		userCount = 0;
-		this.guilds.forEach((guild) => {
-			userCount+=guild.memberCount;
-		});
-		largeGuildCount = 0;
-		srv = [...this.guilds.values()];
-		for(let i=0;i<srv.length;i++) {
-			if(!srv[i].unavailable) {
-				if(srv[i].large) {
-					largeGuildCount++;
-				}
-			} else {
-				console.log(`Guild Unavailable: ${srv[i].name} (${srv[i].id})`);
-			}
-		}
-		data = {
-			"title": "Bot Info!",
-			"fields": [
+		let userCount, largeGuildCount, srv, embed;
+		embed = {
+			title: "Bot Info!",
+			fields: [
 				{
 					name: "Process Memory Usage",
 					value: `${Math.round(this.memory.process.getUsed()/1024/1024)}MB/${Math.round(this.memory.process.getTotal()/1024/1024)}MB`,
@@ -53,15 +37,15 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Total Guilds",
-					value: this.guilds.size,
+					value: this.bot.guilds.size,
 					inline: false
 				}, {
 					name: "Large Guilds (300+ Members)",
-					value: largeGuildCount,
+					value: this.bot.guilds.filter(g => g.large).length,
 					inline: false
 				}, {
 					name: "Total Users",
-					value: userCount,
+					value: this.bot.guilds.map(g => g.memberCount).reduce((a,b) => a + b),
 					inline: false
 				}, {
 					name: "Commands",
@@ -77,7 +61,7 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Discord.JS Version",
-					value: this.Discord.version,
+					value: this.Eris.VERSION,
 					inline: false
 				}, {
 					name: "Node.JS Version",
@@ -98,9 +82,7 @@ module.exports = {
 				}
 			]
 		};
-		Object.assign(data, message.embed_defaults());
-		embed = new this.Discord.MessageEmbed(data);
-		message.channel.send(embed);
-		return message.channel.stopTyping();
+		Object.assign(embed, message.embed_defaults());
+		message.channel.createMessage({ embed });
 	})
 };

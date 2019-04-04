@@ -6,7 +6,7 @@ module.exports = {
 	],
 	userPermissions: [],
 	botPermissions: [
-		"ATTACH_FILES"
+		"attachFiles" // 32768
 	],
 	cooldown: 3e3,
 	description: "Get a picture of a cat!",
@@ -16,16 +16,18 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let attachment;
 		try {
-			attachment = new this.Discord.MessageAttachment("https://cataas.com/cat/gif","cat.gif");
-		}catch(error){
-			this.logger.error(error);
-			attachment = new this.Discord.MessageAttachment(this.config.images.serverError);
+			return message.channel.createMessage("",{
+				file: await this.getImageFromURL("https://cataas.com/cat/gif"),
+				name: "cat.gif"
+			});
+		} catch(e) {
+			this.logger.error(e);
+			return message.channel.createMessage("unknown api error",{
+				file: await this.getImageFromURL(this.config.images.serverError),
+				name: "error.png"
+			});
 		}
-		message.channel.send(attachment);
-		return message.channel.stopTyping();
 			
 	})
 };

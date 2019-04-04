@@ -5,7 +5,9 @@ module.exports = {
 		"ui"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks" // 16e84
+	],
 	cooldown: 2e3,
 	description: "Get some info on a user",
 	usage: "[@member/id]",
@@ -14,7 +16,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
+		
 		let user, roles, data, req, x, ds, db, l, ll, rs, list, embed;
 		if(message.args.length === 0 || !message.args) {
 			user = message.member;
@@ -25,14 +27,14 @@ module.exports = {
 
 		if(!user) return message.errorEmbed("INVALID_USER");
 		
-		roles = user.roles.map(role => role.name !== "@everyone" ? `<@&${role.id}>` : "@everyone");
+		roles = user.roles.map(role => role !== message.channel.guild.id ? `<@&${role}>` : "@everyone");
 		
-		data = {
+		embed = {
 			name: "User info",
 			fields: [
 				{
 					name: "Tag",
-					value: user.user.tag,
+					value: `${user.user.username}#${user.user.discriminator}`,
 					inline: true
 				},{
 					name: "User ID",
@@ -55,12 +57,13 @@ module.exports = {
 		};
 		if(!user.user.bot) {
 			try {
-				req = await this.request(`https://discord.services/api/ban/${user.id}`,{
+				/*req = await this.request(`https://discord.services/api/ban/${user.id}`,{
 					method: "GET"
 				});
 		
 				x = JSON.parse(req.body.toString());
-				ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";
+				ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";*/
+				ds = "Down until further notice";
 			} catch(e) {
 				ds = "Lookup failed.";
 				this.logger.log(e);
@@ -71,9 +74,15 @@ module.exports = {
 				});
 			}
 			db = "Down until further notice";
-			l = await this.db.isBlacklisted(user.id);
+			l = await this.mdb.collection("users").findOne({id: user.id}).then(res => {
+				if(!res.blacklisted) return false;
+				return {
+					blacklisted: res.blacklisted,
+					reason: res.blacklistReason
+				};
+			});
 			ll = l.blacklisted ? `Reason: ${l.reason}` : "No";
-			data.fields.push({
+			embed.fields.push({
 				name: "Blacklist",
 				value: `Discord.Services: **${ds}**\nDiscord Bans: **${db}**\nlocal: **${ll}**`,
 				inline: false
@@ -95,7 +104,7 @@ module.exports = {
 					if(ll[1] !== 200) continue;
 					list += `[${ls}](https://api.furry.bot/botlistgo/${encodeURIComponent(ls)}/${encodeURIComponent(user.id)
 				
-				})\n`;
+					})\n`;
 
 				}
 
@@ -111,20 +120,18 @@ module.exports = {
 				list = "Lookup Failed.";
 			}
 			list = typeof list === "object" ? list.map(ls => `[${ls.name}](${ls.url})`).join("\n") : list;
-			data.fields.push({
+			embed.fields.push({
 				name: "Blacklist",
 				value: "Bots cannot be blacklisted.",
 				inline: false
 			},{
 				name: "Bot List",
-				value: list.length > 1000 ? `Output is too long, use \`${message.gConfig.prefix}botlistinfo ${user.user.tag}\`` : list.length === 0 ? "Not found on any." : list,
+				value: list.length > 1000 ? `Output is too long, use \`${message.gConfig.prefix}botlistinfo ${user.username}#${user.discriminator}\`` : list.length === 0 ? "Not found on any." : list,
 				inline: false
 			});
 		}
-		Object.assign(data, message.embed_defaults());
-		data.thumbnail={url: user.user.displayAvatarURL()};
-		embed = new this.Discord.MessageEmbed(data);
-		message.channel.send(embed);
-		return message.channel.stopTyping();
+		Object.assign(embed, message.embed_defaults());
+		embed.thumbnail={url: user.user.avatarURL};
+		message.channel.createMessage({ embed });
 	})
 };

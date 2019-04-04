@@ -1,3 +1,6 @@
+/* eslint-disable no-redeclare */
+
+
 /*
 Furry Bot™ Custom Logger V3
 11-26-18 - Trademark (™) Donovan Daniels & Furry Bot Limited 

@@ -1,3 +1,5 @@
+/* eslint-disable no-redeclare, no-undef */
+
 /*
 FurryBot Custom Logger V2
 9-13-18

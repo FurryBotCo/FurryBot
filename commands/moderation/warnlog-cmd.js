@@ -2,9 +2,7 @@ module.exports = {
 	triggers: [
 		"warnlog"
 	],
-	userPermissions: [
-		"MANAGE_GUILD"
-	],
+	userPermissions: [],
 	botPermissions: [],
 	cooldown: 2.5e3,
 	description: "Check the warnings a user has",
@@ -14,8 +12,8 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let user, page, mn, warnings, data, embed, wr, pages, fields, w, usr, blame;
-		message.channel.startTyping();
+		let user, page, mn, warnings, embed, wr, pages, fields, w, usr, blame;
+		
 		if(message.args.length === 0 || !message.args || (!isNaN(message.args[0]) && message.args[0].length < 17)) {
 			user = message.member;
 			page = ![undefined,null,""].includes(message.args[0]) && !isNaN(message.args[0]) && message.args[0].length < 17 ? message.args[0] : 1;
@@ -42,40 +40,38 @@ module.exports = {
         
 		if(!user) return message.errorEmbed("INVALID_USER");
         
-		warnings = await this.db.getUserWarnings(user.id,message.guild.id).then(res => res.sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp)));
+		warnings = await this.mdb.collection("users").findOne({id: user.id}).then(res => res.warnings.filter(w => w.gid === message.channel.guild.id).sort((s,g) => s.id < g.id ? -1 : s.id > g.id ? 1 : 0).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp)));
 		if(warnings.length <= 0) {
-			data = {
+			embed = {
 				title: "No Warnings Found",
-				description: `No warnings were found for the specified user **${user.user.tag}**`,
+				description: `No warnings were found for the specified user **${user.username}#${user.discriminator}**`,
 				color: 41728
 			};
-			Object.assign(data, message.embed_defaults("color"));
-			embed = new this.Discord.MessageEmbed(data);
-			message.channel.send(embed);
-			return message.channel.stopTyping();
+			Object.assign(embed, message.embed_defaults("color"));
+			message.channel.createMessage({ embed });
+			
 		}
 		wr = this.chunk(warnings,10);
 		pages = wr.length;
 		if([undefined,null,""].includes(page)) page = 1;
-		if(page > pages) return message.reply("Invalid page number.");
+		if(page > pages) return message.channel.createMessage("Invalid page number.");
 		fields = [];
 		for(let key in wr[page-1]) {
 			w = wr[page-1][key];
-			usr = await this.users.fetch(w.blame);
-			blame = !usr ? "Unknown" : usr.tag;
+			usr = await this.bot.getRESTUser(w.blame);
+			blame = !usr ? "Unknown" : `${usr.username}#${usr.discriminator}`;
 			fields.push({
 				name: `#${w.wid} - ${new Date(w.timestamp).toDateString()} by **${blame}**`,
 				value: w.reason,
 				inline: false
 			});
 		}
-		data = {
-			title: `Warn Log for **${user.user.tag}** - Page ${page}/${pages}`,
+		embed = {
+			title: `Warn Log for **${user.username}#${user.discriminator}** - Page ${page}/${pages}`,
 			fields
 		};
-		Object.assign(data,message.embed_defaults());
-		embed = new this.Discord.MessageEmbed(data);
-		message.channel.send(embed);
-		return message.channel.stopTyping();
+		Object.assign(embed,message.embed_defaults());
+		message.channel.createMessage({ embed });
+		
 	})
 };

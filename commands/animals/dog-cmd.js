@@ -6,7 +6,7 @@ module.exports = {
 	],
 	userPermissions: [],
 	botPermissions: [
-		"ATTACH_FILES"
+		"attachFiles" // 32768
 	],
 	cooldown: 3e3,
 	description: "Get a picture of a doggo!",
@@ -16,20 +16,27 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let req, j, parts, attachment;
-		req = await this.request("https://dog.ceo/api/breeds/image/random",{
-			method: "GET",
-			headers: {
-				"User-Agent": this.config.web.userAgent
-			}
-		});
-		j = JSON.parse(req.body);
-		parts = j.message.replace("https://","").split("/");
-		
-		attachment = new this.Discord.MessageAttachment(j.message,`${parts[2]}_${parts[3]}.png`);
-		
-		message.channel.send(`Breed: ${parts[2]}`,attachment);
-		return message.channel.stopTyping();
+		let req, j, parts;
+		try {
+			req = await this.request("https://dog.ceo/api/breeds/image/random",{
+				method: "GET",
+				headers: {
+					"User-Agent": this.config.web.userAgent
+				}
+			});
+			j = JSON.parse(req.body);
+			parts = j.message.replace("https://","").split("/");
+			
+			return message.channel.createMessage(`Breed: ${parts[2]}`,{
+				file: await this.getImageFromURL(j.message),
+				name: `${parts[2]}_${parts[3]}.png`
+			});
+		} catch(e) {
+			this.logger.error(e);
+			return message.channel.createMessage("unknown api error",{
+				file: await this.getImageFromURL(this.config.images.serverError),
+				name: "error.png"
+			});
+		}
 	})
 };

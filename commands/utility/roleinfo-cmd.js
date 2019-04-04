@@ -13,20 +13,20 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let member, server, a, roles, fields, i, data, embed, allow, deny, role;
+		let member, server, a, roles, fields, i, embed, allow, deny, role;
 		if(message.args.length === 0) member = message.member;
-		else if(message.args[0] === "server") server = message.guild;
+		else if(message.args[0] === "server") server = message.channel.guild;
 		// try member first
 		else member = await message.getMemberFromArgs(0,false,true);
 			
 		// if member failed try role
-		if(([undefined,null,""].includes(member) || !(member instanceof this.Discord.GuildMember)) && message.args[0] !== "server") role = await message.getRoleFromArgs(0,false,true);
+		if(([undefined,null,""].includes(member) || !(member instanceof this.Eris.Member)) && message.args[0] !== "server") role = await message.getRoleFromArgs(0,false,true);
 
 		//finally, try a server (if developer)
-		//if(message.user.isDeveloper  && ([undefined,null,""].includes(member) || !(member instanceof this.Discord.GuildMember)) && ([undefined,null,""].includes(role) || !(role instanceof this.Discord.Role)) && message.args[0] !== "server") server = await message.getServerFromArgs(0,false,true).then(s => s);
+		//if(message.user.isDeveloper  && ([undefined,null,""].includes(member) || !(member instanceof this.Eris.Member)) && ([undefined,null,""].includes(role) || !(role instanceof this.Discord.Role)) && message.args[0] !== "server") server = await message.getServerFromArgs(0,false,true).then(s => s);
 		server = null;
 		
-		if(server instanceof this.Discord.Guild) {
+		if(server instanceof this.Eris.Guild) {
 			// server roles
 			a = server.roles.map(r => `<@&${r.id}>`),
 			roles = [],
@@ -48,14 +48,13 @@ module.exports = {
 					inline: false
 				});
 			});
-			data = {
+			embed = {
 				title: `this server has ${a.length} Roles`,
 				desciption: `You can use \`${message.prefix}roleinfo <rolename>\` to get more info on a single role`,
 				fields
 			};
-			embed = new this.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
-		} else if (member instanceof this.Discord.GuildMember) {
+			return message.channel.createMessage({ embed });
+		} else if (member instanceof this.Eris.Member) {
 			// member roles
 			a = member.roles.map(r => `<@&${r.id}>`),
 			roles = [],
@@ -77,23 +76,26 @@ module.exports = {
 					inline: false
 				});
 			});
-			data = {
-				title: `Member Roles - ${member.user.tag} - ${a.length} Roles`,
+			embed = {
+				title: `Member Roles - ${member.username}#${member.discriminator} - ${a.length} Roles`,
 				desciption: `You can use \`${message.prefix}roleinfo <rolename>\` to get more info on a single role`,
 				fields
 			};
-			embed = new this.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
-		} else if (role instanceof this.Discord.Role) {
+			return message.channel.createMessage({ embed });
+		} else if (role instanceof this.Eris.Role) {
 			// single role info
-			allow = Object.keys(this._.pickBy(role.permissions.serialize(),((val,key)  => {return val;}))),
-			deny = Object.keys(this._.pickBy(role.permissions.serialize(),((val,key)  => {return !val;}))),
-			data = {
+			allow = [],
+			deny = [];
+			for(let p in this.config.Permissions) {
+				if(role.permissions.allow & this.config.permissions[p]) allow.push(p);
+				else deny.push(p);
+			}
+			embed = {
 				title: `**${role.name}**`,
 				fields: [
 					{
 						name: "Color",
-						value: `${role.hexColor} (${role.color})`,
+						value: `${parseInt(role.color,16)} (${role.color})`,
 						inline: false
 					},{
 						name: "Hoisted (displayed separately)",
@@ -109,11 +111,11 @@ module.exports = {
 						inline: false
 					},{
 						name: "Position",
-						value: role.rawPosition,
+						value: role.position,
 						inline: false
 					},{
 						name: "Members With this Role",
-						value: role.members.size,
+						value: message.guild.members.filter(m => m.roles.includes(role.id)).size,
 						inline: false
 					},{
 						name: "Permissions Allowed",
@@ -125,18 +127,16 @@ module.exports = {
 						inline: false
 					}
 				]
-			},
-			embed = new this.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
+			};
+			return message.channel.createMessage({ embed });
 		} else {
 			// nothing was found
-			data = {
+			embed = {
 				title: "Nothing was found",
 				description: "Nothing was found from the given input, please provide one of the following:\n \"server\", server id (developer only), @role, role id, role name, @user, user id, FULL user name, FULL user tag (User#0000)"
 			};
-			Object.assign(data, message.embed_defaults());
-			embed = new this.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
+			Object.assign(embed, message.embed_defaults());
+			return message.channel.createMessage({ embed });
 		}
 	})
 };

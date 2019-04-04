@@ -4,7 +4,7 @@ module.exports = {
 		"w"
 	],
 	userPermissions: [
-		"MANAGE_GUILD"
+		"kickMembers" // 2
 	],
 	botPermissions: [],
 	cooldown: 2.5e3,
@@ -15,25 +15,25 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let user, reason, w, data, embed;
+		let user, reason, w, u, embed, a;
 		if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
 		// get member from message
 		user = await message.getMemberFromArgs();
         
 		if(!user) return message.errorEmbed("INVALID_USER");
-    
-		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourthis.");
-		if(user.roles.highest.rawPosition >= message.member.roles.highest.rawPosition && message.author.id !== message.guild.owner.id && !message.user.isDeveloper) return message.reply(`You cannot warn ${user.user.tag} as their highest role is higher than yours!`);
+		u = await this.mdb.collection("users").findOne({id: user.id});
+		a = this.compareMembers(user,message.member);
+		if(user.id === message.member.id && !message.user.isDeveloper) return message.channel.createMessage("Pretty sure you don't want to do this to yourthis.");
+		if((a.member1.higher || a.member1.same) && message.author.id !== message.channel.guild.ownerID && !message.user.isDeveloper) return message.channel.createMessage(`You cannot warn ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
 		reason = message.args.slice(1).join(" ");
     
-		if(!reason) return message.reply("Please provide a reason.");
+		if(!reason) return message.channel.createMessage("Please provide a reason.");
     
-		w = await this.db.createUserWarning(user.id,message.guild.id,message.author.id,reason);
-    
-		if(!message.gConfig.delCmds && message.channel.permissionsFor(this.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
-		data = {
-			title: `User Warned - #${w.wid}`,
-			description: `User ${user.user.tag} was warned by ${message.author.tag}`,
+		w = await this.mdb.collection("users").findOneAndUpdate({id: user.id},{$push: {warnings: {wid: u.warnings.length + 1, blame: message.author.id, reason, timestamp: Date.now(), gid: message.channel.guild.id}}});
+		if(!message.gConfig.deleteCommands && message.channel.permissionsOf(this.bot.user.id).has("manageMessages")) message.delete().catch(error => null);
+		embed = {
+			title: `User Warned - #${u.warnings.length + 1}`,
+			description: `User ${user.username}#${user.discriminator} was warned by ${message.author.username}#${message.author.discriminator}`,
 			fields: [
 				{
 					name: "Reason",
@@ -42,8 +42,7 @@ module.exports = {
 				}
 			]
 		};
-		Object.assign(data,message.embed_defaults());
-		embed = new this.Discord.MessageEmbed(data);
-		return message.channel.send(embed);
+		Object.assign(embed,message.embed_defaults());
+		return message.channel.createMessage({ embed });
 	})
 };

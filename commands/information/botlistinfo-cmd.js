@@ -5,7 +5,9 @@ module.exports = {
 		"bl"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks" // 16834
+	],
 	cooldown: 2e3,
 	description: "Get the info of a bot on botlists",
 	usage: "<@bot/id>",
@@ -14,8 +16,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let user, data, req, b, rs, list, embed;
+		let user, req, b, rs, list, embed, i;
 		list = [];
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		// get user from message
@@ -59,26 +60,24 @@ module.exports = {
 				b[i] += `${list[key]}\n`;
 			}
 		}
-		data = {
+		embed = {
 			title: "Botlist Info",
 			description: "All links redirect from our api to make keeping links up to date easier.",
 			fields: [
 
 			]
-		}	
+		};	
 		b.forEach((l,c) => {
-			data.fields.push({
+			embed.fields.push({
 				name: `List #${+c+1}`,
 				value: l,
 				inline: false
 			});
 		});
-		Object.assign(data, message.embed_defaults());
-		data.thumbnail = {
-			url: user.displayAvatarURL()
+		Object.assign(embed, message.embed_defaults());
+		embed.thumbnail = {
+			url: user.avatarURL
 		};
-		embed = new this.Discord.MessageEmbed(data);
-		message.channel.send(embed);
-		return message.channel.stopTyping();
+		message.channel.createMessage({ embed });
 	})
 };

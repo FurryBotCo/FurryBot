@@ -4,7 +4,9 @@ module.exports = {
 		"seenon"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks" // 16384
+	],
 	cooldown: 2e3,
 	description: "Get the servers we've seen a user on",
 	usage: "[@user, or id]",
@@ -13,8 +15,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let user, a, b, guilds, fields, data, embed, i;
-		message.channel.startTyping();
+		let user, a, b, guilds, fields, embed, i;
 		if(message.args.length === 0 || !message.args) {
 			user = message.member;
 		} else {
@@ -25,7 +26,7 @@ module.exports = {
 		
 		if(!user) return message.errorEmbed("INVALID_USER");
 		
-		a = this.guilds.filter(g => g.members.has(user.id));
+		a = this.bot.guilds.filter(g => g.members.has(user.id));
 		b = a.map(g => `${g.name} (${g.id})`),
 		guilds = [],
 		fields = [],
@@ -46,13 +47,11 @@ module.exports = {
 				inline: false
 			});
 		});
-		data = {
-			title: `Seen On ${b.length} Servers - ${user.user.tag} (${user.id})`,
+		embed = {
+			title: `Seen On ${b.length} Servers - ${user.user.username}#${user.user.discriminator} (${user.id})`,
 			desciption: `I see this user in ${guilds.size} other guilds.`,
 			fields
 		};
-		embed = new this.Discord.MessageEmbed(data);
-		message.channel.send(embed);
-		return message.channel.stopTyping();
+		message.channel.createMessage({ embed });
 	})
 };
