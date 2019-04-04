@@ -1,11 +1,11 @@
 module.exports = (async function() {
-	this.logger.log(`Bot has started with ${this.bot.users.size} users in ${this.bot.guilds.map(g => g.channels.size).reduce((a,b) =>a + b)} channels of ${this.bot.guilds.size} guilds.`);
+	this.logger.log(`Bot has started with ${this.bot.users.size} users in ${this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b)} channels of ${this.bot.guilds.size} guilds.`);
 	this.trackEvent({
 		group: "EVENTS",
 		event: "client.events.ready",
 		properties: {
 			userCount: this.bot.users.size,
-			channelCount: this.bot.guilds.map(g => g.channels.size).reduce((a,b) =>a + b),
+			channelCount: this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b),
 			guildCount: this.bot.guilds.size,
 			bot: {
 				version: this.config.bot.version,
