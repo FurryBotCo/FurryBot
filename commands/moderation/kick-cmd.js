@@ -4,10 +4,10 @@ module.exports = {
 		"k"
 	],
 	userPermissions: [
-		"KICK_MEMBER"
+		"kickMembers" // 2
 	],
 	botPermissions: [
-		"KICK_MEMBER"
+		"kickMembers" // 2
 	],
 	cooldown: 2e3,
 	description: "Kick members from your server",
@@ -18,26 +18,27 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
-		let user, reason, m;
+		let user, reason, m, a;
 		// get member from message
 		user = await message.getMemberFromArgs();
         
 		if(!user) return message.errorEmbed("INVALID_USER");
     
-		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourthis.");
-		if(user.roles.highest.rawPosition >= message.member.roles.highest.rawPosition && message.author.id !== message.guild.owner.id) return message.reply(`You cannot kick ${user.user.tag} as their highest role is higher than yours!`);
-		if(!user.kickable) return message.reply(`I cannot kick ${user.user.tag}! Do they have a higher role than me? Do I have kick permissions?`);
+		if(user.id === message.member.id && !message.user.isDeveloper) return message.channel.createMessage(`<@!${message.author.id}>, Pretty sure you don't want to do this to yourself.`);
+		a = this.compareMembers(user,message.member);
+		if((a.member2.higher || a.member2.same) && message.author.id !== message.channel.guild.ownerID) return message.channel.createMessage(`<@!${message.author.id}>, You cannot kick ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
+		//if(!user.kickable) return message.channel.createMessage(`I cannot kick ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have kick permissions?`);
 		reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";
-		if(!user.user.bot) m = await user.user.send(`You were kicked from **${message.guild.name}**\nReason: ${reason}`);
-		user.kick(`Kick: ${message.author.tag} -> ${reason}`).then(() => {
-			message.channel.send(`***User ${user.user.tag} was kicked, ${reason}***`).catch(noerr => null);
+		if(!user.user.bot) m = await user.user.getDMChannel().then(dm => dm.createMessage(`You were kicked from **${message.channel.guild.name}**\nReason: ${reason}`));
+		user.kick(`Kick: ${message.author.username}#${message.author.discriminator} -> ${reason}`).then(() => {
+			message.channel.createMessage(`***User ${user.username}#${user.discriminator} was kicked, ${reason}***`).catch(noerr => null);
 		}).catch(async(err) => {
-			message.reply(`I couldn't kick **${user.user.tag}**, ${err}`);
+			await message.channel.createMessage(`<@!${message.author.id}>, I couldn't kick **${user.username}#${user.discriminator}**, ${err}`);
 			if(m !== undefined) {
 				await m.delete();
 			}
 		});
     
-		if(!message.gConfig.delCmds && message.channel.permissionsFor(this.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
+		if(!message.gConfig.deleteCommands && message.channel.permissionsOf(this.bot.user.id).has("manageMessages")) message.delete().catch(error => null);
 	})
 };

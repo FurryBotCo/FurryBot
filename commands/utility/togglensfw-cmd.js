@@ -3,7 +3,7 @@ module.exports = {
 		"togglensfw"
 	],
 	userPermissions: [
-		"MANAGE_GUILD"
+		"manageGuild"
 	],
 	botPermissions: [],
 	cooldown: 3e3,
@@ -18,13 +18,21 @@ module.exports = {
 		// nsfwModuleEnabled
 		switch(message.gConfig.nsfwModuleEnabled) {
 		case true:
-			this.db.updateGuild(message.guild.id, {nsfwModuleEnabled: false});
-			message.reply("Disabled NSFW commands.");
+			await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
+				$set: {
+					nsfwModuleEnabled: false
+				}
+			});
+			message.channel.createMessage("Disabled NSFW commands.");
 			break;
     
 		case false:
-			this.db.updateGuild(message.guild.id, {nsfwModuleEnabled: true});
-			message.reply("Enabled NSFW commands.");
+			await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
+				$set: {
+					nsfwModuleEnabled: true
+				}
+			});
+			message.channel.createMessage("Enabled NSFW commands.");
 			break;
 		}
 	})

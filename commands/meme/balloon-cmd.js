@@ -1,8 +1,10 @@
 module.exports = {
-	triggers: ["balloon"],
+	triggers: [
+		"balloon"
+	],
 	userPermissions: [],
 	botPermissions: [
-		"ATTACH_FILES"
+		"attachFiles" // 32768
 	],
 	cooldown: 5e3,
 	description: "Nothing will pop this",
@@ -12,8 +14,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let text, req, attachment, j;
+		let text, req, j;
 		text = message.unparsedArgs.join(" ");
 		if(text.length === 0) text = "Image api, not providing text";
 		req = await this.memeRequest("/balloon",[],text);
@@ -23,12 +24,12 @@ module.exports = {
 			}catch(error){
 				j = {status:req.statusCode,message:req.body};
 			}
-			message.reply(`API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
-			console.log(`text: ${text}`);
-			return message.channel.stopTyping();
+			message.channel.createMessage(`<@!${message.author.id}>, API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
+			return this.logger.log(`text: ${text}`);
 		}
-		attachment = new this.Discord.MessageAttachment(req.body,"balloon.png");
-		message.channel.send(attachment).catch(err => message.reply(`Error sending: ${err}`));
-		return message.channel.stopTyping();
+		return message.channel.createMessage("",{
+			file: req.body,
+			name: "balloon.png"
+		}).catch(err => message.channel.createMessage(`<@!${message.author.id}>, Error sending: ${err}`));
 	})
 };

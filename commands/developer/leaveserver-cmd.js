@@ -13,22 +13,17 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		// extra check, to be safe
-		if (!this.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
-		message.channel.startTyping();
+		if (!this.config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer of this bot.`);
 		if(message.unparsedArgs.length === 0) {
-			message.channel.stopTyping();
 			return new Error("ERR_INVALID_USAGE");
 		}
 		if(!this.guilds.has(message.unparsedArgs[0])) {
-			message.reply("Guild not found");
-			return message.channel.stopTyping();
+			return message.createMessage(`<@!${message.author.id}>, Guild not found`);
 		}
 		this.guilds.get(message.unparsedArgs[0]).leave().then((guild) => {
-			message.reply(`Left guild **${guild.name}** (${guild.id})`);
-			return message.channel.stopTyping();
+			return message.createMessage(`<@!${message.author.id}>, Left guild **${guild.name}** (${guild.id})`);
 		}).catch((err) => {
-			message.channel.send(`There was an error while doing this: ${err}`) ;
-			return message.channel.stopTyping();
+			return message.channel.createMessage(`There was an error while doing this: ${err}`) ;
 		});
 	})
 };

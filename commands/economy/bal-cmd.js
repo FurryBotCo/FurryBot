@@ -5,7 +5,9 @@ module.exports = {
 		"money"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks" // 16384
+	],
 	cooldown: 1e3,
 	description: "Check your economy balance",
 	usage: "",
@@ -15,7 +17,7 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		let embed, data, u;
-		u = await this.db.getUser(message.author.id);
+		u = await this.mdb.collection("users").findOne({id: message.author.id});
 		if(!u.bal) {
 			await this.mdb.collection("users").findOneAndUpdate({id: message.author.id},{
 				$set: {
@@ -32,14 +34,11 @@ module.exports = {
 			});
 			u.bank = 0;
 		}
-		message.channel.startTyping();
-		data = {
-			title: `${message.author.tag}'s Balance`,
+		embed = {
+			title: `${message.author.username}#${message.author.discriminator}'s Balance`,
 			description: `**Pocket**: ${u.bal}\n**Bank**: ${u.bank}`
 		};
-		Object.assign(data, message.embed_defaults());
-		embed = new this.Discord.MessageEmbed(data);
-		message.channel.send(embed);
-		return message.channel.stopTyping();
+		Object.assign(embed, message.embed_defaults());
+		message.channel.createMessage({ embed });
 	})
 };

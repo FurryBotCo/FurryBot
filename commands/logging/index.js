@@ -8,7 +8,8 @@ module.exports = {
 		delete require.cache[require.resolve(`${__dirname}/${c}`)];
 		return a;
 	}),
-	name: "Logging",
+	name: "logging",
+	displayName: ":gear: Logging",
 	description: "Keep track of what's happing in your server.",
 	path: __dirname
 };

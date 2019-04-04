@@ -18,10 +18,10 @@ module.exports = {
 		try {
 			amount = Number(message.args[0].replace(/[k]/i,"e3").replace(/[m]/i,"e6"));
 		} catch(e) {
-			return message.reply("Please provide a numeric value.");
+			return message.channel.createMessage(`<@!${message.author.id}>, Please provide a numeric value.`);
 		}
-		if(amount > u.bal) return message.reply("You do not have that much in your pocket.");
-		await this.mdb.collection("users").findOneAndUpdate({id: message.author.id},{$set: {bank: u.bank + amount, bal: u.bal - amount}}).then(console.log);
-		return message.reply(`Deposited ${amount} ${this.config.emojis.owo}`);
+		if(amount > u.bal) return message.channel.createMessage(`<@!${message.author.id}>, You do not have that much in your pocket.`);
+		await this.mdb.collection("users").findOneAndUpdate({id: message.author.id},{$set: {bank: u.bank + amount, bal: u.bal - amount}}).then(this.logger.log);
+		return message.channel.createMessage.channel.createMessage(`<@!${message.author.id}>, Deposited ${amount} ${this.config.emojis.owo}`);
 	})
 };

@@ -3,10 +3,10 @@ module.exports = {
 		"role"
 	],
 	userPermissions: [
-		"MANAGE_ROLES"
+		"manageRoles" // 268435456
 	],
 	botPermissions: [
-		"MANAGE_ROLES"
+		"manageRoles" // 268435456
 	],
 	cooldown: 2e3,
 	description: "Manage roles for a single user, or multiple!",
@@ -16,9 +16,9 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let data, embed, member, r, a, operation, l, role, count, role2, skipCount, members, counts;
+		let data, embed, member, r, a, operation, l, role, count, role2, skipCount, members, counts, b, c;
 		if(message.args.length === 0 || message.args[0] === "help") {
-			data = {
+			embed = {
 				title: "Help with role command.",
 				description: `\
 				**${message.prefix}${message.command}** add <user> <role>\n\
@@ -33,13 +33,12 @@ module.exports = {
 				brackets are just for placeholders, do not add them when running commands!\n\
 				if you use them, do not put a space between them and the role name/mention/id`
 			};
-			embed = new this.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
+			return message.channel.createMessage({ embed });
 		}
 
 		member = await message.getMemberFromArgs();
 		if(member) {
-			if(message.args.length <= 1) return message.reply("Please provide a role to add or remove!");
+			if(message.args.length <= 1) return message.channel.createMessage(`<@!${message.author.id}>, Please provide a role to add or remove!`);
 			r = await message.getRoleFromArgs(1);
 			if(!r) {
 				// operation
@@ -54,45 +53,47 @@ module.exports = {
 					l = message.args[1];
 					operation = 0;
 				}
-				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
-				if(!role) return message.reply("Role not found.");
+				role = message.channel.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
+				if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role ${l} not found.`);
 			} else {
 				role = r;
 			}
-			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
+			b = this.compareMemberWithRole(message.member,role);
+			c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
+			if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
+			if(c.higher || c.same) return message.channel.createMessage(`<@!${message.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
+			if(role.managed) return message.channel.createMessage(`<@!${message.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
 			switch(operation) {
 			case 1:
-				if(member.roles.has(role.id)) return message.reply(`No action was taken, as **${member.user.tag}** already has the role **${role.name}**`);
-				return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() => {
-					return message.reply(`Added role **${role.name}** to **${member.user.tag}**`);
+				if(member.roles.includes(role.id)) return message.channel.createMessage(`<@!${message.author.id}>, No action was taken, as **${member.username}#${member.discriminator}** already has the role **${role.name}**`);
+				return member.addRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Add role ${role.name} to ${member.username}#${member.discriminator}`).then(() => {
+					return message.channel.createMessage(`<@!${message.author.id}>, Added role **${role.name}** to **${member.username}#${member.discriminator}**`);
 				}).catch((e) => {
-					return message.reply(`Command failed: ${e}`);
+					return message.channel.createMessage(`<@!${message.author.id}>, Command failed: ${e}`);
 				});
 				break; // eslint-disable-line no-unreachable
 
 			case 2:
-				if(!member.roles.has(role.id)) return message.reply(`No action was taken, as **${member.user.tag}** does not have the role **${role.name}**`);
-				return member.roles.add(role.id,`Command: ${message.author.tag} -> Remove role ${role.name} from ${member.user.tag}`).then(() => {
-					return message.reply(`Removed role **${role.name}** from **${member.user.tag}**`);
+				if(!member.roles.includes(role.id)) return message.channel.createMessage(`<@!${message.author.id}>, o action was taken, as **${member.username}#${member.discriminator}** does not have the role **${role.name}**`);
+				return member.addRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Remove role ${role.name} from ${member.username}#${member.discriminator}`).then(() => {
+					return message.channel.createMessage(`<@!${message.author.id}>, Removed role **${role.name}** from **${member.username}#${member.discriminator}**`);
 				}).catch((e) => {
-					return message.reply(`Command failed: ${e}`);
+					return message.channel.createMessage(`<@!${message.author.id}>, Command failed: ${e}`);
 				});
 				break; // eslint-disable-line no-unreachable
 
 			default:
-				if(member.roles.has(role.id)) {
-					return member.roles.remove(role.id,`Command: ${message.author.tag} -> Remove role ${role.name} from ${member.user.tag}`).then(() => {
-						return message.reply(`Removed role **${role.name}** from **${member.user.tag}**`);
+				if(member.roles.includes(role.id)) {
+					return member.removeRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Remove role ${role.name} from ${member.username}#${member.discriminator}`).then(() => {
+						return message.channel.createMessage(`<@!${message.author.id}>, Removed role **${role.name}** from **${member.username}#${member.discriminator}**`);
 					}).catch((e) => {
-						return message.reply(`Command failed: ${e}`);
+						return message.channel.createMessage(`<@!${message.author.id}>, Command failed: ${e}`);
 					});
 				} else {
-					return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() => {
-						return message.reply(`Added role **${role.name}** to **${member.user.tag}**`);
+					return member.addRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Add role ${role.name} to ${member.username}#${member.discriminator}`).then(() => {
+						return message.channel.createMessage(`<@!${message.author.id}>, Added role **${role.name}** to **${member.username}#${member.discriminator}**`);
 					}).catch((e) => {
-						return message.reply(`Command failed: ${e}`);
+						return message.channel.createMessage(`<@!${message.author.id}>, Command failed: ${e}`);
 					});
 				}
 			}
@@ -100,7 +101,7 @@ module.exports = {
 
 		r = await message.getRoleFromArgs();
 		if(r) {
-			data = {
+			embed = {
 				title: `Role info - ${r.name} (${r.id})`,
 				fields: [
 					{
@@ -122,27 +123,26 @@ module.exports = {
 					}
 				]
 			};
-			embed = new this.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
+			return message.channel.createMessage({ embed });
 		}
 
 		if(!["in","add","remove","all","addall","removeall","humans","bots"].includes(message.args[0].toLowerCase())) return new Error("ERR_INVALID_USAGE");
 		switch(message.args[0].toLowerCase()) {
 		case "in":
 			role = await message.getRoleFromArgs(1);
-			if(!role) return message.reply("Role not found.");
+			if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role not found.`);
 			if(message.args.length === 2) {
 				count = role.guild.members.filter(m => m.roles.has(role.id)).size;
-				return message.reply(`${count} users have the role ${role.name}.`);
+				return message.channel.createMessage(`<@!${message.author.id}>, ${count} users have the role ${role.name}.`);
 			}
 			role2 = await message.getRoleFromArgs(2);
-			if(!role2) return message.reply("Second role not found.");
+			if(!role2) return message.channel.createMessage(`<@!${message.author.id}>, Second role not found.`);
 			role.members.forEach(async(m) => {
-				await m.roles.add(role2.id,`Command: ${message.author.tag} -> Add role ${role2.name} to users in role ${role.name}`).catch(noerr => null);
+				await m.addRole(role2.id,`Command: ${message.author.username}#${message.author.discriminator} -> Add role ${role2.name} to users in role ${role.name}`).catch(noerr => null);
 			});
 			count = role.guild.members.filter(m => m.roles.has(role.id)).size;
 			skipCount = role.guild.members.filter(m => m.roles.has(role2.id)).size;
-			return message.reply(`Changed roles for ${count} users (skipped ${skipCount - count})`);
+			return message.channel.createMessage(`<@!${message.author.id}>, Changed roles for ${count} users (skipped ${skipCount - count})`);
 			break; // eslint-disable-line no-unreachable
 
 		case "add":
@@ -160,16 +160,18 @@ module.exports = {
 					if(l instanceof this.Discord.Role) roles.push(l.id);
 				}
 				*/
-			if(!member) return message.reply("User not found.");
-			if(!role) return message.reply("Role not found.");
-			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
-			if(member.roles.has(role.id)) return message.reply(`**${member.user.tag}** already has the role ${role.name}.`);
-			return member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ${member.user.tag}`).then(() => {
-				return message.reply(`Added role ${role.name} to **${member.user.tag}**.`);
+			if(!member) return message.channel.createMessage(`<@!${message.author.id}>, User not found.`);
+			if(!role) return message.createMessage(`<@!${message.author.id}>, Role not found.`);
+			b = this.compareMemberWithRole(message.member,role);
+			c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
+			if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
+			if(c.higher || c.same) return message.channel.createMessage(`<@!${message.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
+			if(role.managed) return message.channel.createMessage(`<@!${message.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
+			if(member.roles.includes(role.id)) return message.channel.createMessage(`<@!${message.author.id}>, **${member.username}#${member.discriminator}** already has the role ${role.name}.`);
+			return member.addRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Add role ${role.name} to ${member.username}#${member.discriminator}`).then(() => {
+				return message.channel.createMessage(`<@!${message.author.id}>, Added role ${role.name} to **${member.username}#${member.discriminator}**.`);
 			}).catch((e) => {
-				return message.reply(`Command failed: ${e}`);
+				return message.channel.createMessage(`<@!${message.author.id}>, Command failed: ${e}`);
 			});
 			break; // eslint-disable-line no-unreachable
 
@@ -180,66 +182,72 @@ module.exports = {
 				role = await message.getRoleFromArgs(1);
 				member = await message.getMemberFromArgs(2);
 			}
-			if(!member) return message.reply("User not found.");
-			if(!role) return message.reply("Role not found.");
-			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
-			if(!member.roles.has(role.id)) return message.reply(`**${member.user.tag}** does not have the role ${role.name}.`);
-			return member.roles.remove(role.id,`Command: ${message.author.tag} -> remove role ${role.name} from ${member.user.tag}`).then(() => {
-				return message.reply(`Removed role ${role.name} from **${member.user.tag}**.`);
+			if(!member) return message.channel.createMessage(`<@!${message.author.id}>, User not found.`);
+			if(!role) return message.createMessage(`<@!${message.author.id}>, Role not found.`);
+			b = this.compareMemberWithRole(message.member,role);
+			c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
+			if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
+			if(c.higher || c.same) return message.channel.createMessage(`<@!${message.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
+			if(role.managed) return message.channel.createMessage(`<@!${message.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
+			if(!member.roles.includes(role.id)) return message.channel.createMessage(`<@!${message.author.id}>, **${member.username}#${member.discriminator}** does not have the role ${role.name}.`);
+			return member.removeRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> remove role ${role.name} from ${member.username}#${member.discriminator}`).then(() => {
+				return message.channel.createMessage(`<@!${message.author.id}>, Removed role ${role.name} from **${member.username}#${member.discriminator}**.`);
 			}).catch((e) => {
-				return message.reply(`Command failed: ${e}`);
+				return message.channel.createMessage(`<@!${message.author.id}>, Command failed: ${e}`);
 			});
 			break; // eslint-disable-line no-unreachable
 
 		case "all":
 		case "addall":
 			role = await message.getRoleFromArgs(1);
-			if(!role) return message.reply("Role not found.");
-			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
-			members = message.guild.members.filter(m => !m.roles.has(role.id)).map(m => m.id);
+			if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role not found.`);
+			b = this.compareMemberWithRole(message.member,role);
+			c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
+			if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
+			if(c.higher || c.same) return message.channel.createMessage(`<@!${message.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
+			if(role.managed) return message.channel.createMessage(`<@!${message.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
+			members = message.channel.guild.members.filter(m => !m.roles.includes(role.id));
 			counts = {
 				success: 0,
 				fail: 0,
 				skip: 0,
-				before: message.guild.members.filter(m => m.roles.has(role.id)).size
+				before: message.channel.guild.members.filter(m => m.roles.includes(role.id)).size
 			};
-			message.channel.send(`Changing roles for ${members.length} members.\nthis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id)).size, true, true)}.`);
+			message.channel.createMessage(`Changing roles for ${members.length} members.\nthis should take about ${this.parseTime(1e3 * message.channel.guild.members.filter(m => !m.roles.has(role.id)).size, true, true)}.`);
 			for(let m of members) {
-				member = message.guild.members.get(m);
-				if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Add role ${role.name} to ALL.`)
+				member = message.channel.guild.members.get(m);
+				if(!member.roles.has(role.id)) await member.addRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Add role ${role.name} to ALL.`)
 					.then(() => counts.success++)
 					.catch(() => counts.fail++);
 				else counts.skip++;
 			}
-			return message.channel.send(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before + counts.success}**\nSkipped: **${counts.skip}**`);
+			return message.channel.createMessage(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before + counts.success}**\nSkipped: **${counts.skip}**`);
 			break; // eslint-disable-line no-unreachable
 
 		case "removeall":
 			role = await message.getRoleFromArgs(1);
-			if(!role) return message.reply("Role not found.");
-			if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-			if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
-			if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
-			members = message.guild.members.filter(m => m.roles.has(role.id)).map(m => m.id);
+			if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role not found.`);
+			b = this.compareMemberWithRole(message.member,role);
+			c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
+			if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
+			if(c.higher || c.same) return message.channel.createMessage(`<@!${message.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
+			if(role.managed) return message.channel.createMessage(`<@!${message.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
+			members = message.channel.guild.members.filter(m => m.roles.includes(role.id)).map(m => m.id);
 			counts = {
 				success: 0,
 				fail: 0,
 				skip: 0,
-				before: message.guild.members.filter(m => m.roles.has(role.id)).size
+				before: message.channel.guild.members.filter(m => m.roles.includes(role.id)).size
 			};
-			message.channel.send(`Changing roles for ${members.length} members.\nthis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id)).size, true, true)}.`);
+			message.channel.createMessage(`Changing roles for ${members.length} members.\nthis should take about ${this.parseTime(1e3 * message.channel.guild.members.filter(m => m.roles.has(role.id)).size, true, true)}.`);
 			for(let m of members) {
-				member = message.guild.members.get(m);
-				if(member.roles.has(role.id)) await member.roles.remove(role.id,`Command: ${message.author.tag} -> Remove role ${role.name} from ALL.`)
+				member = message.channel.guild.members.get(m);
+				if(member.roles.has(role.id)) await member.removeRole(role.id,`Command: ${message.author.username}#${message.author.id} -> Remove role ${role.name} from ALL.`)
 					.then(() => counts.success++)
 					.catch(() => counts.fail++);
 				else counts.skip++;
 			}
-			return message.channel.send(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before - counts.success}**\nSkipped: **${counts.skip}**`);
+			return message.channel.createMessage(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before - counts.success}**\nSkipped: **${counts.skip}**`);
 			break; // eslint-disable-line no-unreachable
 
 		case "humans":
@@ -252,49 +260,53 @@ module.exports = {
 				operation = 1;
 			}
 			if(operation === 1) {
-				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
-				if(!role) return message.reply("Role not found.");
-				if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
-				if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
-				members = message.guild.members.filter(m => !m.user.bot).map(m => m.id);
+				role = message.channel.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
+				if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role not found.`);
+				b = this.compareMemberWithRole(message.member,role);
+				c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
+				if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
+				if(c.higher || c.same) return message.channel.createMessage(`<@!${message.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
+				if(role.managed) return message.channel.createMessage(`<@!${message.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
+				members = message.channel.guild.members.filter(m => !m.user.bot);
 				counts = {
 					success: 0,
 					fail: 0,
 					skip: 0,
-					before: message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size
+					before: message.channel.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size
 				};
-				message.channel.send(`Changing roles for ${members.length} humans.\nthis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
+				message.channel.createMessage(`Changing roles for ${members.length} humans.\nthis should take about ${this.parseTime(1e3 * message.channel.guild.members.filter(m => !m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
 				for(let m of members) {
-					member = message.guild.members.get(m);
-					if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all humans.`)
+					member = message.channel.guild.members.get(m);
+					if(!member.roles.has(role.id)) await member.addRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Change role ${role.name} for all humans.`)
 						.then(() => counts.success++)
 						.catch(() => counts.fail++);
 					else counts.skip++;
 				}
-				return message.channel.send(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before + counts.success}**\nSkipped: **${counts.skip}**`);
+				return message.channel.createMessage(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before + counts.success}**\nSkipped: **${counts.skip}**`);
 			} else {
-				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
-				if(!role) return message.reply("Role not found.");
-				if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
-				if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
-				members = message.guild.members.filter(m => !m.user.bot).map(m => m.id);
+				role = message.channel.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
+				if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role not found.`);
+				b = this.compareMemberWithRole(message.member,role);
+				c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
+				if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
+				if(c.higher || c.same) return message.channel.createMessage(`<@!${message.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it`);
+				if(role.managed) return message.channel.createMessage(`<@!${message.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
+				members = message.channel.guild.members.filter(m => !m.user.bot);
 				counts = {
 					success: 0,
 					fail: 0,
 					skip: 0,
-					before: message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size
+					before: message.channel.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size
 				};
-				message.channel.send(`Changing roles for ${members.length} humans.\nthis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
+				message.channel.createMessage(`Changing roles for ${members.length} humans.\nthis should take about ${this.parseTime(1e3 * message.channel.guild.members.filter(m => m.roles.has(role.id) && !m.user.bot).size, true, true)}.`);
 				for(let m of members) {
-					member = message.guild.members.get(m);
-					if(member.roles.has(role.id)) await member.roles.remove(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all humans.`)
+					member = message.channel.guild.members.get(m);
+					if(member.roles.includes(role.id)) await member.removeRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Change role ${role.name} for all humans.`)
 						.then(() => counts.success++)
 						.catch(() => counts.fail++);
 					else counts.skip++;
 				}
-				return message.channel.send(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before - counts.success}**\nSkipped: **${counts.skip}**`);
+				return message.channel.createMessage(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before - counts.success}**\nSkipped: **${counts.skip}**`);
 			}
 			break; // eslint-disable-line no-unreachable
 
@@ -308,49 +320,53 @@ module.exports = {
 				operation = 1;
 			}
 			if(operation === 1) {
-				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
-				if(!role) return message.reply("Role not found.");
-				if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
-				if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
-				members = message.guild.members.filter(m => m.user.bot).map(m => m.id);
+				role = message.channel.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
+				if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role not found.`);
+				b = this.compareMemberWithRole(message.member,role);
+				c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
+				if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
+				if(c.higher || c.same) return message.channel.createMessage(`<@!${message.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
+				if(role.managed) return message.channel.createMessage(`<@!${message.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
+				members = message.channel.guild.members.filter(m => m.user.bot).map(m => m.id);
 				counts = {
 					success: 0,
 					fail: 0,
 					skip: 0,
-					before: message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size
+					before: message.channel.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size
 				};
-				message.channel.send(`Changing roles for ${members.length} bots.\nthis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => !m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
+				message.channel.createMessage(`Changing roles for ${members.length} bots.\nthis should take about ${this.parseTime(1e3 * message.channel.guild.members.filter(m => !m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
 				for(let m of members) {
-					member = message.guild.members.get(m);
-					if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all bots.`)
-						.then(() => counts.success++)
-						.catch(() => counts.fail++);
+					member = message.channel.guild.members.get(m);
+					if(!member.roles.has(role.id)) await member.roles.add(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Change role ${role.name} for all bots.`)
+						.then(counts.success++)
+						.catch(counts.fail++);
 					else counts.skip++;
 				}
-				return message.channel.send(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before + counts.success}**\nSkipped: **${counts.skip}**`);
+				return message.channel.createMessage(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before + counts.success}**\nSkipped: **${counts.skip}**`);
 			} else {
-				role = message.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
-				if(!role) return message.reply("Role not found.");
-				if(message.member.roles.highest.rawPosition <= role.rawPosition && message.guild.owner.id !== message.member.id) return message.reply("You cannot assign or remove roles as high as, or higher than you.");
-				if(message.guild.me.roles.highest.rawPosition <= role.rawPosition) return message.reply("this role is higher than, or as high as me, I cannot remove or assign it.");
-				if(role.managed) return message.reply("this role is managed (likely permissions for a bot), these cannot be removed or assigned.");
-				members = message.guild.members.filter(m => m.user.bot).map(m => m.id);
+				role = message.channel.guild.roles.find(r => r.name.toLowerCase() === l.toLowerCase());
+				if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role not found.`);
+				b = this.compareMemberWithRole(message.member,role);
+				c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
+				if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
+				if(c.higher || c.same) return message.channel.createMessage(`<@!${message.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
+				if(role.managed) return message.channel.createMessage(`<@!${message.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
+				members = message.channel.guild.members.filter(m => m.user.bot).map(m => m.id);
 				counts = {
 					success: 0,
 					fail: 0,
 					skip: 0,
-					before: message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size
+					before: message.channel.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size
 				};
-				message.channel.send(`Changing roles for ${members.length} bots.\nthis should take about ${this.parseTime(1e3 * message.guild.members.filter(m => m.roles.has(role.id) && m.user.bot).size, true, true)}.`);
+				message.channel.createMessage(`Changing roles for ${members.length} bots.\nthis should take about ${this.parseTime(1e3 * message.channel.guild.members.filter(m => m.roles.includes(role.id) && m.user.bot).size, true, true)}.`);
 				for(let m of members) {
-					member = message.guild.members.get(m);
-					if(member.roles.has(role.id)) await member.roles.remove(role.id,`Command: ${message.author.tag} -> Change role ${role.name} for all bots.`)
+					member = message.channel.guild.members.get(m);
+					if(member.roles.includes(role.id)) await member.removeRole(role.id,`Command: ${message.author.username}#${message.author.discriminator} -> Change role ${role.name} for all bots.`)
 						.then(() => counts.success++)
 						.catch(() => counts.fail++);
 					else counts.skip++;
 				}
-				return message.channel.send(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before - counts.success}**\nSkipped: **${counts.skip}**`);
+				return message.channel.createMessage(`Succeeded: **${counts.success}**\nFailed: **${counts.fail}**\nBefore: **${counts.before}**\nAfter: **${counts.before - counts.success}**\nSkipped: **${counts.skip}**`);
 			}
 			break; // eslint-disable-line no-unreachable
 		} 

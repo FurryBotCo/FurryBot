@@ -1,7 +1,8 @@
 module.exports = {
 	triggers: [
 		"dictionary",
-		"dict"
+		"dict",
+		"throw_dict"
 	],
 	userPermissions: [],
 	botPermissions: [],
@@ -18,6 +19,6 @@ module.exports = {
 		
 		input = message.args.join(" ");
 		text = this.varParse(message.c,{author:message.author,input:input});
-		message.channel.send(text);
+		message.channel.createMessage(text);
 	})
 };

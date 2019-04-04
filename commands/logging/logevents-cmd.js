@@ -3,7 +3,7 @@ module.exports = {
 		"logevents"
 	],
 	userPermissions: [
-		"MANAGE_GUILD"
+		"manageGuild" // 32
 	],
 	botPermissions: [],
 	cooldown: 1e3,
@@ -14,13 +14,13 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let l, updateFields, log, s, c, data, embed;
+		let l, updateFields, log, s, c, embed;
 		l = "";
 		updateFields = {logging:{}};
 		for(let key in message.gConfig.logging) {
 			log = message.gConfig.logging[key];
 			if(log.enabled) {
-				s = message.guild.channels.get(log.channel);
+				s = message.channel.guild.channels.get(log.channel);
 				if(!s) {
 					updateFields.logging[key] = {
 						channel: null,
@@ -35,12 +35,11 @@ module.exports = {
 			}
 			l+=`**${key}** - ${c}\n`;
 		}
-		data = {
+		embed = {
 			title: "Server Logging Settings",
 			description: `You can change these with \`${message.gConfig.prefix}log <enable/disable> <event>\`\n${l}`
 		};
-		Object.assign(data,message.embed_defaults());
-		embed = new this.Discord.MessageEmbed(data);
-		return message.channel.send(embed);
+		Object.assign(embed,message.embed_defaults());
+		return message.channel.createMessage({ embed });
 	})
 };

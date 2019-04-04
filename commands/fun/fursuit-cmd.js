@@ -4,7 +4,7 @@ module.exports = {
 	],
 	userPermissions: [],
 	botPermissions: [
-		"ATTACH_FILES"
+		"attachFiles" // 32768
 	],
 	cooldown: 2e3,
 	description: "Get a random fursuit image!",
@@ -14,16 +14,14 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let img, attachment, short, extra;
+		let img, short, extra;
 		img = await this.imageAPIRequest(false,"fursuit",true,true);
-		if(img.success !== true) {
-			return message.reply(`API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
-		}
-		attachment = new this.Discord.MessageAttachment(img.response.image);
+		if(img.success !== true) return message.channel.createMessage(`<@!${message.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 		short = await this.shortenUrl(img.response.image);
 		extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
-		message.channel.send(`${extra}Short URL: <${short.link}>\n\nRequested By: ${message.author.tag}`,attachment);
-		return message.channel.stopTyping();
+		message.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nRequested By: ${message.author.username}#${message.author.discriminator}`,{
+			file: await this.getImageFromURL(img.response.image),
+			name: img.response.name
+		});
 	})
 };

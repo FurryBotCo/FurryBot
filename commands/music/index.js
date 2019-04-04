@@ -8,7 +8,8 @@ module.exports = {
 		delete require.cache[require.resolve(`${__dirname}/${c}`)];
 		return a;
 	}),
-	name: "Music",
+	name: "music",
+	displayName: ":loud_sound: Music",
 	description: "Chill with some nice vibes 'n' tunes. Temporarily disabled due to degraded server performance.",
 	path: __dirname
 };

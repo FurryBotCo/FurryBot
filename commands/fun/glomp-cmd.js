@@ -15,6 +15,6 @@ module.exports = {
 		let text;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		text = this.varParse(message.c,{author:message.author,input:message.args.join(" ")});
-		message.channel.send(text);
+		message.channel.createMessage(text);
 	})
 };

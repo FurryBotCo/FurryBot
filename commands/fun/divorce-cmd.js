@@ -13,39 +13,28 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		let member, m, u;
-		if(!message.uConfig.married) return message.reply("You have to marry someone before you can divorce them..");
-		u = await this.users.fetch(message.uConfig.marriagePartner).then(res => res.tag) || "Unknown";
-		message.channel.send(`Are you sure you want to divorce **${u}**? **yes** or **no**.`).then(() => {
-			message.channel.awaitMessages(msg => msg.author.id === message.author.id && ["yes","no"].includes(msg.content.toLowerCase()),{
-				max: 1,
-				time: 6e4
-			}).then(async(c) => {
-				switch(c.first().content.toLowerCase()) {
-				case "yes":
-					await this.mdb.collection("users").findOneAndUpdate({id: message.author.id},{
-						$set: {
-							married: false,
-							marriagePartner: null
-						}
-					});
-					await this.mdb.collection("users").findOneAndUpdate({id: message.uConfig.marriagePartner},{
-						$set: {
-							married: false,
-							marriagePartner: null
-						}
-					});
-					return message.channel.send(`You've divorced **${u}**...`);
-					break; // eslint-disable-line no-unreachable
-
-				default:
-					return message.reply(`You've stayed with **${u}**!`);
-					break; // eslint-disable-line no-unreachable
-				}
-			}).catch(async(c) => {
-				if(c instanceof this.Discord.Collection && c.size === 0) return message.channel.send("You did not reply in time, canceled!");
-				this.logger.error(c);
-				return message.channel.send("unknown error");
-			});
-		});
+		if(!message.uConfig.married) return message.channel.createMessage(`<@!${message.author.id}>, You have to marry someone before you can divorce them..`);
+		u = await this.bot.getRESTUser(message.uConfig.marriagePartner) || "Unknown#0000";
+		message.channel.createMessage(`Are you sure you want to divorce **${u.username}#${u.discriminator}**? **yes** or **no**.`).then(async() => {
+			const d = await this.MessageCollector.awaitMessage(message.channel.id, u.id, 6e4);
+			if(!d || !["yes","no"].some(c => d.content.toLowerCase() === c)) return message.channel.createMessage(`<@!${message.author.id}>, that wasn't a valid option..`);
+			if(d.content.toLowerCase() === "yes") {
+				await this.mdb.collection("users").findOneAndUpdate({id: message.author.id},{
+					$set: {
+						married: false,
+						marriagePartner: null
+					}
+				});
+				await this.mdb.collection("users").findOneAndUpdate({id: message.uConfig.marriagePartner},{
+					$set: {
+						married: false,
+						marriagePartner: null
+					}
+				});
+				return message.channel.createMessage(`You've divorced **${u.username}#${u.discriminator}**...`);
+			} else {
+				return message.channel.createMessage(`<@!${message.author.id}>, You've stayed with **${u}**!`);
+			}
+		}).catch(err => message.channel.createMessage(`<@!${message.author.id}>, unknown error.`));
 	})
 };

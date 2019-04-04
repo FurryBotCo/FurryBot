@@ -15,27 +15,30 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		if(message.args.length === 0) {
-			if(message.channel.furpileActive) return;
+			if(message.channel.furpile !== undefined && message.channel.furpile.active) {
+				if(message.channel.furpile.inPile.includes(message.author.id) && !message.user.isDeveloper) return message.channel.createMessage(`<@!${message.author.id}>, you are already in this furpile!`);
+				clearTimeout(message.channel.furpile.timeout);
+				message.channel.furpile.inPile.push(message.author.id);
+				message.channel.createMessage(`<@!${message.author.id}> joined a furpile on <@!${message.channel.furpile.member.id}>!\n<@!${message.channel.furpile.member.id}> now has ${message.channel.furpile.inPile.length} furs on them!\nJoin in using \`${message.gConfig.prefix}furpile\`.`);
+				message.channel.furpile.timeout = setTimeout((ch) => {
+					delete ch.furpile;
+				},6e4,message.channel);
+				return;
+			}
 			else return new Error("ERR_INVALID_USAGE");
 		} else {
-			const member = await message.getMemberFromArgs(),
-				inPile = [];
+			const member = await message.getMemberFromArgs();
 			if(!member) return message.errorEmbed("INVALID_USER");
-			await message.channel.send(`<@!${message.author.id}> started a furpile on <@!${member.id}>!\nJoin in using \`${message.gConfig.prefix}furpile\`.`);
-			inPile.push(message.author.id,member.id);
-			message.channel.furpileActive = true;
-			const awaitJoin = (async(msg) => {
-				const a = await msg.channel.awaitMessages(m => !m.author.bot && m.content.toLowerCase() === `${message.gConfig.prefix}furpile` && (msg.client.config.developers.includes(m.author.id) || !inPile.includes(m.author.id)),{max: 1, time: 6e5, errors: ["time"]}).then(c => {
-					inPile.push(c.first().author.id);
-					return c.first().channel.send(`<@!${c.first().author.id}> joined a furpile on <@!${member.id}>!\n<@!${member.id}> now has ${inPile.length} furs on them!\nJoin in using \`${message.gConfig.prefix}furpile\`.`).then(true).catch(false);
-				}).catch(false);
-				if(a) return awaitJoin(msg);
-				else {
-					message.channel.furpileActive = false;
-					return false;
-				}
-			});
-			awaitJoin(message);
+			await message.channel.createMessage(`<@!${message.author.id}> started a furpile on <@!${member.id}>!\nJoin in using \`${message.gConfig.prefix}furpile\`.`);
+			message.channel.furpile = {
+				active: true,
+				member,
+				inPile: [],
+				timeout: setTimeout((ch) => {
+					delete ch.furpile;
+				},6e4,message.channel)
+			};
+			return message.channel.furpile.inPile.push(message.author.id,member.id);
 		}
 	})
 };

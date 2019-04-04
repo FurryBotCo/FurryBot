@@ -1,16 +1,17 @@
 module.exports = (async(client) => {
-	const blapi = require("blapi");
-	blapi.manualPostSharded(client.guilds.size,client.user.id,client.config.botLists,0,client.options.shardCount);
+	const blapi = require("blapi"),
+		config = require("../config");
+	blapi.manualPostSharded(client.guilds.size,client.user.id,config.botLists,0,client.shards.size);
 	// botblock was blocked on discordbots.org
-	const rq = await client.request(`https://discordbots.org/api/bots/${client.user.id}/stats`,{
+	const rq = await require("util").promisify(require("request"))(`https://discordbots.org/api/bots/${client.user.id}/stats`,{
 		method: "POST",
 		body: JSON.stringify({
 			server_count: client.guilds.size,
-			shard_count: client.options.shardCount
+			shard_count: client.shards.size
 		}),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: client.config.botLists["discordbots.org"]
+			Authorization: config.botLists["discordbots.org"]
 		}
 	})
 		.then(req => JSON.parse(req.body));

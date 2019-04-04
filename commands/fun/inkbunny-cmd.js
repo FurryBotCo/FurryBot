@@ -5,8 +5,8 @@ module.exports = {
 	],
 	userPermissions: [],
 	botPermissions: [
-		"ATTACH_FILES",
-		"EMBED_LINKS"
+		"attachFiles", // 32768
+		"embedLinks" // 16384
 	],
 	cooldown: 2e3,
 	description: "Get a random image from InkBunny!",
@@ -16,8 +16,8 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let msg, req, a, b, login, tagBlacklist, tags, bl, jsn, rr, submission, attachment;
-		msg = await message.channel.send(`Fetching.. ${this.config.emojis.load}`);
+		let msg, req, a, b, login, tagBlacklist, tags, bl, jsn, rr, submission;
+		msg = await message.channel.createMessage(`Fetching.. ${this.config.emojis.load}`);
 		if(!this.config.apis.inkbunny.sid) {
 			await this.fsn.readFile(`${process.cwd()}/inkbunny-sid.txt`,"UTF8").then(async(sid) => {
 				if(sid === "") sid = "nosid";
@@ -139,10 +139,10 @@ module.exports = {
 			"boobhat",
 			"vore"
 		];
-		tags = message.unparseArgs.length > 0 ? `${message.unparseArgs.join("%20").toLowerCase()}%20-${tagBlacklist.join("%20-")}` : `furry%20-${tagBlacklist.join("%20-")}`;
+		tags = message.unparsedArgs.length > 0 ? `${message.unparsedArgs.join("%20").toLowerCase()}%20-${tagBlacklist.join("%20-")}` : `furry%20-${tagBlacklist.join("%20-")}`;
         
-		bl = message.unparseArgs.join(" ").match(this.config.tagBlacklist);
-		if(bl !== null && bl.length > 0) return message.reply(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
+		bl = message.unparsedArgs.join(" ").match(this.config.tagBlacklist);
+		if(bl !== null && bl.length > 0) return message.channel.createMessage(`<@!${message.author.id}>, Your search contained blacklisted tags, **${bl.join("**, **")}**`);
 		req = await this.request(`https://inkbunny.net/api_search.php?sid=${this.config.apis.inkbunny.sid}&orderby=views&type=1,3,5,8,9&count_limit=50000&submissions_per_page=100&text=${tags}&random=yes&get_rid=yes`,{
 			method: "GET",
 			headers: {
@@ -158,15 +158,19 @@ module.exports = {
 			if(submission.rating_id !== "0") {
 				this.logger.log(`unsafe image:\n${this.util.inspect(submission,{depth:3,showHidden:true})}`);
 				this.logger.log(`Body: ${jsn}`);
-				return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err => message.channel.send(`Command failed: ${err}`));
+				return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err => message.channel.createMessage(`Command failed: ${err}`));
 			}
-			attachment = new this.Discord.MessageAttachment(submission.file_url_full,submission.file_name);
-			return msg.edit(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRequested By: ${message.author.tag}\nRID: ${jsn.rid}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => message.channel.send(`Command failed: ${err}`)).then(() => message.channel.send(attachment)).catch(err => message.channel.send(`Command failed: ${err}`));
+			return msg.edit(`${submission.title} (type ${submission.type_name}) by ${submission.username}\n<https://inkbunny.net/s/${submission.submission_id}>\nRequested By: ${message.author.username}#${message.author.discriminator}\nRID: ${jsn.rid}\nIf a bad image is returned, blame the service, not the bot or its author!`).catch(err => message.channel.createMessage(`Command failed: ${err}`)).then(async() => message.channel.createMessage("",{
+				file: await this.getImageFromURL(submission.file_url_full),
+				name: submission.file_name
+			})).catch(err => message.channel.createMessage(`Command failed: ${err}`));
 		}catch(e){
 			this.logger.error(`Error:\n${e}`);
 			this.logger.log(`${this.util.inspect(jsn,{depth:3})}`);
-			attachment = new this.Discord.MessageAttachment(this.config.images.serverError);
-			return msg.edit("Unknown API Error").then(() => message.channel.send(attachment)).catch(err => message.channel.send(`Command failed: ${err}`));
+			return msg.edit("Unknown API Error").then(async() => message.channel.createMessage("",{
+				file: await this.getImageFromURL(this.config.images.serverError),
+				name: "error.png"
+			})).catch(err => message.channel.createMessage(`Command failed: ${err}`));
 		}
 	})
 };

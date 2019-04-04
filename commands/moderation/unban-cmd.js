@@ -4,10 +4,10 @@ module.exports = {
 		"ub"
 	],
 	userPermissions: [
-		"BAN_MEMBERS"
+		"banMembers" // 4
 	],
 	botPermissions: [
-		"BAN_MEMBERS"
+		"banMembers" // 4
 	],
 	cooldown: 2e3,
 	description: "Remove bans for people that have been previously banned in your server",
@@ -17,33 +17,32 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let user, data, embed, reason, m;
+		let user, embed, reason;
 		// get member from message
-		if(isNaN(message.args[0])) return message.reply("Please provide a user id.");
+		if(isNaN(message.args[0])) return message.channel.createMessage("Please provide a user id.");
         
-		user = this.users.has(message.args[0]) ? this.users.get(message.args[0]) : await this.users.fetch(message.args[0]).catch(error => false);
+		user = this.bot.users.has(message.args[0]) ? this.bot.users.get(message.args[0]) : await this.getRESTUser(message.args[0]).catch(error => false);
     
 		if(!user) return message.errorEmbed("INVALID_USER");
-		if(!(await message.guild.fetchBans()).has(user.id)) {
-			data = {
-				title: "User not banned",
-				description: `It doesn't look like ${user.tag} is banned here..`
-			};
-			Object.assign(data, message.embed_defaults());
-			embed = new this.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
+
+		if(message.channel.permissionsOf(this.bot.user.id).has("viewAuditLogs")) {
+			if(!(await message.channel.guild.getBans().then(res => res.map(u => u.user.id))).includes(user.id)) {
+				embed = {
+					title: "User not banned",
+					description: `It doesn't look like ${user.username}#${user.discriminator} is banned here..`
+				};
+				Object.assign(embed, message.embed_defaults());
+				return message.channel.createMessage({ embed });
+			}
 		}
     
 		reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";
-		message.guild.members.unban(user.id,{reason:`Unban: ${message.author.tag} -> ${reason}`}).then(() => {
-			message.channel.send(`***Unbanned ${user.tag}, ${reason}***`).catch(noerr => null);
+		message.channel.guild.unbanMember(user.id,`Unban: ${message.author.username}#${message.author.discriminator} -> ${reason}`).then(() => {
+			message.channel.createMessage(`***Unbanned ${user.username}#${user.discriminator}, ${reason}***`).catch(noerr => null);
 		}).catch(async(err) => {
-			message.reply(`I couldn't unban **${user.tag}**, ${err}`);
-			if(m !== undefined) {
-				await m.delete();
-			}
+			message.channel.createMessage(`I couldn't unban **${user.username}#${user.discriminator}**, ${err}`);
 		});
     
-		if(!message.gConfig.delCmds && message.channel.permissionsFor(this.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
+		if(!message.gConfig.deleteCommands && message.channel.permissionsOf(this.bot.user.id).has("manageMessages")) message.delete().catch(error => null);
 	})
 };

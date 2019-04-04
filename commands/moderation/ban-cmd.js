@@ -4,10 +4,10 @@ module.exports = {
 		"b"
 	],
 	userPermissions: [
-		"BAN_MEMBERS"
+		"banMembers" // 4
 	],
 	botPermissions: [
-		"BAN_MEMBERS"
+		"banMembers" // 4
 	],
 	cooldown: 1e3,
 	description: "Ban members from your server",
@@ -23,30 +23,34 @@ module.exports = {
 		user = await message.getMemberFromArgs();
         
 		if(!user) return message.errorEmbed("INVALID_USER");
-    
-		if((await message.guild.fetchBans()).has(user.id)) {
-			data = {
-				title: "User already banned",
-				description: `It looks like ${user.tag} is already banned here..`
-			};
-			Object.assign(data, message.embed_defaults());
-			embed = new this.Discord.MessageEmbed(data);
-			return message.channel.send(embed);
+	
+		if(message.channel.permissionsOf(this.bot.user.id).has("viewAuditLogs")) {
+			if((await message.channel.guild.getBans().then(res => res.map(u => u.user.id))).includes(user.id)) {
+				data = {
+					title: "User already banned",
+					description: `It looks like ${user.username}#${user.discriminator} is already banned here..`
+				};
+				Object.assign(data, message.embed_defaults());
+				embed = new this.Discord.MessageEmbed(data);
+				return message.channel.createMessage(embed);
+			}
 		}
-    
-		if(user.id === message.member.id && !message.user.isDeveloper) return message.reply("Pretty sure you don't want to do this to yourthis.");
-		if(user.roles.highest.rawPosition >= message.member.roles.highest.rawPosition && message.author.id !== message.guild.owner.id) return message.reply(`You cannot ban ${user.user.tag} as their highest role is higher than yours!`);
-		if(!user.bannable) return message.reply(`I cannot ban ${user.tag}! Do they have a higher role than me? Do I have ban permissions?`);
+
+		if(user.id === message.member.id && !message.user.isDeveloper) return message.channel.createMessage(`<@!${message.author.id}>, Pretty sure you don't want to do this to yourself.`);
+		if(user.id === message.guild.ownerID) return message.channel.createMessage(`<@!${message.author.id}>, You cannot ban the server owner.`);
+		let a = this.compareMembers(user,message.member);
+		if((a.member1.higher || a.member1.same) && message.author.id !== message.channel.guild.ownerID) return message.channel.createMessage(`<@!${message.author.id}>, You cannot ban ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
+		//if(!user.bannable) return message.channel.createMessage(`<@!${message.author.id}>, I cannot ban ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have ban permissions?`);
 		reason = message.args.length >= 2 ? message.args.splice(1).join(" ") : "No Reason Specified";
-		if(!user.user.bot) m = await user.user.send(`You were baned from **${message.guild.name}**\nReason: ${reason}`);
-		user.ban({reason:`Ban: ${message.author.tag} -> ${reason}`,days:7}).then(() => {
-			message.channel.send(`***User ${user.user.tag} was banned, ${reason}***`).catch(noerr => null);
+		if(!user.user.bot) m = await user.user.getDMChannel().then(dm => dm.createMessage(`You were baned from **${message.channel.guild.name}**\nReason: ${reason}`));
+		user.ban(1, user.id, `Ban: ${message.author.username}#${user.discriminator} -> ${reason}`).then(() => {
+			message.channel.createMessage(`***User ${user.username}#${user.discriminator} was banned, ${reason}***`).catch(noerr => null);
 		}).catch(async(err) => {
-			message.reply(`I couldn't ban **${user.user.tag}**, ${err}`);
+			message.channel.createMessage(`I couldn't ban **${user.username}#${user.discriminator}**, ${err}`);
 			if(m !== undefined) {
 				await m.delete();
 			}
 		});
-		if(!message.gConfig.delCmds && message.channel.permissionsFor(this.user.id).has("MANAGE_MESSAGES")) message.delete().catch(error => null);
+		if(!message.gConfig.deleteCommands && message.channel.permissionsOf(this.bot.user.id).has("manageMessages")) message.delete().catch(error => null);
 	})
 };

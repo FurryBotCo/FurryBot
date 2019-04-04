@@ -1,8 +1,11 @@
 module.exports = {
-	triggers: ["gay","homo"],
+	triggers: [
+		"gay",
+		"homo"
+	],
 	userPermissions: [],
 	botPermissions: [
-		"ATTACH_FILES"
+		"attachFiles" // 32768
 	],
 	cooldown: 5e3,
 	description: "Gay up an image",
@@ -12,23 +15,16 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let user, imgurl, m, req, j, attachment;
+		let user, imgurl, m, req, j;
 		if(message.args.length >= 1) {
 			// get member from message
 			user = await message.getUserFromArgs();
-			imgurl = user instanceof this.Discord.User ? user.displayAvatarURL({format:"png"}) : message.unparsedArgs.join("%20");
-		} else if (message.attachments.first()) {
-			imgurl = message.attachments.first().url;
-		} else if((m = message.channel.messages.filter(m => m.attachments.size>=1)) && m.size >= 1) {
-			imgurl = m.last().attachments.first().url;
-		} else {
-			imgurl = message.author.displayAvatarURL({format:"png"});
-		}
-		if(!imgurl) {
-			message.reply("please either attach an image or provide a url");
-			return message.channel.stopTyping();
-		}
+			imgurl = user instanceof this.Eris.User ? user.staticAvatarURL : message.unparsedArgs.join("%20");
+		} else if (message.attachments[0]) imgurl = message.attachments[0].url;
+		else if((m = message.channel.messages.filter(m => m.attachments.size>=1)) && m.size >= 1) imgurl = m.last().attachments[0].url;
+		else imgurl = message.author.staticAvatarURL;
+
+		if(!imgurl) return message.channel.createMessage(`<@!${message.author.id}>, please either attach an image or provide a url`);
 		req = await this.memeRequest("/gay",[imgurl]);
 		if(req.statusCode !== 200) {
 			try {
@@ -36,12 +32,12 @@ module.exports = {
 			}catch(error){
 				j = {status:req.statusCode,message:req.body};
 			}
-			message.reply(`API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
-			console.log(`imgurl: ${imgurl}`);
-			return message.channel.stopTyping();
+			message.channel.createMessage(`<@!${message.author.id}>, API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
+			return this.logger.log(`imgurl: ${imgurl}`);
 		}
-		attachment = new this.Discord.MessageAttachment(req.body,"gay.png");
-		message.channel.send(attachment).catch(err => message.reply(`Error sending: ${err}`));
-		return message.channel.stopTyping();
+		return message.channel.createMessage("",{
+			file: req.body,
+			name: "gay.png"
+		}).catch(err => message.channel.createMessage(`<@!${message.author.id}>, Error sending: ${err}`));
 	})
 };

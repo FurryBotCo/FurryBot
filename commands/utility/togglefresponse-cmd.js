@@ -6,7 +6,7 @@ module.exports = {
 		"toggleripresponse"
 	],
 	userPermissions: [
-		"MANAGE_GUILD"
+		"manageGuild"
 	],
 	botPermissions: [],
 	cooldown: 3e3,
@@ -20,13 +20,21 @@ module.exports = {
     
 		switch(message.gConfig.fResponseEnabled) {
 		case true:
-			this.db.updateGuild(message.guild.id, {fResponseEnabled: false});
-			message.reply("Disabled f response.");
+			await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
+				$set: {
+					fResponseEnabled: false
+				}
+			});
+			message.channel.createMessage("Disabled f response.");
 			break;
     
 		case false:
-			this.db.updateGuild(message.guild.id, {fResponseEnabled: true});
-			message.reply("Enabled f response.");
+			await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
+				$set: {
+					fResponseEnabled: true
+				}
+			});
+			message.channel.createMessage("Enabled f response.");
 			break;
 		}
 	})

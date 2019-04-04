@@ -5,7 +5,5 @@ module.exports = {
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 2e3,
-	run: (async (client,message) => {
-		return message.reply(`This guilds prefix is **${message.gConfig.prefix}**\nThis can be changed by running \`${message.gConfig.prefix}prefix <new prefix>\``);
-	})
+	run: (async (message) => message.channel.createMessage(`<@!${message.author.id}>, This guilds prefix is **${message.gConfig.prefix}**\nThis can be changed by running \`${message.gConfig.prefix}prefix <new prefix>\``))
 };

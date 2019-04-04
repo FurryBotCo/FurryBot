@@ -59,24 +59,6 @@ class FurryBotLogger extends EventEmitter {
 		//this.isSharded = this.client !== null ? ![undefined,null].includes(this.client.shard) ? true : false : false;
 		//this.shardID = this.isSharded ? this.client.shard.id : 0;
 		//this.shardCount = this.isSharded ? this.client.shard.count : 1;
-		this._getCallerFile = (() => {
-			try {
-				var err = new Error();
-				var callerfile;
-				var currentfile;
-        
-				Error.prepareStackTrace = function (err, stack) { return stack; };
-        
-				currentfile = err.stack.shift().getFileName();
-        
-				while (err.stack.length) {
-					callerfile = err.stack.shift().getFileName();
-        
-					if(currentfile !== callerfile) return callerfile;
-				}
-			} catch (error) {}
-			return undefined;
-		});
 	}
 
 	async log(msg) {
@@ -184,6 +166,25 @@ class FurryBotLogger extends EventEmitter {
 			process.stdout.write(`Error logging to file: ${e}`);
 		});
 		return true;
+	}
+
+	_getCallerFile() {
+		try {
+			var err = new Error();
+			var callerfile;
+			var currentfile;
+	
+			Error.prepareStackTrace = function (err, stack) { return stack; };
+	
+			currentfile = err.stack.shift().getFileName();
+	
+			while (err.stack.length) {
+				callerfile = err.stack.shift().getFileName();
+	
+				if(currentfile !== callerfile) return callerfile;
+			}
+		} catch (error) {}
+		return undefined;
 	}
 }
 

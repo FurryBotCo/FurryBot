@@ -4,8 +4,8 @@ const express = require("express"),
 	{ checkAuth } = require("../functions");
 
 app.post("/dev/eval",checkAuth,async(req,res) => {
-	client.analytics.track({
-		userId: "WEBSERVER",
+	client.trackEvent({
+		group: "WEBSERVER",
 		event: "web.request.dev.eval",
 		properties: {
 			bot: {

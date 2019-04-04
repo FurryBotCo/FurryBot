@@ -4,7 +4,9 @@ module.exports = {
 		"sh"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks" // 16384
+	],
 	cooldown: 0,
 	description: "Execute shell code (dev only)",
 	usage: "[args]",
@@ -14,9 +16,8 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		// extra check, to be safe
-		if (!this.config.developers.includes(message.author.id)) return message.reply("You cannot run this command as you are not a developer of this bot.");
-		message.channel.startTyping();
-		let exec, start, res, end, data, embed;
+		if (!this.config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer of this bot.`);
+		let exec, start, res, end, embed;
 		exec = message.unparsedArgs.join(" ");
 		start = this.performance.now();
 		try {
@@ -39,11 +40,11 @@ module.exports = {
 				});
 				res = `Uploaded ${req.body.toString()}`;
 			}
-			data = {
+			embed = {
 				title: `Executed - Time: \`\`${(+end-start).toFixed(3)}ms\`\``,
 				author: {
-					name: message.author.tag,
-					icon_url: message.author.displayAvatarURL()
+					name: `${message.author.username}#${message.author.discriminator}`,
+					icon_url: message.author.avatarURL
 				},
 				color: 3322313,
 				fields: [
@@ -60,14 +61,12 @@ module.exports = {
 			};
 	
 			this.logger.error(`[Eval]: ${typeof res !== "undefined" && ![null,undefined,""].includes(res.stderr) ? res.stderr : e}`);
-			Object.assign(data,message.embed_defaults());
-			embed = new this.Discord.MessageEmbed(data);
-			message.channel.send(embed).catch(err => {
-				message.channel.send(`I could not return the result: ${err}`).catch(error => {
-					message.author.send(`I could not return the result: ${error}`).catch(noerr => null);
+			Object.assign(embed,message.embed_defaults());
+			return message.channel.createMessage({ embed }).catch(err => {
+				message.channel.createMessage(`I could not return the result: ${err}`).catch(error => {
+					message.author.getDMChannel().then(dm => dm.createMessage(`I could not return the result: ${error}`)).catch(noerr => null);
 				});
 			});
-			return message.channel.stopTyping();
 		}
 		if([null,undefined,""].includes(res.stdout)) {
 			res = "```fix\nfinished with no return```";
@@ -87,17 +86,17 @@ module.exports = {
 				});
 				res = `Uploaded ${req.body.toString()}`;
 			} else if(res.length > 1000) {
-				console.log(`[Eval]: ${res.stdout}`);
+				this.logger.log(`[Eval]: ${res.stdout}`);
 				res = "Logged To Console";
 			}
 			res = "```fix\n"+res.stdout+"```";
 		}
 		end = this.performance.now();
-		data = {
+		embed = {
 			title: `Executed - Time: \`${(+end-start).toFixed(3)}ms\``,
 			author: {
-				name: message.author.tag,
-				icon_url: message.author.displayAvatarURL()
+				name: `${message.author.username}#${message.author.discriminator}`,
+				icon_url: message.author.avatarURL
 			},
 			color: 3322313,
 			fields: [
@@ -113,14 +112,12 @@ module.exports = {
 			]
 		};
 		
-		Object.assign(data,message.embed_defaults());
-		embed = new this.Discord.MessageEmbed(data);
-		message.channel.send(embed).catch(err => {
-			console.error(err);
-			message.channel.send(`I could not return the result: ${err}`).catch(error => {
-				message.author.send(`I could not return the result: ${err}`).catch(noerr => null);
+		Object.assign(embed,message.embed_defaults());
+		return message.channel.createMessage({ embed }).catch(err => {
+			this.logger.error(err);
+			message.channel.createMessage(`I could not return the result: ${err}`).catch(error => {
+				message.author.getDMChannel().then(dm => dm.createMessage(`I could not return the result: ${err}`)).catch(noerr => null);
 			});
 		});
-		return message.channel.stopTyping();
 	})
 };

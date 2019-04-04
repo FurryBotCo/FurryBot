@@ -3,8 +3,8 @@ const express = require("express"),
 	client = require("../../");
 
 app.get("/shorturl/:identifier",async(req,res) => {
-	client.analytics.track({
-		userId: "WEBSERVER",
+	client.trackEvent({
+		group: "WEBSERVER",
 		event: "web.request.shorturl",
 		properties: {
 			bot: {

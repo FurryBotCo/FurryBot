@@ -96,6 +96,10 @@
     "memberupdated": {
       "channel": null,
       "enabled": false
+    },
+    "presenceupdated": {
+      "channel": null,
+      "enabled": false
     }
   },
   "muteRole": null,

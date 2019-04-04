@@ -3,7 +3,9 @@ module.exports = {
 		"yiff"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"attachFiles" // 32768
+	],
 	cooldown: 3e3,
 	description: "Get some yiff!",
 	usage: "[gay/straight]",
@@ -12,8 +14,8 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		message.channel.startTyping();
-		let extra, type, data, embed, attachment, short;
+		
+		let extra, type, embed, short;
 		extra = "";
 		if(message.args.length === 0) {
 			for(let ytype of this.config.yiff.types) {
@@ -22,33 +24,33 @@ module.exports = {
     
 			if(!type) {
 				type = this.config.yiff.defaultType;
-				if(!this.yiffNoticeViewed.has(message.guild.id)) {
-					this.yiffNoticeViewed.add(message.guild.id);
-					extra+=`Showing default yiff type **${type}**\nTo change this, add one of these values somewhere in the channel __name__: **${this.config.yiff.types.join("**, **")}**.\n\n`;
+				if(!this.yiffNoticeViewed.has(message.channel.guild.id)) {
+					this.yiffNoticeViewed.add(message.channel.guild.id);
+					extra += `Showing default yiff type **${type}**\nTo change this, add one of these values somewhere in the channel __name__: **${this.config.yiff.types.join("**, **")}**.\n\n`;
 				}
 			}
     
 		} else {
 			type = message.args.join(" ");
 			if(!this.config.yiff.types.includes(type)) {
-				data = {
+				embed = {
 					title: "Invalid yiff type",
 					description: `The type you provided **${type}** is invalid, valid types are: **${this.config.yiff.types.join("**, **")}**.`
 				};
-				Object.assign(data,message.embed_defaults());
-				embed = new this.Discord.MessageEmbed(data);
-				return message.channel.send(embed);
+				Object.assign(embed,message.embed_defaults());
+				return message.channel.createMessage({ embed });
 			}
 		}
     
 		const img = await this.imageAPIRequest(false,`yiff/${type}`,true,false);
 		if(img.success !== true) {
-			return message.reply(`API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
+			return message.createMessage(`<@!${message.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 		}
-		attachment = new this.Discord.MessageAttachment(img.response.image);
 		short = await this.shortenUrl(img.response.image);
 		extra+= short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
-		message.channel.send(`${extra}Short URL: <${short.link}>\n\nType: ${type}\n\nRequested By: ${message.author.tag}`,attachment);
-		return message.channel.stopTyping();
+		return message.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nType: ${type}\n\nRequested By: ${message.author.username}#${message.author.discriminator}`,{
+			file: await this.getImageFromURL(img.response.image),
+			name: img.response.name
+		});
 	})
 };

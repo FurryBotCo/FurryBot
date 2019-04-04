@@ -3,8 +3,8 @@ const express = require("express"),
 	client = require("../../");
 
 app.get("/status",async(req,res) => {
-	client.analytics.track({
-		userId: "WEBSERVER",
+	client.trackEvent({
+		group: "WEBSERVER",
 		event: "web.request.status",
 		properties: {
 			bot: {
