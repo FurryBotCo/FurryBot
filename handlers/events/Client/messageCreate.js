@@ -459,7 +459,7 @@ module.exports = (async function (message) {
 			}
 		});
 		if(this.commandTimeout[command.triggers[0]].has(message.author.id) && !message.user.isDeveloper) {
-			this.logger.log(`Command timeout encountered by user ${message.author.tag} (${message.author.id}) on command "${message.command}" in guild ${message.channel.guild.name} (${message.channel.guild.id})`);
+			this.logger.log(`Command timeout encountered by user ${message.author.username}#${message.author.discriminator} (${message.author.id}) on command "${message.command}" in guild ${message.channel.guild.name} (${message.channel.guild.id})`);
 			this.trackEvent({
 				group: "COMMANDS",
 				userId: message.author.id,
