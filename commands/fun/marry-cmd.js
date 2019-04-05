@@ -19,7 +19,7 @@ module.exports = {
 
 		if(message.uConfig.married) {
 			u = await this.bot.getRESTUser(message.uConfig.marriagePartner).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
-			return message.createMessage(`<@!${message.author.id}>, Hey, hey! You're already married to **${u}**! You can get a divorce though..`);
+			return message.channel.createMessage(`<@!${message.author.id}>, Hey, hey! You're already married to **${u}**! You can get a divorce though..`);
 		}
 
 		if(m.married) {
