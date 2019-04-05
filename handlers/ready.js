@@ -54,7 +54,7 @@ module.exports = (async function() {
 	this.srv = this.server.load(this.bot);
 	if(!this.config.beta) {
 		//const ls = this.listStats(this);
-		setInterval(this.listStats,3e5,this);
+		this.ls = setInterval(this.listStats,3e5,this);
 	}
 
 	setInterval(() => {
