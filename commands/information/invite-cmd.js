@@ -15,7 +15,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		let botInvite, perms, embed;
+		let botPerms, perms, embed;
 		perms = [
 			"KICK_MEMBERS",          // 2
 			"BAN_MEMBERS",           // 4
@@ -41,13 +41,13 @@ module.exports = {
 			"MANAGE_NICKNAMES",      // 134217728
 			"MANAGE_ROLES"          // 268435456
 		];
-		botInvite = perms.map(p => this.config.Permissions.constant[p]).reduce((a,b) => a + b);
+		botPerms = perms.map(p => this.config.Permissions.constant[p]).reduce((a,b) => a + b);
 		embed = {
 			"title": "Invites",
 			"fields": [
 				{
 					name: "Discord Bot",
-					value: botInvite,
+					value: `https://discordapp.com/oauth2/authorize?client_id=${this.bot.user.id}&scope=bot&permissions=${botPerms}`,
 					inline: false
 				},
 				{
