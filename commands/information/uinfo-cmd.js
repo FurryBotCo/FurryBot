@@ -46,7 +46,7 @@ module.exports = {
 					inline: true
 				},{
 					name: "Joined Discord",
-					value: new Date(user.user).createdAt.toString().split("GMT")[0],
+					value: new Date(user.user.createdAt).toString().split("GMT")[0],
 					inline: true
 				},{
 					name: `Roles [${roles.length}]`,
