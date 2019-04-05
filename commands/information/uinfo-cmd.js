@@ -42,11 +42,11 @@ module.exports = {
 					inline: true
 				},{
 					name: "Joined Server",
-					value: user.joinedAt.toString().split("GMT")[0],
+					value: new Date(user.joinedAt).toString().split("GMT")[0],
 					inline: true
 				},{
 					name: "Joined Discord",
-					value: user.user.createdAt.toString().split("GMT")[0],
+					value: new Date(user.user.createdAt).toString().split("GMT")[0],
 					inline: true
 				},{
 					name: `Roles [${roles.length}]`,
@@ -130,6 +130,12 @@ module.exports = {
 				inline: false
 			});
 		}
+		if(!user.user.bot) embed.fields.push({
+			name: "Bot Specific Info",
+			value: `OwO Count: ${message.uConfig.owoCount || 0}\n\
+			UwU Count: ${message.uConfig.uwuCount || 0}`
+		});
+		
 		Object.assign(embed, message.embed_defaults());
 		embed.thumbnail={url: user.user.avatarURL};
 		message.channel.createMessage({ embed });

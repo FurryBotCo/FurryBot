@@ -10,7 +10,7 @@ module.exports = (async function (message) {
 				version: this.config.bot.version,
 				beta: this.config.beta,
 				alpha: this.config.alpha,
-				server: this.os.hostname()
+				server: require("os").hostname()
 			}
 		}
 	});
@@ -30,7 +30,7 @@ module.exports = (async function (message) {
 					version: this.config.bot.version,
 					beta: this.config.beta,
 					alpha: this.config.alpha,
-					server: this.os.hostname()
+					server: require("os").hostname()
 				},
 				author: {
 					id: message.author.id,
@@ -66,6 +66,105 @@ module.exports = (async function (message) {
 
 	blacklist = (message.uConfig.blacklisted && !message.user.isDeveloper) || message.gConfig.blacklisted;
 
+	if(["owo","uwu"].some(r => message.content.toLowerCase() === r)) {
+		let cn;
+		switch(message.content.toLowerCase()) {
+		case "owo":
+			this.trackEvent({
+				group: "RANDOM",
+				userId: message.author.id,
+				event: "random.owo",
+				properties: {
+					bot: {
+						version: this.config.bot.version,
+						beta: this.config.beta,
+						alpha: this.config.alpha,
+						server: require("os").hostname()
+					},
+					author: {
+						id: message.author.id,
+						tag: message.author.tag
+					},
+					message: {
+						id: message.channel.id,
+						content: message.content,
+						args: message.args,
+						unparsedArgs: message.unparsedArgs
+					},
+					channel: {
+						id: message.channel.id,
+						name: message.channel.name
+					},
+					guild: {
+						id: message.channel.guild.id,
+						name: message.channel.guild.id,
+						owner: {
+							id: message.channel.guild.ownerID,
+							tag: this.bot.users.has(message.channel.guild.ownerID) ? `${this.bot.users.get(message.channel.guild.ownerID).username}#${this.bot.users.get(message.channel.guild.ownerID).discriminator}` : this.bot.getRESTUser(message.channel.guild.ownerID).then(res => `${res.username}#${res.discriminator}`)
+						}
+					}
+				}
+			});
+			this.logger.info(`Logged 1 owo from ${message.author.username}#${message.author.discriminator} (${message.author.id})`);
+			cn = message.uConfig.owoCount || 0;
+			return this.mdb.collection("users").findOneAndUpdate({
+				id: message.author.id
+			},{
+				$set: {
+					owoCount: cn + 1
+				}
+			});
+			break; // eslint-disable-line no-unreachable
+
+		case "uwu":
+			this.trackEvent({
+				group: "RANDOM",
+				userId: message.author.id,
+				event: "random.uwu",
+				properties: {
+					bot: {
+						version: this.config.bot.version,
+						beta: this.config.beta,
+						alpha: this.config.alpha,
+						server: require("os").hostname()
+					},
+					author: {
+						id: message.author.id,
+						tag: message.author.tag
+					},
+					message: {
+						id: message.channel.id,
+						content: message.content,
+						args: message.args,
+						unparsedArgs: message.unparsedArgs
+					},
+					channel: {
+						id: message.channel.id,
+						name: message.channel.name
+					},
+					guild: {
+						id: message.channel.guild.id,
+						name: message.channel.guild.id,
+						owner: {
+							id: message.channel.guild.ownerID,
+							tag: this.bot.users.has(message.channel.guild.ownerID) ? `${this.bot.users.get(message.channel.guild.ownerID).username}#${this.bot.users.get(message.channel.guild.ownerID).discriminator}` : this.bot.getRESTUser(message.channel.guild.ownerID).then(res => `${res.username}#${res.discriminator}`)
+						}
+					}
+				}
+			});
+			this.logger.info(`Logged 1 uwu from ${message.author.username}#${message.author.discriminator} (${message.author.id})`);
+			cn = message.uConfig.uwuCount || 0;
+			return this.mdb.collection("users").findOneAndUpdate({
+				id: message.author.id
+			},{
+				$set: {
+					uwuCount: cn + 1
+				}
+			});
+			break; // eslint-disable-line no-unreachable
+		}
+	}
+
 	if(this.responseList.includes(message.content.toLowerCase()) && !blacklist) {
 		response = this.getResponse(message.content.toLowerCase());
 		if(response.triggers.includes("f") && !message.gConfig.fResponseEnabled) return;
@@ -79,7 +178,7 @@ module.exports = (async function (message) {
 					version: this.config.bot.version,
 					beta: this.config.beta,
 					alpha: this.config.alpha,
-					server: this.os.hostname()
+					server: require("os").hostname()
 				},
 				author: {
 					id: message.author.id,
@@ -148,7 +247,7 @@ module.exports = (async function (message) {
 							version: this.config.bot.version,
 							beta: this.config.beta,
 							alpha: this.config.alpha,
-							server: this.os.hostname()
+							server: require("os").hostname()
 						},
 						author: {
 							id: message.author.id,
@@ -199,7 +298,7 @@ module.exports = (async function (message) {
 							version: this.config.bot.version,
 							beta: this.config.beta,
 							alpha: this.config.alpha,
-							server: this.os.hostname()
+							server: require("os").hostname()
 						},
 						author: {
 							id: message.author.id,
@@ -245,7 +344,7 @@ module.exports = (async function (message) {
 							version: this.config.bot.version,
 							beta: this.config.beta,
 							alpha: this.config.alpha,
-							server: this.os.hostname()
+							server: require("os").hostname()
 						},
 						author: {
 							id: message.author.id,
@@ -289,7 +388,7 @@ module.exports = (async function (message) {
 							version: this.config.bot.version,
 							beta: this.config.beta,
 							alpha: this.config.alpha,
-							server: this.os.hostname()
+							server: require("os").hostname()
 						},
 						author: {
 							id: message.author.id,
@@ -337,7 +436,7 @@ module.exports = (async function (message) {
 								version: this.config.bot.version,
 								beta: this.config.beta,
 								alpha: this.config.alpha,
-								server: this.os.hostname()
+								server: require("os").hostname()
 							},
 							author: {
 								id: message.author.id,
@@ -384,7 +483,7 @@ module.exports = (async function (message) {
 						version: this.config.bot.version,
 						beta: this.config.beta,
 						alpha: this.config.alpha,
-						server: this.os.hostname()
+						server: require("os").hostname()
 					},
 					author: {
 						id: message.author.id,
@@ -432,7 +531,7 @@ module.exports = (async function (message) {
 					version: this.config.bot.version,
 					beta: this.config.beta,
 					alpha: this.config.alpha,
-					server: this.os.hostname()
+					server: require("os").hostname()
 				},
 				author: {
 					id: message.author.id,
@@ -459,7 +558,7 @@ module.exports = (async function (message) {
 			}
 		});
 		if(this.commandTimeout[command.triggers[0]].has(message.author.id) && !message.user.isDeveloper) {
-			this.logger.log(`Command timeout encountered by user ${message.author.tag} (${message.author.id}) on command "${message.command}" in guild ${message.channel.guild.name} (${message.channel.guild.id})`);
+			this.logger.log(`Command timeout encountered by user ${message.author.username}#${message.author.discriminator} (${message.author.id}) on command "${message.command}" in guild ${message.channel.guild.name} (${message.channel.guild.id})`);
 			this.trackEvent({
 				group: "COMMANDS",
 				userId: message.author.id,
@@ -469,7 +568,7 @@ module.exports = (async function (message) {
 						version: this.config.bot.version,
 						beta: this.config.beta,
 						alpha: this.config.alpha,
-						server: this.os.hostname()
+						server: require("os").hostname()
 					},
 					author: {
 						id: message.author.id,
@@ -525,7 +624,7 @@ module.exports = (async function (message) {
 						inline: false
 					},{
 						name: "Category",
-						value: command.category || "Unknown",
+						value: command.category.split(/(\\+|\/)/).reverse()[0] || "Unknown",
 						inline: false
 					},{
 						name: "Arguments Provided",
@@ -548,7 +647,7 @@ module.exports = (async function (message) {
 						version: this.config.bot.version,
 						beta: this.config.beta,
 						alpha: this.config.alpha,
-						server: this.os.hostname()
+						server: require("os").hostname()
 					},
 					author: {
 						id: message.author.id,
@@ -594,7 +693,7 @@ module.exports = (async function (message) {
 						version: this.config.bot.version,
 						beta: this.config.beta,
 						alpha: this.config.alpha,
-						server: this.os.hostname()
+						server: require("os").hostname()
 					},
 					author: {
 						id: message.author.id,

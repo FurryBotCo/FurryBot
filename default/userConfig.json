@@ -13,5 +13,7 @@
 	"blacklisted": false,
 	"bal": 100,
 	"bank": 0,
-	"inv": []
+	"inv": [],
+	"owoCount": 0,
+	"uwuCount": 0
 }

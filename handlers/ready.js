@@ -1,11 +1,11 @@
 module.exports = (async function() {
-	this.logger.log(`Bot has started with ${this.bot.users.size} users in ${this.bot.guilds.map(g => g.channels.size).reduce((a,b) =>a + b)} channels of ${this.bot.guilds.size} guilds.`);
+	this.logger.log(`Bot has started with ${this.bot.users.size} users in ${this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b)} channels of ${this.bot.guilds.size} guilds.`);
 	this.trackEvent({
 		group: "EVENTS",
 		event: "client.events.ready",
 		properties: {
 			userCount: this.bot.users.size,
-			channelCount: this.bot.guilds.map(g => g.channels.size).reduce((a,b) =>a + b),
+			channelCount: this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b),
 			guildCount: this.bot.guilds.size,
 			bot: {
 				version: this.config.bot.version,
@@ -51,11 +51,10 @@ module.exports = (async function() {
 
 	this.logger.log(`ready with ${this.bot.shards.size} shard${this.bot.shards.size>1?"s":""}!`);
 
-	this.srv = this.server.load(this.bot
-	);
+	this.srv = this.server.load(this.bot);
 	if(!this.config.beta) {
 		//const ls = this.listStats(this);
-		setInterval(this.listStats,3e5,this);
+		this.ls = setInterval(this.listStats,3e5,this);
 	}
 
 	setInterval(() => {

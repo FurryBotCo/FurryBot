@@ -60,8 +60,8 @@ module.exports = {
 					value: this.config.bot.version,
 					inline: false
 				}, {
-					name: "Discord.JS Version",
-					value: this.Eris.VERSION,
+					name: `${this.config.bot.library}`,
+					value: this.config.bot.libraryVersion,
 					inline: false
 				}, {
 					name: "Node.JS Version",

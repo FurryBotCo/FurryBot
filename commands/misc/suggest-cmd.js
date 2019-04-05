@@ -37,11 +37,16 @@ module.exports = {
 			]
 		};
 		Object.assign(embed,message.embed_defaults());
-		console.log(JSON.stringify(embed));
-		return this.bot.guilds.get(this.config.bot.mainGuild).channels.get(this.config.bot.channels.suggestion).createMessage({ embed }).then(async(msg) => {
-			await msg.addReaction("upvote:542963565150208001");
-			await msg.addReaction("downvote:542963565238288384");
-			await msg.addReaction("❌");
+		return this.bot.executeWebhook(this.config.webhooks.suggestions.id,this.config.webhooks.suggestions.token,{
+			embeds: [embed],
+			username: `Bot Suggestion${this.config.beta ? " - Beta" : this.config.alpha ? " - Alpha" : ""}`,
+			avatarURL: "https://i.furry.bot/furry.png"
+		}).then(async() => {
+			const i = await this.bot.getRESTChannel(this.config.bot.channels.suggestions).then(c => this.bot.guilds.get(c.guild.id).channels.get(c.id).lastMessageID);
+			const m = await this.bot.getRESTChannel(this.config.bot.channels.suggestions).then(c => this.bot.guilds.get(c.guild.id).channels.get(c.id).messages.get(i));
+			await m.addReaction("upvote:542963565150208001");
+			await m.addReaction("downvote:542963565238288384");
+			await m.addReaction("❌");
 		}).catch(e => {
 			this.logger.error(e);
 			return message.channel.createMessage("unknown error while doing this");

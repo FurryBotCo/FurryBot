@@ -36,8 +36,8 @@ module.exports = {
 			return message.channel.createMessage({ embed });
 		}
 		
-		if(this.commandList.includes(message.args[0])) {
-			command = this.getCommand(message.args[0]);
+		if(this.commandList.includes(message.args[0].toLowerCase())) {
+			command = this.getCommand(message.args[0].toLowerCase());
 			
 			embed = {
 				title: command.triggers[0],
@@ -45,7 +45,7 @@ module.exports = {
 				fields: [
 					{
 						name: "Usage:",
-						value: `\`${message.gConfig.prefix}${command.usage}\``,
+						value: `\`${message.gConfig.prefix}${message.args[0].toLowerCase()} ${command.usage}\``,
 						inline: false
 					},{
 						name: "Restrictions:",
@@ -76,7 +76,7 @@ module.exports = {
 			});
 			Object.assign(embed, message.embed_defaults());
 			return message.channel.createMessage({ embed });
-		} else if (this.categoryList.includes(message.args[0])) {
+		} else if (this.categoryList.includes(message.args[0].toLowerCase())) {
 			category = this.getCategory(message.args[0].toLowerCase());
 
 			embed = {
