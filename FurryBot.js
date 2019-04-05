@@ -328,13 +328,13 @@ class FurryBot extends Base {
 				// member mention
 				if(this.mentionMap.members.length >= mentionPosition+1) return this.mentionMap.members.slice(mentionPosition)[mentionPosition];
 				// user ID
-				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.get(args[argPosition]);
+				if(![undefined,null,""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.get(args[argPosition]);
 				
 				// username
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.find(m => m.user.username.toLowerCase() === args[argPosition].toLowerCase());
+				if(![undefined,null,""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.find(m => m.user.username.toLowerCase() === args[argPosition].toLowerCase());
 				
 				// user tag
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase());
+				if(![undefined,null,""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase());
 		
 				// nothing found
 				return false;
@@ -724,7 +724,7 @@ class FurryBot extends Base {
 	 * @param {String} [keyset=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789] - characters to use in generation
 	 * @returns {String} - randomly generated string 
 	 */
-	async random (len=10,keyset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
+	random (len=10,keyset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
 		if(len > 500 && !this[this.config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
 		let rand = "";
 		for (var i = 0; i < len; i++)
@@ -761,7 +761,7 @@ class FurryBot extends Base {
 			}
 		});
 		const create = (async(url) => {
-			const rand = await this.random(this.config.shortLength),
+			const rand = this.random(this.config.shortLength),
 				createdTimestamp = Date.now(),
 				created = new Date().toISOString(),
 				count = await this.mdb.collection("shorturl").stats().then(res => res.count),
