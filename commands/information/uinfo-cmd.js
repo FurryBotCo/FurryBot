@@ -52,10 +52,6 @@ module.exports = {
 					name: `Roles [${roles.length}]`,
 					value: roles.length > 15 ?`Too many roles to list, please use \`${message.gConfig.prefix}roles ${user.user.id}\``:roles.toString(),
 					inline: false
-				},{
-					name: "Bot Specific Info",
-					value: `OwO Count: ${message.uConfig.owoCount || 0}\n\
-					UwU Count: ${message.uConfig.uwuCount || 0}`
 				}
 			]
 		};
@@ -134,6 +130,12 @@ module.exports = {
 				inline: false
 			});
 		}
+		if(!user.user.bot) embed.fields.push({
+			name: "Bot Specific Info",
+			value: `OwO Count: ${message.uConfig.owoCount || 0}\n\
+			UwU Count: ${message.uConfig.uwuCount || 0}`
+		});
+		
 		Object.assign(embed, message.embed_defaults());
 		embed.thumbnail={url: user.user.avatarURL};
 		message.channel.createMessage({ embed });
