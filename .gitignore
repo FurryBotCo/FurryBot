@@ -109,3 +109,5 @@ mongo.js
 mongodb.js
 test.js
 util/ExtendedEris.js
+
+run.*
