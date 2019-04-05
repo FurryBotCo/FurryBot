@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "4.0.7",
+  "version": "4.0.8",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {

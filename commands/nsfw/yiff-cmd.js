@@ -44,7 +44,7 @@ module.exports = {
     
 		const img = await this.imageAPIRequest(false,`yiff/${type}`,true,false);
 		if(img.success !== true) {
-			return message.createMessage(`<@!${message.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
+			return message.channel.createMessage(`<@!${message.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 		}
 		short = await this.shortenUrl(img.response.image);
 		extra+= short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";

@@ -161,7 +161,7 @@ module.exports = {
 				}
 				*/
 			if(!member) return message.channel.createMessage(`<@!${message.author.id}>, User not found.`);
-			if(!role) return message.createMessage(`<@!${message.author.id}>, Role not found.`);
+			if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role not found.`);
 			b = this.compareMemberWithRole(message.member,role);
 			c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
 			if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
@@ -183,7 +183,7 @@ module.exports = {
 				member = await message.getMemberFromArgs(2);
 			}
 			if(!member) return message.channel.createMessage(`<@!${message.author.id}>, User not found.`);
-			if(!role) return message.createMessage(`<@!${message.author.id}>, Role not found.`);
+			if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Role not found.`);
 			b = this.compareMemberWithRole(message.member,role);
 			c = this.compareMemberWithRole(message.guild.members.get(this.bot.user.id),role);
 			if((b.higher || b.same) && message.channel.guild.ownerID !== message.member.id) return message.channel.createMessage(`<@!${message.author.id}>, You cannot assign or remove roles as high as, or higher than you.`);
