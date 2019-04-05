@@ -43,7 +43,9 @@ module.exports = {
 			"**HIGH** - (╯°□°）╯︵ ┻━┻ - must be a member of the server for longer than 10 minutes",
 			"**VERY HIGH** - ┻━┻ミヽ(ಠ益ಠ)ﾉ彡┻━┻ - must have a verified phone number"
 		];
-	
+		let s;
+		if(message.channel.guild.memberCount < 2000) s = await Promise.all(message.guild.members.filter(m => !m.user.bot).map((m) => this.mdb.collection("users").findOne({id: m.id}))).then(res => res.map(m => m === null ? this.config.default.userConfig : m).map(m => ({owoCount: m.owoCount === undefined ? 0 : m.owoCount,uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount})));
+		else s = false;
 		mfaLevel = [
 			"NONE",
 			"ELEVATED"
@@ -109,9 +111,14 @@ module.exports = {
 					name: "Extra",
 					value: `**Large Guild**: ${message.guild.large?"Yes":"No"}\n**Verification**: ${verificationLevel[message.guild.verificationLevel]}\n**2FA**: ${mfaLevel[message.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[message.guild.defaultNotifications]}\n**Features**:\n${features}`,
 					inline: false
+				},{
+					name: "Counters",
+					value: !s ? "Guild is too large to display counts." : `OwO Counts: ${s.map(j => j.owoCount).reduce((a,b) => a + b)}\nUwU Counts: ${s.map(j => j.uwuCount).reduce((a,b) => a + b)}`,
+					inline: false
 				}
 			]
 		};
+
 		Object.assign(embed, message.embed_defaults());
 		return message.channel.createMessage({ embed });
 	})
