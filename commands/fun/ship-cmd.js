@@ -17,13 +17,19 @@ module.exports = {
 	run: (async function(message) { 
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		let user1, user2, rand1, rand2, r1, r2, shipname, t, amount, u1, u2, imgpath1, imgpath2, profile1, profile2, attch, data, embed;
-		if(message.args[0] === "random") user1 = message.channel.guild.members.filter(u => u.id !== message.author.id && !u.user.bot).random();
+		if(message.args[0] === "random") {
+			user1 = message.channel.guild.members.filter(u => u.id !== message.author.id && !u.user.bot);
+			user1 = user1[Math.floor(Math.random() * user1.length)];
+		}
 		else user1 = await message.getUserFromArgs(0,false,false,0);
         
 		// 2
 		if(message.args.length > 1) {
 			if(message.args[1] === "random") {
-				if(!user1) {} else user2 = message.channel.guild.members.filter(u => u.id !== user1.id && u.id !== message.author.id && !u.user.bot).random();
+				if(!user1) {} else {
+					user2 = message.channel.guild.members.filter(u => u.id !== user1.id && u.id !== message.author.id && !u.user.bot);
+					user2 = user2[Math.floor(Math.random() * user2.length)];
+				}
 			} else user2 = await message.getUserFromArgs(1,false,false,1);
 		}
 		if(!user1) return message.errorEmbed("INVALID_USER");
