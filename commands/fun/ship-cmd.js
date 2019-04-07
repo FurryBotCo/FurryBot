@@ -88,8 +88,8 @@ module.exports = {
 			shipname = user1.username.substr(0,r1) + user2.username.substr(user2.username.length - r2,r2);
 			t = builtin.filter(b => b.users.includes(user1.id)).filter(b => b.users.includes(user2.id));
 			amount = t.length > 0 ? t[0].percent : Math.floor(Math.random()*101);
-			const heart = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "1" : amount >= 2 && amount <= 19 ? "2-19" : amount >= 20 && amount < 39 ? "20-39" : amount >= 40 && amount < 59 ? "40-59" : amount >= 60 && amount < 79 ? "60-79" : amount >= 80 && amount < 99 ? "80-99" : amount === 100 ? "100" : "unknown",
-				shiptext = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "Not Happening.." : amount >= 2 && amount <= 19 ? "Unlikely.." : amount >= 20 && amount < 39 ? "Maybe?" : amount >= 40 && amount < 59 ? "Hopeful!" : amount >= 60 && amount < 79 ? "Good!" : amount >= 80 && amount < 99 ? "Amazing!" : amount === 100 ? "Epic!" : "unknown",
+			const heart = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "1" : amount >= 2 && amount <= 19 ? "2-19" : amount >= 20 && amount < 39 ? "20-39" : amount >= 40 && amount < 59 ? "40-59" : amount >= 60 && amount < 79 ? "60-79" : amount >= 80 && amount <= 99 ? "80-99" : amount === 100 ? "100" : "unknown",
+				shiptext = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "Not Happening.." : amount >= 2 && amount <= 19 ? "Unlikely.." : amount >= 20 && amount < 39 ? "Maybe?" : amount >= 40 && amount < 59 ? "Hopeful!" : amount >= 60 && amount < 79 ? "Good!" : amount >= 80 && amount <= 99 ? "Amazing!" : amount === 100 ? "Epic!" : "unknown",
 				heartIcon = await this.fsn.readFile(`${this.config.rootDir}/assets/images/ship/ship-${heart}-percent.png`);
 			u1 = user1.avatarURL.split(".");
 			u1.pop();
