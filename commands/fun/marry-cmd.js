@@ -16,6 +16,10 @@ module.exports = {
 		member = await message.getMemberFromArgs();
 		if(!member) return message.errorEmbed("INVALID_USER");
 		m = await this.mdb.collection("users").findOne({id: member.id});
+		if(!m) {
+			await this.mdb.collection("users").insertOne(Object.assign({id: member.id},this.config.default.userConfig));
+			m = await this.mdb.collection("users").findOne({id: member.id});
+		}
 
 		if(message.uConfig.married) {
 			u = await this.bot.getRESTUser(message.uConfig.marriagePartner).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
