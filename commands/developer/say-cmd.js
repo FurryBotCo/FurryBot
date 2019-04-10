@@ -14,6 +14,6 @@ module.exports = {
 	run: (async function(message) {
 		// extra check, to be safe
 		if (!this.config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer of this bot.`);
-		return message.channel.createMessage(message.unparsedArgs);
+		return message.channel.createMessage(message.unparsedArgs.join(" "));
 	})
 };

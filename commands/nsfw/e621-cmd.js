@@ -41,9 +41,13 @@ module.exports = {
 		post = res[postNumber];
 		if(!post) post = res[0];
 		bl = post.tags.match(this.config.tagBlacklist);
-		if(![undefined,null,""].includes(bl) && bl.length > 0) this.logger.warn(`Blacklisted e621 post found, https://e621.net/post/show/${post.id}`);
-		if(bl.length === 1) return message.channel.createMessage(`<@!${message.author.id}>, I couldn't return the result as it contained blacklisted a tag.\nBlacklisted Tag: **${bl[0]}**`);
-		else if(bl.length > 1) return message.channel.createMessage(`<@!${message.author.id}>, I couldn't return the result as it contained blacklisted tags.\nBlacklisted Tags: **${bl.join("**, **")}**`);
+		if(![undefined,null,""].includes(bl) && bl.length === 1) {
+			this.logger.warn(`Blacklisted e621 post found, https://e621.net/post/show/${post.id}, blacklisted tag: ${bl[0]}`);
+			return message.channel.createMessage(`<@!${message.author.id}>, I couldn't return the result as it contained blacklisted a tag.\nBlacklisted Tag: **${bl[0]}**`);
+		} else if(![undefined,null,""].includes(bl) && bl.length > 1) {
+			this.logger.warn(`Blacklisted e621 post found, https://e621.net/post/show/${post.id}, blacklisted tags: ${bl.join(", ")}`);
+			return message.channel.createMessage(`<@!${message.author.id}>, I couldn't return the result as it contained blacklisted tags.\nBlacklisted Tags: **${bl.join("**, **")}**`);
+		}
 		embed = {
 			title: "E621 Yiff!",
 			description: `Tags: ${this.truncate(post.tags.replace("_","\\_"),1900)}\n\nLink: <https://e621.net/post/show/${post.id}>`,

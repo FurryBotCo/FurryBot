@@ -23,6 +23,8 @@ module.exports = {
 		if(message.args[0] < 100) message.args[0]++;
 
 		const m = await message.channel.getMessages(message.args[0]);
-		return message.channel.deleteMessages(m.map(j => j.id));
+		const f = m.filter(d => !(d.timestamp + 12096e5 < Date.now()));
+		await message.channel.deleteMessages(f.map(j => j.id));
+		if(m.length !== f.length) await message.channel.createMessage(`Skipped ${m.length - f.length} message(s), reason: over 2 weeks old.`);
 	})
 };

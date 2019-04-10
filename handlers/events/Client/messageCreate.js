@@ -676,13 +676,57 @@ module.exports = (async function (message) {
 			Object.assign(embed, message.embed_defaults("color"));
 			return message.channel.createMessage({ embed });
 		} else {
-			this.logger.error(`[CommandHandler] e1: ${error.name}: ${error.message}\n${error.stack}`);
+			const num = this.random(10,"1234567890"),
+				code = `${message.command}.${this.config.beta ? "beta" : "stable"}.${num}`;
+			this.logger.error(`[CommandHandler] e1: ${error.name}: ${error.message}\n${error.stack},\nError Code: ${code}`);
+
+			await this.mdb.collection("errors").insertOne({
+				id: code,
+				num,
+				command: message.command,
+				error: {
+					name: error.name,
+					message: error.message,
+					stack: error.stack
+				},
+				level: "e1",
+				bot: {
+					version: this.config.bot.version,
+					beta: this.config.beta,
+					alpha: this.config.alpha,
+					server: require("os").hostname()
+				},
+				author: {
+					id: message.author.id,
+					tag: message.author.tag
+				},
+				message: {
+					id: message.channel.id,
+					content: message.content,
+					args: message.args,
+					unparsedArgs: message.unparsedArgs
+				},
+				channel: {
+					id: message.channel.id,
+					name: message.channel.name
+				},
+				guild: {
+					id: message.channel.guild.id,
+					name: message.channel.guild.id,
+					owner: {
+						id: message.channel.guild.ownerID,
+						tag: this.bot.users.has(message.channel.guild.ownerID) ? `${this.bot.users.get(message.channel.guild.ownerID).username}#${this.bot.users.get(message.channel.guild.ownerID).discriminator}` : this.bot.getRESTUser(message.channel.guild.ownerID).then(res => `${res.username}#${res.discriminator}`)
+					}
+				}
+			});
 			this.trackEvent({
 				group: "ERRORS",
 				userId: message.author.id,
 				event: "client.errors",
 				properties: {
 					command: message.command,
+					code,
+					num,
 					error: {
 						name: error.name,
 						message: error.message,
@@ -719,6 +763,49 @@ module.exports = (async function (message) {
 					}
 				}
 			});
+			const owner = message.channel.guild.members.get(message.channel.guild.ownerID);
+			embed = {
+				title: "Level One Command Handler Error",
+				description: `Error Code: \`${code}\``,
+				author: {
+					name: message.channel.guild.name,
+					icon_url: message.channel.guild.iconURL
+				},
+				fields: [
+					{
+						name: "Server",
+						value: `Server: ${message.channel.guild.name} (${message.channel.guild.id})\n\
+						Server Creation Date: ${new Date(message.channel.guild.createdAt).toString().split("GMT")[0]}\n\
+						Owner: ${owner.username}#${owner.discriminator} (${owner.id})`,
+						inline: false
+					},
+					{
+						name: "Message",
+						value: `Message Content: ${message.content}\n\
+						Message ID: ${message.id}\n\
+						Channel: ${message.channel.name} (${message.channel.id}, <#${message.channel.id}>)\n\
+						Author: ${message.author.username}#${message.author.discriminator} (${message.author.id})`,
+						inline: false
+					},
+					{
+						name: "Command",
+						value: `Command: ${message.command}\n\
+						Arguments: ${message.args.join(" ")}\n\
+						Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
+						Ran: ${message.content}`,
+						inline: false
+					},
+					{
+						name: "Error",
+						value: `Name: ${error.name}\n\
+						Stack: ${error.stack}\n\
+						Message: ${error.message}`,
+						inline: false
+					}
+				]
+			};
+			await this.bot.executeWebhook(this.config.webhooks.errors.id,this.config.webhooks.errors.token,{ embeds: [ embed ], username: `Error Reporter${this.config.beta ? " - Beta" : ""}` });
+			return message.channel.createMessage(`An internal error occured while doing this, tell the people in my support server ${this.config.bot.supportInvite}.\nError code: \`${code}\``);
 		}
 	}
 });

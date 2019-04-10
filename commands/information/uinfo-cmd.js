@@ -131,11 +131,11 @@ module.exports = {
 			});
 		}
 		if(!user.user.bot) embed.fields.push({
-			name: "Bot Specific Info",
+			name: "Counters",
 			value: `OwO Count: ${message.uConfig.owoCount || 0}\n\
 			UwU Count: ${message.uConfig.uwuCount || 0}`
 		});
-		
+
 		Object.assign(embed, message.embed_defaults());
 		embed.thumbnail={url: user.user.avatarURL};
 		message.channel.createMessage({ embed });
