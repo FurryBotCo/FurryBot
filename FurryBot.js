@@ -9,7 +9,7 @@ const { Base } = require("eris-sharder"),
  */
 class FurryBot extends Base {
 	/**
-	 * creates client
+	 * creates the client
 	 * @param {Eris.Client} bot - eris client
 	 */
 	constructor(bot) {
@@ -25,6 +25,15 @@ class FurryBot extends Base {
 		this.os = require("os");
 		this.util = require("util");
 		this.request = this.util.promisify(require("request"));
+		this.phin = require("phin").defaults({
+			method: "GET",
+			parse: "json",
+			headers: {
+				"User-Agent": this.config.web.userAgent
+			}
+		});
+
+		
 		this.uuid = require("uuid/v4");
 		this.listStats = require("./util/ListStats");
 		this.fs = require("fs");

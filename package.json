@@ -49,6 +49,7 @@
     "pako": "^1.0.10",
     "path": "^0.12.7",
     "perf_hooks": "0.0.1",
+    "phin": "^3.3.0",
     "random-words": "^1.1.0",
     "request": "^2.88.0",
     "sodium-native": "^2.3.0",
