@@ -29,7 +29,7 @@ class FurryBotLogger {
 
 	_log(name,msg) {
 		if(!(typeof msg === "string") && !(msg instanceof Object)) msg = msg.toString();
-		msg = msg instanceof Object ? require("util").inspect(msg) : msg;
+		else msg = msg instanceof Object ? require("util").inspect(msg) : msg;
 		if(require("fs").existsSync(`${require("../config").rootDir}/logs`)) require("fs").appendFileSync(`${require("../config").rootDir}/logs/${this._getDate()}.txt`,`[${new Date().toString().split(" ")[4]}][${require("path").basename(this._getCallerFile())}][${name}]: ${msg}\n`);
 		else process.send({ name: "error", msg: "Error logging to file: logs directory not found" });
 		return process.send({ name, msg: `[${require("path").basename(this._getCallerFile())}]: ${msg}` });
