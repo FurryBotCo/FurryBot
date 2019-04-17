@@ -17,6 +17,13 @@ module.exports = (async function (message) {
 
 	let blacklist, embed, response, start, c, end, command, category, g, u, blacklistType, blReason, neededPerms, st;
 
+	if(["563448758965239839"].includes(message.author.id) && message.channel.id === "475196091822899210") {
+		await message.addReaction("upvote:542963565150208001");
+		await message.addReaction("downvote:542963565238288384");
+		await message.addReaction("❌");
+		return;
+	}
+
 	if(message.author.bot || (this.config.devOnly && !this.config.developers.includes(message.author.id))) return;
 
 
