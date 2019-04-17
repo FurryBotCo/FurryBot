@@ -65,8 +65,11 @@ module.exports = {
 					}
 				]
 			};
-	
-			this.log(`[Eval]: ${require("util").inspect(e,{depth: 3,color:true})}`);
+			try {
+				this.log(`[Eval]: ${require("util").inspect(e,{depth: 3,color:true})}`);
+			} catch(e) {
+				console.log(e);
+			}
 			Object.assign(embed,message.embed_defaults());
 			message.channel.createMessage({ embed }).catch(err => {
 				message.channel.createMessage(`I could not return the result: ${err}`).catch(error => {
