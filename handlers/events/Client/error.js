@@ -2,8 +2,8 @@ module.exports = (async function(error) {
 	let embed;
 	const num = this.random(10,"1234567890"),
 		code = `err.${this.config.beta ? "beta" : "stable"}.${num}`;
-	if(this.logger !== undefined) this.logger.error(`[CommandHandler] e1: ${error.name}: ${error.message}\n${error.stack},\nError Code: ${code}`);
-	else console.error(`[CommandHandler] e1: ${error.name}: ${error.message}\n${error.stack},\nError Code: ${code}`);
+	if(this.logger !== undefined) this.logger.error(`[UnknownOrigin] e1: ${error.name}: ${error.message}\n${error.stack},\nError Code: ${code}`);
+	else console.error(`[UnknownOrigin] e1: ${error.name}: ${error.message}\n${error.stack},\nError Code: ${code}`);
 
 	await this.mdb.collection("errors").insertOne({
 		id: code,
