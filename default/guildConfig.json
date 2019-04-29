@@ -41,19 +41,19 @@
     "image": false
   },
   "logging": {
-    "channelcreated": {
+    "channelcreate": {
       "channel": null,
       "enabled": false
     },
-    "channeldeleted": {
+    "channeldelete": {
       "channel": null,
       "enabled": false
     },
-    "channelupdated": {
+    "channelupdate": {
       "channel": null,
       "enabled": false
     },
-    "guildupdated": {
+    "guildupdate": {
       "channel": null,
       "enabled": false
     },
@@ -65,23 +65,23 @@
       "channel": null,
       "enabled": false
     },
-    "messagedeleted": {
+    "messagedelete": {
       "channel": null,
       "enabled": false
     },
-    "messageupdated": {
+    "messageupdate": {
       "channel": null,
       "enabled": false
     },
-    "rolecreated": {
+    "rolecreate": {
       "channel": null,
       "enabled": false
     },
-    "roledeleted": {
+    "roledelete": {
       "channel": null,
       "enabled": false
     },
-    "roleupdated": {
+    "roleupdate": {
       "channel": null,
       "enabled": false
     },
@@ -93,11 +93,11 @@
       "channel": null,
       "enabled": false
     },
-    "memberupdated": {
+    "memberupdate": {
       "channel": null,
       "enabled": false
     },
-    "presenceupdated": {
+    "presenceupdate": {
       "channel": null,
       "enabled": false
     }
