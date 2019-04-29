@@ -770,49 +770,89 @@ module.exports = (async function (message) {
 					}
 				}
 			});
-			const owner = message.channel.guild.members.get(message.channel.guild.ownerID);
-			embed = {
-				title: "Level One Command Handler Error",
-				description: `Error Code: \`${code}\``,
-				author: {
-					name: message.channel.guild.name,
-					icon_url: message.channel.guild.iconURL
-				},
-				fields: [
-					{
-						name: "Server",
-						value: `Server: ${message.channel.guild.name} (${message.channel.guild.id})\n\
-						Server Creation Date: ${new Date(message.channel.guild.createdAt).toString().split("GMT")[0]}\n\
-						Owner: ${owner.username}#${owner.discriminator} (${owner.id})`,
-						inline: false
+			if(!this.config.developers.includes(message.author.id)) {
+				const owner = message.channel.guild.members.get(message.channel.guild.ownerID);
+				embed = {
+					title: "Level One Command Handler Error",
+					description: `Error Code: \`${code}\``,
+					author: {
+						name: message.channel.guild.name,
+						icon_url: message.channel.guild.iconURL
 					},
-					{
-						name: "Message",
-						value: `Message Content: ${message.content}\n\
-						Message ID: ${message.id}\n\
-						Channel: ${message.channel.name} (${message.channel.id}, <#${message.channel.id}>)\n\
-						Author: ${message.author.username}#${message.author.discriminator} (${message.author.id})`,
-						inline: false
+					fields: [
+						{
+							name: "Server",
+							value: `Server: ${message.channel.guild.name} (${message.channel.guild.id})\n\
+							Server Creation Date: ${new Date(message.channel.guild.createdAt).toString().split("GMT")[0]}\n\
+							Owner: ${owner.username}#${owner.discriminator} (${owner.id})`,
+							inline: false
+						},
+						{
+							name: "Message",
+							value: `Message Content: ${message.content}\n\
+							Message ID: ${message.id}\n\
+							Channel: ${message.channel.name} (${message.channel.id}, <#${message.channel.id}>)\n\
+							Author: ${message.author.username}#${message.author.discriminator} (${message.author.id})`,
+							inline: false
+						},
+						{
+							name: "Command",
+							value: `Command: ${message.command}\n\
+							Arguments: ${message.args.join(" ")}\n\
+							Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
+							Ran: ${message.content}`,
+							inline: false
+						},
+						{
+							name: "Error",
+							value: `Name: ${error.name}\n\
+							Stack: ${error.stack}\n\
+							Message: ${error.message}`,
+							inline: false
+						}
+					]
+				};
+				await this.bot.executeWebhook(this.config.webhooks.errors.id,this.config.webhooks.errors.token,{ embeds: [ embed ], username: `Error Reporter${this.config.beta ? " - Beta" : ""}` });
+				return message.channel.createMessage(`An internal error occured while doing this, tell the people in my support server ${this.config.bot.supportInvite}.\nError code: \`${code}\``);
+			} else {
+				embed = {
+					title: "Level One Command Handler Error",
+					description: `Error Code: \`${code}\``,
+					author: {
+						name: message.channel.guild.name,
+						icon_url: message.channel.guild.iconURL
 					},
-					{
-						name: "Command",
-						value: `Command: ${message.command}\n\
-						Arguments: ${message.args.join(" ")}\n\
-						Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
-						Ran: ${message.content}`,
-						inline: false
-					},
-					{
-						name: "Error",
-						value: `Name: ${error.name}\n\
-						Stack: ${error.stack}\n\
-						Message: ${error.message}`,
-						inline: false
-					}
-				]
-			};
-			await this.bot.executeWebhook(this.config.webhooks.errors.id,this.config.webhooks.errors.token,{ embeds: [ embed ], username: `Error Reporter${this.config.beta ? " - Beta" : ""}` });
-			return message.channel.createMessage(`An internal error occured while doing this, tell the people in my support server ${this.config.bot.supportInvite}.\nError code: \`${code}\``);
+					fields: [
+						{
+							name: "Message",
+							value: `Message Content: ${message.content}\n\
+							Message ID: ${message.id}\n\
+							Channel: ${message.channel.name} (${message.channel.id}, <#${message.channel.id}>)\n\
+							Author: ${message.author.username}#${message.author.discriminator} (${message.author.id})`,
+							inline: false
+						},
+						{
+							name: "Command",
+							value: `Command: ${message.command}\n\
+							Arguments: ${message.args.join(" ")}\n\
+							Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
+							Ran: ${message.content}`,
+							inline: false
+						},
+						{
+							name: "Error",
+							value: `Name: ${error.name}\n\
+							Stack: ${error.stack}\n\
+							Message: ${error.message}`,
+							inline: false
+						}
+					]
+				};
+				return message.channel.createMessage({
+					content: `<@!${message.author.id}> An error occured.`,
+					embed
+				});
+			}
 		}
 	}
 });
