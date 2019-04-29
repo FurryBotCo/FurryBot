@@ -49,7 +49,7 @@ module.exports = (async function(message,oldMessage) {
 			text: `Message Author: ${message.author.username}#${message.author.discriminator}`
 		},
 		title: "Message Edited",
-		description: `Message by ${message.author.username}#${message.author.discriminator} edited in <#${message.channel.id}> (${message.channel.name})`,
+		description: `Message by ${message.author.username}#${message.author.discriminator} edited in <#${message.channel.id}> (${message.channel.id})`,
 		fields: [
 			{
 				name: "Old Content",

@@ -48,7 +48,7 @@ module.exports = (async function(message) {
 			text: `Message Author: ${message.author.username}#${message.author.discriminator}`
 		},
 		title: "Message Deleted",
-		description: `Message by ${message.author.username}#${message.author.discriminator} deleted in <#${message.channel.id}> (${message.channel.name})`,
+		description: `Message by ${message.author.username}#${message.author.discriminator} deleted in <#${message.channel.id}> (${message.channel.id})`,
 		fields: [
 			{
 				name: "Content",
