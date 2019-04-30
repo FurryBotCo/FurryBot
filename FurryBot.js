@@ -17,9 +17,14 @@ class FurryBot extends Base {
 		this.fs = require("fs");
 		this.log = require("./util/LoggerV5");
 		this.MongoClient = require("mongodb").MongoClient;
-		Object.assign(this,require("./util/functions"));
-		this.MessageCollector = new MessageCollector(this.bot);
 		this.config = config;
+		if(!config.beta && !config.alpha && !config.manualDevOnly && config.onMainServer) {
+			this.wsA = require("./util/WebSocket");
+		}
+		Object.assign(this,require("./util/functions"));
+		this.AnalyticsWebSocket = require("./util/AnalyticsWebSocket");
+		this.analyticsSocket = new this.AnalyticsWebSocket(config.beta ? "furrybotbeta" : "furrybot","send");
+		this.MessageCollector = new MessageCollector(this.bot);
 		this.Trello = require("trello");
 		this.tclient = new this.Trello(config.apis.trello.apiKey,config.apis.trello.apiToken);
 		this.os = require("os");
@@ -32,8 +37,6 @@ class FurryBot extends Base {
 				"User-Agent": this.config.web.userAgent
 			}
 		});
-
-		
 		this.uuid = require("uuid/v4");
 		this.listStats = require("./util/ListStats");
 		this.fs = require("fs");
@@ -644,7 +647,21 @@ class FurryBot extends Base {
 		if(!props.group) throw new TypeError("missing group");
 		if(!props.properties) props.properties = {};
 		let type = config.beta ? "furrybotbeta" : "furrybot";
-		return require("util").promisify(require("request"))(`https://yiff.guru/track/${type}`,{
+		if(typeof this.analyticsSocket !== "undefined" && this.analyticsSocket.ws.readyState === 1) this.analyticsSocket.sendJSON({
+			op: 4,
+			d: {
+				timestamp: new Date().toISOString(),
+				userId: props.userId || null,
+				guildId: props.guildId || null,
+				channelId: props.channelId || null,
+				messageId: props.messageId || null,
+				roleId: props.roleId || null,
+				event: props.event,
+				group: props.group,
+				properties: props.properties
+			}
+		});
+		else return require("util").promisify(require("request"))(`https://yiff.guru/track/${type}`,{
 			method: "POST",
 			headers: {
 				Authorization: config.universalKey
@@ -661,6 +678,7 @@ class FurryBot extends Base {
 				properties: props.properties
 			}
 		});
+		
 	}
 	
 	/**
