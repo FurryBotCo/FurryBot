@@ -1,7 +1,7 @@
 module.exports = (async function(message,oldMessage) {
 	this.trackEvent({
 		group: "EVENTS",
-		userId: message.author.id,
+		userId: message.author !== "undefined" ? message.author.id : null,
 		event: "client.events.messageUpdate",
 		properties: {
 			bot: {
