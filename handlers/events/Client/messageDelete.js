@@ -1,8 +1,8 @@
-module.exports = (async function(message,oldMessage) {
+module.exports = (async function(message) {
 	this.trackEvent({
 		group: "EVENTS",
-		userId: message.author !== "undefined" ? message.author.id : null,
-		event: "client.events.messageUpdate",
+		userId: typeof message.author !== "undefined" ? message.author.id : null,
+		event: "client.events.messageDelete",
 		properties: {
 			bot: {
 				version: this.config.bot.version,
@@ -12,11 +12,10 @@ module.exports = (async function(message,oldMessage) {
 			}
 		}
 	});
-	if(!this || !this.mdb || !message || !message.author || message.author.bot || !oldMessage || message.channel.type !== 0 || message.content === oldMessage.content) return;
-	this.bot.emit("messageCreate",message);
+	if(!this || !this.mdb || !message || !message.author || message.author.bot || message.channel.type !== 0) return;
 	if(!message.channel.guild || ![0,2,4].includes(message.channel.type)) return;
 	const gConfig = await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}),
-		ev = "messageupdate";
+		ev = "messagedelete";
 	if(!gConfig) return;
 	if([undefined,null,""].includes(gConfig.logging[ev])) return this.mdb.collection("guilds").findOneAndUpdate({ id: message.channel.guild.id },{
 		$set: {
@@ -48,16 +47,11 @@ module.exports = (async function(message,oldMessage) {
 			icon_url: message.author.avatarURL,
 			text: `Message Author: ${message.author.username}#${message.author.discriminator}`
 		},
-		title: "Message Edited",
-		description: `Message by ${message.author.username}#${message.author.discriminator} edited in <#${message.channel.id}> (${message.channel.id})`,
+		title: "Message Deleted",
+		description: `Message by ${message.author.username}#${message.author.discriminator} deleted in <#${message.channel.id}> (${message.channel.id})`,
 		fields: [
 			{
-				name: "Old Content",
-				value: oldMessage.content,
-				inline: false
-			},
-			{
-				name: "New Content",
+				name: "Content",
 				value: message.content,
 				inline: false
 			}

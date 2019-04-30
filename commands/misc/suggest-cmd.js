@@ -41,15 +41,6 @@ module.exports = {
 			embeds: [embed],
 			username: `Bot Suggestion${this.config.beta ? " - Beta" : this.config.alpha ? " - Alpha" : ""}`,
 			avatarURL: "https://i.furry.bot/furry.png"
-		}).then(async() => {
-			const i = await this.bot.getRESTChannel(this.config.bot.channels.suggestions).then(c => this.bot.guilds.get(c.guild.id).channels.get(c.id).lastMessageID);
-			const m = await this.bot.getRESTChannel(this.config.bot.channels.suggestions).then(c => this.bot.guilds.get(c.guild.id).channels.get(c.id).messages.get(i));
-			await m.addReaction("upvote:542963565150208001");
-			await m.addReaction("downvote:542963565238288384");
-			await m.addReaction("❌");
-		}).catch(e => {
-			this.logger.error(e);
-			return message.channel.createMessage("unknown error while doing this");
 		});
 	})
 };

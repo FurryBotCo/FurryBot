@@ -16,8 +16,38 @@ module.exports = {
 	run: (async function(message) {
 		let l, updateFields, log, s, c, embed;
 		l = "";
+		const events = Object.keys(this.config.default.loggingConfig);
+		for(let key of events) {
+			if(typeof message.gConfig.logging[key] === "undefined"){
+				await this.mdb.collection("guilds").findOneAndUpdate({
+					id: message.channel.guild.id
+				},{
+					$set: {
+						[`logging.${key}`]: {
+							enabled: false,
+							channel: null
+						}
+					}
+				});
+				message.gConfig.logging[key] = {
+					enabled: false,
+					channel: null
+				};
+			}
+		}
 		updateFields = {logging:{}};
 		for(let key in message.gConfig.logging) {
+			if(events.indexOf(key) === -1) {
+				await this.mdb.collection("guilds").findOneAndUpdate({
+					id: message.channel.guild.id
+				},{
+					$unset: {
+						[`logging.${key}`]: ""
+					}
+				});
+				continue;
+			}
+
 			log = message.gConfig.logging[key];
 			if(log.enabled) {
 				s = message.channel.guild.channels.get(log.channel);

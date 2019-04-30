@@ -17,19 +17,21 @@ module.exports = {
 	guildOwnerOnly: false,
 	run: (async function(message) {
 		
-		let tags, bl, req, res, embed, postNumber, post;
+		let tags, bl, req, embed, postNumber, post;
 		tags = encodeURIComponent(message.args.join(" "));
 		bl = tags.match(this.config.tagBlacklist);
 		if(bl !== null && bl.length > 0) return message.channel.createMessage(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
-		req = await this.request(`https://e621.net/post/index.json?limit=50&tags=${tags}%20rating%3Aexplict`,{
-			method: "GET",
-			headers: {
-				"User-Agent": `FurryBot/${this.config.bot.version}`,
-				"Content-Type": "application/json"
-			}
-		});
-		res = JSON.parse(req.body);
-		if(res.length === 0) {
+		try {
+			req = await this.phin({
+				url: `https://e621.net/post/index.json?limit=50&tags=${tags}%20rating%3Aexplict`,
+			}).then(res => res.body);
+		} catch(e) {
+			await message.channel.createMessage("unknown error while doing this..");
+			return this.logger.error(e);
+		}
+
+		if(req.success !== undefined && req.success === false) return message.channel.createMessage(`<@!${message.author.id}>, error while running command: ${req.reason}`);
+		if(req.length === 0) {
 			embed = {
 				title: "No Posts Found",
 				description: `no posts were found with the tags "${decodeURIComponent(tags)}", try another query`
@@ -37,9 +39,9 @@ module.exports = {
 			Object.assign(embed,message.embed_defaults());
 			return message.channel.createMessage({ embed });
 		} 
-		postNumber = Math.floor(Math.random(0,res.length+1) * res.length);
-		post = res[postNumber];
-		if(!post) post = res[0];
+		postNumber = Math.floor(Math.random(0,req.length+1) * req.length);
+		post = req[postNumber];
+		if(!post) post = req[0];
 		bl = post.tags.match(this.config.tagBlacklist);
 		if(![undefined,null,""].includes(bl) && bl.length === 1) {
 			this.logger.warn(`Blacklisted e621 post found, https://e621.net/post/show/${post.id}, blacklisted tag: ${bl[0]}`);

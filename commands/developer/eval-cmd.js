@@ -28,7 +28,7 @@ module.exports = {
 		}catch(e){
 			//return message.channel.createMessage(`Error evaluating: ${err}`);
 			m = typeof e.message !== "string" ? require("util").inspect(e.message,{depth: 1}) : e.message;
-			this.log(require("util").inspect(e.message,{depth: 1}));
+			//this.log(require("util").inspect(e.message,{depth: 1}));
 	
 			end = this.performance.now();
 			if(e.length > 1000) {
@@ -65,8 +65,11 @@ module.exports = {
 					}
 				]
 			};
-	
-			this.log(`[Eval]: ${require("util").inspect(e,{depth: 3,color:true})}`);
+			try {
+				this.log(`[Eval]: ${require("util").inspect(e,{depth: 3,color:true})}`);
+			} catch(e) {
+				console.log(e);
+			}
 			Object.assign(embed,message.embed_defaults());
 			message.channel.createMessage({ embed }).catch(err => {
 				message.channel.createMessage(`I could not return the result: ${err}`).catch(error => {
@@ -77,7 +80,13 @@ module.exports = {
 		if([null,undefined,""].includes(res)) {
 			res = "```fix\nfinished with no return```";
 		} else {
-			if(typeof res !== "string") res = require("util").inspect(res,{showHidden:true,depth: 3});
+			try {
+				if(typeof res !== "string") res = require("util").inspect(res,{showHidden:true,depth: 3});
+			} catch(e) {
+				try {
+					if(typeof res !== "string") res = JSON.stringify(res);
+				} catch(e) {}
+			}
 			if(res.length > 1000) {
 				const req = await this.request("https://pastebin.com/api/api_post.php",{
 					method: "POST",

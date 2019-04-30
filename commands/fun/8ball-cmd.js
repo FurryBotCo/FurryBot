@@ -25,6 +25,6 @@ module.exports = {
 				"Very doubtful"
 			],
 			response = responses[Math.floor(Math.random() * responses.length)];
-		return message.channel.createMessage(`<@!${message.author.id}>, The Magic 8ball said ${response}.`);
+		return message.channel.createMessage(`<@!${message.author.id}>, The Magic 8ball said **${response}**.`);
 	})
 };

@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "4.0.10",
+  "version": "4.0.17",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {
@@ -49,6 +49,7 @@
     "pako": "^1.0.10",
     "path": "^0.12.7",
     "perf_hooks": "0.0.1",
+    "phin": "^3.3.0",
     "random-words": "^1.1.0",
     "request": "^2.88.0",
     "sodium-native": "^2.3.0",
@@ -58,6 +59,7 @@
     "util": "^0.11.1",
     "uuid": "^3.3.2",
     "uws": "^100.0.1",
+    "ws": "^6.2.1",
     "ytdl-core": "^0.29.1",
     "zlib-sync": "^0.1.4"
   },

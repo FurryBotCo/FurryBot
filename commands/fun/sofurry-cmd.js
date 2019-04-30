@@ -16,8 +16,8 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
-		return message.channel.createMessage(`<@!${message.author.id}>, Sorry, sofurry is having issues right now, and we cannot fetch anything from their api.\n(if it's back, and I haven't noticed, let me know in my support server - https://discord.gg/SuccpZw)`);
-		/* eslint-disable no-unreachable */
+		// saved for when sofurry api has issues
+		//return message.channel.createMessage(`<@!${message.author.id}>, Sorry, sofurry is having issues right now, and we cannot fetch anything from their api.\n(if it's back, and I haven't noticed, let me know in my support server - https://discord.gg/SuccpZw)`);
 		const contentType = [
 			"story",
 			"art",
