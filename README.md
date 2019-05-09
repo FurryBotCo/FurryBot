@@ -4,6 +4,6 @@
 
 Furry bot for Discord - [https://furry.bot](https://furry.bot)
 
-## Any and all content in this repository has **All Rights Reserved** to [Furry Bot Limited](https://beta.companieshouse.gov.uk/company/11505151), a limited liability company, and [Donovan Daniels](https://www.donovand.info)
+## Any and all content in this repository is owned by [Furry Bot Limited](https://beta.companieshouse.gov.uk/company/11505151), a limited liability company, and [Donovan Daniels](https://furry.cool), under the GNU General Public License v3.0 (AGPL-3.0).
 
-You are therefore not allowed to copy, modify, use, or distribute anything here.
+Please [read the lisence](https://opensource.org/licenses/AGPL-3.0) before copying or modifying anything.
