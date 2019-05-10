@@ -661,23 +661,6 @@ class FurryBot extends Base {
 				properties: props.properties
 			}
 		});
-		else return require("util").promisify(require("request"))(`https://yiff.guru/track/${type}`,{
-			method: "POST",
-			headers: {
-				Authorization: config.universalKey
-			},
-			json: {
-				timestamp: new Date().toISOString(),
-				userId: props.userId || null,
-				guildId: props.guildId || null,
-				channelId: props.channelId || null,
-				messageId: props.messageId || null,
-				roleId: props.roleId || null,
-				event: props.event,
-				group: props.group,
-				properties: props.properties
-			}
-		});
 		
 	}
 	
@@ -959,6 +942,21 @@ class FurryBot extends Base {
 		if(!(![undefined,null,""].includes(skipChecks.action) && skipChecks.action === true) && log.action !== action) return false;
 		if(!(![undefined,null,""].includes(skipChecks.executor) && skipChecks.executor === true) && !(log.executor instanceof this.Eris.User || log.executor instanceof this.Eris.Member)) return false;
 		return {executor:log.executor,reason:log.executor.bot ? log.reson === null ? "None Provided" : log.reason : "Not Applicable"};
+	}
+
+	walkDirSync(dir,req = false) {
+		const res = {};
+		const s = this.fs.readdirSync(dir).filter(d => d !== "");
+	
+		for(let d of s) {
+			if(this.fs.lstatSync(`${dir}/${d}`).isDirectory()) {
+				res[d] = this.walkDirSync(`${dir}/${d}`,req);
+			} else {
+				if(req) res[d.split(".")[0]] = require(`${dir}/${d}`);
+				else res[d.split(".")[0]] = `${dir}/${d}`;
+			}
+		}
+		return res;
 	}
 }
 
