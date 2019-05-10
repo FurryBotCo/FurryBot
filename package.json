@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "4.0.17",
+  "version": "4.0.20",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,7 @@
     "discord-bot"
   ],
   "author": "Donovan_DMC",
-  "license": "UNLICENSED",
+  "license": "AGPL-3.0",
   "bugs": {
     "url": "https://github.com/FurryBotCo/FurryBot/issues"
   },
@@ -44,6 +44,7 @@
     "lodash": "^4.17.11",
     "mongodb": "^3.2.2",
     "morgan": "^1.9.1",
+    "node-dogstatsd": "0.0.7",
     "node-opus": "^0.3.1",
     "os": "^0.1.1",
     "pako": "^1.0.10",
