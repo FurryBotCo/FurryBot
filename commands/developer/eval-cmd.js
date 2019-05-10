@@ -19,7 +19,7 @@ module.exports = {
 	run: (async function(message) {
 		// extra check, to be safe
 		if (!this.config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer of this bot.`);
-		let exec, start, res, m, end, data, embed;
+		let exec, start, res, m, end, embed;
 		const r = this.r;
 		exec = message.unparsedArgs.join(" ");
 		start = this.performance.now();
