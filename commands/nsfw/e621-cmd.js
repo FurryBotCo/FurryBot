@@ -16,6 +16,7 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		//return message.channel.createMessage(`This command has been permanently disabled until Cloudflare stops giving us captchas, join our support server for updates on the status of this: ${this.config.bot.supportInvite}.`);
 		
 		let tags, bl, req, embed, postNumber, post;
 		tags = encodeURIComponent(message.args.join(" "));
@@ -24,10 +25,12 @@ module.exports = {
 		try {
 			req = await this.phin({
 				url: `https://e621.net/post/index.json?limit=50&tags=${tags}%20rating%3Aexplict`,
+				parse: "json"
 			}).then(res => res.body);
 		} catch(e) {
-			await message.channel.createMessage("unknown error while doing this..");
-			return this.logger.error(e);
+			await message.channel.createMessage("There was an unknown error while doing this.");
+			this.logger.error(e);
+			return this.logger.error(req);
 		}
 
 		if(req.success !== undefined && req.success === false) return message.channel.createMessage(`<@!${message.author.id}>, error while running command: ${req.reason}`);
