@@ -18,11 +18,16 @@ module.exports = {
 	run: (async function(message) {
 		
 		let user, roles, data, req, x, ds, db, l, ll, rs, list, embed;
-		if(message.args.length === 0 || !message.args) {
-			user = message.member;
-		} else {
-			// get member from message
-			user = await message.getMemberFromArgs();
+		try {
+			if(message.args.length === 0 || !message.args) {
+				user = message.member;
+			} else {
+				// get member from message
+				user = await message.getMemberFromArgs();
+			}
+		} catch(e) {
+			await message.channel.createMessage(`<@!${message.author.id}>, there was an unknown error while doing this.`);
+			return this.log.error(e);
 		}
 
 		if(!user) return message.errorEmbed("INVALID_USER");

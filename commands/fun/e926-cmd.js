@@ -15,6 +15,8 @@ module.exports = {
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		//return message.channel.createMessage(`This command has been permanently disabled until Cloudflare stops giving us captchas, join our support server for updates on the status of this: ${this.config.bot.supportInvite}.`);
+		
 		let tags, bl, req, embed, postNumber, post;
 		tags = encodeURIComponent(message.args.join(" "));
 		bl = tags.match(this.config.tagBlacklist);
@@ -58,6 +60,6 @@ module.exports = {
 				url: post.file_url
 			}
 		};
-		message.channel.createMessage({ embed });
+		return message.channel.createMessage({ embed });
 	})
 };
