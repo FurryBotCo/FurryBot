@@ -7,11 +7,15 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Check the warnings a user has",
 	usage: "<@member/id> [page]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let user, page, mn, warnings, embed, wr, pages, fields, w, usr, blame;
 		
 		if(message.args.length === 0 || !message.args || (!isNaN(message.args[0]) && message.args[0].length < 17)) {

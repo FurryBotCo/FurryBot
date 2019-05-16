@@ -10,11 +10,15 @@ module.exports = {
 	cooldown: 0,
 	description: "Get some fur images from e926",
 	usage: "[tags]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		//return message.channel.createMessage(`This command has been permanently disabled until Cloudflare stops giving us captchas, join our support server for updates on the status of this: ${this.config.bot.supportInvite}.`);
 		
 		let tags, bl, req, embed, postNumber, post;

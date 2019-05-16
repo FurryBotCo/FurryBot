@@ -10,11 +10,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get your user profile",
 	usage: "[@member/id]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: true,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		
 		let member, position, level, xp_left, rank, image, pr, u, imgpath, img, a, at;
 		// get member from message

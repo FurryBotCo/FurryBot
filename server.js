@@ -25,17 +25,33 @@ class FurryBotServer {
 			});
 			next();
 		});
+		//process.stdout.on("data",(d) => client.bot.logger.log(d));
+		//process.stderr.on("data",(e) => client.bot.logger.error(e));
+		const { default: chalk } = require("chalk");
 		this.server.use(async(req,res,next) => {
 			// return res.status(403).json({success:false,error:"invalid credentials"});
 			next();
 		})
-			.use(this.logger("dev"))
+			/*.use(this.logger("dev",{
+				stream: process.stdout
+			}))*/
+			// logger
+			// :method :url :status :response-time ms - :res[content-length]
+			.use(async(req,res,next) => {
+				const s = process.hrtime();
+				res.on("finish", () => {
+					const t = process.hrtime(s);
+					const m = t[0] * 1000 + t[1] / 1e6;
+					client.logger.debug(`Webserver: ${chalk.red(req.method.toUpperCase())} ${chalk.green(req.originalUrl)} ${chalk.yellow(res.statusCode)} ${chalk.blue(`${m}ms`)}`);
+				});
+				return next();
+			})
 			.use(this.bodyParser.json())
 			.use(this.bodyParser.urlencoded({
 				extended: true
 			}))
 			.get("/stats",async(req,res) => {
-				client.trackEvent({
+				client.bot.trackEvent({
 					group: "WEBSERVER",
 					event: "web.request.stats",
 					properties: {
@@ -54,34 +70,34 @@ class FurryBotServer {
 				dailyJoins = a !== null ? a.count : null|| null;
 				return res.status(200).json({
 					success: true,
-					clientStatus: client.guilds.get(this.config.bot.mainGuild).members.get(client.user.id).status,
-					guildCount: client.guilds.size,
-					userCount: client.guilds.map(g => g.memberCount).reduce((a,b) => a + b),
-					shardCount: client.shards.size,
+					clientStatus: client.bot.guilds.get(this.config.bot.mainGuild).members.get(client.bot.user.id).status,
+					guildCount: client.bot.guilds.size,
+					userCount: client.bot.guilds.map(g => g.memberCount).reduce((a,b) => a + b),
+					shardCount: client.bot.shards.size,
 					memoryUsage: {
 						process: {
-							used: client.memory.process.getUsed(),
-							total: client.memory.process.getTotal()
+							used: client.bot.memory.process.getUsed(),
+							total: client.bot.memory.process.getTotal()
 						},
 						system: {
-							used: client.memory.system.getUsed(),
-							total: client.memory.system.getTotal()
+							used: client.bot.memory.system.getUsed(),
+							total: client.bot.memory.system.getTotal()
 						}
 					},
-					largeGuildCount: client.guilds.filter(g => g.large).length,
+					largeGuildCount: client.bot.guilds.filter(g => g.large).length,
 					apiVersion: this.config.bot.apiVersion,
 					botVersion: this.config.bot.version,
 					library: this.config.bot.library,
 					libraryVersion: this.config.bot.libraryVersion,
 					nodeVersion: process.version,
 					dailyJoins,
-					commandCount: client.commandList.length,
-					messageCount: await client.mongo.db("analytics").collection(this.config.db.main.database).find({event:"client.events.message"}).count(),
-					dmMessageCount: await client.mongo.db("analytics").collection(this.config.db.main.database).find({event:"client.events.message.directMessage"}).count()
+					commandCount: client.bot.commandList.length,
+					messageCount: 0,
+					dmMessageCount: 0
 				});
 			})
 			.get("/stats/ping",async(req,res) => {
-				client.trackEvent({
+				client.bot.trackEvent({
 					group: "WEBSERVER",
 					event: "web.request.stats.ping",
 					properties: {
@@ -95,11 +111,11 @@ class FurryBotServer {
 				});
 				return res.status(200).json({
 					success: true,
-					ping: Math.floor(client.shards.map(s => s.latency).reduce((a,b) => a + b) / client.shards.size)
+					ping: Math.floor(client.bot.shards.map(s => s.latency).reduce((a,b) => a + b) / client.bot.shards.size)
 				});
 			})
 			.get("/commands",async(req,res) => {
-				client.trackEvent({
+				client.bot.trackEvent({
 					group: "WEBSERVER",
 					event: "web.request.commands",
 					properties: {
@@ -133,7 +149,7 @@ class FurryBotServer {
 				return res.status(200).json({success:true,list:cmds});
 			})
 			.get("/status",async(req,res) => {
-				client.trackEvent({
+				client.bot.trackEvent({
 					group: "WEBSERVER",
 					event: "web.request.status",
 					properties: {
@@ -147,11 +163,11 @@ class FurryBotServer {
 				});
 				return res.status(200).json({
 					success: true,
-					clientStatus: client.guilds.get(this.config.bot.mainGuild).members.get(client.user.id).status
+					clientStatus: client.bot.guilds.get(this.config.bot.mainGuild).members.get(client.bot.user.id).status
 				});
 			})
 			.get("/checkauth",checkAuth,async(req,res) => {
-				client.trackEvent({
+				client.bot.trackEvent({
 					group: "WEBSERVER",
 					event: "web.request.checkauth",
 					properties: {
@@ -168,7 +184,7 @@ class FurryBotServer {
 
 		// guilds section
 			.get("/guilds",async(req,res) => {
-				client.trackEvent({
+				client.bot.trackEvent({
 					group: "WEBSERVER",
 					event: "web.request.guilds",
 					properties: {
@@ -182,15 +198,15 @@ class FurryBotServer {
 				});
 				let jsn = {
 					success: true,
-					guildCount: client.guilds.size
+					guildCount: client.bot.guilds.size
 				};
 				if(checkAuth(req,res,false)) {
-					jsn.guilds = client.guilds.map(g => ({[g.id]:{name:g.name,memberCount:g.memberCount}}));
+					jsn.guilds = client.bot.guilds.map(g => ({[g.id]:{name:g.name,memberCount:g.memberCount}}));
 				}
 				res.status(200).json(jsn);
 			})
 			.get("/guilds/:id/shard",checkAuth,async(req,res) => {
-				client.trackEvent({
+				client.bot.trackEvent({
 					group: "WEBSERVER",
 					event: "web.request.guilds.id.shard",
 					properties: {
@@ -202,18 +218,18 @@ class FurryBotServer {
 						}
 					}
 				});
-				if(!client.guilds.has(req.params.id)) return res.status(404).json({
+				if(!client.bot.guilds.has(req.params.id)) return res.status(404).json({
 					success: false,
 					error: "invalid guild id"
 				});
 				return res.status(200).json({
 					success: true,
-					shardId: client.guilds.get(req.params.id).shard.id,
-					shardCount: client.shards.size
+					shardId: client.bot.guilds.get(req.params.id).shard.id,
+					shardCount: client.bot.shards.size
 				});
 			})
 			.get("/shorturl/:identifier",async(req,res) => {
-				client.trackEvent({
+				client.bot.trackEvent({
 					group: "WEBSERVER",
 					event: "web.request.shorturl",
 					properties: {
@@ -225,7 +241,7 @@ class FurryBotServer {
 						}
 					}
 				});
-				const s = await client.mdb.collection("shorturl").findOne({id: req.params.identifier});
+				const s = await client.bot.mdb.collection("shorturl").findOne({id: req.params.identifier});
 				if(!s) return res.status(404).json({success: false, error: "invalid short code"});
 				return res.status(200).json(s);
 			})
@@ -235,7 +251,7 @@ class FurryBotServer {
 				let data, embed, user;
 				switch(req.body.type.toLowerCase()) {
 				case "upvote":
-					client.trackEvent({
+					client.bot.trackEvent({
 						group: "WEBSERVER",
 						event: "upvote.dbl",
 						properties: {
@@ -246,28 +262,28 @@ class FurryBotServer {
 							query: req.body.query
 						}
 					});
-					user = await client.mdb.collections("users").findOne({id: req.body.user});
+					user = await client.bot.mdb.collections("users").findOne({id: req.body.user});
 					if(req.body.isWeekend) {
-						await client.mdb.collections("users").findOneAndUpdate({id: req.body.user},{$set:{bal: user.bal + 1000}});
+						await client.bot.mdb.collections("users").findOneAndUpdate({id: req.body.user},{$set:{bal: user.bal + 1000}});
 						data = {
 							title: "Thanks For Upvoting!",
 							description: `As a reward for upvoting on Discord Bots, you earned 1000 ${this.config.emojis.owo}\nWeekend Voting, Double ${this.config.emojis.owo}!`,
 							color: 65535
 						};
 					} else {
-						await client.mdb.collections("users").findOneAndUpdate({id: req.body.user},{$set:{bal: user.bal + 500}});
+						await client.bot.mdb.collections("users").findOneAndUpdate({id: req.body.user},{$set:{bal: user.bal + 500}});
 						data = {
 							title: "Thanks For Upvoting!",
 							description: `As a reward for upvoting on Discord Bots, you earned 500 ${this.config.emojis.owo}`,
 							color: 65535
 						};
 					}
-					embed = new client.Discord.MessageEmbed(data);
-					await client.users.get(req.body.user).send(embed);
+					embed = new client.bot.Discord.MessageEmbed(data);
+					await client.bot.users.get(req.body.user).send(embed);
 					break;
 
 				case "test":
-					client.trackEvent({
+					client.bot.trackEvent({
 						group: "WEBSERVER",
 						event: "upvote.dbl.test",
 						properties: {
@@ -278,12 +294,12 @@ class FurryBotServer {
 							query: req.body.query
 						}
 					});
-					client.logger.log(`Test DBL Vote: ${req.body}`);
+					client.bot.logger.log(`Test DBL Vote: ${req.body}`);
 					break;
 				}
 			})
 			.post("/dev/eval",checkAuth,async(req,res) => {
-				client.trackEvent({
+				client.bot.trackEvent({
 					group: "WEBSERVER",
 					event: "web.request.dev.eval",
 					properties: {
@@ -300,9 +316,9 @@ class FurryBotServer {
 				for(let b of  this.config.evalBlacklist) {
 					if(b.test(req.body.code)) return res.status(400).json({ success: false, message: "blacklisted code found"});
 				}
-				const start = client.performance.now(),
+				const start = client.bot.performance.now(),
 					result = await eval(req.body.code),
-					end = client.performance.now();
+					end = client.bot.performance.now();
 				return res.status(200).json({ success: true, result, time: (end-start).toFixed(3) });
 			});
 		if(![undefined,null,""].includes(this.cnf.ssl) && this.cnf.ssl === true) {
@@ -313,9 +329,9 @@ class FurryBotServer {
 			return this.https.createServer({
 				key: privateKey,
 				cert: certificate
-			}, this.server).listen(this.cnf.port,this.cnf.bindIp,(() => client.logger.log("webserver listening")));
+			}, this.server).listen(this.cnf.port,this.cnf.bindIp,(() => client.bot.logger.log("webserver listening")));
 		} else {
-			return this.server.listen(this.cnf.port,this.cnf.bindIp,(() => client.logger.log("webserver listening")));
+			return this.server.listen(this.cnf.port,this.cnf.bindIp,(() => client.bot.logger.log("webserver listening")));
 		}
 	}
 }

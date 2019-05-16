@@ -8,11 +8,15 @@ module.exports = {
 	cooldown: 1e3,
 	description: "Deposit money into your bank from your pocket",
 	usage: "<amount>",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: true,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let amount, u;
 		u = await this.mdb.collection("users").findOne({id: message.author.id});
 		try {

@@ -7,11 +7,15 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Play some music",
 	usage: "<search/link>",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let t, song, songs, pageCount, pageNumber, a, alreadyPlaying, player;
 		
 		if(!message.member.voice.channel) {

@@ -7,11 +7,15 @@ module.exports = {
 	cooldown: 0,
 	description: "Revoke your marriage..",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let member, m, u;
 		if(!message.uConfig.married) return message.channel.createMessage(`<@!${message.author.id}>, You have to marry someone before you can divorce them..`);
 		u = await this.bot.getRESTUser(message.uConfig.marriagePartner) || "Unknown#0000";

@@ -10,11 +10,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get the servers we've seen a user on",
 	usage: "[@user, or id]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let user, a, b, guilds, fields, embed, i;
 		if(message.args.length === 0 || !message.args) {
 			user = message.member;

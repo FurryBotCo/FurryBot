@@ -9,11 +9,15 @@ module.exports = {
 	cooldown: 1.5e3,
 	description: "Toggle your update notifications",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let role = this.bot.guilds.get(this.config.bot.mainGuild).roles.find(r => r.name.toLowerCase() === "announcement notified");
 		if(!role) return message.channel.createMessage(`<@!${message.author.id}>, Announcement Notified role was not found, please notify an admin.`);
 		if(message.member.roles.includes(role.id)) {

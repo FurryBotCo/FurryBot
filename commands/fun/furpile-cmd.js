@@ -9,11 +9,15 @@ module.exports = {
 	cooldown: 5e3,
 	description: "Start a furpile on someone, or join in!",
 	usage: "[@user]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.args.length === 0) {
 			if(message.channel.furpile !== undefined && message.channel.furpile.active) {
 				if(message.channel.furpile.inPile.includes(message.author.id) && !message.user.isDeveloper) return message.channel.createMessage(`<@!${message.author.id}>, you are already in this furpile!`);

@@ -10,11 +10,15 @@ module.exports = {
 	cooldown: 18e5,
 	description: "Get info on an ip address",
 	usage: "<IPv4/IPv6>",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
 		let req, embed;
 		//		if(this.config.apis.ipinfo.regex.ipv4.test(message.unparsedArgs.join(" ")) || this.config.apis.ipinfo.regex.ipv6.test(message.unparsedArgs.join(" "))) {

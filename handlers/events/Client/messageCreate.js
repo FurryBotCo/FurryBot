@@ -612,30 +612,33 @@ module.exports = (async function (message) {
 		this.logger.debug(`Command handler for "${command.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
 		if(c instanceof Error) throw c;
 	}catch(error){
-		if(error.message === "ERR_INVALID_USAGE") {
+		let cmd, num, code;
+		switch(error.message.toUpperCase()) {
+		case "ERR_INVALID_USAGE":
+			cmd = this.getCommand(message.command);
 			embed = {
 				title: ":x: Invalid Command Usage",
 				color: 15601937,
 				fields: [
 					{
 						name: "Command",
-						value: message.command,
+						value: message.command instanceof Array ? message.command.join(" ") : message.command,
 						inline: false
 					},{
 						name: "Usage",
-						value: `${message.gConfig.prefix}${message.command} ${command.usage}`,
+						value: `${message.gConfig.prefix}${message.command instanceof Array ? message.command.join(" ") : message.command} ${cmd.usage}`,
 						inline: false
 					},{
 						name: "Description",
-						value: command.description,
+						value: cmd.description,
 						inline: false
 					},{
 						name: "Category",
-						value: command.category.split(/(\\+|\/)/).reverse()[0] || "Unknown",
+						value: typeof cmd.category !== "undefined" && typeof cmd.category.name !== "undefined" ? this.ucwords(cmd.category.name) : "Unknown",
 						inline: false
 					},{
 						name: "Arguments Provided",
-						value: message.args.join(" ") || "NONE",
+						value: message.args.length !== 0 ? message.args.join(" ") : "NONE",
 						inline: false
 					}/*,{
 						name: "Documentation Link",
@@ -648,7 +651,7 @@ module.exports = (async function (message) {
 			this.trackEvent({
 				group: "COMMANDS",
 				userId: message.author.id,
-				event: `commands.${message.command}.invalidUsage`,
+				event: `commands.${message.command instanceof Array ? message.command.join(".") : message.command}.invalidUsage`,
 				properties: {
 					bot: {
 						version: this.config.bot.version,
@@ -682,15 +685,21 @@ module.exports = (async function (message) {
 			});
 			Object.assign(embed, message.embed_defaults("color"));
 			return message.channel.createMessage({ embed });
-		} else {
-			const num = this.random(10,"1234567890"),
-				code = `${message.command}.${this.config.beta ? "beta" : "stable"}.${num}`;
+			break; // eslint-disable-line no-unreachable
+		
+		case "HELP":
+			return this.sendCommandEmbed(message,message.command);
+			break; // eslint-disable-line no-unreachable
+
+		default:
+			num = this.random(10,"1234567890");
+			code = `${message.command instanceof Array ? message.command.join(".") : message.command}.${this.config.beta ? "beta" : "stable"}.${num}`;
 			this.logger.error(`[CommandHandler] e1: ${error.name}: ${error.message}\n${error.stack},\nError Code: ${code}`);
 
 			await this.mdb.collection("errors").insertOne({
 				id: code,
 				num,
-				command: message.command,
+				command: message.command instanceof Array ? message.command.join(".") : message.command,
 				error: {
 					name: error.name,
 					message: error.message,
@@ -731,7 +740,7 @@ module.exports = (async function (message) {
 				userId: message.author.id,
 				event: "client.errors",
 				properties: {
-					command: message.command,
+					command: message.command instanceof Array ? message.command.join(".") : message.command,
 					code,
 					num,
 					error: {
@@ -797,7 +806,7 @@ module.exports = (async function (message) {
 						},
 						{
 							name: "Command",
-							value: `Command: ${message.command}\n\
+							value: `Command: ${message.command instanceof Array ? message.command.join(" ") : message.command}\n\
 							Arguments: ${message.args.join(" ")}\n\
 							Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
 							Ran: ${message.content}`,
@@ -833,7 +842,7 @@ module.exports = (async function (message) {
 						},
 						{
 							name: "Command",
-							value: `Command: ${message.command}\n\
+							value: `Command: ${message.command instanceof Array ? message.command.join(" ") : message.command}\n\
 							Arguments: ${message.args.join(" ")}\n\
 							Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
 							Ran: ${message.content}`,

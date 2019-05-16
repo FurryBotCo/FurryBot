@@ -10,11 +10,15 @@ module.exports = {
 	cooldown: 3e3,
 	description: "*notices bulge* OwO",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: true,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let img, short, extra;
 		img = await this.imageAPIRequest(false,"bulge",true,false);
 		if(img.success !== true) {

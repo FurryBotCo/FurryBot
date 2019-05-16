@@ -12,11 +12,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get some info about the current server",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let textChCount = message.guild.channels.filter(c => c.type === 0).length,
 			voiceChCount = message.guild.channels.filter(c => c.type === 2).length,
 			categoryChCount = message.guild.channels.filter(c => c.type === 4).length,

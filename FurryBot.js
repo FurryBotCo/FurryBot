@@ -22,6 +22,7 @@ class FurryBot extends Base {
 			this.wsA = require("./util/WebSocket");
 		}
 		Object.assign(this,require("./util/functions"));
+		Object.assign(this.bot,require("./util/functions"));
 		this.AnalyticsWebSocket = require("./util/AnalyticsWebSocket");
 		this.analyticsSocket = new this.AnalyticsWebSocket(config.beta ? "furrybotbeta" : "furrybot","send");
 		this.MessageCollector = new MessageCollector(this.bot);
@@ -67,14 +68,14 @@ class FurryBot extends Base {
 		this.deasync = require("deasync");
 		this.logger = new this.Logger.FurryBotLogger();
 		
-		console.log = this.logger.log;
-		console.warn = this.logger.warn;
-		console.error = this.logger.error;
-		console.debug = this.logger.debug;
-		console.info = this.logger.info;
-		console._log = this.logger._log;
-		console._getCallerFile = this.logger._getCallerFile;
-		console._getDate = this.logger._getDate;
+		global.console.log = this.logger.log;
+		global.console.warn = this.logger.warn;
+		global.console.error = this.logger.error;
+		global.console.debug = this.logger.debug;
+		global.console.info = this.logger.info;
+		global.console._log = this.logger._log;
+		global.console._getCallerFile = this.logger._getCallerFile;
+		global.console._getDate = this.logger._getDate;
 	}
 
 	/**
@@ -91,7 +92,14 @@ class FurryBot extends Base {
 		Object.assign(this.bot,{
 			MongoClient: this.MongoClient,
 			mongo: this.mongo,
-			mdb: this.mdb
+			mdb: this.mdb,
+			getUserFromArgs: this.getUserFromArgs,
+			getMemberFromArgs: this.getMemberFromArgs,
+			getChannelFromArgs: this.getChannelFromArgs,
+			getRoleFromArgs: this.getRoleFromArgs,
+			getServerFromArgs: this.getServerFromArgs,
+			configureUser: this.configureUser,
+			errorEmbed: this.errorEmbed
 		});
 		require("./handlers/ready").call(this);
 		this.loadCommands();
@@ -122,7 +130,7 @@ class FurryBot extends Base {
 	loadCommands() {
 		this.commands = require("./commands");
 		this.responses = require("./responses");
-		this.categories = require("./commands");
+		this.categories = this.commands.map(c => ({ name: c.name, displayName: c.displayName, description: c.description, triggers: c.commands.map(cmd => cmd.triggers).reduce((a,b) => a.concat(b)) }));
 		this.commandList = this.commands.map(c => c.commands.map(cc => cc.triggers)).reduce((a,b) => a.concat(b)).reduce((a,b) => a.concat(b));
 		this.responseList = this.responses.map(r => r.triggers).reduce((a,b) => a.concat(b));
 		this.categoryList = this.categories.map(c => c.name);
@@ -155,15 +163,76 @@ class FurryBot extends Base {
 	}
 
 	getCommand(command) {
+		const client = this;
 		if(!command) return null;
-		let a = this.commands.map(c => c.commands).reduce((a,b) => a.concat(b)).filter(cc => cc.triggers.includes(command));
-		return a.length === 0 ? null : a[0];
+		let a;
+		let parents = [];
+		function walkCmd(c,ct) {
+			let b;
+			const d = c[0];
+			if(!ct) b = client.commands.map(c => c.commands).reduce((a,b) => a.concat(b)).find(cc => cc.triggers.includes(d));
+			else if(![undefined,null,""].includes(ct) && typeof ct.subCommands !== "undefined") b = ct.subCommands.find(cc => cc.triggers.includes(d));
+			else b = null;
+			if(!b) return null;
+			c.shift();
+			if(c.length > 0 && b.hasSubCommands) {
+				parents.push(b);
+				return walkCmd(c,b);
+			} else {
+				return Object.assign(b,{
+					parents
+				});
+			}
+		}
+		if(command instanceof Array) a = walkCmd([...command]);
+		else a = this.commands.map(c => c.commands).reduce((a,b) => a.concat(b)).find(cc => cc.triggers.includes(command));
+		if(![undefined,null,""].includes(a)) {
+			if(typeof a.parents !== "undefined" && a.parents.length > 0) a.category = this.categories.find(c => c.triggers.includes(a.parents[0].triggers[0]));
+			else a.category = this.categories.find(c => c.triggers.includes(a.triggers[0]));
+		}
+		return [undefined,null,""].includes(a) ? null : a;
 	}
 
 	getResponse(response) {
 		if(!response) return null;
 		let a = this.responses.filter(r => r.triggers.includes(response));
 		return a.length === 0 ? null : a[0];
+	}
+
+	/**
+	 * sends an embed listing commands to a channel
+	 * @async
+	 * @param {(Message|TextChannel)} msgOrCh - message or channel to send to
+	 * @param {String} cmd - command to list subcommands
+	 * @returns {Message} message that was sent to the
+	 */
+	sendCommandEmbed(msgOrCh,cmd) {
+		const {
+			Message,
+			TextChannel
+		} = require("eris");
+		if(!msgOrCh || !(msgOrCh instanceof Message || msgOrCh instanceof TextChannel)) throw new TypeError("invalid message or channel");
+		if(!cmd) throw new TypeError("missing command");
+		const l = this.getCommand(cmd);
+		if(!l) throw new Error("invalid command");
+		let embed;
+		if(l.hasSubCommands && l.subCommands.length > 0) {
+			embed = {
+				title: `Subcommand List: ${this.ucwords(l.triggers[0])}`,
+				description: l.subCommands.map(s => `\`${s.triggers[0]}\` - ${s.description}`).join("\n")
+			};
+		} else {
+			embed = {
+				title: `Command Help: ${this.ucwords(l.triggers[0])}`,
+				description: `Usage: ${l.usage}\nDescription: ${l.description}`
+			};
+		}
+		if(msgOrCh instanceof Message) {
+			Object.assign(embed,msgOrCh.embed_defaults());
+			return msgOrCh.channel.createMessage({ embed });
+		} else if(msgOrCh instanceof TextChannel) {
+			return msgOrCh.createMessage({ embed });
+		} else throw new Error("unknown error");
 	}
 
 	/**
@@ -268,6 +337,14 @@ class FurryBot extends Base {
 			},
 			guild: message.channel.guild,
 			/**
+			 * Reply to the author of the last message
+			 * @async
+			 * @param {msg} - message to reply to
+			 */
+			reply: async function(msg) {
+				return this.channel.createMessage(`<@!${this.author.id}>, ${msg}`);
+			},
+			/**
 			 * Get a user from message args
 			 * @async
 			 * @param {Number} [argPosition=0] arg position to look at
@@ -277,37 +354,7 @@ class FurryBot extends Base {
 			 * @returns {(User|Boolean)} user that was found, or false if none were found
 			 */
 			async getUserFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0) {
-				const {
-					User,
-					Member,
-					Message,
-					Guild
-				} = require("eris");
-				if(!(this instanceof Message)) throw new TypeError("invalid message");
-				let argObject, args;
-				argObject = unparsed ? "unparsedArgs" : "args"; 
-				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-				if(join) {
-					args = [this[argObject].join(" ")];
-					argPosition = 0;
-				} else {
-					args = this[argObject];
-				}
-				
-				// user mention
-				if(this.mentionMap.users.length >= mentionPosition+1) return this.mentionMap.users.slice(mentionPosition)[mentionPosition];
-				
-				// user ID
-				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.users.length >= mentionPosition+1)) return this._client.getRESTUser(args[argPosition]);
-				
-				// username
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.users.length >= mentionPosition+1)) return this._client.users.find(t => t.username.toLowerCase()===args[argPosition].toLowerCase());
-				
-				// user tag
-				if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.users.length >= mentionPosition+1)) return this._client.users.find(t => `${t.username}#${t.discriminator}`.toLowerCase() === args[argPosition].toLowerCase());
-		
-				// nothing found
-				return false;
+				return this._client.getUserFromArgs.call(this,...arguments);
 			},
 			/**
 			 * Get a member from message args
@@ -319,37 +366,7 @@ class FurryBot extends Base {
 			 * @returns {(Member|Boolean)} guild member that was found, or false if none were found
 			 */
 			async getMemberFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0) {
-				const {
-					User,
-					Member,
-					Message,
-					Guild
-				} = require("eris");
-				if(!(this instanceof Message)) throw new TypeError("invalid message");
-				let argObject, args;
-				argObject = unparsed ? "unparsedArgs" : "args"; 
-				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-				if(join) {
-					args = [this[argObject].join(" ")];
-					argPosition = 0;
-				} else {
-					args = this[argObject];
-				}
-				if(!this.guild || !(this.guild instanceof Guild)) throw new TypeError("invalid or missing guild on this");
-
-				// member mention
-				if(this.mentionMap.members.length >= mentionPosition+1) return this.mentionMap.members.slice(mentionPosition)[mentionPosition];
-				// user ID
-				if(![undefined,null,""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.get(args[argPosition]);
-				
-				// username
-				if(![undefined,null,""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.find(m => m.user.username.toLowerCase() === args[argPosition].toLowerCase());
-				
-				// user tag
-				if(![undefined,null,""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase());
-		
-				// nothing found
-				return false;
+				return this._client.getMemberFromArgs.call(this,...arguments);
 			},
 			/**
 			 * Get a channel from message args
@@ -361,35 +378,7 @@ class FurryBot extends Base {
 			 * @returns {(TextChannel|Boolean)} channel that was found, or false if none were found
 			 */
 			async getChannelFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0) {
-				const {
-					User,
-					Member,
-					Message,
-					Guild
-				} = require("eris");
-				if(!(this instanceof Message)) throw new TypeError("invalid message");
-				let argObject, args;
-				argObject = unparsed ? "unparsedArgs" : "args"; 
-				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-				if(join) {
-					args = [this[argObject].join(" ")];
-					argPosition = 0;
-				} else {
-					args = this[argObject];
-				}
-				if(!this.guild || !(this.guild instanceof Guild)) throw new TypeError("invalid or missing guild on this");
-				
-				// channel mention
-				if(this.mentionMap.channels.length >= mentionPosition+1) return this.mentionMap.channels.slice(mentionPosition)[mentionPosition];
-				
-				// channel ID
-				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition+1)) return this.guild.channels.get(args[argPosition]);
-				
-				// channel name
-				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition+1)) return this.guild.channels.find(c => c.name.toLowerCase()===args[argPosition].toLowerCase());
-		
-				// nothing found
-				return false;
+				return this._client.getChannelFromArgs.call(this,...arguments);
 			},
 			/**
 			 * Get a role from message args
@@ -401,35 +390,7 @@ class FurryBot extends Base {
 			 * @returns {(Role|Boolean)} role that was found, or false if none were found
 			 */
 			async getRoleFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0) {
-				const {
-					User,
-					Member,
-					Message,
-					Guild
-				} = require("eris");
-				if(!(this instanceof Message)) throw new TypeError("invalid message");
-				let argObject, args;
-				argObject = unparsed ? "unparsedArgs" : "args"; 
-				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-				if(join) {
-					args = [this[argObject].join(" ")];
-					argPosition = 0;
-				} else {
-					args = this[argObject];
-				}
-				if(!this.guild || !(this.guild instanceof Guild)) throw new TypeError("invalid or missing guild on this");
-		
-				// role mention
-				if(this.mentionMap.roles.length >= mentionPosition+1) return this.mentionMap.roles.slice(mentionPosition)[mentionPosition];
-				
-				// role ID
-				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.roles.length >= mentionPosition+1)) return this.guild.roles.get(args[argPosition]);
-				
-				// role name
-				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.roles.length >= mentionPosition+1)) return this.guild.roles.find(r => r.name.toLowerCase()===args[argPosition].toLowerCase());
-		
-				// nothing found
-				return false;
+				return this._client.getRoleFromArgs.call(this,...arguments);
 			},
 			/**
 			 * Get a server from message args
@@ -440,30 +401,7 @@ class FurryBot extends Base {
 			 * @returns {(Guild|Boolean)} guild that was found, or false if none were found
 			 */
 			async getServerFromArgs(argPosition = 0, unparsed = false, join = false) {
-				const {
-					User,
-					Member,
-					Message,
-					Guild
-				} = require("eris");
-				if(!(this instanceof Message)) throw new TypeError("invalid message");
-				let argObject, args;
-				argObject = unparsed ? "unparsedArgs" : "args"; 
-				if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-				if(join) {
-					args = [this[argObject].join(" ")];
-					argPosition = 0;
-				} else {
-					args = this[argObject];
-				}
-				// server id
-				if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this._client.guilds.get(args[argPosition]);
-		
-				// server name
-				if(isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this._client.guilds.find(g => g.name.toLowerCase()===args[argPosition].toLowerCase());
-		
-				// nothing found
-				return false;
+				return this._client.getServerFromArgs.call(this,...arguments);
 			},
 			/**
 			 * Configure user
@@ -472,20 +410,7 @@ class FurryBot extends Base {
 			 * @returns {Object} configured user properties
 			 */
 			async configureUser(user = null) {
-				const {
-						User,
-						Member,
-						Message,
-						Guild
-					} = require("eris"),
-					config = require("./config");
-				let member = ![undefined,null,""].includes(user) ? user instanceof User ? this.guild.members.get(user.id) : user instanceof this.client.Discord.GuildMember ? user : !isNaN(user) ? this.guild.members.get(user) : false : this.member;
-				if(!(member instanceof Member)) throw new Error("invalid member");
-				return {
-					isDeveloper: config.developers.includes(member.id),
-					isServerModerator: member.permissions.has("manageServer"),
-					isServerAdministrator: member.permissions.has("administrator")
-				};
+				return this._client.configureUser.call(this,...arguments);
 			},
 			/**
 			 * send an error embed to a channel
@@ -497,39 +422,8 @@ class FurryBot extends Base {
 			 * @param {Array} [fields=[]] fields for custom error embed
 			 * @returns {Message} message that was sent to channel
 			 */
-			async errorEmbed(type = "", custom = false, title = "", description = "", fields = []) {
-				if(!custom) {
-					switch(type.replace(/(\s|-)/g,"_").toUpperCase()) {
-					case "INVALID_USER":
-					case "INVALID_MEMBER":
-						title = "User Not Found",
-						description = "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag",
-						fields = [];
-						break;
-						
-					case "INVALID_ROLE":
-						title = "Role Not Found",
-						description = "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
-						fields = [];
-						break;
-		
-					case "INVALID_CHANNEL":
-						title = "Channel Not Found",
-						description = "The specified channel was not found, please provide one of the following:\nFULL channel ID, FULL channel name, or channel mention",
-						fields = [];
-						break;
-						
-					default:
-						title = "Default Title",
-						description = "Default Description",
-						fields = [];
-					}
-				}
-				return this.channel.createMessage({embed: (Object.assign({
-					title,
-					description,
-					fields
-				},this.embed_defaults()))});
+			async errorEmbed(type = "", custom = false, title = "", description = "", fields = [], color = this._client.randomColor()) {
+				return this._client.errorEmbed.call(this,...arguments);
 			}
 		});
 		return m;
@@ -689,6 +583,284 @@ class FurryBot extends Base {
 	}
 
 	/**
+	 * Get a user from message args
+	 * @async
+	 * @param {Number} [argPosition=0] arg position to look at
+	 * @param {Boolean} [unparsed=false] used parsed or unparsed args
+	 * @param {Boolean} [join=false] join together all args before running
+	 * @param {Number} [mentionPosition=0] which mention to look for
+	 * @returns {(User|Boolean)} user that was found, or false if none were found
+	 */
+	async getUserFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0) {
+		const {
+			User,
+			Member,
+			Message,
+			Guild
+		} = require("eris");
+		if(!(this instanceof Message)) throw new TypeError("invalid message");
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args"; 
+		if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if(join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+		
+		// user mention
+		if(this.mentionMap.users.length >= mentionPosition+1) return this.mentionMap.users.slice(mentionPosition)[mentionPosition];
+		
+		// user ID
+		if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.users.length >= mentionPosition+1)) return this._client.getRESTUser(args[argPosition]);
+		
+		// username
+		if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.users.length >= mentionPosition+1)) return this._client.users.find(t => t.username.toLowerCase()===args[argPosition].toLowerCase());
+		
+		// user tag
+		if(isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.users.length >= mentionPosition+1)) return this._client.users.find(t => `${t.username}#${t.discriminator}`.toLowerCase() === args[argPosition].toLowerCase());
+
+		// nothing found
+		return false;
+	}
+
+	/**
+	 * Get a member from message args
+	 * @async
+	 * @param {Number} [argPosition=0] arg position to look at
+	 * @param {Boolean} [unparsed=false] used parsed or unparsed args
+	 * @param {Boolean} [join=false] join together all args before running
+	 * @param {Number} [mentionPosition=0] which mention to look for
+	 * @returns {(Member|Boolean)} guild member that was found, or false if none were found
+	 */
+	async getMemberFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0) {
+		const {
+			User,
+			Member,
+			Message,
+			Guild
+		} = require("eris");
+		if(!(this instanceof Message)) throw new TypeError("invalid message");
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args"; 
+		if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if(join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+		if(!this.guild || !(this.guild instanceof Guild)) throw new TypeError("invalid or missing guild on this");
+
+		// member mention
+		if(this.mentionMap.members.length >= mentionPosition+1) return this.mentionMap.members.slice(mentionPosition)[mentionPosition];
+		// user ID
+		if(![undefined,null,""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.get(args[argPosition]);
+		
+		// username
+		if(![undefined,null,""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.find(m => m.user.username.toLowerCase() === args[argPosition].toLowerCase());
+		
+		// user tag
+		if(![undefined,null,""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition+1)) return this.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase());
+
+		// nothing found
+		return false;
+	}
+
+	/**
+	 * Get a channel from message args
+	 * @async
+	 * @param {Number} [argPosition=0] arg position to look at
+	 * @param {Boolean} [unparsed=false] used parsed or unparsed args
+	 * @param {Boolean} [join=false] join together all args before running
+	 * @param {Number} [mentionPosition=0] which mention to look for
+	 * @returns {(TextChannel|Boolean)} channel that was found, or false if none were found
+	 */
+	async getChannelFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0) {
+		const {
+			User,
+			Member,
+			Message,
+			Guild
+		} = require("eris");
+		if(!(this instanceof Message)) throw new TypeError("invalid message");
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args"; 
+		if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if(join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+		if(!this.guild || !(this.guild instanceof Guild)) throw new TypeError("invalid or missing guild on this");
+		
+		// channel mention
+		if(this.mentionMap.channels.length >= mentionPosition+1) return this.mentionMap.channels.slice(mentionPosition)[mentionPosition];
+		
+		// channel ID
+		if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition+1)) return this.guild.channels.get(args[argPosition]);
+		
+		// channel name
+		if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition+1)) return this.guild.channels.find(c => c.name.toLowerCase()===args[argPosition].toLowerCase());
+
+		// nothing found
+		return false;
+	}
+
+	/**
+	 * Get a role from message args
+	 * @async
+	 * @param {Number} [argPosition=0] arg position to look at
+	 * @param {Boolean} [unparsed=false] used parsed or unparsed args
+	 * @param {Boolean} [join=false] join together all args before running
+	 * @param {Number} [mentionPosition=0] which mention to look for
+	 * @returns {(Role|Boolean)} role that was found, or false if none were found
+	 */
+	async getRoleFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0) {
+		const {
+			User,
+			Member,
+			Message,
+			Guild
+		} = require("eris");
+		if(!(this instanceof Message)) throw new TypeError("invalid message");
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args"; 
+		if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if(join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+		if(!this.guild || !(this.guild instanceof Guild)) throw new TypeError("invalid or missing guild on this");
+
+		// role mention
+		if(this.mentionMap.roles.length >= mentionPosition+1) return this.mentionMap.roles.slice(mentionPosition)[mentionPosition];
+		
+		// role ID
+		if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.roles.length >= mentionPosition+1)) return this.guild.roles.get(args[argPosition]);
+		
+		// role name
+		if(isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.roles.length >= mentionPosition+1)) return this.guild.roles.find(r => r.name.toLowerCase()===args[argPosition].toLowerCase());
+
+		// nothing found
+		return false;
+	}
+
+	/**
+	 * Get a server from message args
+	 * @async
+	 * @param {Number} [argPosition=0] arg position to look at
+	 * @param {Boolean} [unparsed=false] used parsed or unparsed args
+	 * @param {Boolean} [join=false] join together all args before running
+	 * @returns {(Guild|Boolean)} guild that was found, or false if none were found
+	 */
+	async getServerFromArgs(argPosition = 0, unparsed = false, join = false) {
+		const {
+			User,
+			Member,
+			Message,
+			Guild
+		} = require("eris");
+		if(!(this instanceof Message)) throw new TypeError("invalid message");
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args"; 
+		if(!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if(join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+		// server id
+		if(!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this._client.guilds.get(args[argPosition]);
+
+		// server name
+		if(isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this._client.guilds.find(g => g.name.toLowerCase()===args[argPosition].toLowerCase());
+
+		// nothing found
+		return false;
+	}
+
+	/**
+	 * Configure user
+	 * @async
+	 * @param {(User|Member)} [user=null] the user to configure 
+	 * @returns {Object} configured user properties
+	 */
+	async configureUser(user = null) {
+		const {
+				User,
+				Member,
+				Message,
+				Guild
+			} = require("eris"),
+			config = require("./config");
+		let member = ![undefined,null,""].includes(user) ? user instanceof User ? this.guild.members.get(user.id) : user instanceof Member ? user : !isNaN(user) ? this.guild.members.get(user) : false : this.member;
+		if(!(member instanceof Member)) throw new Error("invalid member");
+		return {
+			isDeveloper: config.developers.includes(member.id),
+			isServerModerator: member.permissions.has("manageServer"),
+			isServerAdministrator: member.permissions.has("administrator")
+		};
+	}
+
+	/**
+		* send an error embed to a channel
+		* @async
+		* @param {String} [type=""] the type of embed to send
+		* @param {Boolean} [custom=false] use a custom error embed
+		* @param {String} [title=""] title for custom error embed
+		* @param {String} [description=""] description for custom error embed
+		* @param {Array} [fields=[]] fields for custom error embed
+		* @returns {Message} message that was sent to channel
+		*/
+	async errorEmbed(type = "", custom = false, title = "", description = "", fields = [], color = this.randomColor()) {
+		if(!custom) {
+			switch(type.replace(/(\s|-)/g,"_").toUpperCase()) {
+			case "INVALID_USER":
+			case "INVALID_MEMBER":
+				title = "User Not Found",
+				description = "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag",
+				fields = [];
+				break;
+				
+			case "INVALID_ROLE":
+				title = "Role Not Found",
+				description = "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
+				fields = [];
+				break;
+
+			case "INVALID_CHANNEL":
+				title = "Channel Not Found",
+				description = "The specified channel was not found, please provide one of the following:\nFULL channel ID, FULL channel name, or channel mention",
+				fields = [];
+				break;
+
+			case "INVALID_SERVER":
+				title = "Server Not Found",
+				description = "The specified server was not found, please provide a valid server id the bot is in.",
+				fields = [];
+				break;
+				
+			default:
+				title = "Default Title",
+				description = "Default Description",
+				fields = [];
+			}
+		}
+		return this.channel.createMessage({embed: (Object.assign({
+			title,
+			description,
+			fields,
+			color
+		},this.embed_defaults("color")))});
+	}
+
+	/**
 	 * download an image to the disk
 	 * @async
 	 * @param {URL} url - url of image to download
@@ -746,17 +918,17 @@ class FurryBot extends Base {
 	// code url link new linkNumber createdTimestamp created length
 
 	/**
- * @typedef ShortURL
- * @type {Object}
- * @property {String} code - short url code
- * @property {URL} url - shortened url
- * @property {URL} link - redirect link
- * @property {Boolean} new - wether a new entry was created
- * @property {Number} linkNumber - short url number
- * @property {Date} createdTimestamp - seconds sence january 1, 1970 at which the url was shortened
- * @property {Date} created - ISO date at which the url was shortened
- * @property {Number} length - length of the shortened url
- */
+	 * @typedef ShortURL
+	 * @type {Object}
+	 * @property {String} code - short url code
+	 * @property {URL} url - shortened url
+	 * @property {URL} link - redirect link
+	 * @property {Boolean} new - wether a new entry was created
+	 * @property {Number} linkNumber - short url number
+	 * @property {Date} createdTimestamp - seconds sence january 1, 1970 at which the url was shortened
+	 * @property {Date} created - ISO date at which the url was shortened
+	 * @property {Number} length - length of the shortened url
+	 */
 
 	/**
 	 * 

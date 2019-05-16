@@ -12,11 +12,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Remove bans for people that have been previously banned in your server",
 	usage: "<id> [reason]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let user, embed, reason;
 		// get member from message
 		if(isNaN(message.args[0])) return message.channel.createMessage("Please provide a user id.");

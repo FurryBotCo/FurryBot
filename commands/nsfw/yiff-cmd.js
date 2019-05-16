@@ -9,11 +9,15 @@ module.exports = {
 	cooldown: 3e3,
 	description: "Get some yiff!",
 	usage: "[gay/straight]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: true,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		
 		let extra, type, embed, short;
 		extra = "";

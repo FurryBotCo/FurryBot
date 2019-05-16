@@ -10,11 +10,15 @@ module.exports = {
 	cooldown: 3e3,
 	description: "Get a picture of a birb!",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let img = await this.imageAPIRequest(true, "birb");
 		try {
 			return message.channel.createMessage("",{

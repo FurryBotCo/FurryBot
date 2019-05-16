@@ -12,11 +12,15 @@ module.exports = {
 	cooldown: 5e3,
 	description: "List self assignable roles",
 	usage: "[page]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let roles, page, c, remove, rl, b, embed, n;
 		roles = await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.selfAssignableRoles);
 		page = message.args.length > 0 ? parseInt(message.args[0],10) : 1;

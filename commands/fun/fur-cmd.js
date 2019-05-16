@@ -9,11 +9,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get a random fur image! use `fur list	 to get a list of all supported types!",
 	usage: "[type]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		const types = [
 			"boop",
 			"cuddle",

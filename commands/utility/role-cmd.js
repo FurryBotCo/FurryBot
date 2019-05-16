@@ -11,11 +11,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Manage roles for a single user, or multiple!",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let data, embed, member, r, a, operation, l, role, count, role2, skipCount, members, counts, b, c;
 		if(message.args.length === 0 || message.args[0] === "help") {
 			embed = {

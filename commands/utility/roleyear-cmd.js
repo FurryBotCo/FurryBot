@@ -11,11 +11,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Assign roles based on join year.",
 	usage: "<year> <role>",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let data, embed;
 		if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
 		const year = parseInt(message.args[0],10),

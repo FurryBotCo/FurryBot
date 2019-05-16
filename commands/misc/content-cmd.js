@@ -7,11 +7,15 @@ module.exports = {
 	cooldown: 5e3,
 	description: "Get the content count for the image types",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		//return message.channel.createMessage("this has been temporarily disabled.");
 		let req, counts, txt, content;
 

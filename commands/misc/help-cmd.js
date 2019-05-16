@@ -11,11 +11,15 @@ module.exports = {
 	cooldown: .5e3,
 	description: "Get some help with the bot",
 	usage: "[command or category]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let command, embed, category;
 		if(!message.args[0]) {
 			//lnk = message.gConfig.prefix !== "f!" ? `${this.config.bot.documentationURL}prefix=${message.gConfig.prefix}` : this.config.bot.documentationURL;

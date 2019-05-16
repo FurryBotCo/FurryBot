@@ -11,11 +11,15 @@ module.exports = {
 	cooldown: .75e3,
 	description: "Toggle command deletion",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		switch(message.gConfig.deleteCommands) {
 		case true:
 			await this.mdb.collection("guilds").findOneAndUpdate({

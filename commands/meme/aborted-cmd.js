@@ -10,11 +10,15 @@ module.exports = {
 	cooldown: 5e3,
 	description: "Why someone should've been aborted",
 	usage: "[image]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let user, imgurl, m, req, j;
 		if(message.args.length >= 1) {
 			// get member from message

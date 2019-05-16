@@ -10,11 +10,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Check your own and the bots permissions",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let allow_user, deny_user, allow_bot, deny_bot, au, du, ab, db, embed, b;
 		b = message.channel.permissionsOf(this.bot.user.id);
 		allow_user = [],

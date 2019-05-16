@@ -16,11 +16,15 @@ module.exports = {
 	cooldown: 1e3,
 	description: "Create a text channel",
 	usage: "<name>",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		if(message.channel.guild.channels.size >= 500) return message.channel.createMessage(`<@!${message.author.id}>, This server has the maximum channels a server can have, please delete some before creating more.\n(voice, text, category, store, and news channels all count towards this.)`);
 		const name = message.args.join("\u2009\u2009");

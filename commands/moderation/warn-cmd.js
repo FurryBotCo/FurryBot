@@ -10,11 +10,15 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Warn a user for someting they've done",
 	usage: "<@member/id> <reason>",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let user, reason, w, u, embed, a;
 		if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
 		// get member from message

@@ -7,11 +7,15 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Pause whatever is playing",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let c;
 		if(!message.member.voice.channel) return message.channel.createMessage("You must be in a voice channel to use this.");
 		if(message.member.voice.channel.members.filter(m => m.id!==this.bot.user.id).size !== 1 && !this.config.developers.includes(message.author.id)) {

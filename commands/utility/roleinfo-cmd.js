@@ -8,11 +8,15 @@ module.exports = {
 	cooldown: 3e3,
 	description: "Get user or server roles",
 	usage: "[server/@member/@role/name/id]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let member, server, a, roles, fields, i, embed, allow, deny, role;
 		if(message.args.length === 0) member = message.member;
 		else if(message.args[0] === "server") server = message.channel.guild;

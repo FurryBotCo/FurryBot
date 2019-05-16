@@ -16,11 +16,15 @@ module.exports = {
 	cooldown: 1e3,
 	description: "Delete a role",
 	usage: "<name>",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		const role = message.getRoleFromArgs(0,false,true);
 		if(!role) return message.errorEmbed("INVALID_ROLE");

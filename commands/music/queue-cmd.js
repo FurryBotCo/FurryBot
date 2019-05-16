@@ -8,11 +8,15 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Get the current music queue",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let queue, ql, pages, page, fields, i, q, usr, addedBy, data, embed;
 		queue = await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue);
 		ql = this.chunk(queue,10);

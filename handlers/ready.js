@@ -51,7 +51,7 @@ module.exports = (async function() {
 
 	this.logger.log(`ready with ${this.bot.shards.size} shard${this.bot.shards.size>1?"s":""}!`);
 
-	this.srv = this.server.load(this.bot);
+	this.srv = this.server.load(this);
 	if(!this.config.beta) {
 		//const ls = this.listStats(this);
 		this.ls = setInterval(this.listStats,3e5,this);

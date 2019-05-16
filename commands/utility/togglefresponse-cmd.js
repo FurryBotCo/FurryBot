@@ -12,11 +12,15 @@ module.exports = {
 	cooldown: 3e3,
 	description: "Toggles the \"f\" and \"rip\" responses",
 	usage: "",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
     
 		switch(message.gConfig.fResponseEnabled) {
 		case true:

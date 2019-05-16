@@ -16,11 +16,15 @@ module.exports = {
 	cooldown: 1e3,
 	description: "Create a role",
 	usage: "<name>",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		if(message.channel.guild.roles.size >= 250) return message.channel.createMessage(`<@!${message.author.id}>, This server has the maximum roles a server can have, please delete some before creating more.\n(the roles bots create when they're invited to a server count towards this total)`);
 		const name = message.args.join(" ");

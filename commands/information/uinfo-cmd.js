@@ -11,11 +11,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get some info on a user",
 	usage: "[@member/id]",
+	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
+	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	run: (async function(message) {
+		const sub = await this.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		
 		let user, roles, data, req, x, ds, db, l, ll, rs, list, embed;
 		try {
@@ -27,7 +31,7 @@ module.exports = {
 			}
 		} catch(e) {
 			await message.channel.createMessage(`<@!${message.author.id}>, there was an unknown error while doing this.`);
-			return this.log.error(e);
+			return this.logger.error(e);
 		}
 
 		if(!user) return message.errorEmbed("INVALID_USER");
