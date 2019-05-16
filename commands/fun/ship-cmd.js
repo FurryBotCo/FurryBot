@@ -16,6 +16,7 @@ module.exports = {
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) { 
 		const sub = await this.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;

@@ -13,15 +13,16 @@ module.exports = {
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
 		const sub = await this.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		// extra check, to be safe
 		if (!this.config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer of this bot.`);
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
-		if(!this.commandList.includes(message.args[0])) return message.channel.createMessage("Invalid command");
-		let cmd = this.getCommand(message.args[0]),
-			newcmd = require(cmd.path),
+		let cmd = this.getCommand(message.args);
+		if(!cmd) return message.channel.createMessage("Invalid command");
+		let newcmd = require(cmd.path),
 			changes = [];
 		Reflect.ownKeys(cmd).forEach((key) => {
 			if(["path","category"].includes(key)) return;
