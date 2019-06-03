@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"modules"
@@ -7,11 +18,16 @@ module.exports = {
 	cooldown: 1e3,
 	description: "List the current statuses of modules in your server",
 	usage: "",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let embed;
 		embed = {
 			title: "Module Status",

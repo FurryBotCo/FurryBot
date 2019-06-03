@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"queue",
@@ -8,13 +19,18 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Get the current music queue",
 	usage: "",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let queue, ql, pages, page, fields, i, q, usr, addedBy, data, embed;
-		queue = await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue);
+		queue = await mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue);
 		ql = this.chunk(queue,10);
 		if(ql.length >= 1) {
 			pages = ql.length;

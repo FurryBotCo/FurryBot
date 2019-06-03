@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"spacify"
@@ -9,11 +20,16 @@ module.exports = {
 	cooldown: 3e3,
 	description: "Replaces dashes with 'spaces' in channel names.",
 	usage: "<channel>",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		const ch = await message.getChannelFromArgs();
 		if(!ch) return message.errorEmbed("INVALID_CHANNEL");

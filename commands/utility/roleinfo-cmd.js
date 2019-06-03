@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"roleinfo",
@@ -8,11 +19,20 @@ module.exports = {
 	cooldown: 3e3,
 	description: "Get user or server roles",
 	usage: "[server/@member/@role/name/id]",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		return message.reply("Temporarily disabled");
+		
+		/* eslint-disable no-unreachable */
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
+
 		let member, server, a, roles, fields, i, embed, allow, deny, role;
 		if(message.args.length === 0) member = message.member;
 		else if(message.args[0] === "server") server = message.channel.guild;
@@ -86,8 +106,8 @@ module.exports = {
 			// single role info
 			allow = [],
 			deny = [];
-			for(let p in this.config.Permissions) {
-				if(role.permissions.allow & this.config.permissions[p]) allow.push(p);
+			for(let p in config.Permissions) {
+				if(role.permissions.allow & config.permissions[p]) allow.push(p);
 				else deny.push(p);
 			}
 			embed = {
@@ -138,5 +158,7 @@ module.exports = {
 			Object.assign(embed, message.embed_defaults());
 			return message.channel.createMessage({ embed });
 		}
+
+		/* eslint-enable no-unreachable */
 	})
 };

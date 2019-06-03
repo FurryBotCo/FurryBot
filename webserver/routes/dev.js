@@ -1,7 +1,8 @@
 const express = require("express"),
 	app = express.Router(),
 	client = require("../../"),
-	{ checkAuth } = require("../functions");
+	{ checkAuth } = require("../functions"),
+	config = require("../../config");
 
 app.post("/dev/eval",checkAuth,async(req,res) => {
 	client.trackEvent({
@@ -18,7 +19,7 @@ app.post("/dev/eval",checkAuth,async(req,res) => {
 	});
 	console.log(req.body);
 	if(!req.body.code) return res.status(400).json({ success: false, message: "missing code" });
-	for(let b of  this.config.evalBlacklist) {
+	for(let b of  config.evalBlacklist) {
 		if(b.test(req.body.code)) return res.status(400).json({ success: false, message: "blacklisted code found"});
 	}
 	const start = client.performance.now(),

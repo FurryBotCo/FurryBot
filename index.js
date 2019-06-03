@@ -6,6 +6,8 @@ const { Master: Sharder } = require("eris-sharder"),
 	//mdb = mongo.db(config.db.main.database),
 	master = new Sharder(config.bot.token,"/FurryBot.js",config.bot.options);
 
+module.exports = master;
+
 master.on("stats", async(res) => {
 	//await mdb.collection("stats").findOneAndDelete({id: 1});
 	//await mdb.collection("stats").insertOne(Object.assign({id: 1}, res));

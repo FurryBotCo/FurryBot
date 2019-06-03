@@ -1,6 +1,17 @@
-// add: this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id}, {$push: {selfAssignableRoles: "role"}});
-// remove: this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{$pull: {selfAssignableRoles: "role"}})
-// get: this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.selfAssignableRoles);
+// add: mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id}, {$push: {selfAssignableRoles: "role"}});
+// remove: mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{$pull: {selfAssignableRoles: "role"}})
+// get: mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.selfAssignableRoles);
+
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
 
 module.exports = {
 	triggers: [
@@ -12,14 +23,19 @@ module.exports = {
 	cooldown: 5e3,
 	description: "Get a self assignable role",
 	usage: "<role>",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let roles, b, a, role;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
-		roles = await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.selfAssignableRoles).then(r => r.map(a => {
+		roles = await mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.selfAssignableRoles).then(r => r.map(a => {
 			b = message.channel.guild.roles.get(a);
 			if(!b) return {id: null,name: null};
 			return {name: b.name.toLowerCase(), id: a};

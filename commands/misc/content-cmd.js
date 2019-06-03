@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"content"
@@ -7,11 +18,16 @@ module.exports = {
 	cooldown: 5e3,
 	description: "Get the content count for the image types",
 	usage: "",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		//return message.channel.createMessage("this has been temporarily disabled.");
 		let req, counts, txt, content;
 

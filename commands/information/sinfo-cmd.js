@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"sinfo",
@@ -12,11 +23,16 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get some info about the current server",
 	usage: "",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let textChCount = message.guild.channels.filter(c => c.type === 0).length,
 			voiceChCount = message.guild.channels.filter(c => c.type === 2).length,
 			categoryChCount = message.guild.channels.filter(c => c.type === 4).length,
@@ -44,7 +60,7 @@ module.exports = {
 			"**VERY HIGH** - ┻━┻ミヽ(ಠ益ಠ)ﾉ彡┻━┻ - must have a verified phone number"
 		];
 		let s;
-		if(message.channel.guild.memberCount < 1000) s = await Promise.all(message.guild.members.filter(m => !m.user.bot).map((m) => this.mdb.collection("users").findOne({id: m.id}))).then(res => res.map(m => m === null ? this.config.default.userConfig : m).map(m => ({owoCount: m.owoCount === undefined ? 0 : m.owoCount,uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount})));
+		if(message.channel.guild.memberCount < 1000) s = await Promise.all(message.guild.members.filter(m => !m.user.bot).map((m) => mdb.collection("users").findOne({id: m.id}))).then(res => res.map(m => m === null ? config.default.userConfig : m).map(m => ({owoCount: m.owoCount === undefined ? 0 : m.owoCount,uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount})));
 		else s = false;
 		mfaLevel = [
 			"NONE",
@@ -76,10 +92,10 @@ module.exports = {
 				{
 					name: "Members",
 					value: `Total: ${message.guild.memberCount}\n\n\
-					${this.config.emojis.online}: ${message.guild.members.filter(m => m.status === "online").length}\n\
-					${this.config.emojis.idle}: ${message.guild.members.filter(m => m.status === "idle").length}\n\
-					${this.config.emojis.dnd}: ${message.guild.members.filter(m => m.status === "dnd").length}\n\
-					${this.config.emojis.offline}: ${message.guild.members.filter(m => m.status === "offline").length}\n\n\
+					${config.emojis.online}: ${message.guild.members.filter(m => m.status === "online").length}\n\
+					${config.emojis.idle}: ${message.guild.members.filter(m => m.status === "idle").length}\n\
+					${config.emojis.dnd}: ${message.guild.members.filter(m => m.status === "dnd").length}\n\
+					${config.emojis.offline}: ${message.guild.members.filter(m => m.status === "offline").length}\n\n\
 					Non Bots: ${message.channel.guild.members.filter(m => !m.bot).length}\n\
 					Bots: ${message.channel.guild.members.filter(m => m.bot).length}`,
 					inline: false

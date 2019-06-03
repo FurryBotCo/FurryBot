@@ -101,5 +101,59 @@ module.exports = {
 		return j;
 	}),
 	randomColor: (() => Math.floor(Math.random() * 0xFFFFFF)),
-	removeDuplicates: ((array) => [...new Set(array).values()])
+	removeDuplicates: ((array) => [...new Set(array).values()]),
+	processSub: (async(cmd,msg,ctx) => {
+		if(msg.args.length > 0 && cmd.hasSubCommands && cmd.subCommands.map(s => s.triggers).reduce((a,b) => a.concat(b)).includes(msg.args[0].toLowerCase())) {
+			const sub = msg.args.shift().toLowerCase();
+			msg.unparsedArgs.shift();
+			if(msg.command instanceof Array) msg.command.push(sub);
+			else msg.command = [msg.command,sub];
+			return cmd.subCommands.find(s => s.triggers.includes(sub)).run.call(ctx,msg);
+		} else return "NOSUB";
+	}),
+	subCmds: ((dir,file) => {
+		const fs = require("fs"),
+			d = file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0];
+		if(fs.existsSync(`${dir}/${d}`)) {
+			if(fs.existsSync(`${dir}/${d}/index.js`)) return require(`${dir}/${d}/index.js`);
+			else {
+				console.warn(`Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+				if(fs.existsSync(`${process.cwd()}/default/subcmdindex.js`)) fs.copyFileSync(`${process.cwd()}/default/subcmdindex.js`,`${dir}/${d}/index.js`);
+				if(fs.existsSync(`${dir}/${d}/index.js`)) {
+					console.debug("Auto copying worked, continuing as normal..");
+					return require(`${dir}/${d}/index.js`);
+				} else {
+					console.error(`Auto copying failed, please check that default/subcmdindex.js exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+				}
+				return [];
+			}
+		}
+		return null;
+	}),
+	hasSubCmds: ((dir,file) => require("fs").existsSync(`${dir}/${file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0]}`)),
+	_getCallerFile: (() => {
+		try {
+			var err = new Error();
+			var callerfile;
+			var currentfile;
+	
+			Error.prepareStackTrace = function (err, stack) { return stack; };
+	
+			currentfile = err.stack.shift().getFileName();
+	
+			while (err.stack.length) {
+				callerfile = err.stack.shift().getFileName();
+	
+				if(currentfile !== callerfile) return callerfile;
+			}
+		} catch (error) {}
+		return undefined;
+	}),
+	_getDate: (() => {
+		var date = new Date();
+		return `${date.getMonth()+1}-${date.getDate()}-${date.getFullYear()}`;
+	}),
+	getImageFromURL: (async(url) => require("util").promisify(require("request"))(url,{
+		encoding: null
+	}).then(res => res.body))
 };

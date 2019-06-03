@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"uinfo",
@@ -11,11 +22,16 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get some info on a user",
 	usage: "[@member/id]",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		
 		let user, roles, data, req, x, ds, db, l, ll, rs, list, embed;
 		try {
@@ -27,7 +43,7 @@ module.exports = {
 			}
 		} catch(e) {
 			await message.channel.createMessage(`<@!${message.author.id}>, there was an unknown error while doing this.`);
-			return this.log.error(e);
+			return this.logger.error(e);
 		}
 
 		if(!user) return message.errorEmbed("INVALID_USER");
@@ -79,7 +95,7 @@ module.exports = {
 				});
 			}
 			db = "Down until further notice";
-			l = await this.mdb.collection("users").findOne({id: user.id}).then(res => {
+			l = await mdb.collection("users").findOne({id: user.id}).then(res => {
 				if(!res.blacklisted) return false;
 				return {
 					blacklisted: res.blacklisted,

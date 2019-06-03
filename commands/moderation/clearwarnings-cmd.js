@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"clearwarnings",
@@ -10,18 +21,23 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Clear warnings for a user",
 	usage: "<@member/id>",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		let user, w, embed;
 		// get member from message
 		user = await message.getMemberFromArgs();
     
 		if(!user) return message.errorEmbed("INVALID_USER");
-		w = await this.mdb.collection("users").findOneAndUpdate({id: user.id},{$pull: {warnings: {gid: message.channel.guild.id}}});
+		w = await mdb.collection("users").findOneAndUpdate({id: user.id},{$pull: {warnings: {gid: message.channel.guild.id}}});
     
 		if(!w.ok) {
 			embed = {

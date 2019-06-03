@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"marry"
@@ -7,18 +18,23 @@ module.exports = {
 	cooldown: 0,
 	description: "Propose to someone!",
 	usage: "<@user>",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let member, m, u;
 		member = await message.getMemberFromArgs();
 		if(!member) return message.errorEmbed("INVALID_USER");
-		m = await this.mdb.collection("users").findOne({id: member.id});
+		m = await mdb.collection("users").findOne({id: member.id});
 		if(!m) {
-			await this.mdb.collection("users").insertOne(Object.assign({id: member.id},this.config.default.userConfig));
-			m = await this.mdb.collection("users").findOne({id: member.id});
+			await mdb.collection("users").insertOne(Object.assign({id: member.id},config.default.userConfig));
+			m = await mdb.collection("users").findOne({id: member.id});
 		}
 
 		if(message.uConfig.married) {
@@ -34,13 +50,13 @@ module.exports = {
 			const d = await this.MessageCollector.awaitMessage(message.channel.id, member.id, 6e4);
 			if(!d || !["yes","no"].some(c => d.content.toLowerCase() === c)) return message.channel.createMessage(`<@!${message.author.id}>, that wasn't a valid option..`);
 			if(d.content.toLowerCase() === "yes") {
-				await this.mdb.collection("users").findOneAndUpdate({id: message.author.id},{
+				await mdb.collection("users").findOneAndUpdate({id: message.author.id},{
 					$set: {
 						married: true,
 						marriagePartner: member.id
 					}
 				});
-				await this.mdb.collection("users").findOneAndUpdate({id: member.id},{
+				await mdb.collection("users").findOneAndUpdate({id: member.id},{
 					$set: {
 						married: true,
 						marriagePartner: message.author.id

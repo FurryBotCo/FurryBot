@@ -1,5 +1,37 @@
+const config = require("../../../config"),
+	Trello = require("trello"),
+	os = require("os"),
+	util = require("util"),
+	request = util.promisify(require("request")),
+	phin = require("phin").defaults({
+		method: "GET",
+		parse: "json",
+		headers: {
+			"User-Agent": config.web.userAgent
+		}
+	}),
+	uuid = require("uuid/v4"),
+	fs = require("fs"),
+	path = require("path"),
+	colors = require("console-colors-2"),
+	Canvas = require("canvas-constructor").Canvas,
+	fsn = require("fs-nextra"),
+	chalk = require("chalk"),
+	chunk = require("chunk"),
+	ytdl = require("ytdl-core"),
+	_ = require("lodash"),
+	perf = require("perf_hooks"),
+	performance = perf.performance,
+	PerformanceObserver = perf.PerformanceObserver,
+	child_process = require("child_process"),
+	shell = child_process.exec,
+	truncate = require("truncate"),
+	wordGen = require("random-words"),
+	deasync = require("deasync"),
+	{ MongoClient, mongo, mdb } = require("../../../modules/Database");
+	
 module.exports = (async function (message) {
-	if(!this.mdb || !message) return;
+	if(!mdb || !message) return;
 	
 	this.trackEvent({
 		group: "MESSAGE",
@@ -7,10 +39,10 @@ module.exports = (async function (message) {
 		event: "client.events.message",
 		properties: {
 			bot: {
-				version: this.config.bot.version,
-				beta: this.config.beta,
-				alpha: this.config.alpha,
-				server: require("os").hostname()
+				version: config.bot.version,
+				beta: config.beta,
+				alpha: config.alpha,
+				server: os.hostname()
 			}
 		}
 	});
@@ -24,35 +56,94 @@ module.exports = (async function (message) {
 		return;
 	}
 
-	if(message.author.bot || (this.config.devOnly && !this.config.developers.includes(message.author.id))) return;
+	if(message.author.bot || (config.devOnly && !config.developers.includes(message.author.id))) return;
 
 
 	if(message.channel.type === 1) {
-		this.trackEvent({
-			group: "DM",
-			userId: message.author.id,
-			event: "client.events.message.directMessage",
-			properties: {
-				bot: {
-					version: this.config.bot.version,
-					beta: this.config.beta,
-					alpha: this.config.alpha,
-					server: require("os").hostname()
-				},
-				author: {
-					id: message.author.id,
-					tag: message.author.tag
-				},
-				channelId: message.channel.id,
-				content: message.content
-			}
-		});
-		await message.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <${this.config.bot.websiteURL}> to see our website, use \`${this.config.defaultPrefix}help\` to see my commands, and join ${this.config.bot.supportInvite} if you need more help!`));
-		return this.logger.log(`Direct message recieved from ${message.author.username}#${message.author.discriminator}: ${message.content}`);
+
+		let dmAds;
+		// dm advertising to bot
+		if(/discord\.gg/gi.test(message.content.toLowerCase())) {
+			dmAds = true;
+			const c = await this.bot.getRESTGuild(config.bot.mainGuild);
+			await c.banMember(message.author.id,0,"Advertising in bots dms.");
+
+			embed = {
+				title: `DM Advertisment from ${message.author.username}#${message.author.discriminator} (${message.author.id})`,
+				description: "User auto banned.",
+				fields: [
+					{
+						name: "Content",
+						value: message.content,
+						inline: false
+					}
+				]
+			};
+
+			await this.bot.executeWebhook(config.webhooks.dm.id,config.webhooks.dm.token,{ embeds: [ embed ], username: `Direct Messages${config.beta ? " - Beta" : ""}` });
+			this.trackEvent({
+				group: "DM",
+				userId: message.author.id,
+				event: "client.events.message.directMessage",
+				properties: {
+					bot: {
+						version: config.bot.version,
+						beta: config.beta,
+						alpha: config.alpha,
+						server: os.hostname()
+					},
+					author: {
+						id: message.author.id,
+						tag: message.author.tag
+					},
+					channelId: message.channel.id,
+					content: message.content
+				}
+			});
+			await message.author.getDMChannel().then(dm => dm.createMessage("Hey, I see that you're sending dm advertisments dm me, that isn't a good idea.. You've been auto banned from my support server for dm advertising."));
+			return this.logger.log(`DM Advertisment recieved from ${message.author.username}#${message.author.discriminator}: ${message.content}`);
+		} else {
+			dmAds = false;
+			embed = {
+				title: `Direct Message from ${message.author.username}#${message.author.discriminator} (${message.author.id})`,
+				fields: [
+					{
+						name: "Content",
+						value: message.content,
+						inline: false
+					}
+				]
+			};
+
+			await this.bot.executeWebhook(config.webhooks.dm.id,config.webhooks.dm.token,{ embeds: [ embed ], username: `Direct Messages${config.beta ? " - Beta" : ""}` });
+			this.trackEvent({
+				group: "DM",
+				userId: message.author.id,
+				event: "client.events.message.directMessage",
+				properties: {
+					bot: {
+						version: config.bot.version,
+						beta: config.beta,
+						alpha: config.alpha,
+						server: os.hostname()
+					},
+					author: {
+						id: message.author.id,
+						tag: message.author.tag
+					},
+					channelId: message.channel.id,
+					content: message.content
+				}
+			});
+			await message.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <${config.bot.websiteURL}> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join ${config.bot.supportInvite} if you need more help!\nAnother tip: commands cannot be ran in my dms!`));
+			return this.logger.log(`Direct message recieved from ${message.author.username}#${message.author.discriminator}: ${message.content}`);
+		}
+
+		
 	}
 
 	if(message.content === `<@${this.bot.user.id}>` || message.content === `<@!${this.bot.user.id}>`) {
-		/*c = await require(`${process.cwd()}/commands/${this.config.commandList.fullList["help"].category}/help-cmd.js`)(message);
+		/*c = await require(`${process.cwd()}/commands/${config.commandList.fullList["help"].category}/help-cmd.js`)(message);
 		if(c instanceof Error) throw c;*/
 		embed = {
 			title: "Hewwo!",
@@ -83,10 +174,10 @@ module.exports = (async function (message) {
 				event: "random.owo",
 				properties: {
 					bot: {
-						version: this.config.bot.version,
-						beta: this.config.beta,
-						alpha: this.config.alpha,
-						server: require("os").hostname()
+						version: config.bot.version,
+						beta: config.beta,
+						alpha: config.alpha,
+						server: os.hostname()
 					},
 					author: {
 						id: message.author.id,
@@ -114,7 +205,7 @@ module.exports = (async function (message) {
 			});
 			this.logger.info(`Logged 1 owo from ${message.author.username}#${message.author.discriminator} (${message.author.id})`);
 			cn = message.uConfig.owoCount || 0;
-			return this.mdb.collection("users").findOneAndUpdate({
+			return mdb.collection("users").findOneAndUpdate({
 				id: message.author.id
 			},{
 				$set: {
@@ -130,10 +221,10 @@ module.exports = (async function (message) {
 				event: "random.uwu",
 				properties: {
 					bot: {
-						version: this.config.bot.version,
-						beta: this.config.beta,
-						alpha: this.config.alpha,
-						server: require("os").hostname()
+						version: config.bot.version,
+						beta: config.beta,
+						alpha: config.alpha,
+						server: os.hostname()
 					},
 					author: {
 						id: message.author.id,
@@ -161,7 +252,7 @@ module.exports = (async function (message) {
 			});
 			this.logger.info(`Logged 1 uwu from ${message.author.username}#${message.author.discriminator} (${message.author.id})`);
 			cn = message.uConfig.uwuCount || 0;
-			return this.mdb.collection("users").findOneAndUpdate({
+			return mdb.collection("users").findOneAndUpdate({
 				id: message.author.id
 			},{
 				$set: {
@@ -182,10 +273,10 @@ module.exports = (async function (message) {
 			event: `responses.${response.triggers[0]}`,
 			properties: {
 				bot: {
-					version: this.config.bot.version,
-					beta: this.config.beta,
-					alpha: this.config.alpha,
-					server: require("os").hostname()
+					version: config.bot.version,
+					beta: config.beta,
+					alpha: config.alpha,
+					server: os.hostname()
 				},
 				author: {
 					id: message.author.id,
@@ -211,9 +302,9 @@ module.exports = (async function (message) {
 				}
 			}
 		});
-		start = this.performance.now();
+		start = performance.now();
 		c = await response.run.call(this,message);
-		end = this.performance.now();
+		end = performance.now();
 		this.logger.debug(`Response handler for "${response.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
 		return;
 	}
@@ -223,21 +314,22 @@ module.exports = (async function (message) {
 	category = this.getCategory(message.command);
 
 
-	if(blacklist) {
-		g = await this.mdb.findOne({id: message.channel.guild.id}).then(res => res.blacklisted ? { blacklisted: true, reason: res.reason} : false);
+	// this code is from more than 5 months ago, and doesn't event work with the new database
+	/*if(blacklist) {
+		g = await mdb.findOne({id: message.channel.guild.id}).then(res => res.blacklisted ? { blacklisted: true, reason: res.reason} : false);
 		u = await this.db.isBlacklisted(message.author.id).then(res => res.blacklisted ? { blacklisted: true, reason: res.reason} : false);
 		blacklistType = g.blacklisted ? "guild" : u.blacklisted ? "user" : "unknown";
 		blReason = g.blacklisted ? g.reason : u.blacklisted ? u.reason : "unknown";
 		this.logger.info(`Skipped command "${command.triggers[0]}" with args "${message.unparsedArgs}" from ${message.author.tag} (${message.author.id}) in ${message.channel.guild.name} (${message.channel.guild.id}) because of ${blacklistType} blacklist, reason: ${blReason}`);
 		return;
-	}
+	}*/
 	if(!command || !category) return;
 
-	if(category.name.toLowerCase() === "custom" && message.channel.guild.id !== this.config.bot.mainGuild) return;
+	if(category.name.toLowerCase() === "custom" && message.channel.guild.id !== config.bot.mainGuild) return;
 	message.command = command.triggers[0];
 	try {
 		if(message.gConfig.deleteCommands) message.delete().catch(err => message.channel.createMessage(`Unable to delete command invocation:\n**${err}**`));
-		if(command.devOnly && !this.config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer.`);
+		if(command.devOnly && !config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer.`);
 		// user permission check
 		if(command.userPermissions.length > 0 && !message.user.isDeveloper) {
 			if(command.userPermissions.some(perm => !message.channel.permissionsOf(message.member.id).has(perm,true))) {
@@ -251,10 +343,10 @@ module.exports = (async function (message) {
 						type: "user",
 						neededPerms,
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
-							server: require("os").hostname()
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
+							server: os.hostname()
 						},
 						author: {
 							id: message.author.id,
@@ -302,10 +394,10 @@ module.exports = (async function (message) {
 						type: "bot",
 						neededPerms,
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
-							server: require("os").hostname()
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
+							server: os.hostname()
 						},
 						author: {
 							id: message.author.id,
@@ -348,10 +440,10 @@ module.exports = (async function (message) {
 					event: `commands.${message.command}.errors.channelNotNSFW`,
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
-							server: require("os").hostname()
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
+							server: os.hostname()
 						},
 						author: {
 							id: message.author.id,
@@ -392,10 +484,10 @@ module.exports = (async function (message) {
 					event: `commands.${message.command}.errors.nsfwNotEnabled`,
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
-							server: require("os").hostname()
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
+							server: os.hostname()
 						},
 						author: {
 							id: message.author.id,
@@ -430,8 +522,8 @@ module.exports = (async function (message) {
 				return message.channel.createMessage({ embed });
 			}
 			if(![undefined,null,""].includes(message.channel.topic)) {
-				if(this.config.yiff.disableStatements.some(t => message.channel.topic.indexOf(t) !== -1)) {
-					for(let key of this.config.yiff.disableStatements) {
+				if(config.yiff.disableStatements.some(t => message.channel.topic.indexOf(t) !== -1)) {
+					for(let key of config.yiff.disableStatements) {
 						if(message.channel.topic.indexOf(key) !== -1) st = key;
 					}
 					this.trackEvent({
@@ -440,10 +532,10 @@ module.exports = (async function (message) {
 						event: `commands.${message.command}.errors.channelDisabled`,
 						properties: {
 							bot: {
-								version: this.config.bot.version,
-								beta: this.config.beta,
-								alpha: this.config.alpha,
-								server: require("os").hostname()
+								version: config.bot.version,
+								beta: config.beta,
+								alpha: config.alpha,
+								server: os.hostname()
 							},
 							author: {
 								id: message.author.id,
@@ -487,10 +579,10 @@ module.exports = (async function (message) {
 				event: `commands.${message.command}.errors.guildOwnerOnly`,
 				properties: {
 					bot: {
-						version: this.config.bot.version,
-						beta: this.config.beta,
-						alpha: this.config.alpha,
-						server: require("os").hostname()
+						version: config.bot.version,
+						beta: config.beta,
+						alpha: config.alpha,
+						server: os.hostname()
 					},
 					author: {
 						id: message.author.id,
@@ -535,10 +627,10 @@ module.exports = (async function (message) {
 			event: `commands.${message.command}`,
 			properties: {
 				bot: {
-					version: this.config.bot.version,
-					beta: this.config.beta,
-					alpha: this.config.alpha,
-					server: require("os").hostname()
+					version: config.bot.version,
+					beta: config.beta,
+					alpha: config.alpha,
+					server: os.hostname()
 				},
 				author: {
 					id: message.author.id,
@@ -572,10 +664,10 @@ module.exports = (async function (message) {
 				event: `commands.${message.command}.errors.timeout`,
 				properties: {
 					bot: {
-						version: this.config.bot.version,
-						beta: this.config.beta,
-						alpha: this.config.alpha,
-						server: require("os").hostname()
+						version: config.bot.version,
+						beta: config.beta,
+						alpha: config.alpha,
+						server: os.hostname()
 					},
 					author: {
 						id: message.author.id,
@@ -601,45 +693,48 @@ module.exports = (async function (message) {
 					}
 				}
 			});
-			return message.channel.createMessage(`<@!${message.author.id}>, ${this.config.emojis.cooldown}\nPlease wait ${this.ms(command.cooldown)} before using this command again!`);
+			return message.channel.createMessage(`<@!${message.author.id}>, ${config.emojis.cooldown}\nPlease wait ${this.ms(command.cooldown)} before using this command again!`);
 		}
 		this.commandTimeout[command.triggers[0]].add(message.author.id);
 		setTimeout((cmd,user) => {this.commandTimeout[cmd].delete(user);}, command.cooldown,command.triggers[0],message.author.id);
 		this.logger.command(`Command  "${command.triggers[0]}" ran with arguments "${message.unparsedArgs.join(" ")}" by user ${message.author.username}#${message.author.discriminator} (${message.author.id}) in guild ${message.channel.guild.name} (${message.channel.guild.id})`);
-		start = this.performance.now();
+		start = performance.now();
 		c = await command.run.call(this,message);
-		end = this.performance.now();
+		end = performance.now();
 		this.logger.debug(`Command handler for "${command.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
 		if(c instanceof Error) throw c;
 	}catch(error){
-		if(error.message === "ERR_INVALID_USAGE") {
+		let cmd, num, code;
+		switch(error.message.toUpperCase()) {
+		case "ERR_INVALID_USAGE":
+			cmd = this.getCommand(message.command);
 			embed = {
 				title: ":x: Invalid Command Usage",
 				color: 15601937,
 				fields: [
 					{
 						name: "Command",
-						value: message.command,
+						value: message.command instanceof Array ? message.command.join(" ") : message.command,
 						inline: false
 					},{
 						name: "Usage",
-						value: `${message.gConfig.prefix}${message.command} ${command.usage}`,
+						value: `${message.gConfig.prefix}${message.command instanceof Array ? message.command.join(" ") : message.command} ${cmd.usage}`,
 						inline: false
 					},{
 						name: "Description",
-						value: command.description,
+						value: cmd.description,
 						inline: false
 					},{
 						name: "Category",
-						value: command.category.split(/(\\+|\/)/).reverse()[0] || "Unknown",
+						value: typeof cmd.category !== "undefined" && typeof cmd.category.name !== "undefined" ? this.ucwords(cmd.category.name) : "Unknown",
 						inline: false
 					},{
 						name: "Arguments Provided",
-						value: message.args.join(" ") || "NONE",
+						value: message.args.length !== 0 ? message.args.join(" ") : "NONE",
 						inline: false
 					}/*,{
 						name: "Documentation Link",
-						value: `${this.config.bot.documentationURL}#command/${command.triggers[0]}`,
+						value: `${config.bot.documentationURL}#command/${command.triggers[0]}`,
 						inline: false
 					}*/
 					// removed due to help being moved fully into bot commands
@@ -648,13 +743,13 @@ module.exports = (async function (message) {
 			this.trackEvent({
 				group: "COMMANDS",
 				userId: message.author.id,
-				event: `commands.${message.command}.invalidUsage`,
+				event: `commands.${message.command instanceof Array ? message.command.join(".") : message.command}.invalidUsage`,
 				properties: {
 					bot: {
-						version: this.config.bot.version,
-						beta: this.config.beta,
-						alpha: this.config.alpha,
-						server: require("os").hostname()
+						version: config.bot.version,
+						beta: config.beta,
+						alpha: config.alpha,
+						server: os.hostname()
 					},
 					author: {
 						id: message.author.id,
@@ -682,15 +777,21 @@ module.exports = (async function (message) {
 			});
 			Object.assign(embed, message.embed_defaults("color"));
 			return message.channel.createMessage({ embed });
-		} else {
-			const num = this.random(10,"1234567890"),
-				code = `${message.command}.${this.config.beta ? "beta" : "stable"}.${num}`;
+			break; // eslint-disable-line no-unreachable
+		
+		case "HELP":
+			return this.sendCommandEmbed(message,message.command);
+			break; // eslint-disable-line no-unreachable
+
+		default:
+			num = this.random(10,"1234567890");
+			code = `${message.command instanceof Array ? message.command.join(".") : message.command}.${config.beta ? "beta" : "stable"}.${num}`;
 			this.logger.error(`[CommandHandler] e1: ${error.name}: ${error.message}\n${error.stack},\nError Code: ${code}`);
 
-			await this.mdb.collection("errors").insertOne({
+			await mdb.collection("errors").insertOne({
 				id: code,
 				num,
-				command: message.command,
+				command: message.command instanceof Array ? message.command.join(".") : message.command,
 				error: {
 					name: error.name,
 					message: error.message,
@@ -698,10 +799,10 @@ module.exports = (async function (message) {
 				},
 				level: "e1",
 				bot: {
-					version: this.config.bot.version,
-					beta: this.config.beta,
-					alpha: this.config.alpha,
-					server: require("os").hostname()
+					version: config.bot.version,
+					beta: config.beta,
+					alpha: config.alpha,
+					server: os.hostname()
 				},
 				author: {
 					id: message.author.id,
@@ -731,7 +832,7 @@ module.exports = (async function (message) {
 				userId: message.author.id,
 				event: "client.errors",
 				properties: {
-					command: message.command,
+					command: message.command instanceof Array ? message.command.join(".") : message.command,
 					code,
 					num,
 					error: {
@@ -741,10 +842,10 @@ module.exports = (async function (message) {
 					},
 					level: "e1",
 					bot: {
-						version: this.config.bot.version,
-						beta: this.config.beta,
-						alpha: this.config.alpha,
-						server: require("os").hostname()
+						version: config.bot.version,
+						beta: config.beta,
+						alpha: config.alpha,
+						server: os.hostname()
 					},
 					author: {
 						id: message.author.id,
@@ -770,7 +871,7 @@ module.exports = (async function (message) {
 					}
 				}
 			});
-			if(!this.config.developers.includes(message.author.id)) {
+			if(!config.developers.includes(message.author.id)) {
 				const owner = message.channel.guild.members.get(message.channel.guild.ownerID);
 				embed = {
 					title: "Level One Command Handler Error",
@@ -797,7 +898,7 @@ module.exports = (async function (message) {
 						},
 						{
 							name: "Command",
-							value: `Command: ${message.command}\n\
+							value: `Command: ${message.command instanceof Array ? message.command.join(" ") : message.command}\n\
 							Arguments: ${message.args.join(" ")}\n\
 							Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
 							Ran: ${message.content}`,
@@ -812,8 +913,8 @@ module.exports = (async function (message) {
 						}
 					]
 				};
-				await this.bot.executeWebhook(this.config.webhooks.errors.id,this.config.webhooks.errors.token,{ embeds: [ embed ], username: `Error Reporter${this.config.beta ? " - Beta" : ""}` });
-				return message.channel.createMessage(`An internal error occured while doing this, tell the people in my support server ${this.config.bot.supportInvite}.\nError code: \`${code}\``);
+				await this.bot.executeWebhook(config.webhooks.errors.id,config.webhooks.errors.token,{ embeds: [ embed ], username: `Error Reporter${config.beta ? " - Beta" : ""}` });
+				return message.channel.createMessage(`An internal error occured while doing this, tell the people in my support server ${config.bot.supportInvite}.\nError code: \`${code}\``);
 			} else {
 				embed = {
 					title: "Level One Command Handler Error",
@@ -833,7 +934,7 @@ module.exports = (async function (message) {
 						},
 						{
 							name: "Command",
-							value: `Command: ${message.command}\n\
+							value: `Command: ${message.command instanceof Array ? message.command.join(" ") : message.command}\n\
 							Arguments: ${message.args.join(" ")}\n\
 							Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
 							Ran: ${message.content}`,

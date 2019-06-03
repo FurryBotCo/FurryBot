@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"ship"
@@ -10,11 +21,16 @@ module.exports = {
 	cooldown: 5e3,
 	description: "Ship some people!",
 	usage: "<@user1> [@user2]",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) { 
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		let user1, user2, rand1, rand2, r1, r2, shipname, t, amount, u1, u2, imgpath1, imgpath2, profile1, profile2, attch, data, embed;
 		if(message.args[0] === "random") {
@@ -96,15 +112,15 @@ module.exports = {
 			amount = t.length > 0 ? t[0].percent : Math.floor(Math.random()*101);
 			const heart = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "1" : amount >= 2 && amount <= 19 ? "2-19" : amount >= 20 && amount <= 39 ? "20-39" : amount >= 40 && amount <= 59 ? "40-59" : amount >= 60 && amount <= 79 ? "60-79" : amount >= 80 && amount <= 99 ? "80-99" : amount === 100 ? "100" : "unknown",
 				shiptext = [undefined,null,""].includes(amount) ? "unknown" : amount <= 1 ? "Not Happening.." : amount >= 2 && amount <= 19 ? "Unlikely.." : amount >= 20 && amount <= 39 ? "Maybe?" : amount >= 40 && amount <= 59 ? "Hopeful!" : amount >= 60 && amount <= 79 ? "Good!" : amount >= 80 && amount <= 99 ? "Amazing!" : amount === 100 ? "Epic!" : "unknown",
-				heartIcon = await this.fsn.readFile(`${this.config.rootDir}/assets/images/ship/ship-${heart}-percent.png`);
+				heartIcon = await this.fsn.readFile(`${config.rootDir}/assets/images/ship/ship-${heart}-percent.png`);
 			u1 = user1.avatarURL.split(".");
 			u1.pop();
-			imgpath1 = `${this.config.rootDir}/tmp/${message.channel.guild.id}-${message.channel.id}-${message.author.id}-ship-u1.png`;
+			imgpath1 = `${config.rootDir}/tmp/${message.channel.guild.id}-${message.channel.id}-${message.author.id}-ship-u1.png`;
 			await this.download(`${u1.join(".")}.png`,imgpath1);
 			profile1 = await this.fsn.readFile(imgpath1);
 			u2 = user2.avatarURL.split(".");
 			u2.pop();
-			imgpath2 = `${this.config.rootDir}/tmp/${message.channel.guild.id}-${message.channel.id}-${message.author.id}-ship-u2.png`;
+			imgpath2 = `${config.rootDir}/tmp/${message.channel.guild.id}-${message.channel.id}-${message.author.id}-ship-u2.png`;
 			await this.download(`${u2.join(".")}.png`,imgpath2);
 			profile2 = await this.fsn.readFile(imgpath2);
 			const img = new this.Canvas(384,128)

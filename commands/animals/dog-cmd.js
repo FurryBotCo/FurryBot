@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"dog",
@@ -11,30 +22,35 @@ module.exports = {
 	cooldown: 3e3,
 	description: "Get a picture of a doggo!",
 	usage: "",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let req, j, parts;
 		try {
 			req = await this.request("https://dog.ceo/api/breeds/image/random",{
 				method: "GET",
 				headers: {
-					"User-Agent": this.config.web.userAgent
+					"User-Agent": config.web.userAgent
 				}
 			});
 			j = JSON.parse(req.body);
 			parts = j.message.replace("https://","").split("/");
 			
 			return message.channel.createMessage(`Breed: ${parts[2]}`,{
-				file: await this.getImageFromURL(j.message),
+				file: await functions.getImageFromURL(j.message),
 				name: `${parts[2]}_${parts[3]}.png`
 			});
 		} catch(e) {
 			this.logger.error(e);
 			return message.channel.createMessage("unknown api error",{
-				file: await this.getImageFromURL(this.config.images.serverError),
+				file: await functions.getImageFromURL(config.images.serverError),
 				name: "error.png"
 			});
 		}

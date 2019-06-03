@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"prefix",
@@ -10,14 +21,19 @@ module.exports = {
 	cooldown: 3e3,
 	description: "Change the bots prefix for this guild (server)",
 	usage: "<new prefix>",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
 		if(message.args[0].length === 0 || message.args[0].length > 30) return message.channel.createMessage("Prefix must be between 1 and 30 characters.");
-		await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
+		await mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
 			$set: {
 				prefix: message.args[0].toLowerCase()
 			}

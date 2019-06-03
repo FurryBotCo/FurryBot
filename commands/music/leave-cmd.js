@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"leave"
@@ -7,11 +18,16 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Make the bot leave the current voice channel",
 	usage: "",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let c;
 		if(!message.member.voice.channel) return message.channel.createMessage("You must be in a voice channel to use this.");
 		if(message.member.voice.channel.members.filter(m => m.id!==this.bot.user.id).size !== 1) {

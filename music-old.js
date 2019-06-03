@@ -1,3 +1,5 @@
+const config = require("./config");
+
 class FurryBot {
 	constructor() {
 
@@ -15,12 +17,12 @@ class FurryBot {
 	 */
 	async getSong (str) {
 		throw new Error("not usable"); 
-		const res = await this.request(`http://${this.config.restnode.host}:${this.config.restnode.port}/loadtracks`,{
+		const res = await this.request(`http://${config.restnode.host}:${config.restnode.port}/loadtracks`,{
 			qs: {
 				identifier: str
 			},
 			headers: {
-				Authorization: this.config.restnode.password
+				Authorization: config.restnode.password
 			}
 		}).catch(err => {
 			this.logger.error(err);
@@ -46,10 +48,10 @@ class FurryBot {
 			if(!strSearch) reject(new Error("Missing parameters"));
 			switch(platform) {
 			case "youtube":
-				var res = await this.request(`http://${this.config.lavalink.host}:${this.config.lavalink.port}/loadtracks?identifier=ytsearch:${strSearch}`,{
+				var res = await this.request(`http://${config.lavalink.host}:${config.lavalink.port}/loadtracks?identifier=ytsearch:${strSearch}`,{
 					method: "GET",
 					headers: {
-						Authorization: this.config.lavalink.secret
+						Authorization: config.lavalink.secret
 					}
 				});
 				resolve(JSON.parse(res.body));

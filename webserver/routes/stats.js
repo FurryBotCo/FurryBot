@@ -1,6 +1,7 @@
 const express = require("express"),
 	app = express.Router(),
-	client = require("../../");
+	client = require("../../"),
+	config = require("../../config");
 
 app.get("/stats",async(req,res) => {
 	client.trackEvent({
@@ -8,9 +9,9 @@ app.get("/stats",async(req,res) => {
 		event: "web.request.stats",
 		properties: {
 			bot: {
-				version: client.config.bot.version,
-				beta: client.config.beta,
-				alpha: client.config.alpha,
+				version: config.bot.version,
+				beta: config.beta,
+				alpha: config.alpha,
 				server: client.os.hostname()
 			}
 		}
@@ -39,8 +40,8 @@ app.get("/stats",async(req,res) => {
 			}
 		},
 		largeGuildCount,
-		apiVersion: this.config.bot.apiVersion,
-		botVersion: this.config.bot.version,
+		apiVersion: config.bot.apiVersion,
+		botVersion: config.bot.version,
 		discordjsVersion: client.Discord.version,
 		nodeVersion: process.version,
 		dailyJoins,
@@ -54,9 +55,9 @@ app.get("/stats",async(req,res) => {
 		event: "web.request.stats.ping",
 		properties: {
 			bot: {
-				version: client.config.bot.version,
-				beta: client.config.beta,
-				alpha: client.config.alpha,
+				version: config.bot.version,
+				beta: config.beta,
+				alpha: config.alpha,
 				server: client.os.hostname()
 			}
 		}

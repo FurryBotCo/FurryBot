@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"fetchwarn",
@@ -10,11 +21,16 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Fetch a warning for a specific user",
 	usage: "<@member/id> <warning id>",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
 		let user, w, embed, usr, blame;
 		// get member from message
@@ -23,7 +39,7 @@ module.exports = {
 		if(!user) return message.errorEmbed("INVALID_USER");
 		if(isNaN(message.args[1])) return message.channel.createMessage(`<@!${message.author.id}>, Please provide a valid warning id as the second argument.`);
     
-		w = await this.mdb.collection("users").findOne({id: user.id}).then(res => res.warnings.filter(w => w.wid === parseInt(message.args[1],10) && w.gid === message.channel.guild.id)[0]);
+		w = await mdb.collection("users").findOne({id: user.id}).then(res => res.warnings.filter(w => w.wid === parseInt(message.args[1],10) && w.gid === message.channel.guild.id)[0]);
 		if(!w) {
 			embed = {
 				title: "Failure",

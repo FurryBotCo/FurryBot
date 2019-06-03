@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"unban",
@@ -12,11 +23,16 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Remove bans for people that have been previously banned in your server",
 	usage: "<id> [reason]",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let user, embed, reason;
 		// get member from message
 		if(isNaN(message.args[0])) return message.channel.createMessage("Please provide a user id.");

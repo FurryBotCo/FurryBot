@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"invite",
@@ -10,11 +21,16 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get some invite links for the bot",
 	usage: "",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
+	path: __filename,
 	run: (async function(message) {
+		const sub = await functions.processSub(module.exports,message,this);
+		if(sub !== "NOSUB") return sub;
 		let botPerms, perms, embed;
 		perms = [
 			"KICK_MEMBERS",          // 2
@@ -41,7 +57,7 @@ module.exports = {
 			"MANAGE_NICKNAMES",      // 134217728
 			"MANAGE_ROLES"          // 268435456
 		];
-		botPerms = perms.map(p => this.config.Permissions.constant[p]).reduce((a,b) => a + b);
+		botPerms = perms.map(p => config.Permissions.constant[p]).reduce((a,b) => a + b);
 		embed = {
 			"title": "Invites",
 			"fields": [
@@ -52,7 +68,7 @@ module.exports = {
 				},
 				{
 					name: "Discord Server",
-					value: this.config.bot.supportInvite,
+					value: config.bot.supportInvite,
 					inline: false
 				}
 			]
