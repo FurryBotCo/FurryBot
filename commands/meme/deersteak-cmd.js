@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"deersteak",
@@ -10,19 +21,19 @@ module.exports = {
 	cooldown: 5e3,
 	description: "this is an old meme of ours, carried down for months.",
 	usage: "[@user]",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: true,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		let image, profile, d, time, i;
 		image = await this.fsn.readFile(`${process.cwd()}/images/deersteak.png`);
-		await this.download(`https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png`,`${this.config.rootDir}/tmp/${message.author.id}.png`);
+		await this.download(`https://cdn.discordapp.com/avatars/${message.author.id}/${message.author.avatar}.png`,`${config.rootDir}/tmp/${message.author.id}.png`);
 		profile = await this.fsn.readFile(`${process.cwd()}/tmp/${message.author.id}.png`);
 		
 		d = new Date();

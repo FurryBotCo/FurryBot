@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"logevents"
@@ -9,22 +20,22 @@ module.exports = {
 	cooldown: 1e3,
 	description: "List the loggable events, and their current state",
 	usage: "",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		let l, updateFields, log, s, c, embed;
 		l = "";
-		const events = Object.keys(this.config.default.loggingConfig);
+		const events = Object.keys(config.default.loggingConfig);
 		for(let key of events) {
 			if(typeof message.gConfig.logging[key] === "undefined"){
-				await this.mdb.collection("guilds").findOneAndUpdate({
+				await mdb.collection("guilds").findOneAndUpdate({
 					id: message.channel.guild.id
 				},{
 					$set: {
@@ -43,7 +54,7 @@ module.exports = {
 		updateFields = {logging:{}};
 		for(let key in message.gConfig.logging) {
 			if(events.indexOf(key) === -1) {
-				await this.mdb.collection("guilds").findOneAndUpdate({
+				await mdb.collection("guilds").findOneAndUpdate({
 					id: message.channel.guild.id
 				},{
 					$unset: {

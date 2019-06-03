@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"bal",
@@ -11,20 +22,20 @@ module.exports = {
 	cooldown: 1e3,
 	description: "Check your economy balance",
 	usage: "",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: true,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		let embed, data, u;
-		u = await this.mdb.collection("users").findOne({id: message.author.id});
+		u = await mdb.collection("users").findOne({id: message.author.id});
 		if(!u.bal) {
-			await this.mdb.collection("users").findOneAndUpdate({id: message.author.id},{
+			await mdb.collection("users").findOneAndUpdate({id: message.author.id},{
 				$set: {
 					bal: 100
 				}
@@ -32,7 +43,7 @@ module.exports = {
 			u.bal = 100;
 		}
 		if(!u.bank) {
-			await this.mdb.collection("users").findOneAndUpdate({id: message.author.id},{
+			await mdb.collection("users").findOneAndUpdate({id: message.author.id},{
 				$set: {
 					bank: 0
 				}

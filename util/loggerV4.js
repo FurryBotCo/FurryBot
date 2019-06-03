@@ -20,8 +20,8 @@ class FurryBotLogger extends EventEmitter {
 		this.WebSocket = require("ws");
 		this.https = require("https");
 		this.server = new this.https.createServer({
-			cert: this.fs.readFileSync(`${this.config.rootDir}/ssl/ssl.crt`),
-			key: this.fs.readFileSync(`${this.config.rootDir}/ssl/ssl.key`)
+			cert: this.fs.readFileSync(`${config.rootDir}/ssl/ssl.crt`),
+			key: this.fs.readFileSync(`${config.rootDir}/ssl/ssl.key`)
 		});
 		this.wss = new this.WebSocket.Server({server:this.server});
 		this.wss.broadcast = ((data) => {
@@ -43,7 +43,7 @@ class FurryBotLogger extends EventEmitter {
 				var j = p.split("=");
 				url.params[j[0]]=j[1]||null;
 			});
-			if(!url.params.auth || url.params.auth !== this.config.universalKey) {
+			if(!url.params.auth || url.params.auth !== config.universalKey) {
 				if(this.wss.readyState === this.WebSocket.OPEN) {
 					socket.send(JSON.stringify({success:false,error:"Invalid Authentication"}));
 					socket.close();
@@ -52,9 +52,9 @@ class FurryBotLogger extends EventEmitter {
 			if(this.wss.readyState === this.WebSocket.OPEN) socket.send(JSON.stringify({success:true,message:"Connection Accepted, Authorization Valid",wsType:"EHELLO",type:"IDENTIFY"}));
 		});
 		this.on("log",async(args) => {
-			this.wss.broadcast(JSON.stringify({type:args.type||null,message:args.message||null,beta:this.config.beta,file:args.file||null,time:args.time||null,console:true}));
+			this.wss.broadcast(JSON.stringify({type:args.type||null,message:args.message||null,beta:config.beta,file:args.file||null,time:args.time||null,console:true}));
 		});
-		this.server.listen(this.config.serverOptions.wsPort,this.config.serverOptions.bindIp);
+		this.server.listen(config.serverOptions.wsPort,config.serverOptions.bindIp);
 		this.client = !client ? null : client;
 		//this.isSharded = this.client !== null ? ![undefined,null].includes(this.client.shard) ? true : false : false;
 		//this.shardID = this.isSharded ? this.client.shard.id : 0;
@@ -63,7 +63,7 @@ class FurryBotLogger extends EventEmitter {
 
 	async log(msg) {
 		var color = this.chalk.green,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("LOG"),
 			time  = this.chalk.blue.bold(new Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -75,7 +75,7 @@ class FurryBotLogger extends EventEmitter {
 
 	async warn(msg) {
 		var color = this.chalk.yellow,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("WARN"),
 			time  = this.chalk.blue.bold(new Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -87,7 +87,7 @@ class FurryBotLogger extends EventEmitter {
 
 	async error(msg) {
 		var color = this.chalk.red,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("ERROR"),
 			time  = this.chalk.blue.bold(new Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -99,7 +99,7 @@ class FurryBotLogger extends EventEmitter {
 
 	async debug(msg) {
 		var color = this.chalk.blue,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("DEBUG"),
 			time  = this.chalk.blue.bold(new Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -111,7 +111,7 @@ class FurryBotLogger extends EventEmitter {
 
 	async info(msg) {
 		var color = this.chalk.blue,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("INFO"),
 			time  = this.chalk.blue.bold(new Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -123,7 +123,7 @@ class FurryBotLogger extends EventEmitter {
 
 	async rethinkdb(msg) {
 		var color = this.chalk.blue,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("RETHINKDB"),
 			time  = this.chalk.blue.bold(new Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -139,7 +139,7 @@ class FurryBotLogger extends EventEmitter {
 
 	async command(msg) {
 		var color = this.chalk.green,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("COMMAND"),
 			time  = this.chalk.blue.bold(new Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -160,8 +160,8 @@ class FurryBotLogger extends EventEmitter {
 
 	async _log(msg) {
 		if(process.stdout.writable) process.stdout.write(msg);
-		await this.fsn.pathExists(`${this.config.rootDir}/logs`).then(async() => {
-			await this.fsn.appendFile(`${this.config.rootDir}/logs/${this._getDate()}.txt`,msg.replace(/\[\d(\d)?m/g,""));
+		await this.fsn.pathExists(`${config.rootDir}/logs`).then(async() => {
+			await this.fsn.appendFile(`${config.rootDir}/logs/${this._getDate()}.txt`,msg.replace(/\[\d(\d)?m/g,""));
 		}).catch(e => {
 			process.stdout.write(`Error logging to file: ${e}`);
 		});

@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"delwarn",
@@ -10,15 +21,15 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Delete a users warning",
 	usage: "<@member/id>",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		if(message.args.length < 2) return new Error("ERR_INVALID_USAGE");
 		let user, w, data, embed;
@@ -29,7 +40,7 @@ module.exports = {
     
 		if(isNaN(message.args[1])) return message.channel.createMessage(`<@!${message.author.id}>, Please provide a valid warning id as the second argument.`);
 	
-		w = await this.mdb.collection("users").findOneAndUpdate({id: user.id},{$pull: {warnings: {wid: message.args[1],gid: message.channel.guild.id}}});
+		w = await mdb.collection("users").findOneAndUpdate({id: user.id},{$pull: {warnings: {wid: message.args[1],gid: message.channel.guild.id}}});
 		if(!w.ok) {
 			embed = {
 				title: "Failure",

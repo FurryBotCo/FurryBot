@@ -1,3 +1,12 @@
+const {
+		config,
+		os,
+		fs,
+		functions,
+		Temp
+	} = require("../modules/CommandRequire"),
+	server = new (require("../server"))(config.serverOptions);
+	
 module.exports = (async function() {
 	this.logger.log(`Bot has started with ${this.bot.users.size} users in ${this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b)} channels of ${this.bot.guilds.size} guilds.`);
 	this.trackEvent({
@@ -8,33 +17,33 @@ module.exports = (async function() {
 			channelCount: this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b),
 			guildCount: this.bot.guilds.size,
 			bot: {
-				version: this.config.bot.version,
-				beta: this.config.beta,
-				alpha: this.config.alpha,
-				server: this.os.hostname()
+				version: config.bot.version,
+				beta: config.beta,
+				alpha: config.alpha,
+				server: os.hostname()
 			}
 		}
 	});
 
 	const statuses = [
 			{
-				status: "🐾 ${this.config.defaultPrefix}help for help! 🐾",
+				status: "?? ${config.defaultPrefix}help for help! ??",
 				type: 0 // playing
 			},
 			{
-				status: "🐾 ${this.config.defaultPrefix}help in ${this.bot.guilds.size} guilds! 🐾",
+				status: "?? ${config.defaultPrefix}help in ${this.bot.guilds.size} guilds! ??",
 				type: 0 // playing
 			},
 			{
-				status: "🐾 ${this.config.defaultPrefix}help with ${this.bot.users.size} users! 🐾",
+				status: "?? ${config.defaultPrefix}help with ${this.bot.users.size} users! ??",
 				type: 3 // watching
 			},
 			{
-				status: "🐾 ${this.config.defaultPrefix}help in ${this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b)} channels! 🐾",
+				status: "?? ${config.defaultPrefix}help in ${this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b)} channels! ??",
 				type: 2 // listening
 			}, 
 			{
-				status: "🐾 ${this.config.defaultPrefix}help with ${this.bot.shards.size} shard${this.bot.shards.size>1?\"s\":\"\"}! 🐾",
+				status: "?? ${config.defaultPrefix}help with ${this.bot.shards.size} shard${this.bot.shards.size>1?\"s\":\"\"}! ??",
 				type: 0 // playing
 			}
 		],
@@ -51,33 +60,35 @@ module.exports = (async function() {
 
 	this.logger.log(`ready with ${this.bot.shards.size} shard${this.bot.shards.size>1?"s":""}!`);
 
-	this.srv = this.server.load(this);
-	if(!this.config.beta) {
+	this.srv = server.load(this);
+	if(!config.beta) {
 		//const ls = this.listStats(this);
 		this.ls = setInterval(this.listStats,3e5,this);
 	}
 
-	setInterval(() => {
-		if(!this.fs.existsSync(`${this.config.rootDir}/tmp`)) {
-			this.fs.mkdirSync(`${this.config.rootDir}/tmp`);
-			this.fs.writeFileSync(`${this.config.rootDir}/tmp/placeholder`,"");
+	/*setInterval(() => {
+		if(!fs.existsSync(`${config.rootDir}/tmp`)) {
+			fs.mkdirSync(`${config.rootDir}/tmp`);
+			fs.writeFileSync(`${config.rootDir}/tmp/placeholder`,"");
 			this.logger.debug("Made temporary folder, and added placeholder file");
 		}
-		if(!this.fs.existsSync(`${this.config.rootDir}/tmp/placeholder`)) {
-			this.fs.writeFileSync(`${this.config.rootDir}/tmp/placeholder`,"");
+		if(!fs.existsSync(`${config.rootDir}/tmp/placeholder`)) {
+			fs.writeFileSync(`${config.rootDir}/tmp/placeholder`,"");
 			this.logger.debug("Recreated placeholder file in temporary directory");
 		}
-		this.fs.readdir(`${this.config.rootDir}/tmp`, (err, files) => {
+		fs.readdir(`${config.rootDir}/tmp`, (err, files) => {
 			if (err) this.logger.error(err);
 			for (let file of files) {
 				if(file === "placeholder") continue;
-				this.fs.unlink(this.path.join(`${this.config.rootDir}/tmp`, file), err => {
+				fs.unlink(this.path.join(`${config.rootDir}/tmp`, file), err => {
 					if (err) throw err;
 				});
 			}
 			this.logger.debug("Cleared Temporary Directory");
 		});
-	},3e5);
+	},1.8e+6);*/
+
+	this.Temp = Temp(`${config.rootDir}/tmp`);
 	this.logger.log("end of ready");
 
 	// redo daily counts posting sometime

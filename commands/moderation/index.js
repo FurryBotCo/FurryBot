@@ -1,5 +1,5 @@
 module.exports = {
-	commands: require("fs").readdirSync(__dirname).filter(c => c !== "index.js").map(c => {
+	commands: require("fs").readdirSync(__dirname).filter(c => c !== "index.js" && c.endsWith("js")).map(c => {
 		let a = require(`${__dirname}/${c}`);
 		Object.assign(a,{
 			path:`${__dirname}/${c}`,

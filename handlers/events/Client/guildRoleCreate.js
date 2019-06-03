@@ -1,3 +1,35 @@
+const config = require("../../../config"),
+	Trello = require("trello"),
+	os = require("os"),
+	util = require("util"),
+	request = util.promisify(require("request")),
+	phin = require("phin").defaults({
+		method: "GET",
+		parse: "json",
+		headers: {
+			"User-Agent": config.web.userAgent
+		}
+	}),
+	uuid = require("uuid/v4"),
+	fs = require("fs"),
+	path = require("path"),
+	colors = require("console-colors-2"),
+	Canvas = require("canvas-constructor").Canvas,
+	fsn = require("fs-nextra"),
+	chalk = require("chalk"),
+	chunk = require("chunk"),
+	ytdl = require("ytdl-core"),
+	_ = require("lodash"),
+	perf = require("perf_hooks"),
+	performance = perf.performance,
+	PerformanceObserver = perf.PerformanceObserver,
+	child_process = require("child_process"),
+	shell = child_process.exec,
+	truncate = require("truncate"),
+	wordGen = require("random-words"),
+	deasync = require("deasync"),
+	{ MongoClient, mongo, mdb } = require("../../../modules/Database");
+	
 module.exports = (async function(guild,role) {
 	this.trackEvent({
 		group: "EVENTS",
@@ -5,18 +37,18 @@ module.exports = (async function(guild,role) {
 		event: "client.events.roleCreate",
 		properties: {
 			bot: {
-				version: this.config.bot.version,
-				beta: this.config.beta,
-				alpha: this.config.alpha,
+				version: config.bot.version,
+				beta: config.beta,
+				alpha: config.alpha,
 				server: require("os").hostname()
 			}
 		}
 	});
-	if(!this || !this.mdb || !guild || !role) return;
-	const gConfig = await this.mdb.collection("guilds").findOne({id: guild.id}),
+	if(!this || !mdb || !guild || !role) return;
+	const gConfig = await mdb.collection("guilds").findOne({id: guild.id}),
 		ev = "rolecreate";
 	if(!gConfig) return;
-	if([undefined,null,""].includes(gConfig.logging[ev])) return this.mdb.collection("guilds").findOneAndUpdate({ id: guild.id },{
+	if([undefined,null,""].includes(gConfig.logging[ev])) return mdb.collection("guilds").findOneAndUpdate({ id: guild.id },{
 		$set: {
 			[`logging.${ev}`]: {
 				enabled: false,
@@ -26,7 +58,7 @@ module.exports = (async function(guild,role) {
 	});
 	if(!gConfig.logging[ev].enabled) return;
 	const ch = guild.channels.get(gConfig.logging[ev].channel);
-	if(!ch) return this.mdb.collection("guilds").findOneAndUpdate({ id: guild.id },{
+	if(!ch) return mdb.collection("guilds").findOneAndUpdate({ id: guild.id },{
 		$set: {
 			[`logging.${ev}`]: {
 				enabled: false,

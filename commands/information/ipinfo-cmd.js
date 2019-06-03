@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"ipinfo",
@@ -10,23 +21,23 @@ module.exports = {
 	cooldown: 18e5,
 	description: "Get info on an ip address",
 	usage: "<IPv4/IPv6>",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		if(message.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
 		let req, embed;
-		//		if(this.config.apis.ipinfo.regex.ipv4.test(message.unparsedArgs.join(" ")) || this.config.apis.ipinfo.regex.ipv6.test(message.unparsedArgs.join(" "))) {
+		//		if(config.apis.ipinfo.regex.ipv4.test(message.unparsedArgs.join(" ")) || config.apis.ipinfo.regex.ipv6.test(message.unparsedArgs.join(" "))) {
 		req = await this.request(`https://ipapi.co/${message.unparsedArgs.join(" ")}/json`,{
 			method: "GET",
 			headers: {
-				"User-Agent": this.config.web.userAgent
+				"User-Agent": config.web.userAgent
 			}
 		}).then(rq => JSON.parse(rq.body));
 		if(req.error || req.reserved) {

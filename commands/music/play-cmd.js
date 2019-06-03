@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"play"
@@ -7,15 +18,15 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Play some music",
 	usage: "<search/link>",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		let t, song, songs, pageCount, pageNumber, a, alreadyPlaying, player;
 		
@@ -84,19 +95,19 @@ module.exports = {
 				}
 			}
 			if(song.song.info.length > 6e5 && !message.gConfig.premium) {
-				message.channel.createMessage(`this is too long to be played! The maximum time for this guild is \`10 minutes (6000s)\`, to increase this limit please donate, and mark this server as premium **${this.config.bot.donationURL}**.`);
+				message.channel.createMessage(`this is too long to be played! The maximum time for this guild is \`10 minutes (6000s)\`, to increase this limit please donate, and mark this server as premium **${config.bot.donationURL}**.`);
 				
 			} 
 			a = this.voiceConnections.filter(g => g.channel.guild.id === message.channel.guild.id);
 			alreadyPlaying = a.size === 0 ? false : a.first().speaking.has("SPEAKING");
-			if(!alreadyPlaying) await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
+			if(!alreadyPlaying) await mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
 				$set: {
 					music: {
 						textChannel: message.channel.id
 					}
 				}
 			});
-			await this.mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
+			await mdb.collection("guilds").findOneAndUpdate({id: message.channel.guild.id},{
 				$push: {
 					music: {
 						queue: {
@@ -111,10 +122,10 @@ module.exports = {
 				}
 			});
 			if(!song.msg) {
-				if(alreadyPlaying) message.channel.createMessage(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue)).length}`);
+				if(alreadyPlaying) message.channel.createMessage(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue)).length}`);
 				else message.channel.createMessage(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
 			} else {
-				if(alreadyPlaying) message.channel.createMessage(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue)).length}`);
+				if(alreadyPlaying) message.channel.createMessage(`Added **${song.song.info.title}** by *${song.song.info.author}* (Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s) to the queue. Position: ${(await mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue)).length}`);
 				else song.msg.edit(`Now playing **${song.song.info.title}** by *${song.song.info.author}* - Length: ${Math.floor(song.song.info.length/1000/60)}m${song.song.info.length%60}s`);
 			}
 			if(!alreadyPlaying) {
@@ -122,7 +133,7 @@ module.exports = {
 			}
 		} else {
 			if(alreadyPlaying) {
-				message.channel.createMessage(`Added **${song.info.title}** by *${song.info.author}* (Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s) to the queue. Position: ${(await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue)).length}`);
+				message.channel.createMessage(`Added **${song.info.title}** by *${song.info.author}* (Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s) to the queue. Position: ${(await mdb.collection("guilds").findOne({id: message.channel.guild.id}).then(res => res.music.queue)).length}`);
 			} else {
 				message.channel.createMessage(`Now playing **${song.info.title}** by *${song.info.author}* - Length: ${Math.floor(song.info.length/1000/60)}m${song.info.length%60}s`);
 				player = await this.playSong(message.member.voice.channel,song.info,"youtube");

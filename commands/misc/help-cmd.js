@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"help",
@@ -11,27 +22,27 @@ module.exports = {
 	cooldown: .5e3,
 	description: "Get some help with the bot",
 	usage: "[command or category]",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		let command, embed, category;
 		if(!message.args[0]) {
-			//lnk = message.gConfig.prefix !== "f!" ? `${this.config.bot.documentationURL}prefix=${message.gConfig.prefix}` : this.config.bot.documentationURL;
-			//return message.channel.createMessage(`You can view our full command documentation here: ${lnk}\n\nMake sure to check the Trello board regularly: <${this.config.apis.trello.board}>\nYou can use **${message.gConfig.prefix}help <command>** to get help with a specific command.\nMake sure to check out our official Twitter account: ${this.config.bot.twitterURL}.\n\nJoin can join our support server here: ${this.config.bot.supportInvite}`);
+			//lnk = message.gConfig.prefix !== "f!" ? `${config.bot.documentationURL}prefix=${message.gConfig.prefix}` : config.bot.documentationURL;
+			//return message.channel.createMessage(`You can view our full command documentation here: ${lnk}\n\nMake sure to check the Trello board regularly: <${config.apis.trello.board}>\nYou can use **${message.gConfig.prefix}help <command>** to get help with a specific command.\nMake sure to check out our official Twitter account: ${config.bot.twitterURL}.\n\nJoin can join our support server here: ${config.bot.supportInvite}`);
 			const categories = this.commands.map(c => {
 				let j = Object.assign({},c);
 				j.commands = c.commands.map(cmd => cmd.triggers[0]);
 				return j;
 			});
 			categories.forEach((c) => {
-				if((c.name.toLowerCase() === "developer" && !this.config.developers.includes(message.author.id)) || (c.name.toLowerCase() === "custom" && message.channel.guild.id !== this.config.bot.mainGuild)) categories.splice(categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()),categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()));
+				if((c.name.toLowerCase() === "developer" && !config.developers.includes(message.author.id)) || (c.name.toLowerCase() === "custom" && message.channel.guild.id !== config.bot.mainGuild)) categories.splice(categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()),categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()));
 			});
 			embed = {
 				title: "Command Help",
@@ -74,7 +85,7 @@ module.exports = {
 					}
 				]
 			};
-			if(this.config.developers.includes(message.author.id)) embed.fields.push({
+			if(config.developers.includes(message.author.id)) embed.fields.push({
 				name: "Path (dev)",
 				value: command.path,
 				inline: false
@@ -95,7 +106,7 @@ module.exports = {
 					}
 				]
 			};
-			if(this.config.developers.includes(message.author.id)) embed.fields.push({
+			if(config.developers.includes(message.author.id)) embed.fields.push({
 				name: "Path (dev)",
 				value: category.path,
 				inline: false

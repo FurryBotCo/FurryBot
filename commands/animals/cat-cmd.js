@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"cat",
@@ -11,25 +22,25 @@ module.exports = {
 	cooldown: 3e3,
 	description: "Get a picture of a cat!",
 	usage: "",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		try {
 			return message.channel.createMessage("",{
-				file: await this.getImageFromURL("https://cataas.com/cat/gif"),
+				file: await functions.getImageFromURL("https://cataas.com/cat/gif"),
 				name: "cat.gif"
 			});
 		} catch(e) {
 			this.logger.error(e);
 			return message.channel.createMessage("unknown api error",{
-				file: await this.getImageFromURL(this.config.images.serverError),
+				file: await functions.getImageFromURL(config.images.serverError),
 				name: "error.png"
 			});
 		}

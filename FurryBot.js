@@ -1,7 +1,20 @@
-const { Base } = require("eris-sharder"),
-	config = require("./config"),
-	MessageCollector = require("./util/MessageCollector"),
-	Eris = require("eris");
+const {
+	config,
+	MessageCollector,
+	Eris,
+	ErisSharder: {
+		Base
+	},
+	phin,
+	util,
+	request,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	},
+	wordGen
+} = require("./modules/CommandRequire");
 
 /**
  * main client
@@ -16,56 +29,24 @@ class FurryBot extends Base {
 		super(bot);
 		this.fs = require("fs");
 		this.log = require("./util/LoggerV5");
-		this.MongoClient = require("mongodb").MongoClient;
-		this.config = config;
+		const AnalyticsWebSocket = require("./util/AnalyticsWebSocket"),
+			Trello = require("trello");
 		if(!config.beta && !config.alpha && !config.manualDevOnly && config.onMainServer) {
-			this.wsA = require("./util/WebSocket");
+			this.wsServer = require("./util/WebSocket");
 		}
-		Object.assign(this,require("./util/functions"));
-		Object.assign(this.bot,require("./util/functions"));
-		this.AnalyticsWebSocket = require("./util/AnalyticsWebSocket");
-		this.analyticsSocket = new this.AnalyticsWebSocket(config.beta ? "furrybotbeta" : "furrybot","send");
+		Object.assign(this,require("./util/functions"),require("./modules/Database"));
+		Object.assign(this.bot,require("./util/functions"),require("./modules/Database"));
+		this.analyticsSocket = new AnalyticsWebSocket(config.beta ? "furrybotbeta" : "furrybot","send");
 		this.MessageCollector = new MessageCollector(this.bot);
-		this.Trello = require("trello");
-		this.tclient = new this.Trello(config.apis.trello.apiKey,config.apis.trello.apiToken);
-		this.os = require("os");
-		this.util = require("util");
-		this.request = this.util.promisify(require("request"));
-		this.phin = require("phin").defaults({
-			method: "GET",
-			parse: "json",
-			headers: {
-				"User-Agent": this.config.web.userAgent
-			}
-		});
-		this.uuid = require("uuid/v4");
+		this.tclient = new Trello(config.apis.trello.apiKey,config.apis.trello.apiToken);
 		this.listStats = require("./util/ListStats");
-		this.fs = require("fs");
-		this.MongoClient = require("mongodb").MongoClient,
 		this.Logger = require("./util/LoggerV5");
 		this.log = this.Logger.log;
 		this.varParse = require("./util/varHandler");
 		this.lang = require("./lang")(this);
-		this.path = require("path");
-		this.colors = require("console-colors-2");
-		this.Canvas = require("canvas-constructor").Canvas,
-		this.fsn = require("fs-nextra");
-		this.chalk = require("chalk");
-		this.chunk = require("chunk");
-		this.ytdl = require("ytdl-core");
-		this.furpile = {},
-		this.server = new (require("./server"))(config.serverOptions);
+		this.furpile = {};
 		this.yiffNoticeViewed = new Set();
-		this._ = require("lodash");
-		this.perf = require("perf_hooks");
-		this.performance = this.perf.performance;
-		this.PerformanceObserver = this.perf.PerformanceObserver;
-		this.child_process = require("child_process"),
-		this.shell = this.child_process.exec;
-		this.truncate = require("truncate");
-		this.wordGen = require("random-words");
 		this.Eris = Eris;
-		this.deasync = require("deasync");
 		this.logger = new this.Logger.FurryBotLogger();
 		
 		global.console.log = this.logger.log;
@@ -74,8 +55,6 @@ class FurryBot extends Base {
 		global.console.debug = this.logger.debug;
 		global.console.info = this.logger.info;
 		global.console._log = this.logger._log;
-		global.console._getCallerFile = this.logger._getCallerFile;
-		global.console._getDate = this.logger._getDate;
 	}
 
 	/**
@@ -87,12 +66,13 @@ class FurryBot extends Base {
 		this.bot.logger = this.logger;
 		this.bot.log = this.log;
 		this.bot.memory = this.memory;
-		this.mongo = await this.MongoClient.connect(`mongodb://${this.config.db.main.host}:${this.config.db.main.port}/${this.config.db.main.database}`,this.config.db.main.opt);
-		this.mdb = this.mongo.db(this.config.db.main.database);
+		//this.mongo = await this.MongoClient.connect(`mongodb://${config.db.main.host}:${config.db.main.port}/${config.db.main.database}`,config.db.main.opt);
+		//mdb = this.mongo.db(config.db.main.database);
+		this.mdb = mdb;
 		Object.assign(this.bot,{
-			MongoClient: this.MongoClient,
-			mongo: this.mongo,
-			mdb: this.mdb,
+			//MongoClient: this.MongoClient,
+			//mongo: this.mongo,
+			//mdb: mdb,
 			getUserFromArgs: this.getUserFromArgs,
 			getMemberFromArgs: this.getMemberFromArgs,
 			getChannelFromArgs: this.getChannelFromArgs,
@@ -115,9 +95,9 @@ class FurryBot extends Base {
 				event: `events.${eventName}.load`,
 				properties: {
 					bot: {
-						version: this.config.bot.version,
-						beta: this.config.beta,
-						alpha: this.config.alpha,
+						version: config.bot.version,
+						beta: config.beta,
+						alpha: config.alpha,
 						server: this.os.hostname()
 					}
 				}
@@ -219,7 +199,7 @@ class FurryBot extends Base {
 		if(l.hasSubCommands && l.subCommands.length > 0) {
 			embed = {
 				title: `Subcommand List: ${this.ucwords(l.triggers[0])}`,
-				description: l.subCommands.map(s => `\`${s.triggers[0]}\` - ${s.description}`).join("\n")
+				description: `\`command\` (\`alias\`) - description\n\n${l.subCommands.map(s => s.triggers.length > 1 ? `\`${s.triggers[0]}\` (\`${s.triggers[1]}\`) - ${s.description}` : `\`${s.triggers[0]}\` - ${s.description}`).join("\n")}`
 			};
 		} else {
 			embed = {
@@ -266,7 +246,7 @@ class FurryBot extends Base {
 			let def;
 			def = {
 				footer: {
-					text: `Shard ${![undefined,null].includes(message.channel.guild.shard) ? `${+message.channel.guild.shard.id+1}/${this.bot.options.maxShards}`: "1/1"} | Bot Version ${this.config.bot.version}`
+					text: `Shard ${![undefined,null].includes(message.channel.guild.shard) ? `${+message.channel.guild.shard.id+1}/${this.bot.options.maxShards}`: "1/1"} | Bot Version ${config.bot.version}`
 				},
 				author: {
 					name: `${message.author.username}#${message.author.discriminator}`,
@@ -288,7 +268,7 @@ class FurryBot extends Base {
 			let def;
 			def = {
 				footer: {
-					text: `Shard ${![undefined,null].includes(message.channel.guild.shard) ? `${+message.channel.guild.shard.id+1}/${this.bot.options.maxShards}`: "1/1"} | Bot Version ${this.config.bot.version}`
+					text: `Shard ${![undefined,null].includes(message.channel.guild.shard) ? `${+message.channel.guild.shard.id+1}/${this.bot.options.maxShards}`: "1/1"} | Bot Version ${config.bot.version}`
 				},
 				color: this.randomColor(),
 				timestamp: this.getCurrentTimestamp()
@@ -298,19 +278,19 @@ class FurryBot extends Base {
 			});
 			return def;
 		});
-		m.gConfig = await this.mdb.collection("guilds").findOne({id: message.channel.guild.id});
+		m.gConfig = await mdb.collection("guilds").findOne({id: message.channel.guild.id});
 		if(!m.gConfig) {
-			await this.mdb.collection("guilds").insertOne(Object.assign({id: message.channel.guild.id},this.config.default.guildConfig));
+			await mdb.collection("guilds").insertOne(Object.assign({id: message.channel.guild.id},config.default.guildConfig));
 			this.logger.debug(`Created Guild Entry "${message.channel.guild.id}"`);
-			m.gConfig = this.config.default.guildConfig;
+			m.gConfig = config.default.guildConfig;
 		}
-		m.uConfig = await this.mdb.collection("users").findOne({id: message.author.id});
+		m.uConfig = await mdb.collection("users").findOne({id: message.author.id});
 		if(!m.uConfig) {
-			await this.mdb.collection("users").insertOne(Object.assign({id: message.author.id},this.config.default.userConfig));
+			await mdb.collection("users").insertOne(Object.assign({id: message.author.id},config.default.userConfig));
 			this.logger.debug(`Created user "${message.author.id}"`);
-			m.uConfig = this.config.default.userConfig;
+			m.uConfig = config.default.userConfig;
 		}
-		m.prefix = message.content.startsWith(`<@${this.bot.user.id}>`) ? `<@${this.bot.user.id}` : message.content.startsWith(`<@!${this.bot.user.id}>`) ? `<@!${this.bot.user.id}>` : this.config.beta || this.config.alpha ? this.config.defaultPrefix : m.gConfig.prefix.toLowerCase();
+		m.prefix = message.content.startsWith(`<@${this.bot.user.id}>`) ? `<@${this.bot.user.id}` : message.content.startsWith(`<@!${this.bot.user.id}>`) ? `<@!${this.bot.user.id}>` : config.beta || config.alpha ? config.defaultPrefix : m.gConfig.prefix.toLowerCase();
 		try {
 			m.args = message.content.replace(new RegExp(m.prefix,"i"),"").trim().match(/[^\s"]+|"[^"]+"/g).map(s => s.replace(/\"/g,"")); // eslint-disable-line no-useless-escape
 		} catch(e) {
@@ -325,7 +305,7 @@ class FurryBot extends Base {
 		m.unparsedArgs.shift();
 		m.command = m.args.shift().toLowerCase();
 		m.user = {
-			isDeveloper: this.config.developers.includes(message.author.id)
+			isDeveloper: config.developers.includes(message.author.id)
 		};
 
 		Object.assign(m,{
@@ -436,7 +416,7 @@ class FurryBot extends Base {
 	 * @returns {Buffer} - image buffer
 	 */
 	async getImageFromURL(imageURL) {
-		return require("util").promisify(require("request"))(imageURL,{
+		return request(imageURL,{
 			encoding: null
 		}).then(res => res.body);
 	}
@@ -570,14 +550,21 @@ class FurryBot extends Base {
 	 */
 	async imageAPIRequest (animal = true,category = null,json = true, safe = false) {
 		return new Promise(async(resolve, reject) => {
-			let s, j;
+			let s;
 			if([undefined,null,""].includes(json)) json = true;
-			s = await this.request(`https://api.furry.bot/${animal ? "animals" : `furry/${safe?"sfw":"nsfw"}`}/${category?category.toLowerCase():safe?"hug":"bulge"}${json?"":"/image"}`.replace(/\s/g,""));
+			
 			try {
-				j = JSON.parse(s.body);
-				resolve(j);
+				s = await phin({
+					method: "GET",
+					url: `https://api.furry.bot/${animal ? "animals" : `furry/${safe?"sfw":"nsfw"}`}/${category?category.toLowerCase():safe?"hug":"bulge"}${json?"":"/image"}`.replace(/\s/g,""),
+					parse: "json"
+				});
+				resolve(s.body);
 			} catch(error) {
-				reject({error:error,response:s.body});
+				reject({
+					error,
+					response: s.body
+				});
 			}
 		});
 	}
@@ -907,7 +894,7 @@ class FurryBot extends Base {
 	 * @returns {String} - randomly generated string 
 	 */
 	random (len=10,keyset="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") {
-		if(len > 500 && !this[this.config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
+		if(len > 500 && !this[config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
 		let rand = "";
 		for (var i = 0; i < len; i++)
 			rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
@@ -936,26 +923,45 @@ class FurryBot extends Base {
 	 * @returns {ShortURL}
 	 */
 	async shortenUrl(url) {
-		this.mdb.listCollections().toArray().then(res => res.map(c => c.name)).then(async(list) => {
+		mdb.listCollections().toArray().then(res => res.map(c => c.name)).then(async(list) => {
 			if(!list.includes("shorturl")) {
-				await this.mdb.createCollection("shorturl");
+				await mdb.createCollection("shorturl");
 				this.logger.log("[ShortURL]: Created Short URL table");
 			}
 		});
 		const create = (async(url) => {
-			const rand = this.random(this.config.shortLength),
+			const rand = this.random(config.shortLength),
 				createdTimestamp = Date.now(),
 				created = new Date().toISOString(),
-				count = await this.mdb.collection("shorturl").stats().then(res => res.count),
-				a = await this.mdb.collection("shorturl").insertOne({id:rand,url,linkNumber:count+1,createdTimestamp,created,length:url.length,link:`https://furry.services/r/${rand}`});
+				count = await mdb.collection("shorturl").stats().then(res => res.count),
+				a = await mdb.collection("shorturl").insertOne({
+					nsfw: url.indexOf("nsfw") !== -1,
+					id: rand,
+					url,
+					linkNumber: count + 1,
+					createdTimestamp,
+					created,
+					length: url.length,
+					link: `https://furry.services/r/${rand}`
+				});
 			if(a.errors === 1) {
 				return create(url);
 			} else {
-				return {code:rand,url,link:`https://furry.services/r/${rand}`,new:true,linkNumber:count+1,createdTimestamp,created,length:url.length};
+				return {
+					nsfw: url.indexOf("nsfw") !== -1,
+					code: rand,
+					url,
+					link: `https://furry.services/r/${rand}`,
+					new: true,
+					linkNumber: count + 1,
+					createdTimestamp,
+					created,
+					length: url.length
+				};
 			}
 		});
 
-		let res = await this.mdb.collection("shorturl").find({url}).toArray();
+		let res = await mdb.collection("shorturl").find({url}).toArray();
 		
 		switch(res.length) {
 		case 0: // create
@@ -968,8 +974,8 @@ class FurryBot extends Base {
 
 		default:// delete & recreate
 			this.logger.log("[ShortURL]: Duplicate records found, deleting");
-			this.mdb.collection("shorturl").find({url}).forEach((short) => {
-				return this.mdb.collection("shorturl").deleteOne({id: short.id});
+			mdb.collection("shorturl").find({url}).forEach((short) => {
+				return mdb.collection("shorturl").deleteOne({id: short.id});
 			});
 			return create(url);
 		}
@@ -1040,7 +1046,7 @@ class FurryBot extends Base {
 		case "word":
 		case "words":
 			for(let i = 0;i<len;i++) {
-				res.push(this.wordGen({exactly:1,maxLength:Math.floor(Math.random()*7)+1,wordsPerString:Math.floor(Math.random()*4)+1}));
+				res.push(wordGen({exactly:1,maxLength:Math.floor(Math.random()*7)+1,wordsPerString:Math.floor(Math.random()*4)+1}));
 			}
 			break;
 	
@@ -1069,12 +1075,12 @@ class FurryBot extends Base {
 	 */
 	async memeRequest(path,avatars = [],text = "") {
 		avatars = typeof avatars === "string" ? [avatars] : avatars;
-		return this.request(`https://dankmemer.services/api${path}`,{
+		return phin(`https://dankmemer.services/api${path}`,{
 			method: "POST",
 			json: {avatars,text},
 			headers: {
-				Authorization: this.config.apis.dankMemer.token,
-				"User-Agent": this.config.userAgent,
+				Authorization: config.apis.dankMemer.token,
+				"User-Agent": config.userAgent,
 				"Content-Type": "application/json"
 			},
 			encoding: null

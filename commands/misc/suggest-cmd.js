@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"suggest"
@@ -7,24 +18,24 @@ module.exports = {
 	cooldown: 18e5,
 	description: "Suggest something for the bot!",
 	usage: "<suggestion>",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		let card, data, embed;
 		if(message.unparsedArgs.length === 0 || !message.unparsedArgs[0]) return new Error("ERR_INVALID_USAGE");
 		try {
-			card = await this.tclient.addCard(message.unparsedArgs.join(" "),`Suggestion by ${message.author.username}#${message.author.discriminator} (${message.author.id}) from guild ${message.channel.guild.name} (${message.channel.guild.id})`,this.config.apis.trello.list);
+			card = await this.tclient.addCard(message.unparsedArgs.join(" "),`Suggestion by ${message.author.username}#${message.author.discriminator} (${message.author.id}) from guild ${message.channel.guild.name} (${message.channel.guild.id})`,config.apis.trello.list);
 		}catch(error) {
 			return message.channel.createMessage(`<@!${message.author.id}>, Failed to create card: **${error.message}**`);
 		}
-		await this.tclient.addLabelToCard(card.id,this.config.apis.trello.labels.approval).catch(err => this.logger.log(err));
+		await this.tclient.addLabelToCard(card.id,config.apis.trello.labels.approval).catch(err => this.logger.log(err));
 		await message.channel.createMessage(`<@!${message.author.id}>, Suggestion posted!\nView it here: ${card.shortUrl}`);
 		
 		embed = {
@@ -42,9 +53,9 @@ module.exports = {
 			]
 		};
 		Object.assign(embed,message.embed_defaults());
-		return this.bot.executeWebhook(this.config.webhooks.suggestions.id,this.config.webhooks.suggestions.token,{
+		return this.bot.executeWebhook(config.webhooks.suggestions.id,config.webhooks.suggestions.token,{
 			embeds: [embed],
-			username: `Bot Suggestion${this.config.beta ? " - Beta" : this.config.alpha ? " - Alpha" : ""}`,
+			username: `Bot Suggestion${config.beta ? " - Beta" : config.alpha ? " - Alpha" : ""}`,
 			avatarURL: "https://i.furry.bot/furry.png"
 		});
 	})

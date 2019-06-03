@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"info",
@@ -10,15 +21,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get some info about the bot",
 	usage: "",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		let userCount, largeGuildCount, srv, embed;
 		embed = {
@@ -34,7 +45,7 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Library",
-					value: this.config.bot.library,
+					value: config.bot.library,
 					inline: false
 				}, {
 					name: "Uptime",
@@ -58,15 +69,15 @@ module.exports = {
 					inline: false
 				}, {
 					name: "API Version",
-					value: this.config.bot.apiVersion,
+					value: config.bot.apiVersion,
 					inline: false
 				}, {
 					name: "Bot Version",
-					value: this.config.bot.version,
+					value: config.bot.version,
 					inline: false
 				}, {
-					name: `${this.config.bot.library}`,
-					value: this.config.bot.libraryVersion,
+					name: `${config.bot.library}`,
+					value: config.bot.libraryVersion,
 					inline: false
 				}, {
 					name: "Node.JS Version",
@@ -74,7 +85,7 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Support Server",
-					value: this.config.bot.supportInvite,
+					value: config.bot.supportInvite,
 					inline: false
 				}, {
 					name: "Bot Creator",
@@ -82,7 +93,7 @@ module.exports = {
 					inline: false
 				}, {
 					name: "Trello Board",
-					value: this.config.apis.trello.board,
+					value: config.apis.trello.board,
 					inline: false
 				}
 			]

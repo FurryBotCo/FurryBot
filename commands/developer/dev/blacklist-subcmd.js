@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"blacklist",
@@ -7,17 +18,17 @@ module.exports = {
 	botPermissions: [],
 	cooldown: 0,
 	description: "Manage the bots blacklist",
-	usage: "<user/server>",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	usage: "<add/check/remove>",
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return;
-		if(message.args.length === 0) return new Error("ERR_INVALID_USAGE");
+		else return this.sendCommandEmbed(message,message.command);
 	})
 };

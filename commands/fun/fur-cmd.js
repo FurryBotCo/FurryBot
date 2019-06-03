@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"fur"
@@ -9,15 +20,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get a random fur image! use `fur list	 to get a list of all supported types!",
 	usage: "[type]",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		const types = [
 			"boop",
@@ -40,18 +51,18 @@ module.exports = {
 		}
 		try {
 			if(!type) type = "hug";
-			req = await this.imageAPIRequest(false,type,true,true);
+			req = await functions.imageAPIRequest(false,type,true,true);
 			short = await this.shortenUrl(req.response.image);
 			extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
 			return message.channel.createMessage(`${extra}Short URL: <${short.link}>\nRequested By: ${message.author.username}#${message.author.discriminator}\nType: ${this.ucwords(type)}`,{
-				file: await this.getImageFromURL(req.response.image),
+				file: await functions.getImageFromURL(req.response.image),
 				name: req.response.name
 			});
 		}catch(error){
 			this.logger.error(`Error:\n${error}`);
 			this.logger.log(`Body: ${jsn}`);
 			return message.channel.createMessage("Unknown API Error",{
-				file: await this.getImageFromURL("https://fb.furcdn.net/NotFound.png"),
+				file: await functions.getImageFromURL("https://fb.furcdn.net/NotFound.png"),
 				name: "NotFound.png"
 			});
 		}

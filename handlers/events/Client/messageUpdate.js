@@ -1,3 +1,35 @@
+const config = require("../../../config"),
+	Trello = require("trello"),
+	os = require("os"),
+	util = require("util"),
+	request = util.promisify(require("request")),
+	phin = require("phin").defaults({
+		method: "GET",
+		parse: "json",
+		headers: {
+			"User-Agent": config.web.userAgent
+		}
+	}),
+	uuid = require("uuid/v4"),
+	fs = require("fs"),
+	path = require("path"),
+	colors = require("console-colors-2"),
+	Canvas = require("canvas-constructor").Canvas,
+	fsn = require("fs-nextra"),
+	chalk = require("chalk"),
+	chunk = require("chunk"),
+	ytdl = require("ytdl-core"),
+	_ = require("lodash"),
+	perf = require("perf_hooks"),
+	performance = perf.performance,
+	PerformanceObserver = perf.PerformanceObserver,
+	child_process = require("child_process"),
+	shell = child_process.exec,
+	truncate = require("truncate"),
+	wordGen = require("random-words"),
+	deasync = require("deasync"),
+	{ MongoClient, mongo, mdb } = require("../../../modules/Database");
+	
 module.exports = (async function(message,oldMessage) {
 	this.trackEvent({
 		group: "EVENTS",
@@ -5,20 +37,20 @@ module.exports = (async function(message,oldMessage) {
 		event: "client.events.messageUpdate",
 		properties: {
 			bot: {
-				version: this.config.bot.version,
-				beta: this.config.beta,
-				alpha: this.config.alpha,
+				version: config.bot.version,
+				beta: config.beta,
+				alpha: config.alpha,
 				server: require("os").hostname()
 			}
 		}
 	});
-	if(!this || !this.mdb || !message || !message.author || message.author.bot || !oldMessage || message.channel.type !== 0 || message.content === oldMessage.content) return;
+	if(!this || !mdb || !message || !message.author || message.author.bot || !oldMessage || message.channel.type !== 0 || message.content === oldMessage.content) return;
 	this.bot.emit("messageCreate",message);
 	if(!message.channel.guild || ![0,2,4].includes(message.channel.type)) return;
-	const gConfig = await this.mdb.collection("guilds").findOne({id: message.channel.guild.id}),
+	const gConfig = await mdb.collection("guilds").findOne({id: message.channel.guild.id}),
 		ev = "messageupdate";
 	if(!gConfig) return;
-	if([undefined,null,""].includes(gConfig.logging[ev])) return this.mdb.collection("guilds").findOneAndUpdate({ id: message.channel.guild.id },{
+	if([undefined,null,""].includes(gConfig.logging[ev])) return mdb.collection("guilds").findOneAndUpdate({ id: message.channel.guild.id },{
 		$set: {
 			[`logging.${ev}`]: {
 				enabled: false,
@@ -28,7 +60,7 @@ module.exports = (async function(message,oldMessage) {
 	});
 	if(!gConfig.logging[ev].enabled) return;
 	const ch = message.channel.guild.channels.get(gConfig.logging[ev].channel);
-	if(!ch) return this.mdb.collection("guilds").findOneAndUpdate({ id: message.channel.guild.id },{
+	if(!ch) return mdb.collection("guilds").findOneAndUpdate({ id: message.channel.guild.id },{
 		$set: {
 			[`logging.${ev}`]: {
 				enabled: false,

@@ -44,7 +44,7 @@ class FurryBotLogger {
 
 	async log(msg) {
 		var color = this.chalk.green,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("LOG"),
 			time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -55,7 +55,7 @@ class FurryBotLogger {
 
 	async warn(msg) {
 		var color = this.chalk.yellow,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("WARN"),
 			time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -66,7 +66,7 @@ class FurryBotLogger {
 
 	async error(msg) {
 		var color = this.chalk.red,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("ERROR"),
 			time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -77,7 +77,7 @@ class FurryBotLogger {
 
 	async debug(msg) {
 		var color = this.chalk.blue,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("DEBUG"),
 			time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -88,7 +88,7 @@ class FurryBotLogger {
 
 	async info(msg) {
 		var color = this.chalk.blue,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("INFO"),
 			time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -99,7 +99,7 @@ class FurryBotLogger {
 
 	async rethinkdb(msg) {
 		var color = this.chalk.blue,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("RETHINKDB"),
 			time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),
@@ -114,7 +114,7 @@ class FurryBotLogger {
 
 	async command(msg) {
 		var color = this.chalk.blue,
-			extra = this.config.beta ? this.chalk.magenta("BETA") : "",
+			extra = config.beta ? this.chalk.magenta("BETA") : "",
 			type  = color.bold("COMMAND"),
 			time  = this.chalk.blue.bold(Date().toString().split(" ")[4]),
 			//shard = this.client !== null ? this.isSharded ? this.chalk.magenta.bold("Shard 1/1") : this.chalk.magenta.bold(`Shard ${+this.shardID+1}/${this.shardCount}`) : this.chalk.magenta.bold("General"),

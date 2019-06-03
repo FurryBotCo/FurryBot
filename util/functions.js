@@ -130,5 +130,30 @@ module.exports = {
 		}
 		return null;
 	}),
-	hasSubCmds: ((dir,file) => require("fs").existsSync(`${dir}/${file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0]}`))
+	hasSubCmds: ((dir,file) => require("fs").existsSync(`${dir}/${file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0]}`)),
+	_getCallerFile: (() => {
+		try {
+			var err = new Error();
+			var callerfile;
+			var currentfile;
+	
+			Error.prepareStackTrace = function (err, stack) { return stack; };
+	
+			currentfile = err.stack.shift().getFileName();
+	
+			while (err.stack.length) {
+				callerfile = err.stack.shift().getFileName();
+	
+				if(currentfile !== callerfile) return callerfile;
+			}
+		} catch (error) {}
+		return undefined;
+	}),
+	_getDate: (() => {
+		var date = new Date();
+		return `${date.getMonth()+1}-${date.getDate()}-${date.getFullYear()}`;
+	}),
+	getImageFromURL: (async(url) => require("util").promisify(require("request"))(url,{
+		encoding: null
+	}).then(res => res.body))
 };

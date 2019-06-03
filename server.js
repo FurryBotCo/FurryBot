@@ -3,7 +3,7 @@ const config = require("./config");
 class FurryBotServer {
 	constructor(cnf) {
 		this.config = config;
-		this.cnf = cnf || this.config.serverOptions;
+		this.cnf = cnf || config.serverOptions;
 		this.express = require("express");
 		this.logger = require("morgan");
 		this.https = require("https");
@@ -11,15 +11,15 @@ class FurryBotServer {
 		this.MongoClient = require("mongodb").MongoClient;
 		
 		this.bodyParser = require("body-parser");
-		//this.ro = require("rethinkdbdash")(this.config.db.other);
+		//this.ro = require("rethinkdbdash")(config.db.other);
 	}
 
 	async load(client) {
-		this.mdb = await this.MongoClient.connect(`mongodb://${this.config.db.main.host}:${this.config.db.main.port}/${this.config.db.main.database}`,this.config.db.main.opt).then(res => res.db(this.config.db.main.db));
+		this.mdb = await this.MongoClient.connect(`mongodb://${config.db.main.host}:${config.db.main.port}/${config.db.main.database}`,config.db.main.opt).then(res => res.db(config.db.main.db));
 		this.server = this.express();
 		const checkAuth = ((req,res,next) => {
-			if(!next) return !((!req.headers.authorization || req.headers.authorization !== this.config.serverOptions.apiKey) && (!req.query.auth || req.query.auth !== this.config.serverOptions.apiKey));
-			if((!req.headers.authorization || req.headers.authorization !== this.config.serverOptions.apiKey) && (!req.query.auth || req.query.auth !== this.config.serverOptions.apiKey)) return res.status(401).json({
+			if(!next) return !((!req.headers.authorization || req.headers.authorization !== config.serverOptions.apiKey) && (!req.query.auth || req.query.auth !== config.serverOptions.apiKey));
+			if((!req.headers.authorization || req.headers.authorization !== config.serverOptions.apiKey) && (!req.query.auth || req.query.auth !== config.serverOptions.apiKey)) return res.status(401).json({
 				success: false,
 				error: "invalid credentials"
 			});
@@ -56,9 +56,9 @@ class FurryBotServer {
 					event: "web.request.stats",
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
 							server: require("os").hostname()
 						}
 					}
@@ -70,7 +70,7 @@ class FurryBotServer {
 				dailyJoins = a !== null ? a.count : null|| null;
 				return res.status(200).json({
 					success: true,
-					clientStatus: client.bot.guilds.get(this.config.bot.mainGuild).members.get(client.bot.user.id).status,
+					clientStatus: client.bot.guilds.get(config.bot.mainGuild).members.get(client.bot.user.id).status,
 					guildCount: client.bot.guilds.size,
 					userCount: client.bot.guilds.map(g => g.memberCount).reduce((a,b) => a + b),
 					shardCount: client.bot.shards.size,
@@ -85,10 +85,10 @@ class FurryBotServer {
 						}
 					},
 					largeGuildCount: client.bot.guilds.filter(g => g.large).length,
-					apiVersion: this.config.bot.apiVersion,
-					botVersion: this.config.bot.version,
-					library: this.config.bot.library,
-					libraryVersion: this.config.bot.libraryVersion,
+					apiVersion: config.bot.apiVersion,
+					botVersion: config.bot.version,
+					library: config.bot.library,
+					libraryVersion: config.bot.libraryVersion,
 					nodeVersion: process.version,
 					dailyJoins,
 					commandCount: client.bot.commandList.length,
@@ -102,9 +102,9 @@ class FurryBotServer {
 					event: "web.request.stats.ping",
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
 							server: require("os").hostname()
 						}
 					}
@@ -120,9 +120,9 @@ class FurryBotServer {
 					event: "web.request.commands",
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
 							server: require("os").hostname()
 						}
 					}
@@ -154,16 +154,16 @@ class FurryBotServer {
 					event: "web.request.status",
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
 							server: require("os").hostname()
 						}
 					}
 				});
 				return res.status(200).json({
 					success: true,
-					clientStatus: client.bot.guilds.get(this.config.bot.mainGuild).members.get(client.bot.user.id).status
+					clientStatus: client.bot.guilds.get(config.bot.mainGuild).members.get(client.bot.user.id).status
 				});
 			})
 			.get("/checkauth",checkAuth,async(req,res) => {
@@ -172,9 +172,9 @@ class FurryBotServer {
 					event: "web.request.checkauth",
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
 							server: require("os").hostname()
 						}
 					}
@@ -189,9 +189,9 @@ class FurryBotServer {
 					event: "web.request.guilds",
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
 							server: require("os").hostname()
 						}
 					}
@@ -211,9 +211,9 @@ class FurryBotServer {
 					event: "web.request.guilds.id.shard",
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
 							server: require("os").hostname()
 						}
 					}
@@ -234,9 +234,9 @@ class FurryBotServer {
 					event: "web.request.shorturl",
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
 							server: require("os").hostname()
 						}
 					}
@@ -246,7 +246,7 @@ class FurryBotServer {
 				return res.status(200).json(s);
 			})
 			.post("/vote/dbl",async(req,res) => {
-				if(!req.headers["authorization"] || req.headers["authorization"] !== this.config.universalKey) return res.status(401).json({success: false, error: "unauthorized"});
+				if(!req.headers["authorization"] || req.headers["authorization"] !== config.universalKey) return res.status(401).json({success: false, error: "unauthorized"});
 				if(req.body.bot !== "398251412246495233") return res.status(400).json({success: false, error: "invalid bot"});
 				let data, embed, user;
 				switch(req.body.type.toLowerCase()) {
@@ -267,14 +267,14 @@ class FurryBotServer {
 						await client.bot.mdb.collections("users").findOneAndUpdate({id: req.body.user},{$set:{bal: user.bal + 1000}});
 						data = {
 							title: "Thanks For Upvoting!",
-							description: `As a reward for upvoting on Discord Bots, you earned 1000 ${this.config.emojis.owo}\nWeekend Voting, Double ${this.config.emojis.owo}!`,
+							description: `As a reward for upvoting on Discord Bots, you earned 1000 ${config.emojis.owo}\nWeekend Voting, Double ${config.emojis.owo}!`,
 							color: 65535
 						};
 					} else {
 						await client.bot.mdb.collections("users").findOneAndUpdate({id: req.body.user},{$set:{bal: user.bal + 500}});
 						data = {
 							title: "Thanks For Upvoting!",
-							description: `As a reward for upvoting on Discord Bots, you earned 500 ${this.config.emojis.owo}`,
+							description: `As a reward for upvoting on Discord Bots, you earned 500 ${config.emojis.owo}`,
 							color: 65535
 						};
 					}
@@ -304,16 +304,16 @@ class FurryBotServer {
 					event: "web.request.dev.eval",
 					properties: {
 						bot: {
-							version: this.config.bot.version,
-							beta: this.config.beta,
-							alpha: this.config.alpha,
+							version: config.bot.version,
+							beta: config.beta,
+							alpha: config.alpha,
 							server: require("os").hostname()
 						}
 					}
 				});
 				console.log(req.body);
 				if(!req.body.code) return res.status(400).json({ success: false, message: "missing code" });
-				for(let b of  this.config.evalBlacklist) {
+				for(let b of  config.evalBlacklist) {
 					if(b.test(req.body.code)) return res.status(400).json({ success: false, message: "blacklisted code found"});
 				}
 				const start = client.bot.performance.now(),
@@ -323,8 +323,8 @@ class FurryBotServer {
 			});
 		if(![undefined,null,""].includes(this.cnf.ssl) && this.cnf.ssl === true) {
 			if(this.cnf.port === 80) throw new Error("ssl server cannot be ran on insecure port");
-			let privateKey = this.fs.readFileSync(`${this.config.rootDir}/ssl/ssl.key`);
-			let certificate = this.fs.readFileSync(`${this.config.rootDir}/ssl/ssl.crt`);
+			let privateKey = this.fs.readFileSync(`${config.rootDir}/ssl/ssl.key`);
+			let certificate = this.fs.readFileSync(`${config.rootDir}/ssl/ssl.crt`);
 
 			return this.https.createServer({
 				key: privateKey,

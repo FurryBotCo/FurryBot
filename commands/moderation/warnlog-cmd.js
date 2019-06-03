@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"warnlog"
@@ -7,15 +18,15 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Check the warnings a user has",
 	usage: "<@member/id> [page]",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		let user, page, mn, warnings, embed, wr, pages, fields, w, usr, blame;
 		
@@ -45,7 +56,7 @@ module.exports = {
         
 		if(!user) return message.errorEmbed("INVALID_USER");
         
-		warnings = await this.mdb.collection("users").findOne({id: user.id}).then(res => res.warnings.filter(w => w.gid === message.channel.guild.id).sort((s,g) => s.id < g.id ? -1 : s.id > g.id ? 1 : 0).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp)));
+		warnings = await mdb.collection("users").findOne({id: user.id}).then(res => res.warnings.filter(w => w.gid === message.channel.guild.id).sort((s,g) => s.id < g.id ? -1 : s.id > g.id ? 1 : 0).sort((a,b) => new Date(a.timestamp) - new Date(b.timestamp)));
 		if(warnings.length <= 0) {
 			embed = {
 				title: "No Warnings Found",

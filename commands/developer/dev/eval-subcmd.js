@@ -1,3 +1,52 @@
+const {
+	config,
+	Trello,
+	os,
+	util,
+	request,
+	phin,
+	uuid,
+	fs,
+	path,
+	colors,
+	Canvas,
+	fsn,
+	chalk,
+	chunk,
+	ytdl,
+	_,
+	perf,
+	performance,
+	PerformanceObserver,
+	child_process,
+	shell,
+	asyncEval,
+	stringSimilarity,
+	truncate,
+	wordGen,
+	deasync,
+	functions,
+	Eris,
+	ErisSharder,
+	MessageEmbed,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	},
+	ExtendedMessage,
+	Snowflake,
+	MessageCollector,
+	Permissions,
+	LoggerV1,
+	LoggerV2,
+	LoggerV3,
+	LoggerV4,
+	LoggerV5,
+	Comic,
+	ComicImage
+} = require("../../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"eval",
@@ -12,36 +61,36 @@ module.exports = {
 	cooldown: 0,
 	description: "Evaluate code (dev only)",
 	usage: "<code>",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		// extra check, to be safe
-		if (!this.config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer of this bot.`);
+		if (!config.developers.includes(message.author.id)) return message.channel.createMessage(`<@!${message.author.id}>, You cannot run this command as you are not a developer of this bot.`);
 		let exec, start, res, m, end, embed;
-		const r = this.r;
 		exec = message.unparsedArgs.join(" ");
-		start = this.performance.now();
+		start = performance.now();
 		try {
 			res = await eval(exec);
 		}catch(e){
+			console.log(e);
 			//return message.channel.createMessage(`Error evaluating: ${err}`);
-			m = typeof e.message !== "string" ? require("util").inspect(e.message,{depth: 1}) : e.message;
-			//this.log(require("util").inspect(e.message,{depth: 1}));
+			m = typeof e.message !== "string" ? util.inspect(e.message,{depth: 1}) : e.message;
+			//this.log(util.inspect(e.message,{depth: 1}));
 	
-			end = this.performance.now();
+			end = performance.now();
 			if(e.length > 1000) {
-				const req = await this.request("https://pastebin.com/api/api_post.php",{
+				const req = await phin("https://pastebin.com/api/api_post.php",{
 					method: "POST",
 					form: {
-						"api_dev_key": this.config.apis.pastebin.devKey,
-						"api_user_key": this.config.apis.pastebin.userKey,
+						"api_dev_key": config.apis.pastebin.devKey,
+						"api_user_key": config.apis.pastebin.userKey,
 						"api_option": "paste",
 						"api_paste_code": e,
 						"api_paste_private": 2,
@@ -71,7 +120,7 @@ module.exports = {
 				]
 			};
 			try {
-				this.log(`[Eval]: ${require("util").inspect(e,{depth: 3,color:true})}`);
+				this.log(`[Eval]: ${util.inspect(e,{depth: 3,color:true})}`);
 			} catch(e) {
 				console.log(e);
 			}
@@ -82,22 +131,23 @@ module.exports = {
 				});
 			});
 		}
+		//console.log(res);
 		if([null,undefined,""].includes(res)) {
 			res = "```fix\nfinished with no return```";
 		} else {
 			try {
-				if(typeof res !== "string") res = require("util").inspect(res,{showHidden:true,depth: 3});
+				if(typeof res !== "string") res = util.inspect(res,{showHidden:true,depth: 3});
 			} catch(e) {
 				try {
 					if(typeof res !== "string") res = JSON.stringify(res);
 				} catch(e) {}
 			}
 			if(res.length > 1000) {
-				const req = await this.request("https://pastebin.com/api/api_post.php",{
+				const req = await phin("https://pastebin.com/api/api_post.php",{
 					method: "POST",
 					form: {
-						"api_dev_key": this.config.apis.pastebin.devKey,
-						"api_user_key": this.config.apis.pastebin.userKey,
+						"api_dev_key": config.apis.pastebin.devKey,
+						"api_user_key": config.apis.pastebin.userKey,
 						"api_option": "paste",
 						"api_paste_code": res,
 						"api_paste_private": 2,
@@ -109,7 +159,7 @@ module.exports = {
 			}
 			res = "```js\n"+res+"```";
 		}
-		end = this.performance.now();
+		end = performance.now();
 		embed = {
 			title: `Evaluated - Time: \`${(end-start).toFixed(3)}ms\``,
 			author: {

@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"role"
@@ -11,15 +22,19 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Manage roles for a single user, or multiple!",
 	usage: "",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		return message.reply("Temporarily disabled");
+		
+		/* eslint-disable no-unreachable */
+		
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		let data, embed, member, r, a, operation, l, role, count, role2, skipCount, members, counts, b, c;
 		if(message.args.length === 0 || message.args[0] === "help") {
@@ -375,5 +390,7 @@ module.exports = {
 			}
 			break; // eslint-disable-line no-unreachable
 		} 
+
+		/* eslint-enable no-unreachable */
 	})
 };

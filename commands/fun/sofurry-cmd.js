@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"sofurry",
@@ -11,15 +22,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get a random post from sofurry!",
 	usage: "",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		// saved for when sofurry api has issues
 		//return message.channel.createMessage(`<@!${message.author.id}>, Sorry, sofurry is having issues right now, and we cannot fetch anything from their api.\n(if it's back, and I haven't noticed, let me know in my support server - https://discord.gg/SuccpZw)`);
@@ -32,13 +43,13 @@ module.exports = {
 		];
 		let tags, bl, req, jsn, rr, submission, short, extra, attachment;
 		tags = message.unparsedArgs.length > 0 ? message.unparsedArgs.join("%20") : "furry";
-		bl = tags.match(this.config.tagBlacklist);
+		bl = tags.match(config.tagBlacklist);
 		if(bl !== null && bl.length > 0) return message.channel.createMessage(`<@!${message.author.id}>, Your search contained blacklisted tags, **${bl.join("**, **")}**`);
-		const msg = await message.channel.createMessage(`Fetching.. ${this.config.emojis.load}`);
+		const msg = await message.channel.createMessage(`Fetching.. ${config.emojis.load}`);
 		req = await this.request(`https://api2.sofurry.com/browse/search?search=${tags}&format=json&minlevel=0&maxlevel=0`,{
 			method: "GET",
 			headers: {
-				"User-Agent": this.config.web.userAgent
+				"User-Agent": config.web.userAgent
 			}
 		});
 		try {
@@ -54,7 +65,7 @@ module.exports = {
 			short = await this.shortenUrl(`http://www.sofurry.com/view/${submission.id}`);
 			extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
 			if([1,4].includes(submission.contentType)) return msg.edit(`${extra}${submission.title} (type ${this.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${message.author.username}#${message.author.discriminator}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => message.channel.createMessage(`Command failed: ${err}`)).then(async() => message.channel.createMessage("",{
-				file: await this.getImageFromURL(submission.full),
+				file: await functions.getImageFromURL(submission.full),
 				name: "sofurry.png"
 			}));
 			else return msg.edit(`${extra}${submission.title} (type ${this.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${message.author.username}#${message.author.discriminator}\nIf something bad is returned, blame the service, not the bot author!`).catch(err => message.channel.createMessage(`Command failed: ${err}`));
@@ -62,7 +73,7 @@ module.exports = {
 			this.logger.error(`Error:\n${e}`);
 			this.logger.log(`Body: ${req.body}`);
 			return msg.edit("Unknown API Error").then(async() => message.channel.createMessage("",{
-				file: await this.getImageFromURL(this.config.images.serverError),
+				file: await functions.getImageFromURL(config.images.serverError),
 				name: "error.png"
 			})).catch(err => message.channel.createMessage(`Command failed: ${err}`));
 		}

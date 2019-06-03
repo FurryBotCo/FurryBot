@@ -1,3 +1,14 @@
+const {
+	config,
+	functions,
+	phin,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../modules/CommandRequire");
+
 module.exports = {
 	triggers: [
 		"profile"
@@ -10,15 +21,15 @@ module.exports = {
 	cooldown: 2e3,
 	description: "Get your user profile",
 	usage: "[@member/id]",
-	hasSubCommands: require(`${process.cwd()}/util/functions.js`).hasSubCmds(__dirname,__filename), 
-	subCommands: require(`${process.cwd()}/util/functions.js`).subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
+	subCommands: functions.subCmds(__dirname,__filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: true,
 	guildOwnerOnly: false,
 	path: __filename,
 	run: (async function(message) {
-		const sub = await this.processSub(module.exports,message,this);
+		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
 		
 		let member, position, level, xp_left, rank, image, pr, u, imgpath, img, a, at;
@@ -29,8 +40,8 @@ module.exports = {
 		position = "1/2";
 		level = message.uConfig.level;
 		xp_left = message.uConfig.xp;
-		rank = this.config.levels.getRank(level);
-		image = await this.fsn.readFile(`${this.config.rootDir}/images/profile.png`);
+		rank = config.levels.getRank(level);
+		image = await this.fsn.readFile(`${config.rootDir}/images/profile.png`);
 		//corners = await fsn.readFile(`${config.rootDir}/images/corners.png`);
 		pr = new this.Canvas(593, 348)
 			.addImage(image, 0, 0, 593, 348)
@@ -56,7 +67,7 @@ module.exports = {
 		}
 		u = member.user.avatarURL.split(".");
 		u.pop();
-		imgpath = `${this.config.rootDir}/tmp/${message.channel.guild.id}-${message.channel.id}-${member.user.id}-profile.png`;
+		imgpath = `${config.rootDir}/tmp/${message.channel.guild.id}-${message.channel.id}-${member.user.id}-profile.png`;
 		await this.download(`${u.join(".")}.png`,imgpath);
 		img = await this.fsn.readFile(imgpath);
 		pr.addImage(img, 18, 128, 119, 119);
