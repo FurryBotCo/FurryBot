@@ -1,5 +1,10 @@
 /* eslint-disable no-redeclare */
-const os = require("os");
+const os = require("os"),
+	phin = require("phin"),
+	config = require("../config"),
+	util = require("util"),
+	request = util.promisify(require("request"));
+
 module.exports = {
 	memory: {
 		process: {
@@ -155,5 +160,57 @@ module.exports = {
 	}),
 	getImageFromURL: (async(url) => require("util").promisify(require("request"))(url,{
 		encoding: null
-	}).then(res => res.body))
+	}).then(res => res.body)),
+	/**
+	 * fetch an image from the furry bot api
+	 * @async
+	 * @param {*} animal - fetch from animal category (true) or furry category (false)
+	 * @param {*} category - image category
+	 * @see {@link https://apidocs.furry.bot|Furry Bot Api Documentation}
+	 * @param {*} json - fetch JSON (true) or image (false)
+	 * @param {*} safe use sfw (true) or nsfw (false) category, only makes a difference if `animal` is false
+	 * @returns {(Object|Buffer)} - json body from request or image buffer
+	 */
+	imageAPIRequest: (async(animal = true,category = null,json = true, safe = false) => {
+		return new Promise(async(resolve, reject) => {
+			let s;
+			if([undefined,null,""].includes(json)) json = true;
+			
+			try {
+				s = await phin({
+					method: "GET",
+					url: `https://api.furry.bot/${animal ? "animals" : `furry/${safe?"sfw":"nsfw"}`}/${category?category.toLowerCase():safe?"hug":"bulge"}${json?"":"/image"}`.replace(/\s/g,""),
+					parse: "json"
+				});
+				resolve(s.body);
+			} catch(error) {
+				reject({
+					error,
+					response: s.body
+				});
+			}
+		});
+	}),
+	/**
+	 * dank memer api request
+	 * @async
+	 * @param {String} path - path to request
+	 * @param {URL[]} [avatars=[]] - array of avatars to use in request
+	 * @param {String} [text=""] - text to use in request
+	 * @returns {Object}
+	 */
+	memeRequest: (async(path,avatars = [],text = "") => {
+		
+		avatars = typeof avatars === "string" ? [avatars] : avatars;
+		return request(`https://dankmemer.services/api${path}`,{
+			method: "POST",
+			json: {avatars,text},
+			headers: {
+				Authorization: config.apis.dankMemer.token,
+				"User-Agent": config.userAgent,
+				"Content-Type": "application/json"
+			},
+			encoding: null
+		});
+	})
 };
