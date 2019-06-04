@@ -38,10 +38,6 @@ const {
 	Snowflake,
 	MessageCollector,
 	Permissions,
-	LoggerV1,
-	LoggerV2,
-	LoggerV3,
-	LoggerV4,
 	LoggerV5,
 	Comic,
 	ComicImage
@@ -86,8 +82,9 @@ module.exports = {
 	
 			end = performance.now();
 			if(e.length > 1000) {
-				const req = await phin("https://pastebin.com/api/api_post.php",{
+				const req = await phin({
 					method: "POST",
+					url: "https://pastebin.com/api/api_post.php",
 					form: {
 						"api_dev_key": config.apis.pastebin.devKey,
 						"api_user_key": config.apis.pastebin.userKey,
@@ -143,8 +140,9 @@ module.exports = {
 				} catch(e) {}
 			}
 			if(res.length > 1000) {
-				const req = await phin("https://pastebin.com/api/api_post.php",{
+				const req = await phin({
 					method: "POST",
+					url: "https://pastebin.com/api/api_post.php",
 					form: {
 						"api_dev_key": config.apis.pastebin.devKey,
 						"api_user_key": config.apis.pastebin.userKey,

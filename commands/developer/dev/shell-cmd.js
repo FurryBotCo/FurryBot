@@ -35,10 +35,6 @@ const {
 	Snowflake,
 	MessageCollector,
 	Permissions,
-	LoggerV1,
-	LoggerV2,
-	LoggerV3,
-	LoggerV4,
 	LoggerV5
 } = require("../../../modules/CommandRequire");
 	
