@@ -44,7 +44,7 @@ module.exports = {
 		"embedLinks", // 16834
 		"attachFiles" // 32768
 	],
-	cooldown: 3e3,
+	cooldown: 1e4,
 	description: "View comics from the yiff gallery",
 	usage: "<id> <start page>",
 	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
@@ -57,7 +57,7 @@ module.exports = {
 	run: (async function(message) {
 		const sub = await functions.processSub(module.exports,message,this);
 		if(sub !== "NOSUB") return sub;
-		const time = 5e3;
+		const time = 6e4;
 
 		let l, m, embed, stopTimeout, c;
 

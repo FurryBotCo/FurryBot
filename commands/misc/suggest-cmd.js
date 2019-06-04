@@ -6,7 +6,8 @@ const {
 		MongoClient,
 		mongo,
 		mdb
-	}
+	},
+	truncate
 } = require("../../modules/CommandRequire");
 
 module.exports = {
@@ -40,7 +41,7 @@ module.exports = {
 		
 		embed = {
 			title: `Suggestion by ${message.author.username}#${message.author.discriminator} (${message.author.id}) from guild ${message.channel.guild.name} (${message.channel.guild.id})`,
-			description: this.truncate(message.unparsedArgs.join(" "),950),
+			description: truncate(message.unparsedArgs.join(" "),950),
 			thumbnail: {
 				url: message.author.avatarURL
 			},

@@ -6,7 +6,8 @@ const {
 		MongoClient,
 		mongo,
 		mdb
-	}
+	},
+	truncate
 } = require("../../modules/CommandRequire");
 
 module.exports = {
@@ -39,7 +40,7 @@ module.exports = {
 		bl = tags.match(config.tagBlacklist);
 		if(bl !== null && bl.length > 0) return message.channel.createMessage(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
 		try {
-			req = await this.phin({
+			req = await phin({
 				url: `https://e621.net/post/index.json?limit=50&tags=${tags}%20rating%3Aexplict`,
 				parse: "json"
 			}).then(res => res.body);
@@ -71,7 +72,7 @@ module.exports = {
 		}
 		embed = {
 			title: "E621 Yiff!",
-			description: `Tags: ${this.truncate(post.tags.replace("_","\\_"),1900)}\n\nLink: <https://e621.net/post/show/${post.id}>`,
+			description: `Tags: ${truncate(post.tags.replace("_","\\_"),1900)}\n\nLink: <https://e621.net/post/show/${post.id}>`,
 			image: {
 				url: post.file_url
 			}

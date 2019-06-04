@@ -6,7 +6,8 @@ const {
 		MongoClient,
 		mongo,
 		mdb
-	}
+	},
+	truncate
 } = require("../../modules/CommandRequire");
 
 module.exports = {
@@ -18,7 +19,7 @@ module.exports = {
 	botPermissions: [
 		"embedLinks" // 16384
 	],
-	cooldown: 0,
+	cooldown: 3e3,
 	description: "Get some fur images from e926",
 	usage: "[tags]",
 	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
@@ -38,7 +39,7 @@ module.exports = {
 		bl = tags.match(config.tagBlacklist);
 		if(bl !== null && bl.length > 0) return message.channel.createMessage(`<@!${message.author.id}>, Your search contained blacklisted tags, **${bl.join("**, **")}**`);
 		try {
-			req = await this.phin(`https://e926.net/post/index.json?limit=50&tags=${tags}%20rating%3Asafe`,{
+			req = await phin(`https://e926.net/post/index.json?limit=50&tags=${tags}%20rating%3Asafe`,{
 				headers: {
 					"User-Agent": config.web.userAgentExt("Donovan_DMC"),
 					"Content-Type": "application/json"
@@ -71,7 +72,7 @@ module.exports = {
 		if(!["s","safe"].includes(post.rating.toLowerCase())) return message.channel.createMessage(`<@!${message.author.id}>, API returned a non sfw image, please use the \`e621\` command if you are expecting nsfw results.`);
 		embed = {
 			title: "E926 Furs!",
-			description: `Tags: ${this.truncate(post.tags.replace("_","\\_"),1900)}\n\nLink: <https://e926.net/post/show/${post.id}>`,
+			description: `Tags: ${truncate(post.tags.replace("_","\\_"),1900)}\n\nLink: <https://e926.net/post/show/${post.id}>`,
 			image: {
 				url: post.file_url
 			}

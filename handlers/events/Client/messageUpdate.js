@@ -31,6 +31,8 @@ const config = require("../../../config"),
 	{ MongoClient, mongo, mdb } = require("../../../modules/Database");
 	
 module.exports = (async function(message,oldMessage) {
+	if(!message || !message.author || !message.author.id) return;
+
 	this.trackEvent({
 		group: "EVENTS",
 		userId: message.author !== "undefined" ? message.author.id : null,

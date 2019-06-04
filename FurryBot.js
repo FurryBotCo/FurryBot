@@ -31,9 +31,6 @@ class FurryBot extends Base {
 		this.log = require("./util/LoggerV5");
 		const AnalyticsWebSocket = require("./util/AnalyticsWebSocket"),
 			Trello = require("trello");
-		if(!config.beta && !config.alpha && !config.manualDevOnly && config.onMainServer) {
-			this.wsServer = require("./util/WebSocket");
-		}
 		Object.assign(this,require("./util/functions"),require("./modules/Database"));
 		Object.assign(this.bot,require("./util/functions"),require("./modules/Database"));
 		this.analyticsSocket = new AnalyticsWebSocket(config.beta ? "furrybotbeta" : "furrybot","send");
@@ -55,6 +52,25 @@ class FurryBot extends Base {
 		global.console.debug = this.logger.debug;
 		global.console.info = this.logger.info;
 		global.console._log = this.logger._log;
+
+		if(!config.beta && !config.alpha && !config.manualDevOnly && config.onMainServer) {
+			/*const srv = require("express")().listen(3002)
+				.on("error",() => console.warn("Attempted to start analytics server, but port is already in use."))
+				.on("listening", () => {
+					srv.close();
+					this.wsServer = require("./util/WebSocket");
+				})
+				.on("close",() => console.warn("Attempted to start analytics server, but port is already in use."));*/
+
+			const srv = require("http").createServer(require("express")())
+				.on("error",() => this.logger.warn("Attempted to start Analytics Websocket but the port is already in use"))
+				.on("listening",() => {
+					srv.close();
+					this.wsServer = require("./util/WebSocket");
+				})
+				.on("close",() => this.logger.log("Port test server closed, analytics websocket started"))
+				.listen(3002);
+		}
 	}
 
 	/**
@@ -110,7 +126,7 @@ class FurryBot extends Base {
 	loadCommands() {
 		this.commands = require("./commands");
 		this.responses = require("./responses");
-		this.categories = this.commands.map(c => ({ name: c.name, displayName: c.displayName, description: c.description, triggers: c.commands.map(cmd => cmd.triggers).reduce((a,b) => a.concat(b)) }));
+		this.categories = this.commands.map(c => ({ name: c.name, displayName: c.displayName, description: c.description, triggers: c.commands.map(cmd => cmd.triggers).reduce((a,b) => a.concat(b)), commands: c.commands, path: c.path }));
 		this.commandList = this.commands.map(c => c.commands.map(cc => cc.triggers)).reduce((a,b) => a.concat(b)).reduce((a,b) => a.concat(b));
 		this.responseList = this.responses.map(r => r.triggers).reduce((a,b) => a.concat(b));
 		this.categoryList = this.categories.map(c => c.name);
@@ -138,7 +154,6 @@ class FurryBot extends Base {
 		if(this.commandList.includes(lookup.toLowerCase())) a = this.commands.filter(c => c.commands.map(cc => cc.triggers).reduce((a,b) => a.concat(b)).includes(lookup.toLowerCase()));
 		else if(this.categoryList.includes(lookup.toLowerCase())) a = this.categories.filter(cat => cat.name.toLowerCase() === lookup.toLowerCase());
 		else return null;
-		//this.logger.log(this.commands);
 		return a.length === 0 ? null : a[0];
 	}
 
@@ -536,37 +551,6 @@ class FurryBot extends Base {
 			}
 		});
 		
-	}
-	
-	/**
-	 * fetch an image from the furry bot api
-	 * @async
-	 * @param {*} animal - fetch from animal category (true) or furry category (false)
-	 * @param {*} category - image category
-	 * @see {@link https://apidocs.furry.bot|Furry Bot Api Documentation}
-	 * @param {*} json - fetch JSON (true) or image (false)
-	 * @param {*} safe use sfw (true) or nsfw (false) category, only makes a difference if `animal` is false
-	 * @returns {(Object|Buffer)} - json body from request or image buffer
-	 */
-	async imageAPIRequest (animal = true,category = null,json = true, safe = false) {
-		return new Promise(async(resolve, reject) => {
-			let s;
-			if([undefined,null,""].includes(json)) json = true;
-			
-			try {
-				s = await phin({
-					method: "GET",
-					url: `https://api.furry.bot/${animal ? "animals" : `furry/${safe?"sfw":"nsfw"}`}/${category?category.toLowerCase():safe?"hug":"bulge"}${json?"":"/image"}`.replace(/\s/g,""),
-					parse: "json"
-				});
-				resolve(s.body);
-			} catch(error) {
-				reject({
-					error,
-					response: s.body
-				});
-			}
-		});
 	}
 
 	/**
@@ -1066,26 +1050,11 @@ class FurryBot extends Base {
 	}
 
 	/**
-	 * dank memer api request
-	 * @async
-	 * @param {String} path - path to request
-	 * @param {URL[]} [avatars=[]] - array of avatars to use in request
-	 * @param {String} [text=""] - text to use in request
-	 * @returns {Object}
+	 * @typedef LogsReturn
+	 * @type {Object}
+	 * @property {(Eris.User|Eris.Member)} executor - audit log blame
+	 * @property {("None Provided" | "Not Applicable" | String)} reason - audit log reason
 	 */
-	async memeRequest(path,avatars = [],text = "") {
-		avatars = typeof avatars === "string" ? [avatars] : avatars;
-		return phin(`https://dankmemer.services/api${path}`,{
-			method: "POST",
-			json: {avatars,text},
-			headers: {
-				Authorization: config.apis.dankMemer.token,
-				"User-Agent": config.userAgent,
-				"Content-Type": "application/json"
-			},
-			encoding: null
-		});
-	}
 
 	/**
 	 * fetch specific audit logs
@@ -1097,13 +1066,6 @@ class FurryBot extends Base {
 	 * @param {Boolean} [skipChecks.action=false] - skip checks on action
 	 * @param {Boolean} [skipChecks.executor=false] - skip checks on executor
 	 * @returns {LogsReturn}
-	 */
-
-	/**
-	 * @typedef LogsReturn
-	 * @type {Object}
-	 * @property {(Eris.User|Eris.Member)} executor - audit log blame
-	 * @property {("None Provided" | "Not Applicable" | String)} reason - audit log reason
 	 */
 	async getLogs(guild,action,target,skipChecks = {target: false,action: false,executor: false}) {
 		if(!guild || !action || !target) throw new Error("missing params");
@@ -1141,6 +1103,9 @@ class FurryBot extends Base {
 module.exports = FurryBot;
 
 process.on("unhandledRejection",(p) => {
+	//if(p.errno === "EADDRINUSE") return;
+
 	console.error("Unhandled Promise Rejection");
-	console.error(p);
+	if(typeof p === "object") console.error(JSON.stringify(p));
+	else console.error(p);
 });

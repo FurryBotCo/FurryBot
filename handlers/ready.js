@@ -27,23 +27,23 @@ module.exports = (async function() {
 
 	const statuses = [
 			{
-				status: "?? ${config.defaultPrefix}help for help! ??",
+				status: "🐾 ${config.defaultPrefix}help for help! 🐾",
 				type: 0 // playing
 			},
 			{
-				status: "?? ${config.defaultPrefix}help in ${this.bot.guilds.size} guilds! ??",
+				status: "🐾 ${config.defaultPrefix}help in ${this.bot.guilds.size} guilds! 🐾",
 				type: 0 // playing
 			},
 			{
-				status: "?? ${config.defaultPrefix}help with ${this.bot.users.size} users! ??",
+				status: "🐾 ${config.defaultPrefix}help with ${this.bot.users.size} users! 🐾",
 				type: 3 // watching
 			},
 			{
-				status: "?? ${config.defaultPrefix}help in ${this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b)} channels! ??",
+				status: "🐾 ${config.defaultPrefix}help in ${this.bot.guilds.map(g => g.channels.size).reduce((a,b) => a + b)} channels! 🐾",
 				type: 2 // listening
 			}, 
 			{
-				status: "?? ${config.defaultPrefix}help with ${this.bot.shards.size} shard${this.bot.shards.size>1?\"s\":\"\"}! ??",
+				status: "🐾 ${config.defaultPrefix}help with ${this.bot.shards.size} shard${this.bot.shards.size>1?\"s\":\"\"}! 🐾",
 				type: 0 // playing
 			}
 		],

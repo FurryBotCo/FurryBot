@@ -1,34 +1,15 @@
-const config = require("../../../config"),
-	Trello = require("trello"),
-	os = require("os"),
-	util = require("util"),
-	request = util.promisify(require("request")),
-	phin = require("phin").defaults({
-		method: "GET",
-		parse: "json",
-		headers: {
-			"User-Agent": config.web.userAgent
-		}
-	}),
-	uuid = require("uuid/v4"),
-	fs = require("fs"),
-	path = require("path"),
-	colors = require("console-colors-2"),
-	Canvas = require("canvas-constructor").Canvas,
-	fsn = require("fs-nextra"),
-	chalk = require("chalk"),
-	chunk = require("chunk"),
-	ytdl = require("ytdl-core"),
-	_ = require("lodash"),
-	perf = require("perf_hooks"),
-	performance = perf.performance,
-	PerformanceObserver = perf.PerformanceObserver,
-	child_process = require("child_process"),
-	shell = child_process.exec,
-	truncate = require("truncate"),
-	wordGen = require("random-words"),
-	deasync = require("deasync"),
-	{ MongoClient, mongo, mdb } = require("../../../modules/Database");
+const {
+	config,
+	os,
+	util,
+	phin,
+	performance,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	}
+} = require("../../../modules/CommandRequire");
 	
 module.exports = (async function (message) {
 	if(!mdb || !message) return;
@@ -702,6 +683,40 @@ module.exports = (async function (message) {
 		c = await command.run.call(this,message);
 		end = performance.now();
 		this.logger.debug(`Command handler for "${command.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
+		const owner = message.channel.guild.members.get(message.channel.guild.ownerID);
+		
+		embed = {
+			title: "Command Ran",
+			//description: "",
+			fields: [
+				{
+					name: "Server",
+					value: `Server: ${message.channel.guild.name} (${message.channel.guild.id})\n\
+					Server Creation Date: ${new Date(message.channel.guild.createdAt).toString().split("GMT")[0]}\n\
+					Owner: ${owner.username}#${owner.discriminator} (${owner.id})`,
+					inline: false
+				},
+				{
+					name: "Message",
+					value: `Message Content: ${message.content}\n\
+					Message ID: ${message.id}\n\
+					Channel: ${message.channel.name} (${message.channel.id}, <#${message.channel.id}>)\n\
+					Author: ${message.author.username}#${message.author.discriminator} (${message.author.id})`,
+					inline: false
+				},
+				{
+					name: "Command",
+					value: `Command: ${message.command instanceof Array ? message.command.join(" ") : message.command}\n\
+					Arguments: ${message.args.join(" ")}\n\
+					Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
+					Ran: ${message.content}`,
+					inline: false
+				}
+			]
+		};
+
+		Object.assign(embed,message.embed_defaults());
+		await this.bot.executeWebhook(config.webhooks.commandlog.id,config.webhooks.commandlog.token,{ embeds: [ embed ], username: `Command Log${config.beta ? " - Beta" : ""}` });
 		if(c instanceof Error) throw c;
 	}catch(error){
 		let cmd, num, code;

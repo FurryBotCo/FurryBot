@@ -23,7 +23,6 @@
   "homepage": "https://furry.bot",
   "dependencies": {
     "@types/node": "^12.0.2",
-    "async-eval": "^0.1.5",
     "blapi": "^1.1.0",
     "body-parser": "^1.18.3",
     "bufferutil": "^4.0.1",
