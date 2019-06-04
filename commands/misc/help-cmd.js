@@ -94,7 +94,7 @@ module.exports = {
 			return message.channel.createMessage({ embed });
 		} else if (this.categoryList.includes(message.args[0].toLowerCase())) {
 			category = this.getCategory(message.args[0].toLowerCase());
-
+			
 			embed = {
 				title: category.displayName,
 				description: category.description,
@@ -113,6 +113,7 @@ module.exports = {
 			});
 
 			Object.assign(embed, message.embed_defaults());
+
 			return message.channel.createMessage({ embed });
 		} else {
 			return message.channel.createMessage(`<@!${message.author.id}>, Please provide a valid command or category.`);

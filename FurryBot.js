@@ -126,7 +126,7 @@ class FurryBot extends Base {
 	loadCommands() {
 		this.commands = require("./commands");
 		this.responses = require("./responses");
-		this.categories = this.commands.map(c => ({ name: c.name, displayName: c.displayName, description: c.description, triggers: c.commands.map(cmd => cmd.triggers).reduce((a,b) => a.concat(b)) }));
+		this.categories = this.commands.map(c => ({ name: c.name, displayName: c.displayName, description: c.description, triggers: c.commands.map(cmd => cmd.triggers).reduce((a,b) => a.concat(b)), commands: c.commands, path: c.path }));
 		this.commandList = this.commands.map(c => c.commands.map(cc => cc.triggers)).reduce((a,b) => a.concat(b)).reduce((a,b) => a.concat(b));
 		this.responseList = this.responses.map(r => r.triggers).reduce((a,b) => a.concat(b));
 		this.categoryList = this.categories.map(c => c.name);
@@ -154,7 +154,6 @@ class FurryBot extends Base {
 		if(this.commandList.includes(lookup.toLowerCase())) a = this.commands.filter(c => c.commands.map(cc => cc.triggers).reduce((a,b) => a.concat(b)).includes(lookup.toLowerCase()));
 		else if(this.categoryList.includes(lookup.toLowerCase())) a = this.categories.filter(cat => cat.name.toLowerCase() === lookup.toLowerCase());
 		else return null;
-		//this.logger.log(this.commands);
 		return a.length === 0 ? null : a[0];
 	}
 
@@ -1051,6 +1050,13 @@ class FurryBot extends Base {
 	}
 
 	/**
+	 * @typedef LogsReturn
+	 * @type {Object}
+	 * @property {(Eris.User|Eris.Member)} executor - audit log blame
+	 * @property {("None Provided" | "Not Applicable" | String)} reason - audit log reason
+	 */
+
+	/**
 	 * fetch specific audit logs
 	 * @param {Eris.Guild} guild - guild to fetch from
 	 * @param {String} action - {@link https://abal.moe/Eris/docs/reference|Audit Log Action}
@@ -1060,13 +1066,6 @@ class FurryBot extends Base {
 	 * @param {Boolean} [skipChecks.action=false] - skip checks on action
 	 * @param {Boolean} [skipChecks.executor=false] - skip checks on executor
 	 * @returns {LogsReturn}
-	 */
-
-	/**
-	 * @typedef LogsReturn
-	 * @type {Object}
-	 * @property {(Eris.User|Eris.Member)} executor - audit log blame
-	 * @property {("None Provided" | "Not Applicable" | String)} reason - audit log reason
 	 */
 	async getLogs(guild,action,target,skipChecks = {target: false,action: false,executor: false}) {
 		if(!guild || !action || !target) throw new Error("missing params");
