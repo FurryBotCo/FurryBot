@@ -705,42 +705,44 @@ module.exports = (async function (message) {
 		c = await command.run.call(this, message);
 		end = performance.now();
 		this.logger.debug(`Command handler for "${command.triggers[0]}" took ${(end-start).toFixed(3)}ms to execute.`);
-		const owner = message.channel.guild.members.get(message.channel.guild.ownerID);
+		if (!config.developers.includes(message.author.id)) { // ignore developers since their commands may have sensitive info
+			const owner = message.channel.guild.members.get(message.channel.guild.ownerID);
 
-		embed = {
-			title: "Command Ran",
-			//description: "",
-			fields: [{
-					name: "Server",
-					value: `Server: ${message.channel.guild.name} (${message.channel.guild.id})\n\
-					Server Creation Date: ${new Date(message.channel.guild.createdAt).toString().split("GMT")[0]}\n\
-					Owner: ${owner.username}#${owner.discriminator} (${owner.id})`,
-					inline: false
-				},
-				{
-					name: "Message",
-					value: `Message Content: ${message.content}\n\
-					Message ID: ${message.id}\n\
-					Channel: ${message.channel.name} (${message.channel.id}, <#${message.channel.id}>)\n\
-					Author: ${message.author.username}#${message.author.discriminator} (${message.author.id})`,
-					inline: false
-				},
-				{
-					name: "Command",
-					value: `Command: ${message.command instanceof Array ? message.command.join(" ") : message.command}\n\
-					Arguments: ${message.args.join(" ")}\n\
-					Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
-					Ran: ${message.content}`,
-					inline: false
-				}
-			]
-		};
+			embed = {
+				title: "Command Ran",
+				//description: "",
+				fields: [{
+						name: "Server",
+						value: `Server: ${message.channel.guild.name} (${message.channel.guild.id})\n\
+						Server Creation Date: ${new Date(message.channel.guild.createdAt).toString().split("GMT")[0]}\n\
+						Owner: ${owner.username}#${owner.discriminator} (${owner.id})`,
+						inline: false
+					},
+					{
+						name: "Message",
+						value: `Message Content: ${message.content}\n\
+						Message ID: ${message.id}\n\
+						Channel: ${message.channel.name} (${message.channel.id}, <#${message.channel.id}>)\n\
+						Author: ${message.author.username}#${message.author.discriminator} (${message.author.id})`,
+						inline: false
+					},
+					{
+						name: "Command",
+						value: `Command: ${message.command instanceof Array ? message.command.join(" ") : message.command}\n\
+						Arguments: ${message.args.join(" ")}\n\
+						Unparsed Args: ${message.unparsedArgs.join(" ")}\n\
+						Ran: ${message.content}`,
+						inline: false
+					}
+				]
+			};
 
-		Object.assign(embed, message.embed_defaults());
-		await this.bot.executeWebhook(config.webhooks.commandlog.id, config.webhooks.commandlog.token, {
-			embeds: [embed],
-			username: `Command Log${config.beta ? " - Beta" : ""}`
-		});
+			Object.assign(embed, message.embed_defaults());
+			await this.bot.executeWebhook(config.webhooks.commandlog.id, config.webhooks.commandlog.token, {
+				embeds: [embed],
+				username: `Command Log${config.beta ? " - Beta" : ""}`
+			});
+		}
 		if (c instanceof Error) throw c;
 	} catch (error) {
 		let cmd, num, code;
