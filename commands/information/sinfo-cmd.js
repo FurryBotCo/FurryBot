@@ -60,7 +60,7 @@ module.exports = {
 			"**VERY HIGH** - ┻━┻ミヽ(ಠ益ಠ)ﾉ彡┻━┻ - must have a verified phone number"
 		];
 		let s;
-		if(message.channel.guild.memberCount < 1000) s = await Promise.all(message.guild.members.filter(m => !m.user.bot).map((m) => mdb.collection("users").findOne({id: m.id}))).then(res => res.map(m => m === null ? config.default.userConfig : m).map(m => ({owoCount: m.owoCount === undefined ? 0 : m.owoCount,uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount})));
+		if(message.channel.guild.memberCount < 1000) s = await Promise.all(message.guild.members.filter(m => !m.user.bot).map((m) => mdb.collection("users").findOne({id: m.id}))).then(res => res.map(m => m === null ? config.defaults.userConfig : m).map(m => ({owoCount: m.owoCount === undefined ? 0 : m.owoCount,uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount})));
 		else s = false;
 		mfaLevel = [
 			"NONE",

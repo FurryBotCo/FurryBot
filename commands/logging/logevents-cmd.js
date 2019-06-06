@@ -32,7 +32,7 @@ module.exports = {
 		if(sub !== "NOSUB") return sub;
 		let l, updateFields, log, s, c, embed;
 		l = "";
-		const events = Object.keys(config.default.loggingConfig);
+		const events = Object.keys(config.defaults.loggingConfig);
 		for(let key of events) {
 			if(typeof message.gConfig.logging[key] === "undefined"){
 				await mdb.collection("guilds").findOneAndUpdate({

@@ -44,7 +44,7 @@ module.exports = {
 				ings will be reset shortly.\n(note: prefix will be **${config.defaultPrefix}**)`);
 				try {
 					await mdb.collection("guilds").findOneAndDelete({id: message.channel.guild.id});
-					await mdb.collection("guilds").insertOne(Object.assign({id: message.channel.guild.id},config.default.guildConfig));
+					await mdb.collection("guilds").insertOne(Object.assign({id: message.channel.guild.id},config.defaults.guildConfig));
 				}catch(e) {
 					this.logger.error(e);
 					return message.channel.createMessage("There was an internal error while doing this");
