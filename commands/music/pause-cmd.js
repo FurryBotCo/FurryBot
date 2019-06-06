@@ -18,17 +18,19 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Pause whatever is playing",
 	usage: "",
-	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
-	subCommands: functions.subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
+	subCommands: functions.subCmds(__dirname, __filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
-	run: (async function(message) {
-		const sub = await functions.processSub(module.exports,message,this);
-		if(sub !== "NOSUB") return sub;
-		let c;
+	run: (async function (message) {
+		const sub = await functions.processSub(module.exports, message, this);
+		if (sub !== "NOSUB") return sub;
+
+
+		/*let c;
 		if(!message.member.voice.channel) return message.channel.createMessage("You must be in a voice channel to use this.");
 		if(message.member.voice.channel.members.filter(m => m.id!==this.bot.user.id).size !== 1 && !config.developers.includes(message.author.id)) {
 			if(!message.gConfig.djRole)  {
@@ -50,6 +52,6 @@ module.exports = {
 		if(!c.first().speaking.has("SPEAKING")) return message.channel.createMessage("Nothing is playing.");
 		if(c.first().dispatcher.paused) return message.channel.createMessage("Player is already paused.");
 		c.first().dispatcher.pause();
-		return message.channel.createMessage(":pause_button: **Paused**");
+		return message.channel.createMessage(":pause_button: **Paused**");*/
 	})
 };

@@ -18,41 +18,36 @@ module.exports = {
 	cooldown: 2.5e3,
 	description: "Make the bot leave the current voice channel",
 	usage: "",
-	hasSubCommands: functions.hasSubCmds(__dirname,__filename), 
-	subCommands: functions.subCmds(__dirname,__filename),
+	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
+	subCommands: functions.subCmds(__dirname, __filename),
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
-	run: (async function(message) {
-		const sub = await functions.processSub(module.exports,message,this);
-		if(sub !== "NOSUB") return sub;
-		let c;
-		if(!message.member.voice.channel) return message.channel.createMessage("You must be in a voice channel to use this.");
-		if(message.member.voice.channel.members.filter(m => m.id!==this.bot.user.id).size !== 1) {
-			if(!message.gConfig.djRole)  {
-				if(!message.member.permissions.has("manageServer")) return message.channel.createMessage(":x: Missing permissions or DJ role.");
-			} else {
-				try {
-					if(!message.member.roles.has(message.gConfig.djRole) && !message.member.permissions.has("manageServer")) return message.channel.createMessage(":x: Missing permissions or DJ role.");
-				}catch(error){
-					message.channel.createMessage("DJ role is configured incorrectly.");
-					if(!message.member.permissions.has("manageServer")) {
-						message.channel.createMessage(":x: Missing permissions.");
-					}
-				}
-			}
-		}
-    
-		c = this.voiceConnections.filter(g => g.channel.guild.id===message.channel.guild.id);
-		if(c.size === 0) return message.channel.createMessage("I'm not currently playing anything here.");
-		if(c.first().speaking.has("SPEAKING")) {
-			c.first().disconnect();
-			return message.channel.createMessage("Ended playback and left the channel.");
-		} else {
-			c.first().channel.leave();
-			return message.channel.createMessage("Left the voice channel.");
+	run: (async function (message) {
+		const sub = await functions.processSub(module.exports, message, this);
+		if (sub !== "NOSUB") return sub;
+
+		if (!message.member.voiceState.channelID) return message.channel.createMessage(`<@!${message.author.id}>, you must be in a voice channel to use this.`);
+
+		let me = message.channel.guild.members.get(this.bot.user.id);
+		let vc = message.channel.guild.channels.get(message.member.voiceState.channelID);
+
+		if (me.voiceState.channelID !== message.member.voiceState.channelID) return message.channel.createMessage(`<@!${message.author.id}, You must be in the same voice channel as me to use this.`);
+
+
+		let ch;
+		try {
+			ch = await vc.leave();
+
+			return message.channel.createMessage(`<@!${message.author.id}>, left **${vc.name}**.`);
+		} catch (e) {
+			let c = message.channel.guild.members.get(this.bot.user.id).voiceState.channelID;
+			if (c) message.guild.leaveVoiceChannel(c);
+			return message.channel.createMessage("I failed to leave the channel, you may have to manually disconnect me.").catch(err => {
+				return message.author.getDMChannel().then(dm => dm.send("I couldn't send messages to the channel you ran this command in, so I direct messaged you.\n\nI failed to leave the channel, you may have to manually disconnect me.\n\n(responding to this will not aide you, you will just get a default help message, you cannot run commands here)"));
+			});
 		}
 	})
 };
