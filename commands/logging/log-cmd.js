@@ -63,10 +63,10 @@ module.exports = {
 				id: message.channel.guild.id
 			},{
 				$set: {
-					logging: config.default.loggingConfig
+					logging: config.defaults.loggingConfig
 				}
 			});
-			message.gConfig.logging = config.default.loggingConfig;
+			message.gConfig.logging = config.defaults.loggingConfig;
 		}
 
 		if(!message.gConfig.logging[event]) {
@@ -92,10 +92,10 @@ module.exports = {
 				id: message.channel.guild.id
 			},{
 				$set: {
-					[`logging.${event}`]: config.default.loggingConfig[event]
+					[`logging.${event}`]: config.defaults.loggingConfig[event]
 				}
 			});
-			message.gConfig.logging[event] = config.default.loggingConfig[event];
+			message.gConfig.logging[event] = config.defaults.loggingConfig[event];
 		}
 
 		if(message.gConfig.logging[event].enabled) {

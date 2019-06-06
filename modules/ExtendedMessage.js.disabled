@@ -75,7 +75,7 @@ class ExtendedMessage extends Message {
 	get gConfig() {
 		return mdb.collection("guilds").findOne({ id: this.channel.guild.id }).then(async(res) => {
 			if(!res) {
-				await mdb.collection("guilds").insertOne(Object.assign({id: this.channel.guild.id }, config.default.guildConfig));
+				await mdb.collection("guilds").insertOne(Object.assign({id: this.channel.guild.id }, config.defaults.guildConfig));
 				console.debug(`Created Guild Entry "${this.channel.guild.id}`);
 				return mdb.collection("guilds").findOne({ id: this.channel.guild.id });
 			} else return res;
@@ -88,7 +88,7 @@ class ExtendedMessage extends Message {
 	get uConfig() {
 		return mdb.collection("users").findOne({ id: this.author.id }).then(async(res) => {
 			if(!res) {
-				await mdb.collection("users").insertOne(Object.assign({id: this.author.id }, config.default.userConfig));
+				await mdb.collection("users").insertOne(Object.assign({id: this.author.id }, config.defaults.userConfig));
 				console.debug(`Created User Entry "${this.author.id}`);
 				return mdb.collection("users").findOne({ id: this.author.id });
 			} else return res;

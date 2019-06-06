@@ -37,7 +37,7 @@ module.exports = {
 		usr = await mdb.collection("users").findOne({ id });
 		if(!usr) {
 			console.debug(`Created user entry for ${id}`);
-			await mdb.collection("users").insertOne(Object.assign(config.default.userConfig,{ id }));
+			await mdb.collection("users").insertOne(Object.assign(config.defaults.userConfig,{ id }));
 			usr = await mdb.collection("users").findOne({ id });
 		}
 

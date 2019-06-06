@@ -313,9 +313,9 @@ class FurryBot extends Base {
 		if (!m.gConfig) {
 			await mdb.collection("guilds").insertOne(Object.assign({
 				id: message.channel.guild.id
-			}, config.default.guildConfig));
+			}, config.defaults.guildConfig));
 			this.logger.debug(`Created Guild Entry "${message.channel.guild.id}"`);
-			m.gConfig = config.default.guildConfig;
+			m.gConfig = config.defaults.guildConfig;
 		}
 		m.uConfig = await mdb.collection("users").findOne({
 			id: message.author.id
@@ -323,9 +323,9 @@ class FurryBot extends Base {
 		if (!m.uConfig) {
 			await mdb.collection("users").insertOne(Object.assign({
 				id: message.author.id
-			}, config.default.userConfig));
+			}, config.defaults.userConfig));
 			this.logger.debug(`Created user "${message.author.id}"`);
-			m.uConfig = config.default.userConfig;
+			m.uConfig = config.defaults.userConfig;
 		}
 		m.prefix = message.content.startsWith(`<@${this.bot.user.id}>`) ? `<@${this.bot.user.id}` : message.content.startsWith(`<@!${this.bot.user.id}>`) ? `<@!${this.bot.user.id}>` : config.beta || config.alpha ? config.defaultPrefix : m.gConfig.prefix.toLowerCase();
 		try {

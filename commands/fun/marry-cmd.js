@@ -37,7 +37,7 @@ module.exports = {
 		if (!m) {
 			await mdb.collection("users").insertOne(Object.assign({
 				id: member.id
-			}, config.default.userConfig));
+			}, config.defaults.userConfig));
 			m = await mdb.collection("users").findOne({
 				id: member.id
 			});

@@ -34,7 +34,7 @@ module.exports = (async function (guild) {
 	});
 	await mdb.collection("guilds").insertOne(Object.assign({
 		id: guild.id
-	}, config.default.guildConfig));
+	}, config.defaults.guildConfig));
 	let o, owner, embed, chn;
 	o = guild.members.find(m => m.id === guild.ownerID);
 	owner = !o ? "Unknown#0000" : `${o.username}#${o.discriminator} (${o.id})`;
