@@ -1,36 +1,18 @@
-const config = require("../../../config"),
-	Trello = require("trello"),
-	os = require("os"),
-	util = require("util"),
-	request = util.promisify(require("request")),
-	phin = require("phin").defaults({
-		method: "GET",
-		parse: "json",
-		headers: {
-			"User-Agent": config.web.userAgent
-		}
-	}),
-	uuid = require("uuid/v4"),
-	fs = require("fs"),
-	path = require("path"),
-	colors = require("console-colors-2"),
-	Canvas = require("canvas-constructor").Canvas,
-	fsn = require("fs-nextra"),
-	chalk = require("chalk"),
-	chunk = require("chunk"),
-	ytdl = require("ytdl-core"),
-	_ = require("lodash"),
-	perf = require("perf_hooks"),
-	performance = perf.performance,
-	PerformanceObserver = perf.PerformanceObserver,
-	child_process = require("child_process"),
-	shell = child_process.exec,
-	truncate = require("truncate"),
-	wordGen = require("random-words"),
-	deasync = require("deasync"),
-	{ MongoClient, mongo, mdb } = require("../../../modules/Database");
-	
-module.exports = (async function(guild,role,oldRole) {
+const {
+	config,
+	os,
+	util,
+	phin,
+	performance,
+	Database: {
+		MongoClient,
+		mongo,
+		mdb
+	},
+	functions
+} = require("../../../modules/CommandRequire");
+
+module.exports = (async function (guild, role, oldRole) {
 	this.trackEvent({
 		group: "EVENTS",
 		guildId: guild.id,
@@ -40,15 +22,19 @@ module.exports = (async function(guild,role,oldRole) {
 				version: config.bot.version,
 				beta: config.beta,
 				alpha: config.alpha,
-				server: require("os").hostname()
+				server: os.hostname()
 			}
 		}
 	});
-	if(!this || !mdb || !guild || !role || !oldRole || (role.id === guild.id || oldRole.id === guild.id)) return;
-	const gConfig = await mdb.collection("guilds").findOne({id: guild.id}),
+	if (!this || !mdb || !guild || !role || !oldRole || (role.id === guild.id || oldRole.id === guild.id)) return;
+	const gConfig = await mdb.collection("guilds").findOne({
+			id: guild.id
+		}),
 		ev = "roleupdate";
-	if(!gConfig) return;
-	if([undefined,null,""].includes(gConfig.logging[ev])) return mdb.collection("guilds").findOneAndUpdate({ id: guild.id },{
+	if (!gConfig) return;
+	if ([undefined, null, ""].includes(gConfig.logging[ev])) return mdb.collection("guilds").findOneAndUpdate({
+		id: guild.id
+	}, {
 		$set: {
 			[`logging.${ev}`]: {
 				enabled: false,
@@ -56,9 +42,11 @@ module.exports = (async function(guild,role,oldRole) {
 			}
 		}
 	});
-	if(!gConfig.logging[ev].enabled) return;
+	if (!gConfig.logging[ev].enabled) return;
 	const ch = guild.channels.get(gConfig.logging[ev].channel);
-	if(!ch) return mdb.collection("guilds").findOneAndUpdate({ id: guild.id },{
+	if (!ch) return mdb.collection("guilds").findOneAndUpdate({
+		id: guild.id
+	}, {
 		$set: {
 			[`logging.${ev}`]: {
 				enabled: false,
@@ -74,8 +62,7 @@ module.exports = (async function(guild,role,oldRole) {
 		},
 		title: "Role Updated",
 		description: `Role ${role.name} (${role.id}) was updated`,
-		fields: [
-			{
+		fields: [{
 				name: "Old Role Info",
 				value: `Name: ${oldRole.name}\n\
 				Hoisted: ${oldRole.hoisted ? "Yes": "No"}\n\
@@ -97,10 +84,12 @@ module.exports = (async function(guild,role,oldRole) {
 				inline: false
 			}
 		],
-		color: this.randomColor(),
+		color: functions.randomColor(),
 		timestamp: this.getCurrentTimestamp()
 	};
-	return ch.createMessage({ embed }).catch(err => {
+	return ch.createMessage({
+		embed
+	}).catch(err => {
 		this.logger.error(err);
 	});
 });
