@@ -57,7 +57,6 @@ module.exports = (async function (message) {
 		id: message.channel.guild.id
 	});
 
-	console.log(this.blNoticeViewed);
 	blacklist = blU.blacklisted || blG.blacklisted;
 
 
