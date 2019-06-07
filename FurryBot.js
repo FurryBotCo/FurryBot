@@ -44,7 +44,8 @@ class FurryBot extends Base {
 		this.varParse = require("./util/varHandler");
 		this.lang = require("./lang")(this);
 		this.furpile = {};
-		this.yiffNoticeViewed = new Set();
+		this.yiffNoticeViewed = new Set()
+		this.blNoticeViewed = new Set();
 		this.Eris = Eris;
 		this.logger = new this.Logger.FurryBotLogger();
 

@@ -40,9 +40,35 @@ module.exports = (async function (message) {
 
 	if (message.author.bot || (config.devOnly && !config.developers.includes(message.author.id))) return;
 
+	//blacklist = (message.uConfig.blacklisted && !message.user.isDeveloper) || message.gConfig.blacklisted;
+
+	let blU = {
+		blacklist: false
+	};
+
+	if (!config.developers.includes(message.author.id)) blU = await mdb.collection("users").findOne({
+		id: message.author.id
+	});
+	let blG = {
+		blacklist: false
+	};
+
+	if (!config.developers.includes(message.author.id) && message.channel.guild && !config.whitelistedGuilds.includes(message.channel.guild.id)) blG = await mdb.collection("guilds").findOne({
+		id: message.channel.guild.id
+	});
+
+	console.log(this.blNoticeViewed);
+	blacklist = blU.blacklisted || blG.blacklisted;
+
 
 	if (message.channel.type === 1) {
 
+		if (blU.blacklisted) {
+			if (this.blNoticeViewed.has(blU.id)) return;
+
+			this.blNoticeViewed.add(blU.id);
+			return message.channel.createMessage(`<@!${message.author.id}>, You are blacklisted from using this bot, reason: ${blU.blacklistReason}`);
+		}
 		let dmAds;
 		// dm advertising to bot
 		if (/discord\.gg/gi.test(message.content.toLowerCase())) {
@@ -126,9 +152,24 @@ module.exports = (async function (message) {
 
 	}
 
+	const m = await this.setupMessage(message);
+	Object.assign(message, m);
+
 	if (message.content === `<@${this.bot.user.id}>` || message.content === `<@!${this.bot.user.id}>`) {
 		/*c = await require(`${process.cwd()}/commands/${config.commandList.fullList["help"].category}/help-cmd.js`)(message);
 		if(c instanceof Error) throw c;*/
+
+		if (blU.blacklisted) {
+			if (this.blNoticeViewed.has(blU.id)) return;
+
+			this.blNoticeViewed.add(blU.id);
+			return message.channel.createMessage(`<@!${message.author.id}>, You are blacklisted from using this bot, reason: ${blU.blacklistReason}`);
+		} else if (blG.blacklisted) {
+			if (this.blNoticeViewed.has(blG.id)) return;
+
+			this.blNoticeViewed.add(blG.id);
+			return message.channel.createMessage(`<@!${message.author.id}>, This server is blacklisted from using this bot, reason: ${blG.blacklistReason}`);
+		}
 		embed = {
 			title: "Hewwo!",
 			description: `You can find out how to use me by running **${message.gConfig.prefix}help**, my current prefix here is: **${message.gConfig.prefix}**\n(this can be changed via \`${message.gConfig.prefix}prefix <newprefix>\`\nTo invite me to new servers, use [this link](https://discordapp.com/oauth2/authorize?this_id=${this.bot.user.id}&scope=bot&permissions=-1))`
@@ -148,12 +189,7 @@ module.exports = (async function (message) {
 		}
 	}
 
-	const m = await this.setupMessage(message);
-	Object.assign(message, m);
-
-	blacklist = (message.uConfig.blacklisted && !message.user.isDeveloper) || message.gConfig.blacklisted;
-
-	if (["owo", "uwu"].some(r => message.content.toLowerCase() === r)) {
+	if (["owo", "uwu"].some(r => message.content.toLowerCase() === r) && !blacklist) {
 		let cn;
 		switch (message.content.toLowerCase()) {
 			case "owo":
@@ -252,7 +288,18 @@ module.exports = (async function (message) {
 		}
 	}
 
-	if (this.responseList.includes(message.content.toLowerCase()) && !blacklist) {
+	if (this.responseList.includes(message.content.toLowerCase())) {
+		if (blU.blacklisted) {
+			if (this.blNoticeViewed.has(blU.id)) return;
+
+			this.blNoticeViewed.add(blU.id);
+			return message.channel.createMessage(`<@!${message.author.id}>, You are blacklisted from using this bot, reason: ${blU.blacklistReason}`);
+		} else if (blG.blacklisted) {
+			if (this.blNoticeViewed.has(blG.id)) return;
+
+			this.blNoticeViewed.add(blG.id);
+			return message.channel.createMessage(`<@!${message.author.id}>, This server is blacklisted from using this bot, reason: ${blG.blacklistReason}`);
+		}
 		response = this.getResponse(message.content.toLowerCase());
 		if (response.triggers.includes("f") && !message.gConfig.fResponseEnabled) return;
 		this.logger.command(`Response "${response.triggers[0]}" triggered by user ${message.author.tag} (${message.author.id}) in guild ${message.channel.guild.name} (${message.channel.guild.id})`);
@@ -313,6 +360,19 @@ module.exports = (async function (message) {
 		return;
 	}*/
 	if (!command || !category) return;
+
+
+	if (blU.blacklisted) {
+		if (this.blNoticeViewed.has(blU.id)) return;
+
+		this.blNoticeViewed.add(blU.id);
+		return message.channel.createMessage(`<@!${message.author.id}>, You are blacklisted from using this bot, reason: ${blU.blacklistReason}`);
+	} else if (blG.blacklisted) {
+		if (this.blNoticeViewed.has(blG.id)) return;
+
+		this.blNoticeViewed.add(blG.id);
+		return message.channel.createMessage(`<@!${message.author.id}>, This server is blacklisted from using this bot, reason: ${blG.blacklistReason}`);
+	}
 
 	if (category.name.toLowerCase() === "custom" && message.channel.guild.id !== config.bot.mainGuild) return;
 	message.command = command.triggers[0];
