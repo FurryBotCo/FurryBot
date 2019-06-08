@@ -57,7 +57,11 @@ module.exports = (async function (message) {
 		id: message.channel.guild.id
 	});
 
-	blacklist = blU.blacklisted || blG.blacklisted;
+	try {
+		blacklist = blU.blacklisted || blG.blacklisted;
+	} catch (e) {
+		blacklist = false;
+	}
 
 
 	if (message.channel.type === 1) {
