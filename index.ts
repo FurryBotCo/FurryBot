@@ -3,6 +3,10 @@ import config from "@config";
 import * as fs from "fs";
 import functions from "@src/util/functions";
 
+Object.assign(config.bot.clientOptions, {
+    shardCount: "auto"
+});
+
 const bot = new FurryBot(config.bot.token, config.bot.clientOptions);
 
 bot.connect();
