@@ -28,7 +28,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	if (!config.beta) this.ls = setInterval(ListStats, 3e5, this);
 
-	this.Temp = new Temp(`${__dirname}/tmp`);
+	this.Temp = new Temp(`${config.rootDir}/tmp`);
 
 	process.on("exit", this.Temp.clean)
 		.on("SIGINT", this.Temp.clean)
