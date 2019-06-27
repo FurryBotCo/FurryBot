@@ -50,6 +50,7 @@
     "truncate": "^2.1.0",
     "ts-node-dev": "^1.0.0-pre.40",
     "tsconfig-paths": "^3.8.0",
+    "typescript": "^3.5.2",
     "util": "^0.12.0"
   }
 }

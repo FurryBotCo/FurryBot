@@ -78,4 +78,4 @@ tmp/*
 
 *ssl*
 test.js
-run.*
+run.sh
