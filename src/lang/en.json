@@ -1,0 +1,57 @@
+{
+	"$schema": "https://assets.furry.bot/LangSchema.json",
+	"bap": [
+		"{0} smacks {1} hard on the snoot with a rolled up news paper!",
+		"{0} goes to smack {1} on the snoot with a news paper, but missed and hit themselves!"
+	],
+	"boop": [
+		"{0} has booped {1}!\nOwO",
+		"{0} lightly pokes the nose of {1}!\nOwO"
+	],
+	"cuddle": [
+		"{0} has cuddled {1}!\nThey're so cute!",
+		"{0} sneaks up behind {1} and cuddles them!\nIsn't that sweet!"
+	],
+	"dictionary": [
+		"{0} throws a dictionary at {1} screaming \"KNOWLEDGE\"!!",
+		"{0} drops some knowledge on {1}, with their dictionary!",
+		"{0} drops their entire english homework folder onto {1}, it seems it flattened them!\nMust be a lot of homework!"
+	],
+	"flop": [
+		"{0} flops over onto {1}!\nOof",
+		"{0} lays on {1}.. owo",
+		"{0} jumps onto {1}!\nYikes! Hopefully they aren't too heavy!"
+	],
+	"glomp": [
+		"{0} pounces onto {1}, tackling them to the floor in a giant hug! {0} whispers \"I love you~\" quitely into {1}'s ear."
+	],
+	"hug": [
+		"{0} sneaks up beind {1}, and when they aren't looking, tackles them from behind in the biggest hug ever!\nAww",
+		"{0} gently wraps their arms around {1}!",
+		"{0} wraps their arms around {1}, giving them a big warm hug!"
+	],
+	"kiss": [
+		"{0} kisses {1}!\nThey must be in love!\n:blue_heart:",
+		"{0} kisses {1}!\nCute!"
+	],
+	"lick": [
+		"{0} licks {1}\nUwU",
+		"{0} decides to make {1}'s fur a little slimy..."
+	],
+	"nuzzle": [
+		"{0} nuzzles {1} gently\nIsn't that cute!"
+	],
+	"pat": [
+		"{0} pats {1} on the head for being a good boi (or girl/other)",
+		"{0} gently pets {1}"
+	],
+	"sniff": [
+		"{0} sniffs {1}\nMaybe they smell good..?"
+	],
+	"poke": [
+		"{0} pokes {1}\nDon't make them mad.."
+	],
+	"nap": [
+		"{0} decided to take a nap on {1}"
+	]
+}
