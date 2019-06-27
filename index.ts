@@ -26,7 +26,7 @@ bot.on("shardDisconnect", (error: string, id: number) => {
         let embed = {
             title: "Shard Status Update",
             description: `Shard ${id} is ready!`,
-            time: new Date().toISOString(),
+            timestamp: new Date().toISOString(),
             color: functions.randomColor()
         };
         bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
