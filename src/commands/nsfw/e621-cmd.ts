@@ -35,7 +35,11 @@ export default new Command({
 	if (bl !== null && bl.length > 0) return msg.channel.createMessage(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
 	try {
 		req = await phin({
-			url: `https://e621.net/post/index.json?limit=50&tags=${tags}%20rating%3Aexplict`
+			url: `https://e621.net/post/index.json?limit=50&tags=${tags}%20rating%3Aexplict`,
+			headers: {
+				"User-Agent": config.web.userAgentExt("Donovan_DMC"),
+				"Content-Type": "application/json"
+			}
 		}).then(res => res.body.toString());
 		if (req.indexOf("block.opendns.com") !== -1) return msg.reply("This command is blocked on the current network the bot is being ran on.");
 		req = JSON.parse(req);
