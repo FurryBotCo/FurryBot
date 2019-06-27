@@ -8,6 +8,6 @@ export default class Temp {
 	}
 
 	clean() {
-		return fs.readdirSync(this.dir).map(d => fs.unlinkSync(`${this.dir}/${d}`));
+		return fs.readdirSync(`${__dirname}/../../tmp`).map(d => fs.unlinkSync(`${__dirname}/../../tmp/${d}`));
 	}
 }
