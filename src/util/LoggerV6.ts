@@ -51,7 +51,7 @@ class Logger {
         const d = date.toString().split(" ")[4];
         const logDir = `${__dirname}/../../logs`;
         if (!fs.existsSync(logDir)) {
-            process.stdout.write(`log directory (${logDir}) does not exist`);
+            process.stderr.write(`log directory (${logDir}) does not exist\n`);
             return false;
         }
         let c: Chalk;
