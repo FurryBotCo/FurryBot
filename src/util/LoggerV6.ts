@@ -69,11 +69,11 @@ class Logger {
                 break;
 
             case "info":
-                c = chalk.blue;
+                c = chalk.green;
                 break;
 
             case "debug":
-                c = chalk.blue;
+                c = chalk.cyan;
                 break;
         }
         if (msg.toString().indexOf(config.bot.token)) msg = msg.toString().replace(new RegExp(config.bot.token, "g"), "[TOKEN]");
