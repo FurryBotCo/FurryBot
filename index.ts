@@ -1,7 +1,7 @@
 import FurryBot from "@FurryBot";
 import config from "@config";
 import * as fs from "fs";
-import functions from "@src/util/functions";
+import functions from "@util/functions";
 
 const bot = new FurryBot(config.bot.token, config.bot.clientOptions);
 
@@ -26,7 +26,7 @@ bot.on("shardDisconnect", (error: string, id: number) => {
         let embed = {
             title: "Shard Status Update",
             description: `Shard ${id} is ready!`,
-            time: new Date().toISOString(),
+            timestamp: new Date().toISOString(),
             color: functions.randomColor()
         };
         bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {

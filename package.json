@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "5.0.0",
+  "version": "5.0.2",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {
@@ -39,7 +39,7 @@
     "chalk": "^2.4.2",
     "chunk": "0.0.2",
     "deasync": "^0.1.15",
-    "eris": "github:abalabahaha/eris#pull/498/head",
+    "eris": "github:DonovanDMC/eris#dev",
     "eval": "^0.1.3",
     "express": "^4.17.1",
     "lodash": "^4.17.11",

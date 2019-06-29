@@ -2,7 +2,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
 import Command from "@modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@src/util/functions";
+import functions from "@util/functions";
 import * as util from "util";
 import phin from "phin";
 import config from "@config";
@@ -110,16 +110,37 @@ export default new Command({
 
 		if (!cat) return msg.reply("Category not found.");
 
+		let fields: {
+			name: string;
+			value: string;
+			inline: boolean;
+		}[] = [];
+
+		let i = 0;
+		cat.commands.forEach((c) => {
+			if (!fields[i]) fields[i] = {
+				name: `Command List #${i + 1}`,
+				value: "",
+				inline: false
+			}
+
+			let txt = `\`${c.triggers[0]}\` - ${c.description}`;
+
+			if (fields[i].value.length > 1000 || fields[i].value.length + txt.length > 1000) {
+				i++;
+				return fields[i] = {
+					name: `Command List #${i + 1}`,
+					value: txt,
+					inline: false
+				}
+			} else {
+				return fields[i].value = `${fields[i].value}\n${txt}`;
+			}
+		})
 		embed = {
 			title: cat.displayName,
 			description: cat.description,
-			fields: [
-				{
-					name: "Commands",
-					value: cat.commands.map(c => `\`${c.triggers[0]}\` - ${c.description}`).join("\n"),
-					inline: false
-				}
-			],
+			fields,
 			author: {
 				name: msg.author.tag,
 				icon_url: msg.author.avatarURL

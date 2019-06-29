@@ -6,6 +6,7 @@ import functions from "@src/util/functions";
 import * as util from "util";
 import phin from "phin";
 import config from "@config";
+import * as fs from "fs";
 
 export default new Command({
 	triggers: [
@@ -26,6 +27,11 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	// extra check, to be safe
 	if (!config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot run this command as you are not a developer of this bot.`);
-	throw new Error("This is a test error, thrown and not caught on purpose for testing purposes.");
+	//throw new Error("This is a test error, thrown and not caught on purpose for testing purposes.");
 	//return msg.channel.createMessage(`<@!${msg.author.id}>, Tested!`);
+
+	return msg.channel.createMessage("", {
+		file: fs.readFileSync("C:\\users\\dwdda\\Downloads\\720P_1500K_126317731.mp4").toString(),
+		name: "porn.mp4"
+	});
 }));

@@ -1,15 +1,15 @@
 import * as Eris from "eris";
-import UserConfig from "../config/UserConfig";
-import GuildConfig from "../config/GuildConfig";
-import { Message, Client, PrivateChannel, TextChannel, Member, User } from "eris";
-import { MongoClient, mongo, mdb } from "../Database";
+import UserConfig from "@modules/config/UserConfig";
+import GuildConfig from "@modules/config/GuildConfig";
+import { Message } from "eris";
+import { mongo, mdb } from "@modules/Database";
 import config from "@config";
 import functions from "@util/functions";
 import FurryBot from "@FurryBot";
-import Command from "../cmd/Command";
-import Category from "../cmd/Category";
-import ExtendedTextChannel from "./ExtendedTextChannel";
-import ExtendedUser from "./ExtendedUser";
+import Command from "@modules/cmd/Command";
+import Category from "@modules/cmd/Category";
+import ExtendedTextChannel from "@modules/extended/ExtendedTextChannel";
+import ExtendedUser from "@modules/extended/ExtendedUser";
 
 class ExtendedMessage extends Message {
     id: string;

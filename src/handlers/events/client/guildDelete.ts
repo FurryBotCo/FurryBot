@@ -3,7 +3,7 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "@config";
 import { O_NOCTTY } from "constants";
-import functions from "@src/util/functions";
+import functions from "@util/functions";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 

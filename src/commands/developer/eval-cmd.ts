@@ -3,7 +3,7 @@ import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
 import Command from "@modules/cmd/Command";
 import { performance } from "perf_hooks";
 import * as Eris from "eris";
-import functions from "@src/util/functions";
+import functions from "@util/functions";
 import * as util from "util";
 import phin from "phin";
 import config from "@config";

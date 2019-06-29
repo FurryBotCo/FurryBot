@@ -2,7 +2,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
 import Command from "@modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@src/util/functions";
+import functions from "@util/functions";
 import * as util from "util";
 import phin from "phin";
 import config from "@config";
@@ -16,7 +16,7 @@ export default new Command({
 		"attachFiles"
 	],
 	cooldown: 2e3,
-	description: "Get a random fur image! use `fur list	 to get a list of all supported types!",
+	description: "Get a random fur image! use **fur list** to get a list of all supported types!",
 	usage: "[type]",
 	nsfw: false,
 	devOnly: false,

@@ -10,6 +10,7 @@ import ExtendedUser from "@src/modules/extended/ExtendedUser";
 import * as Eris from "eris";
 import FurryBot from "@src/main";
 import { mdb } from "@modules/Database";
+import ErrorHandler from "@util/ErrorHandler";
 
 // moved to separate variable as it is needed in a function here
 const random = ((len: number = 10, keyset: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string => {
@@ -20,6 +21,8 @@ const random = ((len: number = 10, keyset: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZa
 
     return rand;
 });
+
+export { ErrorHandler }
 
 export default {
     memory: {
@@ -262,7 +265,7 @@ export default {
                     length: url.length,
                     link: `https://furry.services/r/${rand}`
                 });
-            if (a.errors === 1) {
+            if (!a.result.ok) {
                 return create(url);
             } else {
                 return {
