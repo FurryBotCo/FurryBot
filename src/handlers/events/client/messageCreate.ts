@@ -3,7 +3,7 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
 import Permissions from "@util/Permissions";
-import functions from "@util/functions";
+import functions, { ErrorHandler } from "@util/functions"
 import { performance } from "perf_hooks";
 import config from "@config";
 import { mdb } from "@modules/Database";
@@ -325,6 +325,15 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				break; // eslint-disable-line no-unreachable
 
 			default:
+				// internal error handling
+				const er = ErrorHandler(err);
+				if (!(er instanceof Error)) return msg.reply(er).catch(err =>
+					msg.author.getDMChannel().then(ch =>
+						ch.createMessage(`I couldn't send messages in the channel where that command was sent, so I've sent this here.\n${er}`)
+							.catch(err => null)
+					)
+				);
+
 				num = functions.random(10, "1234567890");
 				code = `${msg.cmd.command.map(c => c.triggers[0]).join(".")}.${config.beta ? "beta" : "stable"}.${num}`;
 				this.logger.error(`[CommandHandler] e1: ${err.name}: ${err.message}\n${err.stack},\nError Code: ${code}`);

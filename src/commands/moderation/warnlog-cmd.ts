@@ -2,7 +2,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
 import Command from "@modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@src/util/functions";
+import functions from "@util/functions";
 import * as util from "util";
 import phin from "phin";
 import config from "@config";
@@ -56,7 +56,7 @@ export default new Command({
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
-	warnings = await mdb.collection("users").findOne({ id: user.id }).then(res => new UserConfig(msg.author.id, res)).then(res => res.warnings.filter(w => w.gid === msg.channel.guild.id).sort((s, g) => s.id < g.id ? -1 : s.id > g.id ? 1 : 0).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()));
+	warnings = await mdb.collection("users").findOne({ id: user.id }).then(res => new UserConfig(msg.author.id, res)).then(res => res.warnings.filter(w => w.gid === msg.channel.guild.id).sort((s, g) => s.wid < g.wid ? -1 : s.wid > g.wid ? 1 : 0).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()));
 	if (warnings.length <= 0) {
 		embed = {
 			title: "No Warnings Found",

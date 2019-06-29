@@ -2,7 +2,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
 import Command from "@modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@src/util/functions";
+import functions from "@util/functions";
 import * as util from "util";
 import phin from "phin";
 import config from "@config";
@@ -33,7 +33,7 @@ export default new Command({
 	if (msg.args.length !== 0) {
 		nsfw = msg.args[0].toLowerCase() === "nsfw";
 	} else nsfw = Math.random() < .5;
-	let s = await mongo.db("furrybot").collection("shorturl").find({ nsfw }).toArray();
+	let s: any[] | any = await mongo.db("furrybot").collection("shorturl").find({ nsfw }).toArray();
 
 	if (s.length === 0) return msg.reply("No results were found.");
 

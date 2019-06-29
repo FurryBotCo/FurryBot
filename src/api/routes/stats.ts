@@ -1,7 +1,7 @@
 import express from "express";
 import { mdb } from "@modules/Database";
 import client from "@root/index";
-import functions from "@src/util/functions";
+import functions from "@util/functions";
 import config from "@src/config/config";
 
 const app = express.Router();

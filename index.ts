@@ -1,7 +1,7 @@
 import FurryBot from "@FurryBot";
 import config from "@config";
 import * as fs from "fs";
-import functions from "@src/util/functions";
+import functions from "@util/functions";
 
 const bot = new FurryBot(config.bot.token, config.bot.clientOptions);
 
