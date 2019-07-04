@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {
@@ -32,6 +32,7 @@
     "@types/mongodb": "^3.1.28",
     "@types/node": "^12.0.7",
     "@types/phin": "^3.3.0",
+    "@types/uuid": "^3.4.5",
     "blapi": "^1.1.0",
     "body-parser": "^1.19.0",
     "canvas": "^2.5.0",
@@ -40,6 +41,7 @@
     "chunk": "0.0.2",
     "deasync": "^0.1.15",
     "eris": "github:DonovanDMC/eris#dev",
+    "erlpack": "github:discordapp/erlpack",
     "eval": "^0.1.3",
     "express": "^4.17.1",
     "lodash": "^4.17.11",
@@ -51,6 +53,8 @@
     "ts-node-dev": "^1.0.0-pre.40",
     "tsconfig-paths": "^3.8.0",
     "typescript": "^3.5.2",
-    "util": "^0.12.0"
+    "util": "^0.12.0",
+    "uuid": "^3.3.2",
+    "yargs": "^13.2.4"
   }
 }
