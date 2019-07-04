@@ -4,7 +4,7 @@ import client from "@root/index";
 import functions from "@util/functions";
 import config from "@src/config/config";
 
-const app = express.Router();
+const app: express.Router = express.Router();
 
 app.get("/", async (req, res) => {
 	let d, date, a, dailyJoins;
