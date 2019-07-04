@@ -63,7 +63,7 @@ export default {
     secondsToHours: ((sec: number) => {
         let hours: string | number = Math.floor(sec / 3600);
         let minutes: string | number = Math.floor((sec - (hours * 3600)) / 60);
-        let seconds: string | number = sec - (hours * 3600) - (minutes * 60);
+        let seconds: string | number = Math.floor(sec - (hours * 3600) - (minutes * 60));
 
         if (hours < 10) hours = `0${hours}`;
         if (minutes < 10) minutes = `0${minutes}`;
