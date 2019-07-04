@@ -47,7 +47,7 @@ export default new Command({
 	if (remove.length > 0) await mdb.collection("guilds").findOneAndUpdate({ id: msg.channel.guild.id }, { $pull: { selfAssignableRoles: { $each: remove } } });
 	embed = {
 		title: "Self Assignable Roles",
-		description: `To gain a role, use the command \`${msg.gConfig.prefix}iam <role name>\`\nTo go to the next page, use \`${msg.gConfig.prefix}\`lsar [page].\nPage ${page}/${c.length}`,
+		description: `To gain a role, use the command \`${msg.gConfig.prefix}iam <role name>\`\nTo go to the next page, use \`${msg.gConfig.prefix}lsar [page]\`.\nPage ${page}/${c.length}`,
 		fields: [
 			{
 				name: "Roles",

@@ -31,7 +31,7 @@ export default new Command({
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	let role, roles, a, b;
-	role = await msg.getRoleFromArgs();
+	role = await msg.getRoleFromArgs(0, true, true);
 	if (!role) return msg.errorEmbed("INVALID_ROLE");
 	a = functions.compareMemberWithRole(msg.member, role);
 	b = functions.compareMemberWithRole(msg.guild.members.get(this.user.id), role);
