@@ -126,6 +126,8 @@ class ExtendedMessage extends Message {
                     return res;
                 } else return res;
             }).then(res => new GuildConfig(this.channel.guild.id, res));
+
+            //this.author.dmChannel = this.author.bot ? null : await this.author.getDMChannel();
         }
 
 
@@ -249,13 +251,18 @@ class ExtendedMessage extends Message {
         if (!this.guild || !(this.guild instanceof Guild)) throw new TypeError("invalid or missing guild on this");
 
         // member mention
-        if (this.mentionMap.members.length >= mentionPosition + 1) return this.mentionMap.users.slice(mentionPosition)[mentionPosition];
+        if (this.mentionMap.users.length >= mentionPosition + 1) return this.mentionMap.users.slice(mentionPosition)[mentionPosition];
         // user ID
         if (![undefined, null, ""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.guild.members.get(args[argPosition]).user;
 
         // username
         // update this to fix error "cannot read property 'user' of undefined" at the end
-        if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find(m => m.user.username.toLowerCase() === args[argPosition].toLowerCase()).user;
+        // ^ fixed
+        if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
+            try {
+                return this.channel.guild.members.find(m => m.user.username.toLowerCase() === args[argPosition].toLowerCase()).user;
+            } catch (e) { }
+        }
 
         // user tag
         if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition + 1)) return this.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase()).user;
