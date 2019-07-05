@@ -184,14 +184,17 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			if (!msg.channel.permissionsOf(this.user.id).has("readMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `readMessages` permission to run the command you tried to run.").catch(err => null));
 			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `sendMessages` permission to run the command you tried to run.").catch(err => null));
 
-			if (msg.cmd.category.name === "custom" && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("This command cannot be ran in this server!");
+			//if (msg.cmd.category.name === "custom" && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("This command cannot be ran in this server!");
 
 			if (cmd.devOnly && !config.developers.includes(msg.author.id)) return msg.reply("You cannot run this command as you are not a developer of this bot.");
 
 			if (cmd.guildOwnerOnly && (msg.author.id !== msg.guild.ownerID) && !config.developers.includes(msg.author.id)) return msg.reply("This command can only be ran by the owner of this server.");
 
 			if (cmd.nsfw) {
-				if (!msg.channel.nsfw) return msg.reply("This command can only be ran in nsfw channels.");
+				if (!msg.channel.nsfw) return msg.reply("This command can only be ran in nsfw channels.", {
+					file: await functions.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
+					name: "nsfw.gif"
+				});
 				if (!msg.gConfig.nsfwEnabled) return msg.reply(`You must enable nsfw commands to use this, have a server administrator run \`${msg.gConfig.prefix}togglensfwcommands\``);
 
 				if (![undefined, null, ""].includes(msg.channel.topic) && config.yiff.disableStatements.some(y => msg.channel.topic.trim().indexOf(y) !== -1)) {
