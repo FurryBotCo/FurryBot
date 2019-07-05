@@ -53,5 +53,8 @@
 	],
 	"nap": [
 		"{0} decided to take a nap on {1}"
+	],
+	"huff": [
+		"{0} huffed, and puffed, and blew {1}'s house down!"
 	]
 }
