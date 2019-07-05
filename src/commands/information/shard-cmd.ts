@@ -28,7 +28,7 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	let embed: Eris.EmbedOptions = {
 		title: "Shard Info",
-		description: `Guilds: ${this.guilds.filter(g => g.shard.id === msg.guild.shard.id).length}\nPing: ${msg.guild.shard.latency}`,
+		description: `Guilds: ${this.guilds.filter(g => g.shard.id === msg.guild.shard.id).length}\nPing: ${msg.guild.shard.latency}ms`,
 		color: functions.randomColor(),
 		timestamp: new Date().toISOString()
 	}

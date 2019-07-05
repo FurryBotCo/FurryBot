@@ -30,7 +30,7 @@ export default new Command({
 		title: "Shard Info",
 		fields: this.shards.map(s => ({
 			name: `Shard #${s.id}`,
-			value: `Guilds: ${this.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency}`,
+			value: `Guilds: ${this.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency}ms`,
 			inline: true
 		})),
 		color: functions.randomColor(),
