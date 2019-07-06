@@ -85,6 +85,7 @@ process.on("SIGINT", () => {
 	bot.disconnect({
 		reconnect: false
 	});
+	fs.unlinkSync(`${__dirname}/process.pid`);
 	process.kill(process.pid);
 });
 
