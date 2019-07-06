@@ -8,6 +8,7 @@ import Category from "@modules/cmd/Category";
 import functions from "@util/functions";
 import Temp from "@util/Temp";
 import MessageCollector from "@util/MessageCollector";
+import Trello from "trello";
 
 class FurryBot extends Eris.Client {
     logger: Logger;
@@ -23,6 +24,7 @@ class FurryBot extends Eris.Client {
     Temp: Temp;
     MessageCollector: MessageCollector;
     yiffNoticeViewed: Set<string>;
+    tclient: Trello;
     constructor(token: string, options: Eris.ClientOptions) {
         super(token, options);
 
@@ -46,6 +48,7 @@ class FurryBot extends Eris.Client {
 
         this.MessageCollector = new MessageCollector(this);
 
+        this.tclient = new Trello(config.apis.trello.apiKey, config.apis.trello.apiToken);
         global.console.log = (async (msg: string | any[] | Object | Buffer | Promise<any>): Promise<boolean> => this.logger._log("log", msg));
         global.console.info = (async (msg: string | any[] | Object | Buffer | Promise<any>): Promise<boolean> => this.logger._log("info", msg));
         global.console.debug = (async (msg: string | any[] | Object | Buffer | Promise<any>): Promise<boolean> => this.logger._log("debug", msg));

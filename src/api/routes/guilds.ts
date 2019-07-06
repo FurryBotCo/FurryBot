@@ -3,7 +3,7 @@ import config from "@config";
 import client from "@root/index";
 import functions from "@src/api/functions";
 
-const app = express.Router();
+const app: express.Router = express.Router();
 
 app.get("/", async (req, res) => {
 	let jsn: {

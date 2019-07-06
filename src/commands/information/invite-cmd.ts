@@ -35,7 +35,7 @@ export default new Command({
 		"manageChannels",
 		"manageGuild",
 		"addReactions",
-		"viewAduitLog",
+		"viewAuditLogs",
 		"voicePrioritySpeaker",
 		"readMessages",
 		"sendMessages",
@@ -49,12 +49,12 @@ export default new Command({
 		"voiceMuteMembers",
 		"voiceDeafenMembers",
 		"voiceMoveMembers",
-		"voiceuserVAD",
+		"voiceUseVAD",
 		"changeNickname",
 		"manageNicknames",
 		"manageRoles"
 	];
-	let botPerms = p.map(perm => Permissions.constant[perm]).reduce((a, b) => a + b);
+	let botPerms = p.map(perm => Permissions.constant[perm] || 0).reduce((a, b) => a + b);
 
 	let embed: Eris.EmbedOptions;
 	embed = {
@@ -64,6 +64,7 @@ export default new Command({
 			url: "https://cdn.discordapp.com/embed/avatars/0.png"
 		}
 	};
+
 	Object.assign(embed, msg.embed_defaults());
-	msg.channel.createMessage({ embed });
+	return msg.channel.createMessage({ embed });
 }));

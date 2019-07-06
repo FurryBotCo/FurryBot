@@ -9,13 +9,15 @@ import config from "@config";
 
 export default new Command({
 	triggers: [
-		"bap"
+		"shards"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks"
+	],
 	cooldown: 2e3,
-	description: "Bap someone! Ouch!",
-	usage: "<@member/text>",
+	description: "Get some info about the shards of the bot",
+	usage: "",
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
@@ -24,18 +26,20 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	if (msg.args.length === 0) return new Error("ERR_INVALID_USAGE");
-	let input, text;
-	input = msg.args.join(" ");
-
-	text = functions.formatStr(msg.c, msg.author.mention, input);
-
-	if (msg.channel.permissionsOf(this.user.id).has("attachFiles")) {
-		msg.channel.createMessage(text, {
-			file: await functions.getImageFromURL("https://assets.furry.bot/bap.gif"),
-			name: "bap.gif"
-		});
-	} else {
-		msg.channel.createMessage(text);
+	let embed: Eris.EmbedOptions = {
+		title: "Shard Info",
+		fields: this.shards.map(s => ({
+			name: `Shard #${s.id}`,
+			value: `Guilds: ${this.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
+			inline: true
+		})),
+		color: functions.randomColor(),
+		timestamp: new Date().toISOString()
 	}
+
+	embed.fields[msg.guild.shard.id].name = `Shard #${msg.guild.shard.id} (current)`;
+
+	return msg.channel.createMessage({
+		embed
+	});
 }));

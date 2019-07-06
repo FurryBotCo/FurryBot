@@ -9,6 +9,8 @@ import phin from "phin";
 import config from "@config";
 import _eval from "@util/eval";
 import * as fs from "fs";
+import { mdb } from "@modules/Database";
+import Permissions from "@util/Permissions";
 
 export default new Command({
     triggers: [
@@ -57,7 +59,9 @@ export default new Command({
             phin,
             functions,
             util,
-            fs
+            fs,
+            mdb,
+            Permissions
         });
     } catch (e) {
         res = e;

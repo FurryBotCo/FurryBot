@@ -63,7 +63,7 @@ export default {
     secondsToHours: ((sec: number) => {
         let hours: string | number = Math.floor(sec / 3600);
         let minutes: string | number = Math.floor((sec - (hours * 3600)) / 60);
-        let seconds: string | number = sec - (hours * 3600) - (minutes * 60);
+        let seconds: string | number = Math.floor(sec - (hours * 3600) - (minutes * 60));
 
         if (hours < 10) hours = `0${hours}`;
         if (minutes < 10) minutes = `0${minutes}`;
@@ -408,5 +408,32 @@ export default {
             lower: b.position > role.position,
             same: b.position === role.position
         };
+    }),
+    everyOtherUpper: ((str: string): string => {
+        let res = "";
+        for (let i = 0; i < str.length; i++) {
+            res += i % 2 == 0 ? str.charAt(i).toUpperCase() : str.charAt(i);
+        }
+        return res;
+    }),
+    incrementDailyCounter: (async (positive: boolean = true, guildCount: number) => {
+        const d = new Date(),
+            date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
+
+        let a = await mdb.collection("dailyjoins").findOne({ date });
+        let count;
+        if (!a) {
+            count = 0;
+            await mdb.collection("dailyjoins").insertOne({ date, count, guildCount });
+        }
+        else count = a.count;
+
+        count = parseInt(count, 10);
+
+        if (isNaN(count)) count = 0;
+
+        if (positive) count++; else count--;
+
+        return mdb.collection("dailyjoins").findOneAndUpdate({ date }, { $set: { count, guildCount } });
     })
 };

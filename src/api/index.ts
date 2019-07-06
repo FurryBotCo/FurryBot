@@ -6,7 +6,7 @@ import chalk from "chalk";
 import client from "@root/index";
 import bodyParser from "body-parser";
 
-const app = express();
+const app: express.Application = express();
 
 app/*.use(async (req, res, next) => {
 	const s = process.hrtime();

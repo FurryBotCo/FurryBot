@@ -27,13 +27,15 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let user, req, b, rs, list, embed, i;
+	let user: Eris.User, req, b, rs, list, embed, i;
 	list = [];
 	if (msg.args.length === 0) return new Error("ERR_INVALID_USAGE");
 	// get user from message
 	user = await msg.getUserFromArgs();
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
+
+	if (!user.bot) return msg.reply("You cannot look up users.");
 
 	// botlist lookup
 	req = await phin({
@@ -74,7 +76,7 @@ export default new Command({
 	}
 	embed = {
 		title: "Botlist Info",
-		description: "All links redirect from our api to make keeping links up to date easier.",
+		description: "All links redirect from our api to make keeping links up to date easier.\nNote: we use an external api to fetch these, so some may be wrongfully listed.",
 		fields: [
 
 		]

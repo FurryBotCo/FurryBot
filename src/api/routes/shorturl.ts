@@ -1,7 +1,7 @@
 import express from "express";
 import { mongo } from "@modules/Database";
 
-const app = express();
+const app: express.Router = express();
 
 app.get("/:identifier", async (req, res) => {
 	const beta = ![undefined, null].includes(req.query.beta);

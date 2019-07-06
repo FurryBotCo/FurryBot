@@ -31,7 +31,7 @@ export default new Command({
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	let role, roles;
-	role = await msg.getRoleFromArgs();
+	role = await msg.getRoleFromArgs(0, true, true);
 	if (!role) return msg.errorEmbed("INVALID_ROLE");
 	roles = msg.gConfig.selfAssignableRoles;
 	if (!roles.includes(role.id)) return msg.channel.createMessage("this role is not listed as a self assignable role.");

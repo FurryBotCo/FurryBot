@@ -2,10 +2,11 @@ import ClientEvent from "@modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "@config";
-import { O_NOCTTY } from "constants";
 import functions from "@util/functions";
 
 export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
+
+    await functions.incrementDailyCounter(true, this.guilds.size);
 
     let author = {
         name: "Unknown#0000",

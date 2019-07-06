@@ -9,13 +9,13 @@ import config from "@config";
 
 export default new Command({
 	triggers: [
-		"bap"
+		"spray"
 	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 2e3,
-	description: "Bap someone! Ouch!",
-	usage: "<@member/text>",
+	description: "spray someone with a bottle of water..",
+	usage: "<@member/string>",
 	nsfw: false,
 	devOnly: false,
 	betaOnly: false,
@@ -27,15 +27,6 @@ export default new Command({
 	if (msg.args.length === 0) return new Error("ERR_INVALID_USAGE");
 	let input, text;
 	input = msg.args.join(" ");
-
 	text = functions.formatStr(msg.c, msg.author.mention, input);
-
-	if (msg.channel.permissionsOf(this.user.id).has("attachFiles")) {
-		msg.channel.createMessage(text, {
-			file: await functions.getImageFromURL("https://assets.furry.bot/bap.gif"),
-			name: "bap.gif"
-		});
-	} else {
-		msg.channel.createMessage(text);
-	}
+	msg.channel.createMessage(text);
 }));

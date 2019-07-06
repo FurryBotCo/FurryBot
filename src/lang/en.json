@@ -53,5 +53,23 @@
 	],
 	"nap": [
 		"{0} decided to take a nap on {1}"
+	],
+	"huff": [
+		"{0} huffed, and puffed, and blew {1}'s house down!"
+	],
+	"bellyrub": [
+		"{0} rubs {1}'s belly!"
+	],
+	"slap": [
+		"{0} slaps {1}.. ouch"
+	],
+	"spray": [
+		"{0} sprays {1} with a bottle of water, yelling \"bad fur!\""
+	],
+	"pounce": [
+		"{0} pounces onto {1} uwu"
+	],
+	"snowball": [
+		"{0} throws a snowball at {1}!"
 	]
 }

@@ -21,6 +21,8 @@ bot.on("shardDisconnect", (error: string, id: number) => {
         username: `Furry Bot Status${config.beta ? " - Beta" : ""}`,
         avatarURL: "https://i.furry.bot/furry.png"
     });
+
+    bot.logger.error(`Shard #${id} disconnected`);
 })
     .on("shardReady", (id: number) => {
         let embed = {
