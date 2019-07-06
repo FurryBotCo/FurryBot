@@ -29,8 +29,8 @@ export default new Command({
 	input = msg.args.join(" ");
 
 	text = functions.formatStr(msg.c, msg.author.mention, input);
-	if (msg.gConfig.commandImages) {
-		if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
+
+	if (msg.channel.permissionsOf(this.user.id).has("attachFiles")) {
 		msg.channel.createMessage(text, {
 			file: await functions.getImageFromURL("https://assets.furry.bot/bap.gif"),
 			name: "bap.gif"
