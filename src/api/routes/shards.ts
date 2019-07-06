@@ -13,7 +13,7 @@ app.get("/", async (req, res) => res.status(200).json({
 }))
 	.get("/:id", async (req, res) => {
 
-		const s = client.shards.get(parseInt(req.params.id,10));
+		const s = client.shards.get(parseInt(req.params.id, 10));
 		if (!s) return res.status(404).json({
 			success: false,
 			error: "invalid shard id"

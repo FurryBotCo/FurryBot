@@ -23,12 +23,12 @@ app.get("/", async (req, res) => {
 		shardCount: client.shards.size,
 		memoryUsage: {
 			process: {
-				used: functions.memory.process.getUsed(),
-				total: functions.memory.process.getTotal()
+	used: functions.memory.process.getUsed(),
+	total: functions.memory.process.getTotal()
 			},
 			system: {
-				used: functions.memory.system.getUsed(),
-				total: functions.memory.system.getTotal()
+	used: functions.memory.system.getUsed(),
+	total: functions.memory.system.getTotal()
 			}
 		},
 		largeGuildCount: client.guilds.filter(g => g.large).length,

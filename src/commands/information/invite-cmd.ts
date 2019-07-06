@@ -29,7 +29,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let p = [
+	const botPerms = [
 		"kickMembers",
 		"banMembers",
 		"manageChannels",
@@ -53,8 +53,7 @@ export default new Command({
 		"changeNickname",
 		"manageNicknames",
 		"manageRoles"
-	];
-	let botPerms = p.map(perm => Permissions.constant[perm] || 0).reduce((a, b) => a + b);
+	].map(perm => Permissions.constant[perm] || 0).reduce((a, b) => a + b);
 
 	let embed: Eris.EmbedOptions;
 	embed = {

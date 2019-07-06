@@ -29,7 +29,7 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	if (msg.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
 	let req, embed: Eris.EmbedOptions;
-	//		if(config.apis.ipinfo.regex.ipv4.test(msg.unparsedArgs.join(" ")) || config.apis.ipinfo.regex.ipv6.test(msg.unparsedArgs.join(" "))) {
+	// if(config.apis.ipinfo.regex.ipv4.test(msg.unparsedArgs.join(" ")) || config.apis.ipinfo.regex.ipv6.test(msg.unparsedArgs.join(" "))) {
 	req = await phin({
 		method: "GET",
 		url: `https://ipapi.co/${msg.unparsedArgs.join(" ")}/json`,
@@ -61,7 +61,7 @@ export default new Command({
 	return msg.channel.createMessage({
 		embed
 	});
-	//		} else {
-	//			return msg.channel.createMessage("Invalid ip address.");
-	//		}
+	// } else {
+	// return msg.channel.createMessage("Invalid ip address.");
+	// }
 }));

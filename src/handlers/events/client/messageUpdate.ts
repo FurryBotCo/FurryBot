@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import config from "@config";
 
 export default new ClientEvent("messageUpdate", (async function (this: FurryBot, message: Eris.Message, oldMessage: PartialMessage) {
-    if (!this || !message || !message.author || message.author.bot || !oldMessage || message.channel.type !== 0 || message.content === oldMessage.content) return;
+	if (!this || !message || !message.author || message.author.bot || !oldMessage || message.channel.type !== 0 || message.content === oldMessage.content) return;
 
-    this.emit("messageCreate", message);
+	this.emit("messageCreate", message);
 }));

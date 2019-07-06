@@ -56,7 +56,7 @@ export default new Command({
 
 	if (typeof res !== "string") {
 		if (typeof res === "undefined") res = "No Return";
-		//else if (res instanceof Array) res = res.join(" ");
+		// else if (res instanceof Array) res = res.join(" ");
 		else if (typeof res === "object") res = util.inspect(res, { depth: 3, showHidden: true });
 		else if (res instanceof Promise) res = await res;
 		else if (res instanceof Function) res = res.toString();
@@ -72,19 +72,19 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					"api_dev_key": config.apis.pastebin.devKey,
-					"api_user_key": config.apis.pastebin.userKey,
-					"api_option": "paste",
-					"api_paste_code": res,
-					"api_paste_private": "2",
-					"api_paste_name": "Furry Bot Shell Eval",
-					"api_paste_expire_date": "N"
+					api_dev_key: config.apis.pastebin.devKey,
+					api_user_key: config.apis.pastebin.userKey,
+					api_option: "paste",
+					api_paste_code: res,
+					api_paste_private: "2",
+					api_paste_name: "Furry Bot Shell Eval",
+					api_paste_expire_date: "1W"
 				}
 			});
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		let embed: Eris.EmbedOptions = {
+		const embed: Eris.EmbedOptions = {
 			title: `Evaluated in \`${(end - start).toFixed(3)}ms\``,
 			author: {
 				name: msg.author.tag,
@@ -113,13 +113,13 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					"api_dev_key": config.apis.pastebin.devKey,
-					"api_user_key": config.apis.pastebin.userKey,
-					"api_option": "paste",
-					"api_paste_code": res,
-					"api_paste_private": "2",
-					"api_paste_name": "Furry Bot Silent Shell Eval",
-					"api_paste_expire_date": "N"
+					api_dev_key: config.apis.pastebin.devKey,
+					api_user_key: config.apis.pastebin.userKey,
+					api_option: "paste",
+					api_paste_code: res,
+					api_paste_private: "2",
+					api_paste_name: "Furry Bot Silent Shell Eval",
+					api_paste_expire_date: "1W"
 				}
 			});
 			res = `Uploaded ${req.body.toString()}`;

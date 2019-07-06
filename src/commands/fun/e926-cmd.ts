@@ -36,8 +36,8 @@ export default new Command({
 		req = await phin({
 			url: `https://e926.net/post/index.json?limit=50&tags=${tags}%20rating%3Asafe`,
 			headers: {
-				"User-Agent": config.web.userAgentExt("Donovan_DMC"),
-				"Content-Type": "application/json"
+	"User-Agent": config.web.userAgentExt("Donovan_DMC"),
+	"Content-Type": "application/json"
 			}
 		}).then(res => JSON.parse(res.body.toString()));
 	} catch (e) {

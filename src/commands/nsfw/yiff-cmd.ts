@@ -26,10 +26,9 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let extra, type, embed, short;
-	extra = "";
+	let extra = "", type, embed, short;
 	if (msg.args.length === 0) {
-		for (let ytype of config.yiff.types) {
+		for (const ytype of config.yiff.types) {
 			if (msg.channel.name.indexOf(ytype) !== -1) type = ytype;
 		}
 

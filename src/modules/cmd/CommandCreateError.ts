@@ -1,9 +1,9 @@
 class CommandCreateError extends TypeError {
-    constructor(message?: string) {
-        super(message);
+	constructor(message?: string) {
+		super(message);
 
-        this.name = "CommandError";
-    }
+		this.name = "CommandError";
+	}
 }
 
 export default CommandCreateError;

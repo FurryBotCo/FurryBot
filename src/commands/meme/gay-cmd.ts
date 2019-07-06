@@ -27,7 +27,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let user, imgurl, m, req, j;
+	let user, imgurl, req, j;
 	if (msg.args.length >= 1) {
 		// get member from message
 		user = await msg.getUserFromArgs();

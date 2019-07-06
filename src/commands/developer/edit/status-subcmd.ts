@@ -29,7 +29,7 @@ export default new Command({
 	if (msg.args.length <= 0) return new Error("ERR_INVALID_USAGE");
 	const types = ["online", "idle", "dnd", "invisible"];
 	if (!types.includes(msg.args[0].toLowerCase())) return msg.channel.createMessage(`<@!${msg.author.id}>, invalid type. Possible types: **${types.join("**, **")}**.`);
-	let game = this.guilds.filter(g => g.members.has(this.user.id))[0].members.get(this.user.id).game;
+	const game = this.guilds.filter(g => g.members.has(this.user.id))[0].members.get(this.user.id).game;
 
 	try {
 		this.editStatus(msg.args[0].toLowerCase(), game);

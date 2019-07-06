@@ -5,7 +5,7 @@ import phin from "phin";
 
 export default (async (client: FurryBot) => {
 
-	let g = [];
+	const g = [];
 	try {
 		for (let i = 0; i < client.shards.size; i++) g.push(Object.values(client.guildShardMap).filter(s => s === i).length);
 		blapi.manualPost(client.guilds.size, client.user.id, config.botLists, 0, client.shards.size, g);
@@ -19,7 +19,7 @@ export default (async (client: FurryBot) => {
 			},
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: config.botLists["discordbots.org"]
+				"Authorization": config.botLists["discordbots.org"]
 			}
 		})
 			.then(req => JSON.parse(req.body.toString()));

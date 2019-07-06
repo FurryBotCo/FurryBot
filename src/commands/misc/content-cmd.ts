@@ -24,7 +24,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let req, counts, txt, content;
+	let req, counts, content;
 
 	req = await phin({
 		method: "GET",
@@ -36,16 +36,16 @@ export default new Command({
 	// TODO: Make recursive function for this
 
 	content = "";
-	for (let category in counts) {
+	for (const category in counts) {
 		content += `**${category}**\n`;
 		if (counts[category] instanceof Object) {
-			for (let level1 in counts[category]) {
+			for (const level1 in counts[category]) {
 				if (counts[category][level1] instanceof Object) {
 					content += `\t${level1}:\n`;
-					for (let level2 in counts[category][level1]) {
+					for (const level2 in counts[category][level1]) {
 						if (counts[category][level1][level2] instanceof Object) {
 							content += `\t\t${level2}:\n`;
-							for (let level3 in counts[category][level1][level2]) content += `\t\t\t${level3}: ${counts[category][level1][level2][level3]}\n`;
+							for (const level3 in counts[category][level1][level2]) content += `\t\t\t${level3}: ${counts[category][level1][level2][level3]}\n`;
 						} else content += `\t\t${level2}: ${counts[category][level1][level2]}\n`;
 					}
 				} else content += `\t${level1}: ${counts[category][level1]}\n`;

@@ -29,16 +29,16 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let entries: GuildConfig[] = await mdb.collection("guilds").find({ "blacklist.blacklisted": true }).toArray();
+	const entries: GuildConfig[] = await mdb.collection("guilds").find({ "blacklist.blacklisted": true }).toArray();
 
 	if (entries.length === 0) return msg.reply("no entries found");
-	let e = [];
+	const e = [];
 
 	let page = 1;
 
 	if (msg.args.length > 0) page = parseInt(msg.args[0], 10);
 
-	for (let en of entries) {
+	for (const en of entries) {
 		let s;
 		if (this.guilds.has(en.id)) s = await this.getRESTGuild(en.id);
 		else s = null;
@@ -47,10 +47,10 @@ export default new Command({
 		else e.push(`\`${s.name}\` (\`${en.id}\`) - ${en.blacklist.reason}`);
 	}
 
-	let ee = [];
+	const ee = [];
 
 	let i = 0;
-	for (let entry of e) {
+	for (const entry of e) {
 		if ([undefined, null, ""].includes(ee[i])) ee[i] = [];
 
 		if (ee[i].join("\n").length >= 1950 || ee[i].join("\n").length + entry.length >= 1950) i++;
@@ -61,7 +61,7 @@ export default new Command({
 
 	if (page < 1 || page > ee.length) return msg.reply(`Invalid page number ${page}, valid: 1-${ee.length}`);
 
-	let embed = {
+	const embed = {
 		title: `Server Blacklist List ${page}/${ee.length}`,
 		description: ee[page - 1].join("\n"),
 		timestamp: new Date().toISOString(),

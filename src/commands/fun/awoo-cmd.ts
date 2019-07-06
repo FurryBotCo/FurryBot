@@ -30,7 +30,7 @@ export default new Command({
 		if (msg.channel.awoo.inAwoo.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this awoo!`);
 		clearTimeout(msg.channel.awoo.timeout);
 		msg.channel.awoo.inAwoo.push(msg.author.id);
-		let txt = "<:Awoo:596965580481888258>".repeat(msg.channel.awoo.inAwoo.length);
+		const txt = "<:Awoo:596965580481888258>".repeat(msg.channel.awoo.inAwoo.length);
 		msg.channel.createMessage(`<@!${msg.author.id}> joined a howl with ${msg.channel.awoo.inAwoo.length} furs!\nJoin in using \`${msg.gConfig.prefix}awoo\`.\n${msg.channel.awoo.inAwoo.length > 30 ? "This howl is too large for emojis!" : txt}`);
 		msg.channel.awoo.timeout = setTimeout((ch) => {
 			delete ch.awoo;

@@ -36,7 +36,7 @@ export default new Command({
 		"lick",
 		"propose"
 	];
-	let ln, type, req, short, extra, jsn;
+	let ln, type, req, short, extra;
 	if (msg.args.length === 0) {
 		ln = Math.floor(Math.random() * (types.length));
 		// 0 (1) - 25: Inkbunny

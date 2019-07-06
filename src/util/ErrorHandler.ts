@@ -15,7 +15,7 @@ const errors = {
 	504: "Some server we were trying to contact returned a gateway timeout error.",
 	40005: "Whatever we tried to upload was too large. This is a Discord error, there is almost nothing we can do about this! Please try again.",
 	50013: "I cannot send messages to that channel."
-}
+};
 
 const errorText = {
 	400: "bad request",
@@ -30,7 +30,7 @@ const errorText = {
 	504: "gateway timeout",
 	40005: "request entity too large",
 	50013: "missing permissions"
-}
+};
 
 export default ((e: number | Error | string) => {
 	/*if (e instanceof DiscordRESTError || e instanceof DiscordHTTPError || ["DiscordRESTError", "DiscordHTTPError"].some(t => e.message.indexOf(t) !== -1)) {
@@ -42,17 +42,17 @@ export default ((e: number | Error | string) => {
 		else return `Error ${e}`;
 	} else if (e instanceof Error) {
 		if (Object.keys(errorText).some(t => e.message.toLowerCase().indexOf(t.toLowerCase()) !== -1)) {
-			for (let k in errorText) {
+			for (const k in errorText) {
 				if (e.message.toLowerCase().indexOf(errorText[k].toLowerCase()) !== -1) return `${errors[k]}\nCode: \`${k}\``;
 			}
 		} else if (Object.keys(errorText).some(t => e.name.indexOf(t) !== -1)) {
-			for (let k in errorText) {
+			for (const k in errorText) {
 				if (e.name.toLowerCase().indexOf(errorText[k].toLowerCase()) !== -1) return `${errors[k]}\nCode: \`${k}\``;
 			}
 		} else return `${e.name}: ${e.message}`;
 	} else {
 		if (Object.keys(errorText).some(t => e.toLowerCase().indexOf(t.toLowerCase()) !== -1)) {
-			for (let k in errorText) {
+			for (const k in errorText) {
 				if (e.toLowerCase().indexOf(errorText[k].toLowerCase()) !== -1) return `${errors[k]}\nCode: \`${k}\``;
 			}
 		}

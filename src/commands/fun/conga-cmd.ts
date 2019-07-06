@@ -29,7 +29,7 @@ export default new Command({
 			if (msg.channel.conga.inConga.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this conga!`);
 			clearTimeout(msg.channel.conga.timeout);
 			msg.channel.conga.inConga.push(msg.author.id);
-			let txt = "<a:furdancing:596817635023519777>".repeat(msg.channel.conga.inConga.length);
+			const txt = "<a:furdancing:596817635023519777>".repeat(msg.channel.conga.inConga.length);
 			msg.channel.createMessage(`<@!${msg.author.id}> joined a conga with <@!${msg.channel.conga.member.id}>!\n<@!${msg.channel.conga.member.id}> now has ${msg.channel.conga.inConga.length} furs congaing them!\nJoin in using \`${msg.gConfig.prefix}conga\`.\n${msg.channel.conga.inConga.length > 30 ? "This conga line is too long for emojis!" : txt}`);
 			msg.channel.conga.timeout = setTimeout((ch) => {
 				delete ch.conga;

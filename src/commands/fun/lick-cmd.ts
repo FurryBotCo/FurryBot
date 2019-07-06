@@ -25,7 +25,7 @@ export default new Command({
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	if (msg.args.length === 0) return new Error("ERR_INVALID_USAGE");
-	let input, text, attachment, img;
+	let input, text, img;
 	input = msg.args.join(" ");
 	text = functions.formatStr(msg.c, msg.author.mention, input);
 	if (msg.gConfig.commandImages) {

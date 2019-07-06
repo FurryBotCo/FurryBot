@@ -29,10 +29,10 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let textChCount = msg.guild.channels.filter(c => c.type === 0).length,
+	const textChCount = msg.guild.channels.filter(c => c.type === 0).length,
 		voiceChCount = msg.guild.channels.filter(c => c.type === 2).length,
-		categoryChCount = msg.guild.channels.filter(c => c.type === 4).length,
-		embed, o, owner, features, mfaLevel, verificationLevel, defaultNotifications, roles, rr;
+		categoryChCount = msg.guild.channels.filter(c => c.type === 4).length;
+	let embed, o, owner, features, mfaLevel, verificationLevel, defaultNotifications, roles, rr;
 
 	o = msg.guild.members.find(m => m.id === msg.guild.ownerID);
 	if (!o) {
@@ -41,7 +41,7 @@ export default new Command({
 		owner = `${o.user.username}#${o.user.discriminator} (${o.id})`;
 	}
 	features = "";
-	//if (msg.channel.guild.verified) features += "Verified\n";
+	// if (msg.channel.guild.verified) features += "Verified\n";
 	if (msg.channel.guild.features.indexOf("VIP_REGIONS") !== -1) features += "VIP Voice Vegions\n";
 	// if fetching vanity url fails return discord-api
 	if (msg.channel.guild.features.indexOf("VANITY_URL") !== -1) features += "Vanity URL\n"; // features+=`Vanity URL: https://discord.gg/${msg.guild.fetchVanityCode().catch(noerr => "discord-api")}\n`;
@@ -55,9 +55,9 @@ export default new Command({
 		"**HIGH** - (╯°□°）╯︵ ┻━┻ - must be a member of the server for longer than 10 minutes",
 		"**VERY HIGH** - ┻━┻ミヽ(ಠ益ಠ)ﾉ彡┻━┻ - must have a verified phone number"
 	];
-	//let s;
-	//if (msg.channel.guild.memberCount < 1000) s = await Promise.all(msg.guild.members.filter(m => !m.user.bot).map((m) => mdb.collection("users").findOne({ id: m.id }))).then(res => res.map(m => m === null ? config.defaults.userConfig : m).map(m => ({ owoCount: m.owoCount === undefined ? 0 : m.owoCount, uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount })));
-	//else s = false;
+	// let s;
+	// if (msg.channel.guild.memberCount < 1000) s = await Promise.all(msg.guild.members.filter(m => !m.user.bot).map((m) => mdb.collection("users").findOne({ id: m.id }))).then(res => res.map(m => m === null ? config.defaults.userConfig : m).map(m => ({ owoCount: m.owoCount === undefined ? 0 : m.owoCount, uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount })));
+	// else s = false;
 	mfaLevel = [
 		"NONE",
 		"ELEVATED"
@@ -88,20 +88,20 @@ export default new Command({
 			{
 				name: "Members",
 				value: `Total: ${msg.guild.memberCount}\n\n\
-				<:online:590067324837691401>: ${msg.guild.members.filter(m => m.status === "online").length}\n\
-				<:idle:590067351806803968>: ${msg.guild.members.filter(m => m.status === "idle").length}\n\
-				<:dnd:590067389782032384>: ${msg.guild.members.filter(m => m.status === "dnd").length}\n\
-				<:offline:590067411080970241>: ${msg.guild.members.filter(m => m.status === "offline").length}\n\n\
-				Non Bots: ${msg.channel.guild.members.filter(m => !m.bot).length}\n\
-				Bots: ${msg.channel.guild.members.filter(m => m.bot).length}`,
+	<:online:590067324837691401>: ${msg.guild.members.filter(m => m.status === "online").length}\n\
+	<:idle:590067351806803968>: ${msg.guild.members.filter(m => m.status === "idle").length}\n\
+	<:dnd:590067389782032384>: ${msg.guild.members.filter(m => m.status === "dnd").length}\n\
+	<:offline:590067411080970241>: ${msg.guild.members.filter(m => m.status === "offline").length}\n\n\
+	Non Bots: ${msg.channel.guild.members.filter(m => !m.bot).length}\n\
+	Bots: ${msg.channel.guild.members.filter(m => m.bot).length}`,
 				inline: false
 			},
 			{
 				name: "Channels",
 				value: `Total: ${msg.guild.channels.size}\n\
-				Text: ${textChCount}\n\
-				Voice: ${voiceChCount}\n\
-				Category: ${categoryChCount}`,
+	Text: ${textChCount}\n\
+	Voice: ${voiceChCount}\n\
+	Category: ${categoryChCount}`,
 				inline: false
 			},
 			{
@@ -124,9 +124,9 @@ export default new Command({
 				value: `**Large Guild**: ${msg.guild.large ? "Yes" : "No"}\n**Verification**: ${verificationLevel[msg.guild.verificationLevel]}\n**2FA**: ${mfaLevel[msg.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[msg.guild.defaultNotifications]}\n**Features**:\n${features}`,
 				inline: false
 			}/*, {
-				name: "Counters",
-				value: !s ? "Guild is too large to display counts." : `OwO Counts: ${s.map(j => j.owoCount).reduce((a, b) => a + b)}\nUwU Counts: ${s.map(j => j.uwuCount).reduce((a, b) => a + b)}`,
-				inline: false
+	name: "Counters",
+	value: !s ? "Guild is too large to display counts." : `OwO Counts: ${s.map(j => j.owoCount).reduce((a, b) => a + b)}\nUwU Counts: ${s.map(j => j.uwuCount).reduce((a, b) => a + b)}`,
+	inline: false
 			}*/
 		]
 	};

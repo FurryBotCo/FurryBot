@@ -28,7 +28,7 @@ export default new Command({
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 
-	let img = await functions.imageAPIRequest(true, "birb");
+	const img = await functions.imageAPIRequest(true, "birb");
 	try {
 		return msg.channel.createMessage("", {
 			file: await functions.getImageFromURL(img.response.image),

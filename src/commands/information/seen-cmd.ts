@@ -43,7 +43,7 @@ export default new Command({
 		guilds = [],
 		fields = [],
 		i = 0;
-	for (let key in b) {
+	for (const key in b) {
 		if (!guilds[i]) guilds[i] = "";
 		if (guilds[i].length > 1000 || +guilds[i].length + b[key].length > 1000) {
 			i++;

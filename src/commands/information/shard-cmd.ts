@@ -26,12 +26,12 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let embed: Eris.EmbedOptions = {
+	const embed: Eris.EmbedOptions = {
 		title: "Shard Info",
 		description: `Guilds: ${this.guilds.filter(g => g.shard.id === msg.guild.shard.id).length}\nPing: ${msg.guild.shard.latency}ms`,
 		color: functions.randomColor(),
 		timestamp: new Date().toISOString()
-	}
+	};
 
 	return msg.channel.createMessage({
 		embed

@@ -5,8 +5,8 @@ import { Message } from "eris";
 class MessageCollector {
 	collectors: {
 		[str: string]: {
-			resolve: Function,
-			filter: Function
+			resolve: Function, // tslint:disable-line ban-types
+			filter: Function // tslint:disable-line ban-types
 		}
 	};
 	constructor(bot: FurryBot) {
@@ -22,7 +22,7 @@ class MessageCollector {
 		}
 	}
 
-	awaitMessage(channelId: string, userId: string, timeout: number, filter: Function = () => true): Promise<Message> {
+	awaitMessage(channelId: string, userId: string, timeout: number, filter: Function = () => true): Promise<Message> { // tslint:disable-line ban-types
 		return new Promise(resolve => {
 			if (this.collectors[`${channelId}-${userId}`]) {
 				delete this.collectors[`${channelId}-${userId}`];
@@ -33,6 +33,6 @@ class MessageCollector {
 			setTimeout(resolve.bind(null, false), timeout);
 		});
 	}
-};
+}
 
 export default MessageCollector;
