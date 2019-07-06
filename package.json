@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "5.0.3",
+  "version": "5.0.4",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {
@@ -49,6 +49,7 @@
     "morgan": "^1.9.1",
     "phin": "^3.4.0",
     "safe-eval": "^0.4.1",
+    "trello": "^0.9.1",
     "truncate": "^2.1.0",
     "ts-node-dev": "^1.0.0-pre.40",
     "tsconfig-paths": "^3.8.0",
