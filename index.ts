@@ -88,4 +88,5 @@ process.on("SIGINT", () => {
 	process.kill(process.pid);
 });
 
+fs.writeFileSync(`${__dirname}/process.pid`, process.pid);
 export default bot;
