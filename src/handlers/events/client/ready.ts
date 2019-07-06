@@ -7,6 +7,8 @@ import express from "express";
 import http from "http";
 import ListStats from "@util/ListStats";
 import Temp from "@util/Temp";
+import functions from "@util/functions";
+import { mdb } from "@src/modules/Database";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
 
@@ -37,4 +39,28 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 	this.logger.log(`Client has started with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds.`);
 
 	// redo daily counts posting sometime
+	setInterval(async () => {
+		if (new Date().toString().split(" ")[4] === "00:00:00") {
+			const d = new Date(),
+				date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
+				{ count } = await mdb.collection("dailyjoins").findOne({ date });
+
+			let embed: Eris.EmbedOptions = {
+				title: `Daily Counts For ${date}`,
+				description: `Servers Joined Today: ${count}`,
+				timestamp: new Date().toISOString(),
+				color: functions.randomColor()
+			}
+
+			console.log(`Daily joins for ${date}: ${count}`);
+
+			return this.executeWebhook(config.webhooks.dailyjoins.id, config.webhooks.dailyjoins.token, {
+				embeds: [
+					embed
+				],
+				username: `Daily Joins${config.beta ? " - Beta" : ""}`,
+				avatarURL: "https://i.furry.bot/furry.png"
+			});
+		}
+	}, 1e3);
 }));
