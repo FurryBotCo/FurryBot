@@ -30,12 +30,14 @@ export default new Command({
 		title: "Shard Info",
 		fields: this.shards.map(s => ({
 			name: `Shard #${s.id}`,
-			value: `Guilds: ${this.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency}ms`,
+			value: `Guilds: ${this.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
 			inline: true
 		})),
 		color: functions.randomColor(),
 		timestamp: new Date().toISOString()
 	}
+
+	embed.fields[msg.guild.shard.id].name = `Shard #${msg.guild.shard.id} (current)`;
 
 	return msg.channel.createMessage({
 		embed
