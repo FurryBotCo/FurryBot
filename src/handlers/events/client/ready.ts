@@ -17,13 +17,11 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		type: 0
 	});
 
-	const client = this;
-
 	const sv = http.createServer(express())
 		.on("error", () => this.logger.warn("Attempted to start api server, but the port is in use."))
 		.on("listening", () => {
 			sv.close();
-			client.srv = srv.listen(config.apiPort);
+			this.srv = srv.listen(config.apiPort);
 		})
 		.on("close", () => this.logger.debug("Port test server closed, starting bot api server."))
 		.listen(config.apiPort);
@@ -45,12 +43,12 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 				date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
 				{ count } = await mdb.collection("dailyjoins").findOne({ date });
 
-			let embed: Eris.EmbedOptions = {
+			const embed: Eris.EmbedOptions = {
 				title: `Daily Counts For ${date}`,
 				description: `Servers Joined Today: ${count}`,
 				timestamp: new Date().toISOString(),
 				color: functions.randomColor()
-			}
+			};
 
 			console.log(`Daily joins for ${date}: ${count}`);
 

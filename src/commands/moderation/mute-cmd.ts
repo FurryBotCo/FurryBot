@@ -29,7 +29,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let user, embed, reason, m, a, b;
+	let user, embed, reason, a, b;
 	// get member from message
 	user = await msg.getMemberFromArgs();
 
@@ -85,9 +85,9 @@ export default new Command({
 		msg.channel.createMessage(`***User ${user.username}#${user.discriminator} was muted, ${reason}***`).catch(noerr => null);
 	}).catch(async (err) => {
 		msg.channel.createMessage(`<@!${msg.author.id}>, I couldn't mute **${user.username}#${user.discriminator}**, ${err}`);
-		if (m !== undefined) {
+		/*if (m !== undefined) {
 			await m.delete();
-		}
+		}*/
 	});
 	if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
 }));

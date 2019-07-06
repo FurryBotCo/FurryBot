@@ -26,7 +26,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let embed: Eris.EmbedOptions = {
+	const embed: Eris.EmbedOptions = {
 		title: "Shard Info",
 		fields: this.shards.map(s => ({
 			name: `Shard #${s.id}`,
@@ -35,7 +35,7 @@ export default new Command({
 		})),
 		color: functions.randomColor(),
 		timestamp: new Date().toISOString()
-	}
+	};
 
 	embed.fields[msg.guild.shard.id].name = `Shard #${msg.guild.shard.id} (current)`;
 

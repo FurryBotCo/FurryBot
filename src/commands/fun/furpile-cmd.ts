@@ -31,7 +31,7 @@ export default new Command({
 			msg.channel.furpile.inPile.push(msg.author.id);
 			msg.channel.createMessage(`<@!${msg.author.id}> joined a furpile on <@!${msg.channel.furpile.member.id}>!\n<@!${msg.channel.furpile.member.id}> now has ${msg.channel.furpile.inPile.length} furs on them!\nJoin in using \`${msg.gConfig.prefix}furpile\`.`);
 			msg.channel.furpile.timeout = setTimeout((ch) => {
-				delete ch.furpile;
+	delete ch.furpile;
 			}, 6e4, msg.channel);
 			return;
 		}
@@ -45,7 +45,7 @@ export default new Command({
 			member,
 			inPile: [],
 			timeout: setTimeout((ch) => {
-				delete ch.furpile;
+	delete ch.furpile;
 			}, 6e4, msg.channel)
 		};
 		return msg.channel.furpile.inPile.push(msg.author.id, member.id);

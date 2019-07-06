@@ -36,7 +36,7 @@ export default new Command({
 	srv = await mdb.collection("guilds").findOne({ id });
 	if (!srv) {
 		console.debug(`Created guild entry for ${id}`);
-		await mdb.collection("guilds").insertOne(Object.assign(config.defaults.guildConfig, { id }));
+		await mdb.collection("guilds").insertOne({ ...config.defaults.guildConfig, ...{ id } });
 		srv = await mdb.collection("guilds").findOne({ id });
 	}
 

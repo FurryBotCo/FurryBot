@@ -4,7 +4,7 @@ fs.readdirSync(__dirname).filter(d => (d.endsWith(".js") || d.endsWith(".ts")) &
 */
 
 export default {
-    displayName: ":tools: Developer",
-    name: "developer",
-    description: "Commands to make development easier."
-}
+	displayName: ":tools: Developer",
+	name: "developer",
+	description: "Commands to make development easier."
+};

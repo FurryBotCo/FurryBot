@@ -27,7 +27,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let embed: Eris.EmbedOptions = {
+	const embed: Eris.EmbedOptions = {
 		title: "Bot Info!",
 		fields: [
 			{

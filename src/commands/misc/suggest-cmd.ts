@@ -25,7 +25,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	//return msg.reply("We are not accepting suggestions at this time.");
+	// return msg.reply("We are not accepting suggestions at this time.");
 
 	let card, embed: Eris.EmbedOptions;
 
@@ -33,7 +33,7 @@ export default new Command({
 	try {
 		card = await this.tclient.addCard(msg.unparsedArgs.join(" "), `Suggestion by ${msg.author.tag} (${msg.author.id}) from guild ${msg.guild.name} (${msg.guild.id})`, config.apis.trello.list);
 	} catch (e) {
-		return msg.reply(`Failed to create suggestion, **${e.message}**`)
+		return msg.reply(`Failed to create suggestion, **${e.message}**`);
 	}
 
 	await this.tclient.addLabelToCard(card.id, config.apis.trello.labels.unapproved).catch(err => null);
@@ -54,7 +54,7 @@ export default new Command({
 		],
 		timestamp: new Date().toISOString(),
 		color: functions.randomColor()
-	}
+	};
 
 	return this.executeWebhook(config.webhooks.suggestion.id, config.webhooks.suggestion.token, {
 		embeds: [

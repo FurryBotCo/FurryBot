@@ -33,12 +33,13 @@ export default new Command({
 		id: member.id
 	}).then(res => new UserConfig(member.id, res));
 	if (!m) {
-		await mdb.collection("users").insertOne(Object.assign({
-			id: member.id
-		}, config.defaults.userConfig));
+		await mdb.collection("users").insertOne({
+			...{ id: member.id }
+			, ...config.defaults.userConfig
+		});
 		m = await mdb.collection("users").findOne({
 			id: member.id
-		}).then(res => new UserConfig(member.id, res));;
+		}).then(res => new UserConfig(member.id, res));
 	}
 
 	if ([undefined, null].includes(msg.uConfig.marriage)) await msg.uConfig.edit({
@@ -78,5 +79,5 @@ export default new Command({
 		} else {
 			return msg.reply("Better luck next time!");
 		}
-	})
+	});
 }));

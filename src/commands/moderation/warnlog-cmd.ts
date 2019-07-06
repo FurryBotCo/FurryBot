@@ -72,7 +72,7 @@ export default new Command({
 	if ([undefined, null, ""].includes(page)) page = 1;
 	if (page > pages) return msg.channel.createMessage("Invalid page number.");
 	fields = [];
-	for (let key in wr[page - 1]) {
+	for (const key in wr[page - 1]) {
 		w = wr[page - 1][key];
 		usr = await this.getRESTUser(w.blame);
 		blame = !usr ? "Unknown" : `${usr.username}#${usr.discriminator}`;

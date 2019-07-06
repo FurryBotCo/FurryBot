@@ -50,9 +50,9 @@ export default new Command({
 		description: `User ${user.username}#${user.discriminator} was warned by ${msg.author.username}#${msg.author.discriminator}`,
 		fields: [
 			{
-				name: "Reason",
-				value: reason,
-				inline: false
+	name: "Reason",
+	value: reason,
+	inline: false
 			}
 		]
 	};

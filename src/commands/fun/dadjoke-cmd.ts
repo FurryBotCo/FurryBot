@@ -31,7 +31,7 @@ export default new Command({
 		method: "GET",
 		url: "https://icanhazdadjoke.com",
 		headers: {
-			Accept: "application/json",
+			"Accept": "application/json",
 			"User-Agent": config.web.userAgent
 		}
 	});

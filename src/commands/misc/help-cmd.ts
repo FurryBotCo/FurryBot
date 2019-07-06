@@ -33,7 +33,7 @@ export default new Command({
 	if (msg.args.length === 0) {
 
 		const categories = this.categories.map(c => {
-			let j: any = Object.assign({}, c);
+			const j: any = { ...{}, ...c };
 			j.commands = c.commands.map(cmd => cmd.triggers[0]);
 			return j;
 		});
@@ -94,7 +94,7 @@ export default new Command({
 			},
 			timestamp: new Date().toISOString(),
 			color: functions.randomColor()
-		}
+		};
 
 		if (config.developers.includes(msg.author.id)) embed.fields.push({
 			name: "Path (dev)",
@@ -110,7 +110,7 @@ export default new Command({
 
 		if (!cat) return msg.reply("Category not found.");
 
-		let fields: {
+		const fields: {
 			name: string;
 			value: string;
 			inline: boolean;
@@ -122,9 +122,9 @@ export default new Command({
 				name: `Command List #${i + 1}`,
 				value: "",
 				inline: false
-			}
+			};
 
-			let txt = `\`${c.triggers[0]}\` - ${c.description}`;
+			const txt = `\`${c.triggers[0]}\` - ${c.description}`;
 
 			if (fields[i].value.length > 1000 || fields[i].value.length + txt.length > 1000) {
 				i++;
@@ -132,11 +132,12 @@ export default new Command({
 					name: `Command List #${i + 1}`,
 					value: txt,
 					inline: false
-				}
+				};
 			} else {
 				return fields[i].value = `${fields[i].value}\n${txt}`;
 			}
-		})
+		});
+
 		embed = {
 			title: cat.displayName,
 			description: cat.description,
@@ -147,7 +148,7 @@ export default new Command({
 			},
 			timestamp: new Date().toISOString(),
 			color: functions.randomColor()
-		}
+		};
 
 		if (config.developers.includes(msg.author.id)) embed.fields.push({
 			name: "Path (dev)",

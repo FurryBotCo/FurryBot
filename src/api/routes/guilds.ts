@@ -6,7 +6,7 @@ import functions from "@src/api/functions";
 const app: express.Router = express.Router();
 
 app.get("/", async (req, res) => {
-	let jsn: {
+	const jsn: {
 		success: boolean;
 		guildCount: number;
 		guilds?: {

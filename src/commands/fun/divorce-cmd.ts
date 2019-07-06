@@ -26,20 +26,22 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let member: Eris.Member, m: UserConfig, u: Eris.User | {
+	const member: Eris.Member = null;
+	let m: UserConfig, u: Eris.User | {
 		username: string;
 		discriminator: string;
-	};
+	} = null;
 	m = await mdb.collection("users").findOne({
 		id: msg.uConfig.marriage.partner
 	}).then(res => new UserConfig(msg.uConfig.marriage.partner, res));
 	if (!m) {
-		await mdb.collection("users").insertOne(Object.assign({
-			id: msg.uConfig.marriage.partner
-		}, config.defaults.userConfig));
+		await mdb.collection("users").insertOne({
+			...{ id: msg.uConfig.marriage.partner }
+			, ...config.defaults.userConfig
+		});
 		m = await mdb.collection("users").findOne({
 			id: msg.uConfig.marriage.partner
-		}).then(res => new UserConfig(msg.uConfig.marriage.partner, res));;
+		}).then(res => new UserConfig(msg.uConfig.marriage.partner, res));
 	}
 
 	if ([undefined, null].includes(msg.uConfig.marriage)) await msg.uConfig.edit({
@@ -71,5 +73,5 @@ export default new Command({
 		} else {
 			return msg.reply(`You've stayed with **${u}**!`);
 		}
-	})
+	});
 }));

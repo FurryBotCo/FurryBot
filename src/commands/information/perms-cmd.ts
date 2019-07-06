@@ -28,27 +28,27 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let allow_user, deny_user, allow_bot, deny_bot, au, du, ab, db, embed, b;
+	let allowUser, denyUser, allowBot, denyBot, au, du, ab, db, embed, b;
 	b = msg.channel.permissionsOf(this.user.id);
-	allow_user = [],
-		deny_user = [],
-		allow_bot = [],
-		deny_bot = [];
+	allowUser = [],
+		denyUser = [],
+		allowBot = [],
+		denyBot = [];
 
-	for (let p in Permissions.constant) {
-		if (msg.member.permission.allow & Permissions.constant[p]) allow_user.push(p);
-		else deny_user.push(p);
+	for (const p in Permissions.constant) {
+		if (msg.member.permission.allow & Permissions.constant[p]) allowUser.push(p);
+		else denyUser.push(p);
 	}
 
-	for (let p in Permissions.constant) {
-		if (b.allow & Permissions.constant[p]) allow_bot.push(p);
-		else deny_bot.push(p);
+	for (const p in Permissions.constant) {
+		if (b.allow & Permissions.constant[p]) allowBot.push(p);
+		else denyBot.push(p);
 	}
 
-	au = allow_user.length === 0 ? "NONE" : allow_user.join("**, **"),
-		du = deny_user.length === Object.keys(Permissions.constant).length ? "NONE" : deny_user.join("**, **"),
-		ab = allow_bot.length === 0 ? "NONE" : allow_bot.join("**, **"),
-		db = deny_bot.length === Object.keys(Permissions.constant).length ? "NONE" : deny_bot.join("**, **");
+	au = allowUser.length === 0 ? "NONE" : allowUser.join("**, **"),
+		du = denyUser.length === Object.keys(Permissions.constant).length ? "NONE" : denyUser.join("**, **"),
+		ab = allowBot.length === 0 ? "NONE" : allowBot.join("**, **"),
+		db = denyBot.length === Object.keys(Permissions.constant).length ? "NONE" : denyBot.join("**, **");
 	embed = {
 		title: "Permission Info",
 		fields: [

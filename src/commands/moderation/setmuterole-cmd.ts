@@ -35,7 +35,7 @@ export default new Command({
 	if (msg.args[0] === "reset") {
 		msg.channel.guild.channels.forEach(async (ch) => {
 			if (![null, undefined, ""].includes(msg.gConfig.muteRole) && ch.permissionOverwrites.has(msg.gConfig.muteRole)) {
-				await ch.deletePermission(msg.gConfig.muteRole).catch(err => null);
+	await ch.deletePermission(msg.gConfig.muteRole).catch(err => null);
 			}
 		});
 

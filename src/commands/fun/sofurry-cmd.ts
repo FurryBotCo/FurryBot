@@ -29,7 +29,7 @@ export default new Command({
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	// saved for when sofurry api has issues
-	//return msg.channel.createMessage(`<@!${msg.author.id}>, Sorry, sofurry is having issues right now, and we cannot fetch anything from their api.\n(if it's back, and I haven't noticed, let me know in my support server - https://discord.gg/SuccpZw)`);
+	// return msg.channel.createMessage(`<@!${msg.author.id}>, Sorry, sofurry is having issues right now, and we cannot fetch anything from their api.\n(if it's back, and I haven't noticed, let me know in my support server - https://discord.gg/SuccpZw)`);
 	const contentType = [
 		"story",
 		"art",
@@ -37,7 +37,7 @@ export default new Command({
 		"journal",
 		"photo"
 	];
-	let tags, bl, req, jsn, rr, submission, short, extra, attachment;
+	let tags, bl, req, jsn, rr, submission, short, extra;
 	tags = msg.unparsedArgs.length > 0 ? msg.unparsedArgs.join("%20") : "furry";
 	bl = tags.match(config.tagBlacklist);
 	if (bl !== null && bl.length > 0) return msg.channel.createMessage(`<@!${msg.author.id}>, Your search contained blacklisted tags, **${bl.join("**, **")}**`);

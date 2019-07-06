@@ -49,9 +49,9 @@ export default new Command({
 
 	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.reply("Pretty sure you don't want to do this to yourself.");
 	if (user.id === msg.guild.ownerID) return msg.reply("You cannot ban the server owner.");
-	let a = functions.compareMembers(user, msg.member);
+	const a = functions.compareMembers(user, msg.member);
 	if ((a.member1.higher || a.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(`You cannot ban ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
-	//if(!user.bannable) return msg.channel.createMessage(`<@!${msg.author.id}>, I cannot ban ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have ban permissions?`);
+	// if(!user.bannable) return msg.channel.createMessage(`<@!${msg.author.id}>, I cannot ban ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have ban permissions?`);
 	reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
 	if (!user.user.bot) m = await user.user.getDMChannel().then(dm => dm.createMessage(`You were banned from **${msg.channel.guild.name}**\nReason: ${reason}`));
 	user.ban(1, user.id, `Ban: ${msg.author.username}#${user.discriminator} -> ${reason}`).then(() => {

@@ -28,7 +28,7 @@ export default new Command({
 	// extra check, to be safe
 	if (!config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot run this command as you are not a developer of this bot.`);
 	if (msg.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
-	let set = await phin({ url: msg.unparsedArgs.join("%20"), parse: "none" }).then(res => `data:${res.headers["content-type"]};base64,${res.body.toString("base64")}`);
+	const set = await phin({ url: msg.unparsedArgs.join("%20"), parse: "none" }).then(res => `data:${res.headers["content-type"]};base64,${res.body.toString("base64")}`);
 	this.editSelf({ avatar: set })
 		.then(async (user) => msg.channel.createMessage(`<@!${msg.author.id}>, Set Avatar to (attachment)`, {
 			file: await functions.getImageFromURL(user.avatarURL),

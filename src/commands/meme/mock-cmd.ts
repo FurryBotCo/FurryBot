@@ -28,7 +28,7 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	if (msg.unparsedArgs.length < 1) return new Error("ERR_INVALID_USAGE");
 
-	let embed: Eris.EmbedOptions = {
+	const embed: Eris.EmbedOptions = {
 		title: "Mocking Text",
 		description: functions.everyOtherUpper(msg.unparsedArgs.join(" ")),
 		image: {

@@ -28,7 +28,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let roles, page, c, remove, rl, b, embed, n;
+	let roles, page, c, remove, rl, b, embed;
 	roles = msg.gConfig.selfAssignableRoles;
 	page = msg.args.length > 0 ? parseInt(msg.args[0], 10) : 1;
 	if (roles.length === 0) return msg.reply("There are no roles set as self assignable.");

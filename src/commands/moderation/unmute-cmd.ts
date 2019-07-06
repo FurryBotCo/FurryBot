@@ -29,7 +29,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let user, embed, reason, a, m;
+	let user, embed, reason, a;
 	if (msg.args.length === 0) return new Error("ERR_INVALID_USAGE");
 
 	// get member from message
@@ -37,9 +37,9 @@ export default new Command({
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
-	//if(user.id === msg.member.id && !msg.user.isDeveloper) return msg.channel.createMessage("Pretty sure you don't want to do this to yourthis.");
-	//if(user.roles.highest.rawPosition >= msg.member.roles.highest.rawPosition && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`You cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
-	//if(user.permissions.has("administrator")) return msg.channel.createMessage("That user has `ADMINISTRATOR`, that would literally do nothing.");
+	// if(user.id === msg.member.id && !msg.user.isDeveloper) return msg.channel.createMessage("Pretty sure you don't want to do this to yourthis.");
+	// if(user.roles.highest.rawPosition >= msg.member.roles.highest.rawPosition && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`You cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
+	// if(user.permissions.has("administrator")) return msg.channel.createMessage("That user has `ADMINISTRATOR`, that would literally do nothing.");
 	reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
 	if (msg.gConfig.muteRole === null) {
 		embed = {
@@ -85,9 +85,9 @@ export default new Command({
 		msg.channel.createMessage(`***User ${user.username}#${user.discriminator} was unmuted, ${reason}***`).catch(noerr => null);
 	}).catch(async (err) => {
 		msg.channel.createMessage(`I couldn't unmute **${user.username}#${user.discriminator}**, ${err}`);
-		if (m !== undefined) {
+		/*if (m !== undefined) {
 			await m.delete();
-		}
+		}*/
 	});
 	if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
 }));

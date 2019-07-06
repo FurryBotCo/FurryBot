@@ -28,7 +28,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let user, roles, data, req, x, ds, db, l, ll, rs, list, embed;
+	let user, roles, req, ds, db, rs, list, embed;
 	try {
 		if (msg.args.length === 0 || !msg.args) {
 			user = msg.member;
@@ -72,10 +72,10 @@ export default new Command({
 	if (!user.user.bot) {
 		try {
 			/*req = await phin({
-				method: "GET",
-				url: `https://discord.services/api/ban/${user.id}`
+	method: "GET",
+	url: `https://discord.services/api/ban/${user.id}`
 			});
-	
+
 			x = JSON.parse(req.body.toString());
 			ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";*/
 			ds = "Down until further notice";
@@ -94,8 +94,8 @@ export default new Command({
 		}).then(res => {
 			if (!res.blacklisted) return false;
 			return {
-				blacklisted: res.blacklisted,
-				reason: res.blacklistReason
+	blacklisted: res.blacklisted,
+	reason: res.blacklistReason
 			};
 		});
 		ll = l.blacklisted ? `Reason: ${l.reason}` : "No";
@@ -104,20 +104,20 @@ export default new Command({
 			value: `Discord.Services: **${ds}**\nDiscord Bans: **${db}**\nlocal: **${ll}**`,
 			inline: false
 		}, {
-				name: "Bot List",
-				value: "Humans are not listed on (most) bot lists.",
-				inline: false
+	name: "Bot List",
+	value: "Humans are not listed on (most) bot lists.",
+	inline: false
 			});*/
 	} else {
 		// botlist lookup
-		const req = await phin({
+		req = await phin({
 			method: "GET",
 			url: `https://botblock.org/api/bots/${user.id}`
 		});
 		try {
 			rs = JSON.parse(req.body.toString());
 			list = "(all links redirect from our api to make keeping links up to date easier)\n";
-			for (let ls in rs.list_data) {
+			for (const ls in rs.list_data) {
 				const ll = rs.list_data[ls];
 				if (ll[1] !== 200) continue;
 				list += `[${ls}](https://api.furry.bot/botlistgo/${encodeURIComponent(ls)}/${encodeURIComponent(user.id)
@@ -126,7 +126,7 @@ export default new Command({
 
 			}
 
-			//list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
+			// list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 		} catch (e) {
 			this.logger.log({
 				headers: req.headers,

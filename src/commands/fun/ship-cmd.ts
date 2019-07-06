@@ -42,8 +42,8 @@ export default new Command({
 	if (msg.args.length > 1) {
 		if (msg.args[1] === "random") {
 			if (!user1) { } else {
-				tt = msg.channel.guild.members.filter(u => u.id !== user1.id && u.id !== msg.author.id && !u.user.bot);
-				user2 = tt[Math.floor(Math.random() * tt.length)];
+	tt = msg.channel.guild.members.filter(u => u.id !== user1.id && u.id !== msg.author.id && !u.user.bot);
+	user2 = tt[Math.floor(Math.random() * tt.length)];
 			}
 		} else user2 = await msg.getUserFromArgs(1, false, false, 1);
 	}
@@ -129,15 +129,15 @@ export default new Command({
 			title: ":heart: **Shipping!** :heart:",
 			description: `Shipping **${user1.username}#${user1.discriminator}** with **${user2.username}#${user2.discriminator}**\n**${amount}%** - ${shiptext}\nShipname: ${shipname}`,
 			image: {
-				url: "attachment://ship.png"
+	url: "attachment://ship.png"
 			}
 		};
 		Object.assign(embed, msg.embed_defaults());
 		await msg.channel.createMessage({
 			embed
 		}, {
-				file,
-				name: "ship.png"
+	file,
+	name: "ship.png"
 			});
 		fs.unlinkSync(imgpath1);
 		fs.unlinkSync(imgpath2);
