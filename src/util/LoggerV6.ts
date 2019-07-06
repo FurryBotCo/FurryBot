@@ -77,7 +77,7 @@ class Logger {
                 break;
         }
         if (msg.toString().indexOf(config.bot.token)) msg = msg.toString().replace(new RegExp(config.bot.token, "g"), "[TOKEN]");
-        fs.appendFileSync(`${logDir}/${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}.log`, `[${d}][${type}]: ${msg}${os.EOL}`);
+        fs.appendFileSync(`${logDir}/${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}.log`, `[${d}][${type}]: ${msg}${os.EOL}`);
         process.stdout.write(`${chalk.grey(`[${chalk.blue(d)}][${c(type)}]: ${c(msg.toString())}`)}\n`);
         return true;
     }
