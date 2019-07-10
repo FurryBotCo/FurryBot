@@ -3,7 +3,9 @@ import * as fs from "fs";
 import config from "@src/config/config";
 import Logger from "@Logger";
 import cat from "./commands";
+import resp from "./responses";
 import Command from "@modules/cmd/Command";
+import AutoResponse from "@modules/cmd/AutoResponse";
 import Category from "@modules/cmd/Category";
 import functions from "@util/functions";
 import Temp from "@util/Temp";
@@ -12,9 +14,11 @@ import Trello from "trello";
 
 class FurryBot extends Eris.Client {
 	logger: Logger;
+	autoResponses: AutoResponse[];
 	commands: Command[];
 	categories: Category[];
 	commandTriggers: string[];
+	autoResponseTriggers: string[];
 	commandTimeout: {
 		[key: string]: Set<string>
 	};
@@ -38,10 +42,13 @@ class FurryBot extends Eris.Client {
 		this.commands = cat.map(c => c.commands).reduce((a, b) => a.concat(b));
 		this.categories = cat;
 		this.commandTriggers = cat.map(c => c.commands).reduce((a, b) => a.concat(b)).map(c => c.triggers).reduce((a, b) => a.concat(b));
+		this.autoResponses = resp;
+		this.autoResponseTriggers = this.autoResponses.map(r => r.triggers).reduce((a, b) => a.concat(b));
 
 		this.commandTimeout = {};
 
 		this.commands.map(c => this.commandTimeout[c.triggers[0]] = new Set());
+		this.autoResponses.map(r => this.commandTimeout[r.triggers[0]] = new Set());
 		this.yiffNoticeViewed = new Set();
 
 		this.ucwords = functions.ucwords;
@@ -59,7 +66,7 @@ class FurryBot extends Eris.Client {
 	getCommand(cmd: string | string[]): {
 		command: Command[];
 		category: Category;
-	} | null {
+	} {
 		if (!cmd) return null;
 		if (!(cmd instanceof Array)) {
 			cmd = [cmd];
@@ -96,18 +103,27 @@ class FurryBot extends Eris.Client {
 		};
 	}
 
-	getCategory(cat: string): Category | null {
+	getCategory(cat: string): Category {
 		cat = cat.toLowerCase();
 		if (!this.categories.map(c => c.name.toLowerCase()).includes(cat)) return null;
 		return this.categories.find(c => c.name.toLowerCase() === cat);
 	}
 
-	getCategoryFromCommand(cmd: string): Category | null {
+	getCategoryFromCommand(cmd: string): Category {
 		if (!cmd) return null;
 		cmd = cmd.toLowerCase();
-		if (!this.commandTriggers.includes(cmd)) return null;
-		const command = this.commands.find(c => c.triggers.includes(cmd));
+		if (!this.commandTriggers.includes(cmd.toLowerCase())) return null;
+		const command = this.commands.find(c => c.triggers.includes(cmd.toLowerCase()));
 		return this.getCategory(command.category.name);
+	}
+
+	getResponse(resp: string): AutoResponse {
+		if (!resp || !this.autoResponseTriggers.includes(resp.toLowerCase())) return null;
+
+		const j = this.autoResponses.find(r => r.triggers.includes(resp.toLowerCase()));
+
+		if (!j) return null;
+		return j;
 	}
 }
 
