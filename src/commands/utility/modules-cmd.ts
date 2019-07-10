@@ -43,7 +43,7 @@ export default new Command({
 				inline: false
 			},
 			{
-				name: "F Response Enabled",
+				name: "F Response",
 				value: msg.gConfig.fResponseEnabled ? "Enabled" : "Disabled",
 				inline: false
 			}
