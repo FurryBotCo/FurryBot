@@ -270,7 +270,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					file: await functions.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
 					name: "nsfw.gif"
 				});
-				if (!msg.gConfig.nsfwEnabled) return msg.reply(`You must enable nsfw commands to use this, have a server administrator run \`${msg.gConfig.prefix}togglensfwcommands\``);
+				if (!msg.gConfig.nsfwEnabled) return msg.reply(`You must enable nsfw commands to use this, have a server administrator run \`${msg.gConfig.prefix}settings nsfw enabled\``);
 
 				if (![undefined, null, ""].includes(msg.channel.topic) && config.yiff.disableStatements.some(y => msg.channel.topic.trim().indexOf(y) !== -1)) {
 					const t = config.yiff.disableStatements.filter(y => msg.channel.topic.trim().indexOf(y) !== -1);

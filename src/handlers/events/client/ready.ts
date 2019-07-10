@@ -46,7 +46,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 	setInterval(async () => {
 		if (new Date().toString().split(" ")[4] === "00:00:00") {
 			const d = new Date(),
-				date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
+				date = `${d.getMonth() + 1}-${d.getDate() - 1}-${d.getFullYear()}`,
 				count = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => "Unknown");
 
 			const embed: Eris.EmbedOptions = {
