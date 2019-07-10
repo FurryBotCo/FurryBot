@@ -237,7 +237,8 @@ export default {
 		args = args.map(a => a.toString());
 		const a = res.match(/({\d})/g);
 		const e = ((s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"));
-		a.map((b, i) => args[i] !== undefined ? res = res.replace(new RegExp(e(b), "g"), args[i]) : null);
+		const e2 = ((s) => s.replace(/\{/g, "").replace(/\}/g, ""));
+		a.map((b) => args[e2(b)] !== undefined ? res = res.replace(new RegExp(e(b), "g"), args[e2(b)]) : null);
 		return res;
 	}),
 	downloadImage: (async (url: string, filename: string): Promise<fs.WriteStream> =>
