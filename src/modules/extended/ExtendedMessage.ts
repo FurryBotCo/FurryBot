@@ -1,12 +1,13 @@
 import * as Eris from "eris";
 import UserConfig from "@modules/config/UserConfig";
 import GuildConfig from "@modules/config/GuildConfig";
-import { mongo, mdb } from "@modules/Database";
+import { mdb } from "@modules/Database";
 import config from "@config";
 import functions from "@util/functions";
 import FurryBot from "@FurryBot";
 import Command from "@modules/cmd/Command";
 import Category from "@modules/cmd/Category";
+import AutoResponse from "@modules/cmd/AutoResponse";
 import ExtendedTextChannel from "@modules/extended/ExtendedTextChannel";
 import ExtendedUser from "@modules/extended/ExtendedUser";
 
@@ -38,6 +39,7 @@ class ExtendedMessage extends Eris.Message {
 		command: Command[];
 		category: Category
 	};
+	response: AutoResponse;
 	client: FurryBot;
 	_client: FurryBot;
 	c: string;
@@ -146,6 +148,7 @@ class ExtendedMessage extends Eris.Message {
 			}
 
 			this.cmd = this._client.getCommand(this.args.shift().toLowerCase());
+			this.response = this._client.getResponse(this.content.toLowerCase());
 			this.unparsedArgs = a;
 
 			this.user = {

@@ -5,87 +5,90 @@ import functions from "@util/functions";
 
 const bot = new FurryBot(config.bot.token, config.bot.clientOptions);
 
+fs.writeFileSync(`${__dirname}/process.pid`, process.pid);
+
 bot.connect();
 
 bot.on("shardDisconnect", (error: string, id: number) => {
-    let embed = {
-        title: "Shard Status Update",
-        description: `Shard ${id} Disconnected!`,
-        timestamp: new Date().toISOString(),
-        color: functions.randomColor()
-    };
-    bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
-        embeds: [
-            embed
-        ],
-        username: `Furry Bot Status${config.beta ? " - Beta" : ""}`,
-        avatarURL: "https://i.furry.bot/furry.png"
-    });
+	const embed = {
+		title: "Shard Status Update",
+		description: `Shard ${id} Disconnected!`,
+		timestamp: new Date().toISOString(),
+		color: functions.randomColor()
+	};
+	bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
+		embeds: [
+			embed
+		],
+		username: `Furry Bot Status${config.beta ? " - Beta" : ""}`,
+		avatarURL: "https://i.furry.bot/furry.png"
+	});
 
-    bot.logger.error(`Shard #${id} disconnected`);
+	bot.logger.error(`Shard #${id} disconnected`);
 })
-    .on("shardReady", (id: number) => {
-        let embed = {
-            title: "Shard Status Update",
-            description: `Shard ${id} is ready!`,
-            timestamp: new Date().toISOString(),
-            color: functions.randomColor()
-        };
-        bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
-            embeds: [
-                embed
-            ],
-            username: `Furry Bot Status${config.beta ? " - Beta" : ""}`,
-            avatarURL: "https://i.furry.bot/furry.png"
-        });
-    })
-    .on("shardResume", (id: number) => {
-        let embed = {
-            title: "Shard Status Update",
-            description: `Shard ${id} was resumed!`,
-            timestamp: new Date().toISOString(),
-            color: functions.randomColor()
-        };
-        bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
-            embeds: [
-                embed
-            ],
-            username: `Furry Bot Status${config.beta ? " - Beta" : ""}`,
-            avatarURL: "https://i.furry.bot/furry.png"
-        });
-    })
-    .on("ready", () => {
-        let embed = {
-            title: "Client is ready!",
-            description: `Ready with ${bot.shards.size} shard${bot.shards.size > 1 ? "s" : ""}!`,
-            timestamp: new Date().toISOString(),
-            color: functions.randomColor()
-        };
-        bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
-            embeds: [
-                embed
-            ],
-            username: `Furry Bot Status${config.beta ? " - Beta" : ""}`,
-            avatarURL: "https://i.furry.bot/furry.png"
-        });
-    })
+	.on("shardReady", (id: number) => {
+		const embed = {
+			title: "Shard Status Update",
+			description: `Shard ${id} is ready!`,
+			timestamp: new Date().toISOString(),
+			color: functions.randomColor()
+		};
+		bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
+			embeds: [
+				embed
+			],
+			username: `Furry Bot Status${config.beta ? " - Beta" : ""}`,
+			avatarURL: "https://i.furry.bot/furry.png"
+		});
+	})
+	.on("shardResume", (id: number) => {
+		const embed = {
+			title: "Shard Status Update",
+			description: `Shard ${id} was resumed!`,
+			timestamp: new Date().toISOString(),
+			color: functions.randomColor()
+		};
+		bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
+			embeds: [
+				embed
+			],
+			username: `Furry Bot Status${config.beta ? " - Beta" : ""}`,
+			avatarURL: "https://i.furry.bot/furry.png"
+		});
+	})
+	.on("ready", () => {
+		const embed = {
+			title: "Client is ready!",
+			description: `Ready with ${bot.shards.size} shard${bot.shards.size > 1 ? "s" : ""}!`,
+			timestamp: new Date().toISOString(),
+			color: functions.randomColor()
+		};
+		bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
+			embeds: [
+				embed
+			],
+			username: `Furry Bot Status${config.beta ? " - Beta" : ""}`,
+			avatarURL: "https://i.furry.bot/furry.png"
+		});
+	});
 
 process.on("unhandledRejection", (r: Error, p) => {
-    let m: any = p;
-    if (typeof p !== "string") {
-        if (typeof p === "object") m = JSON.stringify(p);
-        if (p instanceof Buffer) m = p.toString();
-        if (p instanceof Function) m = p.toString();
-        //if (p instanceof Promise) m = await p;
-    }
-    bot.logger.error(`Unhandled PromiseRejection\nPromise: ${m}\nError: ${r.stack}`);
+	let m: any = p;
+	if (typeof p !== "string") {
+		if (typeof p === "object") m = JSON.stringify(p);
+		if (p instanceof Buffer) m = p.toString();
+		if (p instanceof Function) m = p.toString();
+		// if (p instanceof Promise) m = await p;
+	}
+	bot.logger.error(`Unhandled PromiseRejection\nPromise: ${m}\nError: ${r.stack}`);
 });
 
 process.on("SIGINT", () => {
-    bot.disconnect({
-        reconnect: false
-    });
-    process.kill(process.pid);
+	bot.disconnect({
+		reconnect: false
+	});
+	fs.unlinkSync(`${__dirname}/process.pid`);
+	process.kill(process.pid);
 });
 
 export default bot;

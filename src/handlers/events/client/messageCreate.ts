@@ -150,10 +150,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 
-		if (!msg.content.startsWith(msg.prefix)) return;
-
-		if (msg.cmd !== null && msg.cmd.command !== null && msg.cmd.command.length > 0) {
-
+		if (msg.response !== null) {
+			/* blacklist notice */
 			if (bl) {
 				let t;
 				let v: string[];
@@ -178,6 +176,83 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				else return msg.author.getDMChannel().then(ch => ch.createMessage(t)).catch(err => null);
 
 			}
+			/* end blacklist notice */
+
+			if (msg.response.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
+				if (msg.response.userPermissions.some(perm => !msg.channel.permissionsOf(msg.author.id).has(perm))) {
+					const p = msg.response.userPermissions.filter(perm => !msg.channel.permissionsOf(msg.author.id).has(perm));
+
+					embed = {
+						title: "You do not have the required permission(s) to use this!",
+						description: `You require the permission(s) **${p.join("**, **")}** to run this, which you do not have.`,
+						color: functions.randomColor(),
+						timestamp: new Date().toISOString()
+					};
+					this.logger.debug(`user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the response ${msg.response.triggers[0]}`);
+					return msg.channel.createMessage({ embed });
+				}
+			}
+
+			if (msg.response.botPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
+				if (msg.response.userPermissions.some(perm => !msg.channel.permissionsOf(this.user.id).has(perm))) {
+					const p = msg.response.botPermissions.filter(perm => !msg.channel.permissionsOf(this.user.id).has(perm));
+
+					embed = {
+						title: "I do not have the required permission(s) to use this!",
+						description: `I need the permission(s) **${p.join("**, **")}** for this command to function properly, please add these to me and try again.`,
+						color: functions.randomColor(),
+						timestamp: new Date().toISOString()
+					};
+					this.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the response ${msg.response.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+					return msg.channel.createMessage({ embed });
+				}
+			}
+
+			if (this.commandTimeout[msg.response.triggers[0]].has(msg.author.id) && !config.developers.includes(msg.author.id)) {
+				this.logger.log(`Response timeout encountered by user ${msg.author.tag} (${msg.author.id}) on response "${msg.response.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+
+				return msg.channel.createMessage(`<@!${msg.author.id}>, <:cooldown:591863995057831946>\nPlease wait ${functions.ms(msg.response.cooldown)} before using this response again!`);
+			}
+
+			this.logger.command(`Response  "${msg.response.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+			const start = performance.now();
+			const c = await msg.response.run.call(this, msg);
+			const end = performance.now();
+			this.logger.debug(`Response handler for "${msg.response.triggers[0]}" took ${(end - start).toFixed(3)}ms to execute.`);
+			if (c instanceof Error) throw c;
+			return;
+		}
+
+		if (!msg.content.startsWith(msg.prefix)) return;
+
+		if (msg.cmd !== null && msg.cmd.command !== null && msg.cmd.command.length > 0) {
+			/* blacklist notice */
+			if (bl) {
+				let t;
+				let v: string[];
+				try {
+					if (!fs.existsSync(`${__dirname}/../../../config/blNoticeViewed.json`)) fs.writeFileSync(`${__dirname}/../../../config/blNoticeViewed.json`, JSON.stringify([]));
+					v = JSON.parse(fs.readFileSync(`${__dirname}/../../../config/blNoticeViewed.json`).toString());
+				} catch (e) {
+					console.error(`Failed to get blacklist notice viewed list`);
+					v = null;
+				}
+
+				if (v === null || v.includes(msg.author.id)) return;
+				else {
+					v.push(msg.author.id);
+					fs.writeFileSync(`${__dirname}/../../../config/blNoticeViewed.json`, JSON.stringify(v));
+				}
+
+				if (blReason.type === 0) t = `You are blacklisted from using this bot, reason: ${blReason.reason}, blame: ${blReason.blame}`;
+				else t = `This server is blacklisted from using this bot, reason: ${blReason.reason}, blame: ${blReason.blame}`;
+
+				if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.reply(t);
+				else return msg.author.getDMChannel().then(ch => ch.createMessage(t)).catch(err => null);
+
+			}
+
+			/* end blacklist notice */
 
 			const [cmd] = msg.cmd.command;
 

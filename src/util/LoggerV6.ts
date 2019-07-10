@@ -76,6 +76,8 @@ class Logger {
 				c = chalk.cyan;
 				break;
 		}
+		if (typeof msg === "undefined") msg = "undefined";
+
 		if (msg.toString().indexOf(config.bot.token)) msg = msg.toString().replace(new RegExp(config.bot.token, "g"), "[TOKEN]");
 		fs.appendFileSync(`${logDir}/${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}.log`, `[${d}][${type}]: ${msg}${os.EOL}`);
 		process.stdout.write(`${chalk.grey(`[${chalk.blue(d)}][${c(type)}]: ${c(msg.toString())}`)}\n`);
