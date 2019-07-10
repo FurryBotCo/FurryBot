@@ -39,7 +39,7 @@ export default ((e: number | Error | string) => {
 	} else return null;*/
 	if (typeof e === "number") {
 		if (Object.keys(errors).indexOf(e.toString()) !== -1) return errors[e];
-		else return `Error ${e}`;
+		else throw e;
 	} else if (e instanceof Error) {
 		if (Object.keys(errorText).some(t => e.message.toLowerCase().indexOf(t.toLowerCase()) !== -1)) {
 			for (const k in errorText) {
@@ -49,7 +49,7 @@ export default ((e: number | Error | string) => {
 			for (const k in errorText) {
 				if (e.name.toLowerCase().indexOf(errorText[k].toLowerCase()) !== -1) return `${errors[k]}\nCode: \`${k}\``;
 			}
-		} else return `${e.name}: ${e.message}`;
+		} else throw e;
 	} else {
 		if (Object.keys(errorText).some(t => e.toLowerCase().indexOf(t.toLowerCase()) !== -1)) {
 			for (const k in errorText) {
@@ -58,5 +58,5 @@ export default ((e: number | Error | string) => {
 		}
 	}
 
-	return e;
+	throw e;
 });

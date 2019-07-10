@@ -255,7 +255,9 @@ class ExtendedMessage extends Eris.Message {
 		// member mention
 		if (this.mentionMap.users.length >= mentionPosition + 1) return this.mentionMap.users.slice(mentionPosition)[mentionPosition];
 		// user ID
-		if (![undefined, null, ""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.guild.members.get(args[argPosition]).user;
+		if (![undefined, null, ""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
+			if (this.guild.members.has(args[argPosition])) return this.guild.members.get(args[argPosition]).user;
+		}
 
 		// username
 		// update this to fix error "cannot read property 'user' of undefined" at the end
@@ -270,7 +272,7 @@ class ExtendedMessage extends Eris.Message {
 		if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition + 1)) return this.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase()).user;
 
 		// nothing found
-		return null;
+		return this._client.getRESTUser(args[argPosition]).catch(err => null);
 	}
 
 	async getMemberFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0): Promise<Eris.Member> {
