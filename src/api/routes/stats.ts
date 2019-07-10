@@ -7,13 +7,9 @@ import config from "@src/config/config";
 const app: express.Router = express.Router();
 
 app.get("/", async (req, res) => {
-	let d, date, a, dailyJoins;
-	d = new Date();
-	date = `${d.getMonth().toString().length > 1 ? d.getMonth() + 1 : `0${d.getMonth() + 1}`}-${d.getDate().toString().length > 1 ? d.getDate() : `0${d.getDate()}`}-${d.getFullYear()}`;
-	a = await mdb.collection("dailyjoins").findOne({
-		id: date
-	});
-	dailyJoins = a !== null ? a.count : null || null;
+	const d = new Date(),
+		date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
+		dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null);
 
 	return res.status(200).json({
 		success: true,
@@ -23,12 +19,12 @@ app.get("/", async (req, res) => {
 		shardCount: client.shards.size,
 		memoryUsage: {
 			process: {
-	used: functions.memory.process.getUsed(),
-	total: functions.memory.process.getTotal()
+				used: functions.memory.process.getUsed(),
+				total: functions.memory.process.getTotal()
 			},
 			system: {
-	used: functions.memory.system.getUsed(),
-	total: functions.memory.system.getTotal()
+				used: functions.memory.system.getUsed(),
+				total: functions.memory.system.getTotal()
 			}
 		},
 		largeGuildCount: client.guilds.filter(g => g.large).length,
