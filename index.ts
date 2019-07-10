@@ -5,6 +5,8 @@ import functions from "@util/functions";
 
 const bot = new FurryBot(config.bot.token, config.bot.clientOptions);
 
+fs.writeFileSync(`${__dirname}/process.pid`, process.pid);
+
 bot.connect();
 
 bot.on("shardDisconnect", (error: string, id: number) => {
@@ -89,5 +91,4 @@ process.on("SIGINT", () => {
 	process.kill(process.pid);
 });
 
-fs.writeFileSync(`${__dirname}/process.pid`, process.pid);
 export default bot;
