@@ -4,6 +4,7 @@ import client from "@root/index";
 import { mdb } from "@modules/Database";
 import uuid from "uuid/v4";
 import functions from "@util/functions";
+import uConfig from "@src/default/userConfig.json";
 
 const app: express.Router = express.Router();
 
@@ -31,8 +32,18 @@ app.post("/:list", async (req, res) => {
 				bot: req.body.bot,
 				weekend: req.body.isWeekend,
 				type: req.body.type,
-				query: req.body.query
+				query: req.body.query,
+				timestamp: Date.now()
 			});
+
+			let bal = await mdb.collection("users").findOne({ id: req.body.user }).then(res => res.bal + 100).catch(err => null);
+
+			if (!bal) {
+				await mdb.collection("users").insertOne({ ...{ id: req.body.user, ...uConfig } });
+				bal = uConfig.bal;
+			}
+
+			await mdb.collection("users").findOneAndUpdate({ id: req.body.user }, { $set: { bal } });
 
 			let u = client.users.get(req.body.user);
 			if (!u) u = await client.getRESTUser(req.body.user);
@@ -40,7 +51,7 @@ app.post("/:list", async (req, res) => {
 			await u.getDMChannel().then(ch => ch.createMessage({
 				embed: {
 					title: "Thanks for voting for me!",
-					description: "Hey, thanks for voting for me on that bot list!\nI don't have any specific rewards yet, but some are planned!",
+					description: `Hey, thanks for voting for me on that bot list!\nYou've been gifted **100**${config.ecoEmoji}!`,
 					timestamp: new Date().toISOString(),
 					color: functions.randomColor()
 				}
