@@ -41,6 +41,11 @@ export default new Command({
 				name: "Delete Command Invocations",
 				value: msg.gConfig.deleteCommands ? "Enabled" : "Disabled",
 				inline: false
+			},
+			{
+				name: "F Response Enabled",
+				value: msg.gConfig.fResponseEnabled ? "Enabled" : "Disabled",
+				inline: false
 			}
 		],
 		color: functions.randomColor(),
