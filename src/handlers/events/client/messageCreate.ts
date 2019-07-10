@@ -32,7 +32,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		};
 	}
 
-	if (!bl && (typeof msg.gConfig.blacklist !== "undefined" && msg.gConfig.blacklist.blacklisted) && !config.developers.includes(msg.author.id)) {
+	if (msg.channel.type !== 1 && !bl && (typeof msg.gConfig.blacklist !== "undefined" && msg.gConfig.blacklist.blacklisted) && !config.developers.includes(msg.author.id)) {
 		bl = true;
 		blReason = {
 			type: 1,

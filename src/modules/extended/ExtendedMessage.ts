@@ -106,19 +106,19 @@ class ExtendedMessage extends Eris.Message {
 	}
 
 	async _load() {
-		if (!this.channel.guild) {
-			this.uConfig = null;
+
+		this.uConfig = await mdb.collection("users").findOne({ id: this.author.id }).then(async (res) => {
+			if (!res) {
+				await mdb.collection("users").insertOne({ ...{ id: this.author.id }, ...config.defaults.userConfig }).catch(err => null);
+				console.debug(`Created User Entry "${this.author.id}"`);
+				const res = await mdb.collection("users").findOne({ id: this.author.id });
+				return res;
+			} else return res;
+		}).then(res => new UserConfig(this.author.id, res));
+
+		if (!this.channel.guild || this.channel.type === 1) {
 			this.gConfig = null;
 		} else {
-			this.uConfig = await mdb.collection("users").findOne({ id: this.author.id }).then(async (res) => {
-				if (!res) {
-					await mdb.collection("users").insertOne({ ...{ id: this.author.id }, ...config.defaults.userConfig }).catch(err => null);
-					console.debug(`Created User Entry "${this.author.id}"`);
-					const res = await mdb.collection("users").findOne({ id: this.author.id });
-					return res;
-				} else return res;
-			}).then(res => new UserConfig(this.author.id, res));
-
 			this.gConfig = await mdb.collection("guilds").findOne({ id: this.channel.guild.id }).then(async (res) => {
 				if (!res) {
 					await mdb.collection("guilds").insertOne({ ...{ id: this.channel.guild.id }, ...config.defaults.guildConfig }).catch(err => null);
