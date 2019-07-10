@@ -43,7 +43,32 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 	try {
 
-		if (msg.channel.type === 1 && !bl) {
+		if (msg.channel.type === 1) {
+
+			if (bl) {
+				let t;
+				let v: string[];
+				try {
+					if (!fs.existsSync(`${__dirname}/../../../config/blNoticeViewed.json`)) fs.writeFileSync(`${__dirname}/../../../config/blNoticeViewed.json`, JSON.stringify([]));
+					v = JSON.parse(fs.readFileSync(`${__dirname}/../../../config/blNoticeViewed.json`).toString());
+				} catch (e) {
+					console.error(`Failed to get blacklist notice viewed list`);
+					v = null;
+				}
+
+				if (v === null || v.includes(msg.author.id)) return;
+				else {
+					v.push(msg.author.id);
+					fs.writeFileSync(`${__dirname}/../../../config/blNoticeViewed.json`, JSON.stringify(v));
+				}
+
+				if (blReason.type === 0) t = `You are blacklisted from using this bot, reason: ${blReason.reason}, blame: ${blReason.blame}`;
+				// else t = `This server is blacklisted from using this bot, reason: ${blReason.reason}, blame: ${blReason.blame}`;
+
+				return msg.channel.createMessage(t);
+
+			}
+			/* end blacklist notice */
 
 			let dmAds;
 			// dm advertising to bot
@@ -53,7 +78,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				await c.banMember(msg.author.id, 0, "Advertising in bots dms.");
 
 				embed = {
-					title: `DM Advertisment from ${msg.author.tag} (${msg.author.id})`,
+					title: `DM Advertisment from ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
 					description: "User auto banned.",
 					fields: [{
 						name: "Content",
@@ -64,7 +89,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 				await this.executeWebhook(config.webhooks.directMessage.id, config.webhooks.directMessage.token, {
 					embeds: [embed],
-					username: `Direct Messages${config.beta ? " - Beta" : ""}`
+					username: `Direct Messages${config.beta ? " - Beta" : ""}`,
+					avatarURL: "https://i.furry.bot/furry.png"
 				});
 
 				await msg.author.getDMChannel().then(dm => dm.createMessage("Hey, I see that you're sending dm advertisments dm me, that isn't a good idea.. You've been auto banned from my support server for dm advertising."));
@@ -72,7 +98,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			} else {
 				dmAds = false;
 				embed = {
-					title: `Direct Message from ${msg.author.tag} (${msg.author.id})`,
+					title: `Direct Message from ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
 					fields: [{
 						name: "Content",
 						value: msg.content,
@@ -82,7 +108,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 				await this.executeWebhook(config.webhooks.directMessage.id, config.webhooks.directMessage.token, {
 					embeds: [embed],
-					username: `Direct Messages${config.beta ? " - Beta" : ""}`
+					username: `Direct Messages${config.beta ? " - Beta" : ""}`,
+					avatarURL: "https://i.furry.bot/furry.png"
 				});
 
 				await msg.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://furry.bot> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join <https://furry.bot/inv> if you need more help!\nAnother tip: commands cannot be ran in my dms!`));
@@ -261,7 +288,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			// if (msg.cmd.category.name === "custom" && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("This command cannot be ran in this server!");
 
-			if (cmd.devOnly && !config.developers.includes(msg.author.id)) return msg.reply("You cannot run this command as you are not a developer of this bot.");
+			if (cmd.devOnly && !config.developers.includes(msg.author.id)) return msg.reply(`This command (**${cmd.triggers[0]}**) has been set to developer only, and you are not a developer of this bot, therefore you can not run this command.`);
 
 			if (cmd.guildOwnerOnly && (msg.author.id !== msg.guild.ownerID) && !config.developers.includes(msg.author.id)) return msg.reply("This command can only be ran by the owner of this server.");
 

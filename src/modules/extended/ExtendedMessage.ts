@@ -131,33 +131,36 @@ class ExtendedMessage extends Eris.Message {
 			// this.author.dmChannel = this.author.bot ? null : await this.author.getDMChannel();
 		}
 
-
 		try {
-			this.prefix = this.content.startsWith(`<@${this._client.user.id}>`) ? `<@${this._client.user.id}` : this.content.startsWith(`<@!${this._client.user.id}>`) ? `<@!${this._client.user.id}>` : config.beta ? config.defaultPrefix : this.gConfig.prefix.toLowerCase();
-
-			const a = this.content.slice(this.prefix.length).trim().split(/\s+/);
-			a.shift();
-			try {
-				this.args = this.content.slice(this.prefix.length).trim().match(/[^\s"]+|"[^"]+"/g).map(s => s.replace(/\"/g, "")); // eslint-disable-line no-useless-escape
-			} catch (e) {
-				try {
-					this.args = this.content.slice(this.prefix.length).trim().split(/\s/);
-				} catch (e) {
-					this.args = [];
-				}
-			}
-
-			this.cmd = this._client.getCommand(this.args.shift().toLowerCase());
-			this.response = this._client.getResponse(this.content.toLowerCase());
-			this.unparsedArgs = a;
-
-			this.user = {
-				isDeveloper: config.developers.includes(this.author.id)
-			};
-
 			this.author.tag = `${this.author.username}#${this.author.discriminator}`;
-		} catch (e) {
-			this._client.logger.log(`Error setting up message ${this.id}: ${e}`);
+		} catch (e) { }
+
+		if (this.channel.type !== 1) {
+			try {
+				this.prefix = this.content.startsWith(`<@${this._client.user.id}>`) ? `<@${this._client.user.id}` : this.content.startsWith(`<@!${this._client.user.id}>`) ? `<@!${this._client.user.id}>` : config.beta ? config.defaultPrefix : this.gConfig.prefix.toLowerCase();
+
+				const a = this.content.slice(this.prefix.length).trim().split(/\s+/);
+				a.shift();
+				try {
+					this.args = this.content.slice(this.prefix.length).trim().match(/[^\s"]+|"[^"]+"/g).map(s => s.replace(/\"/g, "")); // eslint-disable-line no-useless-escape
+				} catch (e) {
+					try {
+						this.args = this.content.slice(this.prefix.length).trim().split(/\s/);
+					} catch (e) {
+						this.args = [];
+					}
+				}
+
+				this.cmd = this._client.getCommand(this.args.shift().toLowerCase());
+				this.response = this._client.getResponse(this.content.toLowerCase());
+				this.unparsedArgs = a;
+
+				this.user = {
+					isDeveloper: config.developers.includes(this.author.id)
+				};
+			} catch (e) {
+				this._client.logger.log(`Error setting up message ${this.id}: ${e}`);
+			}
 		}
 	}
 
