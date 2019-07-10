@@ -80,6 +80,6 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 			embed
 		],
 		username: `FurryBot Bot Guild Stats${config.beta ? " - Beta" : ""}`,
-		avatarURL: "https://reddit.furry.host/FurryBotForDiscord.png"
+		avatarURL: "https://i.furry.bot/furry.png"
 	});
 }));
