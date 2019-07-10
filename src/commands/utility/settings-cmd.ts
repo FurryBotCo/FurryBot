@@ -66,7 +66,7 @@ export default new Command({
 		case "e":
 		case "true":
 			await msg.gConfig.edit({ [type]: true }).then(d => d.reload());
-			return msg.reply(`Enabled ${msg.args[0]}, run again to disable.`);
+			return msg.reply(`Enabled ${msg.args[0]}, use \`${msg.gConfig.prefix}settings ${msg.args[0]} disabled\` to disable.`);
 			break;
 
 		case "disabled":
@@ -74,7 +74,7 @@ export default new Command({
 		case "d":
 		case "false":
 			await msg.gConfig.edit({ [type]: false }).then(d => d.reload());
-			return msg.reply(`Disabled ${msg.args[0]}, run again to enable.`);
+			return msg.reply(`Disabled ${msg.args[0]}, use \`${msg.gConfig.prefix}settings ${msg.args[0]} enabled\` to enable.`);
 			break;
 	}
 }));
