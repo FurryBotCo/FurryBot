@@ -30,15 +30,15 @@ export default new Command({
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	let tags, bl, req, embed, postNumber, post;
-	tags = encodeURIComponent(msg.args.join(" "));
+	tags = encodeURIComponent(msg.args.map(a => a.replace(/,\|/g, "")).join(" "));
 	bl = tags.match(config.tagBlacklist);
 	if (bl !== null && bl.length > 0) return msg.channel.createMessage(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
 	try {
 		req = await phin({
 			url: `https://e621.net/post/index.json?limit=50&tags=${tags}%20rating%3Aexplict`,
 			headers: {
-	"User-Agent": config.web.userAgentExt("Donovan_DMC"),
-	"Content-Type": "application/json"
+				"User-Agent": config.web.userAgentExt("Donovan_DMC"),
+				"Content-Type": "application/json"
 			}
 		}).then(res => res.body.toString());
 		if (req.indexOf("block.opendns.com") !== -1) return msg.reply("This command is blocked on the current network the bot is being ran on.");
