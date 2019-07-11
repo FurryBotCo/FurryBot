@@ -20,7 +20,7 @@ export default new Command({
 	description: "Check your economy balance",
 	usage: "",
 	nsfw: false,
-	devOnly: true,
+	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,

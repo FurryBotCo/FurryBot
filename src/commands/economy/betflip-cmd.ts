@@ -19,7 +19,7 @@ export default new Command({
 	description: "Bet some money on a coin flip",
 	usage: "<side> <amount>",
 	nsfw: false,
-	devOnly: true,
+	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,

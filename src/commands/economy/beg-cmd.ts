@@ -19,7 +19,7 @@ export default new Command({
 	description: "Beg for free money",
 	usage: "",
 	nsfw: false,
-	devOnly: true,
+	devOnly: false,
 	betaOnly: false,
 	guildOwnerOnly: false,
 	path: __filename,
