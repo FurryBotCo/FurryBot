@@ -106,19 +106,19 @@ class ExtendedMessage extends Eris.Message {
 	}
 
 	async _load() {
-		if (!this.channel.guild) {
-			this.uConfig = null;
+
+		this.uConfig = await mdb.collection("users").findOne({ id: this.author.id }).then(async (res) => {
+			if (!res) {
+				await mdb.collection("users").insertOne({ ...{ id: this.author.id }, ...config.defaults.userConfig }).catch(err => null);
+				console.debug(`Created User Entry "${this.author.id}"`);
+				const res = await mdb.collection("users").findOne({ id: this.author.id });
+				return res;
+			} else return res;
+		}).then(res => new UserConfig(this.author.id, res));
+
+		if (!this.channel.guild || this.channel.type === 1) {
 			this.gConfig = null;
 		} else {
-			this.uConfig = await mdb.collection("users").findOne({ id: this.author.id }).then(async (res) => {
-				if (!res) {
-					await mdb.collection("users").insertOne({ ...{ id: this.author.id }, ...config.defaults.userConfig }).catch(err => null);
-					console.debug(`Created User Entry "${this.author.id}"`);
-					const res = await mdb.collection("users").findOne({ id: this.author.id });
-					return res;
-				} else return res;
-			}).then(res => new UserConfig(this.author.id, res));
-
 			this.gConfig = await mdb.collection("guilds").findOne({ id: this.channel.guild.id }).then(async (res) => {
 				if (!res) {
 					await mdb.collection("guilds").insertOne({ ...{ id: this.channel.guild.id }, ...config.defaults.guildConfig }).catch(err => null);
@@ -131,33 +131,36 @@ class ExtendedMessage extends Eris.Message {
 			// this.author.dmChannel = this.author.bot ? null : await this.author.getDMChannel();
 		}
 
-
 		try {
-			this.prefix = this.content.startsWith(`<@${this._client.user.id}>`) ? `<@${this._client.user.id}` : this.content.startsWith(`<@!${this._client.user.id}>`) ? `<@!${this._client.user.id}>` : config.beta ? config.defaultPrefix : this.gConfig.prefix.toLowerCase();
-
-			const a = this.content.slice(this.prefix.length).trim().split(/\s+/);
-			a.shift();
-			try {
-				this.args = this.content.slice(this.prefix.length).trim().match(/[^\s"]+|"[^"]+"/g).map(s => s.replace(/\"/g, "")); // eslint-disable-line no-useless-escape
-			} catch (e) {
-				try {
-					this.args = this.content.slice(this.prefix.length).trim().split(/\s/);
-				} catch (e) {
-					this.args = [];
-				}
-			}
-
-			this.cmd = this._client.getCommand(this.args.shift().toLowerCase());
-			this.response = this._client.getResponse(this.content.toLowerCase());
-			this.unparsedArgs = a;
-
-			this.user = {
-				isDeveloper: config.developers.includes(this.author.id)
-			};
-
 			this.author.tag = `${this.author.username}#${this.author.discriminator}`;
-		} catch (e) {
-			this._client.logger.log(`Error setting up message ${this.id}: ${e}`);
+		} catch (e) { }
+
+		if (this.channel.type !== 1) {
+			try {
+				this.prefix = this.content.startsWith(`<@${this._client.user.id}>`) ? `<@${this._client.user.id}` : this.content.startsWith(`<@!${this._client.user.id}>`) ? `<@!${this._client.user.id}>` : config.beta ? config.defaultPrefix : this.gConfig.prefix.toLowerCase();
+
+				const a = this.content.slice(this.prefix.length).trim().split(/\s+/);
+				a.shift();
+				try {
+					this.args = this.content.slice(this.prefix.length).trim().match(/[^\s"]+|"[^"]+"/g).map(s => s.replace(/\"/g, "")); // eslint-disable-line no-useless-escape
+				} catch (e) {
+					try {
+						this.args = this.content.slice(this.prefix.length).trim().split(/\s/);
+					} catch (e) {
+						this.args = [];
+					}
+				}
+
+				this.cmd = this._client.getCommand(this.args.shift().toLowerCase());
+				this.response = this._client.getResponse(this.content.toLowerCase());
+				this.unparsedArgs = a;
+
+				this.user = {
+					isDeveloper: config.developers.includes(this.author.id)
+				};
+			} catch (e) {
+				this._client.logger.log(`Error setting up message ${this.id}: ${e}`);
+			}
 		}
 	}
 
@@ -255,7 +258,9 @@ class ExtendedMessage extends Eris.Message {
 		// member mention
 		if (this.mentionMap.users.length >= mentionPosition + 1) return this.mentionMap.users.slice(mentionPosition)[mentionPosition];
 		// user ID
-		if (![undefined, null, ""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.guild.members.get(args[argPosition]).user;
+		if (![undefined, null, ""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
+			if (this.guild.members.has(args[argPosition])) return this.guild.members.get(args[argPosition]).user;
+		}
 
 		// username
 		// update this to fix error "cannot read property 'user' of undefined" at the end
@@ -270,7 +275,7 @@ class ExtendedMessage extends Eris.Message {
 		if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition + 1)) return this.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase()).user;
 
 		// nothing found
-		return null;
+		return this._client.getRESTUser(args[argPosition]).catch(err => null);
 	}
 
 	async getMemberFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0): Promise<Eris.Member> {

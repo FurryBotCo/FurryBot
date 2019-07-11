@@ -71,5 +71,9 @@
 	],
 	"snowball": [
 		"{0} throws a snowball at {1}!"
+	],
+	"beg": [
+		"**{0}** gave you {1}{2}",
+		"you found {1}{2} that **{0}** left behind a dumpster.."
 	]
 }

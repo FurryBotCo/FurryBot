@@ -6,18 +6,18 @@ import functions from "@util/functions";
 import * as util from "util";
 import phin from "phin";
 import config from "@config";
+import { mdb } from "@modules/Database";
 
 export default new Command({
 	triggers: [
-		"togglecommandimages",
-		"toggleimages"
+		"bal",
+		"balance",
+		"$"
 	],
-	userPermissions: [
-		"manageGuild"
-	],
+	userPermissions: [],
 	botPermissions: [],
 	cooldown: 3e3,
-	description: "Toggle images on fun commands",
+	description: "Check your economy balance",
 	usage: "",
 	nsfw: false,
 	devOnly: false,
@@ -27,6 +27,13 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	if (!msg.gConfig.commandImages) return msg.gConfig.edit({ commandImages: false }).then(d => d.reload()).then(() => msg.reply("Enabled command images."));
-	else return msg.gConfig.edit({ commandImages: true }).then(d => d.reload()).then(() => msg.reply("Disabled command images."));
+	if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
+
+	if (msg.args.length > 0) {
+		const user = await msg.getUserFromArgs();
+		if (!user) return msg.errorEmbed("INVALID_USER");
+
+		const bal = await mdb.collection("users").findOne({ id: user.id }).then(res => res.bal);
+		return msg.reply(`${user.username}#${user.discriminator}'s balance is **${bal}**${config.ecoEmoji}`);
+	} else return msg.reply(`Your balance is **${msg.uConfig.bal}**${config.ecoEmoji}`);
 }));
