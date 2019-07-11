@@ -93,7 +93,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					avatarURL: "https://i.furry.bot/furry.png"
 				});
 
-				await msg.author.getDMChannel().then(dm => dm.createMessage("Hey, I see that you're sending dm advertisments dm me, that isn't a good idea.. You've been auto banned from my support server for dm advertising."));
+				await msg.author.getDMChannel().then(dm => dm.createMessage("Hey, I see that you're sending dm advertisments to me, that isn't a good idea.. You've been auto banned from my support server for dm advertising."));
 				return this.logger.log(`DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`);
 			} else {
 				dmAds = false;
