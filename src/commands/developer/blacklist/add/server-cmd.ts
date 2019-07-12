@@ -50,7 +50,11 @@ export default new Command({
 			description: `Id: ${id}\nReason: ${blacklistReason}\nBlame: ${msg.author.tag}`
 		};
 		Object.assign(embed, msg.embed_defaults());
-		await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, { embeds: [embed], username: `Blacklist Logs${config.beta ? " - Beta" : ""}` });
+		await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+			embeds: [embed],
+			username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
+			avatarURL: "https://assets.furry.bot/blacklist_logs.png"
+		});
 		return msg.reply(`Added **${id}** to the blacklist, reason: ${blacklistReason}.`);
 	}
 }));
