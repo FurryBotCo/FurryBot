@@ -15,7 +15,7 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [],
-	cooldown: 2e4,
+	cooldown: 6e4,
 	description: "Beg for free money",
 	usage: "",
 	nsfw: false,
