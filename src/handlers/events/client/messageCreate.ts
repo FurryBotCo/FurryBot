@@ -377,7 +377,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			this.logger.command(`Command  "${cmd.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 
 			if (msg.uConfig.tips && cmd.category.name === "economy") {
-				const chance = (Math.random() * 4) + 1;
+				const chance = Math.floor((Math.random() * 4) + 1);
 				if (chance === 1) {
 					const tip = config.eco.tips[Math.floor(Math.random() * config.eco.tips.length)];
 					await msg.channel.createMessage(`${tip}\n\nYou can turn these off by using \`${msg.gConfig.prefix}toggletips\``);
