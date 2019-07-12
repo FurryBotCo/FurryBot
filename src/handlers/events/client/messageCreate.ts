@@ -112,7 +112,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					avatarURL: "https://i.furry.bot/furry.png"
 				});
 
-				await msg.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://furry.bot> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join <https://furry.bot/inv> if you need more help!\nAnother tip: commands cannot be ran in my dms!`));
+				await msg.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://furry.bot> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join <https://furry.bot/inv> if you need more help!\nCommands __**CAN NOT**__ be ran in my dms!\nThese dms are not a good source to ask for support, do that in our support server <https://discord.gg/YazeA7e>!\nIf you spam my dms, you will get blacklisted!`));
 				return this.logger.log(`Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`);
 			}
 
@@ -160,7 +160,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 	Hi, ${msg.author.tag}! Since you've mentioned me, here's a little about me:\n\
 	My prefix here is ${msg.gConfig.prefix}, you can see my commands by using \`${msg.gConfig.prefix}help\`, you can change this by using \`${msg.gConfig.prefix}prefix <new prefix>\`\n\
 	If you want to invite me to another server, you can use [this link](https://discordapp.com/oauth2/authorize?client_id=${this.user.id}&scope=bot&permissions=${botPerms}), or, if that isn't working, you can visit [https://furry.bot/add](https://furry.bot/add)\n\
-	If you need some help with me, you can visit my support server [here](https://furry.bot/inv)`
+	If you need some help with me, you can visit my support server [here](https://discord.gg/YazeA7e)`
 			};
 
 			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
@@ -375,6 +375,15 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			if (msg.gConfig.deleteCommands) msg.delete().catch(err => msg.reply(`Failed to delete command invocation, you can disable this by running \`${msg.gConfig.prefix}delcmds\``));
 			this.logger.command(`Command  "${cmd.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+
+			if (msg.uConfig.tips && cmd.category.name === "economy") {
+				const chance = (Math.random() * 4) + 1;
+				if (chance === 1) {
+					const tip = config.eco.tips[Math.floor(Math.random() * config.eco.tips.length)];
+					await msg.channel.createMessage(`${tip}\n\nYou can turn these off by using \`${msg.gConfig.prefix}toggletips\``);
+				}
+			}
+
 			const start = performance.now();
 			const c = await cmd.run.call(this, msg);
 			const end = performance.now();
