@@ -31,7 +31,7 @@ export default new Command({
 	const { amount: multi } = await functions.calculateMultiplier(msg.member);
 
 	let amount = Math.floor(Math.random() * 50) + 1;
-	amount *= (multi * 100);
+	amount += amount * multi;
 	const people = [
 		...config.eco.people,
 		msg.guild.members.random().username, // positility of a random person from the same server

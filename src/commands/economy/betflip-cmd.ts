@@ -36,7 +36,7 @@ export default new Command({
 	const b = parseInt(msg.args[1], 10);
 	let c = b;
 	const { amount: multi } = await functions.calculateMultiplier(msg.member);
-	c = Math.round(c *= (multi * 100));
+	c = Math.round(c + c * multi);
 	if (isNaN(b) || b < 1) return msg.reply(`please provide a positive number for the amount of ${config.eco.emoji} to bet.`);
 
 	if (b > msg.uConfig.bal) return msg.reply(`you do not have **${b}**${config.eco.emoji}, you only have **${msg.uConfig.bal}**${config.eco.emoji}.`);
