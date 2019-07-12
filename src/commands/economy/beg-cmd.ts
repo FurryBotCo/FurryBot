@@ -32,6 +32,7 @@ export default new Command({
 
 	let amount = Math.floor(Math.random() * 50) + 1;
 	amount += amount * multi;
+	amount = Math.floor(amount);
 	const people = [
 		...config.eco.people,
 		msg.guild.members.random().username, // positility of a random person from the same server
