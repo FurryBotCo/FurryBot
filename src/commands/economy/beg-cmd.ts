@@ -28,32 +28,44 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
-	const amount = Math.floor(Math.random() * 50) + 1;
+	const { amount: multi } = await functions.calculateMultiplier(msg.member);
+
+	let amount = Math.floor(Math.random() * 50) + 1;
+	amount *= (multi * 100);
 	const people = [
-		"Donovan_DMC",
-		"Soul",
-		"Trump",
-		"Melmsie",
-		"Flippy",
-		"Jessi",
-		"Tony",
-		"Habchy",
-		"Skullbite",
+		...config.eco.people,
 		msg.guild.members.random().username, // positility of a random person from the same server
 		msg.guild.members.random().username, // positility of a random person from the same server
 		msg.guild.members.random().username  // positility of a random person from the same server
 	];
-	const texts = [
-
-	];
 
 	const person = people[Math.floor(Math.random() * people.length)];
-	const text = texts[Math.floor(Math.random() * texts.length)];
 
 	// love you, skull
 	if (person.toLowerCase() === "skullbite") msg.c = "**{0}** gave you {1}{2}, though they seemed to have some white substance on them..";
 
-	const t = functions.formatStr(msg.c, person, amount, config.ecoEmoji);
+	let t = functions.formatStr(msg.c, person, amount, config.eco.emoji);
+
+	t += `\nMultiplier: **${multi * 100}%**`;
+
 	await msg.uConfig.edit({ bal: msg.uConfig.bal + amount }).then(d => d.reload());
+
+	await this.executeWebhook(config.webhooks.economyLogs.id, config.webhooks.economyLogs.token, {
+		embeds: [
+			{
+				title: `**beg** command used by ${msg.author.tag}`,
+				description: `Amount Gained: ${amount}\nPerson: ${person}\nText: ${t}`,
+				timestamp: new Date().toISOString(),
+				color: functions.randomColor(),
+				author: {
+					name: msg.author.tag,
+					icon_url: msg.author.avatarURL
+				}
+			}
+		],
+		username: `Economy Logs${config.beta ? " - Beta" : ""}`,
+		avatarURL: "https://assets.furry.bot/economy_logs.png"
+	});
+
 	return msg.reply(t);
 }));
