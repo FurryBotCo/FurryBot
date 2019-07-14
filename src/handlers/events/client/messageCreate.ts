@@ -283,8 +283,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			const [cmd] = msg.cmd.command;
 
-			if (!msg.channel.permissionsOf(this.user.id).has("readMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `readMessages` permission to run the command you tried to run.").catch(err => null));
-			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `sendMessages` permission to run the command you tried to run.").catch(err => null));
+			// if (!msg.channel.permissionsOf(this.user.id).has("readMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `readMessages` permission to run the command you tried to run.").catch(err => null));
+			// if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `sendMessages` permission to run the command you tried to run.").catch(err => null));
 
 			// if (msg.cmd.category.name === "custom" && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("This command cannot be ran in this server!");
 
@@ -318,7 +318,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}
 			}
 
-			if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
+			/*if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
 				if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(msg.author.id).has(perm))) {
 					const p = cmd.userPermissions.filter(perm => !msg.channel.permissionsOf(msg.author.id).has(perm));
 
@@ -346,7 +346,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					this.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 					return msg.channel.createMessage({ embed });
 				}
-			}
+			}*/
 
 			if (this.commandTimeout[cmd.triggers[0]].has(msg.author.id) && !config.developers.includes(msg.author.id)) {
 				this.logger.log(`Command timeout encountered by user ${msg.author.tag} (${msg.author.id}) on command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
