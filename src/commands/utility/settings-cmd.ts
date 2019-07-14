@@ -15,9 +15,7 @@ export default new Command({
 	userPermissions: [
 		"manageGuild"
 	],
-	botPermissions: [
-		"manageGuild"
-	],
+	botPermissions: [],
 	cooldown: .75e3,
 	description: "edit this servers settings",
 	usage: "",
