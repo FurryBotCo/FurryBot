@@ -250,7 +250,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			return;
 		}
 
-		if (!msg.content.startsWith(msg.prefix)) return;
+		if (!msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase())) return;
 
 		if (msg.cmd !== null && msg.cmd.command !== null && msg.cmd.command.length > 0) {
 			/* blacklist notice */
