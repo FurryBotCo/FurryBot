@@ -14,6 +14,8 @@ import ErrorHandler from "@util/ErrorHandler";
 import client from "@root/index";
 import UserConfig from "@src/modules/config/UserConfig";
 import GuildConfig from "@src/modules/config/GuildConfig";
+import youtubesearch from "youtube-search";
+import ytdl from "ytdl-core";
 
 // moved to separate variable as it is needed in a function here
 const random = ((len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string => {
@@ -523,5 +525,10 @@ export default {
 			} else return null;
 		}
 		return new GuildConfig(id, m);
+	}),
+	ytsearch: (async (q = "") => util.promisify(youtubesearch)(q, config.ytSearchOptions).then(res => res.filter(y => y.kind === "youtube#video").slice(0, 10))),
+	ytinfo: (async (url: string): Promise<ytdl.videoInfo> => {
+		const i: any = util.promisify(ytdl.getInfo)(url);
+		return i;
 	})
 };
