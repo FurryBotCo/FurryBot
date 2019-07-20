@@ -39,8 +39,9 @@ export default new Command({
 		await mdb.collection("guilds").insertOne({ ...config.defaults.guildConfig, ... { id } });
 		srv = await mdb.collection("guilds").findOne({ id });
 	}
-
+	srv = new GuildConfig(srv.id, srv);
 	if (!srv) return msg.reply(`Failed to create guild entry for **${id}**`);
+	if (typeof srv.blacklist === "undefined") await srv.edit({ blacklist: { blacklisted: false, reason: null, blame: "" } }).then(d => d.reload());
 	if (srv.blacklist.blacklisted) return msg.reply(`**${id}** is already blacklisted, reason: ${srv.blacklist.reason}.`);
 	else {
 		blacklistReason = msg.args.length > 1 ? msg.args.slice(1, msg.args.length).join(" ") : "No Reason Specified";
