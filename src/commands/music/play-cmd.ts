@@ -8,6 +8,7 @@ import phin from "phin";
 import config from "@config";
 import { mdb } from "@modules/Database";
 import ytdl from "ytdl-core";
+import { YouTubeSearchResults } from "youtube-search";
 
 export default new Command({
 	triggers: [
@@ -39,24 +40,34 @@ export default new Command({
 	if (!vc.permissionsOf(this.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are in.");
 
 	const q = msg.args.join(" ");
-	const search = await functions.ytsearch(q).catch(err => null);
+	const search: YouTubeSearchResults[] = await functions.ytsearch(q).catch(err => null);
 	if (!search) return msg.reply("there was an internal error while fetching search results.");
 
-	const m = await msg.channel.createMessage(`Showing results for **${q}**\n${search.map((s, i) => `\`${i + 1}\` - ${s.title} by **${s.channelTitle}**`).join("\n")}\n\nPlease reply with a number.\nYou can also say **cancel** to cancel.`);
+	let song: YouTubeSearchResults;
 
-	const d = await this.MessageCollector.awaitMessage(msg.channel.id, msg.author.id, 3e4);
 
-	if (!d) return msg.reply("command timed out!");
+	let m: Eris.Message;
 
-	if (d.content.toLowerCase() === "cancel") return msg.reply("canceled.");
+	if (/https?:\/\/(www\.youtube\.com\/watch\?v=|youtu\.be\/)[A-Z\d_-]{9,13}/gi.test(q)) {
+		song = search[0];
+		m = await msg.channel.createMessage(`Loading **${q}**.`);
+	} else {
+		m = await msg.channel.createMessage(`Showing results for **${q}**\n${search.map((s, i) => `\`${i + 1}\` - ${s.title} by **${s.channelTitle}**`).join("\n")}\n\nPlease reply with a number.\nYou can also say **cancel** to cancel.`);
 
-	const j = parseInt(d.content);
+		const d = await this.MessageCollector.awaitMessage(msg.channel.id, msg.author.id, 3e4);
 
-	if (isNaN(j)) return msg.reply("that choice was not valid!");
+		if (!d) return msg.reply("command timed out!");
 
-	const song = search[j - 1];
+		if (d.content.toLowerCase() === "cancel") return msg.reply("canceled.");
 
-	if (!song) return msg.reply("that choice was not found!");
+		const j = parseInt(d.content);
+
+		if (isNaN(j)) return msg.reply("that choice was not valid!");
+
+		song = search[j - 1];
+
+		if (!song) return msg.reply("that choice was not found!");
+	}
 
 	let v;
 	try {
@@ -78,6 +89,9 @@ export default new Command({
 	let newplay = false;
 
 	if (!me.voiceState.channelID) {
+
+		msg.gConfig.music.queue = [];
+		await msg.gConfig.edit({ music: { textChannel: msg.channel.id } }).then(d => d.reload());
 
 		conn = await vc.join({});
 		await conn.updateVoiceState(false, true);
@@ -116,7 +130,8 @@ export default new Command({
 					name: msg.author.tag,
 					icon_url: msg.author.avatarURL
 				},
-				title: `Now Playing ${song.title} by **${song.channelTitle}**`,
+				url: song.link,
+				title: `Now Playing [${song.title}](${song.link}) by **${song.channelTitle}**`,
 				description: `Song Length: ${time}`,
 				timestamp: new Date().toISOString(),
 				color: functions.randomColor()
@@ -185,6 +200,11 @@ export default new Command({
 		}
 
 		conn.once("end", handleQueue);
+		conn.once("disconnect", async (err) => {
+			await msg.gConfig.reload();
+			msg.gConfig.music.queue = [];
+			await msg.gConfig.edit({ music: { volume: 100, textChannel: null } });
+		});
 	}
 
 }));
