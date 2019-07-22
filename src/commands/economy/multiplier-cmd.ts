@@ -28,10 +28,13 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
-	const m = await functions.calculateMultiplier(msg.member);
+	let member = msg.member;
+	if (msg.args.length > 0) member = await msg.getMemberFromArgs();
+
+	const m = await functions.calculateMultiplier(member);
 
 	const embed: Eris.EmbedOptions = {
-		title: `${msg.author.tag}'s Multipliers`,
+		title: `${member.username}#${member.discriminator}'s Multipliers`,
 		description: `[Support Server](https://discord.gg/YazeA7e): ${m.multi.supportServer ? "<:greenTick:599105055240749089>" : "<:redTick:599105059275407381>"} - \`${config.eco.multipliers.supportServer * 100}%\`\n\
 		[Vote](https://discordbots.org/bot/398251412246495233/vote): ${m.multi.vote ? "<:greenTick:599105055240749089>" : "<:redTick:599105059275407381>"} - \`${config.eco.multipliers.vote * 100}%\`\n\
 		[Weekend Vote](https://discordbots.org/bot/398251412246495233/vote): ${m.multi.voteWeekend ? "<:greenTick:599105055240749089>" : "<:redTick:599105059275407381>"} - \`${config.eco.multipliers.voteWeekend * 100}%\`\n\
@@ -45,6 +48,4 @@ export default new Command({
 	};
 
 	return msg.channel.createMessage({ embed });
-
-
 }));
