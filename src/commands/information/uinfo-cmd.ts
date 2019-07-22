@@ -6,6 +6,8 @@ import functions from "@util/functions";
 import * as util from "util";
 import phin from "phin";
 import config from "@config";
+import { mdb } from "@src/modules/Database";
+import UserConfig from "@src/modules/config/UserConfig";
 
 export default new Command({
 	triggers: [
@@ -28,7 +30,7 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	let user, roles, req, ds, db, rs, list, embed;
+	let user, roles, req, rs, list, embed: Eris.EmbedOptions;
 	try {
 		if (msg.args.length === 0 || !msg.args) {
 			user = msg.member;
@@ -46,7 +48,7 @@ export default new Command({
 	roles = user.roles.map(role => role !== msg.channel.guild.id ? `<@&${role}>` : "@everyone");
 
 	embed = {
-		name: "User info",
+		title: "User info",
 		fields: [{
 			name: "Tag",
 			value: `${user.user.username}#${user.user.discriminator}`,
@@ -70,44 +72,21 @@ export default new Command({
 		}]
 	};
 	if (!user.user.bot) {
-		try {
-			/*req = await phin({
-	method: "GET",
-	url: `https://discord.services/api/ban/${user.id}`
-			});
-
-			x = JSON.parse(req.body.toString());
-			ds = typeof x.ban !== "undefined"?`\nReason: ${x.ban.reason}\nProof: [${x.ban.proof}](${x.ban.proof})`:"No";*/
-			ds = "Down until further notice";
-		} catch (e) {
-			ds = "Lookup failed.";
-			this.logger.log(e);
-			this.logger.log({
-				headers: req.headers,
-				body: req.body.toString(),
-				statusCode: req.statusCode
-			});
+		let u: UserConfig = await mdb.collection("users").findOne({ id: user.id });
+		if (!u) {
+			await mdb.collection("users").insertOne({ id: user.id, ...config.defaults.userConfig });
+			u = await mdb.collection("users").findOne({ id: user.id });
 		}
-		db = "Down until further notice";
-		/*l = await mdb.collection("users").findOne({
-			id: user.id
-		}).then(res => {
-			if (!res.blacklisted) return false;
-			return {
-	blacklisted: res.blacklisted,
-	reason: res.blacklistReason
-			};
-		});
-		ll = l.blacklisted ? `Reason: ${l.reason}` : "No";
-		embed.fields.push({
+		if (u.blacklist.blacklisted) embed.fields.push({
 			name: "Blacklist",
-			value: `Discord.Services: **${ds}**\nDiscord Bans: **${db}**\nlocal: **${ll}**`,
-			inline: false
-		}, {
-	name: "Bot List",
-	value: "Humans are not listed on (most) bot lists.",
-	inline: false
-			});*/
+			value: `User is blacklisted.\nReason: ${u.blacklist.reason}\nBlame: ${u.blacklist.blame}`,
+			inline: true
+		});
+		else embed.fields.push({
+			name: "Blacklist",
+			value: "User is not blacklisted.",
+			inline: true
+		});
 	} else {
 		// botlist lookup
 		req = await phin({
