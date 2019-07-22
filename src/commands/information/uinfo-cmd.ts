@@ -87,6 +87,17 @@ export default new Command({
 			value: "User is not blacklisted.",
 			inline: true
 		});
+
+		if (u.marriage.married) embed.fields.push({
+			name: "Marriage Status (on this bot)",
+			value: `Married to ${this.getRESTUser(u.marriage.partner).then(usr => `${usr.username}#${usr.discriminator}`).catch(err => "Unknown#0000")}`,
+			inline: true
+		});
+		else embed.fields.push({
+			name: "Marriage Status (on this bot)",
+			value: "Not Married.",
+			inline: false
+		});
 	} else {
 		// botlist lookup
 		req = await phin({
