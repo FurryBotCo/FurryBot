@@ -33,7 +33,7 @@ export default new Command({
 		const user = await msg.getUserFromArgs();
 		if (!user) return msg.errorEmbed("INVALID_USER");
 
-		const bal = await mdb.collection("users").findOne({ id: user.id }).then(res => res.bal);
+		const bal = await mdb.collection("users").findOne({ id: user.id }).then(res => res.bal).catch(err => 100);
 		return msg.reply(`${user.username}#${user.discriminator}'s balance is **${bal}**${config.eco.emoji}`);
 	} else return msg.reply(`Your balance is **${msg.uConfig.bal}**${config.eco.emoji}`);
 }));
