@@ -41,10 +41,10 @@ export default new Command({
 
 	if (b > msg.uConfig.bal) return msg.reply(`you do not have **${b}**${config.eco.emoji}, you only have **${msg.uConfig.bal}**${config.eco.emoji}.`);
 
-	const flip = Math.random(); // Math.floor(Math.random() * 2); // I know I could just use Math.random and test for above/below .5, but this is easier to read
+	const flip = Math.random();
 
-	const win = flip <= .70 && a === 0 || flip > .70 && a === 1;
-	const side = flip <= .70 ? "heads" : "tails";
+	const win = flip <= .70;
+	const side = win ? "heads" : "tails";
 	// console.debug(`[a] Bet ${a}`);
 	// console.debug(`[a] Bet ${a === 0 ? "heads" : "tails"}`);
 	// console.debug(`[flip] Flip ${flip}`);
