@@ -112,7 +112,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					avatarURL: "https://i.furry.bot/furry.png"
 				});
 
-				await msg.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://furry.bot> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join <https://furry.bot/inv> if you need more help!\nAnother tip: commands cannot be ran in my dms!`));
+				await msg.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://furry.bot> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join <https://furry.bot/inv> if you need more help!\nCommands __**CAN NOT**__ be ran in my dms!\nThese dms are not a good source to ask for support, do that in our support server <https://discord.gg/YazeA7e>!\nIf you spam my dms, you will get blacklisted!`));
 				return this.logger.log(`Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`);
 			}
 
@@ -160,7 +160,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 	Hi, ${msg.author.tag}! Since you've mentioned me, here's a little about me:\n\
 	My prefix here is ${msg.gConfig.prefix}, you can see my commands by using \`${msg.gConfig.prefix}help\`, you can change this by using \`${msg.gConfig.prefix}prefix <new prefix>\`\n\
 	If you want to invite me to another server, you can use [this link](https://discordapp.com/oauth2/authorize?client_id=${this.user.id}&scope=bot&permissions=${botPerms}), or, if that isn't working, you can visit [https://furry.bot/add](https://furry.bot/add)\n\
-	If you need some help with me, you can visit my support server [here](https://furry.bot/inv)`
+	If you need some help with me, you can visit my support server [here](https://discord.gg/YazeA7e)`
 			};
 
 			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
@@ -250,7 +250,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			return;
 		}
 
-		if (!msg.content.startsWith(msg.prefix)) return;
+		if (!msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase())) return;
 
 		if (msg.cmd !== null && msg.cmd.command !== null && msg.cmd.command.length > 0) {
 			/* blacklist notice */
@@ -283,8 +283,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			const [cmd] = msg.cmd.command;
 
-			if (!msg.channel.permissionsOf(this.user.id).has("readMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `readMessages` permission to run the command you tried to run.").catch(err => null));
-			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `sendMessages` permission to run the command you tried to run.").catch(err => null));
+			// if (!msg.channel.permissionsOf(this.user.id).has("readMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `readMessages` permission to run the command you tried to run.").catch(err => null));
+			// if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage("I am missing the `sendMessages` permission to run the command you tried to run.").catch(err => null));
 
 			// if (msg.cmd.category.name === "custom" && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("This command cannot be ran in this server!");
 
@@ -318,7 +318,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}
 			}
 
-			if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
+			/*if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
 				if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(msg.author.id).has(perm))) {
 					const p = cmd.userPermissions.filter(perm => !msg.channel.permissionsOf(msg.author.id).has(perm));
 
@@ -346,7 +346,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					this.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 					return msg.channel.createMessage({ embed });
 				}
-			}
+			}*/
 
 			if (this.commandTimeout[cmd.triggers[0]].has(msg.author.id) && !config.developers.includes(msg.author.id)) {
 				this.logger.log(`Command timeout encountered by user ${msg.author.tag} (${msg.author.id}) on command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
@@ -375,6 +375,15 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			if (msg.gConfig.deleteCommands) msg.delete().catch(err => msg.reply(`Failed to delete command invocation, you can disable this by running \`${msg.gConfig.prefix}delcmds\``));
 			this.logger.command(`Command  "${cmd.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+
+			if (msg.uConfig.tips && cmd.category.name === "economy") {
+				const chance = Math.floor((Math.random() * 4) + 1);
+				if (chance === 1) {
+					const tip = config.eco.tips[Math.floor(Math.random() * config.eco.tips.length)];
+					await msg.channel.createMessage(`${tip}\n\nYou can turn these off by using \`${msg.gConfig.prefix}toggletips\``);
+				}
+			}
+
 			const start = performance.now();
 			const c = await cmd.run.call(this, msg);
 			const end = performance.now();

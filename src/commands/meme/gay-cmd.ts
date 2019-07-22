@@ -36,6 +36,8 @@ export default new Command({
 	else imgurl = msg.author.staticAvatarURL;
 
 	if (!imgurl) return msg.reply("please either attach an image or provide a url");
+	const test = await functions.validateURL(imgurl);
+	if (!test) return msg.reply("either what you provided wasn't a valid url, or the server responded with a non-200 OK response.");
 	req = await functions.memeRequest("/gay", [imgurl]);
 	if (req.statusCode !== 200) {
 		try {

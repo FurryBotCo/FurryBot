@@ -31,7 +31,6 @@ class FurryBot extends Eris.Client {
 	tclient: Trello;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
-
 		this.logger = new Logger();
 
 		fs.readdirSync(`${__dirname}/handlers/events/client`).map(d => {

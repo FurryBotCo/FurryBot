@@ -10,14 +10,12 @@ import { mdb } from "@modules/Database";
 
 export default new Command({
 	triggers: [
-		"bal",
-		"balance",
-		"$"
+		"toggletips"
 	],
 	userPermissions: [],
 	botPermissions: [],
-	cooldown: 3e3,
-	description: "Check your economy balance",
+	cooldown: .75e3,
+	description: "Toggle getting random tips",
 	usage: "",
 	nsfw: false,
 	devOnly: false,
@@ -27,13 +25,6 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
-
-	if (msg.args.length > 0) {
-		const user = await msg.getUserFromArgs();
-		if (!user) return msg.errorEmbed("INVALID_USER");
-
-		const bal = await mdb.collection("users").findOne({ id: user.id }).then(res => res.bal).catch(err => 100);
-		return msg.reply(`${user.username}#${user.discriminator}'s balance is **${bal}**${config.eco.emoji}`);
-	} else return msg.reply(`Your balance is **${msg.uConfig.bal}**${config.eco.emoji}`);
+	if (msg.uConfig.tips) return msg.uConfig.edit({ tips: false }).then(d => d.reload()).then(() => msg.reply("Disabled tips."));
+	else return msg.uConfig.edit({ tips: true }).then(d => d.reload()).then(() => msg.reply("Enabled tips."));
 }));

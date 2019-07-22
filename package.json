@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "5.0.5",
+  "version": "5.0.7",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "discord-bot",
     "furry-bot"
   ],
-  "author": "Donovan_D",
+  "author": "Donovan_DMC",
   "license": "AGPL-3.0",
   "bugs": {
     "url": "https://github.com/FurryBotCo/FurryBot/issues"
@@ -33,22 +33,28 @@
     "@types/node": "^12.0.7",
     "@types/phin": "^3.3.0",
     "@types/uuid": "^3.4.5",
+    "@types/ws": "^6.0.1",
     "blapi": "^1.1.0",
     "body-parser": "^1.19.0",
+    "bufferutil": "^4.0.1",
     "canvas": "^2.5.0",
     "canvas-constructor": "^3.0.3",
     "chalk": "^2.4.2",
     "chunk": "0.0.2",
     "deasync": "^0.1.15",
-    "eris": "github:DonovanDMC/eris#dev",
-    "erlpack": "github:discordapp/erlpack",
+    "eris": "github:abalabahaha/eris#dev",
+    "erlpack": "github:abalabahaha/erlpack",
     "eval": "^0.1.3",
+    "eventemitter3": "^4.0.0",
     "express": "^4.17.1",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "mongodb": "^3.2.7",
     "morgan": "^1.9.1",
+    "node-opus": "^0.3.2",
+    "pako": "^1.0.10",
     "phin": "^3.4.0",
     "safe-eval": "^0.4.1",
+    "sodium-native": "^2.4.2",
     "trello": "^0.9.1",
     "truncate": "^2.1.0",
     "ts-node-dev": "^1.0.0-pre.40",
@@ -56,6 +62,11 @@
     "typescript": "^3.5.2",
     "util": "^0.12.0",
     "uuid": "^3.3.2",
-    "yargs": "^13.2.4"
+    "uws": "^100.0.1",
+    "ws": "^7.1.0",
+    "yargs": "^13.2.4",
+    "youtube-search": "^1.1.4",
+    "ytdl-core": "^0.29.3",
+    "zlib-sync": "^0.1.4"
   }
 }

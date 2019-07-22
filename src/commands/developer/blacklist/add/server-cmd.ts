@@ -39,8 +39,9 @@ export default new Command({
 		await mdb.collection("guilds").insertOne({ ...config.defaults.guildConfig, ... { id } });
 		srv = await mdb.collection("guilds").findOne({ id });
 	}
-
+	srv = new GuildConfig(srv.id, srv);
 	if (!srv) return msg.reply(`Failed to create guild entry for **${id}**`);
+	if (typeof srv.blacklist === "undefined") await srv.edit({ blacklist: { blacklisted: false, reason: null, blame: "" } }).then(d => d.reload());
 	if (srv.blacklist.blacklisted) return msg.reply(`**${id}** is already blacklisted, reason: ${srv.blacklist.reason}.`);
 	else {
 		blacklistReason = msg.args.length > 1 ? msg.args.slice(1, msg.args.length).join(" ") : "No Reason Specified";
@@ -50,7 +51,11 @@ export default new Command({
 			description: `Id: ${id}\nReason: ${blacklistReason}\nBlame: ${msg.author.tag}`
 		};
 		Object.assign(embed, msg.embed_defaults());
-		await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, { embeds: [embed], username: `Blacklist Logs${config.beta ? " - Beta" : ""}` });
+		await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+			embeds: [embed],
+			username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
+			avatarURL: "https://assets.furry.bot/blacklist_logs.png"
+		});
 		return msg.reply(`Added **${id}** to the blacklist, reason: ${blacklistReason}.`);
 	}
 }));

@@ -137,7 +137,7 @@ class ExtendedMessage extends Eris.Message {
 
 		if (this.channel.type !== 1) {
 			try {
-				this.prefix = this.content.startsWith(`<@${this._client.user.id}>`) ? `<@${this._client.user.id}` : this.content.startsWith(`<@!${this._client.user.id}>`) ? `<@!${this._client.user.id}>` : config.beta ? config.defaultPrefix : this.gConfig.prefix.toLowerCase();
+				this.prefix = this.content.startsWith(`<@${this._client.user.id}>`) ? `<@${this._client.user.id}` : this.content.startsWith(`<@!${this._client.user.id}>`) ? `<@!${this._client.user.id}>` : config.beta ? config.defaultPrefix.toLowerCase() : this.gConfig.prefix.toLowerCase();
 
 				const a = this.content.slice(this.prefix.length).trim().split(/\s+/);
 				a.shift();

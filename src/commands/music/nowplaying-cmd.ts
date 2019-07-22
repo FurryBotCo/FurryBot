@@ -7,17 +7,17 @@ import * as util from "util";
 import phin from "phin";
 import config from "@config";
 import { mdb } from "@modules/Database";
+import ytdl from "ytdl-core";
 
 export default new Command({
 	triggers: [
-		"bal",
-		"balance",
-		"$"
+		"nowplaying",
+		"np"
 	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 3e3,
-	description: "Check your economy balance",
+	description: "Check what song is currently playing.",
 	usage: "",
 	nsfw: false,
 	devOnly: false,
@@ -27,13 +27,27 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
-	if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
+	const [q] = [...msg.gConfig.music.queue];
 
-	if (msg.args.length > 0) {
-		const user = await msg.getUserFromArgs();
-		if (!user) return msg.errorEmbed("INVALID_USER");
+	if (!q) return msg.reply("Nothing is playing right now.");
 
-		const bal = await mdb.collection("users").findOne({ id: user.id }).then(res => res.bal).catch(err => 100);
-		return msg.reply(`${user.username}#${user.discriminator}'s balance is **${bal}**${config.eco.emoji}`);
-	} else return msg.reply(`Your balance is **${msg.uConfig.bal}**${config.eco.emoji}`);
+	const embed: Eris.EmbedOptions = {
+		title: `Now Playing in ${msg.channel.guild.name}`,
+		author: {
+			name: msg.author.tag,
+			icon_url: msg.author.avatarURL
+		},
+		fields: [
+			{
+				name: `${q.title} by ${q.channel}`,
+				value: `Length: ${Math.floor(q.length / 60)}m${q.length - Math.floor(q.length / 60) * 60}s\nAdded By: <@!${q.blame}>`,
+				inline: false
+			}
+		],
+		timestamp: new Date().toISOString(),
+		color: functions.randomColor()
+	};
+
+	return msg.channel.createMessage({ embed });
+
 }));

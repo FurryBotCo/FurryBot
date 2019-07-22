@@ -51,7 +51,11 @@ export default new Command({
 			color: functions.randomColor()
 		};
 
-		await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, { embeds: [embed], username: `Blacklist Logs${config.beta ? " - Beta" : ""}` });
+		await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+			embeds: [embed],
+			username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
+			avatarURL: "https://assets.furry.bot/blacklist_logs.png"
+		});
 		return msg.reply(`Added **${u.username}#${u.discriminator}** (${id}) to the blacklist, reason: ${blacklistReason}.`);
 	}
 

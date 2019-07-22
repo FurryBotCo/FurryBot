@@ -39,8 +39,9 @@ export default new Command({
 		await mdb.collection("guilds").insertOne({ ...config.defaults.guildConfig, ...{ id } });
 		srv = await mdb.collection("guilds").findOne({ id });
 	}
-
+	srv = new GuildConfig(srv.id, srv);
 	if (!srv) return msg.reply(`Failed to create guild entry for **${id}**`);
+	if (typeof srv.blacklist === "undefined") await srv.edit({ blacklist: { blacklisted: false, reason: null, blame: "" } }).then(d => d.reload());
 	if (!srv.blacklist.blacklisted) return msg.reply(`**${id}** is not blacklisted.`);
 	else {
 		await mdb.collection("guilds").findOneAndUpdate({ id }, { $set: { blacklist: { blacklisted: false, blame: null, reason: null } } });
@@ -51,7 +52,11 @@ export default new Command({
 			color: functions.randomColor()
 		};
 
-		await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, { embeds: [embed], username: `Blacklist Logs${config.beta ? " - Beta" : ""}` });
+		await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+			embeds: [embed],
+			username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
+			avatarURL: "https://assets.furry.bot/blacklist_logs.png"
+		});
 		return msg.reply(`Removed **${id}** from the blacklist, previous reason: ${srv.blacklist.reason}.`);
 	}
 }));

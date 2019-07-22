@@ -9,7 +9,7 @@ import phin from "phin";
 import config from "@config";
 import _eval from "@util/eval";
 import * as fs from "fs";
-import { mdb } from "@modules/Database";
+import { mdb, mongo } from "@modules/Database";
 import Permissions from "@util/Permissions";
 
 export default new Command({
@@ -61,6 +61,7 @@ export default new Command({
 			util,
 			fs,
 			mdb,
+			mongo,
 			Permissions
 		});
 	} catch (e) {

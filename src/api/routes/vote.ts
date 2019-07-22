@@ -5,6 +5,7 @@ import { mdb } from "@modules/Database";
 import uuid from "uuid/v4";
 import functions from "@util/functions";
 import uConfig from "@src/default/userConfig.json";
+import * as eris from "eris";
 
 const app: express.Router = express.Router();
 
@@ -36,7 +37,7 @@ app.post("/:list", async (req, res) => {
 				timestamp: Date.now()
 			});
 
-			let bal = await mdb.collection("users").findOne({ id: req.body.user }).then(res => res.bal + 100).catch(err => null);
+			let bal = await mdb.collection("users").findOne({ id: req.body.user }).then(res => res.bal + config.eco.voteAmount).catch(err => null);
 
 			if (!bal) {
 				await mdb.collection("users").insertOne({ ...{ id: req.body.user, ...uConfig } });
@@ -51,11 +52,28 @@ app.post("/:list", async (req, res) => {
 			await u.getDMChannel().then(ch => ch.createMessage({
 				embed: {
 					title: "Thanks for voting for me!",
-					description: `Hey, thanks for voting for me on that bot list!\nYou've been gifted **100**${config.ecoEmoji}!`,
+					description: `Hey, thanks for voting for me on that bot list!\nYou've been gifted **${config.eco.voteAmount}**${config.eco.emoji}!`,
 					timestamp: new Date().toISOString(),
 					color: functions.randomColor()
 				}
 			})).catch(err => null);
+
+			const embed: eris.EmbedOptions = {
+				title: `Vote for ${client.user.username}#${client.user.discriminator}`,
+				author: {
+					name: `Vote performed by ${u.username}#${u.discriminator}`,
+					icon_url: u.avatarURL
+				},
+				description: `[voted on dbl](https://discordbots.org/bot/398251412246495233/vote)`,
+				timestamp: new Date().toISOString(),
+				color: functions.randomColor()
+			};
+
+			await client.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+				embeds: [embed],
+				username: `Vote Logs${config.beta ? " - Beta" : ""}`,
+				avatarURL: "https://assets.furry.bot/vote_logs.png"
+			});
 			break;
 
 		default:

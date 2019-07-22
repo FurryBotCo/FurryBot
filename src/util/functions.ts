@@ -11,6 +11,12 @@ import * as Eris from "eris";
 import FurryBot from "@src/main";
 import { mdb } from "@modules/Database";
 import ErrorHandler from "@util/ErrorHandler";
+import client from "@root/index";
+import UserConfig from "@src/modules/config/UserConfig";
+import GuildConfig from "@src/modules/config/GuildConfig";
+import youtubesearch from "youtube-search";
+import ytdl from "ytdl-core";
+import * as URL from "url";
 
 // moved to separate variable as it is needed in a function here
 const random = ((len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string => {
@@ -436,5 +442,100 @@ export default {
 		if (positive) count++; else count--;
 
 		return mdb.collection("dailyjoins").findOneAndUpdate({ date }, { $set: { count, guildCount } });
+	}),
+	memberIsBooster: ((m: Eris.Member): boolean => {
+		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
+		const guild = client.guilds.get(config.bot.mainGuild);
+		if (!guild) throw new TypeError("failed to find main guild");
+		if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
+		return true;
+	}),
+	calculateMultiplier: (async (m: Eris.Member): Promise<{ amount: number, multi: { [s: string]: boolean } }> => {
+		// return null;
+		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
+		const member = m;
+		const guild = m.guild;
+
+		let amount = 0;
+		const multi = {
+			supportServer: false,
+			voteWeekend: false,
+			vote: false,
+			booster: false,
+			tips: false
+		};
+
+		if (guild.id === config.bot.mainGuild) {
+			multi.supportServer = true;
+			amount += config.eco.multipliers.supportServer;
+		}
+
+		const v = await mdb.collection("votes").find({ userId: member.user.id }).toArray().then(res => res.filter(r => (r.timestamp + config.eco.voteTimeout) > Date.now()));
+		if (v.length !== 0) {
+			if (v[0].isWeekend) { // vote weekend multiplier
+				amount += config.eco.multipliers.voteWeekend + config.eco.multipliers.vote;
+				multi.vote = true;
+				multi.voteWeekend = true;
+			}
+			else { // vote weekday multiplier
+				amount += config.eco.multipliers.vote;
+				multi.vote = true;
+			}
+		}
+
+		if (client.guilds.has(config.bot.mainGuild)) {
+			const mainGuild = client.guilds.get(config.bot.mainGuild);
+			if (mainGuild.members.has(member.user.id)) {
+				if (mainGuild.members.get(member.user.id).roles.includes(config.nitroBoosterRole)) {
+					amount += config.eco.multipliers.booster;
+					multi.booster = true;
+				}
+			}
+		} else console.error("Failed to find main guild");
+
+		const t = await mdb.collection("users").findOne({ id: m.user.id }).then(res => res.tips).catch(err => false);
+		if (t) {
+			amount += config.eco.multipliers.tips;
+			multi.tips = true;
+		}
+		amount = parseFloat(amount.toFixed(3));
+		do {
+			if (amount.toString().endsWith("0")) amount = parseFloat(amount.toString().slice(0, amount.toString().length - 1));
+		}
+		while (amount.toString().endsWith("0"));
+
+
+		return { multi, amount };
+	}),
+	fetchDBUser: (async (id: string, createIfNotFound = false): Promise<UserConfig> => {
+		let m = await mdb.collection("users").findOne({ id });
+		if (!m) {
+			if (createIfNotFound === true) {
+				await mdb.collection("users").insertOne({ id, ...config.defaults.userConfig });
+				m = await mdb.collection("users").findOne({ id });
+			} else return null;
+		}
+		return new UserConfig(id, m);
+	}),
+	fetchDBGuild: (async (id: string, createIfNotFound = false): Promise<GuildConfig> => {
+		let m = await mdb.collection("guilds").findOne({ id });
+		if (!m) {
+			if (createIfNotFound === true) {
+				await mdb.collection("guilds").insertOne({ id, ...config.defaults.userConfig });
+				m = await mdb.collection("guilds").findOne({ id });
+			} else return null;
+		}
+		return new GuildConfig(id, m);
+	}),
+	ytsearch: (async (q = "") => util.promisify(youtubesearch)(q, config.ytSearchOptions).then(res => res.filter(y => y.kind === "youtube#video").slice(0, 10))),
+	ytinfo: (async (url: string): Promise<ytdl.videoInfo> => {
+		const i: any = util.promisify(ytdl.getInfo)(url);
+		return i;
+	}),
+	validateURL: ((url: string) => { // check that url is a well formed url, and that the server responds to HEAD requests properly
+		return URL.parse(url).hostname ? phin({
+			method: "HEAD",
+			url
+		}).then(d => d.statusCode === 200) : false;
 	})
 };
