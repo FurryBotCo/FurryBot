@@ -66,8 +66,10 @@ out/
 # ignore .files/folders
 .*
 
-# Dont ignore .gitignore
+# Dont ignore some files
 !/.gitignore
+!/.eslintignore
+!/.eslintrc.json
 !/.codacy.yaml
 
 # lavalink 

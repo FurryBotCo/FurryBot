@@ -1,0 +1,7 @@
+tmp/
+logs/
+images/
+assets/
+test/
+*token*
+*secret*
