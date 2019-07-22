@@ -40,8 +40,8 @@ export default new Command({
 	if (msg.channel.permissionsOf(this.user.id).has("viewAuditLogs")) {
 		if (!(await msg.channel.guild.getBans().then(res => res.map(u => u.user.id))).includes(user.id)) {
 			embed = {
-	title: "User not banned",
-	description: `It doesn't look like ${user.username}#${user.discriminator} is banned here..`
+				title: "User not banned",
+				description: `It doesn't look like ${user.username}#${user.discriminator} is banned here..`
 			};
 			Object.assign(embed, msg.embed_defaults());
 			return msg.channel.createMessage({ embed });

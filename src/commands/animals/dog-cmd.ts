@@ -34,7 +34,7 @@ export default new Command({
 			method: "GET",
 			url: "https://dog.ceo/api/breeds/image/random",
 			headers: {
-	"User-Agent": config.web.userAgent
+				"User-Agent": config.web.userAgent
 			}
 		});
 		j = JSON.parse(req.body);
