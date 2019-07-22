@@ -16,6 +16,7 @@ import UserConfig from "@src/modules/config/UserConfig";
 import GuildConfig from "@src/modules/config/GuildConfig";
 import youtubesearch from "youtube-search";
 import ytdl from "ytdl-core";
+import * as URL from "url";
 
 // moved to separate variable as it is needed in a function here
 const random = ((len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string => {
@@ -530,5 +531,11 @@ export default {
 	ytinfo: (async (url: string): Promise<ytdl.videoInfo> => {
 		const i: any = util.promisify(ytdl.getInfo)(url);
 		return i;
+	}),
+	validateURL: ((url: string) => { // check that url is a well formed url, and that the server responds to HEAD requests properly
+		return URL.parse(url).hostname ? phin({
+			method: "HEAD",
+			url
+		}).then(d => d.statusCode === 200) : false;
 	})
 };
