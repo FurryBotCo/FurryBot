@@ -1,0 +1,16 @@
+{
+    "blacklist": {
+        "blacklisted": false,
+        "reason": null,
+        "blame": null
+    },
+    "marriage": {
+        "married": false,
+        "partner": null
+    },
+    "warnings": [
+
+    ],
+    "bal": 100,
+    "tips": true
+}

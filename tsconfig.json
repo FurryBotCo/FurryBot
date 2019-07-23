@@ -1,0 +1,44 @@
+{
+    "$schema": "http://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "outDir": "./build",
+        "allowJs": true,
+        "target": "es6",
+        "baseUrl": "src",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "paths": {
+            "@events/*": [
+                "handlers/events/*"
+            ],
+            "@src/*": [
+                "*"
+            ],
+            "@root/*": [
+                "../*"
+            ],
+            "@util/*": [
+                "util/*"
+            ],
+            "@modules/*": [
+                "modules/*"
+            ],
+            "@Logger": [
+                "util/LoggerV6.ts"
+            ],
+            "@Command": [
+                "modules/Command.ts"
+            ],
+            "@config": [
+                "config/config.ts"
+            ],
+            "@FurryBot": [
+                "main.ts"
+            ],
+            "@pkg": [
+                "../package.json"
+            ]
+        },
+        "moduleResolution": "node"
+    }
+}
