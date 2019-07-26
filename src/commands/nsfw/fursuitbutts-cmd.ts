@@ -38,7 +38,7 @@ export default new Command({
 	}
 	short = await functions.shortenURL(img.body.response.image);
 	extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
-	return msg.channel.createMessage(`${extra}Short URL: <${short.link}${config.beta ? "?beta" : ""}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
+	return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
 		file: await functions.getImageFromURL(img.body.response.image),
 		name: img.body.response.name
 	});

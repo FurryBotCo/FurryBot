@@ -50,7 +50,7 @@ export default new Command({
 		req = await functions.imageAPIRequest(false, type, true, true);
 		short = await functions.shortenURL(req.response.image);
 		extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
-		return msg.channel.createMessage(`${extra}Short URL: <${short.link}${config.beta ? "?beta" : ""}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${this.ucwords(type)}`, {
+		return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${this.ucwords(type)}`, {
 			file: await functions.getImageFromURL(req.response.image),
 			name: req.response.name
 		});

@@ -62,7 +62,7 @@ export default new Command({
 		}
 		short = await functions.shortenURL(`http://www.sofurry.com/view/${submission.id}`);
 		extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
-		if ([1, 4].includes(submission.contentType)) return m.edit(`${extra}${submission.title} (type ${functions.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}${config.beta ? "?beta" : ""}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`)).then(async () => msg.channel.createMessage("", {
+		if ([1, 4].includes(submission.contentType)) return m.edit(`${extra}${submission.title} (type ${functions.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`)).then(async () => msg.channel.createMessage("", {
 			file: await functions.getImageFromURL(submission.full),
 			name: "sofurry.png"
 		}));

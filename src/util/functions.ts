@@ -18,16 +18,6 @@ import youtubesearch from "youtube-search";
 import ytdl from "ytdl-core";
 import * as URL from "url";
 
-// moved to separate variable as it is needed in a function here
-const random = ((len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string => {
-	// if (len > 500 && !this[config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
-	let rand = "";
-	for (let i = 0; i < len; i++)
-		rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
-
-	return rand;
-});
-
 export { ErrorHandler };
 
 export default {
@@ -234,7 +224,14 @@ export default {
 			}
 		});
 	}),
-	random,
+	random: ((len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string => {
+		// if (len > 500 && !this[config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
+		let rand = "";
+		for (let i = 0; i < len; i++)
+			rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
+
+		return rand;
+	}),
 	formatStr: ((str: string | ExtendedUser | Eris.User | Eris.Member | ExtendedTextChannel | Eris.GuildChannel, ...args: any[]): string => {
 		let res;
 		if (str instanceof ExtendedUser || str instanceof Eris.User || str instanceof Eris.Member) res = `<@!${str.id}>`;
@@ -251,68 +248,35 @@ export default {
 		phin({ url }).then(res => res.pipe(fs.createWriteStream(filename)))
 	),
 	shortenURL: (async (url) => {
-		mdb.listCollections().toArray().then(res => res.map(c => c.name)).then(async (list) => {
-			if (!list.includes("shorturl")) {
-				await mdb.createCollection("shorturl");
-				this.logger.log("[ShortURL]: Created Short URL table");
-			}
-		});
-		const create = (async (url) => {
-			const rand = random(config.shortLength),
-				createdTimestamp = Date.now(),
-				created = new Date().toISOString(),
-				count = await mdb.collection("shorturl").stats().then(res => res.count),
-				a = await mdb.collection("shorturl").insertOne({
-					nsfw: url.indexOf("nsfw") !== -1,
-					id: rand,
-					url,
-					linkNumber: count + 1,
-					createdTimestamp,
-					created,
-					length: url.length,
-					link: `https://furry.services/r/${rand}`
-				});
-			if (!a.result.ok) {
-				return create(url);
-			} else {
-				return {
-					nsfw: url.indexOf("nsfw") !== -1,
-					code: rand,
-					url,
-					link: `https://furry.services/r/${rand}`,
-					new: true,
-					linkNumber: count + 1,
-					createdTimestamp,
-					created,
-					length: url.length
-				};
-			}
+		const req = await phin({
+			url: `https://r.furry.services/get?url=${encodeURIComponent(url)}`,
+			headers: {
+				"User-Agent": config.web.userAgent
+			},
+			parse: "json"
 		});
 
-		const res = await mdb.collection("shorturl").find({
-			url
-		}).toArray();
+		if (req.statusCode === 200) return {
+			new: false,
+			...req.body
+		};
+		else if (req.statusCode === 404) {
+			const cr = await phin({
+				method: "POST",
+				url: `https://r.furry.services/create?url=${encodeURIComponent(url)}`,
+				headers: {
+					"User-Agent": config.web.userAgent
+				},
+				parse: "json"
+			});
 
-		switch (res.length) {
-			case 0: // create
-				return create(url);
-				break; // eslint-disable-line no-unreachable
-
-			case 1: // return
-				return res[0];
-				break; // eslint-disable-line no-unreachable
-
-			default: // delete & recreate
-				this.logger.log("[ShortURL]: Duplicate records found, deleting");
-				mdb.collection("shorturl").find({
-					url
-				}).forEach((short) => {
-					return mdb.collection("shorturl").deleteOne({
-						id: short.id
-					});
-				});
-				return create(url);
+			if (cr.statusCode !== 200) return null;
+			else return {
+				new: true,
+				...cr.body
+			};
 		}
+		else throw new Error(`furry.services api returned non 200/404 response: ${req.statusCode}, body: ${req.body}`);
 	}),
 	memeRequest: (async (path: string, avatars: string[] | string = [], text = ""): Promise<phin.JsonResponse> => {
 		avatars = typeof avatars === "string" ? [avatars] : avatars;
