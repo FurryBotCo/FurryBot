@@ -42,7 +42,7 @@ export default new Command({
 
 	embed = {
 		title: "Link Roulette",
-		description: `[${s.link}](${s.link}) - ${s.nsfw ? "NSFW" : "SFW"} - **Link #${s.linkNumber}**`
+		description: `[${s.link}](${s.link}) - **Link #${s.linkNumber}**`
 	};
 
 	Object.assign(embed, msg.embed_defaults());
