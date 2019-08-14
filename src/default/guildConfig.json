@@ -25,5 +25,9 @@
         "enabled": [
 
         ]
+    },
+    "pawboard": {
+        "emoji": "🐾",
+        "channel": null
     }
 }

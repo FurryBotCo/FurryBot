@@ -29,9 +29,13 @@ class GuildConfig {
 			blame: string;
 		}[];
 	};
-	commandConfig?: {
-		disabled?: CommandConfigEntry[];
-		enabled?: CommandConfigEntry[];
+	commandConfig: {
+		disabled: CommandConfigEntry[];
+		enabled: CommandConfigEntry[];
+	};
+	pawboard: {
+		emoji: string;
+		channel: string;
 	};
 	constructor(id, data) {
 		this.id = id;
@@ -51,6 +55,7 @@ class GuildConfig {
 		this.selfAssignableRoles = ![undefined, null].includes(data.selfAssignableRoles) ? data.selfAssignableRoles : config.selfAssignableRoles;
 		this.fResponseEnabled = ![undefined, null].includes(data.fResponseEnabled) ? data.fResponseEnabled : config.fResponseEnabled;
 		this.music = ![undefined, null].includes(data.music) ? data.music : config.music;
+		this.pawboard = ![undefined, null].includes(data.pawboard) ? data.pawboard : config.pawboard;
 
 		return null;
 	}
@@ -79,6 +84,14 @@ class GuildConfig {
 		music?: {
 			volume?: number;
 			textChannel?: string;
+		};
+		commandConfig?: {
+			disabled?: CommandConfigEntry[];
+			enabled?: CommandConfigEntry[];
+		};
+		pawboard?: {
+			emoji?: string;
+			channel?: string;
 		}
 	}): Promise<GuildConfig> {
 		const g = {
@@ -91,7 +104,9 @@ class GuildConfig {
 			muteRole: this.muteRole,
 			premium: this.premium,
 			fResponseEnabled: this.fResponseEnabled,
-			music: this.music
+			music: this.music,
+			commandConfig: this.commandConfig,
+			pawboard: this.pawboard
 		};
 
 		if (typeof data.prefix !== "undefined") g.prefix = data.prefix;
@@ -113,6 +128,16 @@ class GuildConfig {
 			if (typeof data.music.textChannel !== "undefined") g.music.textChannel = data.music.textChannel;
 		}
 
+		if (typeof data.commandConfig !== "undefined") {
+			if (typeof data.commandConfig.disabled !== "undefined") g.commandConfig.disabled = data.commandConfig.disabled;
+			if (typeof data.commandConfig.enabled !== "undefined") g.commandConfig.enabled = data.commandConfig.enabled;
+		}
+
+		if (typeof data.pawboard !== "undefined") {
+			if (typeof data.pawboard.emoji !== "undefined") g.pawboard.emoji = data.pawboard.emoji;
+			if (typeof data.pawboard.channel !== "undefined") g.pawboard.channel = data.pawboard.channel;
+		}
+
 		try {
 			await mdb.collection("guilds").findOneAndUpdate({
 				id: this.id
@@ -120,7 +145,7 @@ class GuildConfig {
 					$set: g
 				});
 		} catch (e) {
-			await mdb.collection("guilds").insertOne({ ...{}, ...{ id: this.id }, ...g });
+			await mdb.collection("guilds").insertOne({ id: this.id, ...g });
 		}
 
 		// auto reload on edit
