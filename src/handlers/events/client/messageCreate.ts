@@ -357,7 +357,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					});
 
 					const sp = this.spamCounter.filter(s => s.user === msg.author.id);
-					if (sp.length >= 10 && sp.length % 5 === 0) {
+					if (sp.length >= 15 && sp.length % 5 === 0) {
 						/*if (sp.length % 10 === 0) p = await phin({
 							method: "POST",
 							url: "https://pastebin.com/api/api_post.php",
@@ -393,7 +393,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 							avatarURL: "https://assets.furry.bot/blacklist_logs.png"
 						});
 
-						if (sp.length === 20) {
+						if (sp.length === 25) {
 							await msg.uConfig.edit({
 								blacklist: {
 									blacklisted: true,
