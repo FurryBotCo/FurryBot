@@ -357,7 +357,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					});
 
 					const sp = this.spamCounter.filter(s => s.user === msg.author.id);
-					if (sp.length >= 15 && sp.length % 5 === 0) {
+					if (sp.length >= config.antiSpam.start && sp.length % config.antiSpam.warning === 0) {
 						/*if (sp.length % 10 === 0) p = await phin({
 							method: "POST",
 							url: "https://pastebin.com/api/api_post.php",
@@ -393,11 +393,11 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 							avatarURL: "https://assets.furry.bot/blacklist_logs.png"
 						});
 
-						if (sp.length === 25) {
+						if (sp.length === config.antiSpam.blacklist) {
 							await msg.uConfig.edit({
 								blacklist: {
 									blacklisted: true,
-									reason: "Spamming Commands. Automatic Blacklist for a VL at or above 20",
+									reason: `Spamming Commands. Automatic Blacklist for a VL at or above ${config.antiSpam.blacklist}`,
 									blame: "Automatic"
 								}
 							});
@@ -406,7 +406,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 								embeds: [
 									{
 										title: "User Blacklisted",
-										description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist for a VL at or above 20\nBlame: Automatic`,
+										description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist for a VL at or above ${config.antiSpam.blacklist}\nBlame: Automatic`,
 										timestamp: new Date().toISOString(),
 										color: functions.randomColor()
 									}
