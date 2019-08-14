@@ -91,7 +91,7 @@ class ClientEvent {
 	);
 	constructor(
 		event: "messageReactionAdd" | "messageReactionRemove",
-		listener: (this: FurryBot, message: Eris.PossiblyUncachedMessage[], emoji: Eris.Emoji, userID: string) => void
+		listener: (this: FurryBot, message: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, userID: string) => void
 	);
 	constructor(
 		event: "messageUpdate",
