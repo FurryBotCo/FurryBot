@@ -348,6 +348,79 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}
 			}*/
 
+			if (!config.developers.includes(msg.author.id)) {
+				if (!msg.uConfig.blacklist.blacklisted) {
+					this.spamCounter.push({
+						time: Date.now(),
+						user: msg.author.id,
+						cmd: msg.cmd.command[0].triggers[0]
+					});
+
+					const sp = this.spamCounter.filter(s => s.user === msg.author.id);
+					if (sp.length >= 10 && sp.length % 5 === 0) {
+						/*if (sp.length % 10 === 0) p = await phin({
+							method: "POST",
+							url: "https://pastebin.com/api/api_post.php",
+							form: {
+								api_dev_key: config.apis.pastebin.devKey,
+								api_user_key: config.apis.pastebin.userKey,
+								api_option: "paste",
+								api_paste_code: report,
+								api_paste_private: "1",
+								api_paste_name: `Furry Bot Spam Report${config.beta ? " - Beta" : ""}`,
+								api_paste_expire_date: "1D"
+							}
+						}).then(res => res.body.toString());
+						else p = "None Generated.";*/
+
+
+						if (!fs.existsSync(`${config.rootDir}/spam-reports`)) fs.mkdirSync(`${config.rootDir}/spam-reports`);
+
+						const report = `----- NEW SPAM ENTRY -----\n\n${sp.map(s => `Time: ${new Date(s.time).toString()}\nCommand: ${s.cmd}\nUser: ${msg.author.tag}`).join("\n\n----- NEW SPAM ENTRY -----\n\n")}`;
+
+						const reportId = functions.random(10);
+
+						fs.writeFileSync(`${config.rootDir}/spam-reports/${msg.author.id}-${reportId}.log`, report);
+
+						await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+							embeds: [
+								{
+									title: `Possible Command Spam From ${msg.author.tag} (${msg.author.id}) | VL: ${sp.length}`,
+									description: `Report: ${config.beta ? `http://localhost:12346/reports/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/${msg.author.id}/${reportId}`}`
+								}
+							],
+							username: `FurryBot Spam Logs${config.beta ? " - Beta" : ""}`,
+							avatarURL: "https://assets.furry.bot/blacklist_logs.png"
+						});
+
+						if (sp.length === 20) {
+							await msg.uConfig.edit({
+								blacklist: {
+									blacklisted: true,
+									reason: "Spamming Commands. Automatic Blacklist for a VL at or above 20",
+									blame: "Automatic"
+								}
+							});
+
+							await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+								embeds: [
+									{
+										title: "User Blacklisted",
+										description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist for a VL at or above 20\nBlame: Automatic`,
+										timestamp: new Date().toISOString(),
+										color: functions.randomColor()
+									}
+								],
+								username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
+								avatarURL: "https://assets.furry.bot/blacklist_logs.png"
+							});
+						}
+
+						return msg.reply(`It seems like you may be spamming commands, try to slow down a bit.. VL: ${sp.length}`);
+					}
+				}
+			}
+
 			if (this.commandTimeout[cmd.triggers[0]].has(msg.author.id) && !config.developers.includes(msg.author.id)) {
 				this.logger.log(`Command timeout encountered by user ${msg.author.tag} (${msg.author.id}) on command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 

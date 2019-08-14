@@ -29,6 +29,12 @@ class FurryBot extends Eris.Client {
 	MessageCollector: MessageCollector; // tslint:disable-line: variable-name
 	yiffNoticeViewed: Set<string>;
 	tclient: Trello;
+	spamCounter: {
+		time: number;
+		user: string;
+		cmd: string;
+	}[];
+	spamCounterInterval: NodeJS.Timeout;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
 		this.logger = new Logger();
@@ -45,8 +51,12 @@ class FurryBot extends Eris.Client {
 		this.autoResponseTriggers = this.autoResponses.map(r => r.triggers).reduce((a, b) => a.concat(b));
 
 		this.commandTimeout = {};
+		this.spamCounter = [];
 
-		this.commands.map(c => this.commandTimeout[c.triggers[0]] = new Set());
+		this.commands.map(c => {
+			this.commandTimeout[c.triggers[0]] = new Set();
+			// this.spamCounter[c.triggers[0]] = [];
+		});
 		this.autoResponses.map(r => this.commandTimeout[r.triggers[0]] = new Set());
 		this.yiffNoticeViewed = new Set();
 
