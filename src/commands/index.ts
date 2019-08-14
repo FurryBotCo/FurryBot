@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import Category from "@modules/cmd/Category";
+import Category from "../modules/cmd/Category";
 
 /*
 ordering by category name

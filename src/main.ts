@@ -1,15 +1,15 @@
 import * as Eris from "eris";
 import * as fs from "fs";
-import config from "@src/config/config";
-import Logger from "@Logger";
+import config from "./config/config";
+import Logger from "./util/LoggerV6";
 import cat from "./commands";
 import resp from "./responses";
-import Command from "@modules/cmd/Command";
-import AutoResponse from "@modules/cmd/AutoResponse";
-import Category from "@modules/cmd/Category";
-import functions from "@util/functions";
-import Temp from "@util/Temp";
-import MessageCollector from "@util/MessageCollector";
+import Command from "./modules/cmd/Command";
+import AutoResponse from "./modules/cmd/AutoResponse";
+import Category from "./modules/cmd/Category";
+import functions from "./util/functions";
+import Temp from "./util/Temp";
+import MessageCollector from "./util/MessageCollector";
 import Trello from "trello";
 
 class FurryBot extends Eris.Client {

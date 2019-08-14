@@ -1,4 +1,4 @@
-import config from "@src/default/guildConfig.json";
+import config from "../../default/guildConfig.json";
 import { mdb } from "../Database";
 import CommandConfigEntry from "./CommandConfigEntry";
 

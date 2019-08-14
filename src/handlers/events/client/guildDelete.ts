@@ -1,9 +1,8 @@
-import ClientEvent from "@modules/ClientEvent";
+import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "@config";
-import { O_NOCTTY } from "constants";
-import functions from "@util/functions";
+import config from "../../../config/config";
+import functions from "../../../util/functions";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 

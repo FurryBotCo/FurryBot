@@ -1,6 +1,6 @@
 import * as Eris from "eris";
 import FurryBot from "@FurryBot";
-import PartialMessage from "@modules/PartialMessage";
+import PartialMessage from "./PartialMessage";
 
 class ClientEvent {
 	event: string;

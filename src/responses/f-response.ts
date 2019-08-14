@@ -1,12 +1,12 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import AutoResponse from "@modules/cmd/AutoResponse";
+import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import AutoResponse from "../modules/cmd/AutoResponse";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
-import { mdb } from "@modules/Database";
+import config from "../config/config";
+import { mdb } from "../modules/Database";
 
 export default new AutoResponse({
 	triggers: [

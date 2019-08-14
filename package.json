@@ -4,8 +4,13 @@
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc": "tsc"
+    "test": "xo",
+    "compile": "tsc",
+    "build": "npm run tslint && rm -Rf build && tsc",
+    "build-dev": "rm -Rf build && tsc",
+    "tslint": "tslint -c tslint.json -p . *.ts",
+    "start": "node build",
+    "start-dev": "npm run build-dev && node build"
   },
   "repository": {
     "type": "git",

@@ -10,35 +10,8 @@
         "moduleResolution": "node",
         "module": "commonjs",
         "paths": {
-            "@events/*": [
-                "handlers/events/*"
-            ],
-            "@src/*": [
-                "*"
-            ],
-            "@root/*": [
-                "../*"
-            ],
-            "@util/*": [
-                "util/*"
-            ],
-            "@modules/*": [
-                "modules/*"
-            ],
-            "@Logger": [
-                "util/LoggerV6.ts"
-            ],
-            "@Command": [
-                "modules/Command.ts"
-            ],
-            "@config": [
-                "config/config.ts"
-            ],
             "@FurryBot": [
                 "main.ts"
-            ],
-            "@pkg": [
-                "../package.json"
             ]
         }
     },

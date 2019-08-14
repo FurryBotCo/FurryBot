@@ -1,14 +1,14 @@
-import ClientEvent from "@modules/ClientEvent";
+import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "@config";
-import srv from "@src/api";
+import config from "../../../config/config";
+import srv from "../../../api";
 import express from "express";
 import http from "http";
-import ListStats from "@util/ListStats";
-import Temp from "@util/Temp";
-import functions from "@util/functions";
-import { mdb } from "@src/modules/Database";
+import ListStats from "../../../util/ListStats";
+import Temp from "../../../util/Temp";
+import functions from "../../../util/functions";
+import { mdb } from "../../../modules/Database";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
 
@@ -34,7 +34,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	if (!config.beta) this.ls = setInterval(ListStats, 3e5, this);
 
-	this.Temp = new Temp(`${config.rootDir}/tmp`);
+	this.Temp = new Temp(config.tmpDir);
 
 	process.on("exit", this.Temp.clean)
 		.on("SIGINT", this.Temp.clean)

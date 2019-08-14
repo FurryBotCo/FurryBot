@@ -1,4 +1,4 @@
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
+import ExtendedMessage from "../extended/ExtendedMessage";
 import Command from "./Command";
 
 class Category {

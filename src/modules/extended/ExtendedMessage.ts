@@ -1,15 +1,15 @@
 import * as Eris from "eris";
-import UserConfig from "@modules/config/UserConfig";
-import GuildConfig from "@modules/config/GuildConfig";
-import { mdb } from "@modules/Database";
-import config from "@config";
-import functions from "@util/functions";
+import UserConfig from "../config/UserConfig";
+import GuildConfig from "../config/GuildConfig";
+import { mdb } from "../Database";
+import config from "../../config/config";
+import functions from "../../util/functions";
 import FurryBot from "@FurryBot";
-import Command from "@modules/cmd/Command";
-import Category from "@modules/cmd/Category";
-import AutoResponse from "@modules/cmd/AutoResponse";
-import ExtendedTextChannel from "@modules/extended/ExtendedTextChannel";
-import ExtendedUser from "@modules/extended/ExtendedUser";
+import Command from "../cmd/Command";
+import Category from "../cmd/Category";
+import AutoResponse from "../cmd/AutoResponse";
+import ExtendedTextChannel from "../extended/ExtendedTextChannel";
+import ExtendedUser from "../extended/ExtendedUser";
 
 class ExtendedMessage extends Eris.Message {
 	id: string;

@@ -1,13 +1,13 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../../../modules/extended/ExtendedMessage";
+import Command from "../../../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
-import { mdb } from "@modules/Database";
-import UserConfig from "@src/modules/config/UserConfig";
+import config from "../../../../config/config";
+import { mdb } from "../../../../modules/Database";
+import UserConfig from "../../../../modules/config/UserConfig";
 
 export default new Command({
 	triggers: [

@@ -1,39 +1,40 @@
 import * as fs from "fs";
 import chalk, { Chalk } from "chalk";
-import _getCallerFile from "@util/_getCallerFile";
+import _getCallerFile from "./_getCallerFile";
 import os from "os";
-import config from "@config";
+import config from "../config/config";
+import path from "path";
 
 class Logger {
 	constructor() {
 
 	}
 
-	async log(msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> {
-		return this._log("log", msg);
+	async log(msg: string | number | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> {
+		return this._log("log", msg, shardId);
 	}
 
-	async warn(msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> {
-		return this._log("warn", msg);
+	async warn(msg: string | number | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> {
+		return this._log("warn", msg, shardId);
 	}
 
-	async error(msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> {
-		return this._log("error", msg);
+	async error(msg: string | number | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> {
+		return this._log("error", msg, shardId);
 	}
 
-	async info(msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> {
-		return this._log("info", msg);
+	async info(msg: string | number | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> {
+		return this._log("info", msg, shardId);
 	}
 
-	async debug(msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> {
-		return this._log("debug", msg);
+	async debug(msg: string | number | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> {
+		return this._log("debug", msg, shardId);
 	}
 
-	async command(msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> {
-		return this._log("info", msg);
+	async command(msg: string | number | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> {
+		return this._log("info", msg, shardId);
 	}
 
-	async _log(type: "log" | "warn" | "error" | "info" | "debug", msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> {
+	async _log(type: "log" | "warn" | "error" | "info" | "debug", msg: string | number | [] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> {
 		if (!process.stdout.writable) return false;
 		if (typeof msg !== "string") {
 			if (msg instanceof Promise) msg = await msg;
@@ -49,9 +50,8 @@ class Logger {
 		}
 		const date = new Date();
 		const d = date.toString().split(" ")[4];
-		const logDir = `${__dirname}/../../logs`;
-		if (!fs.existsSync(logDir)) {
-			process.stderr.write(`log directory (${logDir}) does not exist\n`);
+		if (!fs.existsSync(config.logsDir)) {
+			process.stderr.write(`log directory (${config.logsDir}) does not exist\n`);
 			return false;
 		}
 		let c: Chalk;
@@ -79,8 +79,9 @@ class Logger {
 		if (typeof msg === "undefined") msg = "undefined";
 
 		if (msg.toString().indexOf(config.bot.token)) msg = msg.toString().replace(new RegExp(config.bot.token, "g"), "[TOKEN]");
-		fs.appendFileSync(`${logDir}/${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}.log`, `[${d}][${type}]: ${msg}${os.EOL}`);
-		process.stdout.write(`${chalk.grey(`[${chalk.blue(d)}][${c(type)}]: ${c(msg.toString())}`)}\n`);
+		const shard = typeof shardId === "number" ? `[Shard ${shardId}]` : "";
+		fs.appendFileSync(`${config.logsDir}/${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}.log`, `[${d}][${type}]${typeof shardId === "number" ? `[Shard ${shardId}]` : ""}: ${msg}${os.EOL}`);
+		process.stdout.write(`${chalk.grey(`[${chalk.blue(d)}][${c(type)}]${typeof shardId === "number" ? `[${chalk.magenta(`Shard ${shardId}`)}]` : ""}: ${c(msg.toString())}`)}\n`);
 		return true;
 	}
 }

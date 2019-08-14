@@ -1,5 +1,5 @@
-import FurryBot from "@src/main";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
+import FurryBot from "../main";
+import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import { Message } from "eris";
 
 class MessageCollector {

@@ -1,7 +1,11 @@
-import FurryBot from "@FurryBot";
-import config from "@config";
+import FurryBot from "./src/main";
+import config from "./src/config/config";
 import * as fs from "fs";
-import functions from "@util/functions";
+import functions from "./src/util/functions";
+import path from "path";
+
+// directory existence check
+[config.logsDir, `${config.logsDir}/spam`, `${config.logsDir}/client`, config.tmpDir].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), console.log(`Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
 
 const bot = new FurryBot(config.bot.token, config.bot.clientOptions);
 

@@ -1,5 +1,5 @@
-import config from "@src/default/userConfig.json";
-import { mdb } from "@modules/Database";
+import config from "../../default/userConfig.json";
+import { mdb } from "../Database";
 import Warning from "./Warning";
 
 // I considered adding votes onto user objects, bot tracking them separately will work out

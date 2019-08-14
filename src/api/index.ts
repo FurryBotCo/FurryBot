@@ -1,9 +1,9 @@
-import config from "@config";
+import config from "../config/config";
 import logger from "morgan";
 import express from "express";
 import * as fs from "fs";
 import chalk from "chalk";
-import client from "@root/index";
+import client from "../../";
 import bodyParser from "body-parser";
 
 const app: express.Application = express();

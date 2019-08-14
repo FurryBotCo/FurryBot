@@ -1,11 +1,11 @@
-import ClientEvent from "@modules/ClientEvent";
+import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "@config";
-import { mdb } from "@src/modules/Database";
-import GuildConfig from "@src/modules/config/GuildConfig";
+import config from "../../../config/config";
+import { mdb } from "../../../modules/Database";
+import GuildConfig from "../../../modules/config/GuildConfig";
 import uuid from "uuid/v4";
-import functions from "@src/util/functions";
+import functions from "../../../util/functions";
 
 export default new ClientEvent("messageReactionAdd", (async function (this: FurryBot, m, emoji, userID) {
 

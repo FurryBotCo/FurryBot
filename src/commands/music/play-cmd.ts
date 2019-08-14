@@ -1,12 +1,12 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
-import { mdb } from "@modules/Database";
+import config from "../../config/config";
+import { mdb } from "../../modules/Database";
 import ytdl from "ytdl-core";
 import { YouTubeSearchResults } from "youtube-search";
 
@@ -60,7 +60,7 @@ export default new Command({
 
 		if (d.content.toLowerCase() === "cancel") return msg.reply("canceled.");
 
-		const j = parseInt(d.content);
+		const j = parseInt(d.content, 10);
 
 		if (isNaN(j)) return msg.reply("that choice was not valid!");
 

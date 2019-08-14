@@ -1,6 +1,6 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import CommandCreateError from "@src/modules/cmd/CommandCreateError";
+import ExtendedMessage from "../extended/ExtendedMessage";
+import CommandCreateError from "../cmd/CommandCreateError";
 import * as fs from "fs";
 import Category from "./Category";
 
@@ -32,19 +32,19 @@ class Command {
 	run: (this: FurryBot, message: ExtendedMessage) => any;
 	category: PartialCategory;
 	constructor(data: {
-		triggers: string[] /*ArrayOneOrMore<string>*/, // change back when all commands have been made
-		userPermissions?: string[],
-		botPermissions?: string[],
-		cooldown?: number,
-		description?: string,
-		usage?: string,
-		hasSubCommands?: boolean,
-		subCommands?: Command[] | null,
-		nsfw?: boolean,
-		devOnly?: boolean,
-		betaOnly?: boolean,
-		guildOwnerOnly?: boolean,
-		path: string,
+		triggers: string[] /*ArrayOneOrMore<string>*/; // change back when all commands have been made
+		userPermissions?: string[];
+		botPermissions?: string[];
+		cooldown?: number;
+		description?: string;
+		usage?: string;
+		hasSubCommands?: boolean;
+		subCommands?: Command[];
+		nsfw?: boolean;
+		devOnly?: boolean;
+		betaOnly?: boolean;
+		guildOwnerOnly?: boolean;
+		path: string;
 	}, run: (message: ExtendedMessage) => any) {
 		if (!data.triggers || data.triggers.length === 0) {
 			/* throw new CommandCreateError("Invalid trigger list provided."); */ // uncomment when all commands have been made

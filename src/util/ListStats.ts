@@ -1,5 +1,5 @@
 import FurryBot from "@FurryBot";
-import config from "@config";
+import config from "../config/config";
 import blapi from "blapi";
 import phin from "phin";
 

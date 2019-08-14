@@ -1,4 +1,4 @@
-import config from "@config";
+import config from "../config/config";
 
 export default {
 	checkAuth: ((req, res, next) => {
