@@ -12,7 +12,7 @@ const app: express.Router = express.Router();
 app.get("/", async (req, res) => res.status(200).end("Missing User ID."))
 	.get("/:userId", async (req, res) => res.status(200).end("Missing Report ID."))
 	.get("/:userId/:reportId", async (req, res) => {
-		if (fs.existsSync(`${config.rootDir}/logs/spam/${req.params.userId}-${req.params.reportId}.log`)) return res.status(200).sendFile(`${config.rootDir}/spam-reports/${req.params.userId}-${req.params.reportId}.log`);
+		if (fs.existsSync(`${config.logsDir}/spam/${req.params.userId}-${req.params.reportId}.log`)) return res.status(200).sendFile(`${config.logsDir}/spam/${req.params.userId}-${req.params.reportId}.log`);
 		else return res.status(404).end("Report not found.");
 	});
 
