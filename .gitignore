@@ -53,13 +53,7 @@ test/
 *secret*
 
 # vsc
-.vscode/
-
-# counts
-counts/
-
-# jsdocs
-out/
+.vscode
 
 *package-lock*
 

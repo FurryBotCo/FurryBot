@@ -3,10 +3,12 @@
     "compilerOptions": {
         "outDir": "./build",
         "allowJs": true,
-        "target": "es6",
+        "target": "es2017",
         "baseUrl": "src",
         "resolveJsonModule": true,
         "esModuleInterop": true,
+        "moduleResolution": "node",
+        "module": "commonjs",
         "paths": {
             "@events/*": [
                 "handlers/events/*"
@@ -38,7 +40,13 @@
             "@pkg": [
                 "../package.json"
             ]
-        },
-        "moduleResolution": "node"
-    }
+        }
+    },
+    "include": [
+        "**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "build"
+    ]
 }

@@ -7,7 +7,6 @@
     },
     "rules": {
         "no-unnecessary-type-assertion": true,
-
         "array-type": [true, "array"],
         "ban-types": {
             "options": [
@@ -93,8 +92,11 @@
         "no-var-requires": false,
         "ordered-imports": false,
         "prefer-conditional-expression": false,
-        "radix": false,
-        "trailing-comma": false,
+        "radix": true,
+        "trailing-comma": [true, {
+            "multiline": "never",
+            "singleline": "never"
+        }],
         "align": false,
         "eofline": false,
         "max-line-length": false,
