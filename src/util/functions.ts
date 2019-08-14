@@ -150,17 +150,32 @@ export default {
 	subCmds: ((dir: string, file: string): Command[] => {
 		const d = file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0];
 		if (fs.existsSync(`${dir}/${d}`)) {
-			if (fs.existsSync(`${dir}/${d}/index.ts`)) return require(`${dir}/${d}/index.ts`).default;
-			else {
-				console.warn(`Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
-				if (fs.existsSync(`${process.cwd()}/src/default/subcmdindex.ts`)) fs.copyFileSync(`${process.cwd()}/src/default/subcmdindex.ts`, `${dir}/${d}/index.ts`);
-				if (fs.existsSync(`${dir}/${d}/index.ts`)) {
-					console.debug("Auto copying worked, continuing as normal..");
-					return require(`${dir}/${d}/index.ts`).default;
-				} else {
-					console.error(`Auto copying failed, please check that default/subcmdindex.ts exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+			if (__filename.endsWith(".ts")) {
+				if (fs.existsSync(`${dir}/${d}/index.ts`)) return require(`${dir}/${d}/index.ts`).default;
+				else {
+					console.warn(`Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					if (fs.existsSync(`${config.rootDir}/src/default/subcmdindex.ts`)) fs.copyFileSync(`${config.rootDir}/src/default/subcmdindex.ts`, `${dir}/${d}/index.ts`);
+					if (fs.existsSync(`${dir}/${d}/index.ts`)) {
+						console.debug("Auto copying worked, continuing as normal..");
+						return require(`${dir}/${d}/index.ts`).default;
+					} else {
+						console.error(`Auto copying failed, please check that default/subcmdindex.ts exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					}
+					return [];
 				}
-				return [];
+			} else {
+				if (fs.existsSync(`${dir}/${d}/index.js`)) return require(`${dir}/${d}/index.js`).default;
+				else {
+					console.warn(`Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					if (fs.existsSync(`${config.rootDir}/src/default/subcmdindex.js`)) fs.copyFileSync(`${config.rootDir}/src/default/subcmdindex.js`, `${dir}/${d}/index.js`);
+					if (fs.existsSync(`${dir}/${d}/index.js`)) {
+						console.debug("Auto copying worked, continuing as normal..");
+						return require(`${dir}/${d}/index.js`).default;
+					} else {
+						console.error(`Auto copying failed, please check that default/subcmdindex.js exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					}
+					return [];
+				}
 			}
 		}
 		return null;
@@ -420,6 +435,7 @@ export default {
 		const member = m;
 		const guild = m.guild;
 
+		const a = [];
 		let amount = 0;
 		const multi = {
 			supportServer: false,
@@ -431,18 +447,19 @@ export default {
 
 		if (guild.id === config.bot.mainGuild) {
 			multi.supportServer = true;
-			amount += config.eco.multipliers.supportServer;
+			a.push(config.eco.multipliers.supportServer);
 		}
 
 		const v = await mdb.collection("votes").find({ userId: member.user.id }).toArray().then(res => res.filter(r => (r.timestamp + config.eco.voteTimeout) > Date.now()));
 		if (v.length !== 0) {
 			if (v[0].isWeekend) { // vote weekend multiplier
-				amount += config.eco.multipliers.voteWeekend + config.eco.multipliers.vote;
+				a.push(config.eco.multipliers.voteWeekend);
+				a.push(config.eco.multipliers.vote);
 				multi.vote = true;
 				multi.voteWeekend = true;
 			}
 			else { // vote weekday multiplier
-				amount += config.eco.multipliers.vote;
+				a.push(config.eco.multipliers.vote);
 				multi.vote = true;
 			}
 		}
@@ -451,7 +468,7 @@ export default {
 			const mainGuild = client.guilds.get(config.bot.mainGuild);
 			if (mainGuild.members.has(member.user.id)) {
 				if (mainGuild.members.get(member.user.id).roles.includes(config.nitroBoosterRole)) {
-					amount += config.eco.multipliers.booster;
+					a.push(config.eco.multipliers.booster);
 					multi.booster = true;
 				}
 			}
@@ -459,10 +476,11 @@ export default {
 
 		const t = await mdb.collection("users").findOne({ id: m.user.id }).then(res => res.tips).catch(err => false);
 		if (t) {
-			amount += config.eco.multipliers.tips;
+			a.push(config.eco.multipliers.tips);
 			multi.tips = true;
 		}
-		amount = parseFloat(amount.toFixed(3));
+		amount = parseFloat(a.filter(n => !isNaN(n)).reduce((a, b) => a + b).toFixed(3));
+
 		do {
 			if (amount.toString().endsWith("0")) amount = parseFloat(amount.toString().slice(0, amount.toString().length - 1));
 		}
