@@ -9,13 +9,13 @@ import config from "@config";
 
 export default new Command({
 	triggers: [
-		"edit"
+		"eco"
 	],
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,
-	description: "Edit stuff about the bot",
-	usage: "<icon/name/game/status>",
+	description: "Manages the bots economy",
+	usage: "",
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,

@@ -48,6 +48,7 @@ export default new Command({
 		default:
 			return msg.channel.createMessage(`<@!${msg.author.id}>, invalid type. Possible types: **playing**, **listening**, **watching**, **streaming**.`);
 	}
+	msg.args.shift();
 	let status = this.shards.get(0).presence.status;
 	// this.shards.get(0).presence.status
 	// this.guilds.filter(g => g.members.has(this.user.id))[0].members.get(this.user.id).status

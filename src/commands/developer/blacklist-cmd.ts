@@ -26,6 +26,6 @@ export default new Command({
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	const sub = await functions.processSub(msg.cmd.command, msg, this);
-	if (sub !== "NOSUB") return;
+	if (sub !== "NOSUB") return sub;
 	else return functions.sendCommandEmbed(msg, msg.cmd.command);
 }));

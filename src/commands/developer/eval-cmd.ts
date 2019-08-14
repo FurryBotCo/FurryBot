@@ -11,6 +11,7 @@ import _eval from "@util/eval";
 import * as fs from "fs";
 import { mdb, mongo } from "@modules/Database";
 import Permissions from "@util/Permissions";
+import os from "os";
 
 export default new Command({
 	triggers: [
@@ -62,7 +63,8 @@ export default new Command({
 			fs,
 			mdb,
 			mongo,
-			Permissions
+			Permissions,
+			os
 		});
 	} catch (e) {
 		res = e;
