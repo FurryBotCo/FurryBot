@@ -33,7 +33,7 @@ export default new Command({
 	});
 
 	if (img.statusCode !== 200) {
-		this.logger.error(img);
+		this.logger.error(img, msg.guild.shard.id);
 		return msg.channel.createMessage(`<@!${msg.author.id}>, Unknown api error.`);
 	}
 	short = await functions.shortenURL(img.body.response.image);

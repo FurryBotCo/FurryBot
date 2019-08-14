@@ -34,7 +34,7 @@ export default new Command({
 			name: "foxrudor.de.png"
 		});
 	} catch (e) {
-		this.logger.error(e);
+		this.logger.error(e, msg.guild.shard.id);
 		return msg.channel.createMessage("unknown api error", {
 			file: await functions.getImageFromURL(config.images.serverError),
 			name: "error.png"

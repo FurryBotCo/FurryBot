@@ -2,7 +2,7 @@ import * as os from "os";
 import phin from "phin";
 import config from "../config/config";
 import * as util from "util";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import Command from "../modules/cmd/Command";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import ExtendedTextChannel from "../modules/extended/ExtendedTextChannel";

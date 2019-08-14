@@ -8,7 +8,7 @@ import * as util from "util";
 import phin from "phin";
 import config from "../../config/config";
 import _eval from "../../util/eval";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import { mdb, mongo } from "../../modules/Database";
 import Permissions from "../../util/Permissions";
 import os from "os";
@@ -143,6 +143,6 @@ export default new Command({
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		return this.logger.log(`Silent eval return: ${res}`);
+		return this.logger.log(`Silent eval return: ${res}`, msg.guild.shard.id);
 	}
 }));

@@ -160,7 +160,7 @@ class ExtendedMessage extends Eris.Message {
 					isDeveloper: config.developers.includes(this.author.id)
 				};
 			} catch (e) {
-				this._client.logger.log(`Error setting up message ${this.id}: ${e}`);
+				this._client.logger.log(`Error setting up message ${this.id}: ${e}`, this.guild.shard.id);
 			}
 		}
 	}

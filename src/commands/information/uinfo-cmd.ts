@@ -40,7 +40,7 @@ export default new Command({
 		}
 	} catch (e) {
 		await msg.channel.createMessage(`<@!${msg.author.id}>, there was an unknown error while doing this.`);
-		return this.logger.error(e);
+		return this.logger.error(e, msg.guild.shard.id);
 	}
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
@@ -122,8 +122,8 @@ export default new Command({
 				headers: req.headers,
 				body: req.body.toString(),
 				statusCode: req.statusCode
-			});
-			this.logger.error(e);
+			}, msg.guild.shard.id);
+			this.logger.error(e, msg.guild.shard.id);
 			rs = req.body;
 			list = "Lookup Failed.";
 		}
@@ -133,10 +133,10 @@ export default new Command({
 			value: "Bots cannot be blacklisted.",
 			inline: false
 		}, {
-				name: "Bot List",
-				value: list.length > 1000 ? `Output is too long, use \`${msg.gConfig.prefix}botlistinfo ${user.username}#${user.discriminator}\`` : list.length === 0 ? "Not found on any." : list,
-				inline: false
-			});
+			name: "Bot List",
+			value: list.length > 1000 ? `Output is too long, use \`${msg.gConfig.prefix}botlistinfo ${user.username}#${user.discriminator}\`` : list.length === 0 ? "Not found on any." : list,
+			inline: false
+		});
 	}
 
 	Object.assign(embed, msg.embed_defaults());

@@ -4,7 +4,7 @@ import client from "../../../";
 import functions from "../../util/functions";
 import config from "../../config/config";
 import util from "util";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import apiFunctions from "../functions";
 
 const app: express.Router = express.Router();

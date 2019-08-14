@@ -1,7 +1,7 @@
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "../extended/ExtendedMessage";
 import CommandCreateError from "../cmd/CommandCreateError";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import Category from "./Category";
 
 type ArrayOneOrMore<T> = {

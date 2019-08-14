@@ -9,7 +9,7 @@ import config from "../../../config/config";
 import { mdb } from "../../../modules/Database";
 import * as os from "os";
 import phin from "phin";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
 	const msg: ExtendedMessage = new ExtendedMessage(message, this);
@@ -94,7 +94,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				});
 
 				await msg.author.getDMChannel().then(dm => dm.createMessage("Hey, I see that you're sending dm advertisments to me, that isn't a good idea.. You've been auto banned from my support server for dm advertising."));
-				return this.logger.log(`DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`);
+				return this.logger.log(`DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
 			} else {
 				dmAds = false;
 				embed = {
@@ -113,7 +113,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				});
 
 				await msg.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://furry.bot> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join <https://furry.bot/inv> if you need more help!\nCommands __**CAN NOT**__ be ran in my dms!\nThese dms are not a good source to ask for support, do that in our support server <https://discord.gg/YazeA7e>!\nIf you spam my dms, you will get blacklisted!`));
-				return this.logger.log(`Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`);
+				return this.logger.log(`Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
 			}
 
 
@@ -205,7 +205,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 			/* end blacklist notice */
 
-			if (!config.developers.includes(msg.author.id) && !msg.uConfig.blacklist.blacklisted) {
+			if (!config.developers.includes(msg.author.id) && !msg.uConfig.blacklist.blacklisted && (msg.response.triggers[0] === "f" && msg.gConfig.fResponseEnabled)) {
 				this.responseSpamCounter.push({
 					time: Date.now(),
 					user: msg.author.id,
@@ -283,7 +283,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						color: functions.randomColor(),
 						timestamp: new Date().toISOString()
 					};
-					this.logger.debug(`user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the response ${msg.response.triggers[0]}`);
+					this.logger.debug(`user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the response ${msg.response.triggers[0]}`, msg.guild.shard.id);
 					return msg.channel.createMessage({ embed });
 				}
 			}
@@ -298,22 +298,22 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						color: functions.randomColor(),
 						timestamp: new Date().toISOString()
 					};
-					this.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the response ${msg.response.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+					this.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the response ${msg.response.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
 					return msg.channel.createMessage({ embed });
 				}
 			}
 
 			if (this.commandTimeout[msg.response.triggers[0]].has(msg.author.id) && !config.developers.includes(msg.author.id)) {
-				this.logger.log(`Response timeout encountered by user ${msg.author.tag} (${msg.author.id}) on response "${msg.response.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+				this.logger.log(`Response timeout encountered by user ${msg.author.tag} (${msg.author.id}) on response "${msg.response.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
 
 				return msg.channel.createMessage(`<@!${msg.author.id}>, <:cooldown:591863995057831946>\nPlease wait ${functions.ms(msg.response.cooldown)} before using this response again!`);
 			}
 
-			this.logger.command(`Response  "${msg.response.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+			this.logger.command(`Response  "${msg.response.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
 			const start = performance.now();
 			const c = await msg.response.run.call(this, msg);
 			const end = performance.now();
-			this.logger.debug(`Response handler for "${msg.response.triggers[0]}" took ${(end - start).toFixed(3)}ms to execute.`);
+			this.logger.debug(`Response handler for "${msg.response.triggers[0]}" took ${(end - start).toFixed(3)}ms to execute.`, msg.guild.shard.id);
 			if (c instanceof Error) throw c;
 			return;
 		}
@@ -329,7 +329,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					if (!fs.existsSync(`${__dirname}/../../../config/blNoticeViewed.json`)) fs.writeFileSync(`${__dirname}/../../../config/blNoticeViewed.json`, JSON.stringify([]));
 					v = JSON.parse(fs.readFileSync(`${__dirname}/../../../config/blNoticeViewed.json`).toString());
 				} catch (e) {
-					console.error(`Failed to get blacklist notice viewed list`);
+					console.error(`Failed to get blacklist notice viewed list`, msg.guild.shard.id);
 					v = null;
 				}
 
@@ -464,7 +464,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						color: functions.randomColor(),
 						timestamp: new Date().toISOString()
 					};
-					this.logger.debug(`user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`);
+					this.logger.debug(`user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`, msg.guild.shard.id);
 					return msg.channel.createMessage({ embed });
 				}
 			}
@@ -479,13 +479,13 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						color: functions.randomColor(),
 						timestamp: new Date().toISOString()
 					};
-					this.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+					this.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
 					return msg.channel.createMessage({ embed });
 				}
 			}*/
 
 			if (this.commandTimeout[cmd.triggers[0]].has(msg.author.id) && !config.developers.includes(msg.author.id)) {
-				this.logger.log(`Command timeout encountered by user ${msg.author.tag} (${msg.author.id}) on command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+				this.logger.log(`Command timeout encountered by user ${msg.author.tag} (${msg.author.id}) on command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
 
 				return msg.channel.createMessage(`<@!${msg.author.id}>, <:cooldown:591863995057831946>\nPlease wait ${functions.ms(cmd.cooldown)} before using this command again!`);
 			}
@@ -510,7 +510,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}, cmd.cooldown, cmd.triggers[0], msg.author.id);
 
 			if (msg.gConfig.deleteCommands) msg.delete().catch(err => msg.reply(`Failed to delete command invocation, you can disable this by running \`${msg.gConfig.prefix}delcmds\``));
-			this.logger.command(`Command  "${cmd.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+			this.logger.command(`Command  "${cmd.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
 
 			if (msg.uConfig.tips && cmd.category.name === "economy") {
 				const chance = Math.floor((Math.random() * 4) + 1);
@@ -523,7 +523,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			const start = performance.now();
 			const c = await cmd.run.call(this, msg);
 			const end = performance.now();
-			this.logger.debug(`Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms to execute.`);
+			this.logger.debug(`Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms to execute.`, msg.guild.shard.id);
 			if (c instanceof Error) throw c;
 			return;
 		}
@@ -586,7 +586,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 				num = functions.random(10, "1234567890");
 				code = `${msg.cmd.command.map(c => c.triggers[0]).join(".")}.${config.beta ? "beta" : "stable"}.${num}`;
-				this.logger.error(`[CommandHandler] e1: ${err.name}: ${err.message}\n${err.stack},\nError Code: ${code}`);
+				this.logger.error(`[CommandHandler] e1: ${err.name}: ${err.message}\n${err.stack},\nError Code: ${code}`, msg.guild.shard.id);
 
 				await mdb.collection("errors").insertOne({
 					id: code,

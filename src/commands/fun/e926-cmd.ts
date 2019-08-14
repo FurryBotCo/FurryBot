@@ -42,7 +42,7 @@ export default new Command({
 		}).then(res => JSON.parse(res.body.toString()));
 	} catch (e) {
 		await msg.channel.createMessage("unknown error while doing this..");
-		return this.logger.error(e);
+		return this.logger.error(e, msg.guild.shard.id);
 	}
 	if (req.success !== undefined && req.success === false) return msg.reply(`error while running command: ${req.reason}`);
 	if (req.length === 0) {
@@ -62,10 +62,10 @@ export default new Command({
 	if (!post) post = req[0];
 	if (post.tags.length !== 0) bl = post.tags.match(config.tagBlacklist);
 	if (![undefined, null, ""].includes(bl) && bl.length === 1) {
-		this.logger.warn(`Blacklisted e926 post found, https://e926.net/post/show/${post.id}, blacklisted tag: ${bl[0]}`);
+		this.logger.warn(`Blacklisted e926 post found, https://e926.net/post/show/${post.id}, blacklisted tag: ${bl[0]}`, msg.guild.shard.id);
 		return msg.reply(`I couldn't return the result as it contained blacklisted a tag: **${bl[0]}**`);
 	} else if (![undefined, null, ""].includes(bl) && bl.length > 1) {
-		this.logger.warn(`Blacklisted e926 post found, https://e926.net/post/show/${post.id}, blacklisted tags: ${bl.join(", ")}`);
+		this.logger.warn(`Blacklisted e926 post found, https://e926.net/post/show/${post.id}, blacklisted tags: ${bl.join(", ")}`, msg.guild.shard.id);
 		return msg.reply(`I couldn't return the result as it contained blacklisted tags: **${bl.join("**, **")}**`);
 	}
 	if (!["s", "safe"].includes(post.rating.toLowerCase())) return msg.reply(`API returned a non sfw image, please use the \`e621\` command if you are expecting nsfw results.`);

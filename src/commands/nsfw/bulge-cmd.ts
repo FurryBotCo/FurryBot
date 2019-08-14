@@ -30,7 +30,7 @@ export default new Command({
 	let img, short, extra;
 	img = await functions.imageAPIRequest(false, "bulge", true, false);
 	if (img.success !== true) {
-		this.logger.error(img);
+		this.logger.error(img, msg.guild.shard.id);
 		return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 	}
 	short = await functions.shortenURL(img.response.image);

@@ -2,21 +2,28 @@
 This is kept in a javascript file because it throws errors in typescript
 */
 
-module.exports = (() => {
+module.exports = function _getCallerFile() {
+	var originalFunc = Error.prepareStackTrace;
+
+	var callerfile;
 	try {
 		var err = new Error();
-		var callerfile;
 		var currentfile;
 
-		Error.prepareStackTrace = (e, stack) => stack;
+		Error.prepareStackTrace = function (err, stack) {
+			return stack;
+		};
 
 		currentfile = err.stack.shift().getFileName();
 
 		while (err.stack.length) {
 			callerfile = err.stack.shift().getFileName();
 
-			if (currentfile !== callerfile) return callerfile;
+			if (currentfile !== callerfile) break;
 		}
-	} catch (error) {}
-	return undefined;
-});
+	} catch (e) {}
+
+	Error.prepareStackTrace = originalFunc;
+
+	return callerfile;
+}

@@ -32,7 +32,7 @@ export default new Command({
 			name: "cat.gif"
 		});
 	} catch (e) {
-		this.logger.error(e);
+		this.logger.error(e, msg.guild.shard.id);
 		return msg.channel.createMessage("unknown api error", {
 			file: await functions.getImageFromURL(config.images.serverError),
 			name: "error.png"

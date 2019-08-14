@@ -45,8 +45,8 @@ export default new Command({
 			name: `${parts[2]}_${parts[3]}.png`
 		});
 	} catch (e) {
-		this.logger.error(e);
-		this.logger.error(j);
+		this.logger.error(e, msg.guild.shard.id);
+		this.logger.error(j, msg.guild.shard.id);
 		return msg.channel.createMessage("unknown api error", {
 			file: await functions.getImageFromURL(config.images.serverError),
 			name: "error.png"

@@ -1,7 +1,7 @@
 import config from "../config/config";
 import logger from "morgan";
 import express from "express";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import chalk from "chalk";
 import client from "../../";
 import bodyParser from "body-parser";

@@ -39,7 +39,7 @@ export default new Command({
 		try {
 			await msg.gConfig.reset().then(d => d.reload());
 		} catch (e) {
-			this.logger.error(e);
+			this.logger.error(e, msg.guild.shard.id);
 			return msg.channel.createMessage("There was an internal error while doing this");
 		}
 	}

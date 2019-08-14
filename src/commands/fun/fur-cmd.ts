@@ -55,8 +55,8 @@ export default new Command({
 			name: req.response.name
 		});
 	} catch (error) {
-		this.logger.error(`Error:\n${error}`);
-		this.logger.log(`Body: ${req}`);
+		this.logger.error(`Error:\n${error}`, msg.guild.shard.id);
+		this.logger.log(`Body: ${req}`, msg.guild.shard.id);
 		return msg.channel.createMessage("Unknown API Error", {
 			file: await functions.getImageFromURL("https://fb.furcdn.net/NotFound.png"),
 			name: "NotFound.png"

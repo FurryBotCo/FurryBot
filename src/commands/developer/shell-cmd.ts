@@ -125,6 +125,6 @@ export default new Command({
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		return this.logger.log(`Silent shell eval return: ${res}`);
+		return this.logger.log(`Silent shell eval return: ${res}`, msg.guild.shard.id);
 	}
 }));

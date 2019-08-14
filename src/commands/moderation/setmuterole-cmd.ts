@@ -60,7 +60,7 @@ export default new Command({
 	g = await msg.gConfig.edit({ muteRole: role.id }).then(d => d.reload());
 	if (!g) {
 		msg.channel.createMessage("There was an internal error while doing this, please try again");
-		return this.logger.log(g);
+		return this.logger.log(g, msg.guild.shard.id);
 	}
 	await msg.channel.createMessage(`Set the new muted role to **${role.name}**`);
 

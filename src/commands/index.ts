@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import Category from "../modules/cmd/Category";
 
 /*

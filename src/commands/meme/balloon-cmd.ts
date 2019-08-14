@@ -37,7 +37,7 @@ export default new Command({
 			j = { status: req.statusCode, message: req.body };
 		}
 		msg.reply(`API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
-		return this.logger.log(`text: ${text}`);
+		return this.logger.log(`text: ${text}`, msg.guild.shard.id);
 	}
 	return msg.channel.createMessage("", {
 		file: req.body,

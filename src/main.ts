@@ -1,5 +1,5 @@
 import * as Eris from "eris";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import config from "./config/config";
 import Logger from "./util/LoggerV6";
 import cat from "./commands";
@@ -71,11 +71,11 @@ class FurryBot extends Eris.Client {
 		this.MessageCollector = new MessageCollector(this);
 
 		this.tclient = new Trello(config.apis.trello.apiKey, config.apis.trello.apiToken);
-		global.console.log = (async (msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> => this.logger._log("log", msg));
-		global.console.info = (async (msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> => this.logger._log("info", msg));
-		global.console.debug = (async (msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> => this.logger._log("debug", msg));
-		global.console.warn = (async (msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> => this.logger._log("warn", msg));
-		global.console.error = (async (msg: string | any[] | object | Buffer | Promise<any>): Promise<boolean> => this.logger._log("error", msg));
+		global.console.log = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> => this.logger._log("log", msg, shardId));
+		global.console.info = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> => this.logger._log("info", msg, shardId));
+		global.console.debug = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> => this.logger._log("debug", msg, shardId));
+		global.console.warn = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> => this.logger._log("warn", msg, shardId));
+		global.console.error = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> => this.logger._log("error", msg, shardId));
 	}
 
 	getCommand(cmd: string | string[]): {

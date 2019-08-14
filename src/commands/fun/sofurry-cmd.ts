@@ -56,8 +56,8 @@ export default new Command({
 		submission = jsn.data.entries[rr];
 		if (typeof submission.contentLevel === "undefined") throw new Error("secondary");
 		if (submission.contentLevel !== 0) {
-			this.logger.log(`unsafe image:\n${util.inspect(submission, { depth: 3, showHidden: true })}`);
-			this.logger.log(`Body: ${util.inspect(jsn, { depth: null })}`);
+			this.logger.log(`unsafe image:\n${util.inspect(submission, { depth: 3, showHidden: true })}`, msg.guild.shard.id);
+			this.logger.log(`Body: ${util.inspect(jsn, { depth: null })}`, msg.guild.shard.id);
 			return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err => msg.channel.createMessage(`Command failed: ${err}`));
 		}
 		short = await functions.shortenURL(`http://www.sofurry.com/view/${submission.id}`);
@@ -68,8 +68,8 @@ export default new Command({
 		}));
 		else return m.edit(`${extra}${submission.title} (type ${functions.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf something bad is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`));
 	} catch (e) {
-		this.logger.error(`Error:\n${e}`);
-		this.logger.log(`Body: ${req.body}`);
+		this.logger.error(`Error:\n${e}`, msg.guild.shard.id);
+		this.logger.log(`Body: ${req.body}`, msg.guild.shard.id);
 		return m.edit("Unknown API Error").then(async () => msg.channel.createMessage("", {
 			file: await functions.getImageFromURL(config.images.serverError),
 			name: "error.png"

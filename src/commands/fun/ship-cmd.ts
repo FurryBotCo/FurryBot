@@ -6,7 +6,7 @@ import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
 import config from "../../config/config";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import { Canvas } from "canvas-constructor";
 
 export default new Command({
@@ -91,14 +91,14 @@ export default new Command({
 		await msg.channel.createMessage({
 			embed
 		}, {
-				file,
-				name: "ship.png"
-			});
+			file,
+			name: "ship.png"
+		});
 	} catch (e) {
 		this.logger.error({
 			shipname,
 			amount
-		});
+		}, msg.guild.shard.id);
 		throw e;
 	}
 }));

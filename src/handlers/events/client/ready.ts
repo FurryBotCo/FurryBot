@@ -24,12 +24,12 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		});
 	}, 6e4);
 	const sv = http.createServer(express())
-		.on("error", () => this.logger.warn("Attempted to start api server, but the port is in use."))
+		.on("error", () => this.logger.warn("Attempted to start api server, but the port is in use.", 0))
 		.on("listening", () => {
 			sv.close();
 			this.srv = srv.listen(config.apiPort);
 		})
-		.on("close", () => this.logger.debug("Port test server closed, starting bot api server."))
+		.on("close", () => this.logger.debug("Port test server closed, starting bot api server.", 0))
 		.listen(config.apiPort);
 
 	if (!config.beta) this.ls = setInterval(ListStats, 3e5, this);
@@ -40,7 +40,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		.on("SIGINT", this.Temp.clean)
 		.on("SIGTERM", this.Temp.clean);
 
-	this.logger.log(`Client has started with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds.`);
+	this.logger.log(`Client has started with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds.`, 0);
 
 	setInterval(async () => {
 		if (new Date().toString().split(" ")[4] === "00:00:00") {
@@ -50,7 +50,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 			const embed: Eris.EmbedOptions = {
 				title: `Daily Counts For ${date}`,
-				description: `Servers Joined Today: ${count}`,
+				description: `Servers Joined Today: ${count}\nTotal Servers: ${this.guilds.size}`,
 				timestamp: new Date().toISOString(),
 				color: functions.randomColor()
 			};

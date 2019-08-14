@@ -39,9 +39,9 @@ export default new Command({
 		j = JSON.parse(req.body);
 	} catch (e) {
 		await msg.channel.createMessage("Cloudflare is being dumb and rejecting our requests, please try again later.");
-		this.logger.error(req.body);
+		this.logger.error(req.body, msg.guild.shard.id);
 		await msg.channel.createMessage(`This command has been permanently disabled until Cloudflare stops giving us captchas, join our support server for updates on the status of this: <https://furry.bot/inv>.`);
-		return this.logger.error(e);
+		return this.logger.error(e, msg.guild.shard.id);
 	}
 
 	return msg.channel.createMessage(j.joke);

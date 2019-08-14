@@ -56,8 +56,8 @@ export default new Command({
 			headers: req.headers,
 			body: req.body.toString(),
 			statusCode: req.statusCode
-		});
-		this.logger.error(e);
+		}, msg.guild.shard.id);
+		this.logger.error(e, msg.guild.shard.id);
 		rs = req.body;
 		list = "Lookup Failed.";
 	}

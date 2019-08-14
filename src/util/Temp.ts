@@ -1,4 +1,5 @@
-import * as fs from "fs";
+import * as fs from "fs-extra";
+import config from "../config/config";
 
 export default class Temp {
 	dir: string;
@@ -8,6 +9,6 @@ export default class Temp {
 	}
 
 	clean() {
-		return fs.readdirSync(`${__dirname}/../../tmp`).map(d => fs.unlinkSync(`${__dirname}/../../tmp/${d}`));
+		return fs.readdirSync(config.tmpDir).map(d => fs.unlinkSync(`${__dirname}/../../tmp/${d}`));
 	}
 }

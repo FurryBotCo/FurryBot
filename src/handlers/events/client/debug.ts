@@ -4,9 +4,10 @@ import * as Eris from "eris";
 import config from "../../../config/config";
 
 export default new ClientEvent("debug", (async function (this: FurryBot, info: string, id: number) {
+	if (!id) id = 0;
 	if (typeof config !== "undefined" && config.debug === true) {
 		if (["Duplicate presence update"].some(t => info.toLowerCase().indexOf(t.toLowerCase()) !== -1)) return;
-		if (this.logger !== undefined) return this.logger.debug(info);
-		else return console.debug(info);
+		if (this.logger !== undefined) return this.logger.debug(info, id);
+		else return console.debug(info, id);
 	}
 }));

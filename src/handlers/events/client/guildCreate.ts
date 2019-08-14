@@ -25,7 +25,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 	}
 
 
-	this.logger.info(`Joined guild ${guild.name} (${guild.id}), owner: ${owner}, this guild has ${guild.memberCount} members! This guild has been placed on shard ${guild.shard.id}.`);
+	this.logger.info(`Joined guild ${guild.name} (${guild.id}), owner: ${owner}, this guild has ${guild.memberCount} members! This guild has been placed on shard ${guild.shard.id}.`, guild.shard.id);
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Joined!",
 		description: `Guild #${this.guilds.size}\nCurrent Total: ${this.guilds.size}`,

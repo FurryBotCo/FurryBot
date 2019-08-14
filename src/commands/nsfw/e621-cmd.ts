@@ -46,8 +46,8 @@ export default new Command({
 	} catch (e) {
 
 		await msg.channel.createMessage("There was an unknown error while doing this.");
-		this.logger.error(e);
-		return this.logger.error(req);
+		this.logger.error(e, msg.guild.shard.id);
+		return this.logger.error(req, msg.guild.shard.id);
 	}
 
 	if (req.success !== undefined && req.success === false) return msg.channel.createMessage(`<@!${msg.author.id}>, error while running command: ${req.reason}`);
@@ -64,10 +64,10 @@ export default new Command({
 	if (!post) post = req[0];
 	bl = post.tags.match(config.tagBlacklist);
 	if (![undefined, null, ""].includes(bl) && bl.length === 1) {
-		this.logger.warn(`Blacklisted e621 post found, https://e621.net/post/show/${post.id}, blacklisted tag: ${bl[0]}`);
+		this.logger.warn(`Blacklisted e621 post found, https://e621.net/post/show/${post.id}, blacklisted tag: ${bl[0]}`, msg.guild.shard.id);
 		return msg.channel.createMessage(`<@!${msg.author.id}>, I couldn't return the result as it contained blacklisted a tag.\nBlacklisted Tag: **${bl[0]}**`);
 	} else if (![undefined, null, ""].includes(bl) && bl.length > 1) {
-		this.logger.warn(`Blacklisted e621 post found, https://e621.net/post/show/${post.id}, blacklisted tags: ${bl.join(", ")}`);
+		this.logger.warn(`Blacklisted e621 post found, https://e621.net/post/show/${post.id}, blacklisted tags: ${bl.join(", ")}`, msg.guild.shard.id);
 		return msg.channel.createMessage(`<@!${msg.author.id}>, I couldn't return the result as it contained blacklisted tags.\nBlacklisted Tags: **${bl.join("**, **")}**`);
 	}
 	embed = {

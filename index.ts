@@ -1,11 +1,16 @@
 import FurryBot from "./src/main";
 import config from "./src/config/config";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import functions from "./src/util/functions";
 import path from "path";
 
 // directory existence check
 [config.logsDir, `${config.logsDir}/spam`, `${config.logsDir}/client`, config.tmpDir].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), console.log(`Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
+
+if (__filename.endsWith(".js") && !fs.existsSync(`${__dirname}/src/assets`)) {
+	fs.copy(path.resolve(`${__dirname}/../src/assets`), `${__dirname}/src/assets`);
+	console.log(`Copied assets directory ${path.resolve(`${__dirname}/../src/assets`)} to ${__dirname}/src/assets`);
+}
 
 const bot = new FurryBot(config.bot.token, config.bot.clientOptions);
 
@@ -28,7 +33,7 @@ bot.on("shardDisconnect", (error: string, id: number) => {
 		avatarURL: "https://i.furry.bot/furry.png"
 	});
 
-	bot.logger.error(`Shard #${id} disconnected`);
+	bot.logger.error(`Shard #${id} disconnected`, id);
 })
 	.on("shardReady", (id: number) => {
 		bot.shards.get(id).editStatus("idle", {
