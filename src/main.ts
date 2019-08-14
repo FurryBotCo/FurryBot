@@ -34,6 +34,11 @@ class FurryBot extends Eris.Client {
 		user: string;
 		cmd: string;
 	}[];
+	responseSpamCounter: {
+		time: number;
+		user: string;
+		response: string;
+	}[];
 	spamCounterInterval: NodeJS.Timeout;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
@@ -52,6 +57,7 @@ class FurryBot extends Eris.Client {
 
 		this.commandTimeout = {};
 		this.spamCounter = [];
+		this.responseSpamCounter = [];
 
 		this.commands.map(c => {
 			this.commandTimeout[c.triggers[0]] = new Set();

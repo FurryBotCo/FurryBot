@@ -42,7 +42,6 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	this.logger.log(`Client has started with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds.`);
 
-	// redo daily counts posting sometime
 	setInterval(async () => {
 		if (new Date().toString().split(" ")[4] === "00:00:00") {
 			const d = new Date(),
@@ -70,5 +69,6 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	this.spamCounterInterval = setInterval(() => {
 		this.spamCounter = this.spamCounter.filter(s => s.time + 3e4 > Date.now());
+		this.responseSpamCounter = this.responseSpamCounter.filter(s => s.time + 3e4 > Date.now());
 	}, 1e3);
 }));
