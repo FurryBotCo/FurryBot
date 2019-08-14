@@ -70,5 +70,5 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	this.spamCounterInterval = setInterval(() => {
 		this.spamCounter = this.spamCounter.filter(s => s.time + 3e4 > Date.now());
-	}, 3e4);
+	}, 1e3);
 }));
