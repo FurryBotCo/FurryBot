@@ -27,6 +27,11 @@ bot.on("shardDisconnect", (error: string, id: number) => {
 	bot.logger.error(`Shard #${id} disconnected`);
 })
 	.on("shardReady", (id: number) => {
+		bot.shards.get(id).editStatus("idle", {
+			name: "Not ready yet..",
+			type: 0
+		});
+
 		const embed = {
 			title: "Shard Status Update",
 			description: `Shard ${id} is ready!`,
