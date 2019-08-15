@@ -519,5 +519,46 @@ export default {
 			method: "HEAD",
 			url
 		}).then(d => d.statusCode === 200) : false;
+	}),
+	combineReports: ((...reports: {
+		userTag: string;
+		userId: string;
+		generatedTimestamp: number;
+		type: "cmd" | "response";
+		beta: boolean;
+		entries: {
+			time: number;
+			cmd: string;
+		}[] | {
+			time: number;
+			response: string;
+		}[];
+	}[]): {
+		userTag: string;
+		userId: string;
+		generatedTimestamp: number;
+		type: "cmd" | "response";
+		beta: boolean;
+		entries: {
+			time: number;
+			cmd: string;
+		}[] | {
+			time: number;
+			response: string;
+		}[];
+	} => {
+		if (Array.from(new Set(reports.map(r => r.userId))).length > 1) throw new TypeError("Cannot combine reports of different users.");
+		if (Array.from(new Set(reports.map(r => r.type))).length > 1) throw new TypeError("Cannot combine reports of different types.");
+		if (Array.from(new Set(reports.map(r => r.beta))).length > 1) throw new TypeError("Cannot combine beta, and non-beta reports.");
+
+		const entries: any = Array.from(new Set(reports.map(r => r.entries as any).reduce((a, b) => a.concat(b)).map(r => JSON.stringify(r)))).map(r => JSON.parse(r as string));
+		return {
+			userTag: reports[0].userTag,
+			userId: reports[0].userId,
+			generatedTimestamp: Date.now(),
+			type: reports[0].type,
+			beta: reports[0].beta,
+			entries
+		};
 	})
 };
