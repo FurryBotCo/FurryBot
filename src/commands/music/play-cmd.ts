@@ -43,6 +43,8 @@ export default new Command({
 	const search: YouTubeSearchResults[] = await functions.ytsearch(q).catch(err => null);
 	if (!search) return msg.reply("there was an internal error while fetching search results.");
 
+	if (search.length < 1) return msg.reply("No results were found");
+
 	let song: YouTubeSearchResults;
 
 
