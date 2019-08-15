@@ -51,7 +51,7 @@ class Logger {
 		const date = new Date();
 		const d = date.toString().split(" ")[4];
 		if (!fs.existsSync(config.logsDir)) {
-			process.stderr.write(`log directory (${config.logsDir}) does not exist\n`);
+			process.stderr.write(`logs directory (${config.logsDir}) does not exist\n`);
 			return false;
 		}
 		let c: Chalk;
@@ -80,7 +80,7 @@ class Logger {
 
 		if (msg.toString().indexOf(config.bot.token)) msg = msg.toString().replace(new RegExp(config.bot.token, "g"), "[TOKEN]");
 		const shard = typeof shardId === "number" ? `[Shard ${shardId}]` : "";
-		fs.appendFileSync(`${config.logsDir}/${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}.log`, `[${d}][${type}]${typeof shardId === "number" ? `[Shard ${shardId}]` : ""}: ${msg}${os.EOL}`);
+		fs.appendFileSync(`${config.logsDir}/client/${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}.log`, `[${d}][${type}]${typeof shardId === "number" ? `[Shard ${shardId}]` : ""}: ${msg}${os.EOL}`);
 		process.stdout.write(`${chalk.grey(`[${chalk.blue(d)}][${c(type)}]${typeof shardId === "number" ? `[${chalk.magenta(`Shard ${shardId}`)}]` : ""}: ${c(msg.toString())}`)}\n`);
 		return true;
 	}
