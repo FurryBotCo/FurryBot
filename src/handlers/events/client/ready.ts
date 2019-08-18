@@ -23,6 +23,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 			type: 0
 		});
 	}, 6e4);
+
 	const sv = http.createServer(express())
 		.on("error", () => this.logger.warn("Attempted to start api server, but the port is in use.", 0))
 		.on("listening", () => {
