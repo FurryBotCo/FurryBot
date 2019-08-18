@@ -2,10 +2,12 @@ import config from "../config/config";
 import logger from "morgan";
 import express from "express";
 import * as fs from "fs-extra";
+import session from "express-session";
+import cookieParser from "cookie-parser";
 import chalk from "chalk";
 import client from "../../";
 import bodyParser from "body-parser";
-
+import https from "https";
 const app: express.Application = express();
 
 app/*.use(async (req, res, next) => {
@@ -16,7 +18,17 @@ app/*.use(async (req, res, next) => {
 		//client.logger.debug(`Webserver: ${chalk.red(req.method.toUpperCase())} ${chalk.green(req.originalUrl)} ${chalk.yellow(res.statusCode)} ${chalk.blue(`${m}ms`)}`);
 	});
 	return next();
-})*/
+})*/.use(session({
+	name: "fb-sess.id",
+	secret: config.web.cookieSecret,
+	cookie: {
+		maxAge: 8.64e7,
+		secure: false // since the api server is ran as http, we have to save it as non-secure (it will be secured through the proxy when properly accesed)
+	},
+	resave: false,
+	saveUninitialized: true
+}))
+	.use(cookieParser(config.web.cookieSecret))
 	.use(logger("dev"))
 	.use(bodyParser.json())
 	.use(bodyParser.urlencoded({
@@ -30,4 +42,13 @@ app.use(async (req, res) => res.status(404).json({
 	error: "page not found"
 }));
 
-export default app;
+let e;
+
+if (config.web.security.useHttps) e = https.createServer({
+	ca: config.web.security.ca,
+	cert: config.web.security.cert,
+	key: config.web.security.key
+}, app);
+else e = app;
+
+export default e;
