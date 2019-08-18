@@ -14,8 +14,8 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 0,
-	description: "Make the bot leave a server (dev only)",
-	usage: "[server id]",
+	description: "Make the bot say something (dev only)",
+	usage: "[text]",
 	nsfw: false,
 	devOnly: true,
 	betaOnly: false,
@@ -26,5 +26,6 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	// extra check, to be safe
 	if (!config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot run this command as you are not a developer of this bot.`);
+	await msg.delete().catch(err => null);
 	return msg.channel.createMessage(msg.unparsedArgs.join(" "));
 }));
