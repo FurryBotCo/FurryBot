@@ -186,7 +186,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					if (!fs.existsSync(`${__dirname}/../../../config/blNoticeViewed.json`)) fs.writeFileSync(`${__dirname}/../../../config/blNoticeViewed.json`, JSON.stringify([]));
 					v = JSON.parse(fs.readFileSync(`${__dirname}/../../../config/blNoticeViewed.json`).toString());
 				} catch (e) {
-					console.error(`Failed to get blacklist notice viewed list`);
+					console.error("Failed to get blacklist notice viewed list");
 					v = null;
 				}
 
@@ -204,6 +204,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			}
 			/* end blacklist notice */
+
+			// make sure we aren't processing this if it's disabled
+			if (msg.response.triggers[0] === "f" && !msg.gConfig.fResponseEnabled) return;
 
 			if (!config.developers.includes(msg.author.id) && !msg.uConfig.blacklist.blacklisted && ((msg.response.triggers[0] === "f" && msg.gConfig.fResponseEnabled)) || msg.content.toLowerCase() !== "f") {
 				this.responseSpamCounter.push({
