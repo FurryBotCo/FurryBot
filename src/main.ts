@@ -11,6 +11,8 @@ import functions from "./util/functions";
 import Temp from "./util/Temp";
 import MessageCollector from "./util/MessageCollector";
 import Trello from "trello";
+import E6API from "e6api";
+import E9API from "e9api";
 
 class FurryBot extends Eris.Client {
 	logger: Logger;
@@ -40,6 +42,8 @@ class FurryBot extends Eris.Client {
 		response: string;
 	}[];
 	spamCounterInterval: NodeJS.Timeout;
+	e6: E6API;
+	e9: E9API;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
 		this.logger = new Logger();
@@ -76,6 +80,13 @@ class FurryBot extends Eris.Client {
 		global.console.debug = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> => this.logger._log("debug", msg, shardId));
 		global.console.warn = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> => this.logger._log("warn", msg, shardId));
 		global.console.error = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number): Promise<boolean> => this.logger._log("error", msg, shardId));
+
+		this.e6 = new E6API({
+			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
+		});
+		this.e9 = new E9API({
+			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
+		});
 	}
 
 	getCommand(cmd: string | string[]): {

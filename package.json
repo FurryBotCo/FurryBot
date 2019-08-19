@@ -40,6 +40,8 @@
     "cookie-parser": "^1.4.4",
     "cryptr": "^4.0.2",
     "deasync": "^0.1.15",
+    "e6api": "^1.0.4",
+    "e9api": "^1.0.4",
     "ejs": "^2.6.2",
     "eris": "github:abalabahaha/eris#dev",
     "erlpack": "github:abalabahaha/erlpack",
@@ -91,5 +93,6 @@
     "ts-node-dev": "^1.0.0-pre.40",
     "tsconfig-paths": "^3.8.0",
     "typescript": "^3.5.3"
-  }
+  },
+  "private": true
 }
