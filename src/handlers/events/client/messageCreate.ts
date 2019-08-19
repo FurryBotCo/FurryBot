@@ -266,7 +266,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						await msg.uConfig.edit({
 							blacklist: {
 								blacklisted: true,
-								reason: `Spamming Auto Responses. Automatic Blacklist for a VL at or above ${config.antiSpam.response.blacklist}`,
+								reason: `Spamming Auto Responses. Automatic Blacklist for a VL at or above ${config.antiSpam.response.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}`,
 								blame: "Automatic"
 							}
 						});
@@ -275,7 +275,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 							embeds: [
 								{
 									title: "User Blacklisted",
-									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Auto Responses. Automatic Blacklist for a VL at or above ${config.antiSpam.response.blacklist}\nBlame: Automatic`,
+									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Auto Responses. Automatic Blacklist for a VL at or above ${config.antiSpam.response.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
 									timestamp: new Date().toISOString(),
 									color: functions.randomColor()
 								}
@@ -433,7 +433,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						await msg.uConfig.edit({
 							blacklist: {
 								blacklisted: true,
-								reason: `Spamming Commands. Automatic Blacklist for a VL at or above ${config.antiSpam.cmd.blacklist}`,
+								reason: `Spamming Commands. Automatic Blacklist for a VL at or above ${config.antiSpam.cmd.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`,
 								blame: "Automatic"
 							}
 						});
@@ -442,7 +442,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 							embeds: [
 								{
 									title: "User Blacklisted",
-									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist for a VL at or above ${config.antiSpam.cmd.blacklist}\nBlame: Automatic`,
+									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist for a VL at or above ${config.antiSpam.cmd.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
 									timestamp: new Date().toISOString(),
 									color: functions.randomColor()
 								}
