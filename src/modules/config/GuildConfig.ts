@@ -1,6 +1,11 @@
 import config from "../../default/guildConfig.json";
 import { mdb } from "../Database";
-import CommandConfigEntry from "./CommandConfigEntry";
+
+interface CommandConfigEntry {
+	type: "command" | "category";
+	selectionType: "channel" | "user" | "role" | "server";
+	selection: string;
+}
 
 class GuildConfig {
 	id: string;
@@ -142,8 +147,8 @@ class GuildConfig {
 			await mdb.collection("guilds").findOneAndUpdate({
 				id: this.id
 			}, {
-					$set: g
-				});
+				$set: g
+			});
 		} catch (e) {
 			await mdb.collection("guilds").insertOne({ id: this.id, ...g });
 		}

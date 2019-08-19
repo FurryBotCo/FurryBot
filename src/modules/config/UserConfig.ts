@@ -1,9 +1,16 @@
 import config from "../../default/userConfig.json";
 import { mdb } from "../Database";
-import Warning from "./Warning";
 
 // I considered adding votes onto user objects, bot tracking them separately will work out
 // better in the long run.
+
+interface Warning {
+	blame: string;
+	gid: string;
+	reason: string;
+	timestamp: Date;
+	wid: number;
+}
 
 class UserConfig {
 	id: string;
@@ -89,8 +96,8 @@ class UserConfig {
 			await mdb.collection("users").findOneAndUpdate({
 				id: this.id
 			}, {
-					$set: u
-				});
+				$set: u
+			});
 		} catch (e) {
 			await mdb.collection("users").insertOne({ ...{}, ...{ id: this.id }, ...u });
 		}

@@ -26,4 +26,4 @@ module.exports = function _getCallerFile() {
 	Error.prepareStackTrace = originalFunc;
 
 	return callerfile;
-}
+};
