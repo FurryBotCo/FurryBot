@@ -26,6 +26,7 @@ class UserConfig {
 	warnings: Warning[];
 	bal: number;
 	tips: boolean;
+	dmActive: boolean;
 	// voteCount: number;
 	// lastVote: number;
 	constructor(id, data) {
@@ -40,6 +41,7 @@ class UserConfig {
 		this.warnings = ![undefined, null].includes(data.warnings) ? data.warnings : config.warnings;
 		this.bal = ![undefined, null].includes(data.bal) ? data.bal : config.bal;
 		this.tips = ![undefined, null].includes(data.tips) ? data.tips : config.tips;
+		this.dmActive = ![undefined, null].includes(data.dmActive) ? data.dmActive : config.dmActive;
 		// this.voteCount = ![undefined, null].includes(data.voteCount) ? data.voteCount : config.voteCount;
 		// this.lastVote = ![undefined, null].includes(data.lastVote) ? data.lastVote : config.lastVote;
 
@@ -65,6 +67,7 @@ class UserConfig {
 		}
 		bal?: number;
 		tips?: boolean;
+		dmActive?: boolean;
 		// voteCount?: number;
 		// lastVote?: number;
 	}): Promise<UserConfig> {
@@ -73,7 +76,8 @@ class UserConfig {
 			marriage: this.marriage,
 			id: this.id,
 			bal: this.bal,
-			tips: this.tips
+			tips: this.tips,
+			dmActive: this.dmActive
 			// voteCount: this.voteCount,
 			// lastVote: this.lastVote
 		};
@@ -91,6 +95,7 @@ class UserConfig {
 
 		if (typeof data.bal !== "undefined") u.bal = data.bal;
 		if (typeof data.tips !== "undefined") u.tips = data.tips;
+		if (typeof data.dmActive !== "undefined") u.dmActive = data.dmActive;
 
 		try {
 			await mdb.collection("users").findOneAndUpdate({

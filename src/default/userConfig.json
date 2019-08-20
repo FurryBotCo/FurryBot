@@ -12,5 +12,6 @@
 
     ],
     "bal": 100,
-    "tips": true
+    "tips": true,
+    "dmActive": false
 }

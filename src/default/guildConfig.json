@@ -29,5 +29,14 @@
     "pawboard": {
         "emoji": "🐾",
         "channel": null
+    },
+    "registration": {
+        "enabled": false,
+        "logsChannel": null,
+        "questions": [],
+        "roleDuring": null,
+        "roleAfter": null,
+        "useDirectMessages": true,
+        "autoUnderTOSAction": "none"
     }
 }

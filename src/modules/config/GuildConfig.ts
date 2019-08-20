@@ -7,6 +7,13 @@ interface CommandConfigEntry {
 	selection: string;
 }
 
+interface RegistrationQuestion {
+	createdBy: string;
+	question: string;
+	options: {
+		[q: string]: string;
+	};
+}
 class GuildConfig {
 	id: string;
 	prefix: string;
@@ -41,6 +48,15 @@ class GuildConfig {
 	pawboard: {
 		emoji: string;
 		channel: string;
+	};
+	registration: {
+		enabled: boolean;
+		logsChannel: string;
+		questions: RegistrationQuestion[];
+		roleDuring: string;
+		roleAfter: string;
+		useDirectMessages: boolean;
+		autoUnderTOSAction: "none" | "kick" | "ban";
 	};
 	constructor(id, data) {
 		this.id = id;
@@ -98,6 +114,15 @@ class GuildConfig {
 			emoji?: string;
 			channel?: string;
 		}
+		registration?: {
+			enabled?: boolean;
+			logsChannel?: string;
+			questions?: RegistrationQuestion[];
+			roleDuring?: string;
+			roleAfter?: string;
+			useDirectMessages?: boolean;
+			autoUnderTOSAction?: "none" | "kick" | "ban";
+		};
 	}): Promise<GuildConfig> {
 		const g = {
 			prefix: this.prefix,
@@ -111,7 +136,8 @@ class GuildConfig {
 			fResponseEnabled: this.fResponseEnabled,
 			music: this.music,
 			commandConfig: this.commandConfig,
-			pawboard: this.pawboard
+			pawboard: this.pawboard,
+			registration: this.registration
 		};
 
 		if (typeof data.prefix !== "undefined") g.prefix = data.prefix;
@@ -143,6 +169,16 @@ class GuildConfig {
 			if (typeof data.pawboard.channel !== "undefined") g.pawboard.channel = data.pawboard.channel;
 		}
 
+		if (typeof data.registration !== "undefined") {
+			if (typeof data.registration.enabled !== "undefined") g.registration.enabled = data.registration.enabled;
+			if (typeof data.registration.logsChannel !== "undefined") g.registration.logsChannel = data.registration.logsChannel;
+			if (typeof data.registration.questions !== "undefined") g.registration.questions = data.registration.questions;
+			if (typeof data.registration.roleDuring !== "undefined") g.registration.roleDuring = data.registration.roleDuring;
+			if (typeof data.registration.roleAfter !== "undefined") g.registration.roleAfter = data.registration.roleAfter;
+			if (typeof data.registration.useDirectMessages !== "undefined") g.registration.useDirectMessages = data.registration.useDirectMessages;
+			if (typeof data.registration.autoUnderTOSAction !== "undefined") g.registration.autoUnderTOSAction = data.registration.autoUnderTOSAction;
+		}
+
 		try {
 			await mdb.collection("guilds").findOneAndUpdate({
 				id: this.id
@@ -164,7 +200,7 @@ class GuildConfig {
 	async reset(): Promise<GuildConfig> {
 		// await this.delete();
 		// await mdb.collection("guilds").insertOne(Object.assign({}, config, { id: this.id }));
-		await this.edit(config);
+		await this.edit(config as any);
 		await this._load(config);
 		return this;
 	}
