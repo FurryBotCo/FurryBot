@@ -14,6 +14,7 @@ import Trello from "trello";
 import E6API from "e6api";
 import E9API from "e9api";
 
+
 class FurryBot extends Eris.Client {
 	logger: Logger;
 	autoResponses: AutoResponse[];
