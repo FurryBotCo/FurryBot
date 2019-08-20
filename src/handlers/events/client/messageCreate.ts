@@ -15,7 +15,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 	const msg: ExtendedMessage = new ExtendedMessage(message, this);
 	await msg._load.call(msg);
 
-	if (msg.author.bot) return;
+	if (msg.author.bot || msg.uConfig.dmActive) return;
 
 	let embed: Eris.EmbedOptions, bl: boolean, blReason: {
 		type: number;
