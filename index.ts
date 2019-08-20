@@ -14,7 +14,7 @@ if (__filename.endsWith(".js") && !fs.existsSync(`${__dirname}/src/assets`)) {
 
 const bot = new FurryBot(config.bot.token, config.bot.clientOptions);
 
-fs.writeFileSync(`${__dirname}/process.pid`, process.pid);
+fs.writeFileSync(`${config.rootDir}/../process.pid`, process.pid);
 
 bot.connect();
 
@@ -101,8 +101,8 @@ process.on("SIGINT", () => {
 	bot.disconnect({
 		reconnect: false
 	});
-	fs.unlinkSync(`${__dirname}/process.pid`);
+	fs.unlinkSync(`${config.rootDir}/../process.pid`);
 	process.kill(process.pid);
 });
 
-export default bot;
+export = bot;
