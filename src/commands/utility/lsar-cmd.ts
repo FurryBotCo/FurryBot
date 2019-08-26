@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import { mdb } from "../../modules/Database";
 import chunk from "chunk";
 import GuildConfig from "../../modules/config/GuildConfig";

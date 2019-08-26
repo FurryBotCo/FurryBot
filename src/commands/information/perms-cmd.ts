@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import Permissions from "../../util/Permissions";
 
 export default new Command({

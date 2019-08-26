@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import truncate from "truncate";
 
 export default new Command({
@@ -29,7 +29,7 @@ export default new Command({
 
 	let card, embed: Eris.EmbedOptions;
 
-	if (msg.unparsedArgs.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.unparsedArgs.length < 1 || !msg.unparsedArgs[0]) return new Error("ERR_INVALID_USAGE");
 	try {
 		card = await this.tclient.addCard(msg.unparsedArgs.join(" "), `Suggestion by ${msg.author.tag} (${msg.author.id}) from guild ${msg.guild.name} (${msg.guild.id})`, config.apis.trello.list);
 	} catch (e) {

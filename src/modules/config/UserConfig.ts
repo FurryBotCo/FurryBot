@@ -27,6 +27,13 @@ class UserConfig {
 	bal: number;
 	tips: boolean;
 	dmActive: boolean;
+	patreon: {
+		amount: number;
+		createdAt: number;
+		declinedAt: number;
+		donator?: boolean;
+		patronId: string;
+	};
 	// voteCount: number;
 	// lastVote: number;
 	constructor(id, data) {
@@ -42,6 +49,7 @@ class UserConfig {
 		this.bal = ![undefined, null].includes(data.bal) ? data.bal : config.bal;
 		this.tips = ![undefined, null].includes(data.tips) ? data.tips : config.tips;
 		this.dmActive = ![undefined, null].includes(data.dmActive) ? data.dmActive : config.dmActive;
+		this.patreon = ![undefined, null].includes(data.patreon) ? data.patreon : config.patreon;
 		// this.voteCount = ![undefined, null].includes(data.voteCount) ? data.voteCount : config.voteCount;
 		// this.lastVote = ![undefined, null].includes(data.lastVote) ? data.lastVote : config.lastVote;
 
@@ -68,8 +76,13 @@ class UserConfig {
 		bal?: number;
 		tips?: boolean;
 		dmActive?: boolean;
-		// voteCount?: number;
-		// lastVote?: number;
+		patreon?: {
+			amount?: number;
+			createdAt?: number;
+			declinedAt?: number;
+			donator?: boolean;
+			patronId?: string;
+		};
 	}): Promise<UserConfig> {
 		const u = {
 			blacklist: this.blacklist,
@@ -77,9 +90,8 @@ class UserConfig {
 			id: this.id,
 			bal: this.bal,
 			tips: this.tips,
-			dmActive: this.dmActive
-			// voteCount: this.voteCount,
-			// lastVote: this.lastVote
+			dmActive: this.dmActive,
+			patreon: this.patreon
 		};
 
 		if (typeof data.blacklist !== "undefined") {
@@ -97,6 +109,13 @@ class UserConfig {
 		if (typeof data.tips !== "undefined") u.tips = data.tips;
 		if (typeof data.dmActive !== "undefined") u.dmActive = data.dmActive;
 
+		if (typeof data.patreon !== "undefined") {
+			if (typeof data.patreon.amount) u.patreon.amount = data.patreon.amount;
+			if (typeof data.patreon.createdAt) u.patreon.createdAt = data.patreon.createdAt;
+			if (typeof data.patreon.declinedAt) u.patreon.declinedAt = data.patreon.declinedAt;
+			if (typeof data.patreon.donator) u.patreon.donator = data.patreon.donator;
+			if (typeof data.patreon.patronId) u.patreon.patronId = data.patreon.patronId;
+		}
 		try {
 			await mdb.collection("users").findOneAndUpdate({
 				id: this.id

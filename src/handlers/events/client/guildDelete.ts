@@ -1,12 +1,12 @@
 import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "../../../config/config";
+import config from "../../../config";
 import functions from "../../../util/functions";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 
-	await functions.incrementDailyCounter(false, this.guilds.size);
+	await this.f.incrementDailyCounter(false, this.guilds.size);
 
 	let author = {
 		name: "Unknown#0000",
@@ -65,7 +65,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 			}
 		],
 		timestamp: new Date().toISOString(),
-		color: functions.randomColor(),
+		color: this.f.randomColor(),
 		footer: {
 			text: `Shard ${guild.shard.id + 1}/${this.shards.size}`,
 			icon_url: "https://reddit.furry.host/FurryBotForDiscord.png"

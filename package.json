@@ -6,8 +6,9 @@
   "scripts": {
     "test": "xo",
     "compile": "tsc",
-    "build": "npm run tslint && rm -Rf build && tsc",
-    "build-dev": "rm -Rf build && tsc",
+    "files": "copyfiles src/**/*.txt build",
+    "build": "npm run tslint && rm -Rf build && tsc && npm run files",
+    "build-dev": "rm -Rf build && tsc && npm run files",
     "tslint": "tslint -c tslint.json -p . *.ts",
     "start": "node build",
     "start-dev": "npm run build-dev && node build"
@@ -50,6 +51,7 @@
     "express": "^4.17.1",
     "express-session": "^1.16.2",
     "fs-extra": "^8.1.0",
+    "furrybotapi": "^1.0.0",
     "lodash": "^4.17.15",
     "mongodb": "^3.2.7",
     "morgan": "^1.9.1",
@@ -89,6 +91,7 @@
     "@types/uuid": "^3.4.5",
     "@types/uws": "^0.13.2",
     "@types/ws": "^6.0.2",
+    "copyfiles": "^2.1.1",
     "mongoose": "^5.6.9",
     "ts-node-dev": "^1.0.0-pre.40",
     "tsconfig-paths": "^3.8.0",

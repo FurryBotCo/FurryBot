@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -16,6 +16,7 @@ export default new Command({
 		"attachFiles"
 	],
 	cooldown: 5e3,
+	donatorCooldown: 2.5e3,
 	description: "My baby won't be affected.",
 	usage: "[image]",
 	nsfw: false,

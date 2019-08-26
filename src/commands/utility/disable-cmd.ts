@@ -5,8 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
-import CommandConfigEntry from "../../modules/config/CommandConfigEntry";
+import config from "../../config";
 
 export default new Command({
 	triggers: [

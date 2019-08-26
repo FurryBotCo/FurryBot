@@ -13,5 +13,12 @@
     ],
     "bal": 100,
     "tips": true,
-    "dmActive": false
+    "dmActive": false,
+    "patreon": {
+        "amount": 0,
+        "createdAt": null,
+        "declinedAt": null,
+        "donator": false,
+        "patronId": null
+    }
 }

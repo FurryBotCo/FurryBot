@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -15,6 +15,7 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 5e3,
+	donatorCooldown: 2.5e3,
 	description: "Start a howl, or join in!",
 	usage: "",
 	nsfw: false,

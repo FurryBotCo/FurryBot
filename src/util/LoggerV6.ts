@@ -2,7 +2,7 @@ import * as fs from "fs-extra";
 import chalk, { Chalk } from "chalk";
 import _getCallerFile from "./_getCallerFile";
 import os from "os";
-import config from "../config/config";
+import config from "../config";
 import path from "path";
 
 class Logger {

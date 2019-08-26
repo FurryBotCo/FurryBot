@@ -1,13 +1,15 @@
 import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "../../../config/config";
+import config from "../../../config";
 import { mdb } from "../../../modules/Database";
 import GuildConfig from "../../../modules/config/GuildConfig";
 import uuid from "uuid/v4";
 import functions from "../../../util/functions";
 
 export default new ClientEvent("messageReactionAdd", (async function (this: FurryBot, m, emoji, userID) {
+
+	return;
 
 	if (!config.beta) return;
 
@@ -52,9 +54,9 @@ export default new ClientEvent("messageReactionAdd", (async function (this: Furr
 					title: `${gConfig.pawboard.emoji} 1 in <#${msg.channel.id}>`
 				}
 			}, {
-					name: msg.attachments[0].filename,
-					file: await functions.getImageFromURL(msg.attachments[0].url)
-				});
+				name: msg.attachments[0].filename,
+				file: await this.f.getImageFromURL(msg.attachments[0].url)
+			});
 		} else {
 			pbMsg = await ch.createMessage(`${gConfig.pawboard.emoji} 1\n${!msg.content ? "" : msg.content}`);
 		}

@@ -1,6 +1,6 @@
 import * as os from "os";
 import phin from "phin";
-import config from "../config/config";
+import config from "../config";
 import * as util from "util";
 import * as fs from "fs-extra";
 import Command from "../modules/cmd/Command";
@@ -17,6 +17,8 @@ import GuildConfig from "../modules/config/GuildConfig";
 import youtubesearch from "youtube-search";
 import ytdl from "ytdl-core";
 import * as URL from "url";
+import refreshPatreonToken from "./patreon/refreshPatreonToken";
+import loopPatrons from "./patreon/loopPatrons";
 
 export { ErrorHandler };
 
@@ -560,5 +562,7 @@ export default {
 			beta: reports[0].beta,
 			entries
 		};
-	})
+	}),
+	refreshPatreonToken,
+	loopPatrons
 };

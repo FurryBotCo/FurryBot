@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import { mdb } from "../../modules/Database";
 import ytdl from "ytdl-core";
 import { YouTubeSearchResults } from "youtube-search";
@@ -16,7 +16,8 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [],
-	cooldown: 3e3,
+	cooldown: 3e4,
+	donatorCooldown: 1.5e4,
 	description: "Play some music in your Discord",
 	usage: "<song search/yt link>",
 	nsfw: false,
@@ -31,10 +32,8 @@ export default new Command({
 
 	if (!msg.member.voiceState.channelID) return msg.reply("you must be in a voice channel to use this.");
 
-	if (msg.gConfig.music.queue.length >= 6 && !msg.gConfig.premium) return msg.reply("Hey, you can only have **5** songs in your queue right now, we may have a premium option to allow for more soon.");
-	let vc: Eris.VoiceChannel;
-	const t = msg.channel.guild.channels.get(msg.member.voiceState.channelID);
-	if (t instanceof Eris.VoiceChannel) vc = t;
+	if (msg.gConfig.music.queue.length >= 6 && !(msg.uConfig.patreon.amount >= 3)) return msg.reply("Hey, you can only have **5** songs in your queue right now, we may have a premium option to allow for more soon.");
+	const vc = msg.channel.guild.channels.get(msg.member.voiceState.channelID) as Eris.VoiceChannel;
 
 	if (!vc.permissionsOf(this.user.id).has("voiceConnect")) return msg.reply("I cannot connect to the voice channel you are in.");
 	if (!vc.permissionsOf(this.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are in.");

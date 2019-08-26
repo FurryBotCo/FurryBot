@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import { mdb } from "../../modules/Database";
 
 export default new Command({
@@ -17,6 +17,7 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	description: "Check your economy balance",
 	usage: "",
 	nsfw: false,

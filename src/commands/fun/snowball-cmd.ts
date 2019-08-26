@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -14,6 +14,7 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 2e3,
+	donatorCooldown: 1e3,
 	description: "snowball",
 	usage: "<@member/string>",
 	nsfw: false,

@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import { mdb } from "../../modules/Database";
 import UserConfig from "../../modules/config/UserConfig";
 
@@ -16,6 +16,7 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 3e4,
+	donatorCooldown: 1.5e4,
 	description: "Propose to someone!",
 	usage: "<@user>",
 	nsfw: false,

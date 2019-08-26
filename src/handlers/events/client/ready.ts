@@ -1,7 +1,7 @@
 import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "../../../config/config";
+import config from "../../../config";
 import srv from "../../../api";
 import express from "express";
 import http from "http";
@@ -53,7 +53,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 				title: `Daily Counts For ${date}`,
 				description: `Servers Joined Today: ${count}\nTotal Servers: ${this.guilds.size}`,
 				timestamp: new Date().toISOString(),
-				color: functions.randomColor()
+				color: this.f.randomColor()
 			};
 
 			console.log(`Daily joins for ${date}: ${count}`);

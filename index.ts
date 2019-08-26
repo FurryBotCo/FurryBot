@@ -1,5 +1,5 @@
 import FurryBot from "./src/main";
-import config from "./src/config/config";
+import config from "./src/config";
 import * as fs from "fs-extra";
 import functions from "./src/util/functions";
 import path from "path";

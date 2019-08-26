@@ -20,6 +20,7 @@ class Command {
 	userPermissions: string[];
 	botPermissions: string[];
 	cooldown: number;
+	donatorCooldown: number;
 	description: string;
 	usage: string;
 	hasSubCommands: boolean;
@@ -27,6 +28,7 @@ class Command {
 	nsfw: boolean;
 	devOnly: boolean;
 	betaOnly: boolean;
+	donatorOnly: boolean;
 	guildOwnerOnly: boolean;
 	path: string;
 	run: (this: FurryBot, message: ExtendedMessage) => any;
@@ -36,6 +38,7 @@ class Command {
 		userPermissions?: string[];
 		botPermissions?: string[];
 		cooldown?: number;
+		donatorCooldown?: number;
 		description?: string;
 		usage?: string;
 		hasSubCommands?: boolean;
@@ -43,6 +46,7 @@ class Command {
 		nsfw?: boolean;
 		devOnly?: boolean;
 		betaOnly?: boolean;
+		donatorOnly?: boolean;
 		guildOwnerOnly?: boolean;
 		path: string;
 	}, run: (message: ExtendedMessage) => any) {
@@ -54,6 +58,7 @@ class Command {
 		this.userPermissions = !data.userPermissions ? [] : data.userPermissions;
 		this.botPermissions = !data.botPermissions ? [] : data.botPermissions;
 		this.cooldown = [undefined, null].includes(data.cooldown) ? 0 : data.cooldown;
+		this.donatorCooldown = [undefined, null].includes(data.donatorCooldown) ? this.cooldown : data.donatorCooldown;
 		this.description = !data.description ? "None Provided" : data.description;
 		this.usage = !data.usage ? "" : data.usage;
 		this.hasSubCommands = [undefined, null].includes(data.hasSubCommands) ? null : data.hasSubCommands;
@@ -61,6 +66,7 @@ class Command {
 		this.nsfw = [undefined, null].includes(data.nsfw) ? false : data.nsfw;
 		this.devOnly = [undefined, null].includes(data.devOnly) ? false : data.devOnly;
 		this.betaOnly = [undefined, null].includes(data.betaOnly) ? false : data.betaOnly;
+		this.donatorOnly = [undefined, null].includes(data.donatorOnly) ? false : data.donatorOnly;
 		this.guildOwnerOnly = [undefined, null].includes(data.guildOwnerOnly) ? false : data.guildOwnerOnly;
 		// this.category = [undefined, null].includes(data.category) ? null : data.category;
 		if (!data.path) throw new CommandCreateError("Invalid path provided.");

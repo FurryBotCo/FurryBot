@@ -1,5 +1,5 @@
 import express from "express";
-import config from "../../config/config";
+import config from "../../config";
 import client from "../../../";
 import { mdb } from "../../modules/Database";
 import uuid from "uuid/v4";

@@ -1,19 +1,19 @@
 import * as Eris from "eris";
 import * as fs from "fs-extra";
-import config from "./config/config";
+import config from "./config";
 import Logger from "./util/LoggerV6";
 import cat from "./commands";
 import resp from "./responses";
 import Command from "./modules/cmd/Command";
 import AutoResponse from "./modules/cmd/AutoResponse";
 import Category from "./modules/cmd/Category";
-import functions from "./util/functions";
+import functions, { ErrorHandler } from "./util/functions";
 import Temp from "./util/Temp";
 import MessageCollector from "./util/MessageCollector";
 import Trello from "trello";
 import E6API from "e6api";
 import E9API from "e9api";
-
+import FurryBotAPI from "furrybotapi";
 
 class FurryBot extends Eris.Client {
 	logger: Logger;
@@ -45,6 +45,8 @@ class FurryBot extends Eris.Client {
 	spamCounterInterval: NodeJS.Timeout;
 	e6: E6API;
 	e9: E9API;
+	fb: FurryBotAPI;
+	f: typeof import("./util/functions").default & { ErrorHandler: typeof import("./util/functions").ErrorHandler };
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
 		this.logger = new Logger();
@@ -85,9 +87,14 @@ class FurryBot extends Eris.Client {
 		this.e6 = new E6API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
 		});
+
 		this.e9 = new E9API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
 		});
+
+		this.fb = new FurryBotAPI(config.web.userAgent);
+
+		this.f = { ...functions, ErrorHandler };
 	}
 
 	getCommand(cmd: string | string[]): {

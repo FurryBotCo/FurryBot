@@ -3,9 +3,8 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import ExtendedMessage from "../../../modules/extended/ExtendedMessage";
 import Permissions from "../../../util/Permissions";
-import functions, { ErrorHandler } from "../../../util/functions";
 import { performance } from "perf_hooks";
-import config from "../../../config/config";
+import config from "../../../config";
 import { mdb } from "../../../modules/Database";
 import * as os from "os";
 import phin from "phin";
@@ -150,7 +149,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			const embed: Eris.EmbedOptions = {
 				title: "Hi, I'm your little friend, Furry Bot!",
-				color: functions.randomColor(),
+				color: this.f.randomColor(),
 				author: {
 					name: msg.author.tag,
 					icon_url: msg.author.avatarURL
@@ -245,12 +244,12 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					const d = fs.readdirSync(`${config.logsDir}/spam`).filter(d => !fs.lstatSync(`${config.logsDir}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-response.json") && fs.lstatSync(`${config.logsDir}/spam/${d}`).birthtimeMs + 3e5 > Date.now());
 
 					if (d.length > 0) {
-						report = functions.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.logsDir}/spam/${f}`).toString())), report);
+						report = this.f.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.logsDir}/spam/${f}`).toString())), report);
 						spC = report.entries.length;
 						d.map(f => fs.unlinkSync(`${config.logsDir}/spam/${f}`));
 					}
 
-					const reportId = functions.random(10);
+					const reportId = this.f.random(10);
 
 					fs.writeFileSync(`${config.logsDir}/spam/${msg.author.id}-${reportId}-response.json`, JSON.stringify(report));
 
@@ -280,7 +279,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 									title: "User Blacklisted",
 									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Auto Responses. Automatic Blacklist for a VL at or above ${config.antiSpam.response.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
 									timestamp: new Date().toISOString(),
-									color: functions.randomColor()
+									color: this.f.randomColor()
 								}
 							],
 							username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
@@ -299,7 +298,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					embed = {
 						title: "You do not have the required permission(s) to use this!",
 						description: `You require the permission(s) **${p.join("**, **")}** to run this, which you do not have.`,
-						color: functions.randomColor(),
+						color: this.f.randomColor(),
 						timestamp: new Date().toISOString()
 					};
 					this.logger.debug(`user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the response ${msg.response.triggers[0]}`, msg.guild.shard.id);
@@ -314,7 +313,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					embed = {
 						title: "I do not have the required permission(s) to use this!",
 						description: `I need the permission(s) **${p.join("**, **")}** for this command to function properly, please add these to me and try again.`,
-						color: functions.randomColor(),
+						color: this.f.randomColor(),
 						timestamp: new Date().toISOString()
 					};
 					this.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the response ${msg.response.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
@@ -325,7 +324,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			if (this.commandTimeout[msg.response.triggers[0]].has(msg.author.id) && !config.developers.includes(msg.author.id)) {
 				this.logger.log(`Response timeout encountered by user ${msg.author.tag} (${msg.author.id}) on response "${msg.response.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
 
-				return msg.channel.createMessage(`<@!${msg.author.id}>, <:cooldown:591863995057831946>\nPlease wait ${functions.ms(msg.response.cooldown)} before using this response again!`);
+				return msg.channel.createMessage(`<@!${msg.author.id}>, <:cooldown:591863995057831946>\nPlease wait ${this.f.ms(msg.response.cooldown)} before using this response again!`);
 			}
 
 			this.logger.command(`Response  "${msg.response.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
@@ -412,12 +411,12 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					const d = fs.readdirSync(`${config.logsDir}/spam`).filter(d => !fs.lstatSync(`${config.logsDir}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.logsDir}/spam/${d}`).birthtimeMs + 3e5 > Date.now());
 
 					if (d.length > 0) {
-						report = functions.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.logsDir}/spam/${f}`).toString())), report);
+						report = this.f.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.logsDir}/spam/${f}`).toString())), report);
 						spC = report.entries.length;
 						d.map(f => fs.unlinkSync(`${config.logsDir}/spam/${f}`));
 					}
 
-					const reportId = functions.random(10);
+					const reportId = this.f.random(10);
 
 					fs.writeFileSync(`${config.logsDir}/spam/${msg.author.id}-${reportId}-cmd.json`, JSON.stringify(report));
 
@@ -447,7 +446,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 									title: "User Blacklisted",
 									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist for a VL at or above ${config.antiSpam.cmd.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
 									timestamp: new Date().toISOString(),
-									color: functions.randomColor()
+									color: this.f.randomColor()
 								}
 							],
 							username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
@@ -465,7 +464,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			if (cmd.nsfw) {
 				if (!msg.channel.nsfw) return msg.reply("This command can only be ran in nsfw channels.", {
-					file: await functions.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
+					file: await this.f.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
 					name: "nsfw.gif"
 				});
 				if (!msg.gConfig.nsfwEnabled) return msg.reply(`You must enable nsfw commands to use this, have a server administrator run \`${msg.gConfig.prefix}settings nsfw enabled\``);
@@ -481,7 +480,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					embed = {
 						title: "NSFW command explicitiy disabled in this channel",
 						description: `NSFW commands have been explicitly disabled in this channel, ask a server moderator/administrator to remove **${txt}** from the channel topic.`,
-						color: functions.randomColor(),
+						color: this.f.randomColor(),
 						timestamp: new Date().toISOString()
 					};
 
@@ -496,7 +495,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					embed = {
 						title: "You do not have the required permission(s) to use this!",
 						description: `You require the permission(s) **${p.join("**, **")}** to run this, which you do not have.`,
-						color: functions.randomColor(),
+						color: this.f.randomColor(),
 						timestamp: new Date().toISOString()
 					};
 					this.logger.debug(`user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`, msg.guild.shard.id);
@@ -511,7 +510,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					embed = {
 						title: "I do not have the required permission(s) to use this!",
 						description: `I need the permission(s) **${p.join("**, **")}** for this command to function properly, please add these to me and try again.`,
-						color: functions.randomColor(),
+						color: this.f.randomColor(),
 						timestamp: new Date().toISOString()
 					};
 					this.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
@@ -522,7 +521,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			if (this.commandTimeout[cmd.triggers[0]].has(msg.author.id) && !config.developers.includes(msg.author.id)) {
 				this.logger.log(`Command timeout encountered by user ${msg.author.tag} (${msg.author.id}) on command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
 
-				return msg.channel.createMessage(`<@!${msg.author.id}>, <:cooldown:591863995057831946>\nPlease wait ${functions.ms(cmd.cooldown)} before using this command again!`);
+				return msg.channel.createMessage(`<@!${msg.author.id}>, <:cooldown:591863995057831946>\nPlease wait ${this.f.ms(cmd.cooldown)} before using this command again!`);
 			}
 
 			let lang;
@@ -606,12 +605,12 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				break; // eslint-disable-line no-unreachable
 
 			case "HELP":
-				return functions.sendCommandEmbed(msg, msg.cmd.command);
+				return this.f.sendCommandEmbed(msg, msg.cmd.command);
 				break; // eslint-disable-line no-unreachable
 
 			default:
 				// internal error handling
-				const er = ErrorHandler(err);
+				const er = this.f.ErrorHandler(err);
 				if (!(er instanceof Error)) return msg.reply(er).catch(err =>
 					msg.author.getDMChannel().then(ch =>
 						ch.createMessage(`I couldn't send messages in the channel where that command was sent, so I've sent this here.\n${er}`)
@@ -619,7 +618,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					)
 				);
 
-				num = functions.random(10, "1234567890");
+				num = this.f.random(10, "1234567890");
 				code = `${msg.cmd.command.map(c => c.triggers[0]).join(".")}.${config.beta ? "beta" : "stable"}.${num}`;
 				this.logger.error(`[CommandHandler] e1: ${err.name}: ${err.message}\n${err.stack},\nError Code: ${code}`, msg.guild.shard.id);
 

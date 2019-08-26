@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import { mdb } from "../../modules/Database";
 import UserConfig from "../../modules/config/UserConfig";
 
@@ -20,6 +20,7 @@ export default new Command({
 		"embedLinks"
 	],
 	cooldown: 2e3,
+	donatorCooldown: 1e3,
 	description: "Get some info on a user",
 	usage: "[@member/id]",
 	nsfw: false,

@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import _ from "lodash";
 
 export default new Command({
@@ -15,6 +15,7 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 2e3,
+	donatorCooldown: 1e3,
 	description: "Roll the dice",
 	usage: "",
 	nsfw: false,

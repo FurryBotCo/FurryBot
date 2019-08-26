@@ -1,7 +1,7 @@
 import express from "express";
 import client from "../../../";
 import functions from "../../util/functions";
-import config from "../../config/config";
+import config from "../../config";
 import util from "util";
 import apiFunctions from "../functions";
 

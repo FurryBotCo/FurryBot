@@ -1,5 +1,5 @@
 import * as fs from "fs-extra";
-import config from "../config/config";
+import config from "../config";
 
 export default class Temp {
 	dir: string;

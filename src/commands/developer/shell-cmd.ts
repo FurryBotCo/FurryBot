@@ -6,7 +6,7 @@ import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
 import { performance } from "perf_hooks";
-import config from "../../config/config";
+import config from "../../config";
 import { execSync } from "child_process";
 
 export default new Command({

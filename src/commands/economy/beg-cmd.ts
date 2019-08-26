@@ -5,7 +5,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import { mdb } from "../../modules/Database";
 import lang from "../../lang";
 
@@ -16,6 +16,7 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 6e4,
+	donatorCooldown: 3e4,
 	description: "Beg for free money",
 	usage: "",
 	nsfw: false,

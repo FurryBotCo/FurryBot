@@ -2,7 +2,7 @@ import * as Eris from "eris";
 import UserConfig from "../config/UserConfig";
 import GuildConfig from "../config/GuildConfig";
 import { mdb } from "../Database";
-import config from "../../config/config";
+import config from "../../config";
 import functions from "../../util/functions";
 import FurryBot from "@FurryBot";
 import Command from "../cmd/Command";

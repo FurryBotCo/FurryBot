@@ -6,7 +6,7 @@ import * as Eris from "eris";
 import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "../../config/config";
+import config from "../../config";
 import _eval from "../../util/eval";
 import * as fs from "fs-extra";
 import { mdb, mongo } from "../../modules/Database";

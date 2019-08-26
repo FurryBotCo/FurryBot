@@ -1,4 +1,4 @@
-import config from "../config/config";
+import config from "../config";
 import deasync from "deasync";
 import { MongoClient, Db } from "mongodb";
 

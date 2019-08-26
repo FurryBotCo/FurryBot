@@ -1,4 +1,4 @@
-import config from "../config/config";
+import config from "../config";
 import logger from "morgan";
 import express from "express";
 import * as fs from "fs-extra";
