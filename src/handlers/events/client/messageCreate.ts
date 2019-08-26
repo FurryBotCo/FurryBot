@@ -241,7 +241,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						beta: config.beta
 					};
 
-					const d = fs.readdirSync(`${config.logsDir}/spam`).filter(d => !fs.lstatSync(`${config.logsDir}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-response.json") && fs.lstatSync(`${config.logsDir}/spam/${d}`).birthtimeMs + 3e5 > Date.now());
+					const d = fs.readdirSync(`${config.logsDir}/spam`).filter(d => !fs.lstatSync(`${config.logsDir}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-response.json") && fs.lstatSync(`${config.logsDir}/spam/${d}`).birthtimeMs + 1.2e5 > Date.now());
 
 					if (d.length > 0) {
 						report = this.f.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.logsDir}/spam/${f}`).toString())), report);
@@ -268,7 +268,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						await msg.uConfig.edit({
 							blacklist: {
 								blacklisted: true,
-								reason: `Spamming Auto Responses. Automatic Blacklist for a VL at or above ${config.antiSpam.response.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}`,
+								reason: `Spamming Auto Responses. Automatic Blacklist. Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}`,
 								blame: "Automatic"
 							}
 						});
@@ -277,7 +277,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 							embeds: [
 								{
 									title: "User Blacklisted",
-									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Auto Responses. Automatic Blacklist for a VL at or above ${config.antiSpam.response.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
+									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Auto Responses. Automatic Blacklist. Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
 									timestamp: new Date().toISOString(),
 									color: this.f.randomColor()
 								}
@@ -287,7 +287,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						});
 					}
 
-					return msg.reply(`It seems like you may be spamming commands, try to slow down a bit.. VL: ${spC}`);
+					return; // msg.reply(`It seems like you may be spamming commands, try to slow down a bit.. VL: ${spC}`);
 				}
 			}
 
@@ -408,7 +408,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						beta: config.beta
 					};
 
-					const d = fs.readdirSync(`${config.logsDir}/spam`).filter(d => !fs.lstatSync(`${config.logsDir}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.logsDir}/spam/${d}`).birthtimeMs + 3e5 > Date.now());
+					const d = fs.readdirSync(`${config.logsDir}/spam`).filter(d => !fs.lstatSync(`${config.logsDir}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.logsDir}/spam/${d}`).birthtimeMs + 1.2e5 > Date.now());
 
 					if (d.length > 0) {
 						report = this.f.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.logsDir}/spam/${f}`).toString())), report);
@@ -435,7 +435,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						await msg.uConfig.edit({
 							blacklist: {
 								blacklisted: true,
-								reason: `Spamming Commands. Automatic Blacklist for a VL at or above ${config.antiSpam.cmd.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`,
+								reason: `Spamming Commands. Automatic Blacklist. Report: ${config.beta ? `http://localhost:12346/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`,
 								blame: "Automatic"
 							}
 						});
@@ -444,7 +444,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 							embeds: [
 								{
 									title: "User Blacklisted",
-									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist for a VL at or above ${config.antiSpam.cmd.blacklist}. Report: ${config.beta ? `http://localhost:12346/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
+									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist. Report: ${config.beta ? `http://localhost:12346/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
 									timestamp: new Date().toISOString(),
 									color: this.f.randomColor()
 								}
@@ -454,7 +454,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						});
 					}
 
-					return msg.reply(`It seems like you may be spamming commands, try to slow down a bit.. VL: ${spC}`);
+					return; // msg.reply(`It seems like you may be spamming commands, try to slow down a bit.. VL: ${spC}`);
 				}
 			}
 
