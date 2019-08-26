@@ -105,4 +105,4 @@ process.on("SIGINT", () => {
 	process.kill(process.pid);
 });
 
-export = bot;
+export default bot;
