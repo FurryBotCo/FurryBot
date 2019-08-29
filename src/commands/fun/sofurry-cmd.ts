@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -56,20 +56,20 @@ export default new Command({
 		submission = jsn.data.entries[rr];
 		if (typeof submission.contentLevel === "undefined") throw new Error("secondary");
 		if (submission.contentLevel !== 0) {
-			this.logger.log(`unsafe image:\n${util.inspect(submission, { depth: 3, showHidden: true })}`);
-			this.logger.log(`Body: ${util.inspect(jsn, { depth: null })}`);
+			this.logger.log(`unsafe image:\n${util.inspect(submission, { depth: 3, showHidden: true })}`, msg.guild.shard.id);
+			this.logger.log(`Body: ${util.inspect(jsn, { depth: null })}`, msg.guild.shard.id);
 			return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err => msg.channel.createMessage(`Command failed: ${err}`));
 		}
 		short = await functions.shortenURL(`http://www.sofurry.com/view/${submission.id}`);
 		extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
-		if ([1, 4].includes(submission.contentType)) return m.edit(`${extra}${submission.title} (type ${functions.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}${config.beta ? "?beta" : ""}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`)).then(async () => msg.channel.createMessage("", {
+		if ([1, 4].includes(submission.contentType)) return m.edit(`${extra}${submission.title} (type ${functions.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`)).then(async () => msg.channel.createMessage("", {
 			file: await functions.getImageFromURL(submission.full),
 			name: "sofurry.png"
 		}));
 		else return m.edit(`${extra}${submission.title} (type ${functions.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf something bad is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`));
 	} catch (e) {
-		this.logger.error(`Error:\n${e}`);
-		this.logger.log(`Body: ${req.body}`);
+		this.logger.error(`Error:\n${e}`, msg.guild.shard.id);
+		this.logger.log(`Body: ${req.body}`, msg.guild.shard.id);
 		return m.edit("Unknown API Error").then(async () => msg.channel.createMessage("", {
 			file: await functions.getImageFromURL(config.images.serverError),
 			name: "error.png"

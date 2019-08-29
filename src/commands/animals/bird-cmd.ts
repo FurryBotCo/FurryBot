@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -17,6 +17,7 @@ export default new Command({
 		"attachFiles"
 	],
 	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	description: "Get a picture of a birb!",
 	usage: "",
 	nsfw: false,
@@ -35,7 +36,7 @@ export default new Command({
 			name: img.response.name
 		});
 	} catch (e) {
-		this.logger.error(e);
+		this.logger.error(e, msg.guild.shard.id);
 		return msg.channel.createMessage("unknown api error", {
 			file: await functions.getImageFromURL(config.images.serverError),
 			name: "error.png"

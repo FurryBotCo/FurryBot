@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -16,6 +16,7 @@ export default new Command({
 		"attachFiles"
 	],
 	cooldown: 2e3,
+	donatorCooldown: 1e3,
 	description: "Get a random fursuit image!",
 	usage: "",
 	nsfw: false,
@@ -31,7 +32,7 @@ export default new Command({
 	if (img.success !== true) return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 	short = await functions.shortenURL(img.response.image);
 	extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
-	msg.channel.createMessage(`${extra}Short URL: <${short.link}${config.beta ? "?beta" : ""}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
+	msg.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
 		file: await functions.getImageFromURL(img.response.image),
 		name: img.response.name
 	});

@@ -1,32 +1,24 @@
 import * as os from "os";
 import phin from "phin";
-import config from "@config";
+import config from "../config";
 import * as util from "util";
-import * as fs from "fs";
-import Command from "@modules/cmd/Command";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import ExtendedTextChannel from "@src/modules/extended/ExtendedTextChannel";
-import ExtendedUser from "@src/modules/extended/ExtendedUser";
+import * as fs from "fs-extra";
+import Command from "../modules/cmd/Command";
+import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import ExtendedTextChannel from "../modules/extended/ExtendedTextChannel";
+import ExtendedUser from "../modules/extended/ExtendedUser";
 import * as Eris from "eris";
-import FurryBot from "@src/main";
-import { mdb } from "@modules/Database";
-import ErrorHandler from "@util/ErrorHandler";
-import client from "@root/index";
-import UserConfig from "@src/modules/config/UserConfig";
-import GuildConfig from "@src/modules/config/GuildConfig";
+import FurryBot from "@FurryBot";
+import { mdb } from "../modules/Database";
+import ErrorHandler from "./ErrorHandler";
+import client from "../../";
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 import youtubesearch from "youtube-search";
 import ytdl from "ytdl-core";
 import * as URL from "url";
-
-// moved to separate variable as it is needed in a function here
-const random = ((len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string => {
-	// if (len > 500 && !this[config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
-	let rand = "";
-	for (let i = 0; i < len; i++)
-		rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
-
-	return rand;
-});
+import refreshPatreonToken from "./patreon/refreshPatreonToken";
+import loopPatrons from "./patreon/loopPatrons";
 
 export { ErrorHandler };
 
@@ -160,17 +152,32 @@ export default {
 	subCmds: ((dir: string, file: string): Command[] => {
 		const d = file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0];
 		if (fs.existsSync(`${dir}/${d}`)) {
-			if (fs.existsSync(`${dir}/${d}/index.ts`)) return require(`${dir}/${d}/index.ts`).default;
-			else {
-				console.warn(`Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
-				if (fs.existsSync(`${process.cwd()}/src/default/subcmdindex.ts`)) fs.copyFileSync(`${process.cwd()}/src/default/subcmdindex.ts`, `${dir}/${d}/index.ts`);
-				if (fs.existsSync(`${dir}/${d}/index.ts`)) {
-					console.debug("Auto copying worked, continuing as normal..");
-					return require(`${dir}/${d}/index.ts`).default;
-				} else {
-					console.error(`Auto copying failed, please check that default/subcmdindex.ts exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+			if (__filename.endsWith(".ts")) {
+				if (fs.existsSync(`${dir}/${d}/index.ts`)) return require(`${dir}/${d}/index.ts`).default;
+				else {
+					console.warn(`Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					if (fs.existsSync(`${config.rootDir}/src/default/subcmdindex.ts`)) fs.copyFileSync(`${config.rootDir}/src/default/subcmdindex.ts`, `${dir}/${d}/index.ts`);
+					if (fs.existsSync(`${dir}/${d}/index.ts`)) {
+						console.debug("Auto copying worked, continuing as normal..");
+						return require(`${dir}/${d}/index.ts`).default;
+					} else {
+						console.error(`Auto copying failed, please check that default/subcmdindex.ts exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					}
+					return [];
 				}
-				return [];
+			} else {
+				if (fs.existsSync(`${dir}/${d}/index.js`)) return require(`${dir}/${d}/index.js`).default;
+				else {
+					console.warn(`Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					if (fs.existsSync(`${config.rootDir}/src/default/subcmdindex.js`)) fs.copyFileSync(`${config.rootDir}/src/default/subcmdindex.js`, `${dir}/${d}/index.js`);
+					if (fs.existsSync(`${dir}/${d}/index.js`)) {
+						console.debug("Auto copying worked, continuing as normal..");
+						return require(`${dir}/${d}/index.js`).default;
+					} else {
+						console.error(`Auto copying failed, please check that default/subcmdindex.js exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					}
+					return [];
+				}
 			}
 		}
 		return null;
@@ -234,7 +241,14 @@ export default {
 			}
 		});
 	}),
-	random,
+	random: ((len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string => {
+		// if (len > 500 && !this[config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
+		let rand = "";
+		for (let i = 0; i < len; i++)
+			rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
+
+		return rand;
+	}),
 	formatStr: ((str: string | ExtendedUser | Eris.User | Eris.Member | ExtendedTextChannel | Eris.GuildChannel, ...args: any[]): string => {
 		let res;
 		if (str instanceof ExtendedUser || str instanceof Eris.User || str instanceof Eris.Member) res = `<@!${str.id}>`;
@@ -251,68 +265,35 @@ export default {
 		phin({ url }).then(res => res.pipe(fs.createWriteStream(filename)))
 	),
 	shortenURL: (async (url) => {
-		mdb.listCollections().toArray().then(res => res.map(c => c.name)).then(async (list) => {
-			if (!list.includes("shorturl")) {
-				await mdb.createCollection("shorturl");
-				this.logger.log("[ShortURL]: Created Short URL table");
-			}
-		});
-		const create = (async (url) => {
-			const rand = random(config.shortLength),
-				createdTimestamp = Date.now(),
-				created = new Date().toISOString(),
-				count = await mdb.collection("shorturl").stats().then(res => res.count),
-				a = await mdb.collection("shorturl").insertOne({
-					nsfw: url.indexOf("nsfw") !== -1,
-					id: rand,
-					url,
-					linkNumber: count + 1,
-					createdTimestamp,
-					created,
-					length: url.length,
-					link: `https://furry.services/r/${rand}`
-				});
-			if (!a.result.ok) {
-				return create(url);
-			} else {
-				return {
-					nsfw: url.indexOf("nsfw") !== -1,
-					code: rand,
-					url,
-					link: `https://furry.services/r/${rand}`,
-					new: true,
-					linkNumber: count + 1,
-					createdTimestamp,
-					created,
-					length: url.length
-				};
-			}
+		const req = await phin({
+			url: `https://r.furry.services/get?url=${encodeURIComponent(url)}`,
+			headers: {
+				"User-Agent": config.web.userAgent
+			},
+			parse: "json"
 		});
 
-		const res = await mdb.collection("shorturl").find({
-			url
-		}).toArray();
+		if (req.statusCode === 200) return {
+			new: false,
+			...req.body
+		};
+		else if (req.statusCode === 404) {
+			const cr = await phin({
+				method: "POST",
+				url: `https://r.furry.services/create?url=${encodeURIComponent(url)}`,
+				headers: {
+					"User-Agent": config.web.userAgent
+				},
+				parse: "json"
+			});
 
-		switch (res.length) {
-			case 0: // create
-				return create(url);
-				break; // eslint-disable-line no-unreachable
-
-			case 1: // return
-				return res[0];
-				break; // eslint-disable-line no-unreachable
-
-			default: // delete & recreate
-				this.logger.log("[ShortURL]: Duplicate records found, deleting");
-				mdb.collection("shorturl").find({
-					url
-				}).forEach((short) => {
-					return mdb.collection("shorturl").deleteOne({
-						id: short.id
-					});
-				});
-				return create(url);
+			if (cr.statusCode !== 200) return null;
+			else return {
+				new: true,
+				...cr.body
+			};
 		}
+		else throw new Error(`furry.services api returned non 200/404 response: ${req.statusCode}, body: ${req.body}`);
 	}),
 	memeRequest: (async (path: string, avatars: string[] | string = [], text = ""): Promise<phin.JsonResponse> => {
 		avatars = typeof avatars === "string" ? [avatars] : avatars;
@@ -456,6 +437,7 @@ export default {
 		const member = m;
 		const guild = m.guild;
 
+		const a = [];
 		let amount = 0;
 		const multi = {
 			supportServer: false,
@@ -467,18 +449,19 @@ export default {
 
 		if (guild.id === config.bot.mainGuild) {
 			multi.supportServer = true;
-			amount += config.eco.multipliers.supportServer;
+			a.push(config.eco.multipliers.supportServer);
 		}
 
 		const v = await mdb.collection("votes").find({ userId: member.user.id }).toArray().then(res => res.filter(r => (r.timestamp + config.eco.voteTimeout) > Date.now()));
 		if (v.length !== 0) {
 			if (v[0].isWeekend) { // vote weekend multiplier
-				amount += config.eco.multipliers.voteWeekend + config.eco.multipliers.vote;
+				a.push(config.eco.multipliers.voteWeekend);
+				a.push(config.eco.multipliers.vote);
 				multi.vote = true;
 				multi.voteWeekend = true;
 			}
 			else { // vote weekday multiplier
-				amount += config.eco.multipliers.vote;
+				a.push(config.eco.multipliers.vote);
 				multi.vote = true;
 			}
 		}
@@ -487,7 +470,7 @@ export default {
 			const mainGuild = client.guilds.get(config.bot.mainGuild);
 			if (mainGuild.members.has(member.user.id)) {
 				if (mainGuild.members.get(member.user.id).roles.includes(config.nitroBoosterRole)) {
-					amount += config.eco.multipliers.booster;
+					a.push(config.eco.multipliers.booster);
 					multi.booster = true;
 				}
 			}
@@ -495,10 +478,11 @@ export default {
 
 		const t = await mdb.collection("users").findOne({ id: m.user.id }).then(res => res.tips).catch(err => false);
 		if (t) {
-			amount += config.eco.multipliers.tips;
+			a.push(config.eco.multipliers.tips);
 			multi.tips = true;
 		}
-		amount = parseFloat(amount.toFixed(3));
+		amount = parseFloat(a.filter(n => !isNaN(n)).reduce((a, b) => a + b).toFixed(3));
+
 		do {
 			if (amount.toString().endsWith("0")) amount = parseFloat(amount.toString().slice(0, amount.toString().length - 1));
 		}
@@ -537,5 +521,48 @@ export default {
 			method: "HEAD",
 			url
 		}).then(d => d.statusCode === 200) : false;
-	})
+	}),
+	combineReports: ((...reports: {
+		userTag: string;
+		userId: string;
+		generatedTimestamp: number;
+		type: "cmd" | "response";
+		beta: boolean;
+		entries: {
+			time: number;
+			cmd: string;
+		}[] | {
+			time: number;
+			response: string;
+		}[];
+	}[]): {
+		userTag: string;
+		userId: string;
+		generatedTimestamp: number;
+		type: "cmd" | "response";
+		beta: boolean;
+		entries: {
+			time: number;
+			cmd: string;
+		}[] | {
+			time: number;
+			response: string;
+		}[];
+	} => {
+		if (Array.from(new Set(reports.map(r => r.userId))).length > 1) throw new TypeError("Cannot combine reports of different users.");
+		if (Array.from(new Set(reports.map(r => r.type))).length > 1) throw new TypeError("Cannot combine reports of different types.");
+		if (Array.from(new Set(reports.map(r => r.beta))).length > 1) throw new TypeError("Cannot combine beta, and non-beta reports.");
+
+		const entries: any = Array.from(new Set(reports.map(r => r.entries as any).reduce((a, b) => a.concat(b)).map(r => JSON.stringify(r)))).map(r => JSON.parse(r as string));
+		return {
+			userTag: reports[0].userTag,
+			userId: reports[0].userId,
+			generatedTimestamp: Date.now(),
+			type: reports[0].type,
+			beta: reports[0].beta,
+			entries
+		};
+	}),
+	refreshPatreonToken,
+	loopPatrons
 };

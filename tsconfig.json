@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+        "outDir": "./build",
+        "allowJs": true,
+        "target": "es2017",
+        "baseUrl": "src",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "module": "commonjs",
+        "paths": {
+            "@FurryBot": [
+                "main.ts"
+            ]
+        }
+    },
+    "include": [
+        "**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "build",
+        "test",
+        "tmp",
+        "logs"
+    ]
+}

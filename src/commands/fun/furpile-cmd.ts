@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -14,6 +14,7 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 5e3,
+	donatorCooldown: 2.5e3,
 	description: "Start a furpile on someone, or join in!",
 	usage: "[@user]",
 	nsfw: false,
@@ -31,7 +32,7 @@ export default new Command({
 			msg.channel.furpile.inPile.push(msg.author.id);
 			msg.channel.createMessage(`<@!${msg.author.id}> joined a furpile on <@!${msg.channel.furpile.member.id}>!\n<@!${msg.channel.furpile.member.id}> now has ${msg.channel.furpile.inPile.length} furs on them!\nJoin in using \`${msg.gConfig.prefix}furpile\`.`);
 			msg.channel.furpile.timeout = setTimeout((ch) => {
-	delete ch.furpile;
+				delete ch.furpile;
 			}, 6e4, msg.channel);
 			return;
 		}
@@ -45,7 +46,7 @@ export default new Command({
 			member,
 			inPile: [],
 			timeout: setTimeout((ch) => {
-	delete ch.furpile;
+				delete ch.furpile;
 			}, 6e4, msg.channel)
 		};
 		return msg.channel.furpile.inPile.push(msg.author.id, member.id);

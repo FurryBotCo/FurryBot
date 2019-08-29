@@ -1,0 +1,42 @@
+{
+    "prefix": "f!",
+    "nsfwEnabled": false,
+    "blacklist": {
+        "blacklisted": false,
+        "reason": null,
+        "blame": null
+    },
+    "lang": "en",
+    "commandImages": false,
+    "deleteCommands": false,
+    "muteRole": null,
+    "premium": false,
+    "selfAssignableRoles": [],
+    "fResponseEnabled": false,
+    "music": {
+        "volume": 100,
+        "textChannel": null,
+        "queue": []
+    },
+    "commandConfig": {
+        "disabled": [
+
+        ],
+        "enabled": [
+
+        ]
+    },
+    "pawboard": {
+        "emoji": "🐾",
+        "channel": null
+    },
+    "registration": {
+        "enabled": false,
+        "logsChannel": null,
+        "questions": [],
+        "roleDuring": null,
+        "roleAfter": null,
+        "useDirectMessages": true,
+        "autoUnderTOSAction": "none"
+    }
+}

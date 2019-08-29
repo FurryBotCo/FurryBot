@@ -1,12 +1,12 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
 import { performance } from "perf_hooks";
-import config from "@config";
+import config from "../../config";
 import { execSync } from "child_process";
 
 export default new Command({
@@ -78,7 +78,7 @@ export default new Command({
 					api_paste_code: res,
 					api_paste_private: "2",
 					api_paste_name: "Furry Bot Shell Eval",
-					api_paste_expire_date: "1W"
+					api_paste_expire_date: "1D"
 				}
 			});
 			res = `Uploaded ${req.body.toString()}`;
@@ -95,12 +95,12 @@ export default new Command({
 			fields: [
 				{
 					name: ":inbox_tray: Input",
-					value: `\`\`\`javascript\n${ev}\`\`\``,
+					value: `\`\`\`bash\n${ev}\`\`\``,
 					inline: false
 				},
 				{
 					name: ":outbox_tray: Output",
-					value: `\`\`\`javascript\n${res}\`\`\``,
+					value: `\`\`\`bash\n${res}\`\`\``,
 					inline: false
 				}
 			]
@@ -125,6 +125,6 @@ export default new Command({
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		return this.logger.log(`Silent eval return: ${res}`);
+		return this.logger.log(`Silent shell eval return: ${res}`, msg.guild.shard.id);
 	}
 }));

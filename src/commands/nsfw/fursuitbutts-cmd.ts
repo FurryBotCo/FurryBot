@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -16,6 +16,7 @@ export default new Command({
 		"attachFiles"
 	],
 	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	description: "See some fursuit booties!",
 	usage: "",
 	nsfw: true,
@@ -33,12 +34,12 @@ export default new Command({
 	});
 
 	if (img.statusCode !== 200) {
-		this.logger.error(img);
+		this.logger.error(img, msg.guild.shard.id);
 		return msg.channel.createMessage(`<@!${msg.author.id}>, Unknown api error.`);
 	}
 	short = await functions.shortenURL(img.body.response.image);
 	extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
-	return msg.channel.createMessage(`${extra}Short URL: <${short.link}${config.beta ? "?beta" : ""}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
+	return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
 		file: await functions.getImageFromURL(img.body.response.image),
 		name: img.body.response.name
 	});

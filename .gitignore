@@ -40,7 +40,7 @@ typings/
 .next
 
 # Config files
-*config*
+src/config
 db.*
 *.protected
 *.hidden
@@ -53,21 +53,17 @@ test/
 *secret*
 
 # vsc
-.vscode/
-
-# counts
-counts/
-
-# jsdocs
-out/
+.vscode
 
 *package-lock*
 
 # ignore .files/folders
 .*
 
-# Dont ignore .gitignore
+# Dont ignore some stuff
 !/.gitignore
+!/.eslintignore
+!/.eslintrc.json
 !/.codacy.yaml
 
 # lavalink 
@@ -80,3 +76,7 @@ tmp/*
 test.js
 run.sh
 src/util/AnalyticsWebsocketV2.ts
+
+# tsc output
+build/
+src/modules/Database-new.ts

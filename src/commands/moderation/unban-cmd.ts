@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -40,8 +40,8 @@ export default new Command({
 	if (msg.channel.permissionsOf(this.user.id).has("viewAuditLogs")) {
 		if (!(await msg.channel.guild.getBans().then(res => res.map(u => u.user.id))).includes(user.id)) {
 			embed = {
-	title: "User not banned",
-	description: `It doesn't look like ${user.username}#${user.discriminator} is banned here..`
+				title: "User not banned",
+				description: `It doesn't look like ${user.username}#${user.discriminator} is banned here..`
 			};
 			Object.assign(embed, msg.embed_defaults());
 			return msg.channel.createMessage({ embed });

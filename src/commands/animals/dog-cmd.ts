@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -18,6 +18,7 @@ export default new Command({
 		"attachFiles"
 	],
 	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	description: "Get a picture of a doggo!",
 	usage: "",
 	nsfw: false,
@@ -34,7 +35,7 @@ export default new Command({
 			method: "GET",
 			url: "https://dog.ceo/api/breeds/image/random",
 			headers: {
-	"User-Agent": config.web.userAgent
+				"User-Agent": config.web.userAgent
 			}
 		});
 		j = JSON.parse(req.body);
@@ -45,8 +46,8 @@ export default new Command({
 			name: `${parts[2]}_${parts[3]}.png`
 		});
 	} catch (e) {
-		this.logger.error(e);
-		this.logger.error(j);
+		this.logger.error(e, msg.guild.shard.id);
+		this.logger.error(j, msg.guild.shard.id);
 		return msg.channel.createMessage("unknown api error", {
 			file: await functions.getImageFromURL(config.images.serverError),
 			name: "error.png"

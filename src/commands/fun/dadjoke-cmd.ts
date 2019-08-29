@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -15,6 +15,7 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 4e3,
+	donatorCooldown: 2e3,
 	description: "Get a dadjoke!",
 	usage: "",
 	nsfw: false,
@@ -39,9 +40,9 @@ export default new Command({
 		j = JSON.parse(req.body);
 	} catch (e) {
 		await msg.channel.createMessage("Cloudflare is being dumb and rejecting our requests, please try again later.");
-		this.logger.error(req.body);
+		this.logger.error(req.body, msg.guild.shard.id);
 		await msg.channel.createMessage(`This command has been permanently disabled until Cloudflare stops giving us captchas, join our support server for updates on the status of this: <https://furry.bot/inv>.`);
-		return this.logger.error(e);
+		return this.logger.error(e, msg.guild.shard.id);
 	}
 
 	return msg.channel.createMessage(j.joke);

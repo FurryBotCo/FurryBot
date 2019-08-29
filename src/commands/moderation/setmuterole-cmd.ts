@@ -1,12 +1,12 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
-import Permissions from "@src/util/Permissions";
+import config from "../../config";
+import Permissions from "../../util/Permissions";
 
 export default new Command({
 	triggers: [
@@ -35,7 +35,7 @@ export default new Command({
 	if (msg.args[0] === "reset") {
 		msg.channel.guild.channels.forEach(async (ch) => {
 			if (![null, undefined, ""].includes(msg.gConfig.muteRole) && ch.permissionOverwrites.has(msg.gConfig.muteRole)) {
-	await ch.deletePermission(msg.gConfig.muteRole).catch(err => null);
+				await ch.deletePermission(msg.gConfig.muteRole).catch(err => null);
 			}
 		});
 
@@ -60,7 +60,7 @@ export default new Command({
 	g = await msg.gConfig.edit({ muteRole: role.id }).then(d => d.reload());
 	if (!g) {
 		msg.channel.createMessage("There was an internal error while doing this, please try again");
-		return this.logger.log(g);
+		return this.logger.log(g, msg.guild.shard.id);
 	}
 	await msg.channel.createMessage(`Set the new muted role to **${role.name}**`);
 

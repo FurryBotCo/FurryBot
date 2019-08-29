@@ -1,12 +1,12 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
-import * as fs from "fs";
+import config from "../../config";
+import * as fs from "fs-extra";
 import { Canvas } from "canvas-constructor";
 
 export default new Command({
@@ -19,6 +19,7 @@ export default new Command({
 		"embedLinks"
 	],
 	cooldown: 5e3,
+	donatorCooldown: 2.5e3,
 	description: "Ship some people!",
 	usage: "<@user1> [@user2]",
 	nsfw: false,
@@ -91,14 +92,14 @@ export default new Command({
 		await msg.channel.createMessage({
 			embed
 		}, {
-				file,
-				name: "ship.png"
-			});
+			file,
+			name: "ship.png"
+		});
 	} catch (e) {
 		this.logger.error({
 			shipname,
 			amount
-		});
+		}, msg.guild.shard.id);
 		throw e;
 	}
 }));

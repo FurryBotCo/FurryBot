@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -16,6 +16,7 @@ export default new Command({
 		"attachFiles"
 	],
 	cooldown: 2e3,
+	donatorCooldown: 1e3,
 	description: "Get a random fur image! use **fur list** to get a list of all supported types!",
 	usage: "[type]",
 	nsfw: false,
@@ -50,13 +51,13 @@ export default new Command({
 		req = await functions.imageAPIRequest(false, type, true, true);
 		short = await functions.shortenURL(req.response.image);
 		extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
-		return msg.channel.createMessage(`${extra}Short URL: <${short.link}${config.beta ? "?beta" : ""}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${this.ucwords(type)}`, {
+		return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${this.ucwords(type)}`, {
 			file: await functions.getImageFromURL(req.response.image),
 			name: req.response.name
 		});
 	} catch (error) {
-		this.logger.error(`Error:\n${error}`);
-		this.logger.log(`Body: ${req}`);
+		this.logger.error(`Error:\n${error}`, msg.guild.shard.id);
+		this.logger.log(`Body: ${req}`, msg.guild.shard.id);
 		return msg.channel.createMessage("Unknown API Error", {
 			file: await functions.getImageFromURL("https://fb.furcdn.net/NotFound.png"),
 			name: "NotFound.png"

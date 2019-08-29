@@ -1,13 +1,12 @@
-import ClientEvent from "@modules/ClientEvent";
+import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "@config";
-import { O_NOCTTY } from "constants";
-import functions from "@util/functions";
+import config from "../../../config";
+import functions from "../../../util/functions";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 
-	await functions.incrementDailyCounter(false, this.guilds.size);
+	await this.f.incrementDailyCounter(false, this.guilds.size);
 
 	let author = {
 		name: "Unknown#0000",
@@ -25,7 +24,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		}
 	}
 
-	this.logger.info(`Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members.`);
+	this.logger.info(`Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members.`, guild.shard.id);
 
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Left!",
@@ -66,7 +65,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 			}
 		],
 		timestamp: new Date().toISOString(),
-		color: functions.randomColor(),
+		color: this.f.randomColor(),
 		footer: {
 			text: `Shard ${guild.shard.id + 1}/${this.shards.size}`,
 			icon_url: "https://reddit.furry.host/FurryBotForDiscord.png"

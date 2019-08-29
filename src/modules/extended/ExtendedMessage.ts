@@ -1,15 +1,15 @@
 import * as Eris from "eris";
-import UserConfig from "@modules/config/UserConfig";
-import GuildConfig from "@modules/config/GuildConfig";
-import { mdb } from "@modules/Database";
-import config from "@config";
-import functions from "@util/functions";
+import UserConfig from "../config/UserConfig";
+import GuildConfig from "../config/GuildConfig";
+import { mdb } from "../Database";
+import config from "../../config";
+import functions from "../../util/functions";
 import FurryBot from "@FurryBot";
-import Command from "@modules/cmd/Command";
-import Category from "@modules/cmd/Category";
-import AutoResponse from "@modules/cmd/AutoResponse";
-import ExtendedTextChannel from "@modules/extended/ExtendedTextChannel";
-import ExtendedUser from "@modules/extended/ExtendedUser";
+import Command from "../cmd/Command";
+import Category from "../cmd/Category";
+import AutoResponse from "../cmd/AutoResponse";
+import ExtendedTextChannel from "../extended/ExtendedTextChannel";
+import ExtendedUser from "../extended/ExtendedUser";
 
 class ExtendedMessage extends Eris.Message {
 	id: string;
@@ -59,6 +59,7 @@ class ExtendedMessage extends Eris.Message {
 			author?: Eris.User;
 			channel_id?: string;
 			channelMentions?: string[];
+			roleMentions?: string[];
 			cleanContent?: string;
 			content?: string;
 			editedTimestamp?: number;
@@ -72,7 +73,6 @@ class ExtendedMessage extends Eris.Message {
 				count: number;
 				me: boolean;
 			};
-			roleMentions?: string[];
 			timestamp?: number;
 			tts?: boolean;
 			type?: number;
@@ -84,6 +84,7 @@ class ExtendedMessage extends Eris.Message {
 		if (![undefined].includes(msg.author)) data.author = msg.author;
 		if (![undefined].includes(msg.channel)) data.channel_id = msg.channel.id;
 		if (![undefined].includes(msg.channelMentions) && msg.channelMentions instanceof Array) data.channelMentions = msg.channelMentions;
+		if (![undefined].includes(msg.roleMentions) && msg.roleMentions instanceof Array) data.roleMentions = msg.roleMentions;
 		if (![undefined].includes(msg.cleanContent)) data.cleanContent = msg.cleanContent;
 		if (![undefined].includes(msg.content)) data.content = msg.content;
 		if (![undefined].includes(msg.editedTimestamp)) data.editedTimestamp = msg.editedTimestamp;
@@ -159,7 +160,7 @@ class ExtendedMessage extends Eris.Message {
 					isDeveloper: config.developers.includes(this.author.id)
 				};
 			} catch (e) {
-				this._client.logger.log(`Error setting up message ${this.id}: ${e}`);
+				this._client.logger.log(`Error setting up message ${this.id}: ${e}`, this.guild.shard.id);
 			}
 		}
 	}
@@ -221,10 +222,10 @@ class ExtendedMessage extends Eris.Message {
 		channels: Eris.AnyGuildChannel[]
 	} {
 		return {
-			users: !this.mentions ? [] : this.mentions,
-			members: !this.mentions ? [] : this.mentions.map(j => this.channel.guild.members.get(j.id)),
-			roles: !this.roleMentions ? [] : this.roleMentions.map(j => this.channel.guild.roles.get(j)),
-			channels: !this.channelMentions ? [] : this.channelMentions.map(j => this.channel.guild.channels.get(j))
+			users: !this.mentions ? [] : [...this.mentions].reverse(),
+			members: !this.mentions ? [] : [...this.mentions].map(c => this.channel.guild.members.get(c.id)).reverse(),
+			roles: !this.roleMentions ? [] : [...this.roleMentions].map(r => this.channel.guild.roles.get(r)),
+			channels: !this.channelMentions ? [] : [...this.channelMentions].map(c => this.channel.guild.channels.get(c))
 		};
 	}
 
@@ -256,7 +257,7 @@ class ExtendedMessage extends Eris.Message {
 		if (!this.guild || !(this.guild instanceof Guild)) throw new TypeError("invalid or missing guild on this");
 
 		// member mention
-		if (this.mentionMap.users.length >= mentionPosition + 1) return this.mentionMap.users.slice(mentionPosition)[mentionPosition];
+		if (this.mentionMap.users.length >= mentionPosition + 1) return this.mentionMap.users[mentionPosition];
 		// user ID
 		if (![undefined, null, ""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
 			if (this.guild.members.has(args[argPosition])) return this.guild.members.get(args[argPosition]).user;
@@ -297,13 +298,13 @@ class ExtendedMessage extends Eris.Message {
 		}
 		if (!this.guild || !(this.guild instanceof Guild)) throw new TypeError("invalid or missing guild on this");
 
-		// channel mention
-		if (this.mentionMap.members.length >= mentionPosition + 1) return this.mentionMap.members.slice(mentionPosition)[mentionPosition];
+		// member mention
+		if (this.mentionMap.members.length >= mentionPosition + 1) return this.mentionMap.members[mentionPosition];
 
-		// channel ID
+		// member ID
 		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.guild.members.get(args[argPosition]);
 
-		// channel name
+		// username
 		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.guild.members.find(c => c.user.username.toLowerCase() === args[argPosition].toLowerCase());
 
 		// nothing found
@@ -359,11 +360,12 @@ class ExtendedMessage extends Eris.Message {
 		} else {
 			args = this[argObject];
 		}
-		// server id
+
+		// role id
 		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.guild.roles.get(args[argPosition]);
 
-		// server name
-		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.guild.roles.find(g => g.name.toLowerCase() === args[argPosition].toLowerCase());
+		// role name
+		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.guild.roles.find(r => r.name.toLowerCase() === args[argPosition].toLowerCase());
 
 		// nothing found
 		return null;

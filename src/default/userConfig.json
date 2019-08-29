@@ -1,0 +1,24 @@
+{
+    "blacklist": {
+        "blacklisted": false,
+        "reason": null,
+        "blame": null
+    },
+    "marriage": {
+        "married": false,
+        "partner": null
+    },
+    "warnings": [
+
+    ],
+    "bal": 100,
+    "tips": true,
+    "dmActive": false,
+    "patreon": {
+        "amount": 0,
+        "createdAt": null,
+        "declinedAt": null,
+        "donator": false,
+        "patronId": null
+    }
+}

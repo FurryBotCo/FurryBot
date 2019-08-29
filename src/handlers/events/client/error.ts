@@ -1,9 +1,10 @@
-import ClientEvent from "@modules/ClientEvent";
+import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "@config";
+import config from "../../../config";
 
 export default new ClientEvent("error", (async function (this: FurryBot, info: string, id: number) {
-	if (this.logger !== undefined) return this.logger.error(info);
-	else return console.error(info);
+	if (!id) id = 0;
+	if (this.logger !== undefined) return this.logger.error(info, id);
+	else return console.error(info, id);
 }));

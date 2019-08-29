@@ -1,13 +1,13 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
-import { mdb } from "@modules/Database";
-import UserConfig from "@src/modules/config/UserConfig";
+import config from "../../config";
+import { mdb } from "../../modules/Database";
+import UserConfig from "../../modules/config/UserConfig";
 
 export default new Command({
 	triggers: [
@@ -16,6 +16,7 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [],
 	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	description: "Check out the richest people on this bot!",
 	usage: "",
 	nsfw: false,
@@ -28,7 +29,9 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
-	const count = await mdb.collection("users").countDocuments();
+	return msg.reply("this command has not been released yet!");
+
+	/*const count = await mdb.collection("users").countDocuments();
 	const m = await msg.channel.createMessage(`Please be patient, this may take a bit, counting **${count}** users..`);
 
 	const users: UserConfig[] = await mdb.collection("users").find({}).toArray();
@@ -60,5 +63,5 @@ export default new Command({
 		color: functions.randomColor()
 	};
 
-	return m.edit({ content: "", embed });
+	return m.edit({ content: "", embed });*/
 }));

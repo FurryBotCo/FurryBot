@@ -1,11 +1,12 @@
 import express from "express";
-import config from "@config";
-import client from "@root/index";
-import { mdb } from "@modules/Database";
+import config from "../../config";
+import client from "../../../";
+import { mdb } from "../../modules/Database";
 import uuid from "uuid/v4";
-import functions from "@util/functions";
-import uConfig from "@src/default/userConfig.json";
+import functions from "../../util/functions";
+import uConfig from "../../default/userConfig.json";
 import * as eris from "eris";
+import apiFunctions from "../functions";
 
 const app: express.Router = express.Router();
 

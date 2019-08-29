@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -16,6 +16,7 @@ export default new Command({
 		"attachFiles"
 	],
 	cooldown: 5e3,
+	donatorCooldown: 2.5e3,
 	description: "Nothing will pop this",
 	usage: "<text>",
 	nsfw: false,
@@ -37,7 +38,7 @@ export default new Command({
 			j = { status: req.statusCode, message: req.body };
 		}
 		msg.reply(`API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
-		return this.logger.log(`text: ${text}`);
+		return this.logger.log(`text: ${text}`, msg.guild.shard.id);
 	}
 	return msg.channel.createMessage("", {
 		file: req.body,

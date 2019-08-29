@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../../modules/extended/ExtendedMessage";
+import Command from "../../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../../config";
 
 export default new Command({
 	triggers: [
@@ -48,6 +48,7 @@ export default new Command({
 		default:
 			return msg.channel.createMessage(`<@!${msg.author.id}>, invalid type. Possible types: **playing**, **listening**, **watching**, **streaming**.`);
 	}
+	msg.args.shift();
 	let status = this.shards.get(0).presence.status;
 	// this.shards.get(0).presence.status
 	// this.guilds.filter(g => g.members.has(this.user.id))[0].members.get(this.user.id).status

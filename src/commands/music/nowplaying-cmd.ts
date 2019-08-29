@@ -1,12 +1,12 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
-import { mdb } from "@modules/Database";
+import config from "../../config";
+import { mdb } from "../../modules/Database";
 import ytdl from "ytdl-core";
 
 export default new Command({
@@ -16,7 +16,8 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [],
-	cooldown: 3e3,
+	cooldown: 3e4,
+	donatorCooldown: 1.5e4,
 	description: "Check what song is currently playing.",
 	usage: "",
 	nsfw: false,

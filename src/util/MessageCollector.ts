@@ -1,5 +1,5 @@
-import FurryBot from "@src/main";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
+import FurryBot from "../main";
+import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import { Message } from "eris";
 
 class MessageCollector {
@@ -22,7 +22,7 @@ class MessageCollector {
 		}
 	}
 
-	awaitMessage(channelId: string, userId: string, timeout: number, filter: Function = () => true): Promise<Message> { // tslint:disable-line ban-types
+	awaitMessage(channelId: string, userId: string, timeout: number, filter: Function = (msg: Message) => true): Promise<Message> { // tslint:disable-line ban-types
 		return new Promise(resolve => {
 			if (this.collectors[`${channelId}-${userId}`]) {
 				delete this.collectors[`${channelId}-${userId}`];

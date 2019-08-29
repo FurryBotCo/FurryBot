@@ -1,11 +1,11 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -30,7 +30,7 @@ export default new Command({
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
 	if (msg.args.length === 0) return new Error("ERR_INVALID_USAGE");
-	let user, embed, reason, m;
+	let user: Eris.Member, embed, reason, m;
 	// get member from message
 	user = await msg.getMemberFromArgs();
 
@@ -54,7 +54,7 @@ export default new Command({
 	// if(!user.bannable) return msg.channel.createMessage(`<@!${msg.author.id}>, I cannot ban ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have ban permissions?`);
 	reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
 	if (!user.user.bot) m = await user.user.getDMChannel().then(dm => dm.createMessage(`You were banned from **${msg.channel.guild.name}**\nReason: ${reason}`));
-	user.ban(1, user.id, `Ban: ${msg.author.username}#${user.discriminator} -> ${reason}`).then(() => {
+	user.ban(1, `Ban: ${msg.author.username}#${user.discriminator} -> ${reason}`).then(() => {
 		msg.channel.createMessage(`***User ${user.username}#${user.discriminator} was banned, ${reason}***`).catch(noerr => null);
 	}).catch(async (err) => {
 		msg.channel.createMessage(`I couldn't ban **${user.username}#${user.discriminator}**, ${err}`);

@@ -1,12 +1,12 @@
 import FurryBot from "@FurryBot";
-import ExtendedMessage from "@src/modules/extended/ExtendedMessage";
-import Command from "@modules/cmd/Command";
+import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import Command from "../../modules/cmd/Command";
 import * as Eris from "eris";
-import functions from "@util/functions";
+import functions from "../../util/functions";
 import * as util from "util";
 import phin from "phin";
-import config from "@config";
-import { mdb } from "@modules/Database";
+import config from "../../config";
+import { mdb } from "../../modules/Database";
 import ytdl from "ytdl-core";
 import { YouTubeSearchResults } from "youtube-search";
 
@@ -16,7 +16,8 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [],
-	cooldown: 3e3,
+	cooldown: 3e4,
+	donatorCooldown: 1.5e4,
 	description: "Play some music in your Discord",
 	usage: "<song search/yt link>",
 	nsfw: false,
@@ -31,10 +32,8 @@ export default new Command({
 
 	if (!msg.member.voiceState.channelID) return msg.reply("you must be in a voice channel to use this.");
 
-	if (msg.gConfig.music.queue.length >= 6 && !msg.gConfig.premium) return msg.reply("Hey, you can only have **5** songs in your queue right now, we may have a premium option to allow for more soon.");
-	let vc: Eris.VoiceChannel;
-	const t = msg.channel.guild.channels.get(msg.member.voiceState.channelID);
-	if (t instanceof Eris.VoiceChannel) vc = t;
+	if (msg.gConfig.music.queue.length >= 6 && !(msg.uConfig.patreon.amount >= 3)) return msg.reply("Hey, you can only have **5** songs in your queue right now, we may have a premium option to allow for more soon.");
+	const vc = msg.channel.guild.channels.get(msg.member.voiceState.channelID) as Eris.VoiceChannel;
 
 	if (!vc.permissionsOf(this.user.id).has("voiceConnect")) return msg.reply("I cannot connect to the voice channel you are in.");
 	if (!vc.permissionsOf(this.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are in.");
@@ -42,6 +41,8 @@ export default new Command({
 	const q = msg.args.join(" ");
 	const search: YouTubeSearchResults[] = await functions.ytsearch(q).catch(err => null);
 	if (!search) return msg.reply("there was an internal error while fetching search results.");
+
+	if (search.length < 1) return msg.reply("No results were found");
 
 	let song: YouTubeSearchResults;
 
@@ -60,7 +61,7 @@ export default new Command({
 
 		if (d.content.toLowerCase() === "cancel") return msg.reply("canceled.");
 
-		const j = parseInt(d.content);
+		const j = parseInt(d.content, 10);
 
 		if (isNaN(j)) return msg.reply("that choice was not valid!");
 

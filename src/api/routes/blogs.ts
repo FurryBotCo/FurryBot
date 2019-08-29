@@ -1,9 +1,10 @@
 import express from "express";
-import { mdb, mongo } from "@modules/Database";
-import client from "@root/index";
-import functions from "@util/functions";
-import config from "@src/config/config";
+import { mdb, mongo } from "../../modules/Database";
+import client from "../../../";
+import functions from "../../util/functions";
+import config from "../../config";
 import util from "util";
+import apiFunctions from "../functions";
 
 const app: express.Router = express.Router();
 

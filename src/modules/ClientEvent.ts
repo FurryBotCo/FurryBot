@@ -1,6 +1,6 @@
 import * as Eris from "eris";
 import FurryBot from "@FurryBot";
-import PartialMessage from "@modules/PartialMessage";
+import PartialMessage from "./PartialMessage";
 
 class ClientEvent {
 	event: string;
@@ -91,7 +91,7 @@ class ClientEvent {
 	);
 	constructor(
 		event: "messageReactionAdd" | "messageReactionRemove",
-		listener: (this: FurryBot, message: Eris.PossiblyUncachedMessage[], emoji: Eris.Emoji, userID: string) => void
+		listener: (this: FurryBot, message: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, userID: string) => void
 	);
 	constructor(
 		event: "messageUpdate",

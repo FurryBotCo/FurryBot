@@ -1,7 +1,8 @@
 import express from "express";
-import config from "@config";
-import client from "@root/index";
-import functions from "@src/api/functions";
+import config from "../../config";
+import client from "../../../";
+import functions from "../../util/functions";
+import apiFunctions from "../functions";
 
 const app: express.Router = express.Router();
 
@@ -17,7 +18,7 @@ app.get("/", async (req, res) => {
 		success: true,
 		guildCount: client.guilds.size
 	};
-	if (functions.checkAuth(req, res, false)) {
+	if (apiFunctions.checkAuth(req, res, false)) {
 		jsn.guilds = client.guilds.map(g => ({
 			name: g.name,
 			memberCount: g.memberCount
@@ -25,7 +26,7 @@ app.get("/", async (req, res) => {
 	}
 	res.status(200).json(jsn);
 })
-	.get("/:id/shard", functions.checkAuth, async (req, res) => {
+	.get("/:id/shard", apiFunctions.checkAuth, async (req, res) => {
 		if (!client.guilds.has(req.params.id)) return res.status(404).json({
 			success: false,
 			error: "invalid guild id"
