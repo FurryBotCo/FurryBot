@@ -57,6 +57,11 @@ export default new Command({
 		timestamp: new Date().toISOString()
 	};
 
+
+	let ratelimit = false;
+
+	const rl = setInterval(() => ratelimit = false, 3e3);
+
 	if (["jpg", "png", "gif"].includes(e[currentPost - 1].file_ext)) embed.image = {
 		width: e[currentPost - 1].width,
 		height: e[currentPost - 1].height,
@@ -85,6 +90,8 @@ export default new Command({
 
 	let t = setTimeout(setPost.bind(this), 6e4, "EXIT");
 	async function setPost(this: FurryBot, p: string | number) {
+		if (ratelimit) return msg.reply("You are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete(), 5e3));
+		ratelimit = true;
 		clearTimeout(t);
 		t = setTimeout(setPost.bind(this), 6e4, "EXIT");
 
@@ -102,6 +109,7 @@ export default new Command({
 					if (q.entries.length === 0 || ++count >= 20) {
 						q.destroy();
 						clearInterval(cI);
+						clearInterval(rl);
 					}
 				});
 			}
