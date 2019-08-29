@@ -30,6 +30,9 @@ export default new Command({
 	hasSubCommands: functions.hasSubCmds(__dirname, __filename),
 	subCommands: functions.subCmds(__dirname, __filename)
 }, (async function (this: FurryBot, msg: ExtendedMessage): Promise<any> {
+
+	if (this.activeReactChannels.includes(msg.channel.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
+
 	const colors = {
 		green: 3066993,
 		gold: 15844367,
@@ -105,11 +108,13 @@ export default new Command({
 			this.removeListener("messageReactionAdd", f);
 			if (q.entries.length > 0) {
 				let count = 0;
-				const cI = setInterval(() => {
+				const cI = setInterval(async () => {
 					if (q.entries.length === 0 || ++count >= 20) {
 						q.destroy();
+						await m.removeReactions();
 						clearInterval(cI);
 						clearInterval(rl);
+						this.activeReactChannels.splice(this.activeReactChannels.indexOf(msg.channel.id), 1);
 					}
 				});
 			}
@@ -184,5 +189,5 @@ export default new Command({
 	});
 
 	this.on("messageReactionAdd", f);
-
+	this.activeReactChannels.push(msg.channel.id);
 }));

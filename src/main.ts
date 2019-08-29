@@ -47,6 +47,7 @@ class FurryBot extends Eris.Client {
 	e9: E9API;
 	fb: FurryBotAPI;
 	f: typeof import("./util/functions").default & { ErrorHandler: typeof import("./util/functions").ErrorHandler };
+	activeReactChannels: string[];
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
 		this.logger = new Logger();
@@ -95,6 +96,8 @@ class FurryBot extends Eris.Client {
 		this.fb = new FurryBotAPI(config.web.userAgent);
 
 		this.f = { ...functions, ErrorHandler };
+
+		this.activeReactChannels = [];
 	}
 
 	getCommand(cmd: string | string[]): {
