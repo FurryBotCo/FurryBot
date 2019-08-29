@@ -111,7 +111,7 @@ export default new Command({
 				const cI = setInterval(async () => {
 					if (q.entries.length === 0 || ++count >= 20) {
 						q.destroy();
-						await m.removeReactions();
+						await m.removeReactions().catch(err => null);
 						clearInterval(cI);
 						clearInterval(rl);
 						this.activeReactChannels.splice(this.activeReactChannels.indexOf(msg.channel.id), 1);
