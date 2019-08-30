@@ -546,8 +546,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			if (msg.gConfig.deleteCommands) msg.delete().catch(err => msg.reply(`Failed to delete command invocation, you can disable this by running \`${msg.gConfig.prefix}delcmds\``));
 			this.logger.command(`Command  "${cmd.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
 
-			if (msg.uConfig.tips && cmd.category.name === "economy") {
-				const chance = Math.floor((Math.random() * 4) + 1);
+			if (msg.uConfig.tips) {
+				const chance = Math.floor((Math.random() * 5) + 1);
 				if (chance === 1) {
 					const tip = config.eco.tips[Math.floor(Math.random() * config.eco.tips.length)];
 					await msg.channel.createMessage(`${tip}\n\nYou can turn these off by using \`${msg.gConfig.prefix}toggletips\``);
@@ -611,6 +611,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			default:
 				// internal error handling
 				const er = this.f.ErrorHandler(err);
+				console.log(er);
 				if (!(er instanceof Error)) return msg.reply(er).catch(err =>
 					msg.author.getDMChannel().then(ch =>
 						ch.createMessage(`I couldn't send messages in the channel where that command was sent, so I've sent this here.\n${er}`)
@@ -672,7 +673,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 							api_paste_code: err.stack,
 							api_paste_private: "2",
 							api_paste_name: "Furry Bot Stack Trace",
-							api_paste_expire_date: "1W"
+							api_paste_expire_date: "1D"
 						}
 					});
 
@@ -690,32 +691,22 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						},
 						fields: [{
 							name: "Server",
-							value: `Server: ${msg.channel.guild.name} (${msg.channel.guild.id})\n\
-	Server Creation Date: ${new Date(msg.channel.guild.createdAt).toString().split("GMT")[0]}\n\
-	Owner: ${owner.username}#${owner.discriminator} (${owner.id})`,
+							value: `Server: ${msg.channel.guild.name} (${msg.channel.guild.id})\nServer Creation Date: ${new Date(msg.channel.guild.createdAt).toString().split("GMT")[0]}\nOwner: ${owner.username}#${owner.discriminator} (${owner.id})`,
 							inline: false
 						},
 						{
 							name: "Message",
-							value: `Message Content: ${msg.content}\n\
-	Message ID: ${msg.id}\n\
-	Channel: ${msg.channel.name} (${msg.channel.id}, <#${msg.channel.id}>)\n\
-	Author: ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
+							value: `Message Content: ${msg.content}\nMessage ID: ${msg.id}\nChannel: ${msg.channel.name} (${msg.channel.id}, <#${msg.channel.id}>)\nAuthor: ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
 							inline: false
 						},
 						{
 							name: "Command",
-							value: `Command: ${msg.cmd.command.map(c => c.triggers[0]).join(" ")}\n\
-	Arguments: ${msg.args.join(" ")}\n\
-	Unparsed Args: ${msg.unparsedArgs.join(" ")}\n\
-	Ran: ${msg.content}`,
+							value: `Command: ${msg.cmd.command.map(c => c.triggers[0]).join(" ")}\nArguments: ${msg.args.join(" ")}\nUnparsed Args: ${msg.unparsedArgs.join(" ")}\nRan: ${msg.content}`,
 							inline: false
 						},
 						{
 							name: "Error",
-							value: `Name: ${err.name}\n\
-	Stack: ${stack}\n\
-	Message: ${err.message}`,
+							value: `Name: ${err.name}\nStack: ${stack}\nMessage: ${err.message}`,
 							inline: false
 						}
 						]
@@ -735,25 +726,17 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						},
 						fields: [{
 							name: "Message",
-							value: `Message Content: ${msg.content}\n\
-	Message ID: ${msg.id}\n\
-	Channel: ${msg.channel.name} (${msg.channel.id}, <#${msg.channel.id}>)\n\
-	Author: ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
+							value: `Message Content: ${msg.content}\nMessage ID: ${msg.id}\nChannel: ${msg.channel.name} (${msg.channel.id}, <#${msg.channel.id}>)\nAuthor: ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
 							inline: false
 						},
 						{
 							name: "Command",
-							value: `Command: ${msg.cmd.command.map(c => c.triggers[0]).join(" ")}\n\
-	Arguments: ${msg.args.join(" ")}\n\
-	Unparsed Args: ${msg.unparsedArgs.join(" ")}\n\
-	Ran: ${msg.content}`,
+							value: `Command: ${msg.cmd.command.map(c => c.triggers[0]).join(" ")}\nArguments: ${msg.args.join(" ")}\nUnparsed Args: ${msg.unparsedArgs.join(" ")}\nRan: ${msg.content}`,
 							inline: false
 						},
 						{
 							name: "Error",
-							value: `Name: ${err.name}\n\
-	Stack: ${stack}\n\
-	Message: ${err.message}`,
+							value: `Name: ${err.name}\nStack: ${stack}\nMessage: ${err.message}`,
 							inline: false
 						}
 						]
