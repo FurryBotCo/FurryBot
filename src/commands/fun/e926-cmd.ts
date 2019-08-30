@@ -93,7 +93,7 @@ export default new Command({
 
 	let t = setTimeout(setPost.bind(this), 6e4, "EXIT");
 	async function setPost(this: FurryBot, p: string | number) {
-		if (ratelimit) return msg.reply("You are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete(), 5e3));
+		if (ratelimit) return msg.reply("You are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(err => null), 5e3)).catch(err => null);
 		ratelimit = true;
 		clearTimeout(t);
 		t = setTimeout(setPost.bind(this), 6e4, "EXIT");
