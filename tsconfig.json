@@ -12,17 +12,22 @@
         "paths": {
             "@FurryBot": [
                 "main.ts"
+            ],
+            "@ExtendedMessage": [
+                "modules/extended/ExtendedMessage.ts"
             ]
         }
     },
     "include": [
-        "**/*"
+        "**/*",
+        "src/commands/*"
     ],
     "exclude": [
         "node_modules",
         "build",
         "test",
         "tmp",
-        "logs"
+        "logs",
+        "src/commands-old"
     ]
 }

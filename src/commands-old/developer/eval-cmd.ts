@@ -82,7 +82,12 @@ export default new Command({
 		else res = res.toString();
 	}
 
+
+	if (res.indexOf(config.bot.token)) res = res.replace(new RegExp(config.bot.token, "g"), "[BOT TOKEN]");
+	if (res.indexOf(config.universalKey)) res = res.replace(new RegExp(config.universalKey, "g"), "[UNIVERSAL KEY]");
+
 	if (deleteInvoke) await msg.delete();
+
 	if (!silent) {
 
 		if (res.length > 1000) {

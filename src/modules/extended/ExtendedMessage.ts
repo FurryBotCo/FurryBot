@@ -10,6 +10,7 @@ import Category from "../cmd/Category";
 import AutoResponse from "../cmd/AutoResponse";
 import ExtendedTextChannel from "../extended/ExtendedTextChannel";
 import ExtendedUser from "../extended/ExtendedUser";
+import chalk from "chalk";
 
 class ExtendedMessage extends Eris.Message {
 	id: string;
@@ -35,11 +36,8 @@ class ExtendedMessage extends Eris.Message {
 		me: boolean
 	};
 	pinned: boolean;
-	cmd: {
-		command: Command[];
-		category: Category
-	};
-	response: AutoResponse;
+	cmd: string[];
+	// response: AutoResponse;
 	client: FurryBot;
 	_client: FurryBot;
 	c: string;
@@ -49,8 +47,8 @@ class ExtendedMessage extends Eris.Message {
 	user: {
 		isDeveloper: boolean;
 	};
-	uConfig: UserConfig;
-	gConfig: GuildConfig;
+	private _uConfig: UserConfig;
+	private _gConfig: GuildConfig;
 	constructor(msg: Eris.Message, client: FurryBot) {
 
 		if (!msg.channel) return;
@@ -108,22 +106,22 @@ class ExtendedMessage extends Eris.Message {
 
 	async _load() {
 
-		this.uConfig = await mdb.collection("users").findOne({ id: this.author.id }).then(async (res) => {
+		this._uConfig = await mdb.collection("users").findOne({ id: this.author.id }).then(async (res) => {
 			if (!res) {
 				await mdb.collection("users").insertOne({ ...{ id: this.author.id }, ...config.defaults.userConfig }).catch(err => null);
-				console.debug(`Created User Entry "${this.author.id}"`);
+				console.debug(`Created User Entry "${this.author.id}"`, this.guild && this.guild.shard ? this.guild.shard.id || null : null, chalk.magentaBright("ExtendedMessage"));
 				const res = await mdb.collection("users").findOne({ id: this.author.id });
 				return res;
 			} else return res;
 		}).then(res => new UserConfig(this.author.id, res));
 
 		if (!this.channel.guild || this.channel.type === 1) {
-			this.gConfig = null;
+			this._gConfig = null;
 		} else {
-			this.gConfig = await mdb.collection("guilds").findOne({ id: this.channel.guild.id }).then(async (res) => {
+			this._gConfig = await mdb.collection("guilds").findOne({ id: this.channel.guild.id }).then(async (res) => {
 				if (!res) {
 					await mdb.collection("guilds").insertOne({ ...{ id: this.channel.guild.id }, ...config.defaults.guildConfig }).catch(err => null);
-					console.debug(`Created Guild Entry "${this.channel.guild.id}"`);
+					console.debug(`Created Guild Entry "${this.channel.guild.id}"`, this.guild.shard.id, chalk.magentaBright("ExtendedMessage"));
 					const res = await mdb.collection("guilds").findOne({ id: this.channel.guild.id });
 					return res;
 				} else return res;
@@ -138,7 +136,7 @@ class ExtendedMessage extends Eris.Message {
 
 		if (this.channel.type !== 1) {
 			try {
-				this.prefix = this.content.startsWith(`<@${this._client.user.id}>`) ? `<@${this._client.user.id}` : this.content.startsWith(`<@!${this._client.user.id}>`) ? `<@!${this._client.user.id}>` : config.beta ? config.defaultPrefix.toLowerCase() : this.gConfig.prefix.toLowerCase();
+				this.prefix = this.content.startsWith(`<@${this._client.user.id}>`) ? `<@${this._client.user.id}` : this.content.startsWith(`<@!${this._client.user.id}>`) ? `<@!${this._client.user.id}>` : this.gConfig.prefix.toLowerCase();
 
 				const a = this.content.slice(this.prefix.length).trim().split(/\s+/);
 				a.shift();
@@ -152,15 +150,15 @@ class ExtendedMessage extends Eris.Message {
 					}
 				}
 
-				this.cmd = this._client.getCommand(this.args.shift().toLowerCase());
-				this.response = this._client.getResponse(this.content.toLowerCase());
+				this.cmd = [this.args.shift().toLowerCase()];
+				// this.response = this._client.getResponse(this.content.toLowerCase());
 				this.unparsedArgs = a;
 
 				this.user = {
 					isDeveloper: config.developers.includes(this.author.id)
 				};
 			} catch (e) {
-				this._client.logger.log(`Error setting up message ${this.id}: ${e}`, this.guild.shard.id);
+				this._client.logger.log(`Error setting up message ${this.id}: ${e}`, this.guild && this.guild.shard ? this.guild.shard.id || null : null, chalk.magentaBright("ExtendedMessage"));
 			}
 		}
 	}
@@ -214,6 +212,20 @@ class ExtendedMessage extends Eris.Message {
 		}).then(res => new UserConfig(this.author.id, res));
 	}*/
 
+	get uConfig() {
+		return this._uConfig;
+	}
+
+	set uConfig(f) {
+		this._uConfig.edit(f).then(d => d.reload());
+	}
+	get gConfig() {
+		return this._gConfig;
+	}
+
+	set gConfig(f) {
+		this._gConfig.edit(f).then(d => d.reload());
+	}
 
 	get mentionMap(): {
 		users: Eris.User[],

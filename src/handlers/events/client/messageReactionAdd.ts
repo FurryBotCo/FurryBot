@@ -9,6 +9,18 @@ import functions from "../../../util/functions";
 
 export default new ClientEvent("messageReactionAdd", (async function (this: FurryBot, m, emoji, userID) {
 
+	await this.track("clientEvent", "events.messageReactionAdd", {
+		hostname: this.f.os.hostname(),
+		beta: config.beta,
+		clientId: config.bot.clientID,
+		msg: {
+			id: m.id,
+			channelId: m.channel.id
+		},
+		emoji,
+		userID
+	}, new Date());
+
 	return;
 
 	if (!config.beta) return;
