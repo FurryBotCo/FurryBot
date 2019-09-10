@@ -6,6 +6,18 @@ import functions from "../../../util/functions";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 
+	await this.track("clientEvent", "events.guildDelete", {
+		hostname: this.f.os.hostname(),
+		beta: config.beta,
+		clientId: config.bot.clientID,
+		guild: {
+			id: guild.id,
+			name: guild.name,
+			ownerId: guild.id
+		},
+		guildCount: this.guilds.size
+	}, new Date());
+
 	await this.f.incrementDailyCounter(false, this.guilds.size);
 
 	let author = {

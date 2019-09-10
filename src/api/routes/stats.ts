@@ -34,7 +34,7 @@ app.get("/", async (req, res) => {
 		libraryVersion: require("eris").VERSION,
 		nodeVersion: process.version,
 		dailyJoins,
-		commandCount: client.commands.length,
+		commandCount: client.cmdHandler.commands.length,
 		messageCount: 0,
 		dmMessageCount: 0
 	});

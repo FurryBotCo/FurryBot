@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "5.1.11",
+  "version": "6.0.0",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {
@@ -30,6 +30,7 @@
   },
   "homepage": "https://furry.bot",
   "dependencies": {
+    "analytics-node": "^3.4.0-beta.1",
     "blapi": "^1.1.0",
     "body-parser": "^1.19.0",
     "bufferutil": "^4.0.1",
@@ -41,8 +42,8 @@
     "cookie-parser": "^1.4.4",
     "cryptr": "^4.0.2",
     "deasync": "^0.1.15",
-    "e6api": "^1.0.4",
-    "e9api": "^1.0.4",
+    "e6api": "^1.0.6",
+    "e9api": "^1.0.6",
     "ejs": "^2.6.2",
     "eris": "github:abalabahaha/eris#dev",
     "erlpack": "github:abalabahaha/erlpack",
@@ -51,7 +52,7 @@
     "express": "^4.17.1",
     "express-session": "^1.16.2",
     "fs-extra": "^8.1.0",
-    "furrybotapi": "^1.0.0",
+    "furrybotapi": "^1.0.6",
     "lodash": "^4.17.15",
     "mongodb": "^3.2.7",
     "morgan": "^1.9.1",
@@ -59,6 +60,8 @@
     "pako": "^1.0.10",
     "phin": "^3.4.0",
     "safe-eval": "^0.4.1",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
     "sodium-native": "^2.4.2",
     "trello": "^0.9.1",
     "truncate": "^2.1.0",
@@ -71,6 +74,7 @@
     "zlib-sync": "^0.1.4"
   },
   "devDependencies": {
+    "@types/analytics-node": "^3.1.1",
     "@types/body-parser": "^1.17.0",
     "@types/chunk": "0.0.0",
     "@types/connect-mongo": "0.0.43",
@@ -88,6 +92,8 @@
     "@types/morgan": "^1.7.36",
     "@types/node": "^12.7.2",
     "@types/phin": "^3.3.0",
+    "@types/socket.io": "^2.1.2",
+    "@types/socket.io-client": "^1.4.32",
     "@types/uuid": "^3.4.5",
     "@types/uws": "^0.13.2",
     "@types/ws": "^6.0.2",

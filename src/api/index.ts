@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import chalk from "chalk";
 import client from "../../";
 import bodyParser from "body-parser";
+import http from "http";
 import https from "https";
 const app: express.Application = express();
 
@@ -49,6 +50,6 @@ if (config.web.security.useHttps) e = https.createServer({
 	cert: config.web.security.cert,
 	key: config.web.security.key
 }, app);
-else e = app;
+else e = http.createServer(app);
 
 export default e;

@@ -3,7 +3,7 @@ import phin from "phin";
 import config from "../config";
 import * as util from "util";
 import * as fs from "fs-extra";
-import Command from "../modules/cmd/Command";
+import { Command } from "./CommandHandler";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import ExtendedTextChannel from "../modules/extended/ExtendedTextChannel";
 import ExtendedUser from "../modules/extended/ExtendedUser";
@@ -23,6 +23,7 @@ import loopPatrons from "./patreon/loopPatrons";
 export { ErrorHandler };
 
 export default {
+	os,
 	memory: {
 		process: {
 			getTotal: ((): number => process.memoryUsage().heapTotal),
@@ -75,44 +76,115 @@ export default {
 		return `${a[0]} ${a[1].split(".")[0]} UTC`;
 	}),
 	makeSafe: ((msg: string): string => msg.replace(/\@everyone/, "@\u200Beveryone").replace(/\@here/, "@\u200Bhere")), // eslint-disable-line no-useless-escape
-	ms: ((ms: number) => {
-		const cd = ms / 1000;
-		let cooldown;
-		if (cd === 1) {
-			cooldown = `${cd} second`;
-		} else if (cd === 0) {
-			cooldown = "none";
-		} else {
-			if (cd >= 60) {
-				const mm = cd / 60;
-				if (mm === 1) {
-					cooldown = `${mm} minute`;
-				} else {
-					if (mm >= 60) {
-						const hh = mm / 60;
-						if (hh === 1) {
-							cooldown = `${hh} hour`;
-						} else {
-							if (hh >= 24) {
-								const dd = hh / 24;
-								if (dd === 1) {
-									cooldown = `${dd} day`;
-								} else {
-									cooldown = `${dd} days`;
-								}
-							} else {
-								cooldown = `${hh} hours`;
-							}
-						}
-					} else {
-						cooldown = `${mm} minutes`;
+	ms: (async (data: number | {
+		ms?: number;
+		s?: number;
+		m?: number;
+		h?: number;
+		d?: number;
+		w?: number;
+		mn?: number;
+		y?: number;
+	}, words?: boolean) => {
+		const t = await new Promise((a, b) => {
+			const t = {
+				ms: 0,
+				s: 0,
+				m: 0,
+				h: 0,
+				d: 0,
+				w: 0,
+				mn: 0,
+				y: 0
+			};
+
+			if (typeof data === "number") t.ms = data;
+			else if (typeof data !== "object") throw new Error("invalid input");
+			else {
+				if (data.ms) t.ms = data.ms;
+				if (data.s) t.s = data.s;
+				if (data.m) t.m = data.m;
+				if (data.h) t.h = data.h;
+				if (data.d) t.d = data.d;
+				if (data.w) t.w = data.w;
+				if (data.m) t.mn = data.mn;
+				if (data.y) t.y = data.y;
+			}
+
+			const shorten = (() => {
+				if (t.ms >= 1000) {
+					t.ms -= 1000;
+					t.s += 1;
+				}
+
+				if (t.s >= 60) {
+					t.s -= 60;
+					t.m += 1;
+				}
+
+				if (t.m >= 60) {
+					t.m -= 60;
+					t.h += 1;
+				}
+
+				if (t.h >= 24) {
+					t.h -= 24;
+					t.d += 1;
+				}
+
+				if (t.d >= 30) {
+					t.d -= 30;
+					t.mn += 1;
+				}
+
+				if ((t.mn * 30) + t.d >= 365) {
+					t.d = ((t.mn * 30) + t.d) - 365;
+					t.mn -= 12;
+					t.y += 1;
+				}
+			});
+
+			const c = () => (t.ms >= 1000) || (t.s >= 60) || (t.m >= 60) || (t.h >= 24) || (t.d >= 30) || (t.w >= 4) || (t.mn >= 12);
+			const d = () => t.d >= 7;
+			while (c()) {
+				shorten();
+				if (!c()) {
+					if (!d()) return a(t);
+
+					while (d()) {
+						t.d -= 7;
+						t.w += 1;
+						if (!d()) return a(t);
 					}
 				}
-			} else {
-				cooldown = `${cd} seconds`;
 			}
+		});
+
+		if (!words) return t;
+		else {
+			const full = {
+				ms: "millisecond",
+				s: "second",
+				m: "minute",
+				h: "hour",
+				d: "day",
+				w: "week",
+				mn: "month",
+				y: "year"
+			};
+
+			const j = {};
+
+			Object.keys(t).forEach((k) => {
+				if (t[k] !== 0) j[k] = t[k];
+			});
+
+			if (Object.keys(j).length < 1) return {};
+
+			const useFull = Object.keys(j).length < 4;
+
+			return Object.keys(j).reverse().map((k, i, a) => `${i === a.length - 1 && a.length !== 1 ? "and " : ""}${j[k]}${useFull ? ` ${full[k]}${j[k] > 1 ? "s" : ""}` : k}`).join(", ").trim();
 		}
-		return cooldown;
 	}),
 	parseTime: ((time, full = false, ms = false) => {
 		if (ms) time = time / 1000;
@@ -134,7 +206,7 @@ export default {
 	randomColor: ((): number => Math.floor(Math.random() * 0xFFFFFF)),
 	removeDuplicates: ((array: any[]): any[] => [...new Set(array).values()]),
 	processSub: (async (cmd: Command[], msg: ExtendedMessage, ctx: FurryBot) => {
-		const c = cmd[cmd.length - 1];
+		/*const c = cmd[cmd.length - 1];
 		if (msg.args.length > 0 && c.hasSubCommands && c.subCommands.map(s => s.triggers).reduce((a, b) => a.concat(b)).includes(msg.args[0].toLowerCase())) {
 			const { command: sub } = msg._client.getCommand([...cmd.map(c => c.triggers[0]), msg.args.shift().toLowerCase()]);
 			msg.unparsedArgs.shift();
@@ -147,7 +219,7 @@ export default {
 			// console.log(util.inspect(cc.subCommands.find(c => c.triggers.includes(cc.triggers[0])), { depth: null, colors: true }));
 			// console.log(c.subCommands.find(s => s.triggers.includes(cc.triggers[0])));
 			return c.subCommands.find(s => s.triggers.includes(cc.triggers[0])).run.call(ctx, msg);
-		} else return "NOSUB";
+		} else return "NOSUB";*/
 	}),
 	subCmds: ((dir: string, file: string): Command[] => {
 		const d = file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0];
@@ -183,21 +255,20 @@ export default {
 		return null;
 	}),
 	hasSubCmds: ((dir: string, file: string): boolean => fs.existsSync(`${dir}/${file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0]}`)),
-	sendCommandEmbed: ((msg: ExtendedMessage, cmd: Command[]) => {
+	sendCommandEmbed: ((msg: ExtendedMessage, cmd: Command) => {
 		if (!msg || !(msg instanceof ExtendedMessage)) throw new TypeError("invalid message");
 		if (!cmd) throw new TypeError("missing command");
-		const l = cmd[cmd.length - 1];
-		if (!l) throw new Error("invalid command");
+
 		let embed;
-		if (l.hasSubCommands && l.subCommands.length > 0) {
+		if (cmd.subCommands.length > 0) {
 			embed = {
-				title: `Subcommand List: ${msg._client.ucwords(l.triggers[0])}`,
-				description: `\`command\` (\`alias\`) - description\n\n${l.subCommands.map(s => s.triggers.length > 1 ? `\`${s.triggers[0]}\` (\`${s.triggers[1]}\`) - ${s.description}` : `\`${s.triggers[0]}\` - ${s.description}`).join("\n")}`
+				title: `Subcommand List: ${msg._client.ucwords(cmd.triggers[0])}`,
+				description: `\`command\` (\`alias\`) - description\n\n${cmd.subCommands.map(s => s.triggers.length > 1 ? `\`${s.triggers[0]}\` (\`${s.triggers[1]}\`) - ${s.description}` : `\`${s.triggers[0]}\` - ${s.description}`).join("\n")}`
 			};
 		} else {
 			embed = {
-				title: `Command Help: ${msg._client.ucwords(l.triggers[0])}`,
-				description: `Usage: ${l.usage}\nDescription: ${l.description}`
+				title: `Command Help: ${msg._client.ucwords(cmd.triggers[0])}`,
+				description: `Usage: ${cmd.usage}\nDescription: ${cmd.description}`
 			};
 		}
 		return msg.channel.createMessage({
@@ -564,5 +635,13 @@ export default {
 		};
 	}),
 	refreshPatreonToken,
-	loopPatrons
+	loopPatrons,
+	fetchLangMessage: ((lang: string, cmd: Command) => {
+		if (!lang || !Object.keys(config.lang).includes(lang.toLowerCase())) throw new TypeError("invalid language provided");
+		if (!cmd) throw new TypeError("invalid command provided");
+
+		const l = config.lang[lang.toLowerCase()][cmd.triggers[0].toLowerCase()];
+		if (!l) return "";
+		return l[Math.floor(Math.random() * l.length)];
+	})
 };

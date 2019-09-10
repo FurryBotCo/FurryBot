@@ -30,8 +30,14 @@ export default new Command({
 	// throw new Error("This is a test error, thrown and not caught on purpose for testing purposes.");
 	// return msg.channel.createMessage(`<@!${msg.author.id}>, Tested!`);
 
-	return msg.channel.createMessage("", {
-		file: fs.readFileSync("C:\\users\\dwdda\\Downloads\\720P_1500K_126317731.mp4").toString(),
-		name: "porn.mp4"
-	});
+	if (!msg.args[0]) return msg.reply("tested..");
+
+	switch (msg.args[0].toLowerCase()) {
+		case "err":
+			throw new Error("ERR_TESTING");
+			break;
+
+		default:
+			return msg.reply("invalid test.");
+	}
 }));

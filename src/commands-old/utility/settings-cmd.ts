@@ -47,7 +47,7 @@ export default new Command({
 			break;
 
 		case "delcmds":
-			type = "delCmds";
+			type = "deleteCommands";
 			break;
 	}
 

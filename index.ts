@@ -3,6 +3,7 @@ import config from "./src/config";
 import * as fs from "fs-extra";
 import functions from "./src/util/functions";
 import path from "path";
+import io from "socket.io";
 
 // directory existence check
 [config.logsDir, `${config.logsDir}/spam`, `${config.logsDir}/client`, config.tmpDir].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), console.log(`Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
@@ -18,14 +19,23 @@ fs.writeFileSync(`${config.rootDir}/../process.pid`, process.pid);
 
 bot.connect();
 
-bot.on("shardDisconnect", (error: string, id: number) => {
+bot.on("shardDisconnect", async (error: string, id: number) => {
+	await bot.track("clientEvent", "events.shardDisconnect", {
+		hostname: bot.f.os.hostname(),
+		beta: config.beta,
+		clientId: config.bot.clientID,
+		error,
+		id
+	}, new Date());
+
 	const embed = {
 		title: "Shard Status Update",
 		description: `Shard ${id} Disconnected!`,
 		timestamp: new Date().toISOString(),
 		color: functions.randomColor()
 	};
-	bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
+
+	await bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
 		embeds: [
 			embed
 		],
@@ -35,11 +45,18 @@ bot.on("shardDisconnect", (error: string, id: number) => {
 
 	bot.logger.error(`Shard #${id} disconnected`, id);
 })
-	.on("shardReady", (id: number) => {
+	.on("shardReady", async (id: number) => {
 		bot.shards.get(id).editStatus("idle", {
 			name: "Not ready yet..",
 			type: 0
 		});
+
+		await bot.track("clientEvent", "events.shardReady", {
+			hostname: bot.f.os.hostname(),
+			beta: config.beta,
+			clientId: config.bot.clientID,
+			id
+		}, new Date());
 
 		const embed = {
 			title: "Shard Status Update",
@@ -47,7 +64,8 @@ bot.on("shardDisconnect", (error: string, id: number) => {
 			timestamp: new Date().toISOString(),
 			color: functions.randomColor()
 		};
-		bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
+
+		await bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
 			embeds: [
 				embed
 			],
@@ -55,14 +73,22 @@ bot.on("shardDisconnect", (error: string, id: number) => {
 			avatarURL: "https://i.furry.bot/furry.png"
 		});
 	})
-	.on("shardResume", (id: number) => {
+	.on("shardResume", async (id: number) => {
+		await bot.track("clientEvent", "events.shardResume", {
+			hostname: bot.f.os.hostname(),
+			beta: config.beta,
+			clientId: config.bot.clientID,
+			id
+		}, new Date());
+
 		const embed = {
 			title: "Shard Status Update",
 			description: `Shard ${id} was resumed!`,
 			timestamp: new Date().toISOString(),
 			color: functions.randomColor()
 		};
-		bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
+
+		await bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
 			embeds: [
 				embed
 			],
@@ -70,14 +96,15 @@ bot.on("shardDisconnect", (error: string, id: number) => {
 			avatarURL: "https://i.furry.bot/furry.png"
 		});
 	})
-	.on("ready", () => {
+	.on("ready", async () => {
 		const embed = {
 			title: "Client is ready!",
 			description: `Ready with ${bot.shards.size} shard${bot.shards.size > 1 ? "s" : ""}!`,
 			timestamp: new Date().toISOString(),
 			color: functions.randomColor()
 		};
-		bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
+
+		await bot.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
 			embeds: [
 				embed
 			],
@@ -95,6 +122,7 @@ process.on("unhandledRejection", (r: Error, p) => {
 		// if (p instanceof Promise) m = await p;
 	}
 	bot.logger.error(`Unhandled PromiseRejection\nPromise: ${m}\nError: ${r.stack}`);
+	// bot.emit("error", r);
 });
 
 process.on("SIGINT", () => {
@@ -104,5 +132,41 @@ process.on("SIGINT", () => {
 	fs.unlinkSync(`${config.rootDir}/../process.pid`);
 	process.kill(process.pid);
 });
+
+/*process.stdin.resume();
+import ev from "./src/util/eval";
+import phin from "phin";
+import { mdb, mongo } from "./src/modules/Database";
+import util from "util";
+import os from "os";
+import Permissions from "./src/util/Permissions";
+import { performance } from "perf_hooks";
+
+process.stdin.on("data", async (d) => {
+	d = d.toString();
+	const start = performance.now();
+	let res;
+	let error = false;
+	try {
+		// an external functions is used because typescript screws with the context and the variables
+		res = await ev.call(bot, ev, {
+			config,
+			phin,
+			functions,
+			util,
+			fs,
+			mdb,
+			mongo,
+			Permissions,
+			os
+		});
+	} catch (e) {
+		res = e;
+		error = true;
+	}
+	const end = performance.now();
+	if (error) process.stdout.write(`Error: ${res}\n`);
+	process.stdout.write(`Eval took ${end - start}ms\n`);
+});*/
 
 export default bot;
