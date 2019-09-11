@@ -62,10 +62,12 @@ client.cmdHandler
 		donatorCooldown: 3e3,
 		description: "Get some content from E621!",
 		usage: "[tags]",
-		features: ["nsfw"],
+		features: ["nsfw", "devOnly"],
 		category: "nsfw",
 		run: (async function (this: CommandContext, msg: ExtendedMessage) {
 			if (this.activeReactChannels.includes(msg.channel.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
+
+			console.log(this);
 
 			const colors = {
 				green: 3066993,

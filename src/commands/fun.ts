@@ -408,7 +408,7 @@ client.cmdHandler
 		donatorCooldown: 3e3,
 		description: "Get some content from E926 (SFW E621)"!,
 		usage: "[tags]",
-		features: [],
+		features: ["devOnly"],
 		category: "fun",
 		run: (async function (this: CommandContext, msg: ExtendedMessage) {
 			if (this.activeReactChannels.includes(msg.channel.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
