@@ -30,7 +30,7 @@ client.cmdHandler
 		usage: "[image]",
 		features: [],
 		category: "meme",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let user, imgurl, req, j;
 			if (msg.args.length >= 1) {
 				// get member from message
@@ -72,7 +72,7 @@ client.cmdHandler
 		usage: "[image]",
 		features: [],
 		category: "meme",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let user, imgurl, req, j;
 			if (msg.args.length >= 1) {
 				// get member from message
@@ -114,7 +114,7 @@ client.cmdHandler
 		usage: "<text>",
 		features: [],
 		category: "meme",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let text, req, j;
 			text = msg.unparsedArgs.join(" ");
 			if (text.length === 0) text = "Provide some text";
@@ -148,7 +148,7 @@ client.cmdHandler
 		usage: "<text>",
 		features: [],
 		category: "meme",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let text, req, j;
 			text = msg.unparsedArgs.join(" ");
 			if (text.length === 0) text = "Image api, not providing text";
@@ -183,7 +183,7 @@ client.cmdHandler
 		usage: "[image]",
 		features: [],
 		category: "meme",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let user, imgurl, req, j;
 			if (msg.args.length >= 1) {
 				// get member from message
@@ -226,7 +226,7 @@ client.cmdHandler
 		usage: "<text>",
 		features: [],
 		category: "meme",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.unparsedArgs.length < 1) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			const embed: Eris.EmbedOptions = {

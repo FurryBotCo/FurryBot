@@ -3,7 +3,6 @@ import config from "./src/config";
 import * as fs from "fs-extra";
 import functions from "./src/util/functions";
 import path from "path";
-import io from "socket.io";
 
 // directory existence check
 [config.logsDir, `${config.logsDir}/spam`, `${config.logsDir}/client`, config.tmpDir].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), console.log(`Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
@@ -20,13 +19,13 @@ fs.writeFileSync(`${config.rootDir}/../process.pid`, process.pid);
 bot.connect();
 
 bot.on("shardDisconnect", async (error: string, id: number) => {
-	await bot.track("clientEvent", "events.shardDisconnect", {
+	/* await bot.track("clientEvent", "events.shardDisconnect", {
 		hostname: bot.f.os.hostname(),
 		beta: config.beta,
 		clientId: config.bot.clientID,
 		error,
 		id
-	}, new Date());
+	}, new Date()); */
 
 	const embed = {
 		title: "Shard Status Update",
@@ -51,12 +50,12 @@ bot.on("shardDisconnect", async (error: string, id: number) => {
 			type: 0
 		});
 
-		await bot.track("clientEvent", "events.shardReady", {
+		/* await bot.track("clientEvent", "events.shardReady", {
 			hostname: bot.f.os.hostname(),
 			beta: config.beta,
 			clientId: config.bot.clientID,
 			id
-		}, new Date());
+		}, new Date()); */
 
 		const embed = {
 			title: "Shard Status Update",
@@ -74,12 +73,12 @@ bot.on("shardDisconnect", async (error: string, id: number) => {
 		});
 	})
 	.on("shardResume", async (id: number) => {
-		await bot.track("clientEvent", "events.shardResume", {
+		/* await bot.track("clientEvent", "events.shardResume", {
 			hostname: bot.f.os.hostname(),
 			beta: config.beta,
 			clientId: config.bot.clientID,
 			id
-		}, new Date());
+		}, new Date()); */
 
 		const embed = {
 			title: "Shard Status Update",

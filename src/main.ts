@@ -15,7 +15,7 @@ import E6API from "e6api";
 import E9API from "e9api";
 import FurryBotAPI from "furrybotapi";
 import { CommandHandler } from "./util/CommandHandler";
-import io from "socket.io";
+import WebSocket from "ws";
 import Analytics from "analytics-node";
 import ClientEvent from "modules/ClientEvent";
 
@@ -53,7 +53,7 @@ class FurryBot extends Eris.Client {
 	f: typeof import("./util/functions").default & { ErrorHandler: typeof import("./util/functions").ErrorHandler };
 	activeReactChannels: string[];
 	cmdHandler: CommandHandler;
-	io: io.Server;
+	wss: WebSocket.Server;
 	a: Analytics;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
@@ -63,15 +63,15 @@ class FurryBot extends Eris.Client {
 
 		this.a = new Analytics(config.apis.segment.writeKey);
 
-		this.track("client", "client.setup", {
+		/* this.track("client", "client.setup", {
 			hostname: this.f.os.hostname(),
 			beta: config.beta,
 			clientId: config.bot.clientID
-		}, new Date());
+		}, new Date()); */
 
 		fs.readdirSync(`${__dirname}/handlers/events/client`).map(d => {
 			const e: ClientEvent = require(`${__dirname}/handlers/events/client/${d}`).default;
-			this.track("client", "client.eventHandler.load", {
+			/* this.track("client", "client.eventHandler.load", {
 				hostname: this.f.os.hostname(),
 				beta: config.beta,
 				clientId: config.bot.clientID,
@@ -79,7 +79,7 @@ class FurryBot extends Eris.Client {
 					event: e.event,
 					file: `${__dirname}/handlers/events/client/${d}`
 				}
-			}, new Date());
+			}, new Date()); */
 			this.on(e.event, e.listener.bind(this));
 		});
 
@@ -140,6 +140,7 @@ class FurryBot extends Eris.Client {
 			}, (e, d) => e ? b(e) : a(d));
 		});
 	}
+
 	/*getCommand(cmd: string | string[]): {
 		command: Command[];
 		category: Category;

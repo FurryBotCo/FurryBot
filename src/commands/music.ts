@@ -29,7 +29,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "music",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (!msg.member.voiceState.channelID) return msg.reply("you must be in a voice channel to use this.");
 
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
@@ -57,7 +57,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "music",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			// if (!msg.member.voiceState.channelID) return msg.reply("you must be in a voice channel to use this.");
 
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
@@ -85,7 +85,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "music",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const [q] = [...msg.gConfig.music.queue];
 
 			if (!q) return msg.reply("Nothing is playing right now.");
@@ -122,7 +122,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "music",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (!msg.member.voiceState.channelID) return msg.reply("you must be in a voice channel to use this.");
 
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
@@ -153,7 +153,7 @@ client.cmdHandler
 		usage: "<search/yt link>",
 		features: [],
 		category: "music",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length < 1) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			if (!msg.member.voiceState.channelID) return msg.reply("you must be in a voice channel to use this.");
@@ -348,7 +348,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "music",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const q = [...msg.gConfig.music.queue];
 			q.shift();
 
@@ -384,7 +384,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "music",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (!msg.member.voiceState.channelID) return msg.reply("you must be in a voice channel to use this.");
 
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
@@ -415,7 +415,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "music",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (!msg.member.voiceState.channelID) return msg.reply("you must be in a voice channel to use this.");
 
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
@@ -458,7 +458,7 @@ client.cmdHandler
 		usage: "<1-100>",
 		features: [],
 		category: "music",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length < 1) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			if (!msg.member.voiceState.channelID) return msg.reply("you must be in a voice channel to use this.");

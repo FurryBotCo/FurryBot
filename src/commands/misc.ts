@@ -29,7 +29,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "misc",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let req, counts, content;
 
 			req = await phin({
@@ -77,7 +77,7 @@ client.cmdHandler
 		usage: "[command/category]",
 		features: [],
 		category: "misc",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let embed: Eris.EmbedOptions;
 
 			if (msg.args.length === 0) {
@@ -217,7 +217,7 @@ client.cmdHandler
 		usage: "<suggestion>",
 		features: [],
 		category: "misc",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			// return msg.reply("We are not accepting suggestions at this time.");
 
 			let card, embed: Eris.EmbedOptions;
@@ -270,7 +270,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "misc",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.uConfig.tips) return msg.uConfig.edit({ tips: false }).then(d => d.reload()).then(() => msg.reply("Disabled tips."));
 			else return msg.uConfig.edit({ tips: true }).then(d => d.reload()).then(() => msg.reply("Enabled tips."));
 		})

@@ -9,7 +9,7 @@ import ListStats from "../../../util/ListStats";
 import Temp from "../../../util/Temp";
 import functions from "../../../util/functions";
 import { mdb, mongo } from "../../../modules/Database";
-import io from "socket.io";
+import WebSocket from "ws";
 import ev from "../../../util/eval";
 import phin from "phin";
 import Permissions from "../../../util/Permissions";
@@ -20,14 +20,14 @@ import { performance } from "perf_hooks";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
 
-	await this.track("clientEvent", "events.ready", {
+	/* await this.track("clientEvent", "events.ready", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
 		clientId: config.bot.clientID,
 		userCount: this.users.size,
 		channelCount: Object.keys(this.channelGuildMap).length,
 		guildCount: this.guilds.size
-	}, new Date());
+	}, new Date()); */
 
 	fs.readdirSync(`${__dirname}/../../../commands`).filter(d => !fs.lstatSync(`${__dirname}/../../../commands/${d}`).isDirectory() && d.endsWith(__filename.split(".").reverse()[0])).map(f => require(`${__dirname}/../../../commands/${f}`));
 
@@ -44,16 +44,16 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		});
 	}, 6e4);
 
-	this.io = io(srv);
+	this.wss = new WebSocket.Server({ server: srv });
 
 	const sv = http.createServer(express())
 		.on("error", () => this.logger.warn("Attempted to start api server, but the port is in use.", 0))
 		.on("listening", () => {
 			sv.close();
-			this.srv = srv.listen(config.apiPort);
+			this.srv = srv.listen(config.apiPort, config.apiBindIp);
 		})
 		.on("close", () => this.logger.debug("Port test server closed, starting bot api server.", 0))
-		.listen(config.apiPort);
+		.listen(config.apiPort, config.apiBindIp);
 
 	if (!config.beta) this.ls = setInterval(ListStats, 3e5, this);
 
@@ -73,13 +73,13 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 			const date = `${d.getMonth() + 1}-${d.getDate() - 1}-${d.getFullYear()}`;
 			const count = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => "Unknown");
 
-			await this.track("general", "dailyCountPosting", {
+			/* await this.track("general", "dailyCountPosting", {
 				hostname: this.f.os.hostname(),
 				beta: config.beta,
 				clientId: config.bot.clientID,
 				date,
 				count
-			}, d);
+			}, d); */
 
 			const embed: Eris.EmbedOptions = {
 				title: `Daily Counts For ${date}`,
@@ -105,85 +105,146 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		this.responseSpamCounter = this.responseSpamCounter.filter(s => s.time + 3e4 > Date.now());
 	}, 1e3);
 
-	this.io.use(async (s, next) => {
-		await this.track("io", "events.connect", {
-			hostname: this.f.os.hostname(),
-			beta: config.beta,
-			clientId: config.bot.clientID,
-			ipAddress: s.conn.remoteAddress,
-			query: s.handshake.query || {}
-		}, new Date());
-		this.logger.debug(`IO Connection From ${s.conn.remoteAddress}`, 0);
-		s.once("disconnect", async () => {
-			await this.track("io", "events.disconnect", {
-				hostname: this.f.os.hostname(),
-				beta: config.beta,
-				clientId: config.bot.clientID,
-				ipAddress: s.conn.remoteAddress,
-				query: s.handshake.query || {}
-			}, new Date());
+	this.wss.on("connection", async (socket, request) => {
+		this.logger.debug(`IO Connection From ${request.socket.remoteAddress}`, 0, "IO");
+		const k = request.url.split("?")[1].split("&").map(t => t.split("="));
 
-			this.logger.debug(`IO Disconnect From ${s.conn.remoteAddress}`, 0);
-		});
-		if (s.handshake.query && s.handshake.query.key) {
-			if (s.handshake.query.key !== config.universalKey) return s.disconnect();
-			else next();
-		} else return s.disconnect();
-	})
-		.on("connection", async (s) => {
+		const j = k.filter(t => t[0] === "key")[0];
+		if (!j || j[1] !== config.universalKey) return socket.close(1000, "Invalid Authentication");
 
-			s.on("eval", async (d) => {
+		socket.on("message", async (d) => {
+			d = d.toString();
+			let j;
+			try {
+				j = JSON.parse(d);
+			} catch (e) {
+				return socket.send(JSON.stringify({
+					event: "error",
+					data: "all payloads must be in the json format"
+				}));
+			}
 
-				console.debug(`IO Eval: ${d}`);
-				const start = performance.now();
-				let res;
-				let error = false;
-				try {
-					// an external functions is used because typescript screws with the context and the variables
-					res = await ev.call(this, d, {
-						config,
-						phin,
-						functions,
-						util,
-						fs,
-						mdb,
-						mongo,
-						Permissions,
-						os
-					}).catch(err => err);
-				} catch (e) {
-					res = e;
-					error = true;
-				}
-				if (res instanceof Error) error = true;
+			if (!j.event || !j.data) return socket.send(JSON.stringify({
+				event: "error",
+				data: "missing 'event' or 'data' property"
+			}));
 
-				res = util.inspect(res, { depth: 1, colors: false });
-				const end = performance.now();
-
-				if (res.indexOf(config.bot.token) !== -1) res = res.replace(new RegExp(config.bot.token, "g"), "[BOT TOKEN]");
-				if (res.indexOf(config.universalKey) !== -1) res = res.replace(new RegExp(config.universalKey, "g"), "[UNIVERSAL KEY]");
-
-
-				await this.track("io", "events.eval", {
-					hostname: this.f.os.hostname(),
-					beta: config.beta,
-					clientId: config.bot.clientID,
-					ipAddress: s.conn.remoteAddress,
-					query: s.handshake.query || {},
-					res,
-					eval: d
-				}, new Date());
-
-				s.emit("response", {
-					eval: d,
-					res,
-					error,
-					time: {
-						start: parseFloat(start.toFixed(3)),
-						end: parseFloat(end.toFixed(3)),
-						total: parseFloat((end - start).toFixed(3))
+			switch (j.event.toLowerCase()) {
+				case "eval":
+					console.debug(`IO Eval: ${j.data}`);
+					const start = performance.now();
+					let res;
+					let error = false;
+					try {
+						// an external functions is used because typescript screws with the context and the variables
+						res = await ev.call(this, j.data, {
+							config,
+							phin,
+							functions,
+							util,
+							fs,
+							mdb,
+							mongo,
+							Permissions,
+							os
+						}).catch(err => err);
+					} catch (e) {
+						res = e;
+						error = true;
 					}
-				});
-			});
+					if (res instanceof Error) error = true;
+
+					res = util.inspect(res, { depth: 1, colors: false });
+					const end = performance.now();
+
+					if (res.indexOf(config.bot.token) !== -1) res = res.replace(new RegExp(config.bot.token, "g"), "[BOT TOKEN]");
+					if (res.indexOf(config.universalKey) !== -1) res = res.replace(new RegExp(config.universalKey, "g"), "[UNIVERSAL KEY]");
+
+
+					socket.send(JSON.stringify({
+						event: "response",
+						data: {
+							eval: j.data,
+							res,
+							error,
+							time: {
+								start: parseFloat(start.toFixed(3)),
+								end: parseFloat(end.toFixed(3)),
+								total: parseFloat((end - start).toFixed(3))
+							}
+						}
+					}));
+					break;
+
+				default:
+					return socket.send(JSON.stringify({
+						event: "error",
+						data: "invalid event"
+					}));
+			}
 		});
+
+		socket.once("close", () => {
+			this.logger.debug(`IO Disconnect From ${request.socket.remoteAddress}`, 0, "IO");
+		});
+	});
+
+	/*this.io.use(async (s, next) => {
+
+	this.logger.debug(`IO Connection From ${s.conn.remoteAddress}`, 0);
+	s.once("disconnect", async () => {
+
+		this.logger.debug(`IO Disconnect From ${s.conn.remoteAddress}`, 0);
+	});
+	if (s.handshake.query && s.handshake.query.key) {
+		if (s.handshake.query.key !== config.universalKey) return s.disconnect();
+		else next();
+	} else return s.disconnect();
+})
+	.on("connection", async (s) => {
+
+		s.on("eval", async (d) => {
+
+			console.debug(`IO Eval: ${d}`);
+			const start = performance.now();
+			let res;
+			let error = false;
+			try {
+				// an external functions is used because typescript screws with the context and the variables
+				res = await ev.call(this, d, {
+					config,
+					phin,
+					functions,
+					util,
+					fs,
+					mdb,
+					mongo,
+					Permissions,
+					os
+				}).catch(err => err);
+			} catch (e) {
+				res = e;
+				error = true;
+			}
+			if (res instanceof Error) error = true;
+
+			res = util.inspect(res, { depth: 1, colors: false });
+			const end = performance.now();
+
+			if (res.indexOf(config.bot.token) !== -1) res = res.replace(new RegExp(config.bot.token, "g"), "[BOT TOKEN]");
+			if (res.indexOf(config.universalKey) !== -1) res = res.replace(new RegExp(config.universalKey, "g"), "[UNIVERSAL KEY]");
+
+
+	s.emit("response", {
+		eval: d,
+		res,
+		error,
+		time: {
+			start: parseFloat(start.toFixed(3)),
+			end: parseFloat(end.toFixed(3)),
+			total: parseFloat((end - start).toFixed(3))
+		}
+	});
+});
+	});*/
 }));

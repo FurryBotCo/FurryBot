@@ -30,7 +30,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "economy",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			if (isNaN(msg.uConfig.bal) || msg.uConfig.bal === Infinity) return msg.reply("You have been temporarily suspended from using economy commands, please join our support server (<https://discord.gg/YazeA7e>) and tell them that something is wrong with your economy balance. Attempts to circumvent this may get you blacklisted.");
@@ -56,7 +56,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "economy",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			return msg.reply("this command has not been released yet!");
@@ -74,7 +74,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "economy",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			if (isNaN(msg.uConfig.bal) || msg.uConfig.bal === Infinity) return msg.reply("You have been temporarily suspended from using economy commands, please join our support server (<https://discord.gg/YazeA7e>) and tell them that something is wrong with your economy balance. Attempts to circumvent this may get you blacklisted.");
@@ -84,6 +84,8 @@ client.cmdHandler
 			let amount = Math.floor(Math.random() * 50) + 1;
 			amount += amount * multi;
 			amount = Math.floor(amount);
+			let s = functions.fetchLangMessage(msg.gConfig.lang, cmd);
+
 			const people = [
 				...config.eco.people,
 				msg.guild.members.random().username, // positility of a random person from the same server
@@ -94,9 +96,9 @@ client.cmdHandler
 			const person = people[Math.floor(Math.random() * people.length)];
 
 			// love you, skull
-			if (person.toLowerCase() === "skullbite") msg.c = "**{0}** gave you {1}{2}, though they seemed to have some white substance on them..";
+			if (person.toLowerCase() === "skullbite") s = "**{0}** gave you {1}{2}, though they seemed to have some white substance on them..";
 
-			let t = this.f.formatStr(msg.c, person, amount, config.eco.emoji);
+			let t = this.f.formatStr(s, person, amount, config.eco.emoji);
 
 			t += `\nMultiplier: **${multi * 100}%**`;
 
@@ -135,7 +137,7 @@ client.cmdHandler
 		usage: "<side> <amount>",
 		features: [],
 		category: "economy",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			if (isNaN(msg.uConfig.bal) || msg.uConfig.bal === Infinity) return msg.reply("You have been temporarily suspended from using economy commands, please join our support server (<https://discord.gg/YazeA7e>) and tell them that something is wrong with your economy balance. Attempts to circumvent this may get you blacklisted.");
@@ -204,7 +206,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "economy",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			let member = msg.member;
@@ -242,7 +244,7 @@ client.cmdHandler
 		usage: "<amount> <user>",
 		features: [],
 		category: "economy",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			if (isNaN(msg.uConfig.bal) || msg.uConfig.bal === Infinity) return msg.reply("You have been temporarily suspended from using economy commands, please join our support server (<https://discord.gg/YazeA7e>) and tell them that something is wrong with your economy balance. Attempts to circumvent this may get you blacklisted.");

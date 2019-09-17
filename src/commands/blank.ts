@@ -29,7 +29,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 
 		})
 	});

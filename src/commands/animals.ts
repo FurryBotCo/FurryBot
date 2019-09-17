@@ -30,7 +30,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const img = await this.f.imageAPIRequest(true, "birb");
 			try {
 				return msg.channel.createMessage("", {
@@ -60,7 +60,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			try {
 				return msg.channel.createMessage("", {
 					file: await this.f.getImageFromURL("https://cataas.com/cat/gif"),
@@ -91,7 +91,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let req, j, parts;
 			try {
 				req = await phin({
@@ -134,7 +134,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			try {
 				return msg.channel.createMessage("", {
 					file: await this.f.getImageFromURL("https://foxrudor.de/"),
@@ -166,7 +166,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let req, j;
 			try {
 				req = await phin({

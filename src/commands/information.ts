@@ -34,7 +34,7 @@ client.cmdHandler
 		usage: "<@bot/id>",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let list;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			// get user from message
@@ -122,7 +122,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const embed: Eris.EmbedOptions = {
 				title: "Bot Info!",
 				fields: [
@@ -205,7 +205,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const botPerms = [
 				"kickMembers",
 				"banMembers",
@@ -260,7 +260,7 @@ client.cmdHandler
 		usage: "<ip>",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.unparsedArgs.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			// if(config.apis.ipinfo.regex.ipv4.test(msg.unparsedArgs.join(" ")) || config.apis.ipinfo.regex.ipv6.test(msg.unparsedArgs.join(" "))) {
 			const req = await phin({
@@ -315,7 +315,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const allowUser = [],
 				denyUser = [],
 				allowBot = [],
@@ -368,7 +368,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			return msg.channel.createMessage("Checking Ping..")
 				.then(m => m.edit("Ping Calculated!"))
 				.then(async (m) => {
@@ -392,7 +392,7 @@ client.cmdHandler
 		usage: "<@member/id>",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
 			if (!user) return msg.errorEmbed("INVALID_USER");
@@ -445,7 +445,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const embed: Eris.EmbedOptions = {
 				title: "Shard Info",
 				description: `Guilds: ${this.guilds.filter(g => g.shard.id === msg.guild.shard.id).length}\nPing: ${msg.guild.shard.latency}ms`,
@@ -472,7 +472,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const embed: Eris.EmbedOptions = {
 				title: "Shard Info",
 				fields: this.shards.map(s => ({
@@ -508,7 +508,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const textChCount = msg.guild.channels.filter(c => c.type === 0).length,
 				voiceChCount = msg.guild.channels.filter(c => c.type === 2).length,
 				categoryChCount = msg.guild.channels.filter(c => c.type === 4).length;
@@ -632,7 +632,7 @@ client.cmdHandler
 		usage: "[@member/id]",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
 			if (!user) return msg.errorEmbed("INVALID_USER");
@@ -659,7 +659,7 @@ client.cmdHandler
 					inline: true
 				}, {
 					name: `Roles [${roles.length}]`,
-					value: roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.prefix}roles ${user.user.id}\`` : roles.toString(),
+					value: roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.prefix}roles ${user.user.id}\`` : roles.length === 0 ? "NONE" : roles.toString(),
 					inline: false
 				}]
 			};
@@ -699,7 +699,6 @@ client.cmdHandler
 				value: "Bots cannot be blacklisted.",
 				inline: false
 			});
-
 			return msg.channel.createMessage({
 				embed
 			});

@@ -82,7 +82,7 @@ export default class CommandHandler {
 		features?: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
 		subCommands?: Command[];
 		category: Category | string;
-		run: (msg: Eris.Message) => Promise<any>;
+		run: (msg: Eris.Message, cmd?: Command) => Promise<any>;
 	}): this {
 		if (!data.triggers || data.triggers.length < 1) throw new TypeError("invalid triggers provided");
 
@@ -92,7 +92,7 @@ export default class CommandHandler {
 			let dup;
 			if (!d) dup = "Unknown";
 			else dup = d.map(c => c.triggers[0].toLowerCase()).join(", ");
-			console.log(this.commands.map(c => c.triggers).reduce((a, b) => a.concat(b), []).map(t => t.toLowerCase()));
+			// console.log(this.commands.map(c => c.triggers).reduce((a, b) => a.concat(b), []).map(t => t.toLowerCase()));
 			throw new TypeError(`duplicate command triggers with ${dup}, and ${data.triggers[0].toLowerCase()}`);
 		}
 
@@ -145,6 +145,12 @@ export default class CommandHandler {
 	deleteCommand(cmd: string): this {
 		const c = this.getCommand(cmd);
 		delete this._commands[this._commands.indexOf(c)];
+		return this;
+	}
+
+	deleteCategory(cat: string): this {
+		const c = this.getCategory(cat);
+		delete this._categories[this._categories.indexOf(c)];
 		return this;
 	}
 
@@ -209,7 +215,7 @@ export default class CommandHandler {
 		/* end blacklist notice */
 		/* end blacklist check */
 
-		this._client.track("command", `command.${cmd.triggers[0]}`, {
+		/* this._client.track("command", `command.${cmd.triggers[0]}`, {
 			hostname: this._client.f.os.hostname(),
 			beta: config.beta,
 			clientId: config.bot.clientID,
@@ -246,7 +252,7 @@ export default class CommandHandler {
 				donator: msg.uConfig.patreon.donator,
 				developer: config.developers.includes(msg.author.id)
 			}
-		}, new Date());
+		}, new Date()); */
 
 		if (!config.developers.includes(msg.author.id) && !msg.uConfig.blacklist.blacklisted) {
 			this._client.spamCounter.push({
@@ -283,7 +289,7 @@ export default class CommandHandler {
 					embeds: [
 						{
 							title: `Possible Command Spam From ${msg.author.tag} (${msg.author.id}) | VL: ${spC}`,
-							description: `Report: ${config.beta ? `http://localhost:12346/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`
+							description: `Report: ${config.beta ? `http://${config.apiBindIp}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`
 						}
 					],
 					username: `FurryBot Spam Logs${config.beta ? " - Beta" : ""}`,
@@ -303,7 +309,7 @@ export default class CommandHandler {
 						embeds: [
 							{
 								title: "User Blacklisted",
-								description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist. Report: ${config.beta ? `http://localhost:12346/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
+								description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist. Report: ${config.beta ? `http://${config.apiBindIp}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
 								timestamp: new Date().toISOString(),
 								color: this._client.f.randomColor()
 							}
@@ -417,7 +423,7 @@ export default class CommandHandler {
 
 		const start = performance.now();
 		this._client.logger.command(`Command "${cmd.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.channel.guild.shard.id);
-		const res = await cmd.run.call({ ...this._client, _cmd: cmd }, msg).catch(err => err);
+		const res = await cmd.run.call(this._client, msg, cmd).catch(err => err);
 		const end = performance.now();
 
 		this._client.logger.debug(`Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms`, msg.channel.guild.shard.id);
@@ -516,7 +522,7 @@ export default class CommandHandler {
 			}
 		}
 
-		const res = await cmd.run.call({ ...this._client, _cmd: cmd }, msg).catch(err => err);
+		const res = await cmd.run.call(this._client, msg, cmd).catch(err => err);
 
 		if (res instanceof Error && !(res instanceof CommandError) && (res.message !== "ERR_INVALID_USAGE" && res.name !== "ERR_INVALID_USAGE")) throw new CommandError(cmd, res);
 

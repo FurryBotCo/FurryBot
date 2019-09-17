@@ -29,7 +29,7 @@ export default class Command {
 	private _features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
 	private _subCommands: Command[];
 	private _category: Category;
-	private _run: (this: FurryBot, msg: ExtendedMessage) => Promise<any>;
+	private _run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<any>;
 	private _handler: CommandHandler;
 
 	constructor(subcommand: true, data: {
@@ -43,7 +43,7 @@ export default class Command {
 		features?: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
 		subCommands?: Command[];
 		category?: Category | string;
-		run: (this: FurryBot, msg: ExtendedMessage) => Promise<any>;
+		run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<any>;
 	}, h: CommandHandler, client?: FurryBot);
 
 	constructor(subcommand: false, data: {
@@ -71,7 +71,7 @@ export default class Command {
 		features?: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
 		subCommands?: Command[];
 		category: Category | string;
-		run: (this: FurryBot, msg: ExtendedMessage) => Promise<any>;
+		run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<any>;
 	}, h: CommandHandler, client?: FurryBot) {
 		if (!data.triggers) throw new TypeError("Missing triggers property.");
 		if (!(data.triggers instanceof Array)) throw new TypeError("Invalid triggers property.");

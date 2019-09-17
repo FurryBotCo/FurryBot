@@ -29,7 +29,7 @@ new Command(true, {
 	features: ["devOnly"],
 	subCommands: [],
 	category: null,
-	run: (async function (this: CommandContext, msg: ExtendedMessage) {
+	run: (async function (this: FurryBot, msg: ExtendedMessage) {
 
 	})
 }, client.cmdHandler, client)
@@ -64,7 +64,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: CommandContext, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage) {
 					let id, srv: GuildConfig, blacklistReason, embed: Eris.EmbedOptions;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					id = msg.args[0];
@@ -110,7 +110,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: CommandContext, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage) {
 					let u, id, blacklistReason, usr: UserConfig, embed: Eris.EmbedOptions;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					u = await msg.getUserFromArgs();
@@ -146,10 +146,10 @@ export default [
 			}, client.cmdHandler, client)
 		],
 		category: null,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
-			const sub = await this.cmdHandler.handleSubCommand(this._cmd, msg);
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
-			else return this.f.sendCommandEmbed(msg, this._cmd);
+			else return this.f.sendCommandEmbed(msg, cmd);
 		})
 	}, client.cmdHandler, client),
 	new Command(true, {
@@ -180,7 +180,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: CommandContext, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage) {
 					let id, srv: GuildConfig;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					id = msg.args[0];
@@ -211,7 +211,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: CommandContext, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage) {
 					let u, id, usr: UserConfig;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					u = await msg.getUserFromArgs();
@@ -230,10 +230,10 @@ export default [
 				})
 			}, client.cmdHandler, client)],
 		category: null,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
-			const sub = await this.cmdHandler.handleSubCommand(this._cmd, msg);
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
-			else return this.f.sendCommandEmbed(msg, this._cmd);
+			else return this.f.sendCommandEmbed(msg, cmd);
 		})
 	}, client.cmdHandler, client),
 	new Command(true, {
@@ -265,7 +265,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: CommandContext, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage) {
 					const entries: GuildConfig[] = await mdb.collection("guilds").find({ "blacklist.blacklisted": true }).toArray();
 
 					if (entries.length === 0) return msg.reply("no entries found");
@@ -321,7 +321,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: CommandContext, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage) {
 					const entries: UserConfig[] = await mdb.collection("users").find({ "blacklist.blacklisted": true }).toArray();
 
 					if (entries.length === 0) return msg.reply("no entries found");
@@ -362,10 +362,10 @@ export default [
 				})
 			}, client.cmdHandler, client)],
 		category: null,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
-			const sub = await this.cmdHandler.handleSubCommand(this._cmd, msg);
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
-			else return this.f.sendCommandEmbed(msg, this._cmd);
+			else return this.f.sendCommandEmbed(msg, cmd);
 		})
 	}, client.cmdHandler, client),
 	new Command(true, {
@@ -397,7 +397,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: CommandContext, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage) {
 					let id, srv: GuildConfig, embed;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					id = msg.args[0];
@@ -444,7 +444,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: CommandContext, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage) {
 					let u, id, usr: UserConfig, embed: Eris.EmbedOptions;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					u = await msg.getUserFromArgs();
@@ -478,10 +478,10 @@ export default [
 				})
 			}, client.cmdHandler, client)],
 		category: null,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
-			const sub = await this.cmdHandler.handleSubCommand(this._cmd, msg);
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
-			else return this.f.sendCommandEmbed(msg, this._cmd);
+			else return this.f.sendCommandEmbed(msg, cmd);
 		})
 	}, client.cmdHandler, client)
 ];
