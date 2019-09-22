@@ -1,4 +1,4 @@
-import client from "../../../index";
+import manager from "../../../index";
 import FurryBot from "../../main";
 import config from "../../config";
 import functions from "../../util/functions";
@@ -8,6 +8,7 @@ import * as Eris from "eris";
 import GuildConfig from "../../modules/config/GuildConfig";
 import UserConfig from "../../modules/config/UserConfig";
 import { Command, CommandError } from "../../util/CommandHandler";
+import CmdHandler from "../../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
@@ -32,7 +33,7 @@ new Command(true, {
 	run: (async function (this: FurryBot, msg: ExtendedMessage) {
 
 	})
-}, client.cmdHandler, client)
+}, CmdHandler)
 */
 export default [
 	new Command(true, {
@@ -95,7 +96,7 @@ export default [
 						return msg.reply(`Added **${id}** to the blacklist, reason: ${blacklistReason}.`);
 					}
 				})
-			}, client.cmdHandler, client),
+			}, CmdHandler),
 			new Command(true, {
 				triggers: [
 					"user",
@@ -143,7 +144,7 @@ export default [
 						return msg.reply(`Added **${u.username}#${u.discriminator}** (${id}) to the blacklist, reason: ${blacklistReason}.`);
 					}
 				})
-			}, client.cmdHandler, client)
+			}, CmdHandler)
 		],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
@@ -151,7 +152,7 @@ export default [
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"check"
@@ -196,7 +197,7 @@ export default [
 					if (srv.blacklist.blacklisted) return msg.reply(`**${id}** is blacklisted, reason: ${srv.blacklist.reason}.`);
 					else return msg.reply(`**${id}** is not blacklisted.`);
 				})
-			}, client.cmdHandler, client),
+			}, CmdHandler),
 			new Command(true, {
 				triggers: [
 					"user",
@@ -228,14 +229,14 @@ export default [
 					if (usr.blacklist.blacklisted) return msg.reply(`**${u.username}#${u.discriminator}** (${id}) is blacklisted, reason: ${usr.blacklist.reason}.`);
 					else return msg.reply(`**${u.username}#${u.discriminator}** (${id}) is not blacklisted.`);
 				})
-			}, client.cmdHandler, client)],
+			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"list",
@@ -277,7 +278,7 @@ export default [
 
 					for (const en of entries) {
 						let s;
-						if (this.guilds.has(en.id)) s = await this.getRESTGuild(en.id);
+						if (this.guilds.has(en.id)) s = await this.bot.getRESTGuild(en.id);
 						else s = null;
 
 						if (!s) e.push(`\`${en.id}\` - ${en.blacklist.reason}`);
@@ -306,7 +307,7 @@ export default [
 					};
 					return msg.channel.createMessage({ embed });
 				})
-			}, client.cmdHandler, client),
+			}, CmdHandler),
 			new Command(true, {
 				triggers: [
 					"user",
@@ -333,7 +334,7 @@ export default [
 					if (msg.args.length > 0) page = parseInt(msg.args[0], 10);
 
 					for (const en of entries) {
-						const s = await this.getRESTUser(en.id);
+						const s = await this.bot.getRESTUser(en.id);
 
 						if (!s) e.push(`\`${en.id}\` - ${en.blacklist.reason}`);
 						else e.push(`\`${s.username}#${s.discriminator}\` (\`${en.id}\`) - ${en.blacklist.reason}`);
@@ -360,14 +361,14 @@ export default [
 
 					return msg.channel.createMessage({ embed });
 				})
-			}, client.cmdHandler, client)],
+			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"remove",
@@ -429,7 +430,7 @@ export default [
 						return msg.reply(`Removed **${id}** from the blacklist, previous reason: ${srv.blacklist.reason}.`);
 					}
 				})
-			}, client.cmdHandler, client),
+			}, CmdHandler),
 			new Command(true, {
 				triggers: [
 					"user",
@@ -476,12 +477,12 @@ export default [
 						return msg.reply(`Removed **${u.username}#${u.discriminator}** (${id}) from the blacklist, previous reason: ${usr.blacklist.reason}.`);
 					}
 				})
-			}, client.cmdHandler, client)],
+			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
-	}, client.cmdHandler, client)
+	}, CmdHandler)
 ];

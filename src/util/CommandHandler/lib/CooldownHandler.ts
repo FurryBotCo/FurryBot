@@ -1,3 +1,9 @@
+/**
+ * Copied from Furry Bot
+ * https://github.com/FurryBotCo/FurryBot/blob/master/src/util/CommandHandler/lib/CooldownHandler.ts
+ * Licensed under AGPL-3.0, https://github.com/FurryBotCo/FurryBot/blob/master/LICENSE, https://github.com/FurryBotCo/SpotiJS/blob/master/LICENSE
+ */
+
 import Command from "./Command";
 import chalk from "chalk";
 
@@ -26,7 +32,7 @@ class CooldownHandler {
 		if (!this._inHandler) throw new TypeError("Cooldown handler add called with invalid context."); let c;
 		if (cmd instanceof Command) c = cmd.triggers[0].toLowerCase();
 		else c = cmd.toLowerCase();
-		console.debug(`Added label "${c}"`, null, chalk.magentaBright("CommandHandler"));
+		console.debug("CooldownHandler", `Added label "${c}"`, null, chalk.magentaBright("CommandHandler"));
 		if (Object.keys(this._cooldowns).map(k => k.toLowerCase()).includes(c)) throw new TypeError("Duplicate command.");
 
 		this._cooldowns[c] = [];
@@ -47,11 +53,11 @@ class CooldownHandler {
 		}
 
 		if (!Object.keys(this._cooldowns).includes(c)) {
-			console.warn(`Cooldown label "${c}" auto created. Cooldown attempted to be set for non-existent label.`, null, chalk.magentaBright("CommandHandler"));
+			console.warn("CooldownHandler", `Cooldown label "${c}" auto created. Cooldown attempted to be set for non-existent label.`, null, chalk.magentaBright("CommandHandler"));
 			this.addCommand(c);
 		}
 
-		console.debug(`Set cooldown for "${user}" on "${c}" for "${time}"`, null, chalk.magentaBright("CommandHandler"));
+		console.debug("CooldownHandler", `Set cooldown for "${user}" on "${c}" for "${time}"`, null, chalk.magentaBright("CommandHandler"));
 		this._cooldowns[c].push({
 			startTime: Date.now(),
 			time,
@@ -66,7 +72,7 @@ class CooldownHandler {
 		let c;
 		if (cmd instanceof Command) c = cmd.triggers[0].toLowerCase();
 		else c = cmd.toLowerCase();
-		console.debug(`Remove cooldown of "${c}" for user "${user}"`, null, chalk.magentaBright("CommandHandler"));
+		console.debug("CooldownHandler", `Remove cooldown of "${c}" for user "${user}"`, null, chalk.magentaBright("CommandHandler"));
 
 		const d = this._cooldowns[c].filter(d => d.user === user);
 
@@ -82,7 +88,7 @@ class CooldownHandler {
 		let c;
 		if (cmd instanceof Command) c = cmd.triggers[0].toLowerCase();
 		else c = cmd.toLowerCase();
-		console.debug(`Checking cooldown of "${c}" for user "${user}"`, null, chalk.magentaBright("CommandHandler"));
+		console.debug("CooldownHandler", `Checking cooldown of "${c}" for user "${user}"`, null, chalk.magentaBright("CommandHandler"));
 
 		const down = this._cooldowns[c].filter(d => d.user === user);
 		if (!down || down.length < 1) return {
@@ -91,7 +97,6 @@ class CooldownHandler {
 		};
 
 		let time = (Date.now() - down[0].startTime) - down[0].time;
-		console.log(time);
 		if (time > 0) time = 0;
 		return {
 			c: true,

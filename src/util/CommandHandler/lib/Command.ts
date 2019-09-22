@@ -1,7 +1,12 @@
+/**
+ * Copied from Furry Bot
+ * https://github.com/FurryBotCo/FurryBot/blob/master/src/util/CommandHandler/lib/Command.ts
+ * Licensed under AGPL-3.0, https://github.com/FurryBotCo/FurryBot/blob/master/LICENSE, https://github.com/FurryBotCo/SpotiJS/blob/master/LICENSE
+ */
+
 import * as Eris from "eris";
 import Category from "./Category";
 import CommandHandler from "./CommandHandler";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "modules/extended/ExtendedMessage";
 
 type ArrayOneOrMore<T> = {
@@ -29,7 +34,7 @@ export default class Command {
 	private _features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
 	private _subCommands: Command[];
 	private _category: Category;
-	private _run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<any>;
+	private _run: (this: any, msg: ExtendedMessage, cmd: Command) => Promise<any>;
 	private _handler: CommandHandler;
 
 	constructor(subcommand: true, data: {
@@ -43,8 +48,8 @@ export default class Command {
 		features?: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
 		subCommands?: Command[];
 		category?: Category | string;
-		run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<any>;
-	}, h: CommandHandler, client?: FurryBot);
+		run: (this: any, msg: ExtendedMessage, cmd: Command) => Promise<any>;
+	}, h: CommandHandler, client?: any);
 
 	constructor(subcommand: false, data: {
 		triggers: ArrayOneOrMore<string>;
@@ -57,8 +62,8 @@ export default class Command {
 		features?: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
 		subCommands?: Command[];
 		category: Category | string;
-		run: (this: FurryBot, msg: ExtendedMessage) => Promise<any>;
-	}, h: CommandHandler, client?: FurryBot);
+		run: (this: any, msg: ExtendedMessage) => Promise<any>;
+	}, h: CommandHandler, client?: any);
 
 	constructor(subcommand: boolean, data: {
 		triggers: ArrayOneOrMore<string>;
@@ -71,8 +76,8 @@ export default class Command {
 		features?: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
 		subCommands?: Command[];
 		category: Category | string;
-		run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<any>;
-	}, h: CommandHandler, client?: FurryBot) {
+		run: (this: any, msg: ExtendedMessage, cmd: Command) => Promise<any>;
+	}, h: CommandHandler, client?: any) {
 		if (!data.triggers) throw new TypeError("Missing triggers property.");
 		if (!(data.triggers instanceof Array)) throw new TypeError("Invalid triggers property.");
 		if (data.triggers.length < 1) throw new TypeError("Not enough triggers. (must have at least 1)");

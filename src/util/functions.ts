@@ -11,7 +11,7 @@ import * as Eris from "eris";
 import FurryBot from "@FurryBot";
 import { mdb } from "../modules/Database";
 import ErrorHandler from "./ErrorHandler";
-import client from "../../";
+import manager from "../../";
 import UserConfig from "../modules/config/UserConfig";
 import GuildConfig from "../modules/config/GuildConfig";
 import youtubesearch from "youtube-search";
@@ -21,6 +21,14 @@ import refreshPatreonToken from "./patreon/refreshPatreonToken";
 import loopPatrons from "./patreon/loopPatrons";
 
 export { ErrorHandler };
+
+const memberIsBooster = (async (m: Eris.Member): Promise<boolean> => {
+	if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
+	const guild = await manager.eris.getRESTGuild(config.bot.mainGuild);
+	if (!guild) throw new TypeError("failed to find main guild");
+	if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
+	return true;
+});
 
 export default {
 	os,
@@ -494,13 +502,7 @@ export default {
 
 		return mdb.collection("dailyjoins").findOneAndUpdate({ date }, { $set: { count, guildCount } });
 	}),
-	memberIsBooster: ((m: Eris.Member): boolean => {
-		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
-		const guild = client.guilds.get(config.bot.mainGuild);
-		if (!guild) throw new TypeError("failed to find main guild");
-		if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
-		return true;
-	}),
+	memberIsBooster,
 	calculateMultiplier: (async (m: Eris.Member): Promise<{ amount: number, multi: { [s: string]: boolean } }> => {
 		// return null;
 		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
@@ -536,15 +538,11 @@ export default {
 			}
 		}
 
-		if (client.guilds.has(config.bot.mainGuild)) {
-			const mainGuild = client.guilds.get(config.bot.mainGuild);
-			if (mainGuild.members.has(member.user.id)) {
-				if (mainGuild.members.get(member.user.id).roles.includes(config.nitroBoosterRole)) {
-					a.push(config.eco.multipliers.booster);
-					multi.booster = true;
-				}
-			}
-		} else console.error("Failed to find main guild");
+		const b = await memberIsBooster(member);
+		if (b) {
+			a.push(config.eco.multipliers.booster);
+			multi.booster = true;
+		}
 
 		const t = await mdb.collection("users").findOne({ id: m.user.id }).then(res => res.tips).catch(err => false);
 		if (t) {

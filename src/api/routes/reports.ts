@@ -1,6 +1,6 @@
 import express from "express";
 import { mdb, mongo } from "../../modules/Database";
-import client from "../../../";
+import manager from "../../../";
 import functions from "../../util/functions";
 import config from "../../config";
 import util from "util";

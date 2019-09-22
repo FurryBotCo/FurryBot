@@ -1,16 +1,17 @@
-import client from "../../index";
+import manager from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
 import config from "../config";
 import { Command } from "../util/CommandHandler";
+import CmdHandler from "../util/cmd";
 
 
 type CommandContext = FurryBot & { _cmd: Command };
 
 /*
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "",
 		displayName: "",

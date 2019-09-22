@@ -1,5 +1,5 @@
 import express from "express";
-import client from "../../../";
+import manager from "../../../";
 import functions from "../../util/functions";
 import config from "../../config";
 import util from "util";

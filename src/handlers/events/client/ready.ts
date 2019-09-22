@@ -32,13 +32,13 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 	fs.readdirSync(`${__dirname}/../../../commands`).filter(d => !fs.lstatSync(`${__dirname}/../../../commands/${d}`).isDirectory() && d.endsWith(__filename.split(".").reverse()[0])).map(f => require(`${__dirname}/../../../commands/${f}`));
 
 
-	this.editStatus("online", {
+	this.bot.editStatus("online", {
 		name: `with furries.. | ${config.defaultPrefix}help`,
 		type: 0
 	});
 
 	setInterval(() => {
-		this.editStatus("online", {
+		this.bot.editStatus("online", {
 			name: `with furries.. | ${config.defaultPrefix}help`,
 			type: 0
 		});
@@ -46,16 +46,20 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	this.wss = new WebSocket.Server({ server: srv });
 
-	const sv = http.createServer(express())
-		.on("error", () => this.logger.warn("Attempted to start api server, but the port is in use.", 0))
-		.on("listening", () => {
-			sv.close();
-			this.srv = srv.listen(config.apiPort, config.apiBindIp);
-		})
-		.on("close", () => this.logger.debug("Port test server closed, starting bot api server.", 0))
-		.listen(config.apiPort, config.apiBindIp);
+	// we only launch the api on the first cluster
+	if (this.cluster.id === 0) {
+		const sv = http.createServer(express())
+			.on("error", () => this.logger.warn(`Cluster #${this.cluster.id} | APIServer`, "Attempted to start api server, but the port is in use."))
+			.on("listening", () => {
+				sv.close();
+				this.srv = srv.listen(config.apiPort, config.apiBindIp);
+			})
+			.on("close", () => this.logger.debug(`Cluster #${this.cluster.id} | APIServer`, "Port test server closed, starting bot api server."))
+			.listen(config.apiPort, config.apiBindIp);
+	}
 
-	if (!config.beta) this.ls = setInterval(ListStats, 3e5, this);
+	// we will have to rework list stats to work with clustering
+	// if (!config.beta) this.ls = setInterval(ListStats, 3e5, this);
 
 	this.Temp = new Temp(config.tmpDir);
 
@@ -63,9 +67,10 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		.on("SIGINT", this.Temp.clean)
 		.on("SIGTERM", this.Temp.clean);
 
-	this.logger.log(`Client has started with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds.`, 0);
+	this.logger.log(`Cluster #${this.cluster.id}`, `Client has started with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds.`);
 
-	if (!config.beta) setInterval(async () => {
+	// we aren't posting daily joins if we aren't on the main cluster
+	if (!config.beta && this.cluster.id === 0) setInterval(async () => {
 		if (new Date().toString().split(" ")[4] === "00:00:00") {
 
 			let d = new Date();
@@ -106,7 +111,13 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 	}, 1e3);
 
 	this.wss.on("connection", async (socket, request) => {
-		this.logger.debug(`IO Connection From ${request.socket.remoteAddress}`, 0, "IO");
+		this.logger.debug("IO", `IO Connection From ${request.socket.remoteAddress}`);
+
+		socket.once("close", () => {
+			this.logger.debug("IO", `IO Disconnect From ${request.socket.remoteAddress}`);
+		});
+
+		if (!request.url || request.url.indexOf("?") === -1) return socket.close(1000, "Invalid Authentication");
 		const k = request.url.split("?")[1].split("&").map(t => t.split("="));
 
 		const j = k.filter(t => t[0] === "key")[0];
@@ -131,7 +142,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 			switch (j.event.toLowerCase()) {
 				case "eval":
-					console.debug(`IO Eval: ${j.data}`);
+					console.debug("IO", `IO Eval: ${j.data}`);
 					const start = performance.now();
 					let res;
 					let error = false;
@@ -182,10 +193,6 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 						data: "invalid event"
 					}));
 			}
-		});
-
-		socket.once("close", () => {
-			this.logger.debug(`IO Disconnect From ${request.socket.remoteAddress}`, 0, "IO");
 		});
 	});
 

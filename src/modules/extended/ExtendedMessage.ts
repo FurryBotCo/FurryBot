@@ -93,7 +93,7 @@ class ExtendedMessage extends Eris.Message {
 		// else data.timestamp = Date.now();
 		if (![undefined].includes(msg.tts)) data.tts = msg.tts;
 		if (![undefined].includes(msg.type)) data.type = msg.type;
-		super(data, client);
+		super(data, client.bot);
 		this.client = client;
 
 		// this property doesn't seem to be set properly
@@ -155,7 +155,7 @@ class ExtendedMessage extends Eris.Message {
 					isDeveloper: config.developers.includes(this.author.id)
 				};
 			} catch (e) {
-				this._client.logger.log(`Error setting up message ${this.id}: ${e}`, this.guild && this.guild.shard ? this.guild.shard.id || null : null, chalk.magentaBright("ExtendedMessage"));
+				this._client.logger.log("ClusterManager", `Error setting up message ${this.id}: ${e}`);
 			}
 		}
 	}
@@ -285,7 +285,7 @@ class ExtendedMessage extends Eris.Message {
 		if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition + 1)) return this.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase()).user;
 
 		// nothing found
-		return this._client.getRESTUser(args[argPosition]).catch(err => null);
+		return this._client.bot.getRESTUser(args[argPosition]).catch(err => null);
 	}
 
 	async getMemberFromArgs(argPosition = 0, unparsed = false, join = false, mentionPosition = 0): Promise<Eris.Member> {

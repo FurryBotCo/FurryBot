@@ -32,7 +32,7 @@ export default new ClientEvent("messageReactionAdd", (async function (this: Furr
 	else t = emoji.name;
 
 	const msg = await m.channel.getMessage(m.id);
-	const user: Eris.User = this.users.has(userID) ? this.users.get(userID) : await this.getRESTUser(userID).catch(err => null);
+	const user: Eris.User = this.users.has(userID) ? this.users.get(userID) : await this.bot.getRESTUser(userID).catch(err => null);
 	if (!user || user.bot /*|| msg.author.id === user.id*/) return;
 
 	let gConfig: GuildConfig = await mdb.collection("guilds").findOne({ id: msg.member.guild.id });

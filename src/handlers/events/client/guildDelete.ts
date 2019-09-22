@@ -6,31 +6,19 @@ import functions from "../../../util/functions";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 
-	/* await this.track("clientEvent", "events.guildDelete", {
-		hostname: this.f.os.hostname(),
-		beta: config.beta,
-		clientId: config.bot.clientID,
-		guild: {
-			id: guild.id,
-			name: guild.name,
-			ownerId: guild.id
-		},
-		guildCount: this.guilds.size
-	}, new Date()); */
-
 	await this.f.incrementDailyCounter(false, this.guilds.size);
 
 	let author = {
 		name: "Unknown#0000",
-		icon_url: "https://reddit.furry.host/noicon.png"
+		icon_url: "https://i.furcdn.net/noicon.png"
 	};
 	let owner = "Unknown#0000 (000000000000000000)";
 	if (guild.ownerID) {
-		const u: Eris.User = await this.getRESTUser(guild.ownerID).catch(err => null);
+		const u: Eris.User = await this.bot.getRESTUser(guild.ownerID).catch(err => null);
 		if (u !== null) {
 			author = {
 				name: `${u.username}#${u.discriminator}`,
-				icon_url: u.avatarURL ? u.avatarURL : "https://reddit.furry.host/noicon.png"
+				icon_url: u.avatarURL ? u.avatarURL : "https://i.furcdn.net/noicon.png"
 			};
 			owner = `${u.username}#${u.discriminator} (${u.id})`;
 		}
@@ -43,10 +31,10 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		description: `Guild #${this.guilds.size + 1}\nCurrent Total: ${this.guilds.size}`,
 		author,
 		image: {
-			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://reddit.furry.host/noicon.png"
+			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://i.furcdn.net/noicon.png"
 		},
 		thumbnail: {
-			url: "https://reddit.furry.host/noicon.png"
+			url: "https://i.furcdn.net/noicon.png"
 		},
 		fields: [
 			{
@@ -66,7 +54,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 				inline: false
 			},
 			{
-				name: `Large Guild (${this.options.largeThreshold}+ Members)`,
+				name: `Large Guild (${this.bot.options.largeThreshold}+ Members)`,
 				value: guild.large ? `Yes (${guild.memberCount})` : `No ${guild.memberCount}`,
 				inline: false
 			},
@@ -80,7 +68,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		color: this.f.randomColor(),
 		footer: {
 			text: `Shard ${guild.shard.id + 1}/${this.shards.size}`,
-			icon_url: "https://reddit.furry.host/FurryBotForDiscord.png"
+			icon_url: "https://i.furry.bot/furry.png"
 		}
 	};
 

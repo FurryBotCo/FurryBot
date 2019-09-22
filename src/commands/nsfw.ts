@@ -1,4 +1,4 @@
-import client from "../../index";
+import manager from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
@@ -8,10 +8,11 @@ import * as Eris from "eris";
 import phin from "phin";
 import { mongo } from "../modules/Database";
 import ReactionQueue from "../util/queue/ReactionQeueue";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "nsfw",
 		displayName: ":smirk: NSFW",
@@ -62,7 +63,7 @@ client.cmdHandler
 		donatorCooldown: 3e3,
 		description: "Get some content from E621!",
 		usage: "[tags]",
-		features: ["nsfw", "devOnly"],
+		features: ["nsfw"],
 		category: "nsfw",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (this.activeReactChannels.includes(msg.channel.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
@@ -135,7 +136,7 @@ client.cmdHandler
 
 				if (p === "EXIT") {
 					clearTimeout(t);
-					client.removeListener("messageReactionAdd", f);
+					client.bot.removeListener("messageReactionAdd", f);
 					if (q.entries.length > 0) {
 						let count = 0;
 						const cI = setInterval(async () => {
@@ -222,11 +223,7 @@ client.cmdHandler
 					user
 				});
 			});
-
-			console.log(typeof client);
-			console.log(client.constructor.name);
-			console.log(typeof client.on);
-			client.on("messageReactionAdd", f);
+			client.bot.on("messageReactionAdd", f);
 			this.activeReactChannels.push(msg.channel.id);
 		})
 	})

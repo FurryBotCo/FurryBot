@@ -1,4 +1,4 @@
-import client from "../../index";
+import manager from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
@@ -9,10 +9,11 @@ import * as Eris from "eris";
 import Permissions from "../util/Permissions";
 import UserConfig from "../modules/config/UserConfig";
 import { mdb } from "../modules/Database";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "information",
 		displayName: ":tools: Information",
@@ -61,12 +62,12 @@ client.cmdHandler
 
 				// list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			} catch (e) {
-				this.logger.log({
+				this.logger.log(`Cluster #${this.cluster.id}`, {
 					headers: req.headers,
 					body: req.body.toString(),
 					statusCode: req.statusCode
-				}, msg.guild.shard.id);
-				this.logger.error(e, msg.guild.shard.id);
+				});
+				this.logger.error(e);
 				rs = req.body;
 				list = "Lookup Failed.";
 			}
@@ -123,6 +124,7 @@ client.cmdHandler
 		features: [],
 		category: "information",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+			const st = await this.cluster.getManagerStats();
 			const embed: Eris.EmbedOptions = {
 				title: "Bot Info!",
 				fields: [
@@ -143,11 +145,15 @@ client.cmdHandler
 						value: `${this.f.parseTime(process.uptime())} (${this.f.secondsToHours(process.uptime())})`,
 						inline: false
 					}, {
+						name: "Shards/Clusters",
+						value: `Cluster Count: ${st.clusterCount}\nShard Count: ${st.shards.length}`,
+						inline: false
+					}, {
 						name: "Total Guilds",
 						value: this.guilds.size.toString(),
 						inline: false
 					}, {
-						name: `Large Guilds (${this.options.largeThreshold}+ Members)`,
+						name: `Large Guilds (${this.bot.options.largeThreshold}+ Members)`,
 						value: this.guilds.filter(g => g.large).length.toString(),
 						inline: false
 					}, {
@@ -521,12 +527,24 @@ client.cmdHandler
 			}
 
 			let features = "";
-			// if (msg.channel.guild.verified) features += "Verified\n";
-			if (msg.channel.guild.features.indexOf("VIP_REGIONS") !== -1) features += "VIP Voice Vegions\n";
-			// if fetching vanity url fails return discord-api
-			if (msg.channel.guild.features.indexOf("VANITY_URL") !== -1) features += "Vanity URL\n"; // features+=`Vanity URL: https://discord.gg/${msg.guild.fetchVanityCode().catch(noerr => "discord-api")}\n`;
-			if (msg.channel.guild.features.indexOf("INVITE_SPLASH") !== -1) features += "Invite Splash\n"; // features+=`[Invite Splash](${msg.guild.inviteSplash()})\n`;
 
+			const f = {
+				INVITE_SPLASH: "Invite Splash",
+				VIP_REGIONS: "Vip Voice Regions/320kbps Voice Channels",
+				VANITY_URL: "Vanity URL",
+				VERIFIED: "Verified",
+				PARTNERED: "Partnered",
+				LURKABLE: "Lurkable",
+				COMMERCE: "Store Channels",
+				NEWS: "News Channels",
+				DISCOVERABLE: "Discoverable",
+				FEATURABLE: "Featurable",
+				ANIMATED_ICON: "Animated Icon",
+				BANNER: "Guild Banner",
+				PUBLIC: "Public"
+			};
+
+			Object.keys(f).forEach((k) => msg.guild.features.includes(k) ? features += `**${k}** - ${f[k]}\n` : null);
 			if (features === "") features = "NONE";
 			const verificationLevel = [
 				"**NONE** - unrestricted",
@@ -539,8 +557,8 @@ client.cmdHandler
 			// if (msg.channel.guild.memberCount < 1000) s = await Promise.all(msg.guild.members.filter(m => !m.user.bot).map((m) => mdb.collection("users").findOne({ id: m.id }))).then(res => res.map(m => m === null ? config.defaults.userConfig : m).map(m => ({ owoCount: m.owoCount === undefined ? 0 : m.owoCount, uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount })));
 			// else s = false;
 			const mfaLevel = [
-				"NONE",
-				"ELEVATED"
+				"Not Enabled",
+				"Enabled"
 			];
 
 			const defaultNotifications = [
@@ -548,7 +566,7 @@ client.cmdHandler
 				"Only Mentions"
 			];
 			const roles = msg.guild.roles.map(role => role.name === "@everyone" ? "@everyone" : `<@&${role.id}>`).join(",");
-			const rr = roles.length > 1000 ? `Too many to list, please use \`${msg.gConfig.prefix}roles server\`` : roles;
+			const rr = roles.length > 1000 ? `Too many to list.` : roles;
 			const embed = {
 				title: `Server Info - **${msg.guild.name}**`,
 				image: {
@@ -601,7 +619,7 @@ client.cmdHandler
 					},
 					{
 						name: "Extra",
-						value: `**Large Guild**: ${msg.guild.large ? "Yes" : "No"}\n**Verification**: ${verificationLevel[msg.guild.verificationLevel]}\n**2FA**: ${mfaLevel[msg.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[msg.guild.defaultNotifications]}\n**Features**:\n${features}`,
+						value: `**Large Guild**: ${msg.guild.large ? "Yes" : "No"}\n**Verification**: ${verificationLevel[msg.guild.verificationLevel]}\n**2FA**: ${mfaLevel[msg.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[msg.guild.defaultNotifications]}\n**[Features](https://discordapp.com/developers/docs/resources/guild#guild-object-guild-features)**:\n${features}`,
 						inline: false
 					}/*, {
 	name: "Counters",
@@ -685,7 +703,7 @@ client.cmdHandler
 
 				if (u.marriage.married) embed.fields.push({
 					name: "Marriage Status (on this bot)",
-					value: `Married to ${await this.getRESTUser(u.marriage.partner).then(usr => `${usr.username}#${usr.discriminator}`).catch(err => "Unknown#0000")}`,
+					value: `Married to ${await this.bot.getRESTUser(u.marriage.partner).then(usr => `${usr.username}#${usr.discriminator}`).catch(err => "Unknown#0000")}`,
 					inline: true
 				});
 

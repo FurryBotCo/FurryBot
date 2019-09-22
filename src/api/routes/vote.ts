@@ -1,6 +1,6 @@
 import express from "express";
 import config from "../../config";
-import client from "../../../";
+import manager from "../../../";
 import { mdb } from "../../modules/Database";
 import uuid from "uuid/v4";
 import functions from "../../util/functions";
@@ -20,8 +20,8 @@ app.post("/:list", async (req, res) => {
 		case "dbl":
 			console.log(`${req.body.type.toLowerCase() === "test" ? "Test v" : "V"}ote from dbl for ${req.body.user} on bot ${req.body.bot}`);
 
-			if (req.body.bot !== client.user.id) {
-				console.log(`Vote for different client recieved, current client: ${client.user.id}, recieved: ${req.body.bot}`);
+			if (req.body.bot !== manager.eris.user.id) {
+				console.log(`Vote for different client recieved, current client: ${manager.eris.user.id}, recieved: ${req.body.bot}`);
 				return res.status(400).json({
 					success: false,
 					error: "invalid client"
@@ -47,8 +47,8 @@ app.post("/:list", async (req, res) => {
 
 			await mdb.collection("users").findOneAndUpdate({ id: req.body.user }, { $set: { bal } });
 
-			let u = client.users.get(req.body.user);
-			if (!u) u = await client.getRESTUser(req.body.user);
+			let u = manager.eris.users.get(req.body.user);
+			if (!u) u = await manager.eris.getRESTUser(req.body.user);
 
 			await u.getDMChannel().then(ch => ch.createMessage({
 				embed: {
@@ -60,7 +60,7 @@ app.post("/:list", async (req, res) => {
 			})).catch(err => null);
 
 			const embed: eris.EmbedOptions = {
-				title: `Vote for ${client.user.username}#${client.user.discriminator}`,
+				title: `Vote for ${manager.eris.user.username}#${manager.eris.user.discriminator}`,
 				author: {
 					name: `Vote performed by ${u.username}#${u.discriminator}`,
 					icon_url: u.avatarURL
@@ -70,7 +70,7 @@ app.post("/:list", async (req, res) => {
 				color: functions.randomColor()
 			};
 
-			await client.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+			await manager.eris.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 				embeds: [embed],
 				username: `Vote Logs${config.beta ? " - Beta" : ""}`,
 				avatarURL: "https://assets.furry.bot/vote_logs.png"

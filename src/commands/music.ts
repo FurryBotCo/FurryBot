@@ -1,4 +1,4 @@
-import client from "../../index";
+import manager from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
@@ -7,10 +7,11 @@ import { Command, CommandError } from "../util/CommandHandler";
 import * as Eris from "eris";
 import ytdl from "ytdl-core";
 import { YouTubeSearchResults } from "youtube-search";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "music",
 		displayName: ":musical_note: Music",

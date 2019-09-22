@@ -1,4 +1,4 @@
-import client from "../../index";
+import manager from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
@@ -7,10 +7,11 @@ import { Command, CommandError, Category } from "../util/CommandHandler";
 import phin from "phin";
 import * as Eris from "eris";
 import truncate from "truncate";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "misc",
 		displayName: ":thumbsup: Miscellaneous",

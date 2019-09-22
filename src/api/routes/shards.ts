@@ -1,33 +1,19 @@
 import express from "express";
 import { mdb } from "../../modules/Database";
-import client from "../../../";
+import manager from "../../../";
 import functions from "../../util/functions";
 import config from "../../config";
 import apiFunctions from "../functions";
 
 const app: express.Router = express.Router();
 
-app.get("/", async (req, res) => res.status(200).json({
+app.get("/", async (req, res) => !manager.ready ? res.status(400).json({
+	success: false,
+	error: "ClusterManager is not in the 'ready' state."
+}) : res.status(200).json({
 	success: true,
-	shards: client.shards.map(s => ({ id: s.id, ping: s.latency, status: s.status })),
-	shardCount: client.shards.size
-}))
-	.get("/:id", async (req, res) => {
-
-		const s = client.shards.get(parseInt(req.params.id, 10));
-		if (!s) return res.status(404).json({
-			success: false,
-			error: "invalid shard id"
-		});
-
-		return res.status(200).json({
-			success: true,
-			shard: {
-				id: s.id,
-				ping: s.latency,
-				status: s.status
-			}
-		});
-	});
+	shards: manager.stats.shards,
+	shardCount: manager.stats.shards.length
+}));
 
 export default app;

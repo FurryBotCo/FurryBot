@@ -1,4 +1,4 @@
-import client from "../../index";
+import manager from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
@@ -11,10 +11,11 @@ import { mdb } from "../modules/Database";
 import ReactionQueue from "../util/queue/ReactionQeueue";
 import _ from "lodash";
 import util from "util";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "fun",
 		displayName: ":smile: Fun",
@@ -370,7 +371,7 @@ client.cmdHandler
 			}).then(d => d.reload());
 
 			if (!msg.uConfig.marriage.married) return msg.reply("You have to marry someone before you can divorce them..");
-			u = await this.getRESTUser(msg.uConfig.marriage.partner).catch(err => ({ username: "Unknown", discriminator: "0000" }));
+			u = await this.bot.getRESTUser(msg.uConfig.marriage.partner).catch(err => ({ username: "Unknown", discriminator: "0000" }));
 			msg.channel.createMessage(`Are you sure you want to divorce **${u.username}#${u.discriminator}**? **yes** or **no**.`).then(async () => {
 				const d = await this.MessageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);
 				if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply("that wasn't a valid option..");
@@ -482,7 +483,7 @@ client.cmdHandler
 
 				if (p === "EXIT") {
 					clearTimeout(t);
-					this.removeListener("messageReactionAdd", f);
+					this.bot.removeListener("messageReactionAdd", f);
 					if (q.entries.length > 0) {
 						let count = 0;
 						const cI = setInterval(async () => {
@@ -570,7 +571,7 @@ client.cmdHandler
 				});
 			});
 
-			client.on("messageReactionAdd", f);
+			client.bot.on("messageReactionAdd", f);
 			this.activeReactChannels.push(msg.channel.id);
 		})
 	})
@@ -950,12 +951,12 @@ client.cmdHandler
 			}).then(d => d.reload());
 
 			if (msg.uConfig.marriage.married) {
-				u = await this.getRESTUser(msg.uConfig.marriage.partner).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
+				u = await this.bot.getRESTUser(msg.uConfig.marriage.partner).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
 				return msg.reply(`Hey, hey! You're already married to **${u}**! You can get a divorce though..`);
 			}
 
 			if (m.marriage.married) {
-				u = await this.getRESTUser(m.marriage.partner).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
+				u = await this.bot.getRESTUser(m.marriage.partner).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
 				return msg.reply(`Hey, hey! They're already married to **${u}**!`);
 			}
 			msg.channel.createMessage(`<@!${msg.author.id}> has proposed to <@!${member.id}>!\n<@!${member.id}> do you accept? **yes** or **no**.`).then(async () => {

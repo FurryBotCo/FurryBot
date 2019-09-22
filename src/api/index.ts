@@ -5,7 +5,7 @@ import * as fs from "fs-extra";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import chalk from "chalk";
-import client from "../../";
+import manager from "../../";
 import bodyParser from "body-parser";
 import http from "http";
 import https from "https";

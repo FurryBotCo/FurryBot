@@ -1,4 +1,4 @@
-import client from "../../index";
+import manager from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
@@ -8,10 +8,11 @@ import * as Eris from "eris";
 import { mdb } from "../modules/Database";
 import UserConfig from "../modules/config/UserConfig";
 import chunk from "chunk";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "moderation",
 		displayName: ":hammer: Moderation",
@@ -169,7 +170,7 @@ client.cmdHandler
 				Object.assign(embed, msg.embed_defaults("color"));
 				return msg.channel.createMessage({ embed });
 			} else {
-				usr = await this.getRESTUser(w.blame).catch(error => null);
+				usr = await this.bot.getRESTUser(w.blame).catch(error => null);
 				blame = !usr ? "Unknown#0000" : `${usr.username}#${usr.discriminator}`;
 				embed = {
 					title: `**${user.username}#${user.discriminator}** - Warning #${w.wid}`,
@@ -203,7 +204,7 @@ client.cmdHandler
 			// get user from message
 			user = await msg.getUserFromArgs();
 
-			if (!user) user = await this.getRESTUser(msg.args[0]).catch(err => null);
+			if (!user) user = await this.bot.getRESTUser(msg.args[0]).catch(err => null);
 			if (!user) return msg.errorEmbed("INVALID_USER");
 
 			if ((await msg.channel.guild.getBans().then(res => res.map(u => u.user.id))).includes(user.id)) {
@@ -432,7 +433,7 @@ client.cmdHandler
 			// get member from message
 			if (!msg.args[0]) return msg.channel.createMessage("Please provide a user id.");
 
-			user = this.users.has(msg.args[0]) ? this.users.get(msg.args[0]) : await this.getRESTUser(msg.args[0]).catch(error => false);
+			user = this.users.has(msg.args[0]) ? this.users.get(msg.args[0]) : await this.bot.getRESTUser(msg.args[0]).catch(error => false);
 
 			if (!user) return msg.errorEmbed("INVALID_USER");
 
@@ -645,7 +646,7 @@ client.cmdHandler
 			fields = [];
 			for (const key in wr[page - 1]) {
 				w = wr[page - 1][key];
-				usr = await this.getRESTUser(w.blame);
+				usr = await this.bot.getRESTUser(w.blame);
 				blame = !usr ? "Unknown" : `${usr.username}#${usr.discriminator}`;
 				fields.push({
 					name: `#${w.wid} - ${new Date(w.timestamp).toDateString()} by **${blame}**`,

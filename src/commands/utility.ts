@@ -1,4 +1,4 @@
-import client from "../../index";
+import manager from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
@@ -7,10 +7,11 @@ import { Command, CommandError } from "../util/CommandHandler";
 import { mdb } from "../modules/Database";
 import * as Eris from "eris";
 import chunk from "chunk";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "utility",
 		displayName: ":tools: Utility",

@@ -14,6 +14,6 @@ export default new ClientEvent("error", (async function (this: FurryBot, info: s
 		id
 	}, new Date()); */
 
-	if (this.logger !== undefined) return this.logger.error(info, id);
-	else return console.error(info, id);
+	if (this.logger !== undefined) return this.logger.error(`Cluster #${this.cluster.id}`, info);
+	else return console.error(`Cluster #${this.cluster.id}`, info);
 }));

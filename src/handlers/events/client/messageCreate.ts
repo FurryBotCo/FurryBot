@@ -76,7 +76,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			// dm advertising to bot
 			if (/discord\.gg/gi.test(msg.content.toLowerCase())) {
 				dmAds = true;
-				const c = await this.getRESTGuild(config.bot.mainGuild);
+				const c = await this.bot.getRESTGuild(config.bot.mainGuild);
 				await c.banMember(msg.author.id, 0, "Advertising in bots dms.");
 
 				embed = {
@@ -256,6 +256,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects,\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.prefix}settings fResponse disabled\``);
 		}
 
+		// console.log(msg.content.toLowerCase());
+		// console.log(msg.prefix.toLowerCase());
+		// console.log(msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()));
+
 		if (!msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase())) return;
 
 		const h = await this.cmdHandler.handleCommand(msg).catch(err => err);
@@ -362,7 +366,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						name: msg.channel.guild.id,
 						owner: {
 							id: msg.channel.guild.ownerID,
-							tag: this.users.has(msg.channel.guild.ownerID) ? `${this.users.get(msg.channel.guild.ownerID).username}#${this.users.get(msg.channel.guild.ownerID).discriminator}` : this.getRESTUser(msg.channel.guild.ownerID).then(res => `${res.username}#${res.discriminator}`)
+							tag: this.users.has(msg.channel.guild.ownerID) ? `${this.users.get(msg.channel.guild.ownerID).username}#${this.users.get(msg.channel.guild.ownerID).discriminator}` : this.bot.getRESTUser(msg.channel.guild.ownerID).then(res => `${res.username}#${res.discriminator}`)
 						}
 					}
 				});

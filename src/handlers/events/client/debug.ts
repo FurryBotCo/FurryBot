@@ -17,7 +17,7 @@ export default new ClientEvent("debug", (async function (this: FurryBot, info: s
 
 	if (typeof config !== "undefined" && config.debug === true) {
 		if (["Duplicate presence update"].some(t => info.toLowerCase().indexOf(t.toLowerCase()) !== -1)) return;
-		if (this.logger !== undefined) return this.logger.debug(info, id);
-		else return console.debug(info, id);
+		if (this.logger !== undefined) return this.logger.debug(`Cluster #${this.cluster.id}`, info);
+		else return console.debug(`Cluster #${this.cluster.id}`, info);
 	}
 }));

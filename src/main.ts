@@ -1,12 +1,6 @@
 import * as Eris from "eris";
 import * as fs from "fs-extra";
 import config from "./config";
-import Logger from "./util/LoggerV7";
-// import cat from "./commands";
-// import resp from "./responses";
-// import Command from "./modules/cmd/Command";
-// import AutoResponse from "./modules/cmd/AutoResponse";
-// import Category from "./modules/cmd/Category";
 import functions, { ErrorHandler } from "./util/functions";
 import Temp from "./util/Temp";
 import MessageCollector from "./util/MessageCollector";
@@ -18,9 +12,11 @@ import { CommandHandler } from "./util/CommandHandler";
 import WebSocket from "ws";
 import Analytics from "analytics-node";
 import ClientEvent from "modules/ClientEvent";
+import { Base, Cluster, Logger, LoggerV8 } from "@donovan_dmc/eris-clusters";
+import CmdHandler from "./util/cmd";
 
-class FurryBot extends Eris.Client {
-	logger: Logger;
+class FurryBot extends Base {
+	logger: LoggerV8;
 	// autoResponses: AutoResponse[];
 	// commands: Command[];
 	// categories: Category[];
@@ -55,9 +51,9 @@ class FurryBot extends Eris.Client {
 	cmdHandler: CommandHandler;
 	wss: WebSocket.Server;
 	a: Analytics;
-	constructor(token: string, options: Eris.ClientOptions) {
-		super(token, options);
-		this.logger = new Logger();
+	constructor(bot) {
+		super(bot);
+		this.logger = Logger;
 
 		this.f = { ...functions, ErrorHandler };
 
@@ -80,7 +76,7 @@ class FurryBot extends Eris.Client {
 					file: `${__dirname}/handlers/events/client/${d}`
 				}
 			}, new Date()); */
-			this.on(e.event, e.listener.bind(this));
+			this.bot.on(e.event, e.listener.bind(this));
 		});
 
 		// this.commands = cat.map(c => c.commands).reduce((a, b) => a.concat(b));
@@ -105,11 +101,12 @@ class FurryBot extends Eris.Client {
 		this.MessageCollector = new MessageCollector(this);
 
 		this.tclient = new Trello(config.apis.trello.apiKey, config.apis.trello.apiToken);
-		global.console.log = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("log", msg, shardId, extra));
-		global.console.info = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("info", msg, shardId, extra));
-		global.console.debug = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("debug", msg, shardId, extra));
-		global.console.warn = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("warn", msg, shardId, extra));
-		global.console.error = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("error", msg, shardId, extra));
+
+		global.console.log = Logger.log;
+		global.console.info = Logger.info;
+		global.console.debug = Logger.debug;
+		global.console.warn = Logger.warn;
+		global.console.error = Logger.error;
 
 		this.e6 = new E6API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
@@ -123,24 +120,16 @@ class FurryBot extends Eris.Client {
 
 		this.activeReactChannels = [];
 
-		this.cmdHandler = new CommandHandler(this, {
-			alwaysAddSend: true
-		});
+		this.cmdHandler = CmdHandler;
+
+		CmdHandler.setClient(this);
 
 		// this.setupCommandHandler.call(this);
 	}
 
-	async track(userId, event, properties, timestamp = new Date()) {
-		return new Promise((a, b) => {
-			return this.a.track({
-				userId,
-				event,
-				properties,
-				timestamp
-			}, (e, d) => e ? b(e) : a(d));
-		});
-	}
+	async launch(cluster: Cluster) {
 
+	}
 	/*getCommand(cmd: string | string[]): {
 		command: Command[];
 		category: Category;

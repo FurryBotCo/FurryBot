@@ -4,7 +4,7 @@ import os from "os";
 import config from "../config";
 import path from "path";
 import util from "util";
-// import client from "../../index";
+// import manager from "../../index";
 
 class Logger {
 	constructor() {

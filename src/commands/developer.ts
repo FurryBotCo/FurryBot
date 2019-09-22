@@ -1,4 +1,4 @@
-import client from "../../index";
+import manager from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
@@ -14,10 +14,11 @@ import * as Eris from "eris";
 import Permissions from "../util/Permissions";
 import { execSync } from "child_process";
 import { performance } from "perf_hooks";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "developer",
 		displayName: ":tools: Developer",
@@ -453,23 +454,23 @@ client.cmdHandler
 			if (msg.args.length < 1) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			if (fs.existsSync(`${__dirname}/../handlers/events/client/${msg.args[0]}.${__filename.split(".").reverse()[0]}`)) {
-				client.removeAllListeners(msg.args[0]);
+				this.bot.removeAllListeners(msg.args[0]);
 
 				delete require.cache[require.resolve(`${__dirname}/../handlers/events/client/${msg.args[0]}.${__filename.split(".").reverse()[0]}`)];
 
 				const hn = require(`${__dirname}/../handlers/events/client/${msg.args[0]}.${__filename.split(".").reverse()[0]}`).default;
 
-				client.on(msg.args[0], hn.listener.bind(client));
+				this.bot.on(msg.args[0], hn.listener.bind(this));
 
 				return msg.reply(`reloaded the **${msg.args[0]}** event.`);
 			} else if (fs.existsSync(`${__dirname}/${msg.args[0].toLowerCase()}.${__filename.split(".").reverse()[0].toLowerCase()}`)) {
 				delete require.cache[require.resolve(`${__dirname}/${msg.args[0].toLowerCase()}.${__filename.split(".").reverse()[0].toLowerCase()}`)];
 
-				client.cmdHandler.commands.map(c => {
-					if (c.category.name === msg.args[0].toLowerCase()) client.cmdHandler.deleteCommand(msg.args[0].toLowerCase());
+				this.cmdHandler.commands.map(c => {
+					if (c.category.name === msg.args[0].toLowerCase()) this.cmdHandler.deleteCommand(msg.args[0].toLowerCase());
 				});
 
-				client.cmdHandler.deleteCategory(msg.args[0].toLowerCase());
+				this.cmdHandler.deleteCategory(msg.args[0].toLowerCase());
 
 				require(`${__dirname}/${msg.args[0]}.${__filename.split(".").reverse()[0].toLowerCase()}`);
 
