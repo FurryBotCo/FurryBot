@@ -30,7 +30,6 @@
   },
   "homepage": "https://furry.bot",
   "dependencies": {
-    "@donovan_dmc/eris-clusters": "^1.0.17-beta.15",
     "analytics-node": "^3.4.0-beta.1",
     "blapi": "^1.1.0",
     "body-parser": "^1.19.0",
@@ -47,6 +46,7 @@
     "e9api": "^1.0.6",
     "ejs": "^2.6.2",
     "eris": "github:abalabahaha/eris#dev",
+    "eris-clusters": "^1.0.18",
     "erlpack": "github:abalabahaha/erlpack",
     "eval": "^0.1.3",
     "eventemitter3": "^4.0.0",

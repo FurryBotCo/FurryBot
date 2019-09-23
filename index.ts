@@ -3,7 +3,7 @@ import config from "./src/config";
 import * as fs from "fs-extra";
 import functions from "./src/util/functions";
 import path from "path";
-import { ClusterManager } from "@donovan_dmc/eris-clusters";
+import { ClusterManager } from "eris-clusters";
 
 // directory existence check
 [config.logsDir, `${config.logsDir}/spam`, `${config.logsDir}/client`, config.tmpDir].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), console.log(`Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
@@ -18,11 +18,11 @@ manager.init();
 
 /*process.on("message",
 	(m) =>
-		require("@donovan_dmc/eris-clusters").Logger.log("Process Message (Worker)", m)
+		require("eris-clusters").Logger.log("Process Message (Worker)", m)
 );
 require("cluster").on("message",
 	(w, m) =>
-		require("@donovan_dmc/eris-clusters").Logger.log("Process Message (Master)", m)
+		require("eris-clusters").Logger.log("Process Message (Master)", m)
 );*/
 
 process.on("SIGINT", () => {

@@ -12,7 +12,7 @@ import { CommandHandler } from "./util/CommandHandler";
 import WebSocket from "ws";
 import Analytics from "analytics-node";
 import ClientEvent from "modules/ClientEvent";
-import { Base, Cluster, Logger, LoggerV8 } from "@donovan_dmc/eris-clusters";
+import { Base, Cluster, Logger, LoggerV8 } from "eris-clusters";
 import CmdHandler from "./util/cmd";
 
 class FurryBot extends Base {
