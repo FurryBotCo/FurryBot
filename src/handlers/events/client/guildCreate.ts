@@ -6,7 +6,7 @@ import functions from "../../../util/functions";
 
 export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
 
-	await this.track("clientEvent", "events.guildCreate", {
+	/* await this.track("clientEvent", "events.guildCreate", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
 		clientId: config.bot.clientID,
@@ -16,7 +16,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 			ownerId: guild.ownerID
 		},
 		guildCount: this.guilds.size
-	}, new Date());
+	}, new Date()); */
 
 	await this.f.incrementDailyCounter(true, this.guilds.size);
 

@@ -25,7 +25,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length <= 1) return new CommandError(null, "ERR_INVALID_USAGE");
 			let type;
 			switch (msg.args[0].toLowerCase()) {
@@ -74,7 +74,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.unparsedArgs.length === 0) return new CommandError(null, "ERR_INVALID_USAGE");
 			const set = await phin({ url: msg.unparsedArgs.join("%20"), parse: "none" }).then(res => `data:${res.headers["content-type"]};base64,${res.body.toString("base64")}`);
 			this.editSelf({ avatar: set })
@@ -99,7 +99,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.unparsedArgs.length === 0) return new CommandError(null, "ERR_INVALID_USAGE");
 			let set;
 			set = msg.unparsedArgs.join(" ");
@@ -122,7 +122,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length <= 0) return new CommandError(null, "ERR_INVALID_USAGE");
 			const types = ["online", "idle", "dnd", "invisible"];
 			if (!types.includes(msg.args[0].toLowerCase())) return msg.channel.createMessage(`<@!${msg.author.id}>, invalid type. Possible types: **${types.join("**, **")}**.`);

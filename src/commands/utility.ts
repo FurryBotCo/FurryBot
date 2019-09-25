@@ -34,7 +34,7 @@ client.cmdHandler
 		usage: "<@role/id/name>",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let role, roles, a, b;
 			role = await msg.getRoleFromArgs(0, true, true);
 			if (!role) return msg.errorEmbed("INVALID_ROLE");
@@ -63,7 +63,7 @@ client.cmdHandler
 		usage: "<command/category< [@role/@member/#channel/id]",
 		features: ["betaOnly", "devOnly"],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (typeof msg.gConfig.commandConfig.disabled === "undefined") await msg.gConfig.edit({ commandConfig: { disabled: [] } }).then(d => d.reload());
 
 			let type;
@@ -108,7 +108,7 @@ client.cmdHandler
 		usage: "<role>",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let roles, b, a, role;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			roles = msg.gConfig.selfAssignableRoles.map(a => {
@@ -146,7 +146,7 @@ client.cmdHandler
 		usage: "<role>",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let roles, b, a, role;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			roles = msg.gConfig.selfAssignableRoles.map(a => {
@@ -180,7 +180,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.uConfig.patreon.donator) return msg.reply("you are already marked as a donator.");
 
 			const p = await functions.loopPatrons();
@@ -248,7 +248,7 @@ client.cmdHandler
 		usage: "[page]",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let roles, page, c, remove, rl, b, embed;
 			roles = msg.gConfig.selfAssignableRoles;
 			page = msg.args.length > 0 ? parseInt(msg.args[0], 10) : 1;
@@ -293,7 +293,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const embed: Eris.EmbedOptions = {
 				title: "Module Status",
 				description: "The status of some modules on this server.",
@@ -339,8 +339,19 @@ client.cmdHandler
 		usage: "[new prefix]",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
-			return msg.channel.createMessage(`This servers prefix is "${msg.gConfig.prefix}", if you want to change this, please use \`${msg.gConfig.prefix}settings prefix <new prefix>\` to change this servers prefix!`);
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+			if (msg.args.length === 0) return msg.channel.createMessage(`This servers prefix is "${msg.gConfig.prefix}", if you want to change this, run this again with the new prefix!`);
+
+			if (msg.args.join("").toLowerCase() === msg.gConfig.prefix.toLowerCase()) return msg.reply("that is already this servers prefix.");
+
+			if ([`<@!${this.user.id}>`, `<@${this.user.id}>`].some(t => msg.args.join("").toLowerCase() === t.toLowerCase())) return msg.reply(`you cannot use ${msg.args.join("").toLowerCase()} as my prefix.`);
+
+			if (msg.args.join("").length > 15) return msg.reply("the maximum length for my prefix is 15 characters (not counting spaces).");
+
+			await msg.gConfig.edit({ prefix: msg.args.join("").toLowerCase() }).then(d => d.reload());
+
+			return msg.reply(`set this servers prefix to ${msg.args.join("").toLowerCase()}`);
+			// return msg.channel.createMessage(`This servers prefix is "${msg.gConfig.prefix}", if you want to change this, please use \`${msg.gConfig.prefix}settings prefix <new prefix>\` to change this servers prefix!`);
 		})
 	})
 	.addCommand({
@@ -361,7 +372,7 @@ client.cmdHandler
 		usage: "<2-100>",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let count = parseInt(msg.args[0], 10);
 			if (msg.args.length === 0 || isNaN(count)) throw new CommandError(null, "ERR_INVALID_USAGE");
 			if (count < 2 || count > 100) return msg.reply("Please provide a valid number between two (2) and 100.");
@@ -390,7 +401,7 @@ client.cmdHandler
 		usage: "",
 		features: ["betaOnly", "devOnly"],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			await msg.reply("registration is currently not setup here, would you like to set it up? You can reply with **yes** or **no**.");
 
 			const d = await this.MessageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4, (m: Eris.Message) => ["no", "yes"].includes(m.content.toLowerCase()));
@@ -426,7 +437,7 @@ client.cmdHandler
 		usage: "",
 		features: ["guildOwnerOnly"],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let choice;
 			msg.channel.createMessage("this will erase ALL guild (server) settings, are you sure you want to do this?\nType **yes** or **no**.");
 			const d = await this.MessageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);
@@ -463,7 +474,7 @@ client.cmdHandler
 		usage: "<@role/id/name>",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let role, roles;
 			role = await msg.getRoleFromArgs(0, true, true);
 			if (!role) return msg.errorEmbed("INVALID_ROLE");
@@ -487,9 +498,9 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 
-			const settings = ["fResponse", "nsfw", "delCmds", "commandImages", "prefix"];
+			const settings = ["fResponse", "nsfw", "delCmds", "commandImages"/*, "prefix"*/];
 			const choices = ["enabled", "enable", "e", "true", "disabled", "disable", "d", "false"];
 
 			if (msg.args.length === 0 || ["list", "ls"].some(s => msg.args[0].toLowerCase().indexOf(s) !== -1)) return msg.reply(`valid settings: **${settings.join("**, **")}**`);
@@ -515,14 +526,14 @@ client.cmdHandler
 					type = "commandImages";
 					break;
 
-				case "prefix":
+				/*case "prefix":
 					type = "prefix";
-					break;
+					break;*/
 			}
 
 			if (msg.args.length === 1) return msg.reply(`This setting **${type}** is currently set to ${msg.gConfig[type] ? "Enabled" : "Disabled"}, use \`${msg.gConfig.prefix}settings ${msg.args[0]} <enabled/disabled>\` to toggle it.`);
 
-			if (type === "prefix") {
+			/*if (type === "prefix") {
 				const a = [...msg.args].slice(1, msg.args.length).join("");
 				if (a.toLowerCase() === msg.gConfig.prefix.toLowerCase()) return msg.reply("that is already this servers prefix.");
 
@@ -533,7 +544,7 @@ client.cmdHandler
 				await msg.gConfig.edit({ prefix: a.toLowerCase() }).then(d => d.reload());
 
 				return msg.reply(`set this servers prefix to ${a.toLowerCase()}`);
-			}
+			}*/
 
 			if (!choices.includes(msg.args[1].toLowerCase())) msg.reply("Invalid choice, try **enabled** or **disabled**.");
 
@@ -576,7 +587,7 @@ client.cmdHandler
 		usage: "<topic>",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			return msg.channel.edit({ topic: msg.unparsedArgs.join(" ") }, `Command: ${msg.author.username}#${msg.author.discriminator}`).then((c: Eris.TextChannel) =>
 				msg.channel.createMessage(`Set the topic of <#${c.id}> to **${!c.topic ? "NONE" : c.topic}**`)
 			);
@@ -598,7 +609,7 @@ client.cmdHandler
 		usage: "<channel>",
 		features: [],
 		category: "utility",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			const ch = await msg.getChannelFromArgs();
 			if (!ch) return msg.errorEmbed("INVALID_CHANNEL");

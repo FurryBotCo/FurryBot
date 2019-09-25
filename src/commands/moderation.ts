@@ -35,7 +35,7 @@ client.cmdHandler
 		usage: "<@member/id>",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let user: Eris.Member, embed, reason, m;
 			// get member from message
@@ -61,7 +61,7 @@ client.cmdHandler
 			// if(!user.bannable) return msg.channel.createMessage(`<@!${msg.author.id}>, I cannot ban ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have ban permissions?`);
 			reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
 			if (!user.user.bot) m = await user.user.getDMChannel().then(dm => dm.createMessage(`You were banned from **${msg.channel.guild.name}**\nReason: ${reason}`));
-			user.ban(1, `Ban: ${msg.author.username}#${user.discriminator} -> ${reason}`).then(() => {
+			user.ban(1, `Ban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(() => {
 				msg.channel.createMessage(`***User ${user.username}#${user.discriminator} was banned, ${reason}***`).catch(noerr => null);
 			}).catch(async (err) => {
 				msg.channel.createMessage(`I couldn't ban **${user.username}#${user.discriminator}**, ${err}`);
@@ -72,7 +72,7 @@ client.cmdHandler
 			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
 		})
 	})
-	.addCommand({
+	/*.addCommand({
 		triggers: [
 			"clearwarnings"
 		],
@@ -86,7 +86,7 @@ client.cmdHandler
 		usage: "<@member/id>",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 
 		})
 	})
@@ -105,7 +105,7 @@ client.cmdHandler
 		usage: "<@member/id> <wid>",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length < 2) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let user, w, embed;
 			// get member from message
@@ -150,7 +150,7 @@ client.cmdHandler
 		usage: "<@member/id> <wid>",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length < 2) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let user, w, embed, usr, blame;
 			// get member from message
@@ -180,7 +180,7 @@ client.cmdHandler
 				return msg.channel.createMessage({ embed });
 			}
 		})
-	})
+	})*/
 	.addCommand({
 		triggers: [
 			"hackban",
@@ -198,7 +198,7 @@ client.cmdHandler
 		usage: "<@user/id> [reason]",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let user: Eris.User, reason, embed;
 			// get user from message
 			user = await msg.getUserFromArgs();
@@ -246,7 +246,7 @@ client.cmdHandler
 		usage: "<@member/id> [reason]",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let user, reason, m, a;
 			// get member from message
@@ -289,7 +289,7 @@ client.cmdHandler
 		usage: "<@member/id> [reason]",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let user, embed, reason, a, b;
 			// get member from message
 			user = await msg.getMemberFromArgs();
@@ -369,7 +369,7 @@ client.cmdHandler
 		usage: "<@role/id/name>",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length < 1) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			let role, embed, g, a;
@@ -427,7 +427,7 @@ client.cmdHandler
 		usage: "<id> [reason]",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let user, embed, reason;
 			// get member from message
 			if (!msg.args[0]) return msg.channel.createMessage("Please provide a user id.");
@@ -474,7 +474,7 @@ client.cmdHandler
 		usage: "<@member/id> [reason]",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let user, embed, reason, a;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 
@@ -538,7 +538,7 @@ client.cmdHandler
 			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
 		})
 	})
-	.addCommand({
+	/*.addCommand({
 		triggers: [
 			"warn",
 			"w"
@@ -550,10 +550,10 @@ client.cmdHandler
 		cooldown: 3e3,
 		donatorCooldown: 3e3,
 		description: "Warn a user for something they've done.",
-		usage: "<@member.id> <reason>",
+		usage: "<@member/id> <reason>",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let user, reason, w, u, embed, a;
 			if (msg.args.length < 2) throw new CommandError(null, "ERR_INVALID_USAGE");
 			// get member from message
@@ -597,7 +597,7 @@ client.cmdHandler
 		usage: "<@member/id> [page]",
 		features: [],
 		category: "moderation",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let user, page, mn, warnings, embed, wr, pages, fields, w, usr, blame;
 
 			// this code is awful, but I can't be bothered to rewrite it right now
@@ -660,6 +660,6 @@ client.cmdHandler
 			Object.assign(embed, msg.embed_defaults());
 			msg.channel.createMessage({ embed });
 		})
-	});
+	})*/;
 
 export default null;

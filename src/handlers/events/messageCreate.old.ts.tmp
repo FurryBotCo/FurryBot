@@ -14,7 +14,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 	const msg: ExtendedMessage = new ExtendedMessage(message, this);
 	await msg._load.call(msg);
 
-	await this.track("clientEvent", "events.messageCreate", {
+	/* await this.track("clientEvent", "events.messageCreate", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
 		clientId: config.bot.clientID,
@@ -33,7 +33,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				ownerId: msg.channel.guild.ownerID
 			}
 		}
-	}, new Date());
+	}, new Date()); */
 
 	if (!config.developers.includes(msg.author.id)) return;
 

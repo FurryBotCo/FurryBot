@@ -11,32 +11,11 @@ import phin from "phin";
 import * as fs from "fs-extra";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
+	/* dev only */
+	if (!message || (config.beta && !config.developers.includes(message.author.id))) return;
+
 	const msg: ExtendedMessage = new ExtendedMessage(message, this);
 	await msg._load.call(msg);
-
-	await this.track("clientEvent", "events.messageCreate", {
-		hostname: this.f.os.hostname(),
-		beta: config.beta,
-		clientId: config.bot.clientID,
-		message: {
-			id: msg.id,
-			content: msg.content,
-			mentionEveryone: msg.mentionEveryone,
-			author: {
-				id: msg.author.id,
-				username: msg.author.username,
-				discriminator: msg.author.discriminator
-			},
-			guild: {
-				id: msg.channel.guild.id,
-				name: msg.channel.guild.name,
-				ownerId: msg.channel.guild.ownerID
-			}
-		}
-	}, new Date());
-
-	/* dev only */
-	// if (!config.developers.includes(msg.author.id)) return;
 
 	if (msg.author.bot || msg.uConfig.dmActive) return;
 

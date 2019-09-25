@@ -80,3 +80,6 @@ src/util/AnalyticsWebsocketV2.ts
 # tsc output
 build/
 src/modules/Database-new.ts
+
+# old versions
+OldVersions/

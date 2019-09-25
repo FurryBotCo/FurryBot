@@ -33,7 +33,7 @@ client.cmdHandler
 		usage: "<question>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			const responses = [
 				"It is certain",
@@ -63,7 +63,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.channel.awoo !== undefined && msg.channel.awoo.active) {
 				if (msg.channel.awoo.inAwoo.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this awoo!`);
 				clearTimeout(msg.channel.awoo.timeout);
@@ -98,20 +98,20 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text;
 			input = msg.args.join(" ");
 
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 
 			if (msg.channel.permissionsOf(this.user.id).has("attachFiles")) {
-				msg.channel.createMessage(text, {
+				return msg.channel.createMessage(text, {
 					file: await this.f.getImageFromURL("https://assets.furry.bot/bap.gif"),
 					name: "bap.gif"
 				});
 			} else {
-				msg.channel.createMessage(text);
+				return msg.channel.createMessage(text);
 			}
 		})
 	})
@@ -129,12 +129,12 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			let input, text;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text, {
 				file: await this.f.getImageFromURL("https://assets.furry.bot/bellyrub.gif"),
 				name: "bellyrub.gif"
@@ -155,7 +155,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			try {
 				const img = await this.f.imageAPIRequest(true, "blep");
 				return msg.channel.createMessage(`<@!${msg.author.id}> did a little blep!`, {
@@ -183,14 +183,14 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text, img;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
 				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
-				img = await this.f.imageAPIRequest(false, "boop", true, true);
+				img = await this.f.imageAPIRequest(true, "boop");
 				if (!img.success) return msg.reply(`Image API returned an error: ${img.error.description}`);
 				msg.channel.createMessage(text, {
 					file: await this.f.getImageFromURL("img.response.image"),
@@ -213,7 +213,7 @@ client.cmdHandler
 		usage: "[@user]",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length === 0) {
 				if (msg.channel.conga !== undefined && msg.channel.conga.active) {
 					if (msg.channel.conga.inConga.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this conga!`);
@@ -255,11 +255,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text, img;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
 				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
 				img = await this.f.imageAPIRequest(false, "cuddle", true, true);
@@ -286,7 +286,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let req, j;
 			req = await phin({
 				method: "GET",
@@ -322,12 +322,12 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			let input, text;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -343,7 +343,7 @@ client.cmdHandler
 		usage: "<@member>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const member: Eris.Member = null;
 			let m: UserConfig, u: Eris.User | {
 				username: string;
@@ -410,8 +410,10 @@ client.cmdHandler
 		usage: "[tags]",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (this.activeReactChannels.includes(msg.channel.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
+
+			const client = this; // tslint:disable-line no-this-assignment
 
 			const colors = {
 				green: 3066993,
@@ -473,18 +475,13 @@ client.cmdHandler
 
 			let t = setTimeout(setPost.bind(this), 6e4, "EXIT");
 			async function setPost(this: FurryBot, p: string | number) {
-				if (ratelimit) return msg.reply("You are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(err => null), 5e3)).catch(err => null);
+				if (ratelimit && !config.developers.includes(msg.author.id)) return msg.reply("You are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(err => null), 5e3)).catch(err => null);
 				ratelimit = true;
 				clearTimeout(t);
-				t = setTimeout(setPost.bind(this), 6e4, "EXIT");
+				t = setTimeout(setPost.bind(client), 6e4, "EXIT");
 
 				if (p === "EXIT") {
 					clearTimeout(t);
-					q.add({
-						type: "remove",
-						reaction: null,
-						user: null
-					});
 					this.removeListener("messageReactionAdd", f);
 					if (q.entries.length > 0) {
 						let count = 0;
@@ -497,8 +494,13 @@ client.cmdHandler
 								this.activeReactChannels.splice(this.activeReactChannels.indexOf(msg.channel.id), 1);
 							}
 						});
+					} else {
+						q.destroy();
+						await m.removeReactions().catch(err => null);
+						clearInterval(rl);
+						this.activeReactChannels.splice(this.activeReactChannels.indexOf(msg.channel.id), 1);
 					}
-				} else currentPost++;
+				} else currentPost = p as number;
 
 				if (currentPost === 0) currentPost = e.length;
 				if (currentPost === e.length + 1) currentPost = 1;
@@ -538,23 +540,23 @@ client.cmdHandler
 
 				switch (emoji.name) {
 					case "⏮":
-						await setPost.call(this, 1);
+						await setPost.call(client, 1);
 						break;
 
 					case "◀":
-						await setPost.call(this, currentPost - 1);
+						await setPost.call(client, currentPost - 1);
 						break;
 
 					case "⏹":
-						await setPost.call(this, "EXIT");
+						await setPost.call(client, "EXIT");
 						break;
 
 					case "▶":
-						await setPost.call(this, currentPost + 1);
+						await setPost.call(client, currentPost + 1);
 						break;
 
 					case "⏭":
-						await setPost.call(this, e.length);
+						await setPost.call(client, e.length);
 						break;
 
 					default:
@@ -568,7 +570,7 @@ client.cmdHandler
 				});
 			});
 
-			this.on("messageReactionAdd", f);
+			client.on("messageReactionAdd", f);
 			this.activeReactChannels.push(msg.channel.id);
 		})
 	})
@@ -584,12 +586,12 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			let input, text;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -607,7 +609,7 @@ client.cmdHandler
 		usage: "[type/list]",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const types = [
 				"boop",
 				"cuddle",
@@ -658,7 +660,7 @@ client.cmdHandler
 		usage: "[@user]",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length === 0) {
 				if (msg.channel.furpile !== undefined && msg.channel.furpile.active) {
 					if (msg.channel.furpile.inPile.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this furpile!`);
@@ -701,7 +703,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let img, short, extra;
 			img = await this.f.imageAPIRequest(false, "fursuit", true, true);
 			if (img.success !== true) return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
@@ -726,7 +728,7 @@ client.cmdHandler
 		usage: "<keywords>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let embed, rq;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			rq = await phin({
@@ -767,11 +769,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			let text, input;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -788,12 +790,12 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			let input, text;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text, {
 				file: await this.f.getImageFromURL("https://assets.furry.bot/huff.gif"),
 				name: "huff.gif"
@@ -812,11 +814,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text, img;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
 				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
 				img = await this.f.imageAPIRequest(false, "hug", true, true);
@@ -846,7 +848,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			return msg.reply("this command has been temporarily disabled, as it causes a lot of errors.");
 		})
 	})*/
@@ -862,11 +864,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text, img;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
 				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
 				img = await this.f.imageAPIRequest(false, "kiss", true, true);
@@ -892,11 +894,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text, img;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
 				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage("Hey, I require the `ATTACH_FILES` permission for images to work on these commands!");
 				img = await this.f.imageAPIRequest(false, "lick", true, true);
@@ -923,7 +925,7 @@ client.cmdHandler
 		usage: "<@member>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let member: Eris.Member, m: UserConfig, u: Eris.User | string;
 			member = await msg.getMemberFromArgs();
 			if (!member) return msg.errorEmbed("INVALID_USER");
@@ -992,12 +994,12 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
-			let input, text, img;
+			let input, text;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
-			if (msg.gConfig.commandImages) {
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
+			/*if (msg.gConfig.commandImages) {
 				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
 				img = await this.f.imageAPIRequest(false, "nap", true, true);
 				if (!img.success) return msg.reply(`Image API returned an error: ${img.error.description}`);
@@ -1005,9 +1007,9 @@ client.cmdHandler
 					file: await this.f.getImageFromURL(img.response.image),
 					name: img.response.name
 				});
-			} else {
-				msg.channel.createMessage(text);
-			}
+			} else {*/
+			msg.channel.createMessage(text);
+			// }
 		})
 	})
 	.addCommand({
@@ -1022,11 +1024,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -1043,11 +1045,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -1063,11 +1065,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -1085,12 +1087,12 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			let input, text;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text, {
 				file: await this.f.getImageFromURL("https://assets.furry.bot/pounce.gif"),
 				name: "pounce.gif"
@@ -1109,7 +1111,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let min, max;
 			min = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 1;
 			max = typeof msg.args[1] !== "undefined" ? parseInt(msg.args[1], 10) : 20;
@@ -1131,7 +1133,7 @@ client.cmdHandler
 		usage: "[bullets]",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let val, bullets;
 			val = Math.floor(Math.random() * 6);
 			bullets = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 3;
@@ -1155,7 +1157,7 @@ client.cmdHandler
 		usage: "<@member1> [@member2]",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			return msg.reply("this command has been temporarily disabled, as it does not work properly. It should be fixed soon!");
 
 			/*if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
@@ -1246,11 +1248,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -1266,10 +1268,10 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			let input, text;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -1285,12 +1287,12 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			let input, text;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -1310,7 +1312,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			// saved for when sofurry api has issues
 			// return msg.channel.createMessage(`<@!${msg.author.id}>, Sorry, sofurry is having issues right now, and we cannot fetch anything from their api.\n(if it's back, and I haven't noticed, let me know in my support server - https://discord.gg/SuccpZw)`);
 			const contentType = [
@@ -1373,11 +1375,11 @@ client.cmdHandler
 		usage: "<@member/text>",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			let input, text;
 			input = msg.args.join(" ");
-			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, this._cmd), msg.author.mention, input);
+			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			msg.channel.createMessage(text);
 		})
 	})
@@ -1396,7 +1398,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "fun",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			return msg.reply("Yip! Yip! I am! I am! :fox::fox:");
 		})
 	});

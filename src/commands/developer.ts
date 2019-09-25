@@ -38,11 +38,11 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: require("./developer-subcmd/blacklist").default,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
-			const sub = await this.cmdHandler.handleSubCommand(this._cmd, msg);
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			console.log(sub);
 			if (sub !== "NOSUB") return sub;
-			else return this.f.sendCommandEmbed(msg, this._cmd);
+			else return this.f.sendCommandEmbed(msg, cmd);
 		})
 	})
 	.addCommand({
@@ -58,7 +58,7 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length > 0) return new CommandError(null, "ERR_INVALID_USAGE");
 
 			const user = await msg.getUserFromArgs();
@@ -89,10 +89,10 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: require("./developer-subcmd/eco").default,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
-			const sub = await this.cmdHandler.handleSubCommand(this._cmd, msg);
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
-			else return this.f.sendCommandEmbed(msg, this._cmd);
+			else return this.f.sendCommandEmbed(msg, cmd);
 		})
 	})
 	.addCommand({
@@ -108,10 +108,10 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: require("./developer-subcmd/edit").default,
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
-			const sub = await this.cmdHandler.handleSubCommand(this._cmd, msg);
+		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
-			else return this.f.sendCommandEmbed(msg, this._cmd);
+			else return this.f.sendCommandEmbed(msg, cmd);
 		})
 	})
 	.addCommand({
@@ -132,7 +132,7 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let silent = false;
 			let error = false;
 			let deleteInvoke = false;
@@ -166,11 +166,10 @@ client.cmdHandler
 				error = true;
 			}
 			const end = performance.now();
-
 			if (typeof res !== "string") {
 				if (typeof res === "undefined") res = "No Return";
 				// else if (res instanceof Array) res = res.join(" ");
-				else if (typeof res === "object") res = util.inspect(res, { depth: 3, showHidden: true });
+				else if (typeof res === "object") res = util.inspect(res, { depth: 2, showHidden: true });
 				else if (res instanceof Promise) res = await res;
 				else if (res instanceof Function) res = res.toString();
 				else if (res instanceof Buffer) res = res.toString();
@@ -259,7 +258,7 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let guild: Eris.Guild;
 
 			if (msg.unparsedArgs.length === 0) guild = msg.guild;
@@ -292,7 +291,7 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			await msg.delete().catch(err => null);
 			return msg.channel.createMessage(msg.unparsedArgs.join(" "));
 		})
@@ -311,7 +310,7 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let silent = false;
 			let error = false;
 			let deleteInvoke = false;
@@ -337,7 +336,7 @@ client.cmdHandler
 			if (typeof res !== "string") {
 				if (typeof res === "undefined") res = "No Return";
 				// else if (res instanceof Array) res = res.join(" ");
-				else if (typeof res === "object") res = util.inspect(res, { depth: 3, showHidden: true });
+				else if (typeof res === "object") res = util.inspect(res, { depth: 2, showHidden: true });
 				else if (res instanceof Promise) res = await res;
 				else if (res instanceof Function) res = res.toString();
 				else if (res instanceof Buffer) res = res.toString();
@@ -422,7 +421,7 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (!msg.args[0]) return msg.reply("tested..");
 
 			switch (msg.args[0].toLowerCase()) {
@@ -449,7 +448,7 @@ client.cmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.args.length < 1) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			if (fs.existsSync(`${__dirname}/../handlers/events/client/${msg.args[0]}.${__filename.split(".").reverse()[0]}`)) {
@@ -469,9 +468,11 @@ client.cmdHandler
 					if (c.category.name === msg.args[0].toLowerCase()) client.cmdHandler.deleteCommand(msg.args[0].toLowerCase());
 				});
 
+				client.cmdHandler.deleteCategory(msg.args[0].toLowerCase());
+
 				require(`${__dirname}/${msg.args[0]}.${__filename.split(".").reverse()[0].toLowerCase()}`);
 
-				return msg.reply(`reloaded the command **${msg.args[0].toLowerCase()}**`);
+				return msg.reply(`reloaded the category **${msg.args[0].toLowerCase()}**`);
 			}
 		})
 	});

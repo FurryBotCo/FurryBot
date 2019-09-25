@@ -33,7 +33,7 @@ client.cmdHandler
 		usage: "",
 		features: ["nsfw"],
 		category: "nsfw",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let img, short, extra;
 			img = await functions.imageAPIRequest(false, "bulge", true, false);
 			if (img.success !== true) {
@@ -62,10 +62,12 @@ client.cmdHandler
 		donatorCooldown: 3e3,
 		description: "Get some content from E621!",
 		usage: "[tags]",
-		features: ["nsfw"],
+		features: ["nsfw", "devOnly"],
 		category: "nsfw",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (this.activeReactChannels.includes(msg.channel.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
+
+			const client = this; // tslint:disable-line no-this-assignment
 
 			const colors = {
 				green: 3066993,
@@ -126,19 +128,14 @@ client.cmdHandler
 
 			let t = setTimeout(setPost.bind(this), 6e4, "EXIT");
 			async function setPost(this: FurryBot, p: string | number) {
-				if (ratelimit) return msg.reply("You are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(err => null), 5e3)).catch(err => null);
+				if (ratelimit && !config.developers.includes(msg.author.id)) return msg.reply("You are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(err => null), 5e3)).catch(err => null);
 				ratelimit = true;
 				clearTimeout(t);
-				t = setTimeout(setPost.bind(this), 6e4, "EXIT");
+				t = setTimeout(setPost.bind(client), 6e4, "EXIT");
 
 				if (p === "EXIT") {
 					clearTimeout(t);
-					q.add({
-						type: "remove",
-						reaction: null,
-						user: null
-					});
-					this.removeListener("messageReactionAdd", f);
+					client.removeListener("messageReactionAdd", f);
 					if (q.entries.length > 0) {
 						let count = 0;
 						const cI = setInterval(async () => {
@@ -150,8 +147,13 @@ client.cmdHandler
 								this.activeReactChannels.splice(this.activeReactChannels.indexOf(msg.channel.id), 1);
 							}
 						}, 1e2);
+					} else {
+						q.destroy();
+						await m.removeReactions().catch(err => null);
+						clearInterval(rl);
+						this.activeReactChannels.splice(this.activeReactChannels.indexOf(msg.channel.id), 1);
 					}
-				} else currentPost++;
+				} else currentPost = p as number;
 
 				if (currentPost === 0) currentPost = e.length;
 				if (currentPost === e.length + 1) currentPost = 1;
@@ -191,23 +193,23 @@ client.cmdHandler
 
 				switch (emoji.name) {
 					case "⏮":
-						await setPost.call(this, 1);
+						await setPost.call(client, 1);
 						break;
 
 					case "◀":
-						await setPost.call(this, currentPost - 1);
+						await setPost.call(client, currentPost - 1);
 						break;
 
 					case "⏹":
-						await setPost.call(this, "EXIT");
+						await setPost.call(client, "EXIT");
 						break;
 
 					case "▶":
-						await setPost.call(this, currentPost + 1);
+						await setPost.call(client, currentPost + 1);
 						break;
 
 					case "⏭":
-						await setPost.call(this, e.length);
+						await setPost.call(client, e.length);
 						break;
 
 					default:
@@ -221,7 +223,10 @@ client.cmdHandler
 				});
 			});
 
-			this.on("messageReactionAdd", f);
+			console.log(typeof client);
+			console.log(client.constructor.name);
+			console.log(typeof client.on);
+			client.on("messageReactionAdd", f);
 			this.activeReactChannels.push(msg.channel.id);
 		})
 	})
@@ -240,7 +245,7 @@ client.cmdHandler
 		usage: "",
 		features: ["nsfw"],
 		category: "nsfw",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let img, short, extra;
 			img = await phin({
 				url: "https://api.fursuitbutts.com/butts",
@@ -274,7 +279,7 @@ client.cmdHandler
 		usage: "",
 		features: ["nsfw"],
 		category: "nsfw",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let embed;
 
 			let s: any[] | any = await mongo.db("furrybot").collection("shorturl").find().toArray();
@@ -308,7 +313,7 @@ client.cmdHandler
 		usage: "[gay/straight/lesbian/dickgirl]",
 		features: ["nsfw"],
 		category: "nsfw",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let extra = "", type, embed, short;
 			if (msg.args.length === 0) {
 				for (const ytype of config.yiff.types) {

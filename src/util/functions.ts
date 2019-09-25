@@ -275,7 +275,6 @@ export default {
 			embed
 		});
 	}),
-	_getCallerFile: require("./_getCallerFile"),
 	_getDate: ((): string => {
 		const date = new Date();
 		return `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`;

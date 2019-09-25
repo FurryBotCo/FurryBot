@@ -6,7 +6,7 @@ import functions from "../../../util/functions";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 
-	await this.track("clientEvent", "events.guildDelete", {
+	/* await this.track("clientEvent", "events.guildDelete", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
 		clientId: config.bot.clientID,
@@ -16,7 +16,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 			ownerId: guild.id
 		},
 		guildCount: this.guilds.size
-	}, new Date());
+	}, new Date()); */
 
 	await this.f.incrementDailyCounter(false, this.guilds.size);
 

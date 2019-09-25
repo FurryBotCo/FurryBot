@@ -34,7 +34,7 @@ client.cmdHandler
 		usage: "<@bot/id>",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let list;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			// get user from message
@@ -122,7 +122,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const embed: Eris.EmbedOptions = {
 				title: "Bot Info!",
 				fields: [
@@ -205,7 +205,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const botPerms = [
 				"kickMembers",
 				"banMembers",
@@ -260,7 +260,7 @@ client.cmdHandler
 		usage: "<ip>",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.unparsedArgs.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			// if(config.apis.ipinfo.regex.ipv4.test(msg.unparsedArgs.join(" ")) || config.apis.ipinfo.regex.ipv6.test(msg.unparsedArgs.join(" "))) {
 			const req = await phin({
@@ -315,7 +315,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const allowUser = [],
 				denyUser = [],
 				allowBot = [],
@@ -368,7 +368,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			return msg.channel.createMessage("Checking Ping..")
 				.then(m => m.edit("Ping Calculated!"))
 				.then(async (m) => {
@@ -392,7 +392,7 @@ client.cmdHandler
 		usage: "<@member/id>",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
 			if (!user) return msg.errorEmbed("INVALID_USER");
@@ -445,7 +445,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const embed: Eris.EmbedOptions = {
 				title: "Shard Info",
 				description: `Guilds: ${this.guilds.filter(g => g.shard.id === msg.guild.shard.id).length}\nPing: ${msg.guild.shard.latency}ms`,
@@ -472,7 +472,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const embed: Eris.EmbedOptions = {
 				title: "Shard Info",
 				fields: this.shards.map(s => ({
@@ -508,7 +508,7 @@ client.cmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const textChCount = msg.guild.channels.filter(c => c.type === 0).length,
 				voiceChCount = msg.guild.channels.filter(c => c.type === 2).length,
 				categoryChCount = msg.guild.channels.filter(c => c.type === 4).length;
@@ -521,12 +521,24 @@ client.cmdHandler
 			}
 
 			let features = "";
-			// if (msg.channel.guild.verified) features += "Verified\n";
-			if (msg.channel.guild.features.indexOf("VIP_REGIONS") !== -1) features += "VIP Voice Vegions\n";
-			// if fetching vanity url fails return discord-api
-			if (msg.channel.guild.features.indexOf("VANITY_URL") !== -1) features += "Vanity URL\n"; // features+=`Vanity URL: https://discord.gg/${msg.guild.fetchVanityCode().catch(noerr => "discord-api")}\n`;
-			if (msg.channel.guild.features.indexOf("INVITE_SPLASH") !== -1) features += "Invite Splash\n"; // features+=`[Invite Splash](${msg.guild.inviteSplash()})\n`;
 
+			const f = {
+				INVITE_SPLASH: "Invite Splash",
+				VIP_REGIONS: "Vip Voice Regions/320kbps Voice Channels",
+				VANITY_URL: "Vanity URL",
+				VERIFIED: "Verified",
+				PARTNERED: "Partnered",
+				LURKABLE: "Lurkable",
+				COMMERCE: "Store Channels",
+				NEWS: "News Channels",
+				DISCOVERABLE: "Discoverable",
+				FEATURABLE: "Featurable",
+				ANIMATED_ICON: "Animated Icon",
+				BANNER: "Guild Banner",
+				PUBLIC: "Public"
+			};
+
+			Object.keys(f).forEach((k) => msg.guild.features.includes(k) ? features += `**${k}** - ${f[k]}\n` : null);
 			if (features === "") features = "NONE";
 			const verificationLevel = [
 				"**NONE** - unrestricted",
@@ -539,8 +551,8 @@ client.cmdHandler
 			// if (msg.channel.guild.memberCount < 1000) s = await Promise.all(msg.guild.members.filter(m => !m.user.bot).map((m) => mdb.collection("users").findOne({ id: m.id }))).then(res => res.map(m => m === null ? config.defaults.userConfig : m).map(m => ({ owoCount: m.owoCount === undefined ? 0 : m.owoCount, uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount })));
 			// else s = false;
 			const mfaLevel = [
-				"NONE",
-				"ELEVATED"
+				"Not Enabled",
+				"Enabled"
 			];
 
 			const defaultNotifications = [
@@ -548,7 +560,7 @@ client.cmdHandler
 				"Only Mentions"
 			];
 			const roles = msg.guild.roles.map(role => role.name === "@everyone" ? "@everyone" : `<@&${role.id}>`).join(",");
-			const rr = roles.length > 1000 ? `Too many to list, please use \`${msg.gConfig.prefix}roles server\`` : roles;
+			const rr = roles.length > 1000 ? `Too many to list.` : roles;
 			const embed = {
 				title: `Server Info - **${msg.guild.name}**`,
 				image: {
@@ -601,7 +613,7 @@ client.cmdHandler
 					},
 					{
 						name: "Extra",
-						value: `**Large Guild**: ${msg.guild.large ? "Yes" : "No"}\n**Verification**: ${verificationLevel[msg.guild.verificationLevel]}\n**2FA**: ${mfaLevel[msg.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[msg.guild.defaultNotifications]}\n**Features**:\n${features}`,
+						value: `**Large Guild**: ${msg.guild.large ? "Yes" : "No"}\n**Verification**: ${verificationLevel[msg.guild.verificationLevel]}\n**2FA**: ${mfaLevel[msg.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[msg.guild.defaultNotifications]}\n**[Features](https://discordapp.com/developers/docs/resources/guild#guild-object-guild-features)**:\n${features}`,
 						inline: false
 					}/*, {
 	name: "Counters",
@@ -632,7 +644,7 @@ client.cmdHandler
 		usage: "[@member/id]",
 		features: [],
 		category: "information",
-		run: (async function (this: CommandContext, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
 			if (!user) return msg.errorEmbed("INVALID_USER");
@@ -659,7 +671,7 @@ client.cmdHandler
 					inline: true
 				}, {
 					name: `Roles [${roles.length}]`,
-					value: roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.prefix}roles ${user.user.id}\`` : roles.toString(),
+					value: roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.prefix}roles ${user.user.id}\`` : roles.length === 0 ? "NONE" : roles.toString(),
 					inline: false
 				}]
 			};
@@ -699,7 +711,6 @@ client.cmdHandler
 				value: "Bots cannot be blacklisted.",
 				inline: false
 			});
-
 			return msg.channel.createMessage({
 				embed
 			});

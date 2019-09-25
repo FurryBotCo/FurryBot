@@ -36,6 +36,7 @@ export default class ReactionQueue extends Queue {
 	async _processQueue() {
 		if (this._entries.length > 0) {
 			const r = this._entries.shift();
+			if (Object.values(r).some(e => [undefined, null, ""].includes(e))) return;
 			try {
 				switch (r.type.toLowerCase()) {
 					case "add":
