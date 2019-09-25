@@ -166,11 +166,10 @@ client.cmdHandler
 				error = true;
 			}
 			const end = performance.now();
-
 			if (typeof res !== "string") {
 				if (typeof res === "undefined") res = "No Return";
 				// else if (res instanceof Array) res = res.join(" ");
-				else if (typeof res === "object") res = util.inspect(res, { depth: 3, showHidden: true });
+				else if (typeof res === "object") res = util.inspect(res, { depth: 2, showHidden: true });
 				else if (res instanceof Promise) res = await res;
 				else if (res instanceof Function) res = res.toString();
 				else if (res instanceof Buffer) res = res.toString();
@@ -337,7 +336,7 @@ client.cmdHandler
 			if (typeof res !== "string") {
 				if (typeof res === "undefined") res = "No Return";
 				// else if (res instanceof Array) res = res.join(" ");
-				else if (typeof res === "object") res = util.inspect(res, { depth: 3, showHidden: true });
+				else if (typeof res === "object") res = util.inspect(res, { depth: 2, showHidden: true });
 				else if (res instanceof Promise) res = await res;
 				else if (res instanceof Function) res = res.toString();
 				else if (res instanceof Buffer) res = res.toString();

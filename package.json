@@ -30,7 +30,6 @@
   },
   "homepage": "https://furry.bot",
   "dependencies": {
-    "analytics-node": "^3.4.0-beta.1",
     "blapi": "^1.1.0",
     "body-parser": "^1.19.0",
     "bufferutil": "^4.0.1",
@@ -38,7 +37,6 @@
     "canvas-constructor": "^3.0.3",
     "chalk": "^2.4.2",
     "chunk": "0.0.2",
-    "connect-mongo": "^3.0.0",
     "cookie-parser": "^1.4.4",
     "cryptr": "^4.0.2",
     "deasync": "^0.1.15",
@@ -46,7 +44,6 @@
     "e9api": "^1.0.6",
     "ejs": "^2.6.2",
     "eris": "github:abalabahaha/eris#dev",
-    "erlpack": "github:abalabahaha/erlpack",
     "eval": "^0.1.3",
     "eventemitter3": "^4.0.0",
     "express": "^4.17.1",
