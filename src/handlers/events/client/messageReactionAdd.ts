@@ -6,6 +6,7 @@ import { mdb } from "../../../modules/Database";
 import GuildConfig from "../../../modules/config/GuildConfig";
 import uuid from "uuid/v4";
 import functions from "../../../util/functions";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 export default new ClientEvent("messageReactionAdd", (async function (this: FurryBot, m, emoji, userID) {
 
@@ -25,14 +26,14 @@ export default new ClientEvent("messageReactionAdd", (async function (this: Furr
 
 	if (!config.beta) return;
 
-	console.log(emoji);
+	Logger.log(`Cluster #${this.clusterId}`, emoji);
 
 	let t;
 	if (emoji.id !== null) t = `<${emoji.animated ? "a" : ""}:${emoji.name}:${emoji.id}>`;
 	else t = emoji.name;
 
 	const msg = await m.channel.getMessage(m.id);
-	const user: Eris.User = this.users.has(userID) ? this.users.get(userID) : await this.getRESTUser(userID).catch(err => null);
+	const user: Eris.User = this.bot.users.has(userID) ? this.bot.users.get(userID) : await this.bot.getRESTUser(userID).catch(err => null);
 	if (!user || user.bot /*|| msg.author.id === user.id*/) return;
 
 	let gConfig: GuildConfig = await mdb.collection("guilds").findOne({ id: msg.member.guild.id });
@@ -47,9 +48,9 @@ export default new ClientEvent("messageReactionAdd", (async function (this: Furr
 
 	if (!gConfig.pawboard) gConfig.edit({ pawboard: config.defaults.guildConfig.pawboard });
 
-	console.log(gConfig.pawboard.emoji);
-	console.log(t);
-	console.log(gConfig.pawboard.emoji === t);
+	Logger.log(`Cluster #${this.clusterId}`, gConfig.pawboard.emoji);
+	Logger.log(`Cluster #${this.clusterId}`, t);
+	Logger.log(`Cluster #${this.clusterId}`, gConfig.pawboard.emoji === t);
 
 	if (!gConfig.pawboard.channel || !msg.member.guild.channels.has(gConfig.pawboard.channel) || gConfig.pawboard.emoji !== t) return;
 

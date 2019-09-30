@@ -9,25 +9,8 @@ const app: express.Router = express.Router();
 
 app.get("/", async (req, res) => res.status(200).json({
 	success: true,
-	shards: client.shards.map(s => ({ id: s.id, ping: s.latency, status: s.status })),
-	shardCount: client.shards.size
-}))
-	.get("/:id", async (req, res) => {
-
-		const s = client.shards.get(parseInt(req.params.id, 10));
-		if (!s) return res.status(404).json({
-			success: false,
-			error: "invalid shard id"
-		});
-
-		return res.status(200).json({
-			success: true,
-			shard: {
-				id: s.id,
-				ping: s.latency,
-				status: s.status
-			}
-		});
-	});
+	// shards: client.stats.shards.map(s => ({ id: s.id, ping: s.latency, status: s.status })),
+	shardCount: client.stats.shardCount
+}));
 
 export default app;

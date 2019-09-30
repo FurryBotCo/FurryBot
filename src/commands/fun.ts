@@ -11,10 +11,12 @@ import { mdb } from "../modules/Database";
 import ReactionQueue from "../util/queue/ReactionQeueue";
 import _ from "lodash";
 import util from "util";
+import CmdHandler from "../util/cmd";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "fun",
 		displayName: ":smile: Fun",
@@ -105,7 +107,7 @@ client.cmdHandler
 
 			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 
-			if (msg.channel.permissionsOf(this.user.id).has("attachFiles")) {
+			if (msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) {
 				return msg.channel.createMessage(text, {
 					file: await this.f.getImageFromURL("https://assets.furry.bot/bap.gif"),
 					name: "bap.gif"
@@ -163,7 +165,7 @@ client.cmdHandler
 					name: img.response.name
 				});
 			} catch (e) {
-				this.logger.error(e, msg.guild.shard.id);
+				Logger.error(e, msg.guild.shard.id);
 				return msg.channel.createMessage(`<@!${msg.author.id}> did a little blep!`, {
 					file: await this.f.getImageFromURL(config.images.serverError),
 					name: "error.png"
@@ -189,7 +191,7 @@ client.cmdHandler
 			input = msg.args.join(" ");
 			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
-				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
+				if (!msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
 				img = await this.f.imageAPIRequest(true, "boop");
 				if (!img.success) return msg.reply(`Image API returned an error: ${img.error.description}`);
 				msg.channel.createMessage(text, {
@@ -261,7 +263,7 @@ client.cmdHandler
 			input = msg.args.join(" ");
 			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
-				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
+				if (!msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
 				img = await this.f.imageAPIRequest(false, "cuddle", true, true);
 				if (!img.success) return msg.reply(`Image API returned an error: ${img.error.description}`);
 				msg.channel.createMessage(text, {
@@ -300,9 +302,9 @@ client.cmdHandler
 				j = JSON.parse(req.body);
 			} catch (e) {
 				await msg.channel.createMessage("Cloudflare is being dumb and rejecting our requests, please try again later.");
-				this.logger.error(req.body, msg.guild.shard.id);
+				Logger.error(req.body, msg.guild.shard.id);
 				await msg.channel.createMessage(`This command has been permanently disabled until Cloudflare stops giving us captchas, join our support server for updates on the status of this: <https://furry.bot/inv>.`);
-				return this.logger.error(e, msg.guild.shard.id);
+				return Logger.error(e, msg.guild.shard.id);
 			}
 
 			return msg.channel.createMessage(j.joke);
@@ -370,7 +372,7 @@ client.cmdHandler
 			}).then(d => d.reload());
 
 			if (!msg.uConfig.marriage.married) return msg.reply("You have to marry someone before you can divorce them..");
-			u = await this.getRESTUser(msg.uConfig.marriage.partner).catch(err => ({ username: "Unknown", discriminator: "0000" }));
+			u = await this.bot.getRESTUser(msg.uConfig.marriage.partner).catch(err => ({ username: "Unknown", discriminator: "0000" }));
 			msg.channel.createMessage(`Are you sure you want to divorce **${u.username}#${u.discriminator}**? **yes** or **no**.`).then(async () => {
 				const d = await this.MessageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);
 				if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply("that wasn't a valid option..");
@@ -482,7 +484,7 @@ client.cmdHandler
 
 				if (p === "EXIT") {
 					clearTimeout(t);
-					this.removeListener("messageReactionAdd", f);
+					this.bot.removeListener("messageReactionAdd", f);
 					if (q.entries.length > 0) {
 						let count = 0;
 						const cI = setInterval(async () => {
@@ -530,7 +532,7 @@ client.cmdHandler
 
 			const f = (async (ms: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, user: string) => {
 				if (ms.id !== m.id || user !== msg.author.id || !r.includes(emoji.name)) {
-					if (user !== this.user.id && r.includes(emoji.name)) return q.add({
+					if (user !== this.bot.user.id && r.includes(emoji.name)) return q.add({
 						type: "remove",
 						reaction: emoji.id !== null ? `${emoji.name}:${emoji.id}` : emoji.name,
 						user
@@ -570,7 +572,7 @@ client.cmdHandler
 				});
 			});
 
-			client.on("messageReactionAdd", f);
+			client.bot.on("messageReactionAdd", f);
 			this.activeReactChannels.push(msg.channel.id);
 		})
 	})
@@ -639,8 +641,8 @@ client.cmdHandler
 					name: req.response.name
 				});
 			} catch (error) {
-				this.logger.error(`Error:\n${error}`, msg.guild.shard.id);
-				this.logger.log(`Body: ${req}`, msg.guild.shard.id);
+				Logger.error(`Error:\n${error}`, msg.guild.shard.id);
+				Logger.log(`Body: ${req}`, msg.guild.shard.id);
 				return msg.channel.createMessage("Unknown API Error", {
 					file: await this.f.getImageFromURL("https://fb.furcdn.net/NotFound.png"),
 					name: "NotFound.png"
@@ -820,7 +822,7 @@ client.cmdHandler
 			input = msg.args.join(" ");
 			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
-				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
+				if (!msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
 				img = await this.f.imageAPIRequest(false, "hug", true, true);
 				if (!img.success) return msg.reply(`Image API returned an error: ${img.error.description}`);
 				msg.channel.createMessage(text, {
@@ -870,7 +872,7 @@ client.cmdHandler
 			input = msg.args.join(" ");
 			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
-				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
+				if (!msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) return msg.channel.createMessage(`<@!${msg.author.id}>, Hey, I require the \`ATTACH_FILES\` permission for images to work on these commands!`);
 				img = await this.f.imageAPIRequest(false, "kiss", true, true);
 				if (!img.success) return msg.reply(`Image API returned an error: ${img.error.description}`);
 				msg.channel.createMessage(text, {
@@ -900,7 +902,7 @@ client.cmdHandler
 			input = msg.args.join(" ");
 			text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.lang, cmd), msg.author.mention, input);
 			if (msg.gConfig.commandImages) {
-				if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.channel.createMessage("Hey, I require the `ATTACH_FILES` permission for images to work on these commands!");
+				if (!msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) return msg.channel.createMessage("Hey, I require the `ATTACH_FILES` permission for images to work on these commands!");
 				img = await this.f.imageAPIRequest(false, "lick", true, true);
 				if (!img.success) return msg.reply(`Image API returned an error: ${img.error.description}`);
 				msg.channel.createMessage(text, {
@@ -950,12 +952,12 @@ client.cmdHandler
 			}).then(d => d.reload());
 
 			if (msg.uConfig.marriage.married) {
-				u = await this.getRESTUser(msg.uConfig.marriage.partner).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
+				u = await this.bot.getRESTUser(msg.uConfig.marriage.partner).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
 				return msg.reply(`Hey, hey! You're already married to **${u}**! You can get a divorce though..`);
 			}
 
 			if (m.marriage.married) {
-				u = await this.getRESTUser(m.marriage.partner).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
+				u = await this.bot.getRESTUser(m.marriage.partner).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
 				return msg.reply(`Hey, hey! They're already married to **${u}**!`);
 			}
 			msg.channel.createMessage(`<@!${msg.author.id}> has proposed to <@!${member.id}>!\n<@!${member.id}> do you accept? **yes** or **no**.`).then(async () => {
@@ -1226,7 +1228,7 @@ client.cmdHandler
 					name: "ship.png"
 				});
 			} catch (e) {
-				this.logger.error({
+				Logger.error({
 					shipname,
 					amount
 				}, msg.guild.shard.id);
@@ -1341,8 +1343,8 @@ client.cmdHandler
 				submission = jsn.data.entries[rr];
 				if (typeof submission.contentLevel === "undefined") throw new Error("secondary");
 				if (submission.contentLevel !== 0) {
-					this.logger.log(`unsafe image:\n${util.inspect(submission, { depth: 3, showHidden: true })}`, msg.guild.shard.id);
-					this.logger.log(`Body: ${util.inspect(jsn, { depth: null })}`, msg.guild.shard.id);
+					Logger.log(`unsafe image:\n${util.inspect(submission, { depth: 3, showHidden: true })}`, msg.guild.shard.id);
+					Logger.log(`Body: ${util.inspect(jsn, { depth: null })}`, msg.guild.shard.id);
 					return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err => msg.channel.createMessage(`Command failed: ${err}`));
 				}
 				short = await this.f.shortenURL(`http://www.sofurry.com/view/${submission.id}`);
@@ -1353,8 +1355,8 @@ client.cmdHandler
 				}));
 				else return m.edit(`${extra}${submission.title} (type ${this.f.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf something bad is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`));
 			} catch (e) {
-				this.logger.error(`Error:\n${e}`, msg.guild.shard.id);
-				this.logger.log(`Body: ${req.body}`, msg.guild.shard.id);
+				Logger.error(`Error:\n${e}`, msg.guild.shard.id);
+				Logger.log(`Body: ${req.body}`, msg.guild.shard.id);
 				return m.edit("Unknown API Error").then(async () => msg.channel.createMessage("", {
 					file: await this.f.getImageFromURL(config.images.serverError),
 					name: "error.png"

@@ -58,7 +58,7 @@ export default class Command {
 		subCommands?: Command[];
 		category: Category | string;
 		run: (this: FurryBot, msg: ExtendedMessage) => Promise<any>;
-	}, h: CommandHandler, client?: FurryBot);
+	}, h: CommandHandler);
 
 	constructor(subcommand: boolean, data: {
 		triggers: ArrayOneOrMore<string>;
@@ -72,7 +72,7 @@ export default class Command {
 		subCommands?: Command[];
 		category: Category | string;
 		run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<any>;
-	}, h: CommandHandler, client?: FurryBot) {
+	}, h: CommandHandler) {
 		if (!data.triggers) throw new TypeError("Missing triggers property.");
 		if (!(data.triggers instanceof Array)) throw new TypeError("Invalid triggers property.");
 		if (data.triggers.length < 1) throw new TypeError("Not enough triggers. (must have at least 1)");

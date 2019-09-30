@@ -12,7 +12,7 @@ class MessageCollector {
 	constructor(bot: FurryBot) {
 		this.collectors = {};
 
-		bot.on("messageCreate", this.verify.bind(this));
+		bot.bot.on("messageCreate", this.verify.bind(this));
 	}
 
 	async verify(msg: ExtendedMessage | Message) {

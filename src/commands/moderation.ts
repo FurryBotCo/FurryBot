@@ -8,10 +8,12 @@ import * as Eris from "eris";
 import { mdb } from "../modules/Database";
 import UserConfig from "../modules/config/UserConfig";
 import chunk from "chunk";
+import CmdHandler from "../util/cmd";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "moderation",
 		displayName: ":hammer: Moderation",
@@ -43,7 +45,7 @@ client.cmdHandler
 
 			if (!user) return msg.errorEmbed("INVALID_USER");
 
-			if (msg.channel.permissionsOf(this.user.id).has("viewAuditLogs")) {
+			if (msg.channel.permissionsOf(this.bot.user.id).has("viewAuditLogs")) {
 				if (await msg.channel.guild.getBans().then(res => res.map(u => u.user.id).includes(user.id))) {
 					embed = {
 						title: "User already banned",
@@ -69,7 +71,7 @@ client.cmdHandler
 					await m.delete();
 				}
 			});
-			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
 		})
 	})
 	/*.addCommand({
@@ -203,7 +205,7 @@ client.cmdHandler
 			// get user from message
 			user = await msg.getUserFromArgs();
 
-			if (!user) user = await this.getRESTUser(msg.args[0]).catch(err => null);
+			if (!user) user = await this.bot.getRESTUser(msg.args[0]).catch(err => null);
 			if (!user) return msg.errorEmbed("INVALID_USER");
 
 			if ((await msg.channel.guild.getBans().then(res => res.map(u => u.user.id))).includes(user.id)) {
@@ -226,7 +228,7 @@ client.cmdHandler
 				}*/
 			});
 
-			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
 		})
 	})
 	.addCommand({
@@ -269,7 +271,7 @@ client.cmdHandler
 				}
 			});
 
-			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
 		})
 	})
 	.addCommand({
@@ -315,7 +317,7 @@ client.cmdHandler
 				Object.assign(embed, msg.embed_defaults("color"));
 				return msg.channel.createMessage({ embed });
 			}
-			a = this.f.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(msg.gConfig.muteRole));
+			a = this.f.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), msg.channel.guild.roles.get(msg.gConfig.muteRole));
 			if (a.higher || a.same) {
 				embed = {
 					title: "Invalid mute role",
@@ -350,7 +352,7 @@ client.cmdHandler
 					await m.delete();
 				}*/
 			});
-			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
 		})
 	})
 	.addCommand({
@@ -388,7 +390,7 @@ client.cmdHandler
 
 			if (!role) return msg.errorEmbed("INVALID_ROLE");
 
-			a = this.f.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), role);
+			a = this.f.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), role);
 			if (role.managed || role.rawPosition === 0 || a.higher || a.same) {
 				embed = {
 					title: "Invalid Role",
@@ -401,7 +403,7 @@ client.cmdHandler
 			g = await msg.gConfig.edit({ muteRole: role.id }).then(d => d.reload());
 			if (!g) {
 				msg.channel.createMessage("There was an internal error while doing this, please try again");
-				return this.logger.log(g, msg.guild.shard.id);
+				return Logger.log(g, msg.guild.shard.id);
 			}
 			await msg.channel.createMessage(`Set the new muted role to **${role.name}**`);
 
@@ -432,11 +434,11 @@ client.cmdHandler
 			// get member from message
 			if (!msg.args[0]) return msg.channel.createMessage("Please provide a user id.");
 
-			user = this.users.has(msg.args[0]) ? this.users.get(msg.args[0]) : await this.getRESTUser(msg.args[0]).catch(error => false);
+			user = this.bot.users.has(msg.args[0]) ? this.bot.users.get(msg.args[0]) : await this.bot.getRESTUser(msg.args[0]).catch(error => false);
 
 			if (!user) return msg.errorEmbed("INVALID_USER");
 
-			if (msg.channel.permissionsOf(this.user.id).has("viewAuditLogs")) {
+			if (msg.channel.permissionsOf(this.bot.user.id).has("viewAuditLogs")) {
 				if (!(await msg.channel.guild.getBans().then(res => res.map(u => u.user.id))).includes(user.id)) {
 					embed = {
 						title: "User not banned",
@@ -454,7 +456,7 @@ client.cmdHandler
 				msg.channel.createMessage(`I couldn't unban **${user.username}#${user.discriminator}**, ${err}`);
 			});
 
-			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
 		})
 	})
 	.addCommand({
@@ -506,7 +508,7 @@ client.cmdHandler
 				Object.assign(embed, msg.embed_defaults("color"));
 				return msg.channel.createMessage({ embed });
 			}
-			a = this.f.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(msg.gConfig.muteRole));
+			a = this.f.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), msg.channel.guild.roles.get(msg.gConfig.muteRole));
 			if (a.higher || a.same) {
 				embed = {
 					title: "Invalid mute role",
@@ -535,7 +537,7 @@ client.cmdHandler
 					await m.delete();
 				}*/
 			});
-			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+			if (!msg.gConfig.deleteCommands && msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
 		})
 	})
 	/*.addCommand({

@@ -9,6 +9,7 @@ import { mdb } from "../../../modules/Database";
 import * as os from "os";
 import phin from "phin";
 import * as fs from "fs-extra";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
 	let mstart, mprocess, manalytics, mblacklist, mdm, mmention, mresponse, mcmd, mend;
@@ -127,7 +128,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					});
 
 					await msg.author.getDMChannel().then(dm => dm.createMessage("Hey, I see that you're sending dm advertisments to me, that isn't a good idea.. You've been auto banned from my support server for dm advertising."));
-					return this.logger.log(`DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
+					return Logger.log(`DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
 				} else {
 					dmAds = false;
 					embed = {
@@ -146,7 +147,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					});
 
 					await msg.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://furry.bot> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join <https://furry.bot/inv> if you need more help!\nCommands __**CAN NOT**__ be ran in my dms!\nThese dms are not a good source to ask for support, do that in our support server <https://discord.gg/YazeA7e>!\nIf you spam my dms, you will get blacklisted!`));
-					return this.logger.log(`Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
+					return Logger.log(`Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
 				}
 
 
@@ -365,7 +366,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 					num = this.f.random(10, "1234567890");
 					code = `${msg.cmd.join(".")}.${config.beta ? "beta" : "stable"}.${num}`;
-					this.logger.error(`[CommandHandler] e1: ${err.name}: ${err.message}\n${err.stack},\nError Code: ${code}`, msg.guild.shard.id);
+					Logger.error(`[CommandHandler] e1: ${err.name}: ${err.message}\n${err.stack},\nError Code: ${code}`, msg.guild.shard.id);
 
 					await mdb.collection("errors").insertOne({
 						id: code,

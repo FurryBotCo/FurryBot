@@ -8,7 +8,7 @@ const app: express.Router = express.Router();
 
 app.get("/", async (req, res) => res.status(200).json({
 	success: true,
-	clientStatus: client.guilds.get(config.bot.mainGuild).members.get(client.user.id).status
+	clientStatus: "online"
 }));
 
 export default app;

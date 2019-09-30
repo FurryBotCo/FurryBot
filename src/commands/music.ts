@@ -7,10 +7,11 @@ import { Command, CommandError } from "../util/CommandHandler";
 import * as Eris from "eris";
 import ytdl from "ytdl-core";
 import { YouTubeSearchResults } from "youtube-search";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "music",
 		displayName: ":musical_note: Music",
@@ -38,9 +39,9 @@ client.cmdHandler
 			const t = msg.channel.guild.channels.get(msg.member.voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 
-			if (!vc.permissionsOf(this.user.id).has("voiceConnect")) return msg.reply("I cannot join the voice channel you are currently in.");
+			if (!vc.permissionsOf(this.bot.user.id).has("voiceConnect")) return msg.reply("I cannot join the voice channel you are currently in.");
 
-			if (!vc.permissionsOf(this.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are currently in.");
+			if (!vc.permissionsOf(this.bot.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are currently in.");
 
 			vc.join({}).then(() => msg.reply(`joined ${vc.name}`));
 		})
@@ -63,7 +64,7 @@ client.cmdHandler
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
 
 			let vc: Eris.VoiceChannel;
-			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.user.id).voiceState.channelID);
+			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.bot.user.id).voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 			else return msg.reply(`I don't seem to be in a voice channel..`);
 
@@ -128,11 +129,11 @@ client.cmdHandler
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
 
 			let vc: Eris.VoiceChannel;
-			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.user.id).voiceState.channelID);
+			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.bot.user.id).voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 			else return msg.reply(`I don't seem to be in a voice channel..`);
 
-			const conn = this.voiceConnections.get(msg.channel.guild.id);
+			const conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 
 			if (conn.paused) return msg.reply("playback is already paused..");
 
@@ -161,8 +162,8 @@ client.cmdHandler
 			if (msg.gConfig.music.queue.length >= 6 && !(msg.uConfig.patreon.amount >= 3)) return msg.reply("Hey, you can only have **5** songs in your queue right now, we may have a premium option to allow for more soon.");
 			const vc = msg.channel.guild.channels.get(msg.member.voiceState.channelID) as Eris.VoiceChannel;
 
-			if (!vc.permissionsOf(this.user.id).has("voiceConnect")) return msg.reply("I cannot connect to the voice channel you are in.");
-			if (!vc.permissionsOf(this.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are in.");
+			if (!vc.permissionsOf(this.bot.user.id).has("voiceConnect")) return msg.reply("I cannot connect to the voice channel you are in.");
+			if (!vc.permissionsOf(this.bot.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are in.");
 
 			const q = msg.args.join(" ");
 			const search: YouTubeSearchResults[] = await functions.ytsearch(q).catch(err => null);
@@ -207,7 +208,7 @@ client.cmdHandler
 			if (!v) return msg.reply("failed to fetch that video.");
 			if (!info) return msg.reply("failed to fetch info for that video.");
 
-			const me = msg.channel.guild.members.get(this.user.id);
+			const me = msg.channel.guild.members.get(this.bot.user.id);
 
 			let conn: Eris.VoiceConnection;
 
@@ -242,7 +243,7 @@ client.cmdHandler
 
 				await m.edit({ content: "", embed });
 			} else {
-				conn = this.voiceConnections.get(msg.channel.guild.id);
+				conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 				msg.gConfig.music.queue.push({ link: song.link, channel: info.author.name, length: parseInt(info.length_seconds, 10), title: song.title, blame: msg.author.id });
 				await msg.gConfig.edit({}).then(d => d.reload());
 
@@ -390,11 +391,11 @@ client.cmdHandler
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
 
 			let vc: Eris.VoiceChannel;
-			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.user.id).voiceState.channelID);
+			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.bot.user.id).voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 			else return msg.reply(`I don't seem to be in a voice channel..`);
 
-			const conn = this.voiceConnections.get(msg.channel.guild.id);
+			const conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 
 			if (!conn.paused) return msg.reply("I don't seem to be paused..?");
 
@@ -424,7 +425,7 @@ client.cmdHandler
 			const t = msg.channel.guild.channels.get(msg.member.voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 
-			const conn = this.voiceConnections.get(msg.channel.guild.id);
+			const conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 
 			await conn.stopPlaying();
 
@@ -466,11 +467,11 @@ client.cmdHandler
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
 
 			let vc: Eris.VoiceChannel;
-			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.user.id).voiceState.channelID);
+			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.bot.user.id).voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 			else return msg.reply(`I don't seem to be in a voice channel..`);
 
-			const conn = this.voiceConnections.get(msg.channel.guild.id);
+			const conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 
 			const v = parseInt(msg.args[0], 10);
 

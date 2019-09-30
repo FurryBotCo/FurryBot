@@ -7,10 +7,11 @@ import { Command, CommandError, Category } from "../util/CommandHandler";
 import phin from "phin";
 import * as Eris from "eris";
 import truncate from "truncate";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "misc",
 		displayName: ":thumbsup: Miscellaneous",
@@ -249,7 +250,7 @@ client.cmdHandler
 				color: this.f.randomColor()
 			};
 
-			return this.executeWebhook(config.webhooks.suggestion.id, config.webhooks.suggestion.token, {
+			return this.bot.executeWebhook(config.webhooks.suggestion.id, config.webhooks.suggestion.token, {
 				embeds: [
 					embed
 				],

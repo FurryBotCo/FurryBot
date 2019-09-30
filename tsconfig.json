@@ -7,6 +7,7 @@
         "baseUrl": "src",
         "resolveJsonModule": true,
         "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
         "module": "commonjs",
         "paths": {
@@ -19,15 +20,14 @@
         }
     },
     "include": [
-        "**/*",
-        "src/commands/*"
+        "**/*"
     ],
     "exclude": [
         "node_modules",
         "build",
+        "out",
         "test",
         "tmp",
-        "logs",
-        "src/commands-old"
+        "logs"
     ]
 }

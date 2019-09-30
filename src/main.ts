@@ -1,12 +1,6 @@
 import * as Eris from "eris";
 import * as fs from "fs-extra";
 import config from "./config";
-import Logger from "./util/LoggerV7";
-// import cat from "./commands";
-// import resp from "./responses";
-// import Command from "./modules/cmd/Command";
-// import AutoResponse from "./modules/cmd/AutoResponse";
-// import Category from "./modules/cmd/Category";
 import functions, { ErrorHandler } from "./util/functions";
 import Temp from "./util/Temp";
 import MessageCollector from "./util/MessageCollector";
@@ -17,17 +11,10 @@ import FurryBotAPI from "furrybotapi";
 import { CommandHandler } from "./util/CommandHandler";
 import WebSocket from "ws";
 import ClientEvent from "modules/ClientEvent";
+import { BaseClient, Cluster, Logger, LoggerV8 } from "@donovan_dmc/ws-clusters";
 
-class FurryBot extends Eris.Client {
-	logger: Logger;
-	// autoResponses: AutoResponse[];
-	// commands: Command[];
-	// categories: Category[];
-	// commandTriggers: string[];
-	// autoResponseTriggers: string[];
-	/*commandTimeout: {
-		[key: string]: Set<string>
-	};*/
+export default class FurryBot extends BaseClient {
+	cluster: Cluster;
 	ucwords: (str: string) => string;
 	srv: any;
 	ls: any;
@@ -53,15 +40,18 @@ class FurryBot extends Eris.Client {
 	activeReactChannels: string[];
 	cmdHandler: CommandHandler;
 	wss: WebSocket.Server;
-	constructor(token: string, options: Eris.ClientOptions) {
-		super(token, options);
-		this.logger = new Logger();
+	constructor(cluster: Cluster) {
+		super(cluster);
+	}
+
+	async launch(cluster: Cluster) {
+		Logger.log(`Cluster #${cluster.clusterId}`, `Launched as ${this.bot.user.username}#${this.bot.user.discriminator}`);
 
 		this.f = { ...functions, ErrorHandler };
 
 		fs.readdirSync(`${__dirname}/handlers/events/client`).map(d => {
 			const e: ClientEvent = require(`${__dirname}/handlers/events/client/${d}`).default;
-			this.on(e.event, e.listener.bind(this));
+			this.bot.on(e.event, e.listener.bind(this));
 		});
 
 		this.spamCounter = [];
@@ -74,12 +64,6 @@ class FurryBot extends Eris.Client {
 		this.MessageCollector = new MessageCollector(this);
 
 		this.tclient = new Trello(config.apis.trello.apiKey, config.apis.trello.apiToken);
-
-		global.console.log = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("log", msg, shardId, extra));
-		global.console.info = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("info", msg, shardId, extra));
-		global.console.debug = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("debug", msg, shardId, extra));
-		global.console.warn = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("warn", msg, shardId, extra));
-		global.console.error = (async (msg: string | any[] | object | Buffer | Promise<any>, shardId?: number, extra?: string | string[]): Promise<boolean> => this.logger._log("error", msg, shardId, extra));
 
 		this.e6 = new E6API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
@@ -96,8 +80,5 @@ class FurryBot extends Eris.Client {
 		this.cmdHandler = new CommandHandler(this, {
 			alwaysAddSend: true
 		});
-
 	}
 }
-
-export default FurryBot;

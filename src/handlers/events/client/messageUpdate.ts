@@ -14,5 +14,5 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 		messageId: message.id
 	}, new Date());*/
 
-	this.emit("messageCreate", message);
+	this.bot.emit("messageCreate", message);
 }));

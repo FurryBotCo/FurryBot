@@ -2,6 +2,7 @@ import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../../../config";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 export default new ClientEvent("error", (async function (this: FurryBot, info: string, id: number) {
 	if (!id) id = 0;
@@ -14,6 +15,6 @@ export default new ClientEvent("error", (async function (this: FurryBot, info: s
 		id
 	}, new Date()); */
 
-	if (this.logger !== undefined) return this.logger.error(info, id);
-	else return console.error(info, id);
+	if (Logger !== undefined) return Logger.error(info, id);
+	else return Logger.error(`Cluster #${this.clusterId} | Shard #${id}`, info);
 }));

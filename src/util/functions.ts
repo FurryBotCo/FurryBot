@@ -19,8 +19,17 @@ import ytdl from "ytdl-core";
 import * as URL from "url";
 import refreshPatreonToken from "./patreon/refreshPatreonToken";
 import loopPatrons from "./patreon/loopPatrons";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 export { ErrorHandler };
+
+const memberIsBooster = (async (m: Eris.Member): Promise<boolean> => {
+	if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
+	const guild = await client.eris.getRESTGuild(config.bot.mainGuild);
+	if (!guild) throw new TypeError("failed to find main guild");
+	if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
+	return true;
+});
 
 export default {
 	os,
@@ -211,13 +220,13 @@ export default {
 			const { command: sub } = msg._client.getCommand([...cmd.map(c => c.triggers[0]), msg.args.shift().toLowerCase()]);
 			msg.unparsedArgs.shift();
 			const cc = sub[sub.length - 1];
-			// console.log(sub);
-			// console.log(sub[sub.length - 1]);
+			// Logger.log("General", sub);
+			// Logger.log("General", sub[sub.length - 1]);
 			if (msg.cmd.command instanceof Array) msg.cmd.command.push(cc);
 			else msg.cmd.command = [msg.cmd.command, cc];
-			// console.log(cc.triggers[0]);
-			// console.log(util.inspect(cc.subCommands.find(c => c.triggers.includes(cc.triggers[0])), { depth: null, colors: true }));
-			// console.log(c.subCommands.find(s => s.triggers.includes(cc.triggers[0])));
+			// Logger.log("General", cc.triggers[0]);
+			// Logger.log("General", util.inspect(cc.subCommands.find(c => c.triggers.includes(cc.triggers[0])), { depth: null, colors: true }));
+			// Logger.log("General", c.subCommands.find(s => s.triggers.includes(cc.triggers[0])));
 			return c.subCommands.find(s => s.triggers.includes(cc.triggers[0])).run.call(ctx, msg);
 		} else return "NOSUB";*/
 	}),
@@ -227,26 +236,26 @@ export default {
 			if (__filename.endsWith(".ts")) {
 				if (fs.existsSync(`${dir}/${d}/index.ts`)) return require(`${dir}/${d}/index.ts`).default;
 				else {
-					console.warn(`Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					Logger.warn("General", `Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
 					if (fs.existsSync(`${config.rootDir}/src/default/subcmdindex.ts`)) fs.copyFileSync(`${config.rootDir}/src/default/subcmdindex.ts`, `${dir}/${d}/index.ts`);
 					if (fs.existsSync(`${dir}/${d}/index.ts`)) {
-						console.debug("Auto copying worked, continuing as normal..");
+						Logger.debug("General", "Auto copying worked, continuing as normal..");
 						return require(`${dir}/${d}/index.ts`).default;
 					} else {
-						console.error(`Auto copying failed, please check that default/subcmdindex.ts exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+						Logger.error("General", `Auto copying failed, please check that default/subcmdindex.ts exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
 					}
 					return [];
 				}
 			} else {
 				if (fs.existsSync(`${dir}/${d}/index.js`)) return require(`${dir}/${d}/index.js`).default;
 				else {
-					console.warn(`Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+					Logger.warn("General", `Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
 					if (fs.existsSync(`${config.rootDir}/src/default/subcmdindex.js`)) fs.copyFileSync(`${config.rootDir}/src/default/subcmdindex.js`, `${dir}/${d}/index.js`);
 					if (fs.existsSync(`${dir}/${d}/index.js`)) {
-						console.debug("Auto copying worked, continuing as normal..");
+						Logger.debug("General", "Auto copying worked, continuing as normal..");
 						return require(`${dir}/${d}/index.js`).default;
 					} else {
-						console.error(`Auto copying failed, please check that default/subcmdindex.js exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
+						Logger.error("General", `Auto copying failed, please check that default/subcmdindex.js exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
 					}
 					return [];
 				}
@@ -262,12 +271,12 @@ export default {
 		let embed;
 		if (cmd.subCommands.length > 0) {
 			embed = {
-				title: `Subcommand List: ${msg._client.ucwords(cmd.triggers[0])}`,
+				title: `Subcommand List: ${msg.client.f.ucwords(cmd.triggers[0])}`,
 				description: `\`command\` (\`alias\`) - description\n\n${cmd.subCommands.map(s => s.triggers.length > 1 ? `\`${s.triggers[0]}\` (\`${s.triggers[1]}\`) - ${s.description}` : `\`${s.triggers[0]}\` - ${s.description}`).join("\n")}`
 			};
 		} else {
 			embed = {
-				title: `Command Help: ${msg._client.ucwords(cmd.triggers[0])}`,
+				title: `Command Help: ${msg.client.f.ucwords(cmd.triggers[0])}`,
 				description: `Usage: ${cmd.usage}\nDescription: ${cmd.description}`
 			};
 		}
@@ -494,13 +503,7 @@ export default {
 
 		return mdb.collection("dailyjoins").findOneAndUpdate({ date }, { $set: { count, guildCount } });
 	}),
-	memberIsBooster: ((m: Eris.Member): boolean => {
-		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
-		const guild = client.guilds.get(config.bot.mainGuild);
-		if (!guild) throw new TypeError("failed to find main guild");
-		if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
-		return true;
-	}),
+	memberIsBooster,
 	calculateMultiplier: (async (m: Eris.Member): Promise<{ amount: number, multi: { [s: string]: boolean } }> => {
 		// return null;
 		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
@@ -536,15 +539,9 @@ export default {
 			}
 		}
 
-		if (client.guilds.has(config.bot.mainGuild)) {
-			const mainGuild = client.guilds.get(config.bot.mainGuild);
-			if (mainGuild.members.has(member.user.id)) {
-				if (mainGuild.members.get(member.user.id).roles.includes(config.nitroBoosterRole)) {
-					a.push(config.eco.multipliers.booster);
-					multi.booster = true;
-				}
-			}
-		} else console.error("Failed to find main guild");
+
+		const b = await memberIsBooster(member);
+		if (b) (a.push(config.eco.multipliers.booster), multi.booster = true);
 
 		const t = await mdb.collection("users").findOne({ id: m.user.id }).then(res => res.tips).catch(err => false);
 		if (t) {

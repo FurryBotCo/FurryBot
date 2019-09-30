@@ -9,10 +9,12 @@ import * as Eris from "eris";
 import Permissions from "../util/Permissions";
 import UserConfig from "../modules/config/UserConfig";
 import { mdb } from "../modules/Database";
+import CmdHandler from "../util/cmd";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "information",
 		displayName: ":tools: Information",
@@ -61,12 +63,12 @@ client.cmdHandler
 
 				// list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			} catch (e) {
-				this.logger.log({
+				Logger.log(`Cluster #${this.clusterId}`, {
 					headers: req.headers,
 					body: req.body.toString(),
 					statusCode: req.statusCode
-				}, msg.guild.shard.id);
-				this.logger.error(e, msg.guild.shard.id);
+				});
+				Logger.error(e, msg.guild.shard.id);
 				rs = req.body;
 				list = "Lookup Failed.";
 			}
@@ -144,15 +146,15 @@ client.cmdHandler
 						inline: false
 					}, {
 						name: "Total Guilds",
-						value: this.guilds.size.toString(),
+						value: this.bot.guilds.size.toString(),
 						inline: false
 					}, {
-						name: `Large Guilds (${this.options.largeThreshold}+ Members)`,
-						value: this.guilds.filter(g => g.large).length.toString(),
+						name: `Large Guilds (${this.bot.options.largeThreshold}+ Members)`,
+						value: this.bot.guilds.filter(g => g.large).length.toString(),
 						inline: false
 					}, {
 						name: "Total Users",
-						value: this.guilds.map(g => g.memberCount).reduce((a, b) => a + b).toString(),
+						value: this.bot.guilds.map(g => g.memberCount).reduce((a, b) => a + b).toString(),
 						inline: false
 					}, {
 						name: "Commands",
@@ -235,7 +237,7 @@ client.cmdHandler
 			let embed: Eris.EmbedOptions;
 			embed = {
 				title: "Discord",
-				description: `[Join Our Discord Server!](https://discord.gg/YazeA7e)\n[Invite Me To Your Server](https://discordapp.com/oauth2/authorize?client_id=${this.user.id}&scope=bot&permissions=${botPerms})`,
+				description: `[Join Our Discord Server!](https://discord.gg/YazeA7e)\n[Invite Me To Your Server](https://discordapp.com/oauth2/authorize?client_id=${this.bot.user.id}&scope=bot&permissions=${botPerms})`,
 				thumbnail: {
 					url: "https://cdn.discordapp.com/embed/avatars/0.png"
 				}
@@ -320,7 +322,7 @@ client.cmdHandler
 				denyUser = [],
 				allowBot = [],
 				denyBot = [],
-				b = msg.channel.permissionsOf(this.user.id);
+				b = msg.channel.permissionsOf(this.bot.user.id);
 
 			for (const p in Permissions.constant) {
 				if (msg.member.permission.allow & Permissions.constant[p]) allowUser.push(p);
@@ -397,7 +399,7 @@ client.cmdHandler
 
 			if (!user) return msg.errorEmbed("INVALID_USER");
 
-			const a = this.guilds.filter(g => g.members.has(user.id)),
+			const a = this.bot.guilds.filter(g => g.members.has(user.id)),
 				b = a.map(g => `${g.name} (${g.id})`),
 				guilds = [],
 				fields = [];
@@ -448,7 +450,7 @@ client.cmdHandler
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const embed: Eris.EmbedOptions = {
 				title: "Shard Info",
-				description: `Guilds: ${this.guilds.filter(g => g.shard.id === msg.guild.shard.id).length}\nPing: ${msg.guild.shard.latency}ms`,
+				description: `Guilds: ${this.bot.guilds.filter(g => g.shard.id === msg.guild.shard.id).length}\nPing: ${msg.guild.shard.latency}ms`,
 				color: this.f.randomColor(),
 				timestamp: new Date().toISOString()
 			};
@@ -475,9 +477,9 @@ client.cmdHandler
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const embed: Eris.EmbedOptions = {
 				title: "Shard Info",
-				fields: this.shards.map(s => ({
+				fields: this.bot.shards.map(s => ({
 					name: `Shard #${s.id}`,
-					value: `Guilds: ${this.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
+					value: `Guilds: ${this.bot.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
 					inline: true
 				})),
 				color: this.f.randomColor(),
@@ -697,7 +699,7 @@ client.cmdHandler
 
 				if (u.marriage.married) embed.fields.push({
 					name: "Marriage Status (on this bot)",
-					value: `Married to ${await this.getRESTUser(u.marriage.partner).then(usr => `${usr.username}#${usr.discriminator}`).catch(err => "Unknown#0000")}`,
+					value: `Married to ${await this.bot.getRESTUser(u.marriage.partner).then(usr => `${usr.username}#${usr.discriminator}`).catch(err => "Unknown#0000")}`,
 					inline: true
 				});
 

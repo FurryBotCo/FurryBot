@@ -7,8 +7,8 @@
     "test": "xo",
     "compile": "tsc",
     "files": "copyfiles src/**/*.txt build",
-    "build": "npm run tslint && rm -Rf build && tsc && npm run files",
-    "build-dev": "rm -Rf build && tsc && npm run files",
+    "build": "npm run tslint && rm -rf build && tsc && npm run files",
+    "build-dev": "rm -rf build && tsc && npm run files",
     "tslint": "tslint -c tslint.json -p . *.ts",
     "start": "node build",
     "start-dev": "npm run build-dev && node build"
@@ -30,6 +30,7 @@
   },
   "homepage": "https://furry.bot",
   "dependencies": {
+    "@donovan_dmc/ws-clusters": "^1.0.36",
     "blapi": "^1.1.0",
     "body-parser": "^1.19.0",
     "bufferutil": "^4.0.1",

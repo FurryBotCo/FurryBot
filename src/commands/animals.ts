@@ -5,10 +5,12 @@ import functions from "../util/functions";
 import config from "../config";
 import phin from "phin";
 import { Command } from "../util/CommandHandler";
+import CmdHandler from "../util/cmd";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "animals",
 		displayName: ":dog: Animals",
@@ -38,7 +40,7 @@ client.cmdHandler
 					name: img.response.name
 				});
 			} catch (e) {
-				this.logger.error(e, msg.guild.shard.id);
+				Logger.error(e, msg.guild.shard.id);
 				return msg.channel.createMessage("unknown api error", {
 					file: await this.f.getImageFromURL(config.images.serverError),
 					name: "error.png"
@@ -67,7 +69,7 @@ client.cmdHandler
 					name: "cat.gif"
 				});
 			} catch (e) {
-				this.logger.error(e, msg.guild.shard.id);
+				Logger.error(e, msg.guild.shard.id);
 				return msg.channel.createMessage("unknown api error", {
 					file: await this.f.getImageFromURL(config.images.serverError),
 					name: "error.png"
@@ -109,8 +111,8 @@ client.cmdHandler
 					name: `${parts[2]}_${parts[3]}.png`
 				});
 			} catch (e) {
-				this.logger.error(e, msg.guild.shard.id);
-				this.logger.error(j, msg.guild.shard.id);
+				Logger.error(e, msg.guild.shard.id);
+				Logger.error(j, msg.guild.shard.id);
 				return msg.channel.createMessage("unknown api error", {
 					file: await this.f.getImageFromURL(config.images.serverError),
 					name: "error.png"
@@ -141,7 +143,7 @@ client.cmdHandler
 					name: "foxrudor.de.png"
 				});
 			} catch (e) {
-				this.logger.error(e, msg.guild.shard.id);
+				Logger.error(e, msg.guild.shard.id);
 				return msg.channel.createMessage("unknown api error", {
 					file: await this.f.getImageFromURL(config.images.serverError),
 					name: "error.png"
@@ -184,8 +186,8 @@ client.cmdHandler
 					name: j.data.split("/").reverse()[0]
 				});
 			} catch (e) {
-				this.logger.error(e, msg.guild.shard.id);
-				this.logger.error(j, msg.guild.shard.id);
+				Logger.error(e, msg.guild.shard.id);
+				Logger.error(j, msg.guild.shard.id);
 				return msg.channel.createMessage("unknown api error", {
 					file: await this.f.getImageFromURL(config.images.serverError),
 					name: "error.png"

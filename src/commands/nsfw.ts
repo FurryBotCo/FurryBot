@@ -8,10 +8,12 @@ import * as Eris from "eris";
 import phin from "phin";
 import { mongo } from "../modules/Database";
 import ReactionQueue from "../util/queue/ReactionQeueue";
+import CmdHandler from "../util/cmd";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "nsfw",
 		displayName: ":smirk: NSFW",
@@ -37,7 +39,7 @@ client.cmdHandler
 			let img, short, extra;
 			img = await functions.imageAPIRequest(false, "bulge", true, false);
 			if (img.success !== true) {
-				this.logger.error(img, msg.guild.shard.id);
+				Logger.error(img, msg.guild.shard.id);
 				return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 			}
 			short = await functions.shortenURL(img.response.image);
@@ -135,7 +137,7 @@ client.cmdHandler
 
 				if (p === "EXIT") {
 					clearTimeout(t);
-					client.removeListener("messageReactionAdd", f);
+					client.bot.removeListener("messageReactionAdd", f);
 					if (q.entries.length > 0) {
 						let count = 0;
 						const cI = setInterval(async () => {
@@ -183,7 +185,7 @@ client.cmdHandler
 
 			const f = (async (ms: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, user: string) => {
 				if (ms.id !== m.id || user !== msg.author.id || !r.includes(emoji.name)) {
-					if (user !== this.user.id && r.includes(emoji.name)) return q.add({
+					if (user !== this.bot.user.id && r.includes(emoji.name)) return q.add({
 						type: "remove",
 						reaction: emoji.id !== null ? `${emoji.name}:${emoji.id}` : emoji.name,
 						user
@@ -223,10 +225,7 @@ client.cmdHandler
 				});
 			});
 
-			console.log(typeof client);
-			console.log(client.constructor.name);
-			console.log(typeof client.on);
-			client.on("messageReactionAdd", f);
+			client.bot.on("messageReactionAdd", f);
 			this.activeReactChannels.push(msg.channel.id);
 		})
 	})
@@ -253,7 +252,7 @@ client.cmdHandler
 			});
 
 			if (img.statusCode !== 200) {
-				this.logger.error(img, msg.guild.shard.id);
+				Logger.error(img, msg.guild.shard.id);
 				return msg.channel.createMessage(`<@!${msg.author.id}>, Unknown api error.`);
 			}
 			short = await functions.shortenURL(img.body.response.image);

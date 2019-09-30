@@ -7,8 +7,8 @@ import apiFunctions from "../functions";
 
 const app: express.Router = express.Router();
 
-app.get("/", async(req, res) => res.status(200).json({ developers: config.developers, staff: config.staff }))
-	.get("/dev", async(req, res) => res.status(200).json(config.developers))
-	.get("/staff", async(req, res) => res.status(200).json(config.developers));
+app.get("/", async (req, res) => res.status(200).json({ developers: config.developers, staff: config.staff }))
+	.get("/dev", async (req, res) => res.status(200).json(config.developers))
+	.get("/staff", async (req, res) => res.status(200).json(config.developers));
 
 export default app;

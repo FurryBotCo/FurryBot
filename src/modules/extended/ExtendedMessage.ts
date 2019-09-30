@@ -8,6 +8,7 @@ import FurryBot from "@FurryBot";
 import ExtendedTextChannel from "../extended/ExtendedTextChannel";
 import ExtendedUser from "../extended/ExtendedUser";
 import chalk from "chalk";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 class ExtendedMessage extends Eris.Message {
 	id: string;
@@ -36,7 +37,7 @@ class ExtendedMessage extends Eris.Message {
 	cmd: string[];
 	// response: AutoResponse;
 	client: FurryBot;
-	_client: FurryBot;
+	_client: Eris.Client;
 	c: string;
 	prefix: string;
 	args: string[];
@@ -93,7 +94,7 @@ class ExtendedMessage extends Eris.Message {
 		// else data.timestamp = Date.now();
 		if (![undefined].includes(msg.tts)) data.tts = msg.tts;
 		if (![undefined].includes(msg.type)) data.type = msg.type;
-		super(data, client);
+		super(data, client.bot);
 		this.client = client;
 
 		// this property doesn't seem to be set properly
@@ -106,7 +107,7 @@ class ExtendedMessage extends Eris.Message {
 		this._uConfig = await mdb.collection("users").findOne({ id: this.author.id }).then(async (res) => {
 			if (!res) {
 				await mdb.collection("users").insertOne({ ...{ id: this.author.id }, ...config.defaults.userConfig }).catch(err => null);
-				console.debug(`Created User Entry "${this.author.id}"`, this.guild && this.guild.shard ? this.guild.shard.id || null : null, chalk.magentaBright("ExtendedMessage"));
+				Logger.debug(`Cluster #${this.client.clusterId}`, `Created User Entry "${this.author.id}"`);
 				const res = await mdb.collection("users").findOne({ id: this.author.id });
 				return res;
 			} else return res;
@@ -118,7 +119,7 @@ class ExtendedMessage extends Eris.Message {
 			this._gConfig = await mdb.collection("guilds").findOne({ id: this.channel.guild.id }).then(async (res) => {
 				if (!res) {
 					await mdb.collection("guilds").insertOne({ ...{ id: this.channel.guild.id }, ...config.defaults.guildConfig }).catch(err => null);
-					console.debug(`Created Guild Entry "${this.channel.guild.id}"`, this.guild.shard.id, chalk.magentaBright("ExtendedMessage"));
+					Logger.debug(`Cluster #${this.client.clusterId}`, `Created Guild Entry "${this.channel.guild.id}"`);
 					const res = await mdb.collection("guilds").findOne({ id: this.channel.guild.id });
 					return res;
 				} else return res;
@@ -155,7 +156,10 @@ class ExtendedMessage extends Eris.Message {
 					isDeveloper: config.developers.includes(this.author.id)
 				};
 			} catch (e) {
-				this._client.logger.log(`Error setting up message ${this.id}: ${e}`, this.guild && this.guild.shard ? this.guild.shard.id || null : null, chalk.magentaBright("ExtendedMessage"));
+				// create new error & overwrite stack so we get the proper stack, not this line
+				const err = new Error(`Error setting up message "${this.id}": ${e.message}`);
+				err.stack = e.stack;
+				throw err;
 			}
 		}
 	}
@@ -193,7 +197,7 @@ class ExtendedMessage extends Eris.Message {
 		return mdb.collection("guilds").findOne({ id: this.channel.guild.id }).then(async (res) => {
 			if (!res) {
 	await mdb.collection("guilds").insertOne({ ...{ id: this.channel.guild.id }, ...config.defaults.guildConfig});
-	console.debug(`Created Guild Entry "${this.channel.guild.id}`);
+	Logger.debug(`Cluster #${this.clusterId}`, `Created Guild Entry "${this.channel.guild.id}`);
 	return mdb.collection("guilds").findOne({ id: this.channel.guild.id });
 			} else return res;
 		}).then(res => new GuildConfig(this.guild.id, res));
@@ -203,7 +207,7 @@ class ExtendedMessage extends Eris.Message {
 		return mdb.collection("users").findOne({ id: this.author.id }).then(async (res) => {
 			if (!res) {
 	await mdb.collection("users").insertOne({ ...{ id: this.author.id }, ...config.defaults.userConfig });
-	console.debug(`Created User Entry "${this.author.id}`);
+	Logger.debug(`Cluster #${this.clusterId}`, `Created User Entry "${this.author.id}`);
 	return mdb.collection("users").findOne({ id: this.author.id });
 			} else return res;
 		}).then(res => new UserConfig(this.author.id, res));
