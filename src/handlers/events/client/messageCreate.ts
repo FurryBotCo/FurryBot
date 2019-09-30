@@ -10,6 +10,7 @@ import * as os from "os";
 import phin from "phin";
 import * as fs from "fs-extra";
 import { Logger } from "@donovan_dmc/ws-clusters";
+import CmdHandler from "../../../util/cmd";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
 	/* dev only */
@@ -259,7 +260,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase())) return;
 
-		const h = await this.cmdHandler.handleCommand(msg).catch(err => err);
+		const h = await CmdHandler.handleCommand(msg).catch(err => err);
 
 		if (h instanceof Error) throw h;
 
@@ -268,7 +269,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		let embed: Eris.EmbedOptions, num: string, code: string, stack: string;
 
 		let cmd;
-		if (msg.cmd) cmd = this.cmdHandler.getCommand(msg.cmd[msg.cmd.length - 1]);
+		if (msg.cmd) cmd = CmdHandler.getCommand(msg.cmd[msg.cmd.length - 1]);
 		else throw e;
 
 		switch (err.message.toUpperCase()) {
@@ -290,7 +291,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						inline: false
 					}, {
 						name: "Category",
-						value: typeof cmd.category !== "undefined" && typeof cmd.category.name !== "undefined" ? this.ucwords(cmd.category.name) : "Unknown",
+						value: typeof cmd.category !== "undefined" && typeof cmd.category.name !== "undefined" ? this.f.ucwords(cmd.category.name) : "Unknown",
 						inline: false
 					}, {
 						name: "Arguments Provided",

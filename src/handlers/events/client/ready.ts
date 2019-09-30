@@ -2,7 +2,7 @@ import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../../../config";
-import srv from "../../../api";
+import sv from "../../../api";
 import express from "express";
 import http from "http";
 import ListStats from "../../../util/ListStats";
@@ -30,7 +30,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		channelCount: Object.keys(this.channelGuildMap).length,
 		guildCount: this.guilds.size
 	}, new Date()); */
-
+	const srv = await sv(this);
 	fs.readdirSync(`${__dirname}/../../../commands`).filter(d => !fs.lstatSync(`${__dirname}/../../../commands/${d}`).isDirectory() && d.endsWith(__filename.split(".").reverse()[0])).map(f => require(`${__dirname}/../../../commands/${f}`));
 	CmdHandler.setClient(this);
 
@@ -45,8 +45,6 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 			type: 0
 		});
 	}, 6e4);
-
-	this.wss = new WebSocket.Server({ server: srv });
 
 	// we only launch the api on the first cluster
 	if (this.clusterId === 0) {
@@ -111,149 +109,4 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		this.spamCounter = this.spamCounter.filter(s => s.time + 3e4 > Date.now());
 		this.responseSpamCounter = this.responseSpamCounter.filter(s => s.time + 3e4 > Date.now());
 	}, 1e3);
-
-	this.wss.on("connection", async (socket, request) => {
-		Logger.debug("IO", `IO Connection From ${request.socket.remoteAddress}`);
-
-		socket.once("close", () => {
-			Logger.debug("IO", `IO Disconnect From ${request.socket.remoteAddress}`);
-		});
-
-		if (!request.url || request.url.indexOf("?") === -1) return socket.close(1000, "Invalid Authentication");
-		const k = request.url.split("?")[1].split("&").map(t => t.split("="));
-
-		const j = k.filter(t => t[0] === "key")[0];
-		if (!j || j[1] !== config.universalKey) return socket.close(1000, "Invalid Authentication");
-
-		socket.on("message", async (d) => {
-			d = d.toString();
-			let j;
-			try {
-				j = JSON.parse(d);
-			} catch (e) {
-				return socket.send(JSON.stringify({
-					event: "error",
-					data: "all payloads must be in the json format"
-				}));
-			}
-
-			if (!j.event || !j.data) return socket.send(JSON.stringify({
-				event: "error",
-				data: "missing 'event' or 'data' property"
-			}));
-
-			switch (j.event.toLowerCase()) {
-				case "eval":
-					Logger.debug("IO", `IO Eval: ${j.data}`);
-					const start = performance.now();
-					let res;
-					let error = false;
-					try {
-						// an external functions is used because typescript screws with the context and the variables
-						res = await ev.call(this, j.data, {
-							config,
-							phin,
-							functions,
-							util,
-							fs,
-							mdb,
-							mongo,
-							Permissions,
-							os
-						}).catch(err => err);
-					} catch (e) {
-						res = e;
-						error = true;
-					}
-					if (res instanceof Error) error = true;
-
-					res = util.inspect(res, { depth: 1, colors: false });
-					const end = performance.now();
-
-					if (res.indexOf(config.bot.token) !== -1) res = res.replace(new RegExp(config.bot.token, "g"), "[BOT TOKEN]");
-					if (res.indexOf(config.universalKey) !== -1) res = res.replace(new RegExp(config.universalKey, "g"), "[UNIVERSAL KEY]");
-
-
-					socket.send(JSON.stringify({
-						event: "response",
-						data: {
-							eval: j.data,
-							res,
-							error,
-							time: {
-								start: parseFloat(start.toFixed(3)),
-								end: parseFloat(end.toFixed(3)),
-								total: parseFloat((end - start).toFixed(3))
-							}
-						}
-					}));
-					break;
-
-				default:
-					return socket.send(JSON.stringify({
-						event: "error",
-						data: "invalid event"
-					}));
-			}
-		});
-	});
-
-	/*this.io.use(async (s, next) => {
-
-	Logger.debug(`IO Connection From ${s.conn.remoteAddress}`, 0);
-	s.once("disconnect", async () => {
-
-		Logger.debug(`IO Disconnect From ${s.conn.remoteAddress}`, 0);
-	});
-	if (s.handshake.query && s.handshake.query.key) {
-		if (s.handshake.query.key !== config.universalKey) return s.disconnect();
-		else next();
-	} else return s.disconnect();
-})
-	.on("connection", async (s) => {
-
-		s.on("eval", async (d) => {
-
-			Logger.debug(`IO Eval: ${d}`);
-			const start = performance.now();
-			let res;
-			let error = false;
-			try {
-				// an external functions is used because typescript screws with the context and the variables
-				res = await ev.call(this, d, {
-					config,
-					phin,
-					functions,
-					util,
-					fs,
-					mdb,
-					mongo,
-					Permissions,
-					os
-				}).catch(err => err);
-			} catch (e) {
-				res = e;
-				error = true;
-			}
-			if (res instanceof Error) error = true;
-
-			res = util.inspect(res, { depth: 1, colors: false });
-			const end = performance.now();
-
-			if (res.indexOf(config.bot.token) !== -1) res = res.replace(new RegExp(config.bot.token, "g"), "[BOT TOKEN]");
-			if (res.indexOf(config.universalKey) !== -1) res = res.replace(new RegExp(config.universalKey, "g"), "[UNIVERSAL KEY]");
-
-
-	s.emit("response", {
-		eval: d,
-		res,
-		error,
-		time: {
-			start: parseFloat(start.toFixed(3)),
-			end: parseFloat(end.toFixed(3)),
-			total: parseFloat((end - start).toFixed(3))
-		}
-	});
-});
-	});*/
 }));

@@ -1,7 +1,5 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
 import phin from "phin";
 import { Command } from "../util/CommandHandler";

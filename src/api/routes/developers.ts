@@ -1,14 +1,16 @@
 import express from "express";
-import client from "../../../";
-import functions from "../../util/functions";
 import config from "../../config";
 import util from "util";
 import apiFunctions from "../functions";
+import FurryBot from "@FurryBot";
 
-const app: express.Router = express.Router();
+export default (async (client: FurryBot) => {
 
-app.get("/", async (req, res) => res.status(200).json({ developers: config.developers, staff: config.staff }))
-	.get("/dev", async (req, res) => res.status(200).json(config.developers))
-	.get("/staff", async (req, res) => res.status(200).json(config.developers));
+	const app: express.Router = express.Router();
 
-export default app;
+	app.get("/", async (req, res) => res.status(200).json({ developers: config.developers, staff: config.staff }))
+		.get("/dev", async (req, res) => res.status(200).json(config.developers))
+		.get("/staff", async (req, res) => res.status(200).json(config.developers));
+
+	return app;
+});

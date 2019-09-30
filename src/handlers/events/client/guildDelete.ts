@@ -2,7 +2,6 @@ import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../../../config";
-import functions from "../../../util/functions";
 import { Logger } from "@donovan_dmc/ws-clusters";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {

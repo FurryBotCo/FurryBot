@@ -1,7 +1,5 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import phin from "phin";
@@ -125,6 +123,7 @@ CmdHandler
 		features: [],
 		category: "information",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+			const st = await this.cluster.getMasterStats();
 			const embed: Eris.EmbedOptions = {
 				title: "Bot Info!",
 				fields: [
@@ -145,20 +144,24 @@ CmdHandler
 						value: `${this.f.parseTime(process.uptime())} (${this.f.secondsToHours(process.uptime())})`,
 						inline: false
 					}, {
+						name: "Shards/Clusters",
+						value: `Shard Count: ${st.shardCount} (current: ${msg.guild.shard.id})\nTotal Clusters: ${st.clusters.size} (current: ${this.clusterId})`,
+						inline: false
+					}, {
 						name: "Total Guilds",
-						value: this.bot.guilds.size.toString(),
+						value: st.guildCount.toString(),
 						inline: false
 					}, {
 						name: `Large Guilds (${this.bot.options.largeThreshold}+ Members)`,
-						value: this.bot.guilds.filter(g => g.large).length.toString(),
+						value: st.largeGuildCount.toString(),
 						inline: false
 					}, {
 						name: "Total Users",
-						value: this.bot.guilds.map(g => g.memberCount).reduce((a, b) => a + b).toString(),
+						value: st.userCount.toString(),
 						inline: false
 					}, {
 						name: "Commands",
-						value: this.cmdHandler.commands.length.toString(),
+						value: CmdHandler.commands.length.toString(),
 						inline: false
 					}, {
 						name: "API Version",

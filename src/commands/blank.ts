@@ -1,4 +1,3 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";

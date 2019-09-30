@@ -1,4 +1,4 @@
-import FurryBot from "../main";
+import FurryBot from "@FurryBot";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import { Message } from "eris";
 

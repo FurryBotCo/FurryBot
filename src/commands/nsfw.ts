@@ -1,7 +1,5 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import * as Eris from "eris";
@@ -37,15 +35,15 @@ CmdHandler
 		category: "nsfw",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			let img, short, extra;
-			img = await functions.imageAPIRequest(false, "bulge", true, false);
+			img = await this.f.imageAPIRequest(false, "bulge", true, false);
 			if (img.success !== true) {
 				Logger.error(img, msg.guild.shard.id);
 				return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 			}
-			short = await functions.shortenURL(img.response.image);
+			short = await this.f.shortenURL(img.response.image);
 			extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
 			return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
-				file: await functions.getImageFromURL(img.response.image),
+				file: await this.f.getImageFromURL(img.response.image),
 				name: img.response.name
 			});
 		})
@@ -255,10 +253,10 @@ CmdHandler
 				Logger.error(img, msg.guild.shard.id);
 				return msg.channel.createMessage(`<@!${msg.author.id}>, Unknown api error.`);
 			}
-			short = await functions.shortenURL(img.body.response.image);
+			short = await this.f.shortenURL(img.body.response.image);
 			extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
 			return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
-				file: await functions.getImageFromURL(img.body.response.image),
+				file: await this.f.getImageFromURL(img.body.response.image),
 				name: img.body.response.name
 			});
 		})
@@ -339,15 +337,15 @@ CmdHandler
 				}
 			}
 
-			const img = await functions.imageAPIRequest(false, `yiff/${type}`, true, false);
+			const img = await this.f.imageAPIRequest(false, `yiff/${type}`, true, false);
 			if (img.success !== true) {
 				if (typeof img.error === "object") return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 				else return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\n${img.error}`);
 			}
-			short = await functions.shortenURL(img.response.image);
+			short = await this.f.shortenURL(img.response.image);
 			extra += short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
 			return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nType: ${type}\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
-				file: await functions.getImageFromURL(img.response.image),
+				file: await this.f.getImageFromURL(img.response.image),
 				name: img.response.name
 			});
 		})

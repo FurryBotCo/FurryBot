@@ -1,7 +1,5 @@
-import manager from "../../../index";
 import FurryBot from "../../main";
 import config from "../../config";
-import functions from "../../util/functions";
 import ExtendedMessage from "../../modules/extended/ExtendedMessage";
 import { mdb } from "../../modules/Database";
 import * as Eris from "eris";
@@ -148,7 +146,7 @@ export default [
 		],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
@@ -232,7 +230,7 @@ export default [
 			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
@@ -364,7 +362,7 @@ export default [
 			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
@@ -480,7 +478,7 @@ export default [
 			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})

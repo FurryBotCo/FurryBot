@@ -3,7 +3,6 @@ import UserConfig from "../config/UserConfig";
 import GuildConfig from "../config/GuildConfig";
 import { mdb } from "../Database";
 import config from "../../config";
-import functions from "../../util/functions";
 import FurryBot from "@FurryBot";
 import ExtendedTextChannel from "../extended/ExtendedTextChannel";
 import ExtendedUser from "../extended/ExtendedUser";
@@ -172,7 +171,7 @@ class ExtendedMessage extends Eris.Message {
 				name: `${this.author.username}#${this.author.discriminator}`,
 				icon_url: this.author.avatarURL
 			},
-			color: functions.randomColor(),
+			color: this.client.f.randomColor(),
 			timestamp: new Date().toISOString()
 		};
 		without.forEach((wth) => {
@@ -184,7 +183,7 @@ class ExtendedMessage extends Eris.Message {
 	embed_defaults_na(...without: string[]): Eris.EmbedOptions {
 		let def: Eris.EmbedOptions;
 		def = {
-			color: functions.randomColor(),
+			color: this.client.f.randomColor(),
 			timestamp: new Date().toISOString()
 		};
 		without.forEach((wth) => {
@@ -432,7 +431,7 @@ class ExtendedMessage extends Eris.Message {
 		};
 	}
 
-	async errorEmbed(type = "", custom = false, title = "", description = "", fields: any[] = [], color: number = functions.randomColor()): Promise<Eris.Message> {
+	async errorEmbed(type = "", custom = false, title = "", description = "", fields: any[] = [], color: number = this.client.f.randomColor()): Promise<Eris.Message> {
 		if (!custom) {
 			switch (type.replace(/(\s|-)/g, "_").toUpperCase()) {
 				case "INVALID_USER":

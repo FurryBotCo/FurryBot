@@ -32,7 +32,7 @@ type ErisPermissions =
 
 
 export default class CommandHandler {
-	private _client: any;
+	private _client: FurryBot;
 	private _commands: Command[];
 	private _categories: Category[];
 	private _options: {
@@ -128,8 +128,8 @@ export default class CommandHandler {
 
 	getCommand(str: string) {
 		if (!str) throw new TypeError("Missing command name");
-		console.log(this.commands);
-		console.log(this._commands);
+		// console.log(this.commands);
+		// console.log(this._commands);
 		return this.commands.find(c => c.triggers.map(t => t.toLowerCase()).reduce((a, b) => a.concat(b), []).includes(str.toLowerCase())) || null;
 	}
 
@@ -229,7 +229,7 @@ export default class CommandHandler {
 		/* end blacklist check */
 
 		/* this._client.track("command", `command.${cmd.triggers[0]}`, {
-			hostname: this._client.bot.f.os.hostname(),
+			hostname: this._client.f.os.hostname(),
 			beta: config.beta,
 			clientId: config.bot.clientID,
 			message: {
@@ -289,12 +289,12 @@ export default class CommandHandler {
 				const d = fs.readdirSync(`${config.logsDir}/spam`).filter(d => !fs.lstatSync(`${config.logsDir}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.logsDir}/spam/${d}`).birthtimeMs + 1.2e5 > Date.now());
 
 				if (d.length > 0) {
-					report = this._client.bot.f.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.logsDir}/spam/${f}`).toString())), report);
+					report = this._client.f.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.logsDir}/spam/${f}`).toString())), report);
 					spC = report.entries.length;
 					d.map(f => fs.unlinkSync(`${config.logsDir}/spam/${f}`));
 				}
 
-				const reportId = this._client.bot.f.random(10);
+				const reportId = this._client.f.random(10);
 
 				fs.writeFileSync(`${config.logsDir}/spam/${msg.author.id}-${reportId}-cmd.json`, JSON.stringify(report));
 
@@ -324,7 +324,7 @@ export default class CommandHandler {
 								title: "User Blacklisted",
 								description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist. Report: ${config.beta ? `http://${config.apiBindIp}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
 								timestamp: new Date().toISOString(),
-								color: this._client.bot.f.randomColor()
+								color: this._client.f.randomColor()
 							}
 						],
 						username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
@@ -344,7 +344,7 @@ export default class CommandHandler {
 
 		if (cmd.features.includes("nsfw")) {
 			if (!msg.channel.nsfw) return msg.reply("this command can only be ran in nsfw channels.", {
-				file: await this._client.bot.f.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
+				file: await this._client.f.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
 				name: "nsfw.gif"
 			});
 
@@ -358,7 +358,7 @@ export default class CommandHandler {
 				const embed = {
 					title: "You do not have the required permission(s) to use this!",
 					description: `You require the permission(s) **${p.join("**, **")}** to run this, which you do not have.`,
-					color: this._client.bot.f.randomColor(),
+					color: this._client.f.randomColor(),
 					timestamp: new Date().toISOString()
 				};
 				Logger.warn("Command Handler", `user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`);
@@ -373,8 +373,8 @@ export default class CommandHandler {
 		}
 
 		if (cmd.botPermissions.length > 0) {
-			if (cmd.botPermissions.some(perm => !msg.channel.permissionsOf(this._client.user.id).has(perm))) {
-				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(this._client.user.id).has(perm));
+			if (cmd.botPermissions.some(perm => !msg.channel.permissionsOf(this._client.bot.user.id).has(perm))) {
+				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(this._client.bot.user.id).has(perm));
 
 				const embed = {
 					title: "I do not have the required permission(s) to use this!",
@@ -397,7 +397,7 @@ export default class CommandHandler {
 			const cool = this.cooldownHandler.checkCooldown(cmd, msg.author.id);
 
 			if (cool.c && cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) {
-				let t = await this._client.bot.f.ms(cool.time, true) as string;
+				let t = await this._client.f.ms(cool.time, true) as string;
 				t = `${parseInt(t.split(" ")[0], 10)} ${t.split(" ")[1]}`;
 				return msg.reply(`hey, this command is on cooldown! Please wait **${t}**..`);
 			}
@@ -454,7 +454,7 @@ export default class CommandHandler {
 
 		if (cmd.features.includes("nsfw")) {
 			if (!msg.channel.nsfw) return msg.reply("this command can only be ran in nsfw channels.", {
-				file: await this._client.bot.f.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
+				file: await this._client.f.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
 				name: "nsfw.gif"
 			});
 
@@ -468,7 +468,7 @@ export default class CommandHandler {
 				const embed = {
 					title: "You do not have the required permission(s) to use this!",
 					description: `You require the permission(s) **${p.join("**, **")}** to run this, which you do not have.`,
-					color: this._client.bot.f.randomColor(),
+					color: this._client.f.randomColor(),
 					timestamp: new Date().toISOString()
 				};
 				Logger.warn("Command Handler", `user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`);
@@ -483,7 +483,7 @@ export default class CommandHandler {
 				const embed = {
 					title: "I do not have the required permission(s) to use this!",
 					description: `I need the permission(s) **${p.join("**, **")}** for this command to function properly, please add these to me and try again.`,
-					color: this._client.bot.f.randomColor(),
+					color: this._client.f.randomColor(),
 					timestamp: new Date().toISOString()
 				};
 				Logger.warn("Command Handler", `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`);

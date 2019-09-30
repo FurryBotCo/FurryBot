@@ -1,9 +1,7 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
-import { Command, CommandError, Category } from "../util/CommandHandler";
+import { Command, CommandError } from "../util/CommandHandler";
 import phin from "phin";
 import * as Eris from "eris";
 import truncate from "truncate";
@@ -82,7 +80,7 @@ CmdHandler
 			let embed: Eris.EmbedOptions;
 
 			if (msg.args.length === 0) {
-				const categories = [...this.cmdHandler.categories];
+				const categories = [...CmdHandler.categories];
 
 				categories.forEach((c) => {
 					if ((c.devOnly && !config.developers.includes(msg.author.id))) categories.splice(categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()), categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()));
@@ -90,7 +88,7 @@ CmdHandler
 
 				embed = {
 					title: "Command Help",
-					fields: categories.map(c => ({ name: `${c.displayName}`, value: `\`${msg.gConfig.prefix}help ${c.name}\`\n[Hover for more info](https://furry.bot '${c.description}\n${this.cmdHandler.commands.filter(cmd => cmd.category.name === c.name).length} Commands Total')`, inline: true })),
+					fields: categories.map(c => ({ name: `${c.displayName}`, value: `\`${msg.gConfig.prefix}help ${c.name}\`\n[Hover for more info](https://furry.bot '${c.description}\n${CmdHandler.commands.filter(cmd => cmd.category.name === c.name).length} Commands Total')`, inline: true })),
 					author: {
 						name: msg.author.tag,
 						icon_url: msg.author.avatarURL
@@ -102,9 +100,9 @@ CmdHandler
 				return msg.channel.createMessage({ embed });
 			}
 
-			if (this.cmdHandler.commandTriggers.includes(msg.args[0].toLowerCase())) {
-				const cmd = this.cmdHandler.getCommand(msg.args[0].toLowerCase());
-				const cat = this.cmdHandler.getCategoryByCommand(msg.args[0].toLowerCase());
+			if (CmdHandler.commandTriggers.includes(msg.args[0].toLowerCase())) {
+				const cmd = CmdHandler.getCommand(msg.args[0].toLowerCase());
+				const cat = CmdHandler.getCategoryByCommand(msg.args[0].toLowerCase());
 
 				if (!cmd) return msg.reply("Command not found.");
 
@@ -155,8 +153,8 @@ CmdHandler
 				return msg.channel.createMessage({ embed });
 			}
 
-			if (this.cmdHandler.categories.map(c => c.name.toLowerCase()).includes(msg.args[0].toLowerCase())) {
-				const cat = await this.cmdHandler.getCategory(msg.args[0]);
+			if (CmdHandler.categories.map(c => c.name.toLowerCase()).includes(msg.args[0].toLowerCase())) {
+				const cat = CmdHandler.getCategory(msg.args[0]);
 
 				if (!cat) return msg.reply("Category not found.");
 
@@ -167,7 +165,7 @@ CmdHandler
 				}[] = [];
 
 				let i = 0;
-				this.cmdHandler.commands.filter(cmd => cmd.category.name === cat.name).forEach((c) => {
+				CmdHandler.commands.filter(cmd => cmd.category.name === cat.name).forEach((c) => {
 					if (!fields[i]) fields[i] = {
 						name: `Command List #${i + 1}`,
 						value: "",

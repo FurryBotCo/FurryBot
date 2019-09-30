@@ -1,8 +1,6 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
-import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import * as Eris from "eris";
 import ytdl from "ytdl-core";
@@ -105,7 +103,7 @@ CmdHandler
 					}
 				],
 				timestamp: new Date().toISOString(),
-				color: functions.randomColor()
+				color: this.f.randomColor()
 			};
 
 			return msg.channel.createMessage({ embed });
@@ -166,7 +164,7 @@ CmdHandler
 			if (!vc.permissionsOf(this.bot.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are in.");
 
 			const q = msg.args.join(" ");
-			const search: YouTubeSearchResults[] = await functions.ytsearch(q).catch(err => null);
+			const search: YouTubeSearchResults[] = await this.f.ytsearch(q).catch(err => null);
 			if (!search) return msg.reply("there was an internal error while fetching search results.");
 
 			if (search.length < 1) return msg.reply("No results were found");
@@ -203,7 +201,7 @@ CmdHandler
 			} catch (e) {
 				v = null;
 			}
-			const info = await functions.ytinfo(song.link).catch(err => null);
+			const info = await this.f.ytinfo(song.link).catch(err => null);
 
 			if (!v) return msg.reply("failed to fetch that video.");
 			if (!info) return msg.reply("failed to fetch info for that video.");
@@ -238,7 +236,7 @@ CmdHandler
 					title: `Now Playing ${song.title} by **${song.channelTitle}**`,
 					description: `Song Length: ${time}`,
 					timestamp: new Date().toISOString(),
-					color: functions.randomColor()
+					color: this.f.randomColor()
 				};
 
 				await m.edit({ content: "", embed });
@@ -262,7 +260,7 @@ CmdHandler
 						title: `Now Playing [${song.title}](${song.link}) by **${song.channelTitle}**`,
 						description: `Song Length: ${time}`,
 						timestamp: new Date().toISOString(),
-						color: functions.randomColor()
+						color: this.f.randomColor()
 					};
 
 					await m.edit({ content: "", embed });
@@ -278,7 +276,7 @@ CmdHandler
 						title: `Added ${song.title} by **${song.channelTitle}**`,
 						description: `Estimated time until playing: \`${tUntil}\`\nSong Length: ${time}`,
 						timestamp: new Date().toISOString(),
-						color: functions.randomColor()
+						color: this.f.randomColor()
 					};
 
 					await m.edit({ content: "", embed });
@@ -295,7 +293,7 @@ CmdHandler
 						const embed: Eris.EmbedOptions = {
 							title: "Queue Concluded",
 							timestamp: new Date().toISOString(),
-							color: functions.randomColor()
+							color: this.f.randomColor()
 						};
 
 						const k: any = msg.guild.channels.get(msg.channel.guild.members.get(me.user.id).voiceState.channelID);
@@ -306,7 +304,7 @@ CmdHandler
 					} else {
 						const song = msg.gConfig.music.queue[0];
 						const v = await ytdl(song.link);
-						const info = await functions.ytinfo(song.link);
+						const info = await this.f.ytinfo(song.link);
 
 						const time = `${Math.floor(parseInt(info.length_seconds, 10) / 60)}m${parseInt(info.length_seconds, 10) - Math.floor(parseInt(info.length_seconds, 10) / 60) * 60}s`;
 
@@ -314,7 +312,7 @@ CmdHandler
 							title: `Now Playing ${song.title} by **${song.channel}**`,
 							description: `Song Length: ${time}`,
 							timestamp: new Date().toISOString(),
-							color: functions.randomColor()
+							color: this.f.randomColor()
 						};
 
 						const k: any = msg.guild.channels.get(msg.channel.guild.members.get(me.user.id).voiceState.channelID);
@@ -367,7 +365,7 @@ CmdHandler
 					inline: false
 				})),
 				timestamp: new Date().toISOString(),
-				color: functions.randomColor()
+				color: this.f.randomColor()
 			};
 
 			return msg.channel.createMessage({ embed });
@@ -430,7 +428,7 @@ CmdHandler
 			await conn.stopPlaying();
 
 			const old = msg.gConfig.music.queue.shift();
-			const info = await functions.ytinfo(old.link);
+			const info = await this.f.ytinfo(old.link);
 			const time = `${Math.floor(parseInt(info.length_seconds, 10) / 60)}m${parseInt(info.length_seconds, 10) - Math.floor(parseInt(info.length_seconds, 10) / 60) * 60}s`;
 
 
@@ -441,7 +439,7 @@ CmdHandler
 			const embed: Eris.EmbedOptions = {
 				title: `Skipped ${old.title} by **${old.channel}**`,
 				timestamp: new Date().toISOString(),
-				color: functions.randomColor()
+				color: this.f.randomColor()
 			};
 
 			return msg.channel.createMessage({ embed });

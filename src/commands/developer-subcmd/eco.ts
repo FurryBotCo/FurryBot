@@ -1,7 +1,5 @@
-import manager from "../../../index";
 import FurryBot from "../../main";
 import config from "../../config";
-import functions from "../../util/functions";
 import ExtendedMessage from "../../modules/extended/ExtendedMessage";
 import { mdb } from "../../modules/Database";
 import * as Eris from "eris";

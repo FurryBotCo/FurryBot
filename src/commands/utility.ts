@@ -1,7 +1,5 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import { mdb } from "../modules/Database";
@@ -40,8 +38,8 @@ CmdHandler
 			let role, roles, a, b;
 			role = await msg.getRoleFromArgs(0, true, true);
 			if (!role) return msg.errorEmbed("INVALID_ROLE");
-			a = functions.compareMemberWithRole(msg.member, role);
-			b = functions.compareMemberWithRole(msg.guild.members.get(this.bot.user.id), role);
+			a = this.f.compareMemberWithRole(msg.member, role);
+			b = this.f.compareMemberWithRole(msg.guild.members.get(this.bot.user.id), role);
 			if ((a.higher || a.same) && msg.channel.guild.ownerID !== msg.member.id) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot add roles as high as, or higher than you.`);
 			if (b.higher || b.same) return msg.channel.createMessage(`<@!${msg.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
 			if (role.managed) return msg.channel.createMessage(`<@!${msg.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
@@ -126,7 +124,7 @@ CmdHandler
 			if (!role || role.length === 0) return msg.channel.createMessage(`<@!${msg.author.id}>, Role not found.`);
 			role = role[0];
 			if (msg.member.roles.includes(role.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, You already have this role.`);
-			a = functions.compareMemberWithRole(msg.guild.members.get(this.bot.user.id), role);
+			a = this.f.compareMemberWithRole(msg.guild.members.get(this.bot.user.id), role);
 			if (a.higher || a.same) return msg.channel.createMessage(`<@!${msg.author.id}>, That role is higher than, or as high as my highest role.`);
 			await msg.member.addRole(role.id, "iam command");
 			return msg.channel.createMessage(`<@!${msg.author.id}>, You now have the **${role.name}** role.`);
@@ -164,7 +162,7 @@ CmdHandler
 			if (!role || role.length === 0) return msg.channel.createMessage("Role not found.");
 			role = role[0];
 			if (!msg.member.roles.includes(role.id)) return msg.channel.createMessage("You don't have this role.");
-			a = functions.compareMemberWithRole(msg.guild.members.get(this.bot.user.id), role);
+			a = this.f.compareMemberWithRole(msg.guild.members.get(this.bot.user.id), role);
 			if (a.higher || a.same) return msg.channel.createMessage(`<@!${msg.author.id}>, That role is higher than, or as high as my highest role.`);
 			await msg.member.removeRole(role.id, "iamnot command");
 			return msg.channel.createMessage(`<@!${msg.author.id}>, You no longer have the **${role.name}** role.`);
@@ -185,7 +183,7 @@ CmdHandler
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (msg.uConfig.patreon.donator) return msg.reply("you are already marked as a donator.");
 
-			const p = await functions.loopPatrons();
+			const p = await this.f.loopPatrons();
 
 			for (const patron of p) {
 				const discord = patron.attributes.social_connections.discord;
@@ -205,7 +203,7 @@ CmdHandler
 					const embed: Eris.EmbedOptions = {
 						title: "Successfully Linked!",
 						description: `Thanks for donating! Donator perks are still in beta, so they may be a bit buggy on being enabled. You can gain some extra ${config.eco.emoji} by using \`${msg.gConfig.prefix}redeem\`.`,
-						color: functions.randomColor(),
+						color: this.f.randomColor(),
 						timestamp: new Date().toISOString()
 					};
 
@@ -320,7 +318,7 @@ CmdHandler
 						inline: false
 					}
 				],
-				color: functions.randomColor(),
+				color: this.f.randomColor(),
 				timestamp: new Date().toISOString()
 			};
 

@@ -1,10 +1,8 @@
-import FurryBot from "./src/main";
 import config from "./src/config";
 import * as fs from "fs-extra";
 import path from "path";
 import { Main, Logger } from "@donovan_dmc/ws-clusters";
-
-console.log("main");
+import yargs from "yargs";
 
 // directory existence check
 [config.logsDir, `${config.logsDir}/spam`, `${config.logsDir}/client`, config.tmpDir].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), Logger.log("General", `Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
@@ -18,5 +16,4 @@ const main = new Main(config.bot.token, `${__dirname}/src/main.js`, config.bot.o
 main.init();
 
 fs.writeFileSync(`${config.rootDir}/../process.pid`, process.pid);
-
 export default main;

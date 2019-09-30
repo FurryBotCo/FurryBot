@@ -11,7 +11,6 @@ import * as Eris from "eris";
 import FurryBot from "@FurryBot";
 import { mdb } from "../modules/Database";
 import ErrorHandler from "./ErrorHandler";
-import client from "../../";
 import UserConfig from "../modules/config/UserConfig";
 import GuildConfig from "../modules/config/GuildConfig";
 import youtubesearch from "youtube-search";
@@ -23,52 +22,23 @@ import { Logger } from "@donovan_dmc/ws-clusters";
 
 export { ErrorHandler };
 
-const memberIsBooster = (async (m: Eris.Member): Promise<boolean> => {
-	if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
-	const guild = await client.eris.getRESTGuild(config.bot.mainGuild);
-	if (!guild) throw new TypeError("failed to find main guild");
-	if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
-	return true;
-});
+export default class Functions {
+	client: FurryBot;
+	os: typeof os;
+	constructor(client: FurryBot) {
+		this.client = client;
+		this.os = os;
+	}
 
-export default {
-	os,
-	memory: {
-		process: {
-			getTotal: ((): number => process.memoryUsage().heapTotal),
-			getUsed: ((): number => process.memoryUsage().heapUsed),
-			getRSS: ((): number => process.memoryUsage().rss),
-			getExternal: ((): number => process.memoryUsage().external),
-			getAll: ((): {
-				total: number,
-				used: number,
-				rss: number,
-				external: number
-			} => ({
-				total: process.memoryUsage().heapTotal,
-				used: process.memoryUsage().heapUsed,
-				rss: process.memoryUsage().rss,
-				external: process.memoryUsage().external
-			}))
-		},
-		system: {
-			getTotal: ((): number => os.totalmem()),
-			getUsed: ((): number => os.totalmem() - os.freemem()),
-			getFree: ((): number => os.freemem()),
-			getAll: ((): {
-				total: number,
-				used: number,
-				free: number
-			} => ({
-				total: os.totalmem(),
-				used: os.totalmem() - os.freemem(),
-				free: os.freemem()
-			}))
-		}
-	},
-	checkSemVer: ((ver): boolean => require("semver").valid(ver) === ver),
-	getCurrentTimestamp: ((): string => new Date().toISOString()),
-	secondsToHours: ((sec: number) => {
+	get ErrorHandler() {
+		return ErrorHandler;
+	}
+
+	checkSemVer(ver): boolean {
+		return require("semver").valid(ver) === ver;
+	}
+
+	secondsToHours(sec: number): string {
 		let hours: string | number = Math.floor(sec / 3600);
 		let minutes: string | number = Math.floor((sec - (hours * 3600)) / 60);
 		let seconds: string | number = Math.floor(sec - (hours * 3600) - (minutes * 60));
@@ -77,15 +47,54 @@ export default {
 		if (minutes < 10) minutes = `0${minutes}`;
 		if (seconds < 10) seconds = `0${seconds}`;
 		return `${hours}:${minutes}:${seconds}`;
-	}),
-	ucwords: ((str: string): string => str.toString().toLowerCase().replace(/^(.)|\s+(.)/g, (r) => r.toUpperCase())),
-	toReadableDate: ((date: Date): string => {
+	}
+
+	get memory() {
+		return {
+			process: {
+				getTotal: ((): number => process.memoryUsage().heapTotal),
+				getUsed: ((): number => process.memoryUsage().heapUsed),
+				getRSS: ((): number => process.memoryUsage().rss),
+				getExternal: ((): number => process.memoryUsage().external),
+				getAll: ((): {
+					total: number,
+					used: number,
+					rss: number,
+					external: number
+				} => ({
+					total: process.memoryUsage().heapTotal,
+					used: process.memoryUsage().heapUsed,
+					rss: process.memoryUsage().rss,
+					external: process.memoryUsage().external
+				}))
+			},
+			system: {
+				getTotal: ((): number => os.totalmem()),
+				getUsed: ((): number => os.totalmem() - os.freemem()),
+				getFree: ((): number => os.freemem()),
+				getAll: ((): {
+					total: number,
+					used: number,
+					free: number
+				} => ({
+					total: os.totalmem(),
+					used: os.totalmem() - os.freemem(),
+					free: os.freemem()
+				}))
+			}
+		};
+	}
+	ucwords(str: string): string {
+		return str.toString().toLowerCase().replace(/^(.)|\s+(.)/g, (r) => r.toUpperCase());
+	}
+
+	toReadableDate(date: Date) {
 		if (!(date instanceof Date)) throw new Error("must provide javascript Date object.");
 		const a = date.toISOString().replace("Z", "").split("T");
 		return `${a[0]} ${a[1].split(".")[0]} UTC`;
-	}),
-	makeSafe: ((msg: string): string => msg.replace(/\@everyone/, "@\u200Beveryone").replace(/\@here/, "@\u200Bhere")), // eslint-disable-line no-useless-escape
-	ms: (async (data: number | {
+	}
+
+	async ms(data: number | {
 		ms?: number;
 		s?: number;
 		m?: number;
@@ -94,7 +103,16 @@ export default {
 		w?: number;
 		mn?: number;
 		y?: number;
-	}, words?: boolean) => {
+	}, words?: boolean): Promise<string | {
+		ms: number;
+		s: number;
+		m: number;
+		h: number;
+		d: number;
+		w: number;
+		mn: number;
+		y: number;
+	}> {
 		const t = await new Promise((a, b) => {
 			const t = {
 				ms: 0,
@@ -169,7 +187,7 @@ export default {
 			}
 		});
 
-		if (!words) return t;
+		if (!words) return t as any;
 		else {
 			const full = {
 				ms: "millisecond",
@@ -188,14 +206,15 @@ export default {
 				if (t[k] !== 0) j[k] = t[k];
 			});
 
-			if (Object.keys(j).length < 1) return {};
+			if (Object.keys(j).length < 1) return {} as any;
 
 			const useFull = Object.keys(j).length < 4;
 
 			return Object.keys(j).reverse().map((k, i, a) => `${i === a.length - 1 && a.length !== 1 ? "and " : ""}${j[k]}${useFull ? ` ${full[k]}${j[k] > 1 ? "s" : ""}` : k}`).join(", ").trim();
 		}
-	}),
-	parseTime: ((time, full = false, ms = false) => {
+	}
+
+	parseTime(time: number, full = false, ms = false): string {
 		if (ms) time = time / 1000;
 		const methods = [
 			{ name: full ? " day" : "d", count: 86400 },
@@ -211,85 +230,46 @@ export default {
 		let j = timeStr.filter(g => !g.startsWith("0")).join(", ");
 		if (j.length === 0) j = "no time";
 		return j;
-	}),
-	randomColor: ((): number => Math.floor(Math.random() * 0xFFFFFF)),
-	removeDuplicates: ((array: any[]): any[] => [...new Set(array).values()]),
-	processSub: (async (cmd: Command[], msg: ExtendedMessage, ctx: FurryBot) => {
-		/*const c = cmd[cmd.length - 1];
-		if (msg.args.length > 0 && c.hasSubCommands && c.subCommands.map(s => s.triggers).reduce((a, b) => a.concat(b)).includes(msg.args[0].toLowerCase())) {
-			const { command: sub } = msg._client.getCommand([...cmd.map(c => c.triggers[0]), msg.args.shift().toLowerCase()]);
-			msg.unparsedArgs.shift();
-			const cc = sub[sub.length - 1];
-			// Logger.log("General", sub);
-			// Logger.log("General", sub[sub.length - 1]);
-			if (msg.cmd.command instanceof Array) msg.cmd.command.push(cc);
-			else msg.cmd.command = [msg.cmd.command, cc];
-			// Logger.log("General", cc.triggers[0]);
-			// Logger.log("General", util.inspect(cc.subCommands.find(c => c.triggers.includes(cc.triggers[0])), { depth: null, colors: true }));
-			// Logger.log("General", c.subCommands.find(s => s.triggers.includes(cc.triggers[0])));
-			return c.subCommands.find(s => s.triggers.includes(cc.triggers[0])).run.call(ctx, msg);
-		} else return "NOSUB";*/
-	}),
-	subCmds: ((dir: string, file: string): Command[] => {
-		const d = file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0];
-		if (fs.existsSync(`${dir}/${d}`)) {
-			if (__filename.endsWith(".ts")) {
-				if (fs.existsSync(`${dir}/${d}/index.ts`)) return require(`${dir}/${d}/index.ts`).default;
-				else {
-					Logger.warn("General", `Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
-					if (fs.existsSync(`${config.rootDir}/src/default/subcmdindex.ts`)) fs.copyFileSync(`${config.rootDir}/src/default/subcmdindex.ts`, `${dir}/${d}/index.ts`);
-					if (fs.existsSync(`${dir}/${d}/index.ts`)) {
-						Logger.debug("General", "Auto copying worked, continuing as normal..");
-						return require(`${dir}/${d}/index.ts`).default;
-					} else {
-						Logger.error("General", `Auto copying failed, please check that default/subcmdindex.ts exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
-					}
-					return [];
-				}
-			} else {
-				if (fs.existsSync(`${dir}/${d}/index.js`)) return require(`${dir}/${d}/index.js`).default;
-				else {
-					Logger.warn("General", `Subcommand directory found, but no index present. Attempting to auto create index..\nCommand Directory: ${dir}\nCommand File: ${file}\nSubcommand Directory: ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
-					if (fs.existsSync(`${config.rootDir}/src/default/subcmdindex.js`)) fs.copyFileSync(`${config.rootDir}/src/default/subcmdindex.js`, `${dir}/${d}/index.js`);
-					if (fs.existsSync(`${dir}/${d}/index.js`)) {
-						Logger.debug("General", "Auto copying worked, continuing as normal..");
-						return require(`${dir}/${d}/index.js`).default;
-					} else {
-						Logger.error("General", `Auto copying failed, please check that default/subcmdindex.js exists, and is readable/writable, and that I can write in ${dir}${process.platform === "win32" ? "\\" : "/"}${d}`);
-					}
-					return [];
-				}
-			}
-		}
-		return null;
-	}),
-	hasSubCmds: ((dir: string, file: string): boolean => fs.existsSync(`${dir}/${file.split(/(\\|\/)+/g).reverse()[0].split(".")[0].split("-")[0]}`)),
-	sendCommandEmbed: ((msg: ExtendedMessage, cmd: Command) => {
+	}
+
+	randomColor(): number {
+		return Math.floor(Math.random() * 0xFFFFFF);
+	}
+
+	removeDuplicates(array: any[]): any[] {
+		return Array.from(new Set(array));
+	}
+
+	async sendCommandEmbed(msg: ExtendedMessage, cmd: Command): Promise<Eris.Message> {
 		if (!msg || !(msg instanceof ExtendedMessage)) throw new TypeError("invalid message");
 		if (!cmd) throw new TypeError("missing command");
 
 		let embed;
 		if (cmd.subCommands.length > 0) {
 			embed = {
-				title: `Subcommand List: ${msg.client.f.ucwords(cmd.triggers[0])}`,
+				title: `Subcommand List: ${this.ucwords(cmd.triggers[0])}`,
 				description: `\`command\` (\`alias\`) - description\n\n${cmd.subCommands.map(s => s.triggers.length > 1 ? `\`${s.triggers[0]}\` (\`${s.triggers[1]}\`) - ${s.description}` : `\`${s.triggers[0]}\` - ${s.description}`).join("\n")}`
 			};
 		} else {
 			embed = {
-				title: `Command Help: ${msg.client.f.ucwords(cmd.triggers[0])}`,
+				title: `Command Help: ${this.ucwords(cmd.triggers[0])}`,
 				description: `Usage: ${cmd.usage}\nDescription: ${cmd.description}`
 			};
 		}
 		return msg.channel.createMessage({
 			embed
 		});
-	}),
-	_getDate: ((): string => {
-		const date = new Date();
+	}
+
+	_getDate(date = new Date()) {
 		return `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`;
-	}),
-	getImageFromURL: (async (url: string): Promise<Buffer> => phin({ url }).then(res => res.body)),
-	imageAPIRequest: (async (animal = true, category: string = null, json = true, safe = false): Promise<{
+	}
+
+	async getImageFromURL(url: string): Promise<Buffer> {
+		return phin({ url }).then(res => res.body);
+	}
+
+	async imageAPIRequest(animal = true, category: string = null, json = true, safe = false): Promise<{
 		success: boolean;
 		response?: {
 			image: string;
@@ -300,7 +280,7 @@ export default {
 			code: number;
 			description: string;
 		}
-	}> => {
+	}> {
 		return new Promise(async (resolve, reject) => {
 			let s;
 			if ([undefined, null].includes(json)) json = true;
@@ -319,16 +299,15 @@ export default {
 				});
 			}
 		});
-	}),
-	random: ((len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string => {
-		// if (len > 500 && !this[config.overrides.random]) throw new Error("Cannot generate string of specified length, please set global override to override this.");
-		let rand = "";
-		for (let i = 0; i < len; i++)
-			rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
+	}
 
+	random(len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string {
+		let rand = "";
+		for (let i = 0; i < len; i++) rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
 		return rand;
-	}),
-	formatStr: ((str: string | ExtendedUser | Eris.User | Eris.Member | ExtendedTextChannel | Eris.GuildChannel, ...args: any[]): string => {
+	}
+
+	formatStr(str: string | ExtendedUser | Eris.User | Eris.Member | ExtendedTextChannel | Eris.GuildChannel, ...args: any[]): string {
 		let res;
 		if (str instanceof ExtendedUser || str instanceof Eris.User || str instanceof Eris.Member) res = `<@!${str.id}>`;
 		else if (str instanceof ExtendedTextChannel || str instanceof Eris.GuildChannel) res = str.name;
@@ -339,11 +318,23 @@ export default {
 		const e2 = ((s) => s.replace(/\{/g, "").replace(/\}/g, ""));
 		a.map((b) => args[e2(b)] !== undefined ? res = res.replace(new RegExp(e(b), "g"), args[e2(b)]) : null);
 		return res;
-	}),
-	downloadImage: (async (url: string, filename: string): Promise<fs.WriteStream> =>
-		phin({ url }).then(res => res.pipe(fs.createWriteStream(filename)))
-	),
-	shortenURL: (async (url) => {
+	}
+
+	async downloadImage(url: string, filename: string): Promise<fs.WriteStream> {
+		return phin({ url }).then(res => res.pipe(fs.createWriteStream(filename)));
+	}
+
+	async shortenURL(url: string): Promise<{
+		success: boolean;
+		code: string;
+		url: string;
+		link: string;
+		linkNumber: number;
+		createdTimestamp: number;
+		created: string;
+		length: number;
+		new: boolean;
+	}> {
 		const req = await phin({
 			url: `https://r.furry.services/get?url=${encodeURIComponent(url)}`,
 			headers: {
@@ -373,8 +364,9 @@ export default {
 			};
 		}
 		else throw new Error(`furry.services api returned non 200/404 response: ${req.statusCode}, body: ${req.body}`);
-	}),
-	memeRequest: (async (path: string, avatars: string[] | string = [], text = ""): Promise<phin.JsonResponse> => {
+	}
+
+	async memeRequest(path: string, avatars: string[] | string = [], text = ""): Promise<phin.JsonResponse> {
 		avatars = typeof avatars === "string" ? [avatars] : avatars;
 		return phin({
 			method: "POST",
@@ -390,8 +382,9 @@ export default {
 			},
 			parse: "none"
 		});
-	}),
-	compareMembers: ((member1: Eris.Member, member2: Eris.Member): {
+	}
+
+	compareMembers(member1: Eris.Member, member2: Eris.Member): {
 		member1: {
 			higher: boolean;
 			lower: boolean;
@@ -402,7 +395,7 @@ export default {
 			lower: boolean;
 			same: boolean;
 		};
-	} => {
+	} {
 		const a = member1.roles.map(r => member1.guild.roles.get(r));
 		let b: Eris.Role;
 		if (a.length > 0) b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
@@ -461,12 +454,13 @@ export default {
 				same: d.position === b.position
 			}
 		};
-	}),
-	compareMemberWithRole: ((member: Eris.Member, role: Eris.Role): {
+	}
+
+	compareMemberWithRole(member: Eris.Member, role: Eris.Role): {
 		higher: boolean;
 		lower: boolean;
 		same: boolean;
-	} => {
+	} {
 		const a = member.roles.map(r => member.guild.roles.get(r));
 		const b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
 
@@ -475,15 +469,17 @@ export default {
 			lower: b.position > role.position,
 			same: b.position === role.position
 		};
-	}),
-	everyOtherUpper: ((str: string): string => {
+	}
+
+	everyOtherUpper(str: string): string {
 		let res = "";
 		for (let i = 0; i < str.length; i++) {
 			res += i % 2 === 0 ? str.charAt(i).toUpperCase() : str.charAt(i);
 		}
 		return res;
-	}),
-	incrementDailyCounter: (async (positive = true, guildCount: number) => {
+	}
+
+	async incrementDailyCounter(positive = true, guildCount: number) {
 		const d = new Date(),
 			date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 
@@ -502,10 +498,17 @@ export default {
 		if (positive) count++; else count--;
 
 		return mdb.collection("dailyjoins").findOneAndUpdate({ date }, { $set: { count, guildCount } });
-	}),
-	memberIsBooster,
-	calculateMultiplier: (async (m: Eris.Member): Promise<{ amount: number, multi: { [s: string]: boolean } }> => {
-		// return null;
+	}
+
+	async memberIsBooster(m: Eris.Member): Promise<boolean> {
+		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
+		const guild = await this.client.bot.getRESTGuild(config.bot.mainGuild);
+		if (!guild) throw new TypeError("failed to find main guild");
+		if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
+		return true;
+	}
+
+	async calculateMultiplier(m: Eris.Member): Promise<{ amount: number, multi: { [s: string]: boolean } }> {
 		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
 		const member = m;
 		const guild = m.guild;
@@ -540,7 +543,7 @@ export default {
 		}
 
 
-		const b = await memberIsBooster(member);
+		const b = await this.memberIsBooster(member);
 		if (b) (a.push(config.eco.multipliers.booster), multi.booster = true);
 
 		const t = await mdb.collection("users").findOne({ id: m.user.id }).then(res => res.tips).catch(err => false);
@@ -557,39 +560,48 @@ export default {
 
 
 		return { multi, amount };
-	}),
-	fetchDBUser: (async (id: string, createIfNotFound = false): Promise<UserConfig> => {
+	}
+
+	async fetchDBUser(id: string, createIfNotFound = false): Promise<UserConfig> {
 		let m = await mdb.collection("users").findOne({ id });
 		if (!m) {
 			if (createIfNotFound === true) {
+				Logger.log(`Cluster #${this.client.clusterId}`, `Created non existent user entry "${id}"`);
 				await mdb.collection("users").insertOne({ id, ...config.defaults.userConfig });
 				m = await mdb.collection("users").findOne({ id });
 			} else return null;
 		}
 		return new UserConfig(id, m);
-	}),
-	fetchDBGuild: (async (id: string, createIfNotFound = false): Promise<GuildConfig> => {
-		let m = await mdb.collection("guilds").findOne({ id });
-		if (!m) {
+	}
+
+	async fetchDBGuild(id: string, createIfNotFound = false): Promise<GuildConfig> {
+		let g = await mdb.collection("guilds").findOne({ id });
+		if (!g) {
 			if (createIfNotFound === true) {
-				await mdb.collection("guilds").insertOne({ id, ...config.defaults.userConfig });
-				m = await mdb.collection("guilds").findOne({ id });
+				Logger.log(`Cluster #${this.client.clusterId}`, `Created non existent guild entry "${id}"`);
+				await mdb.collection("guilds").insertOne({ id, ...config.defaults.guildConfig });
+				g = await mdb.collection("guilds").findOne({ id });
 			} else return null;
 		}
-		return new GuildConfig(id, m);
-	}),
-	ytsearch: (async (q = "") => util.promisify(youtubesearch)(q, config.ytSearchOptions).then(res => res.filter(y => y.kind === "youtube#video").slice(0, 10))),
-	ytinfo: (async (url: string): Promise<ytdl.videoInfo> => {
-		const i: any = util.promisify(ytdl.getInfo)(url);
-		return i;
-	}),
-	validateURL: ((url: string) => { // check that url is a well formed url, and that the server responds to HEAD requests properly
+		return new GuildConfig(id, g);
+	}
+
+	async ytsearch(q = "") {
+		return util.promisify(youtubesearch)(q, config.ytSearchOptions).then(res => res.filter(y => y.kind === "youtube#video").slice(0, 10));
+	}
+
+	async ytinfo(url: string): Promise<ytdl.videoInfo> {
+		return util.promisify(ytdl.getInfo)(url) as any;
+	}
+
+	async validateURL(url: string): Promise<boolean> {
 		return URL.parse(url).hostname ? phin({
 			method: "HEAD",
 			url
 		}).then(d => d.statusCode === 200) : false;
-	}),
-	combineReports: ((...reports: {
+	}
+
+	combineReports(...reports: {
 		userTag: string;
 		userId: string;
 		generatedTimestamp: number;
@@ -615,7 +627,7 @@ export default {
 			time: number;
 			response: string;
 		}[];
-	} => {
+	} {
 		if (Array.from(new Set(reports.map(r => r.userId))).length > 1) throw new TypeError("Cannot combine reports of different users.");
 		if (Array.from(new Set(reports.map(r => r.type))).length > 1) throw new TypeError("Cannot combine reports of different types.");
 		if (Array.from(new Set(reports.map(r => r.beta))).length > 1) throw new TypeError("Cannot combine beta, and non-beta reports.");
@@ -629,15 +641,22 @@ export default {
 			beta: reports[0].beta,
 			entries
 		};
-	}),
-	refreshPatreonToken,
-	loopPatrons,
-	fetchLangMessage: ((lang: string, cmd: Command) => {
+	}
+
+	get refreshPatreonToken() {
+		return refreshPatreonToken;
+	}
+
+	get loopPatrons() {
+		return loopPatrons;
+	}
+
+	fetchLangMessage(lang: string, cmd: Command) {
 		if (!lang || !Object.keys(config.lang).includes(lang.toLowerCase())) throw new TypeError("invalid language provided");
 		if (!cmd) throw new TypeError("invalid command provided");
 
 		const l = config.lang[lang.toLowerCase()][cmd.triggers[0].toLowerCase()];
 		if (!l) return "";
 		return l[Math.floor(Math.random() * l.length)];
-	})
-};
+	}
+}

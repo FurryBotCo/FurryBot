@@ -5,7 +5,6 @@ import config from "../../../config";
 import { mdb } from "../../../modules/Database";
 import GuildConfig from "../../../modules/config/GuildConfig";
 import uuid from "uuid/v4";
-import functions from "../../../util/functions";
 import { Logger } from "@donovan_dmc/ws-clusters";
 
 export default new ClientEvent("messageReactionAdd", (async function (this: FurryBot, m, emoji, userID) {

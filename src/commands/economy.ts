@@ -1,7 +1,5 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import { mdb } from "../modules/Database";
@@ -86,7 +84,7 @@ CmdHandler
 			let amount = Math.floor(Math.random() * 50) + 1;
 			amount += amount * multi;
 			amount = Math.floor(amount);
-			let s = functions.fetchLangMessage(msg.gConfig.lang, cmd);
+			let s = this.f.fetchLangMessage(msg.gConfig.lang, cmd);
 
 			const people = [
 				...config.eco.people,

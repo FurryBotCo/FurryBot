@@ -1,14 +1,17 @@
 import express from "express";
 import config from "../../config";
-import client from "../../../";
-import functions from "../../util/functions";
 import apiFunctions from "../functions";
+import FurryBot from "@FurryBot";
+import Functions from "../../util/functions";
 
-const app: express.Router = express.Router();
+export default (async (client: FurryBot) => {
 
-app.get("/", async (req, res) => res.status(200).json({
-	success: true,
-	guildCount: client.stats.guildCount
-}));
+	const app: express.Router = express.Router();
 
-export default app;
+	app.get("/", async (req, res) => res.status(200).json({
+		success: true,
+		guildCount: await client.cluster.getMasterStats().then(res => res.guildCount)
+	}));
+
+	return app;
+});

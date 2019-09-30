@@ -1,14 +1,16 @@
 import express from "express";
 import config from "../../config";
-import functions from "../../util/functions";
-import client from "../../../";
 import apiFunctions from "../functions";
+import FurryBot from "@FurryBot";
 
-const app: express.Router = express.Router();
+export default (async (client: FurryBot) => {
 
-app.get("/", async (req, res) => res.status(200).json({
-	success: true,
-	clientStatus: "online"
-}));
+	const app: express.Router = express.Router();
 
-export default app;
+	app.get("/", async (req, res) => res.status(200).json({
+		success: true,
+		clientStatus: "online"
+	}));
+
+	return app;
+});

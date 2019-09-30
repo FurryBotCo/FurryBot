@@ -1,7 +1,5 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import phin from "phin";
@@ -636,7 +634,7 @@ CmdHandler
 				req = await this.f.imageAPIRequest(false, type, true, true);
 				short = await this.f.shortenURL(req.response.image);
 				extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
-				return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${this.ucwords(type)}`, {
+				return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${this.f.ucwords(type)}`, {
 					file: await this.f.getImageFromURL(req.response.image),
 					name: req.response.name
 				});
