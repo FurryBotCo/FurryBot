@@ -1,16 +1,15 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import functions from "../util/functions";
-import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import * as Eris from "eris";
 import ytdl from "ytdl-core";
 import { YouTubeSearchResults } from "youtube-search";
+import CmdHandler from "../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "music",
 		displayName: ":musical_note: Music",
@@ -38,9 +37,9 @@ client.cmdHandler
 			const t = msg.channel.guild.channels.get(msg.member.voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 
-			if (!vc.permissionsOf(this.user.id).has("voiceConnect")) return msg.reply("I cannot join the voice channel you are currently in.");
+			if (!vc.permissionsOf(this.bot.user.id).has("voiceConnect")) return msg.reply("I cannot join the voice channel you are currently in.");
 
-			if (!vc.permissionsOf(this.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are currently in.");
+			if (!vc.permissionsOf(this.bot.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are currently in.");
 
 			vc.join({}).then(() => msg.reply(`joined ${vc.name}`));
 		})
@@ -63,7 +62,7 @@ client.cmdHandler
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
 
 			let vc: Eris.VoiceChannel;
-			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.user.id).voiceState.channelID);
+			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.bot.user.id).voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 			else return msg.reply(`I don't seem to be in a voice channel..`);
 
@@ -104,7 +103,7 @@ client.cmdHandler
 					}
 				],
 				timestamp: new Date().toISOString(),
-				color: functions.randomColor()
+				color: this.f.randomColor()
 			};
 
 			return msg.channel.createMessage({ embed });
@@ -128,11 +127,11 @@ client.cmdHandler
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
 
 			let vc: Eris.VoiceChannel;
-			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.user.id).voiceState.channelID);
+			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.bot.user.id).voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 			else return msg.reply(`I don't seem to be in a voice channel..`);
 
-			const conn = this.voiceConnections.get(msg.channel.guild.id);
+			const conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 
 			if (conn.paused) return msg.reply("playback is already paused..");
 
@@ -161,11 +160,11 @@ client.cmdHandler
 			if (msg.gConfig.music.queue.length >= 6 && !(msg.uConfig.patreon.amount >= 3)) return msg.reply("Hey, you can only have **5** songs in your queue right now, we may have a premium option to allow for more soon.");
 			const vc = msg.channel.guild.channels.get(msg.member.voiceState.channelID) as Eris.VoiceChannel;
 
-			if (!vc.permissionsOf(this.user.id).has("voiceConnect")) return msg.reply("I cannot connect to the voice channel you are in.");
-			if (!vc.permissionsOf(this.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are in.");
+			if (!vc.permissionsOf(this.bot.user.id).has("voiceConnect")) return msg.reply("I cannot connect to the voice channel you are in.");
+			if (!vc.permissionsOf(this.bot.user.id).has("voiceSpeak")) return msg.reply("I cannot speak in the voice channel you are in.");
 
 			const q = msg.args.join(" ");
-			const search: YouTubeSearchResults[] = await functions.ytsearch(q).catch(err => null);
+			const search: YouTubeSearchResults[] = await this.f.ytsearch(q).catch(err => null);
 			if (!search) return msg.reply("there was an internal error while fetching search results.");
 
 			if (search.length < 1) return msg.reply("No results were found");
@@ -202,12 +201,12 @@ client.cmdHandler
 			} catch (e) {
 				v = null;
 			}
-			const info = await functions.ytinfo(song.link).catch(err => null);
+			const info = await this.f.ytinfo(song.link).catch(err => null);
 
 			if (!v) return msg.reply("failed to fetch that video.");
 			if (!info) return msg.reply("failed to fetch info for that video.");
 
-			const me = msg.channel.guild.members.get(this.user.id);
+			const me = msg.channel.guild.members.get(this.bot.user.id);
 
 			let conn: Eris.VoiceConnection;
 
@@ -237,12 +236,12 @@ client.cmdHandler
 					title: `Now Playing ${song.title} by **${song.channelTitle}**`,
 					description: `Song Length: ${time}`,
 					timestamp: new Date().toISOString(),
-					color: functions.randomColor()
+					color: this.f.randomColor()
 				};
 
 				await m.edit({ content: "", embed });
 			} else {
-				conn = this.voiceConnections.get(msg.channel.guild.id);
+				conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 				msg.gConfig.music.queue.push({ link: song.link, channel: info.author.name, length: parseInt(info.length_seconds, 10), title: song.title, blame: msg.author.id });
 				await msg.gConfig.edit({}).then(d => d.reload());
 
@@ -261,7 +260,7 @@ client.cmdHandler
 						title: `Now Playing [${song.title}](${song.link}) by **${song.channelTitle}**`,
 						description: `Song Length: ${time}`,
 						timestamp: new Date().toISOString(),
-						color: functions.randomColor()
+						color: this.f.randomColor()
 					};
 
 					await m.edit({ content: "", embed });
@@ -277,7 +276,7 @@ client.cmdHandler
 						title: `Added ${song.title} by **${song.channelTitle}**`,
 						description: `Estimated time until playing: \`${tUntil}\`\nSong Length: ${time}`,
 						timestamp: new Date().toISOString(),
-						color: functions.randomColor()
+						color: this.f.randomColor()
 					};
 
 					await m.edit({ content: "", embed });
@@ -294,7 +293,7 @@ client.cmdHandler
 						const embed: Eris.EmbedOptions = {
 							title: "Queue Concluded",
 							timestamp: new Date().toISOString(),
-							color: functions.randomColor()
+							color: this.f.randomColor()
 						};
 
 						const k: any = msg.guild.channels.get(msg.channel.guild.members.get(me.user.id).voiceState.channelID);
@@ -305,7 +304,7 @@ client.cmdHandler
 					} else {
 						const song = msg.gConfig.music.queue[0];
 						const v = await ytdl(song.link);
-						const info = await functions.ytinfo(song.link);
+						const info = await this.f.ytinfo(song.link);
 
 						const time = `${Math.floor(parseInt(info.length_seconds, 10) / 60)}m${parseInt(info.length_seconds, 10) - Math.floor(parseInt(info.length_seconds, 10) / 60) * 60}s`;
 
@@ -313,7 +312,7 @@ client.cmdHandler
 							title: `Now Playing ${song.title} by **${song.channel}**`,
 							description: `Song Length: ${time}`,
 							timestamp: new Date().toISOString(),
-							color: functions.randomColor()
+							color: this.f.randomColor()
 						};
 
 						const k: any = msg.guild.channels.get(msg.channel.guild.members.get(me.user.id).voiceState.channelID);
@@ -366,7 +365,7 @@ client.cmdHandler
 					inline: false
 				})),
 				timestamp: new Date().toISOString(),
-				color: functions.randomColor()
+				color: this.f.randomColor()
 			};
 
 			return msg.channel.createMessage({ embed });
@@ -390,11 +389,11 @@ client.cmdHandler
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
 
 			let vc: Eris.VoiceChannel;
-			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.user.id).voiceState.channelID);
+			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.bot.user.id).voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 			else return msg.reply(`I don't seem to be in a voice channel..`);
 
-			const conn = this.voiceConnections.get(msg.channel.guild.id);
+			const conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 
 			if (!conn.paused) return msg.reply("I don't seem to be paused..?");
 
@@ -424,12 +423,12 @@ client.cmdHandler
 			const t = msg.channel.guild.channels.get(msg.member.voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 
-			const conn = this.voiceConnections.get(msg.channel.guild.id);
+			const conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 
 			await conn.stopPlaying();
 
 			const old = msg.gConfig.music.queue.shift();
-			const info = await functions.ytinfo(old.link);
+			const info = await this.f.ytinfo(old.link);
 			const time = `${Math.floor(parseInt(info.length_seconds, 10) / 60)}m${parseInt(info.length_seconds, 10) - Math.floor(parseInt(info.length_seconds, 10) / 60) * 60}s`;
 
 
@@ -440,7 +439,7 @@ client.cmdHandler
 			const embed: Eris.EmbedOptions = {
 				title: `Skipped ${old.title} by **${old.channel}**`,
 				timestamp: new Date().toISOString(),
-				color: functions.randomColor()
+				color: this.f.randomColor()
 			};
 
 			return msg.channel.createMessage({ embed });
@@ -466,11 +465,11 @@ client.cmdHandler
 			if (!msg.member.permission.has("manageGuild") && !msg.member.roles.map(r => msg.guild.roles.get(r)).map(r => r.name.toLowerCase()).includes("dj")) return msg.reply(`You must have either the **manageGuild** permission, or a role called **dj** to use this.`);
 
 			let vc: Eris.VoiceChannel;
-			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.user.id).voiceState.channelID);
+			const t = msg.channel.guild.channels.get(msg.channel.guild.members.get(this.bot.user.id).voiceState.channelID);
 			if (t instanceof Eris.VoiceChannel) vc = t;
 			else return msg.reply(`I don't seem to be in a voice channel..`);
 
-			const conn = this.voiceConnections.get(msg.channel.guild.id);
+			const conn = this.bot.voiceConnections.get(msg.channel.guild.id);
 
 			const v = parseInt(msg.args[0], 10);
 

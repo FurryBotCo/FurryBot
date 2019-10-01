@@ -9,6 +9,8 @@ import { mdb } from "../../../modules/Database";
 import * as os from "os";
 import phin from "phin";
 import * as fs from "fs-extra";
+import { Logger } from "@donovan_dmc/ws-clusters";
+import CmdHandler from "../../../util/cmd";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
 	/* dev only */
@@ -54,7 +56,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					if (!fs.existsSync(`${__dirname}/../../../config/blNoticeViewed.json`)) fs.writeFileSync(`${__dirname}/../../../config/blNoticeViewed.json`, JSON.stringify([]));
 					v = JSON.parse(fs.readFileSync(`${__dirname}/../../../config/blNoticeViewed.json`).toString());
 				} catch (e) {
-					console.error(`Failed to get blacklist notice viewed list`);
+					Logger.error(`Cluster #${this.clusterId}`, `Failed to get blacklist notice viewed list`);
 					v = null;
 				}
 
@@ -76,7 +78,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			// dm advertising to bot
 			if (/discord\.gg/gi.test(msg.content.toLowerCase())) {
 				dmAds = true;
-				const c = await this.getRESTGuild(config.bot.mainGuild);
+				const c = await this.bot.getRESTGuild(config.bot.mainGuild);
 				await c.banMember(msg.author.id, 0, "Advertising in bots dms.");
 
 				embed = {
@@ -89,14 +91,14 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					}]
 				};
 
-				await this.executeWebhook(config.webhooks.directMessage.id, config.webhooks.directMessage.token, {
+				await this.bot.executeWebhook(config.webhooks.directMessage.id, config.webhooks.directMessage.token, {
 					embeds: [embed],
 					username: `Direct Messages${config.beta ? " - Beta" : ""}`,
 					avatarURL: "https://i.furry.bot/furry.png"
 				});
 
 				await msg.author.getDMChannel().then(dm => dm.createMessage("Hey, I see that you're sending dm advertisments to me, that isn't a good idea.. You've been auto banned from my support server for dm advertising."));
-				return this.logger.log(`DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
+				return Logger.log(`DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
 			} else {
 				dmAds = false;
 				embed = {
@@ -108,21 +110,21 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					}]
 				};
 
-				await this.executeWebhook(config.webhooks.directMessage.id, config.webhooks.directMessage.token, {
+				await this.bot.executeWebhook(config.webhooks.directMessage.id, config.webhooks.directMessage.token, {
 					embeds: [embed],
 					username: `Direct Messages${config.beta ? " - Beta" : ""}`,
 					avatarURL: "https://i.furry.bot/furry.png"
 				});
 
 				await msg.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://furry.bot> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join <https://furry.bot/inv> if you need more help!\nCommands __**CAN NOT**__ be ran in my dms!\nThese dms are not a good source to ask for support, do that in our support server <https://discord.gg/YazeA7e>!\nIf you spam my dms, you will get blacklisted!`));
-				return this.logger.log(`Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
+				return Logger.log(`Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
 			}
 
 
 			if (dmAds) return;
 		}
 
-		if ([`<@!${this.user.id}>`, `<@${this.user.id}>`].includes(msg.content) && !bl) {
+		if ([`<@!${this.bot.user.id}>`, `<@${this.bot.user.id}>`].includes(msg.content) && !bl) {
 			const p = [
 				"kickMembers",
 				"banMembers",
@@ -161,16 +163,16 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				description: `\
 	Hi, ${msg.author.tag}! Since you've mentioned me, here's a little about me:\n\
 	My prefix here is ${msg.gConfig.prefix}, you can see my commands by using \`${msg.gConfig.prefix}help\`, you can change my prefix by using \`${msg.gConfig.prefix}settings prefix <new prefix>\`\n\
-	If you want to invite me to another server, you can use [this link](https://discordapp.com/oauth2/authorize?client_id=${this.user.id}&scope=bot&permissions=${botPerms}), or, if that isn't working, you can visit [https://furry.bot/add](https://furry.bot/add)\n\
+	If you want to invite me to another server, you can use [this link](https://discordapp.com/oauth2/authorize?client_id=${this.bot.user.id}&scope=bot&permissions=${botPerms}), or, if that isn't working, you can visit [https://furry.bot/add](https://furry.bot/add)\n\
 	If you need some help with me, you can visit my support server [here](https://discord.gg/YazeA7e)`
 			};
 
-			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
+			if (!msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) {
 				return msg.author.getDMChannel().then(dm => dm.createMessage({
 					content: "I couldn't send messages in the channel where I was mentioned, so I sent this directly to you!",
 					embed
 				})).catch(error => null);
-			} else if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) {
+			} else if (!msg.channel.permissionsOf(this.bot.user.id).has("embedLinks")) {
 				return msg.channel.createMessage(`${embed.title}\n${embed.description}\n(If you give me permission to embed links this would look a lot nicer)`);
 			} else {
 				return msg.channel.createMessage({
@@ -213,7 +215,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 					fs.writeFileSync(`${config.logsDir}/spam/${msg.author.id}-${reportId}-response.json`, JSON.stringify(report));
 
-					await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+					await this.bot.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 						embeds: [
 							{
 								title: `Possible Auto Response Spam From ${msg.author.tag} (${msg.author.id}) | VL: ${spC}`,
@@ -228,16 +230,16 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						await msg.uConfig.edit({
 							blacklist: {
 								blacklisted: true,
-								reason: `Spamming Auto Responses. Automatic Blacklist. Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}`,
+								reason: `Spamming Auto Responses. Automatic Blacklist.`,
 								blame: "Automatic"
 							}
 						});
 
-						await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+						await this.bot.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 							embeds: [
 								{
 									title: "User Blacklisted",
-									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Auto Responses. Automatic Blacklist. Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
+									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Auto Responses. Automatic Blacklist.\nBlame: Automatic`,
 									timestamp: new Date().toISOString(),
 									color: this.f.randomColor()
 								}
@@ -256,9 +258,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects,\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.prefix}settings fResponse disabled\``);
 		}
 
-		if (!msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase())) return;
+		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase())) return;
 
-		const h = await this.cmdHandler.handleCommand(msg).catch(err => err);
+		const h = await CmdHandler.handleCommand(msg).catch(err => err);
 
 		if (h instanceof Error) throw h;
 
@@ -266,7 +268,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const err: Error = e; // typescript doesn't allow annotating of catch clause variables, ts-1196
 		let embed: Eris.EmbedOptions, num: string, code: string, stack: string;
 
-		const cmd = this.cmdHandler.getCommand(msg.cmd[msg.cmd.length - 1]);
+		let cmd;
+		if (msg.cmd) cmd = CmdHandler.getCommand(msg.cmd[msg.cmd.length - 1]);
+		else throw e;
 
 		switch (err.message.toUpperCase()) {
 			case "ERR_INVALID_USAGE":
@@ -287,7 +291,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						inline: false
 					}, {
 						name: "Category",
-						value: typeof cmd.category !== "undefined" && typeof cmd.category.name !== "undefined" ? this.ucwords(cmd.category.name) : "Unknown",
+						value: typeof cmd.category !== "undefined" && typeof cmd.category.name !== "undefined" ? this.f.ucwords(cmd.category.name) : "Unknown",
 						inline: false
 					}, {
 						name: "Arguments Provided",
@@ -310,13 +314,13 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			case "HELP":
 				// this.f.sendCommandEmbed(msg, msg.cmd.command);
-				return console.log("help");
+				return Logger.log(`Cluster #${this.clusterId}`, "help");
 				break; // eslint-disable-line no-unreachable
 
 			default:
 				// internal error handling
 				const er = this.f.ErrorHandler(err);
-				console.log(err);
+				Logger.error(`Cluster #${this.clusterId}`, err);
 				if (!(er instanceof Error)) return msg.reply(er).catch(err =>
 					msg.author.getDMChannel().then(ch =>
 						ch.createMessage(`I couldn't send messages in the channel where that command was sent, so I've sent this here.\n${er}`)
@@ -326,7 +330,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 				num = this.f.random(10, "1234567890");
 				code = `${msg.cmd.join(".")}.${config.beta ? "beta" : "stable"}.${num}`;
-				this.logger.error(`[CommandHandler] e1: ${err.name}: ${err.message}\n${err.stack},\nError Code: ${code}`, msg.guild.shard.id);
+				Logger.error(`[CommandHandler] e1: ${err.name}: ${err.message}\n${err.stack},\nError Code: ${code}`, msg.guild.shard.id);
 
 				await mdb.collection("errors").insertOne({
 					id: code,
@@ -362,7 +366,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						name: msg.channel.guild.id,
 						owner: {
 							id: msg.channel.guild.ownerID,
-							tag: this.users.has(msg.channel.guild.ownerID) ? `${this.users.get(msg.channel.guild.ownerID).username}#${this.users.get(msg.channel.guild.ownerID).discriminator}` : this.getRESTUser(msg.channel.guild.ownerID).then(res => `${res.username}#${res.discriminator}`)
+							tag: this.bot.users.has(msg.channel.guild.ownerID) ? `${this.bot.users.get(msg.channel.guild.ownerID).username}#${this.bot.users.get(msg.channel.guild.ownerID).discriminator}` : this.bot.getRESTUser(msg.channel.guild.ownerID).then(res => `${res.username}#${res.discriminator}`)
 						}
 					}
 				});
@@ -416,7 +420,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						}
 						]
 					};
-					await this.executeWebhook(config.webhooks.errors.id, config.webhooks.errors.token, {
+					await this.bot.executeWebhook(config.webhooks.errors.id, config.webhooks.errors.token, {
 						embeds: [embed],
 						username: `Error Reporter${config.beta ? " - Beta" : ""}`
 					});
@@ -453,8 +457,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					}).catch(async (err) => {
 						await msg.reply("Error while sending error embed, check console.").catch(err => null);
 
-						console.error(err);
-						console.debug(embed);
+						Logger.error(`Cluster #${this.clusterId}`, err);
+						Logger.debug(`Cluster #${this.clusterId}`, embed);
 					});
 				}
 		}

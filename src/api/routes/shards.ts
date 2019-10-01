@@ -1,33 +1,18 @@
 import express from "express";
 import { mdb } from "../../modules/Database";
-import client from "../../../";
-import functions from "../../util/functions";
 import config from "../../config";
 import apiFunctions from "../functions";
+import FurryBot from "@FurryBot";
 
-const app: express.Router = express.Router();
+export default (async (client: FurryBot) => {
 
-app.get("/", async (req, res) => res.status(200).json({
-	success: true,
-	shards: client.shards.map(s => ({ id: s.id, ping: s.latency, status: s.status })),
-	shardCount: client.shards.size
-}))
-	.get("/:id", async (req, res) => {
+	const app: express.Router = express.Router();
 
-		const s = client.shards.get(parseInt(req.params.id, 10));
-		if (!s) return res.status(404).json({
-			success: false,
-			error: "invalid shard id"
-		});
+	app.get("/", async (req, res) => res.status(200).json({
+		success: true,
+		// shards: client.stats.shards.map(s => ({ id: s.id, ping: s.latency, status: s.status })),
+		shardCount: await client.cluster.getMasterStats().then(res => res.shardCount)
+	}));
 
-		return res.status(200).json({
-			success: true,
-			shard: {
-				id: s.id,
-				ping: s.latency,
-				status: s.status
-			}
-		});
-	});
-
-export default app;
+	return app;
+});

@@ -1,14 +1,14 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import * as Eris from "eris";
+import CmdHandler from "../util/cmd";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "meme",
 		displayName: ":joy: Memey",
@@ -50,7 +50,7 @@ client.cmdHandler
 					j = { status: req.statusCode, message: req.body };
 				}
 				msg.reply(`API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
-				return this.logger.log(`imgurl: ${imgurl}`, msg.guild.shard.id);
+				return Logger.log(`imgurl: ${imgurl}`, msg.guild.shard.id);
 			}
 			return msg.channel.createMessage("", {
 				file: req.body,
@@ -92,7 +92,7 @@ client.cmdHandler
 					j = { status: req.statusCode, message: req.body };
 				}
 				msg.reply(`API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
-				return this.logger.log(`imgurl: ${imgurl}`, msg.guild.shard.id);
+				return Logger.log(`imgurl: ${imgurl}`, msg.guild.shard.id);
 			}
 			msg.channel.createMessage("", {
 				file: req.body,
@@ -126,7 +126,7 @@ client.cmdHandler
 					j = { status: req.statusCode, message: req.body };
 				}
 				msg.reply(`API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
-				return this.logger.log(`text: ${text}`, msg.guild.shard.id);
+				return Logger.log(`text: ${text}`, msg.guild.shard.id);
 			}
 			return msg.channel.createMessage("", {
 				file: req.body,
@@ -160,7 +160,7 @@ client.cmdHandler
 					j = { status: req.statusCode, message: req.body };
 				}
 				msg.reply(`API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
-				return this.logger.log(`text: ${text}`, msg.guild.shard.id);
+				return Logger.log(`text: ${text}`, msg.guild.shard.id);
 			}
 			return msg.channel.createMessage("", {
 				file: req.body,
@@ -203,7 +203,7 @@ client.cmdHandler
 					j = { status: req.statusCode, message: req.body };
 				}
 				msg.reply(`API eror:\nStatus: ${j.status}\nMessage: ${j.message}`);
-				return this.logger.log(`imgurl: ${imgurl}`, msg.guild.shard.id);
+				return Logger.log(`imgurl: ${imgurl}`, msg.guild.shard.id);
 			}
 			return msg.channel.createMessage("", {
 				file: req.body,

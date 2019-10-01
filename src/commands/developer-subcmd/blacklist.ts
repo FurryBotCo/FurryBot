@@ -1,13 +1,13 @@
-import client from "../../../index";
 import FurryBot from "../../main";
 import config from "../../config";
-import functions from "../../util/functions";
 import ExtendedMessage from "../../modules/extended/ExtendedMessage";
 import { mdb } from "../../modules/Database";
 import * as Eris from "eris";
 import GuildConfig from "../../modules/config/GuildConfig";
 import UserConfig from "../../modules/config/UserConfig";
 import { Command, CommandError } from "../../util/CommandHandler";
+import CmdHandler from "../../util/cmd";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
@@ -30,9 +30,8 @@ new Command(true, {
 	subCommands: [],
 	category: null,
 	run: (async function (this: FurryBot, msg: ExtendedMessage) {
-
 	})
-}, client.cmdHandler, client)
+}, CmdHandler)
 */
 export default [
 	new Command(true, {
@@ -71,7 +70,7 @@ export default [
 					if (id.length < 17 || id.length > 18) return msg.reply(`**${id}** isn't a valid server id.`);
 					srv = await mdb.collection("guilds").findOne({ id });
 					if (!srv) {
-						console.debug(`Created guild entry for ${id}`);
+						Logger.debug(`Cluster #${this.clusterId}`, `Created guild entry for ${id}`);
 						await mdb.collection("guilds").insertOne({ ...config.defaults.guildConfig, ... { id } });
 						srv = await mdb.collection("guilds").findOne({ id });
 					}
@@ -87,7 +86,7 @@ export default [
 							description: `Id: ${id}\nReason: ${blacklistReason}\nBlame: ${msg.author.tag}`
 						};
 						Object.assign(embed, msg.embed_defaults());
-						await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+						await this.bot.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 							embeds: [embed],
 							username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
 							avatarURL: "https://assets.furry.bot/blacklist_logs.png"
@@ -95,7 +94,7 @@ export default [
 						return msg.reply(`Added **${id}** to the blacklist, reason: ${blacklistReason}.`);
 					}
 				})
-			}, client.cmdHandler, client),
+			}, CmdHandler),
 			new Command(true, {
 				triggers: [
 					"user",
@@ -118,7 +117,7 @@ export default [
 					id = u.id;
 					usr = await mdb.collection("users").findOne({ id });
 					if (!usr) {
-						console.debug(`Created user entry for ${id}`);
+						Logger.debug(`Cluster #${this.clusterId}`, `Created user entry for ${id}`);
 						await mdb.collection("users").insertOne({ ...config.defaults.userConfig, ...{ id } });
 						usr = await mdb.collection("users").findOne({ id });
 					}
@@ -135,7 +134,7 @@ export default [
 							color: this.f.randomColor()
 						};
 
-						await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+						await this.bot.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 							embeds: [embed],
 							username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
 							avatarURL: "https://assets.furry.bot/blacklist_logs.png"
@@ -143,15 +142,15 @@ export default [
 						return msg.reply(`Added **${u.username}#${u.discriminator}** (${id}) to the blacklist, reason: ${blacklistReason}.`);
 					}
 				})
-			}, client.cmdHandler, client)
+			}, CmdHandler)
 		],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"check"
@@ -187,7 +186,7 @@ export default [
 					if (id.length < 17 || id.length > 18) return msg.reply(`**${id}** isn't a valid server id.`);
 					srv = await mdb.collection("guilds").findOne({ id });
 					if (!srv) {
-						console.debug(`Created guild entry for ${id}`);
+						Logger.debug(`Cluster #${this.clusterId}`, `Created guild entry for ${id}`);
 						await mdb.collection("guilds").insertOne({ ...config.defaults.guildConfig, ...{ id } });
 						srv = await mdb.collection("guilds").findOne({ id });
 					}
@@ -196,7 +195,7 @@ export default [
 					if (srv.blacklist.blacklisted) return msg.reply(`**${id}** is blacklisted, reason: ${srv.blacklist.reason}.`);
 					else return msg.reply(`**${id}** is not blacklisted.`);
 				})
-			}, client.cmdHandler, client),
+			}, CmdHandler),
 			new Command(true, {
 				triggers: [
 					"user",
@@ -219,7 +218,7 @@ export default [
 					id = u.id;
 					usr = await mdb.collection("users").findOne({ id });
 					if (!usr) {
-						console.debug(`Created user entry for ${id}`);
+						Logger.debug(`Cluster #${this.clusterId}`, `Created user entry for ${id}`);
 						await mdb.collection("users").insertOne({ ...config.defaults.userConfig, ...{ id } });
 						usr = await mdb.collection("users").findOne({ id });
 					}
@@ -228,14 +227,14 @@ export default [
 					if (usr.blacklist.blacklisted) return msg.reply(`**${u.username}#${u.discriminator}** (${id}) is blacklisted, reason: ${usr.blacklist.reason}.`);
 					else return msg.reply(`**${u.username}#${u.discriminator}** (${id}) is not blacklisted.`);
 				})
-			}, client.cmdHandler, client)],
+			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"list",
@@ -251,9 +250,9 @@ export default [
 		subCommands: [
 			new Command(true, {
 				triggers: [
-					"server",
+					"servers",
 					"s",
-					"guild",
+					"guilds",
 					"g"
 				],
 				userPermissions: [],
@@ -277,7 +276,7 @@ export default [
 
 					for (const en of entries) {
 						let s;
-						if (this.guilds.has(en.id)) s = await this.getRESTGuild(en.id);
+						if (this.bot.guilds.has(en.id)) s = await this.bot.getRESTGuild(en.id);
 						else s = null;
 
 						if (!s) e.push(`\`${en.id}\` - ${en.blacklist.reason}`);
@@ -306,10 +305,10 @@ export default [
 					};
 					return msg.channel.createMessage({ embed });
 				})
-			}, client.cmdHandler, client),
+			}, CmdHandler),
 			new Command(true, {
 				triggers: [
-					"user",
+					"users",
 					"u"
 				],
 				userPermissions: [],
@@ -333,7 +332,7 @@ export default [
 					if (msg.args.length > 0) page = parseInt(msg.args[0], 10);
 
 					for (const en of entries) {
-						const s = await this.getRESTUser(en.id);
+						const s = await this.bot.getRESTUser(en.id);
 
 						if (!s) e.push(`\`${en.id}\` - ${en.blacklist.reason}`);
 						else e.push(`\`${s.username}#${s.discriminator}\` (\`${en.id}\`) - ${en.blacklist.reason}`);
@@ -360,14 +359,16 @@ export default [
 
 					return msg.channel.createMessage({ embed });
 				})
-			}, client.cmdHandler, client)],
+			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			return msg.reply("no.");
+			// this is to avoid this (30 users/30 seconds): https://butts-are.cool/img3746_09-30-2019_23-59-35.254-1359x485_putty.png
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"remove",
@@ -404,7 +405,7 @@ export default [
 					if (id.length < 17 || id.length > 18) return msg.reply(`**${id}** isn't a valid server id.`);
 					srv = await mdb.collection("guilds").findOne({ id });
 					if (!srv) {
-						console.debug(`Created guild entry for ${id}`);
+						Logger.debug(`Cluster #${this.clusterId}`, `Created guild entry for ${id}`);
 						await mdb.collection("guilds").insertOne({ ...config.defaults.guildConfig, ...{ id } });
 						srv = await mdb.collection("guilds").findOne({ id });
 					}
@@ -421,7 +422,7 @@ export default [
 							color: this.f.randomColor()
 						};
 
-						await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+						await this.bot.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 							embeds: [embed],
 							username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
 							avatarURL: "https://assets.furry.bot/blacklist_logs.png"
@@ -429,7 +430,7 @@ export default [
 						return msg.reply(`Removed **${id}** from the blacklist, previous reason: ${srv.blacklist.reason}.`);
 					}
 				})
-			}, client.cmdHandler, client),
+			}, CmdHandler),
 			new Command(true, {
 				triggers: [
 					"user",
@@ -452,7 +453,7 @@ export default [
 					id = u.id;
 					usr = await mdb.collection("users").findOne({ id });
 					if (!usr) {
-						console.debug(`Created user entry for ${id}`);
+						Logger.debug(`Cluster #${this.clusterId}`, `Created user entry for ${id}`);
 						await mdb.collection("users").insertOne({ ...config.defaults.userConfig, ...{ id } });
 						usr = await mdb.collection("users").findOne({ id });
 					}
@@ -468,7 +469,7 @@ export default [
 							color: this.f.randomColor()
 						};
 
-						await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+						await this.bot.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 							embeds: [embed],
 							username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
 							avatarURL: "https://assets.furry.bot/blacklist_logs.png"
@@ -476,12 +477,12 @@ export default [
 						return msg.reply(`Removed **${u.username}#${u.discriminator}** (${id}) from the blacklist, previous reason: ${usr.blacklist.reason}.`);
 					}
 				})
-			}, client.cmdHandler, client)],
+			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
-	}, client.cmdHandler, client)
+	}, CmdHandler)
 ];

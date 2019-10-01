@@ -2,7 +2,7 @@ import ClientEvent from "../../../modules/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../../../config";
-import functions from "../../../util/functions";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 
@@ -18,7 +18,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		guildCount: this.guilds.size
 	}, new Date()); */
 
-	await this.f.incrementDailyCounter(false, this.guilds.size);
+	await this.f.incrementDailyCounter(false, this.bot.guilds.size);
 
 	let author = {
 		name: "Unknown#0000",
@@ -26,7 +26,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 	};
 	let owner = "Unknown#0000 (000000000000000000)";
 	if (guild.ownerID) {
-		const u: Eris.User = await this.getRESTUser(guild.ownerID).catch(err => null);
+		const u: Eris.User = await this.bot.getRESTUser(guild.ownerID).catch(err => null);
 		if (u !== null) {
 			author = {
 				name: `${u.username}#${u.discriminator}`,
@@ -36,11 +36,11 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		}
 	}
 
-	this.logger.info(`Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members.`, guild.shard.id);
+	Logger.info(`Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members.`, guild.shard.id);
 
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Left!",
-		description: `Guild #${this.guilds.size + 1}\nCurrent Total: ${this.guilds.size}`,
+		description: `Guild #${this.bot.guilds.size + 1}\nCurrent Total: ${this.bot.guilds.size}`,
 		author,
 		image: {
 			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://reddit.furry.host/noicon.png"
@@ -66,7 +66,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 				inline: false
 			},
 			{
-				name: `Large Guild (${this.options.largeThreshold}+ Members)`,
+				name: `Large Guild (${this.bot.options.largeThreshold}+ Members)`,
 				value: guild.large ? `Yes (${guild.memberCount})` : `No ${guild.memberCount}`,
 				inline: false
 			},
@@ -79,14 +79,14 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		timestamp: new Date().toISOString(),
 		color: this.f.randomColor(),
 		footer: {
-			text: `Shard ${guild.shard.id + 1}/${this.shards.size}`,
+			text: `Shard ${guild.shard.id + 1}/${this.cluster.maxShards}`,
 			icon_url: "https://reddit.furry.host/FurryBotForDiscord.png"
 		}
 	};
 
 	if (embed.author.icon_url) embed.thumbnail.url = embed.author.icon_url;
 
-	return this.executeWebhook(config.webhooks.guilds.id, config.webhooks.guilds.token, {
+	return this.bot.executeWebhook(config.webhooks.guilds.id, config.webhooks.guilds.token, {
 		embeds: [
 			embed
 		],

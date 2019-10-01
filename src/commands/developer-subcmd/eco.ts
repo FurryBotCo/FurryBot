@@ -1,12 +1,11 @@
-import client from "../../../index";
 import FurryBot from "../../main";
 import config from "../../config";
-import functions from "../../util/functions";
 import ExtendedMessage from "../../modules/extended/ExtendedMessage";
 import { mdb } from "../../modules/Database";
 import * as Eris from "eris";
 import UserConfig from "../../modules/config/UserConfig";
 import { Command, CommandError } from "../../util/CommandHandler";
+import CmdHandler from "../../util/cmd";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
@@ -44,7 +43,7 @@ export default [
 
 			return msg.reply(`the balance of **${u.username}#${u.discriminator}** (${u.id}) is ${d.bal}.`);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"give",
@@ -89,7 +88,7 @@ export default [
 
 			return msg.reply(`gave ${amount} to **${u.username}#${u.discriminator}** (${u.id})\nOld Balance: ${oldBal}\nNew Balance: ${newBal}`);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"reset"
@@ -124,7 +123,7 @@ export default [
 
 			return msg.reply(`reset the balance of **${u.username}#${u.discriminator}** (${u.id})`);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"set"
@@ -165,7 +164,7 @@ export default [
 
 			return msg.reply(`set the balance of **${u.username}#${u.discriminator}** (${u.id}) to ${amount}\nOld Balance: ${oldBal}`);
 		})
-	}, client.cmdHandler, client),
+	}, CmdHandler),
 	new Command(true, {
 		triggers: [
 			"take",
@@ -211,5 +210,5 @@ export default [
 
 			return msg.reply(`took ${amount} from **${u.username}#${u.discriminator}** (${u.id})\nOld Balance: ${oldBal}\nNew Balance: ${newBal}`);
 		})
-	}, client.cmdHandler, client)
+	}, CmdHandler)
 ];

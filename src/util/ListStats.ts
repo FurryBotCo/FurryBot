@@ -1,21 +1,20 @@
-import FurryBot from "@FurryBot";
+import { Main, Logger } from "@donovan_dmc/ws-clusters";
 import config from "../config";
 import blapi from "blapi";
 import phin from "phin";
 
-export default (async (client: FurryBot) => {
+export default (async (client: Main) => {
 
 	const g = [];
 	try {
-		for (let i = 0; i < client.shards.size; i++) g.push(Object.values(client.guildShardMap).filter(s => s === i).length);
-		blapi.manualPost(client.guilds.size, client.user.id, config.botLists, 0, client.shards.size, g);
+		blapi.manualPost(client.stats.guildCount, client.stats.userCount, config.botLists, 0, client.stats.shardCount, g);
 		// botblock was blocked on discordbots.org
 		const rq = await phin({
 			method: "POST",
-			url: `https://discordbots.org/api/bots/${client.user.id}/stats`,
+			url: `https://discordbots.org/api/bots/${client.eris.user.id}/stats`,
 			data: {
-				server_count: client.guilds.size,
-				shard_count: client.shards.size
+				server_count: client.stats.guildCount,
+				shard_count: client.stats.shardCount
 			},
 			headers: {
 				"Content-Type": "application/json",
@@ -23,11 +22,11 @@ export default (async (client: FurryBot) => {
 			}
 		})
 			.then(req => JSON.parse(req.body.toString()));
-		client.logger.log(`Posted guild counts: ${client.guilds.size}`);
+		Logger.log("Cluster Manager | Bot List Stats", `Posted guild counts: ${client.stats.guildCount}`);
 	} catch (e) {
-		client.logger.error(e);
+		Logger.error("Cluster Manager | Bot List Stats", e);
 	}
 	return {
-		count: client.guilds.size
+		count: client.stats.guildCount
 	};
 });

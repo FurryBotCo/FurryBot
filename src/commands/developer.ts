@@ -1,7 +1,5 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import _eval from "../util/eval";
@@ -14,10 +12,12 @@ import * as Eris from "eris";
 import Permissions from "../util/Permissions";
 import { execSync } from "child_process";
 import { performance } from "perf_hooks";
+import CmdHandler from "../util/cmd";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "developer",
 		displayName: ":tools: Developer",
@@ -39,8 +39,7 @@ client.cmdHandler
 		category: "developer",
 		subCommands: require("./developer-subcmd/blacklist").default,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
-			console.log(sub);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
@@ -90,7 +89,7 @@ client.cmdHandler
 		category: "developer",
 		subCommands: require("./developer-subcmd/eco").default,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
@@ -109,7 +108,7 @@ client.cmdHandler
 		category: "developer",
 		subCommands: require("./developer-subcmd/edit").default,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-			const sub = await this.cmdHandler.handleSubCommand(cmd, msg);
+			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
 		})
@@ -153,7 +152,7 @@ client.cmdHandler
 					config,
 					msg,
 					phin,
-					functions,
+					functions: this.f,
 					util,
 					fs,
 					mdb,
@@ -241,7 +240,7 @@ client.cmdHandler
 					res = `Uploaded ${req.body.toString()}`;
 				}
 
-				return this.logger.log(`Silent eval return: ${res}`, msg.guild.shard.id);
+				return Logger.log(`Silent eval return: ${res}`, msg.guild.shard.id);
 			}
 		})
 	})
@@ -263,11 +262,11 @@ client.cmdHandler
 
 			if (msg.unparsedArgs.length === 0) guild = msg.guild;
 			else {
-				if (!this.guilds.has(msg.unparsedArgs[0])) {
+				if (!this.bot.guilds.has(msg.unparsedArgs[0])) {
 					return msg.channel.createMessage(`<@!${msg.author.id}>, Guild not found`);
 				}
 
-				guild = this.guilds.get(msg.unparsedArgs[0]);
+				guild = this.bot.guilds.get(msg.unparsedArgs[0]);
 			}
 
 
@@ -404,7 +403,7 @@ client.cmdHandler
 					res = `Uploaded ${req.body.toString()}`;
 				}
 
-				return this.logger.log(`Silent shell eval return: ${res}`, msg.guild.shard.id);
+				return Logger.log(`Silent shell eval return: ${res}`, msg.guild.shard.id);
 			}
 		})
 	})
@@ -452,23 +451,23 @@ client.cmdHandler
 			if (msg.args.length < 1) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			if (fs.existsSync(`${__dirname}/../handlers/events/client/${msg.args[0]}.${__filename.split(".").reverse()[0]}`)) {
-				client.removeAllListeners(msg.args[0]);
+				this.bot.removeAllListeners(msg.args[0]);
 
 				delete require.cache[require.resolve(`${__dirname}/../handlers/events/client/${msg.args[0]}.${__filename.split(".").reverse()[0]}`)];
 
 				const hn = require(`${__dirname}/../handlers/events/client/${msg.args[0]}.${__filename.split(".").reverse()[0]}`).default;
 
-				client.on(msg.args[0], hn.listener.bind(client));
+				this.bot.on(msg.args[0], hn.listener.bind(this));
 
 				return msg.reply(`reloaded the **${msg.args[0]}** event.`);
 			} else if (fs.existsSync(`${__dirname}/${msg.args[0].toLowerCase()}.${__filename.split(".").reverse()[0].toLowerCase()}`)) {
 				delete require.cache[require.resolve(`${__dirname}/${msg.args[0].toLowerCase()}.${__filename.split(".").reverse()[0].toLowerCase()}`)];
 
-				client.cmdHandler.commands.map(c => {
-					if (c.category.name === msg.args[0].toLowerCase()) client.cmdHandler.deleteCommand(msg.args[0].toLowerCase());
+				CmdHandler.commands.map(c => {
+					if (c.category.name === msg.args[0].toLowerCase()) CmdHandler.deleteCommand(msg.args[0].toLowerCase());
 				});
 
-				client.cmdHandler.deleteCategory(msg.args[0].toLowerCase());
+				CmdHandler.deleteCategory(msg.args[0].toLowerCase());
 
 				require(`${__dirname}/${msg.args[0]}.${__filename.split(".").reverse()[0].toLowerCase()}`);
 

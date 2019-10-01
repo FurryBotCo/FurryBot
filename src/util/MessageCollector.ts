@@ -1,4 +1,4 @@
-import FurryBot from "../main";
+import FurryBot from "@FurryBot";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import { Message } from "eris";
 
@@ -12,7 +12,7 @@ class MessageCollector {
 	constructor(bot: FurryBot) {
 		this.collectors = {};
 
-		bot.on("messageCreate", this.verify.bind(this));
+		bot.bot.on("messageCreate", this.verify.bind(this));
 	}
 
 	async verify(msg: ExtendedMessage | Message) {

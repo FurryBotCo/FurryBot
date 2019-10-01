@@ -1,3 +1,9 @@
+/**
+ * Copied from Furry Bot
+ * https://github.com/FurryBotCo/FurryBot/blob/master/src/util/CommandHandler/lib/CommandHandler.ts
+ * Licensed under AGPL-3.0, https://github.com/FurryBotCo/FurryBot/blob/master/LICENSE, https://github.com/FurryBotCo/SpotiJS/blob/master/LICENSE
+ */
+
 import * as Eris from "eris";
 import Command from "./Command";
 import Category from "./Category";
@@ -6,9 +12,10 @@ import CooldownHandler from "./CooldownHandler";
 import CommandPermissionError from "./CommandPermissionError";
 import config from "../../../config";
 import ExtendedMessage from "../../../modules/extended/ExtendedMessage";
-import FurryBot from "@FurryBot";
 import { performance } from "perf_hooks";
 import * as fs from "fs";
+import { Logger } from "@donovan_dmc/ws-clusters";
+import FurryBot from "@FurryBot";
 
 type ArrayOneOrMore<T> = {
 	0: T
@@ -43,12 +50,16 @@ export default class CommandHandler {
 			alwaysAddSend: true
 		};
 		if (options) {
-			this._options = <any>{};
+			this._options = {} as any;
 			if (![undefined, null].includes(options.alwaysAddSend)) this._options.alwaysAddSend = options.alwaysAddSend;
 			else this._options.alwaysAddSend = true;
 		}
 		this._inHandler = true;
 		this._cooldownHandler = new CooldownHandler(this.commands);
+	}
+
+	setClient(client: any) {
+		this._client = client;
 	}
 
 	get commands() {
@@ -92,13 +103,13 @@ export default class CommandHandler {
 			let dup;
 			if (!d) dup = "Unknown";
 			else dup = d.map(c => c.triggers[0].toLowerCase()).join(", ");
-			// console.log(this.commands.map(c => c.triggers).reduce((a, b) => a.concat(b), []).map(t => t.toLowerCase()));
+			// Logger.log("Command Handler", this.commands.map(c => c.triggers).reduce((a, b) => a.concat(b), []).map(t => t.toLowerCase()));
 			throw new TypeError(`duplicate command triggers with ${dup}, and ${data.triggers[0].toLowerCase()}`);
 		}
 
 		if (this.options.alwaysAddSend && data.botPermissions.indexOf("sendMessages") === -1) data.botPermissions.push("sendMessages");
 
-		const cmd = new Command(false, data, this, this._client);
+		const cmd = new Command(false, data, this);
 		this._commands.push(cmd);
 		this._cooldownHandler.addCommand(cmd);
 		return this;
@@ -117,7 +128,9 @@ export default class CommandHandler {
 
 	getCommand(str: string) {
 		if (!str) throw new TypeError("Missing command name");
-		return this.commands.find(c => c.triggers.map(t => t.toLowerCase()).includes(str.toLowerCase())) || null;
+		// console.log(this.commands);
+		// console.log(this._commands);
+		return this.commands.find(c => c.triggers.map(t => t.toLowerCase()).reduce((a, b) => a.concat(b), []).includes(str.toLowerCase())) || null;
 	}
 
 	getSubCommand(cmd: Command | string, str: string) {
@@ -156,7 +169,7 @@ export default class CommandHandler {
 
 	async handleCommand(msg: ExtendedMessage): Promise<any> {
 		if (!this._inHandler) throw new TypeError("Handle command called with invalid context.");
-
+		if (!this._client) return Logger.warn("Command Handler", "Skipping command as client is not present in command handler.");
 		const cmd: Command = this.getCommand(msg.cmd[0]);
 		if (!cmd) return;
 
@@ -194,7 +207,7 @@ export default class CommandHandler {
 				if (!fs.existsSync(`${__dirname}/../../../config/blNoticeViewed.json`)) fs.writeFileSync(`${__dirname}/../../../config/blNoticeViewed.json`, JSON.stringify([]));
 				v = JSON.parse(fs.readFileSync(`${__dirname}/../../../config/blNoticeViewed.json`).toString());
 			} catch (e) {
-				console.error(`Failed to get blacklist notice viewed list`, msg.guild.shard.id);
+				Logger.error("Command Handler", `Failed to get blacklist notice viewed list`);
 				v = null;
 			}
 
@@ -207,7 +220,7 @@ export default class CommandHandler {
 			if (blReason.type === 0) t = `You are blacklisted from using this bot, reason: ${blReason.reason}, blame: ${blReason.blame}`;
 			else t = `This server is blacklisted from using this bot, reason: ${blReason.reason}, blame: ${blReason.blame}`;
 
-			if (msg.channel.permissionsOf(this._client.user.id).has("sendMessages")) return msg.reply(t);
+			if (msg.channel.permissionsOf(this._client.bot.user.id).has("sendMessages")) return msg.reply(t);
 			else return msg.author.getDMChannel().then(ch => ch.createMessage(t)).catch(err => null);
 
 		}
@@ -285,14 +298,14 @@ export default class CommandHandler {
 
 				fs.writeFileSync(`${config.logsDir}/spam/${msg.author.id}-${reportId}-cmd.json`, JSON.stringify(report));
 
-				await this._client.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+				await this._client.bot.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 					embeds: [
 						{
 							title: `Possible Command Spam From ${msg.author.tag} (${msg.author.id}) | VL: ${spC}`,
 							description: `Report: ${config.beta ? `http://${config.apiBindIp}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`
 						}
 					],
-					username: `FurryBot Spam Logs${config.beta ? " - Beta" : ""}`,
+					username: `SpotiJS Spam Logs${config.beta ? " - Beta" : ""}`,
 					avatarURL: "https://assets.furry.bot/blacklist_logs.png"
 				});
 
@@ -305,7 +318,7 @@ export default class CommandHandler {
 						}
 					});
 
-					await this._client.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+					await this._client.bot.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 						embeds: [
 							{
 								title: "User Blacklisted",
@@ -323,7 +336,7 @@ export default class CommandHandler {
 			}
 		}
 
-		if (cmd.features.includes("betaOnly")) return;
+		if (cmd.features.includes("betaOnly") && !config.beta) return;
 
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) return msg.reply(`this command (**${cmd.triggers[0]}**) has been set to developer only, and you are not a developer of this bot, therefore you can not run this command.`);
 
@@ -336,25 +349,6 @@ export default class CommandHandler {
 			});
 
 			if (!msg.gConfig.nsfwEnabled) return msg.reply(`you must enable nsfw commands to use this, have a server administrator run \`${msg.gConfig.prefix}settings nsfw enabled\``);
-
-			if (![undefined, null, ""].includes(msg.channel.topic) && config.yiff.disableStatements.some(y => msg.channel.topic.trim().indexOf(y) !== -1)) {
-				const t = config.yiff.disableStatements.filter(y => msg.channel.topic.trim().indexOf(y) !== -1);
-				let txt;
-				if (t.length === 1) txt = t[0];
-				else {
-					const tmp = t.pop();
-					txt = `${t.join("**, **")}**, and **${tmp}`;
-				}
-
-				const embed: Eris.EmbedOptions = {
-					title: "NSFW command explicitiy disabled in this channel",
-					description: `NSFW commands have been explicitly disabled in this channel, ask a server moderator/administrator to remove **${txt}** from the channel topic.`,
-					color: this._client.f.randomColor(),
-					timestamp: new Date().toISOString()
-				};
-
-				return msg.channel.createMessage({ embed });
-			}
 		}
 
 		if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
@@ -367,7 +361,7 @@ export default class CommandHandler {
 					color: this._client.f.randomColor(),
 					timestamp: new Date().toISOString()
 				};
-				this._client.logger.debug(`user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`, msg.guild.shard.id);
+				Logger.warn("Command Handler", `user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`);
 				return msg.channel.createMessage({ embed })
 					.catch(async (err) =>
 						msg.author.getDMChannel()
@@ -379,8 +373,8 @@ export default class CommandHandler {
 		}
 
 		if (cmd.botPermissions.length > 0) {
-			if (cmd.botPermissions.some(perm => !msg.channel.permissionsOf(this._client.user.id).has(perm))) {
-				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(this._client.user.id).has(perm));
+			if (cmd.botPermissions.some(perm => !msg.channel.permissionsOf(this._client.bot.user.id).has(perm))) {
+				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(this._client.bot.user.id).has(perm));
 
 				const embed = {
 					title: "I do not have the required permission(s) to use this!",
@@ -388,7 +382,7 @@ export default class CommandHandler {
 					color: this._client.f.randomColor(),
 					timestamp: new Date().toISOString()
 				};
-				this._client.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
+				Logger.warn("Command Handler", `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 				return msg.channel.createMessage({ embed })
 					.catch(async (err) =>
 						msg.author.getDMChannel()
@@ -407,14 +401,6 @@ export default class CommandHandler {
 				t = `${parseInt(t.split(" ")[0], 10)} ${t.split(" ")[1]}`;
 				return msg.reply(`hey, this command is on cooldown! Please wait **${t}**..`);
 			}
-
-			if (msg.uConfig.tips && cmd.category.name === "economy") {
-				const chance = Math.floor((Math.random() * 5) + 1);
-				if (chance === 1) {
-					const tip = config.eco.tips[Math.floor(Math.random() * config.eco.tips.length)];
-					await msg.channel.createMessage(`${tip}\n\nYou can turn these off by using \`${msg.gConfig.prefix}toggletips\``);
-				}
-			}
 		}
 
 		if (msg.gConfig.deleteCommands) await msg.delete().catch(() => msg.reply(`failed to delete command invocation. Please contact a server administrator. This can be disabled using \`${msg.gConfig.prefix}settings delCmds disable\``));
@@ -422,11 +408,11 @@ export default class CommandHandler {
 		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cooldownHandler.setCooldown(cmd, null, msg.author.id);
 
 		const start = performance.now();
-		this._client.logger.command(`Command "${cmd.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.channel.guild.shard.id);
+		Logger.log("Command Handler", `Command "${cmd.triggers[0]}" ran with arguments "${msg.unparsedArgs.join(" ")}" by ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 		const res = await cmd.run.call(this._client, msg, cmd).catch(err => err);
 		const end = performance.now();
 
-		this._client.logger.debug(`Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms`, msg.channel.guild.shard.id);
+		Logger.debug("Command Handler", `Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms`);
 
 		if (res instanceof Error && !(res instanceof CommandError) && (res.message !== "ERR_INVALID_USAGE" && res.name !== "ERR_INVALID_USAGE")) throw new CommandError(cmd, res);
 
@@ -434,6 +420,8 @@ export default class CommandHandler {
 	}
 
 	async handleSubCommand(cmnd: Command | string, msg: ExtendedMessage) {
+		if (!this._client) return null;
+
 		if (!cmnd) throw new TypeError("No command provided");
 
 		if (!(cmnd instanceof Command)) cmnd = this.getCommand(cmnd);
@@ -458,7 +446,7 @@ export default class CommandHandler {
 			return "NOSUB";
 		}
 
-		if (cmd.features.includes("betaOnly")) return;
+		if (cmd.features.includes("betaOnly") && !config.beta) return;
 
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) return msg.reply(`this command (**${cmd.triggers[0]}**) has been set to developer only, and you are not a developer of this bot, therefore you can not run this command.`);
 
@@ -471,25 +459,6 @@ export default class CommandHandler {
 			});
 
 			if (!msg.gConfig.nsfwEnabled) return msg.reply(`you must enable nsfw commands to use this, have a server administrator run \`${msg.gConfig.prefix}settings nsfw enabled\``);
-
-			if (![undefined, null, ""].includes(msg.channel.topic) && config.yiff.disableStatements.some(y => msg.channel.topic.trim().indexOf(y) !== -1)) {
-				const t = config.yiff.disableStatements.filter(y => msg.channel.topic.trim().indexOf(y) !== -1);
-				let txt;
-				if (t.length === 1) txt = t[0];
-				else {
-					const tmp = t.pop();
-					txt = `${t.join("**, **")}**, and **${tmp}`;
-				}
-
-				const embed: Eris.EmbedOptions = {
-					title: "NSFW command explicitiy disabled in this channel",
-					description: `NSFW commands have been explicitly disabled in this channel, ask a server moderator/administrator to remove **${txt}** from the channel topic.`,
-					color: this._client.f.randomColor(),
-					timestamp: new Date().toISOString()
-				};
-
-				return msg.channel.createMessage({ embed });
-			}
 		}
 
 		if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
@@ -502,14 +471,14 @@ export default class CommandHandler {
 					color: this._client.f.randomColor(),
 					timestamp: new Date().toISOString()
 				};
-				this._client.logger.debug(`user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`, msg.guild.shard.id);
+				Logger.warn("Command Handler", `user ${msg.author.tag} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`);
 				return msg.channel.createMessage({ embed });
 			}
 		}
 
 		if (cmd.botPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
-			if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(this._client.user.id).has(perm))) {
-				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(this._client.user.id).has(perm));
+			if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(this._client.bot.user.id).has(perm))) {
+				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(this._client.bot.user.id).has(perm));
 
 				const embed = {
 					title: "I do not have the required permission(s) to use this!",
@@ -517,7 +486,7 @@ export default class CommandHandler {
 					color: this._client.f.randomColor(),
 					timestamp: new Date().toISOString()
 				};
-				this._client.logger.debug(`I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`, msg.guild.shard.id);
+				Logger.warn("Command Handler", `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 				return msg.channel.createMessage({ embed });
 			}
 		}

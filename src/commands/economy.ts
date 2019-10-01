@@ -1,15 +1,15 @@
-import client from "../../index";
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import functions from "../util/functions";
 import config from "../config";
 import { Command, CommandError } from "../util/CommandHandler";
 import { mdb } from "../modules/Database";
 import * as Eris from "eris";
+import CmdHandler from "../util/cmd";
+import { Logger } from "@donovan_dmc/ws-clusters";
 
 type CommandContext = FurryBot & { _cmd: Command };
 
-client.cmdHandler
+CmdHandler
 	.addCategory({
 		name: "economy",
 		displayName: ":moneybag: Economy",
@@ -84,7 +84,7 @@ client.cmdHandler
 			let amount = Math.floor(Math.random() * 50) + 1;
 			amount += amount * multi;
 			amount = Math.floor(amount);
-			let s = functions.fetchLangMessage(msg.gConfig.lang, cmd);
+			let s = this.f.fetchLangMessage(msg.gConfig.lang, cmd);
 
 			const people = [
 				...config.eco.people,
@@ -104,10 +104,10 @@ client.cmdHandler
 
 			await msg.uConfig.edit({ bal: msg.uConfig.bal + amount }).then(d => d.reload());
 
-			await this.executeWebhook(config.webhooks.economyLogs.id, config.webhooks.economyLogs.token, {
+			await this.bot.executeWebhook(config.webhooks.economyLogs.id, config.webhooks.economyLogs.token, {
 				embeds: [
 					{
-						title: `**beg** command used by ${msg.author.tag}`,
+						title: `**beg** command used by ${msg.author.tag} (${msg.author.id})`,
 						description: `Amount Gained: ${amount}\nPerson: ${person}\nText: ${t}`,
 						timestamp: new Date().toISOString(),
 						color: this.f.randomColor(),
@@ -159,18 +159,18 @@ client.cmdHandler
 
 			const win = flip <= .70;
 			const side = win ? "heads" : "tails";
-			// console.debug(`[a] Bet ${a}`);
-			// console.debug(`[a] Bet ${a === 0 ? "heads" : "tails"}`);
-			// console.debug(`[flip] Flip ${flip}`);
-			// console.debug(`[flip] Flip ${flip === 0 ? "heads" : "tails"}`);
-			// console.debug(`[b] Amount bet ${b}`);
-			// console.debug(`[c] Amount won ${c}`);
+			// Logger.debug(`Cluster #${this.clusterId}`, `[a] Bet ${a}`);
+			// Logger.debug(`Cluster #${this.clusterId}`, `[a] Bet ${a === 0 ? "heads" : "tails"}`);
+			// Logger.debug(`Cluster #${this.clusterId}`, `[flip] Flip ${flip}`);
+			// Logger.debug(`Cluster #${this.clusterId}`, `[flip] Flip ${flip === 0 ? "heads" : "tails"}`);
+			// Logger.debug(`Cluster #${this.clusterId}`, `[b] Amount bet ${b}`);
+			// Logger.debug(`Cluster #${this.clusterId}`, `[c] Amount won ${c}`);
 
 
-			await this.executeWebhook(config.webhooks.economyLogs.id, config.webhooks.economyLogs.token, {
+			await this.bot.executeWebhook(config.webhooks.economyLogs.id, config.webhooks.economyLogs.token, {
 				embeds: [
 					{
-						title: `**betflip** command used by ${msg.author.tag}`,
+						title: `**betflip** command used by ${msg.author.tag} (${msg.author.id})`,
 						description: `Bet: ${b}\nWin: ${win ? "Yes" : "No"}\nSide Bet: ${a === 0 ? "heads" : "tails"}\nSide Flipped: ${side}\nMultiplier: **${multi * 100}%**`,
 						timestamp: new Date().toISOString(),
 						color: this.f.randomColor(),
@@ -264,16 +264,16 @@ client.cmdHandler
 
 			const oldBal = msg.uConfig.bal;
 			const oldMdBal = md.bal;
-			// console.log(oldBal);
-			// console.log(oldMdBal);
-			// console.log(md);
+			// Logger.log(`Cluster #${this.clusterId}`, oldBal);
+			// Logger.log(`Cluster #${this.clusterId}`, oldMdBal);
+			// Logger.log(`Cluster #${this.clusterId}`, md);
 			await msg.uConfig.edit({ bal: oldBal - amount }).then(d => d.reload());
 			await md.edit({ bal: oldMdBal + amount }).then(d => d.reload());
 
-			await this.executeWebhook(config.webhooks.economyLogs.id, config.webhooks.economyLogs.token, {
+			await this.bot.executeWebhook(config.webhooks.economyLogs.id, config.webhooks.economyLogs.token, {
 				embeds: [
 					{
-						title: `**share** command used by ${msg.author.tag}`,
+						title: `**share** command used by ${msg.author.tag} (${msg.author.id})`,
 						description: `Amount Shared: ${amount}\nShared From: ${msg.author.tag}\nShared From Old Balance: ${oldBal}\nSharedFrom New Balance: ${msg.uConfig.bal}\nShared To: ${m.username}#${m.discriminator}\nShared To Old Balance: ${oldMdBal}\nShared To New Bal: ${md.bal}`,
 						timestamp: new Date().toISOString(),
 						color: this.f.randomColor(),
