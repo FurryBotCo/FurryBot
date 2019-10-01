@@ -8,7 +8,7 @@ import Trello from "trello";
 import E6API from "e6api";
 import E9API from "e9api";
 import FurryBotAPI from "furrybotapi";
-import ClientEvent from "modules/ClientEvent";
+import ClientEvent from "./modules/ClientEvent";
 import { BaseClient, Cluster, Logger } from "@donovan_dmc/ws-clusters";
 
 export default class FurryBot extends BaseClient {

@@ -250,9 +250,9 @@ export default [
 		subCommands: [
 			new Command(true, {
 				triggers: [
-					"server",
+					"servers",
 					"s",
-					"guild",
+					"guilds",
 					"g"
 				],
 				userPermissions: [],
@@ -308,7 +308,7 @@ export default [
 			}, CmdHandler),
 			new Command(true, {
 				triggers: [
-					"user",
+					"users",
 					"u"
 				],
 				userPermissions: [],
@@ -362,6 +362,8 @@ export default [
 			}, CmdHandler)],
 		category: null,
 		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+			return msg.reply("no.");
+			// this is to avoid this (30 users/30 seconds): https://butts-are.cool/img3746_09-30-2019_23-59-35.254-1359x485_putty.png
 			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);

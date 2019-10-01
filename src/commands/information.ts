@@ -124,6 +124,8 @@ CmdHandler
 		category: "information",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			const st = await this.cluster.getMasterStats();
+			if (st.clusters.length === 0) return msg.reply("hey, I haven't recieved any stats from other clusters yet, please try again later!");
+
 			const embed: Eris.EmbedOptions = {
 				title: "Bot Info!",
 				fields: [
@@ -144,24 +146,12 @@ CmdHandler
 						value: `${this.f.parseTime(process.uptime())} (${this.f.secondsToHours(process.uptime())})`,
 						inline: false
 					}, {
-						name: "Shards/Clusters",
-						value: `Shard Count: ${st.shardCount} (current: ${msg.guild.shard.id})\nTotal Clusters: ${st.clusters.size} (current: ${this.clusterId})`,
-						inline: false
-					}, {
-						name: "Total Guilds",
-						value: st.guildCount.toString(),
-						inline: false
-					}, {
-						name: `Large Guilds (${this.bot.options.largeThreshold}+ Members)`,
-						value: st.largeGuildCount.toString(),
-						inline: false
-					}, {
-						name: "Total Users",
-						value: st.userCount.toString(),
+						name: "Stats",
+						value: `Shard: ${msg.guild.shard.id + 1}/${(st.clusters[st.clusters.length - 1].lastShardId) + 1}\nCluster: ${this.clusterId + 1}/${st.clusters.length}\n Server Count: ${st.guildCount}\n User Count: ${st.userCount}\n Channel Count: ${st.channelCount}\nLarge Guild Count: ${st.largeGuildCount}\nVoice Connection Count: ${st.voiceConnectionCount}`,
 						inline: false
 					}, {
 						name: "Commands",
-						value: CmdHandler.commands.length.toString(),
+						value: `${CmdHandler.commands.length} total commands`,
 						inline: false
 					}, {
 						name: "API Version",

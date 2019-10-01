@@ -21,7 +21,7 @@ export default (async (client: FurryBot) => {
 			guildCount: st.guildCount,
 			userCount: st.userCount,
 			shardCount: st.shardCount,
-			clusterCount: st.clusters.size,
+			clusterCount: st.clusters.length,
 			memoryUsage: {
 				process: {
 					used: client.f.memory.process.getUsed(),
