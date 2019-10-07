@@ -486,7 +486,7 @@ CmdHandler
 				timestamp: new Date().toISOString()
 			};
 
-			if (st.shards.map(s => s.id).includes(msg.guild.shard.id)) embed.fields[msg.guild.shard.id].name = `Shard #${msg.guild.shard.id} (current)`;
+			if (st.shards.map(s => s.id).includes(msg.guild.shard.id)) embed.fields.find(f => f.name === `Shard #${msg.guild.shard.id}`).name = `Shard #${msg.guild.shard.id} (current)`;
 
 			return msg.channel.createMessage({
 				embed
