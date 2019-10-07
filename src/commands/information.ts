@@ -61,7 +61,7 @@ CmdHandler
 
 				// list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			} catch (e) {
-				Logger.log(`Cluster #${this.clusterId}`, {
+				Logger.log(`Cluster #${this.cluster.id}`, {
 					headers: req.headers,
 					body: req.body.toString(),
 					statusCode: req.statusCode
@@ -123,7 +123,7 @@ CmdHandler
 		features: [],
 		category: "information",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
-			const st = await this.cluster.getMasterStats();
+			const st = await this.cluster.getMainStats();
 			if (st.clusters.length === 0) return msg.reply("hey, I haven't recieved any stats from other clusters yet, please try again later!");
 
 			const embed: Eris.EmbedOptions = {
@@ -131,7 +131,7 @@ CmdHandler
 				fields: [
 					{
 						name: "Process Memory Usage",
-						value: `${Math.round(this.f.memory.process.getUsed() / 1024 / 1024)}MB/${Math.round(this.f.memory.process.getTotal() / 1024 / 1024)}MB`,
+						value: `${Math.round(st.memoryUsage.heapUsed / 1024 / 1024)}MB/${Math.round(this.f.memory.process.getTotal() / 1024 / 1024)}MB`,
 						inline: false
 					}, {
 						name: "System Memory Usage",
@@ -147,7 +147,7 @@ CmdHandler
 						inline: false
 					}, {
 						name: "Stats",
-						value: `Shard: ${msg.guild.shard.id + 1}/${(st.clusters[st.clusters.length - 1].lastShardId) + 1}\nCluster: ${this.clusterId + 1}/${st.clusters.length}\n Server Count: ${st.guildCount}\n User Count: ${st.userCount}\n Channel Count: ${st.channelCount}\nLarge Guild Count: ${st.largeGuildCount}\nVoice Connection Count: ${st.voiceConnectionCount}`,
+						value: `Shard: ${msg.guild.shard.id + 1}/${(st.clusters[st.clusters.length - 1].lastShardId) + 1}\nCluster: ${this.cluster.id + 1}/${st.clusters.length}\n Server Count: ${st.guildCount}\n User Count: ${st.userCount}\n Channel Count: ${st.channelCount}\nLarge Guild Count: ${st.largeGuildCount}\nVoice Connection Count: ${st.voiceConnectionCount}`,
 						inline: false
 					}, {
 						name: "Commands",
@@ -464,22 +464,29 @@ CmdHandler
 		cooldown: 2e3,
 		donatorCooldown: 1e3,
 		description: "Get some info about my shards.",
-		usage: "",
+		usage: "[cluster id]",
 		features: [],
 		category: "information",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+			const st =
+				!isNaN(msg.args[0] as any) ?
+					await this.cluster.getClusterStats(parseInt(msg.args[0], 10)) :
+					this.cluster.stats;
+
+			if (!st) return msg.reply("I have not recieved any stats from my manager, please wait a bit!");
+
 			const embed: Eris.EmbedOptions = {
 				title: "Shard Info",
-				fields: this.bot.shards.map(s => ({
+				fields: st.shards.map(s => ({
 					name: `Shard #${s.id}`,
-					value: `Guilds: ${this.bot.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
+					value: `Guilds: ${st.guildCount}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
 					inline: true
 				})),
 				color: this.f.randomColor(),
 				timestamp: new Date().toISOString()
 			};
 
-			embed.fields[msg.guild.shard.id].name = `Shard #${msg.guild.shard.id} (current)`;
+			if (st.shards.map(s => s.id).includes(msg.guild.shard.id)) embed.fields.find(f => f.name === `Shard #${msg.guild.shard.id}`).name = `Shard #${msg.guild.shard.id} (current)`;
 
 			return msg.channel.createMessage({
 				embed

@@ -1,9 +1,3 @@
-/**
- * Copied from Furry Bot
- * https://github.com/FurryBotCo/FurryBot/blob/master/src/util/CommandHandler/lib/CommandHandler.ts
- * Licensed under AGPL-3.0, https://github.com/FurryBotCo/FurryBot/blob/master/LICENSE, https://github.com/FurryBotCo/SpotiJS/blob/master/LICENSE
- */
-
 import * as Eris from "eris";
 import Command from "./Command";
 import Category from "./Category";
@@ -231,7 +225,7 @@ export default class CommandHandler {
 		/* this._client.track("command", `command.${cmd.triggers[0]}`, {
 			hostname: this._client.f.os.hostname(),
 			beta: config.beta,
-			clientId: config.bot.clientID,
+			clientId: config.bot.clientId,
 			message: {
 				id: msg.id,
 				content: msg.content,
@@ -305,7 +299,7 @@ export default class CommandHandler {
 							description: `Report: ${config.beta ? `http://${config.apiBindIp}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`
 						}
 					],
-					username: `SpotiJS Spam Logs${config.beta ? " - Beta" : ""}`,
+					username: `Furry Bot Spam Logs${config.beta ? " - Beta" : ""}`,
 					avatarURL: "https://assets.furry.bot/blacklist_logs.png"
 				});
 

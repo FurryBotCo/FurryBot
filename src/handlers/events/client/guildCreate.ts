@@ -5,24 +5,23 @@ import config from "../../../config";
 import { Logger } from "@donovan_dmc/ws-clusters";
 
 export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
-
+	const gc = await this.cluster.broadcastEval("this.bot.guilds.size").then(res => res.reduce((a, b) => ({ result: a.result + b.result }), { result: 0 }).result);
 	/* await this.track("clientEvent", "events.guildCreate", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
-		clientId: config.bot.clientID,
+		clientId: config.bot.clientId,
 		guild: {
 			id: guild.id,
 			name: guild.name,
 			ownerId: guild.ownerID
 		},
-		guildCount: this.guilds.size
+		guildCount: gc
 	}, new Date()); */
-
-	await this.f.incrementDailyCounter(true, this.bot.guilds.size);
+	await this.f.incrementDailyCounter(true, gc);
 
 	let author = {
 		name: "Unknown#0000",
-		icon_url: "https://reddit.furry.host/noicon.png"
+		icon_url: "https://i.furcdn.net/noicon.png"
 	};
 	let owner = "Unknown#0000 (000000000000000000)";
 	if (guild.ownerID) {
@@ -30,7 +29,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 		if (u !== null) {
 			author = {
 				name: `${u.username}#${u.discriminator}`,
-				icon_url: u.avatarURL ? u.avatarURL : "https://reddit.furry.host/noicon.png"
+				icon_url: u.avatarURL ? u.avatarURL : "https://i.furcdn.net/noicon.png"
 			};
 			owner = `${u.username}#${u.discriminator} (${u.id})`;
 		}
@@ -40,13 +39,13 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 	Logger.info(`Joined guild ${guild.name} (${guild.id}), owner: ${owner}, this guild has ${guild.memberCount} members! This guild has been placed on shard ${guild.shard.id}.`, guild.shard.id);
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Joined!",
-		description: `Guild #${this.bot.guilds.size}\nCurrent Total: ${this.bot.guilds.size}`,
+		description: `Guild #${gc}\nCurrent Total: ${gc}`,
 		author,
 		image: {
-			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://reddit.furry.host/noicon.png"
+			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://i.furcdn.net/noicon.png"
 		},
 		thumbnail: {
-			url: "https://reddit.furry.host/noicon.png"
+			url: "https://i.furcdn.net/noicon.png"
 		},
 		fields: [
 			{
@@ -80,7 +79,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 		color: this.f.randomColor(),
 		footer: {
 			text: `Shard ${guild.shard.id + 1}/${this.cluster.maxShards}`,
-			icon_url: "https://reddit.furry.host/FurryBotForDiscord.png"
+			icon_url: "https://i.furry.bot/furry.png"
 		}
 	};
 

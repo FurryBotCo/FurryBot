@@ -25,7 +25,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 	/* await this.track("clientEvent", "events.ready", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
-		clientId: config.bot.clientID,
+		clientId: config.bot.clientId,
 		userCount: this.users.size,
 		channelCount: Object.keys(this.channelGuildMap).length,
 		guildCount: this.guilds.size
@@ -67,21 +67,21 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		.on("SIGINT", this.Temp.clean)
 		.on("SIGTERM", this.Temp.clean);
 
-	Logger.log(`Cluster #${this.clusterId}`, `Client has started with ${this.bot.users.size} users, in ${Object.keys(this.bot.channelGuildMap).length} channels, of ${this.bot.guilds.size} guilds.`);
+	Logger.log(`Cluster #${this.cluster.id}`, `Client has started with ${this.bot.users.size} users, in ${Object.keys(this.bot.channelGuildMap).length} channels, of ${this.bot.guilds.size} guilds.`);
 
 	// we aren't posting daily joins if we aren't on the main cluster
-	if (!config.beta && this.clusterId === 0) setInterval(async () => {
+	if (!config.beta && this.cluster.id === 0) setInterval(async () => {
 		if (new Date().toString().split(" ")[4] === "00:00:00") {
 
 			let d = new Date();
 			if (d.getDate() - 1 === 0) d = new Date(d.getTime() + 8.64e+7);
 			const date = `${d.getMonth() + 1}-${d.getDate() - 1}-${d.getFullYear()}`;
 			const count = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => "Unknown");
-			const st = await this.cluster.getMasterStats();
+			const st = await this.cluster.getMainStats();
 			/* await this.track("general", "dailyCountPosting", {
 				hostname: this.f.os.hostname(),
 				beta: config.beta,
-				clientId: config.bot.clientID,
+				clientId: config.bot.clientId,
 				date,
 				count
 			}, d); */
@@ -93,7 +93,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 				color: this.f.randomColor()
 			};
 
-			Logger.log(`Cluster #${this.clusterId}`, `Daily joins for ${date}: ${count}`);
+			Logger.log(`Cluster #${this.cluster.id}`, `Daily joins for ${date}: ${count}`);
 
 			return this.bot.executeWebhook(config.webhooks.dailyjoins.id, config.webhooks.dailyjoins.token, {
 				embeds: [

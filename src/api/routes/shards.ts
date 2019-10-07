@@ -11,7 +11,7 @@ export default (async (client: FurryBot) => {
 	app.get("/", async (req, res) => res.status(200).json({
 		success: true,
 		// shards: client.stats.shards.map(s => ({ id: s.id, ping: s.latency, status: s.status })),
-		shardCount: await client.cluster.getMasterStats().then(res => res.shardCount)
+		shardCount: await client.cluster.getMainStats().then(res => res.shards.length)
 	}));
 
 	return app;

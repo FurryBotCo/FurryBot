@@ -10,7 +10,7 @@ export default new ClientEvent("error", (async function (this: FurryBot, info: s
 	/* await this.track("clientEvent", "events.error", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
-		clientId: config.bot.clientID,
+		clientId: config.bot.clientId,
 		info,
 		id
 	}, new Date()); */

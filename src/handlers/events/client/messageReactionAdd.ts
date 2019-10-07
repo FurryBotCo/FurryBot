@@ -12,7 +12,7 @@ export default new ClientEvent("messageReactionAdd", (async function (this: Furr
 	/*await this.track("clientEvent", "events.messageReactionAdd", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
-		clientId: config.bot.clientID,
+		clientId: config.bot.clientId,
 		msg: {
 			id: m.id,
 			channelId: m.channel.id

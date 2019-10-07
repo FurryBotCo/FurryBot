@@ -10,7 +10,7 @@ export default (async (client: FurryBot) => {
 
 	app.get("/", async (req, res) => res.status(200).json({
 		success: true,
-		guildCount: await client.cluster.getMasterStats().then(res => res.guildCount)
+		guildCount: await client.cluster.getMainStats().then(res => res.guildCount)
 	}));
 
 	return app;
