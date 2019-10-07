@@ -16,7 +16,8 @@ const main = new Main(config.bot.token, `${__dirname}/src/main.js`, config.bot.o
 main.init();
 
 main.on("stats", (st: T.MainStats) => {
-	if (!main.ready) Logger.warn("Main", `Skipped stats as main instance is not ready.`)
+	if (config.beta) return;
+	if (!main.ready) Logger.warn("Main", `Skipped stats as main instance is not ready.`);
 
 	ListStats(st.shards.map(s => s.guildCount));
 });

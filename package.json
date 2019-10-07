@@ -30,7 +30,7 @@
   },
   "homepage": "https://furry.bot",
   "dependencies": {
-    "@donovan_dmc/ws-clusters": "^1.0.43",
+    "@donovan_dmc/ws-clusters": "^1.2.12",
     "blapi": "^1.1.0",
     "body-parser": "^1.19.0",
     "bufferutil": "^4.0.1",

@@ -464,22 +464,29 @@ CmdHandler
 		cooldown: 2e3,
 		donatorCooldown: 1e3,
 		description: "Get some info about my shards.",
-		usage: "",
+		usage: "[cluster id]",
 		features: [],
 		category: "information",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+			const st =
+				!isNaN(msg.args[0] as any) ?
+					await this.cluster.getClusterStats(parseInt(msg.args[0], 10)) :
+					this.cluster.stats;
+
+			if (!st) return msg.reply("I have not recieved any stats from my manager, please wait a bit!");
+
 			const embed: Eris.EmbedOptions = {
 				title: "Shard Info",
-				fields: this.bot.shards.map(s => ({
+				fields: st.shards.map(s => ({
 					name: `Shard #${s.id}`,
-					value: `Guilds: ${this.bot.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
+					value: `Guilds: ${st.guildCount}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
 					inline: true
 				})),
 				color: this.f.randomColor(),
 				timestamp: new Date().toISOString()
 			};
 
-			embed.fields[msg.guild.shard.id].name = `Shard #${msg.guild.shard.id} (current)`;
+			if (st.shards.map(s => s.id).includes(msg.guild.shard.id)) embed.fields[msg.guild.shard.id].name = `Shard #${msg.guild.shard.id} (current)`;
 
 			return msg.channel.createMessage({
 				embed
