@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "6.1.1",
+  "version": "6.1.2",
   "description": "Furry bot for Discord!",
   "main": "index.js",
   "scripts": {
@@ -30,7 +30,7 @@
   },
   "homepage": "https://furry.bot",
   "dependencies": {
-    "@donovan_dmc/ws-clusters": "^1.2.12",
+    "@donovan_dmc/ws-clusters": "^1.0.43",
     "blapi": "^1.1.0",
     "body-parser": "^1.19.0",
     "bufferutil": "^4.0.1",
