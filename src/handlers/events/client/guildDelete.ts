@@ -5,7 +5,7 @@ import config from "../../../config";
 import { Logger } from "@donovan_dmc/ws-clusters";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
-
+	const gc = await this.cluster.broadcastEval("this.bot.guilds.size").then(res => res.reduce((a, b) => a.result + b.result, { result: 0 }));
 	/* await this.track("clientEvent", "events.guildDelete", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
@@ -15,7 +15,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 			name: guild.name,
 			ownerId: guild.id
 		},
-		guildCount: this.guilds.size
+		guildCount: gc
 	}, new Date()); */
 
 	await this.f.incrementDailyCounter(false, await this.cluster.getMainStats().then(res => res.guildCount));
@@ -40,7 +40,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Left!",
-		description: `Guild #${this.bot.guilds.size + 1}\nCurrent Total: ${this.bot.guilds.size}`,
+		description: `Guild #${gc + 1}\nCurrent Total: ${gc}`,
 		author,
 		image: {
 			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://i.furcdn.net/noicon.png"
