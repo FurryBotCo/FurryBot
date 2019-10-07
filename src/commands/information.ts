@@ -61,7 +61,7 @@ CmdHandler
 
 				// list = Object.keys(this._.pickBy(rs.list_data,((val,key) => ([null,undefined,""].includes(val[0]) || ((typeof val[0].bot !== "undefined" && val[0].bot.toLowerCase() === "no bot found") || (typeof val[0].success !== "undefined" && [false,"false"].includes(val[0].success)))) ?  false : val[1] === 200))).map(list => ({name: list,url:`https://api.furry.bot/botlistgo.php?list=${list}&id=${user.id}`}));
 			} catch (e) {
-				Logger.log(`Cluster #${this.clusterId}`, {
+				Logger.log(`Cluster #${this.cluster.id}`, {
 					headers: req.headers,
 					body: req.body.toString(),
 					statusCode: req.statusCode
@@ -123,7 +123,7 @@ CmdHandler
 		features: [],
 		category: "information",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
-			const st = await this.cluster.getMasterStats();
+			const st = await this.cluster.getMainStats();
 			if (st.clusters.length === 0) return msg.reply("hey, I haven't recieved any stats from other clusters yet, please try again later!");
 
 			const embed: Eris.EmbedOptions = {
@@ -131,7 +131,7 @@ CmdHandler
 				fields: [
 					{
 						name: "Process Memory Usage",
-						value: `${Math.round(this.f.memory.process.getUsed() / 1024 / 1024)}MB/${Math.round(this.f.memory.process.getTotal() / 1024 / 1024)}MB`,
+						value: `${Math.round(st.memoryUsage.heapUsed / 1024 / 1024)}MB/${Math.round(this.f.memory.process.getTotal() / 1024 / 1024)}MB`,
 						inline: false
 					}, {
 						name: "System Memory Usage",
@@ -147,7 +147,7 @@ CmdHandler
 						inline: false
 					}, {
 						name: "Stats",
-						value: `Shard: ${msg.guild.shard.id + 1}/${(st.clusters[st.clusters.length - 1].lastShardId) + 1}\nCluster: ${this.clusterId + 1}/${st.clusters.length}\n Server Count: ${st.guildCount}\n User Count: ${st.userCount}\n Channel Count: ${st.channelCount}\nLarge Guild Count: ${st.largeGuildCount}\nVoice Connection Count: ${st.voiceConnectionCount}`,
+						value: `Shard: ${msg.guild.shard.id + 1}/${(st.clusters[st.clusters.length - 1].lastShardId) + 1}\nCluster: ${this.cluster.id + 1}/${st.clusters.length}\n Server Count: ${st.guildCount}\n User Count: ${st.userCount}\n Channel Count: ${st.channelCount}\nLarge Guild Count: ${st.largeGuildCount}\nVoice Connection Count: ${st.voiceConnectionCount}`,
 						inline: false
 					}, {
 						name: "Commands",

@@ -9,10 +9,9 @@ import E6API from "e6api";
 import E9API from "e9api";
 import FurryBotAPI from "furrybotapi";
 import ClientEvent from "./modules/ClientEvent";
-import { BaseClient, Cluster, Logger } from "@donovan_dmc/ws-clusters";
+import { BaseClient, Logger, T } from "@donovan_dmc/ws-clusters";
 
 export default class FurryBot extends BaseClient {
-	cluster: Cluster;
 	srv: any;
 	ls: any;
 	Temp: Temp; // tslint:disable-line: variable-name
@@ -35,11 +34,11 @@ export default class FurryBot extends BaseClient {
 	fb: FurryBotAPI;
 	f: Functions;
 	activeReactChannels: string[];
-	constructor(cluster: Cluster) {
+	constructor(cluster: T.Cluster) {
 		super(cluster);
 	}
 
-	async launch(cluster: Cluster) {
+	async launch(cluster: T.Cluster) {
 		Logger.log(`Cluster #${cluster.id}`, `Launched as ${this.bot.user.username}#${this.bot.user.discriminator}`);
 
 		this.f = new Functions(this);

@@ -11,7 +11,7 @@ export default new ClientEvent("debug", (async function (this: FurryBot, info: s
 	/* await this.track("clientEvent", "events.debug", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
-		clientId: config.bot.clientID,
+		clientId: config.bot.clientId,
 		info,
 		id
 	}, new Date());*/

@@ -225,7 +225,7 @@ export default class CommandHandler {
 		/* this._client.track("command", `command.${cmd.triggers[0]}`, {
 			hostname: this._client.f.os.hostname(),
 			beta: config.beta,
-			clientId: config.bot.clientID,
+			clientId: config.bot.clientId,
 			message: {
 				id: msg.id,
 				content: msg.content,

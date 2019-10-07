@@ -14,18 +14,18 @@ export default (async (client: FurryBot) => {
 			date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
 			dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null);
 
-		const st = await client.cluster.getMasterStats();
+		const st = await client.cluster.getMainStats();
 		return res.status(200).json({
 			success: true,
 			clientStatus: "online",
 			guildCount: st.guildCount,
 			userCount: st.userCount,
-			shardCount: st.shardCount,
+			shardCount: st.shards.length,
 			clusterCount: st.clusters.length,
 			memoryUsage: {
 				process: {
-					used: client.f.memory.process.getUsed(),
-					total: client.f.memory.process.getTotal()
+					used: st.memoryUsage.heapUsed,
+					total: st.memoryUsage.heapTotal
 				},
 				system: {
 					used: client.f.memory.system.getUsed(),

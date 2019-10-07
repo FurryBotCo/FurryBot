@@ -9,7 +9,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 	/* await this.track("clientEvent", "events.guildCreate", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
-		clientId: config.bot.clientID,
+		clientId: config.bot.clientId,
 		guild: {
 			id: guild.id,
 			name: guild.name,
@@ -18,11 +18,11 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 		guildCount: this.guilds.size
 	}, new Date()); */
 
-	await this.f.incrementDailyCounter(true, this.bot.guilds.size);
+	await this.f.incrementDailyCounter(true, await this.cluster.getMainStats().then(res => res.guildCount));
 
 	let author = {
 		name: "Unknown#0000",
-		icon_url: "https://reddit.furry.host/noicon.png"
+		icon_url: "https://i.furcdn.net/noicon.png"
 	};
 	let owner = "Unknown#0000 (000000000000000000)";
 	if (guild.ownerID) {
@@ -30,7 +30,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 		if (u !== null) {
 			author = {
 				name: `${u.username}#${u.discriminator}`,
-				icon_url: u.avatarURL ? u.avatarURL : "https://reddit.furry.host/noicon.png"
+				icon_url: u.avatarURL ? u.avatarURL : "https://i.furcdn.net/noicon.png"
 			};
 			owner = `${u.username}#${u.discriminator} (${u.id})`;
 		}
@@ -43,10 +43,10 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 		description: `Guild #${this.bot.guilds.size}\nCurrent Total: ${this.bot.guilds.size}`,
 		author,
 		image: {
-			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://reddit.furry.host/noicon.png"
+			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://i.furcdn.net/noicon.png"
 		},
 		thumbnail: {
-			url: "https://reddit.furry.host/noicon.png"
+			url: "https://i.furcdn.net/noicon.png"
 		},
 		fields: [
 			{
@@ -80,7 +80,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 		color: this.f.randomColor(),
 		footer: {
 			text: `Shard ${guild.shard.id + 1}/${this.cluster.maxShards}`,
-			icon_url: "https://reddit.furry.host/FurryBotForDiscord.png"
+			icon_url: "https://i.furry.bot/furry.png"
 		}
 	};
 
