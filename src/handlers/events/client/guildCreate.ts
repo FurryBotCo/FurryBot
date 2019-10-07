@@ -5,7 +5,7 @@ import config from "../../../config";
 import { Logger } from "@donovan_dmc/ws-clusters";
 
 export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
-	const gc = await this.cluster.broadcastEval("this.bot.guilds.size").then(res => res.reduce((a, b) => a.result + b.result, { result: 0 }));
+	const gc = await this.cluster.broadcastEval("this.bot.guilds.size").then(res => res.reduce((a, b) => ({ result: a.result + b.result }), { result: 0 }).result);
 	/* await this.track("clientEvent", "events.guildCreate", {
 		hostname: this.f.os.hostname(),
 		beta: config.beta,
