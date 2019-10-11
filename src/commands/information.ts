@@ -495,6 +495,43 @@ CmdHandler
 	})
 	.addCommand({
 		triggers: [
+			"clusters"
+		],
+		userPermissions: [],
+		botPermissions: [
+			"embedLinks"
+		],
+		cooldown: 2e3,
+		donatorCooldown: 1e3,
+		description: "Get some info about my clusters.",
+		usage: "",
+		features: [],
+		category: "information",
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+			const st = await this.cluster.getMainStats();
+
+			if (!st) return msg.reply("I have not recieved any stats from my manager, please wait a bit!");
+
+			const embed: Eris.EmbedOptions = {
+				title: "Cluster Info",
+				fields: st.clusters.map(c => ({
+					name: `Cluster #${c.id}`,
+					value: `Shards: ${c.firstShardId} - ${c.lastShardId} (${c.shards.length})\nAverage Ping: ${c.shards.map(s => s.latency).reduce((a, b) => a + b) / c.shards.length}ms\nGuild Count: ${c.guildCount} (${c.largeGuildCount} large)`,
+					inline: true
+				})),
+				color: this.f.randomColor(),
+				timestamp: new Date().toISOString()
+			};
+
+			embed.fields[this.cluster.id].name = `Cluster #${this.cluster.id} (current)`;
+
+			return msg.channel.createMessage({
+				embed
+			});
+		})
+	})
+	.addCommand({
+		triggers: [
 			"sinfo",
 			"serverinfo",
 			"server",
