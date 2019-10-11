@@ -147,7 +147,7 @@ CmdHandler
 						inline: false
 					}, {
 						name: "Stats",
-						value: `Shard: ${msg.guild.shard.id + 1}/${(st.clusters[st.clusters.length - 1].lastShardId) + 1}\nCluster: ${this.cluster.id + 1}/${st.clusters.length}\n Server Count: ${st.guildCount}\n User Count: ${st.userCount}\n Channel Count: ${st.channelCount}\nLarge Guild Count: ${st.largeGuildCount}\nVoice Connection Count: ${st.voiceConnectionCount}`,
+						value: `Shard: ${msg.guild.shard.id + 1}/${(st.clusters[st.clusters.length - 1].lastShardId) + 1}\nCluster: ${this.cluster.id + 1}/${st.clusters.length}\n Server Count: ${st.guildCount}\n User Count: ${st.userCount}\n Channel Count: ${st.channelCount}\nLarge Guild Count: ${st.largeGuildCount}\nVoice Connection Count: ${st.voiceConnectionCount}\nAverage Ping: ${Math.floor(st.shards.map(s => s.latency).reduce((a, b) => a + b) / st.shards.length)}ms`,
 						inline: false
 					}, {
 						name: "Commands",
@@ -516,11 +516,14 @@ CmdHandler
 				title: "Cluster Info",
 				fields: st.clusters.map(c => ({
 					name: `Cluster #${c.id}`,
-					value: `Shards: ${c.firstShardId} - ${c.lastShardId} (${c.shards.length})\nAverage Ping: ${c.shards.map(s => s.latency).reduce((a, b) => a + b) / c.shards.length}ms\nGuild Count: ${c.guildCount} (${c.largeGuildCount} large)`,
+					value: `Shards ${c.firstShardId} - ${c.lastShardId} (${c.shards.length})\nAverage Ping: ${Math.floor(c.shards.map(s => s.latency).reduce((a, b) => a + b) / c.shards.length)}ms\nGuild Count: ${c.guildCount} (${c.largeGuildCount} large)`,
 					inline: true
 				})),
 				color: this.f.randomColor(),
-				timestamp: new Date().toISOString()
+				timestamp: new Date().toISOString(),
+				footer: {
+					text: `Total Guild Count: ${st.guildCount}`
+				}
 			};
 
 			embed.fields[this.cluster.id].name = `Cluster #${this.cluster.id} (current)`;
