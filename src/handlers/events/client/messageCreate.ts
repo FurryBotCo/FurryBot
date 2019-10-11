@@ -258,7 +258,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects,\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.prefix}settings fResponse disabled\``);
 		}
 
-		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase())) return;
+		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()) || msg.content.toLowerCase() === msg.prefix.toLowerCase()) return;
 
 		const h = await CmdHandler.handleCommand(msg).catch(err => err);
 

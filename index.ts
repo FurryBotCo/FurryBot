@@ -1,7 +1,7 @@
 import config from "./src/config";
 import * as fs from "fs-extra";
 import path from "path";
-import { Main, Logger, T } from "@donovan_dmc/ws-clusters";
+import { Main, Logger, MainStats } from "@donovan_dmc/ws-clusters";
 import yargs from "yargs";
 import ListStats from "./src/util/ListStats";
 // directory existence check
@@ -15,7 +15,7 @@ if (__filename.endsWith(".js") && !fs.existsSync(`${__dirname}/src/assets`)) {
 const main = new Main(config.bot.token, `${__dirname}/src/main.js`, config.bot.options);
 main.init();
 
-main.on("stats", (st: T.MainStats) => {
+main.on("stats", (st: MainStats) => {
 	if (config.beta) return;
 	if (!main.ready) Logger.warn("Main", `Skipped stats as main instance is not ready.`);
 

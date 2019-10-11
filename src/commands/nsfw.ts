@@ -1,15 +1,13 @@
 import FurryBot from "../main";
 import ExtendedMessage from "../modules/extended/ExtendedMessage";
 import config from "../config";
-import { Command, CommandError } from "../util/CommandHandler";
+import { Command } from "../util/CommandHandler";
 import * as Eris from "eris";
 import phin from "phin";
 import { mongo } from "../modules/Database";
 import ReactionQueue from "../util/queue/ReactionQeueue";
 import CmdHandler from "../util/cmd";
 import { Logger } from "@donovan_dmc/ws-clusters";
-
-type CommandContext = FurryBot & { _cmd: Command };
 
 CmdHandler
 	.addCategory({
