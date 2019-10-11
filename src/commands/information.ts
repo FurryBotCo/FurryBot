@@ -479,7 +479,7 @@ CmdHandler
 				title: "Shard Info",
 				fields: st.shards.map(s => ({
 					name: `Shard #${s.id}`,
-					value: `Guilds: ${st.guildCount}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
+					value: `Guilds: ${s.guildCount}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
 					inline: true
 				})),
 				color: this.f.randomColor(),
