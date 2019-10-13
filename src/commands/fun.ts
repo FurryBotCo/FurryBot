@@ -72,7 +72,7 @@ CmdHandler
 				msg.channel.createMessage(`<@!${msg.author.id}> joined a howl with ${msg.channel.awoo.inAwoo.length} furs!\nJoin in using \`${msg.gConfig.prefix}awoo\`.\n${msg.channel.awoo.inAwoo.length > 30 ? "This howl is too large for emojis!" : txt}`);
 				msg.channel.awoo.timeout = setTimeout((ch) => {
 					delete ch.awoo;
-				}, 6e4, msg.channel);
+				}, 3e5, msg.channel);
 			} else {
 				await msg.channel.createMessage(`<@!${msg.author.id}> started a howl!\nJoin in using \`${msg.gConfig.prefix}awoo\`.\n<:Awoo:596965580481888258>`);
 				msg.channel.awoo = {
@@ -80,7 +80,7 @@ CmdHandler
 					inAwoo: [],
 					timeout: setTimeout((ch) => {
 						delete ch.awoo;
-					}, 6e4, msg.channel)
+					}, 3e5, msg.channel)
 				};
 				return msg.channel.awoo.inAwoo.push(msg.author.id);
 			}
@@ -223,7 +223,7 @@ CmdHandler
 					msg.channel.createMessage(`<@!${msg.author.id}> joined a conga with <@!${msg.channel.conga.member.id}>!\n<@!${msg.channel.conga.member.id}> now has ${msg.channel.conga.inConga.length} furs congaing them!\nJoin in using \`${msg.gConfig.prefix}conga\`.\n${msg.channel.conga.inConga.length > 30 ? "This conga line is too long for emojis!" : txt}`);
 					msg.channel.conga.timeout = setTimeout((ch) => {
 						delete ch.conga;
-					}, 6e4, msg.channel);
+					}, 3e5, msg.channel);
 					return;
 				}
 				else throw new CommandError(null, "ERR_INVALID_USAGE");
@@ -237,7 +237,7 @@ CmdHandler
 					inConga: [],
 					timeout: setTimeout((ch) => {
 						delete ch.conga;
-					}, 6e4, msg.channel)
+					}, 3e5, msg.channel)
 				};
 				return msg.channel.conga.inConga.push(msg.author.id, member.id);
 			}
@@ -669,7 +669,7 @@ CmdHandler
 					msg.channel.createMessage(`<@!${msg.author.id}> joined a furpile on <@!${msg.channel.furpile.member.id}>!\n<@!${msg.channel.furpile.member.id}> now has ${msg.channel.furpile.inPile.length} furs on them!\nJoin in using \`${msg.gConfig.prefix}furpile\`.`);
 					msg.channel.furpile.timeout = setTimeout((ch) => {
 						delete ch.furpile;
-					}, 6e4, msg.channel);
+					}, 3e5, msg.channel);
 					return;
 				}
 				else throw new CommandError(null, "ERR_INVALID_USAGE");
@@ -683,7 +683,7 @@ CmdHandler
 					inPile: [],
 					timeout: setTimeout((ch) => {
 						delete ch.furpile;
-					}, 6e4, msg.channel)
+					}, 3e5, msg.channel)
 				};
 				return msg.channel.furpile.inPile.push(msg.author.id, member.id);
 			}
