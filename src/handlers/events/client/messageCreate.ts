@@ -117,7 +117,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				});
 
 				await msg.author.getDMChannel().then(dm => dm.createMessage(`Hey, I see you messaged me! Here's some quick tips:\n\nYou can go to <https://furry.bot> to see our website, use \`${config.defaultPrefix}help\` to see my commands, and join <https://furry.bot/inv> if you need more help!\nCommands __**CAN NOT**__ be ran in my dms!\nThese dms are not a good source to ask for support, do that in our support server <https://discord.gg/YazeA7e>!\nIf you spam my dms, you will get blacklisted!`));
-				return Logger.log(`Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, msg.guild.shard.id);
+				return Logger.log(`Cluster #${this.cluster.id}`, `Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`);
 			}
 
 
