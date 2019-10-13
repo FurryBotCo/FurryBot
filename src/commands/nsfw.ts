@@ -60,7 +60,7 @@ CmdHandler
 		donatorCooldown: 3e3,
 		description: "Get some content from E621!",
 		usage: "[tags]",
-		features: ["nsfw", "devOnly"],
+		features: ["nsfw"],
 		category: "nsfw",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			if (this.activeReactChannels.includes(msg.channel.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
