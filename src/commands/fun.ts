@@ -1401,6 +1401,22 @@ CmdHandler
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
 			return msg.reply("Yip! Yip! I am! I am! :fox::fox:");
 		})
+	})
+	.addCommand({
+		triggers: [
+			"wag"
+		],
+		userPermissions: [],
+		botPermissions: [],
+		cooldown: 3e3,
+		donatorCooldown: .5e3,
+		description: "Wag your little tail!",
+		usage: "",
+		features: [],
+		category: "fun",
+		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+			return msg.channel.createMessage(`<@!${msg.author.id}> wags their little tail, aren't they cute ^-^`);
+		})
 	});
 
 export default null;
