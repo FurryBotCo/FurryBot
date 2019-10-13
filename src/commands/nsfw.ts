@@ -63,7 +63,7 @@ CmdHandler
 		features: ["nsfw"],
 		category: "nsfw",
 		run: (async function (this: FurryBot, msg: ExtendedMessage) {
-			if (this.activeReactChannels.includes(msg.channel.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
+			if (this.activeReactChannels.includes(msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
 
 			const client = this; // tslint:disable-line no-this-assignment
 
@@ -80,6 +80,8 @@ CmdHandler
 			if (bl !== null && bl.length > 0) return msg.channel.createMessage(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
 
 			const e = await this.e6.listPosts([...tags, "order:score"], 50, 1, null, config.tagBlacklist);
+
+			if (e.length === 0) return msg.reply("Your search returned no results.");
 
 			let currentPost = 1;
 
