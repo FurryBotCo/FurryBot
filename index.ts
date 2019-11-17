@@ -1,7 +1,7 @@
 import config from "./src/config";
 import * as fs from "fs-extra";
 import path from "path";
-import { Main, Logger, MainStats } from "@donovan_dmc/ws-clusters";
+import { ClusterManager, ManagerStats, Logger } from "clustersv2";
 import yargs from "yargs";
 import ListStats from "./src/util/ListStats";
 // directory existence check
@@ -12,15 +12,15 @@ if (__filename.endsWith(".js") && !fs.existsSync(`${__dirname}/src/assets`)) {
 	Logger.log("General", `Copied assets directory ${path.resolve(`${__dirname}/../src/assets`)} to ${__dirname}/src/assets`);
 }
 
-const main = new Main(config.bot.token, `${__dirname}/src/main.js`, config.bot.options);
-main.init();
+const manager = new ClusterManager(config.bot.token, `${__dirname}/src/main.js`, config.bot.options);
+manager.launch();
 
-main.on("stats", (st: MainStats) => {
+manager.on("stats", (st: ManagerStats) => {
 	if (config.beta) return;
-	if (!main.ready) Logger.warn("Main", `Skipped stats as main instance is not ready.`);
+	// if (!main.ready) Logger.warn("Main", `Skipped stats as main instance is not ready.`);
 
 	ListStats(st.shards.map(s => s.guildCount));
 });
 
 fs.writeFileSync(`${config.rootDir}/../process.pid`, process.pid);
-export default main;
+export default manager;

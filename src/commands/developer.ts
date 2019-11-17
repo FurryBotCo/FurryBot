@@ -1,21 +1,19 @@
 import FurryBot from "../main";
-import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import { ExtendedMessage, Permissions, eval as _eval } from "bot-stuff";
 import config from "../config";
-import { Command, CommandError } from "../util/CommandHandler";
-import _eval from "../util/eval";
+import { Logger } from "clustersv2";
+import { CommandError, Command } from "command-handler";
 import phin from "phin";
 import util from "util";
 import * as fs from "fs-extra";
 import { mdb, mongo } from "../modules/Database";
 import os from "os";
 import * as Eris from "eris";
-import Permissions from "../util/Permissions";
 import { execSync } from "child_process";
 import { performance } from "perf_hooks";
 import CmdHandler from "../util/cmd";
-import { Logger } from "@donovan_dmc/ws-clusters";
-
-type CommandContext = FurryBot & { _cmd: Command };
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 
 CmdHandler
 	.addCategory({
@@ -38,7 +36,7 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: require("./developer-subcmd/blacklist").default,
-		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
 			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
@@ -57,12 +55,12 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.args.length > 0) return new CommandError(null, "ERR_INVALID_USAGE");
 
 			const user = await msg.getUserFromArgs();
 
-			if (!user) return msg.errorEmbed("ERR_INVALID_USER");
+			if (!user) return msg.errorEmbed("INVALID_USER");
 
 			const dm = await user.getDMChannel();
 
@@ -88,7 +86,7 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: require("./developer-subcmd/eco").default,
-		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
 			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
@@ -107,7 +105,7 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: require("./developer-subcmd/edit").default,
-		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
 			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
@@ -131,7 +129,7 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let silent = false;
 			let error = false;
 			let deleteInvoke = false;
@@ -257,7 +255,7 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let guild: Eris.Guild;
 
 			if (msg.unparsedArgs.length === 0) guild = msg.guild;
@@ -290,7 +288,7 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			await msg.delete().catch(err => null);
 			return msg.channel.createMessage(msg.unparsedArgs.join(" "));
 		})
@@ -309,7 +307,7 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let silent = false;
 			let error = false;
 			let deleteInvoke = false;
@@ -420,7 +418,7 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (!msg.args[0]) return msg.reply("tested..");
 
 			switch (msg.args[0].toLowerCase()) {
@@ -447,7 +445,7 @@ CmdHandler
 		features: ["devOnly"],
 		category: "developer",
 		subCommands: [],
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.args.length < 1) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			if (fs.existsSync(`${__dirname}/../handlers/events/client/${msg.args[0]}.${__filename.split(".").reverse()[0]}`)) {

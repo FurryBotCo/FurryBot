@@ -1,12 +1,12 @@
 import FurryBot from "../main";
-import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import { ExtendedMessage } from "bot-stuff";
 import functions from "../util/functions";
 import config from "../config";
-import { Command } from "../util/CommandHandler";
 import CmdHandler from "../util/cmd";
-
-
-type CommandContext = FurryBot & { _cmd: Command };
+import { Logger } from "clustersv2";
+import { CommandError } from "command-handler";
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 
 /*
 
@@ -29,7 +29,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 
 		})
 	});

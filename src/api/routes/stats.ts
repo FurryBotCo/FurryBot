@@ -14,7 +14,7 @@ export default (async (client: FurryBot) => {
 			date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
 			dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null);
 
-		const st = await client.cluster.getMainStats();
+		const st = await client.cluster.getManagerStats();
 		return res.status(200).json({
 			success: true,
 			clientStatus: "online",

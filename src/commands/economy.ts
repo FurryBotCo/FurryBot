@@ -1,13 +1,13 @@
 import FurryBot from "../main";
-import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import { ExtendedMessage } from "bot-stuff";
 import config from "../config";
-import { Command, CommandError } from "../util/CommandHandler";
 import { mdb } from "../modules/Database";
 import * as Eris from "eris";
 import CmdHandler from "../util/cmd";
-import { Logger } from "@donovan_dmc/ws-clusters";
-
-type CommandContext = FurryBot & { _cmd: Command };
+import { Logger } from "clustersv2";
+import { CommandError, Command } from "command-handler";
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 
 CmdHandler
 	.addCategory({
@@ -30,7 +30,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "economy",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			if (isNaN(msg.uConfig.bal) || msg.uConfig.bal === Infinity) return msg.reply("You have been temporarily suspended from using economy commands, please join our support server (<https://discord.gg/YazeA7e>) and tell them that something is wrong with your economy balance. Attempts to circumvent this may get you blacklisted.");
@@ -56,7 +56,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "economy",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			return msg.reply("this command has not been released yet!");
@@ -74,7 +74,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "economy",
-		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			if (isNaN(msg.uConfig.bal) || msg.uConfig.bal === Infinity) return msg.reply("You have been temporarily suspended from using economy commands, please join our support server (<https://discord.gg/YazeA7e>) and tell them that something is wrong with your economy balance. Attempts to circumvent this may get you blacklisted.");
@@ -84,13 +84,13 @@ CmdHandler
 			let amount = Math.floor(Math.random() * 50) + 1;
 			amount += amount * multi;
 			amount = Math.floor(amount);
-			let s = this.f.fetchLangMessage(msg.gConfig.lang, cmd);
+			let s = this.f.fetchLangMessage(msg.gConfig.settings.lang, cmd);
 
 			const people = [
 				...config.eco.people,
-				msg.guild.members.random().username, // positility of a random person from the same server
-				msg.guild.members.random().username, // positility of a random person from the same server
-				msg.guild.members.random().username  // positility of a random person from the same server
+				msg.guild.members.random().username, // posibility of a random person from the same server
+				msg.guild.members.random().username, // posibility of a random person from the same server
+				msg.guild.members.random().username  // posibility of a random person from the same server
 			];
 
 			const person = people[Math.floor(Math.random() * people.length)];
@@ -137,7 +137,7 @@ CmdHandler
 		usage: "<side> <amount>",
 		features: [],
 		category: "economy",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			if (isNaN(msg.uConfig.bal) || msg.uConfig.bal === Infinity) return msg.reply("You have been temporarily suspended from using economy commands, please join our support server (<https://discord.gg/YazeA7e>) and tell them that something is wrong with your economy balance. Attempts to circumvent this may get you blacklisted.");
@@ -206,7 +206,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "economy",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			let member = msg.member;
@@ -244,14 +244,14 @@ CmdHandler
 		usage: "<amount> <user>",
 		features: [],
 		category: "economy",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if ([undefined, null].includes(msg.uConfig.bal)) await msg.uConfig.edit({ bal: 100 }).then(d => d.reload());
 
 			if (isNaN(msg.uConfig.bal) || msg.uConfig.bal === Infinity) return msg.reply("You have been temporarily suspended from using economy commands, please join our support server (<https://discord.gg/YazeA7e>) and tell them that something is wrong with your economy balance. Attempts to circumvent this may get you blacklisted.");
 
 			const m = await msg.getMemberFromArgs();
 
-			if (!m) return msg.errorEmbed("ERR_INVALID_MEMBER");
+			if (!m) return msg.errorEmbed("INVALID_MEMBER");
 
 			const md = await this.f.fetchDBUser(m.user.id, true);
 			if (md.blacklist.blacklisted) return msg.reply(`you can't share ${config.eco.emoji} with blacklisted people..`);

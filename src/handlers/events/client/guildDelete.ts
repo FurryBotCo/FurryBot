@@ -1,24 +1,31 @@
-import ClientEvent from "../../../modules/ClientEvent";
+import { ClientEvent } from "bot-stuff";
+import { Logger } from "clustersv2";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../../../config";
-import { Logger } from "@donovan_dmc/ws-clusters";
 
-export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
-	const gc = await this.cluster.broadcastEval("this.bot.guilds.size").then(res => res.reduce((a, b) => ({ result: a.result + b.result }), { result: 0 }).result);
-	/* await this.track("clientEvent", "events.guildDelete", {
-		hostname: this.f.os.hostname(),
-		beta: config.beta,
-		clientId: config.bot.clientId,
-		guild: {
-			id: guild.id,
-			name: guild.name,
-			ownerId: guild.id
+export default new ClientEvent<FurryBot>("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
+	const c = await this.cluster.evalAtManager("this.clusters.size");
+	const gc = c.response === 1 ? this.bot.guilds.size : await this.cluster.getManagerStats().then(c => c.guildCount);
+	await this.f.incrementDailyCounter(false, gc);
+
+
+	await this.a.track("guildDelete", {
+		clusterId: this.cluster.id,
+		shardId: guild.shard.id,
+		guildId: guild.id,
+		guildOwner: guild.ownerID,
+		total: gc,
+		members: {
+			total: guild.memberCount,
+			online: guild.members.filter(m => m.status === "online").length,
+			idle: guild.members.filter(m => m.status === "idle").length,
+			dnd: guild.members.filter(m => m.status === "dnd").length,
+			offline: guild.members.filter(m => m.status === "offline").length,
+			bots: guild.members.filter(m => m.bot).length
 		},
-		guildCount: gc
-	}, new Date()); */
-
-	await this.f.incrementDailyCounter(false, await this.cluster.getMainStats().then(res => res.guildCount));
+		timestamp: Date.now()
+	});
 
 	let author = {
 		name: "Unknown#0000",
@@ -36,7 +43,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		}
 	}
 
-	Logger.info(`Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members.`, guild.shard.id);
+	Logger.info(`Cluster #${this.cluster.id} | Shard #${guild.shard.id} | Client`, `Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members.`);
 
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Left!",

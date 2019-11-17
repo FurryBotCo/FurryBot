@@ -1,12 +1,12 @@
 import FurryBot from "../main";
-import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import { ExtendedMessage } from "bot-stuff";
 import config from "../config";
 import phin from "phin";
-import { Command } from "../util/CommandHandler";
 import CmdHandler from "../util/cmd";
-import { Logger } from "@donovan_dmc/ws-clusters";
-
-type CommandContext = FurryBot & { _cmd: Command };
+import { Logger } from "clustersv2";
+import { CommandError } from "command-handler";
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 
 CmdHandler
 	.addCategory({
@@ -30,7 +30,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			const img = await this.f.imageAPIRequest(true, "birb");
 			try {
 				return msg.channel.createMessage("", {
@@ -60,7 +60,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			try {
 				return msg.channel.createMessage("", {
 					file: await this.f.getImageFromURL("https://cataas.com/cat/gif"),
@@ -91,7 +91,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let req, j, parts;
 			try {
 				req = await phin({
@@ -134,7 +134,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			try {
 				return msg.channel.createMessage("", {
 					file: await this.f.getImageFromURL("https://foxrudor.de/"),
@@ -166,7 +166,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "animals",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let req, j;
 			try {
 				req = await phin({

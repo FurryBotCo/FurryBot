@@ -1,23 +1,31 @@
-import ClientEvent from "../../../modules/ClientEvent";
+import { ClientEvent } from "bot-stuff";
+import { Logger } from "clustersv2";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../../../config";
-import { Logger } from "@donovan_dmc/ws-clusters";
+import { stringify } from "querystring";
 
-export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
-	const gc = await this.cluster.broadcastEval("this.bot.guilds.size").then(res => res.reduce((a, b) => ({ result: a.result + b.result }), { result: 0 }).result);
-	/* await this.track("clientEvent", "events.guildCreate", {
-		hostname: this.f.os.hostname(),
-		beta: config.beta,
-		clientId: config.bot.clientId,
-		guild: {
-			id: guild.id,
-			name: guild.name,
-			ownerId: guild.ownerID
-		},
-		guildCount: gc
-	}, new Date()); */
+export default new ClientEvent<FurryBot>("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
+	const c = await this.cluster.evalAtManager("this.clusters.size");
+	const gc = c.response === 1 ? this.bot.guilds.size : await this.cluster.getManagerStats().then(c => c.guildCount);
 	await this.f.incrementDailyCounter(true, gc);
+
+	await this.a.track("guildCreate", {
+		clusterId: this.cluster.id,
+		shardId: guild.shard.id,
+		guildId: guild.id,
+		guildOwner: guild.ownerID,
+		total: gc,
+		members: {
+			total: guild.memberCount,
+			online: guild.members.filter(m => m.status === "online").length,
+			idle: guild.members.filter(m => m.status === "idle").length,
+			dnd: guild.members.filter(m => m.status === "dnd").length,
+			offline: guild.members.filter(m => m.status === "offline").length,
+			bots: guild.members.filter(m => m.bot).length
+		},
+		timestamp: Date.now()
+	});
 
 	let author = {
 		name: "Unknown#0000",
@@ -36,7 +44,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 	}
 
 
-	Logger.info(`Joined guild ${guild.name} (${guild.id}), owner: ${owner}, this guild has ${guild.memberCount} members! This guild has been placed on shard ${guild.shard.id}.`, guild.shard.id);
+	Logger.info(`Cluster #${this.cluster.id} | Shard #${guild.shard.id} | Client`, `Joined guild ${guild.name} (${guild.id}), owner: ${owner}, this guild has ${guild.memberCount} members! This guild has been placed on shard ${guild.shard.id}.`);
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Joined!",
 		description: `Guild #${gc}\nCurrent Total: ${gc}`,

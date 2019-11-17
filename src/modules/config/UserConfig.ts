@@ -36,7 +36,7 @@ class UserConfig {
 	};
 	// voteCount: number;
 	// lastVote: number;
-	constructor(id, data) {
+	constructor(id: string, data) {
 		this.id = id;
 		if (!data) data = config;
 		this._load.call(this, data);

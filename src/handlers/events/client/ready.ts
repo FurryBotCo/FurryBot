@@ -1,35 +1,26 @@
-import ClientEvent from "../../../modules/ClientEvent";
+import { ClientEvent, Permissions, eval as ev, Temp } from "bot-stuff";
+import { Logger } from "clustersv2";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../../../config";
 import sv from "../../../api";
 import express from "express";
 import http from "http";
-import ListStats from "../../../util/ListStats";
-import Temp from "../../../util/Temp";
-import functions from "../../../util/functions";
 import { mdb, mongo } from "../../../modules/Database";
-import WebSocket from "ws";
-import ev from "../../../util/eval";
-import phin from "phin";
-import Permissions from "../../../util/Permissions";
 import * as fs from "fs-extra";
-import os from "os";
-import util from "util";
-import { performance } from "perf_hooks";
-import { Logger } from "@donovan_dmc/ws-clusters";
 import CmdHandler from "../../../util/cmd";
 
-export default new ClientEvent("ready", (async function (this: FurryBot) {
+export default new ClientEvent<FurryBot>("ready", (async function (this: FurryBot) {
 
-	/* await this.track("clientEvent", "events.ready", {
-		hostname: this.f.os.hostname(),
-		beta: config.beta,
-		clientId: config.bot.clientId,
-		userCount: this.users.size,
-		channelCount: Object.keys(this.channelGuildMap).length,
-		guildCount: this.guilds.size
-	}, new Date()); */
+
+	await this.a.track("ready", {
+		clusterId: this.cluster.id,
+		shardId: null,
+		users: this.bot.users.size,
+		channels: Object.keys(this.bot.channelGuildMap).length,
+		guids: this.bot.guilds.size,
+		timestamp: Date.now()
+	});
 	const srv = await sv(this);
 	fs.readdirSync(`${__dirname}/../../../commands`).filter(d => !fs.lstatSync(`${__dirname}/../../../commands/${d}`).isDirectory() && d.endsWith(__filename.split(".").reverse()[0])).map(f => require(`${__dirname}/../../../commands/${f}`));
 	CmdHandler.setClient(this);
@@ -63,9 +54,9 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	this.Temp = new Temp(config.tmpDir);
 
-	process.on("exit", this.Temp.clean)
-		.on("SIGINT", this.Temp.clean)
-		.on("SIGTERM", this.Temp.clean);
+	process.on("exit", this.Temp.clean.bind(this.Temp))
+		.on("SIGINT", this.Temp.clean.bind(this.Temp))
+		.on("SIGTERM", this.Temp.clean.bind(this.Temp));
 
 	Logger.log(`Cluster #${this.cluster.id}`, `Client has started with ${this.bot.users.size} users, in ${Object.keys(this.bot.channelGuildMap).length} channels, of ${this.bot.guilds.size} guilds.`);
 
@@ -77,14 +68,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 			if (d.getDate() - 1 === 0) d = new Date(d.getTime() + 8.64e+7);
 			const date = `${d.getMonth() + 1}-${d.getDate() - 1}-${d.getFullYear()}`;
 			const count = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => "Unknown");
-			const st = await this.cluster.getMainStats();
-			/* await this.track("general", "dailyCountPosting", {
-				hostname: this.f.os.hostname(),
-				beta: config.beta,
-				clientId: config.bot.clientId,
-				date,
-				count
-			}, d); */
+			const st = await this.cluster.getManagerStats();
 
 			const embed: Eris.EmbedOptions = {
 				title: `Daily Counts For ${date}`,

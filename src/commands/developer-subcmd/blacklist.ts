@@ -1,16 +1,13 @@
 import FurryBot from "../../main";
 import config from "../../config";
-import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import { ExtendedMessage } from "bot-stuff";
 import { mdb } from "../../modules/Database";
 import * as Eris from "eris";
 import GuildConfig from "../../modules/config/GuildConfig";
 import UserConfig from "../../modules/config/UserConfig";
-import { Command, CommandError } from "../../util/CommandHandler";
 import CmdHandler from "../../util/cmd";
-import { Logger } from "@donovan_dmc/ws-clusters";
-
-type CommandContext = FurryBot & { _cmd: Command };
-
+import { Logger } from "clustersv2";
+import { CommandError, Command } from "command-handler";
 
 /*
 new Command(true, {
@@ -29,7 +26,7 @@ new Command(true, {
 	features: ["devOnly"],
 	subCommands: [],
 	category: null,
-	run: (async function (this: FurryBot, msg: ExtendedMessage) {
+	run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 	})
 }, CmdHandler)
 */
@@ -63,7 +60,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: FurryBot, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 					let id, srv: GuildConfig, blacklistReason, embed: Eris.EmbedOptions;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					id = msg.args[0];
@@ -109,7 +106,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: FurryBot, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 					let u, id, blacklistReason, usr: UserConfig, embed: Eris.EmbedOptions;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					u = await msg.getUserFromArgs();
@@ -145,7 +142,7 @@ export default [
 			}, CmdHandler)
 		],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
 			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
@@ -179,7 +176,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: FurryBot, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 					let id, srv: GuildConfig;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					id = msg.args[0];
@@ -210,7 +207,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: FurryBot, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 					let u, id, usr: UserConfig;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					u = await msg.getUserFromArgs();
@@ -229,7 +226,7 @@ export default [
 				})
 			}, CmdHandler)],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
 			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);
@@ -264,7 +261,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: FurryBot, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 					const entries: GuildConfig[] = await mdb.collection("guilds").find({ "blacklist.blacklisted": true }).toArray();
 
 					if (entries.length === 0) return msg.reply("no entries found");
@@ -320,7 +317,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: FurryBot, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 					const entries: UserConfig[] = await mdb.collection("users").find({ "blacklist.blacklisted": true }).toArray();
 
 					if (entries.length === 0) return msg.reply("no entries found");
@@ -361,7 +358,7 @@ export default [
 				})
 			}, CmdHandler)],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
 			return msg.reply("no.");
 			// this is to avoid this (30 users/30 seconds): https://butts-are.cool/img3746_09-30-2019_23-59-35.254-1359x485_putty.png
 			const sub = await CmdHandler.handleSubCommand(cmd, msg);
@@ -398,7 +395,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: FurryBot, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 					let id, srv: GuildConfig, embed;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					id = msg.args[0];
@@ -445,7 +442,7 @@ export default [
 				features: ["devOnly"],
 				subCommands: [],
 				category: null,
-				run: (async function (this: FurryBot, msg: ExtendedMessage) {
+				run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 					let u, id, usr: UserConfig, embed: Eris.EmbedOptions;
 					if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 					u = await msg.getUserFromArgs();
@@ -479,7 +476,7 @@ export default [
 				})
 			}, CmdHandler)],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
 			const sub = await CmdHandler.handleSubCommand(cmd, msg);
 			if (sub !== "NOSUB") return sub;
 			else return this.f.sendCommandEmbed(msg, cmd);

@@ -1,23 +1,39 @@
-import ClientEvent from "../../../modules/ClientEvent";
+import { ClientEvent, Permissions, ExtendedMessage } from "bot-stuff";
+import { Logger } from "clustersv2";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import ExtendedMessage from "../../../modules/extended/ExtendedMessage";
-import Permissions from "../../../util/Permissions";
-import { performance } from "perf_hooks";
+import GuildConfig from "../../../modules/config/GuildConfig";
+import UserConfig from "../../../modules/config/UserConfig";
 import config from "../../../config";
 import { mdb } from "../../../modules/Database";
 import * as os from "os";
 import phin from "phin";
 import * as fs from "fs-extra";
-import { Logger } from "@donovan_dmc/ws-clusters";
 import CmdHandler from "../../../util/cmd";
 
-export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
+export default new ClientEvent<FurryBot>("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
 	/* dev only */
+	await this.a.track("message", {
+		messageId: message.id,
+		userId: message.author.id,
+		channelid: message.channel.id,
+		guildId: (message.channel as Eris.TextChannel).guild ? (message.channel as Eris.TextChannel).guild.id : null,
+		mentionEveryone: message.mentionEveryone,
+		mentions: message.mentions.map(m => m.id),
+		roleMentions: message.roleMentions,
+		channelMentions: message.channelMentions,
+		messageTimestamp: message.timestamp,
+		tts: message.tts,
+		type: message.type,
+		clusterId: this.cluster.id,
+		shardId: (message.channel as Eris.TextChannel).guild ? (message.channel as Eris.TextChannel).guild.shard.id : null,
+		timestamp: Date.now()
+	});
 	if (!message || (config.beta && !config.developers.includes(message.author.id))) return;
 
-	const msg: ExtendedMessage = new ExtendedMessage(message, this);
-	await msg._load.call(msg);
+	const msg = new ExtendedMessage<FurryBot, UserConfig, GuildConfig>(message, this, mdb, UserConfig, GuildConfig);
+	await msg._load.call(msg, config, Logger);
+
 
 	if (msg.author.bot || msg.uConfig.dmActive) return;
 
@@ -162,11 +178,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				timestamp: new Date().toISOString(),
 				description: `\
 	Hi, ${msg.author.tag}! Since you've mentioned me, here's a little about me:\n\
-	My prefix here is ${msg.gConfig.prefix}, you can see my commands by using \`${msg.gConfig.prefix}help\`, you can change my prefix by using \`${msg.gConfig.prefix}settings prefix <new prefix>\`\n\
+	My prefix here is ${msg.gConfig.settings.prefix}, you can see my commands by using \`${msg.gConfig.settings.prefix}help\`, you can change my prefix by using \`${msg.gConfig.settings.prefix}prefix <new prefix>\`\n\
 	If you want to invite me to another server, you can use [this link](https://discordapp.com/oauth2/authorize?client_id=${this.bot.user.id}&scope=bot&permissions=${botPerms}), or, if that isn't working, you can visit [https://furry.bot/add](https://furry.bot/add)\n\
 	If you need some help with me, you can visit my support server [here](https://discord.gg/YazeA7e)`
 			};
-
 			if (!msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) {
 				return msg.author.getDMChannel().then(dm => dm.createMessage({
 					content: "I couldn't send messages in the channel where I was mentioned, so I sent this directly to you!",
@@ -181,7 +196,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 
-		if (["f", "rip"].includes(msg.content.toLowerCase()) && msg.gConfig.fResponseEnabled) {
+		if (["f", "rip"].includes(msg.content.toLowerCase()) && msg.gConfig.settings.fResponse) {
 
 			if (!config.developers.includes(msg.author.id) && !msg.uConfig.blacklist.blacklisted) {
 				this.responseSpamCounter.push({
@@ -219,7 +234,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						embeds: [
 							{
 								title: `Possible Auto Response Spam From ${msg.author.tag} (${msg.author.id}) | VL: ${spC}`,
-								description: `Report: ${config.beta ? `http://localhost:12346/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}`
+								description: `Report: ${config.beta ? `https://${config.apiBindIp}:${config.apiPort}/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}`
 							}
 						],
 						username: `FurryBot Spam Logs${config.beta ? " - Beta" : ""}`,
@@ -255,13 +270,12 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			let count = await mdb.collection("stats").findOne({ id: "fCount" }).then(res => parseInt(res.count, 10)).catch(err => 1);
 			await mdb.collection("stats").findOneAndUpdate({ id: "fCount" }, { $set: { count: ++count } });
-			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects,\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.prefix}settings fResponse disabled\``);
+			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects,\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings fResponse disabled\``);
 		}
 
 		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()) || msg.content.toLowerCase() === msg.prefix.toLowerCase()) return;
 
 		const h = await CmdHandler.handleCommand(msg).catch(err => err);
-
 		if (h instanceof Error) throw h;
 
 	} catch (e) {
@@ -283,7 +297,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						inline: false
 					}, {
 						name: "Usage",
-						value: `${msg.gConfig.prefix}${msg.cmd.join(" ")} ${cmd.usage}`,
+						value: `${msg.gConfig.settings.prefix}${msg.cmd.join(" ")} ${cmd.usage}`,
 						inline: false
 					}, {
 						name: "Description",

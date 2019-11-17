@@ -3,14 +3,12 @@ import phin from "phin";
 import config from "../config";
 import * as util from "util";
 import * as fs from "fs-extra";
-import { Command } from "./CommandHandler";
-import ExtendedMessage from "../modules/extended/ExtendedMessage";
-import ExtendedTextChannel from "../modules/extended/ExtendedTextChannel";
-import ExtendedUser from "../modules/extended/ExtendedUser";
 import * as Eris from "eris";
 import FurryBot from "@FurryBot";
 import { mdb } from "../modules/Database";
-import ErrorHandler from "./ErrorHandler";
+import { ErrorHandler, Functions, ExtendedMessage, ExtendedTextChannel, ExtendedUser } from "bot-stuff";
+import { Command } from "command-handler";
+import { Logger } from "clustersv2";
 import UserConfig from "../modules/config/UserConfig";
 import GuildConfig from "../modules/config/GuildConfig";
 import youtubesearch from "youtube-search";
@@ -18,229 +16,17 @@ import ytdl from "ytdl-core";
 import * as URL from "url";
 import refreshPatreonToken from "./patreon/refreshPatreonToken";
 import loopPatrons from "./patreon/loopPatrons";
-import { Logger } from "@donovan_dmc/ws-clusters";
 
 export { ErrorHandler };
 
-export default class Functions {
+export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, UserConfig, GuildConfig>> {
 	client: FurryBot;
-	os: typeof os;
 	constructor(client: FurryBot) {
+		super(client, config);
 		this.client = client;
-		this.os = os;
 	}
 
-	get ErrorHandler() {
-		return ErrorHandler;
-	}
-
-	checkSemVer(ver): boolean {
-		return require("semver").valid(ver) === ver;
-	}
-
-	secondsToHours(sec: number): string {
-		let hours: string | number = Math.floor(sec / 3600);
-		let minutes: string | number = Math.floor((sec - (hours * 3600)) / 60);
-		let seconds: string | number = Math.floor(sec - (hours * 3600) - (minutes * 60));
-
-		if (hours < 10) hours = `0${hours}`;
-		if (minutes < 10) minutes = `0${minutes}`;
-		if (seconds < 10) seconds = `0${seconds}`;
-		return `${hours}:${minutes}:${seconds}`;
-	}
-
-	get memory() {
-		return {
-			process: {
-				getTotal: ((): number => process.memoryUsage().heapTotal),
-				getUsed: ((): number => process.memoryUsage().heapUsed),
-				getRSS: ((): number => process.memoryUsage().rss),
-				getExternal: ((): number => process.memoryUsage().external),
-				getAll: ((): {
-					total: number,
-					used: number,
-					rss: number,
-					external: number
-				} => ({
-					total: process.memoryUsage().heapTotal,
-					used: process.memoryUsage().heapUsed,
-					rss: process.memoryUsage().rss,
-					external: process.memoryUsage().external
-				}))
-			},
-			system: {
-				getTotal: ((): number => os.totalmem()),
-				getUsed: ((): number => os.totalmem() - os.freemem()),
-				getFree: ((): number => os.freemem()),
-				getAll: ((): {
-					total: number,
-					used: number,
-					free: number
-				} => ({
-					total: os.totalmem(),
-					used: os.totalmem() - os.freemem(),
-					free: os.freemem()
-				}))
-			}
-		};
-	}
-	ucwords(str: string): string {
-		return str.toString().toLowerCase().replace(/^(.)|\s+(.)/g, (r) => r.toUpperCase());
-	}
-
-	toReadableDate(date: Date) {
-		if (!(date instanceof Date)) throw new Error("must provide javascript Date object.");
-		const a = date.toISOString().replace("Z", "").split("T");
-		return `${a[0]} ${a[1].split(".")[0]} UTC`;
-	}
-
-	async ms(data: number | {
-		ms?: number;
-		s?: number;
-		m?: number;
-		h?: number;
-		d?: number;
-		w?: number;
-		mn?: number;
-		y?: number;
-	}, words?: boolean): Promise<string | {
-		ms: number;
-		s: number;
-		m: number;
-		h: number;
-		d: number;
-		w: number;
-		mn: number;
-		y: number;
-	}> {
-		const t = await new Promise((a, b) => {
-			const t = {
-				ms: 0,
-				s: 0,
-				m: 0,
-				h: 0,
-				d: 0,
-				w: 0,
-				mn: 0,
-				y: 0
-			};
-
-			if (typeof data === "number") t.ms = data;
-			else if (typeof data !== "object") throw new Error("invalid input");
-			else {
-				if (data.ms) t.ms = data.ms;
-				if (data.s) t.s = data.s;
-				if (data.m) t.m = data.m;
-				if (data.h) t.h = data.h;
-				if (data.d) t.d = data.d;
-				if (data.w) t.w = data.w;
-				if (data.m) t.mn = data.mn;
-				if (data.y) t.y = data.y;
-			}
-
-			const shorten = (() => {
-				if (t.ms >= 1000) {
-					t.ms -= 1000;
-					t.s += 1;
-				}
-
-				if (t.s >= 60) {
-					t.s -= 60;
-					t.m += 1;
-				}
-
-				if (t.m >= 60) {
-					t.m -= 60;
-					t.h += 1;
-				}
-
-				if (t.h >= 24) {
-					t.h -= 24;
-					t.d += 1;
-				}
-
-				if (t.d >= 30) {
-					t.d -= 30;
-					t.mn += 1;
-				}
-
-				if ((t.mn * 30) + t.d >= 365) {
-					t.d = ((t.mn * 30) + t.d) - 365;
-					t.mn -= 12;
-					t.y += 1;
-				}
-			});
-
-			const c = () => (t.ms >= 1000) || (t.s >= 60) || (t.m >= 60) || (t.h >= 24) || (t.d >= 30) || (t.w >= 4) || (t.mn >= 12);
-			const d = () => t.d >= 7;
-			while (c()) {
-				shorten();
-				if (!c()) {
-					if (!d()) return a(t);
-
-					while (d()) {
-						t.d -= 7;
-						t.w += 1;
-						if (!d()) return a(t);
-					}
-				}
-			}
-		});
-
-		if (!words) return t as any;
-		else {
-			const full = {
-				ms: "millisecond",
-				s: "second",
-				m: "minute",
-				h: "hour",
-				d: "day",
-				w: "week",
-				mn: "month",
-				y: "year"
-			};
-
-			const j = {};
-
-			Object.keys(t).forEach((k) => {
-				if (t[k] !== 0) j[k] = t[k];
-			});
-
-			if (Object.keys(j).length < 1) return {} as any;
-
-			const useFull = Object.keys(j).length < 4;
-
-			return Object.keys(j).reverse().map((k, i, a) => `${i === a.length - 1 && a.length !== 1 ? "and " : ""}${j[k]}${useFull ? ` ${full[k]}${j[k] > 1 ? "s" : ""}` : k}`).join(", ").trim();
-		}
-	}
-
-	parseTime(time: number, full = false, ms = false): string {
-		if (ms) time = time / 1000;
-		const methods = [
-			{ name: full ? " day" : "d", count: 86400 },
-			{ name: full ? " hour" : "h", count: 3600 },
-			{ name: full ? " minute" : "m", count: 60 },
-			{ name: full ? " second" : "s", count: 1 }
-		];
-
-		const timeStr = [`${Math.floor(time / methods[0].count).toString()}${methods[0].name}${Math.floor(time / methods[0].count) > 1 && full ? "s" : ""}`];
-		for (let i = 0; i < 3; i++) {
-			timeStr.push(`${Math.floor(time % methods[i].count / methods[i + 1].count).toString()}${methods[i + 1].name}${Math.floor(time % methods[i].count / methods[i + 1].count) > 1 && full ? "s" : ""}`);
-		}
-		let j = timeStr.filter(g => !g.startsWith("0")).join(", ");
-		if (j.length === 0) j = "no time";
-		return j;
-	}
-
-	randomColor(): number {
-		return Math.floor(Math.random() * 0xFFFFFF);
-	}
-
-	removeDuplicates(array: any[]): any[] {
-		return Array.from(new Set(array));
-	}
-
-	async sendCommandEmbed(msg: ExtendedMessage, cmd: Command): Promise<Eris.Message> {
+	async sendCommandEmbed(msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>): Promise<Eris.Message> {
 		if (!msg || !(msg instanceof ExtendedMessage)) throw new TypeError("invalid message");
 		if (!cmd) throw new TypeError("missing command");
 
@@ -502,6 +288,7 @@ export default class Functions {
 
 	async memberIsBooster(m: Eris.Member): Promise<boolean> {
 		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
+		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
 		const guild = await this.client.bot.getRESTGuild(config.bot.mainGuild);
 		if (!guild) throw new TypeError("failed to find main guild");
 		if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
@@ -651,7 +438,7 @@ export default class Functions {
 		return loopPatrons;
 	}
 
-	fetchLangMessage(lang: string, cmd: Command) {
+	fetchLangMessage(lang: string, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
 		if (!lang || !Object.keys(config.lang).includes(lang.toLowerCase())) throw new TypeError("invalid language provided");
 		if (!cmd) throw new TypeError("invalid command provided");
 

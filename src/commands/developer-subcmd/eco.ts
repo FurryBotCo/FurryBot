@@ -1,14 +1,13 @@
 import FurryBot from "../../main";
 import config from "../../config";
-import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import { ExtendedMessage } from "bot-stuff";
 import { mdb } from "../../modules/Database";
 import * as Eris from "eris";
+import GuildConfig from "../../modules/config/GuildConfig";
 import UserConfig from "../../modules/config/UserConfig";
-import { Command, CommandError } from "../../util/CommandHandler";
 import CmdHandler from "../../util/cmd";
-
-type CommandContext = FurryBot & { _cmd: Command };
-
+import { Logger } from "clustersv2";
+import { CommandError, Command } from "command-handler";
 
 export default [
 	new Command(true, {
@@ -24,7 +23,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 
 			const u = await msg.getUserFromArgs();
@@ -59,7 +58,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.args.length < 2) return new CommandError(null, "ERR_INVALID_USAGE");
 
 			const u = await msg.getUserFromArgs();
@@ -102,7 +101,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 
 			const u = await msg.getUserFromArgs();
@@ -137,7 +136,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.args.length < 1) return new CommandError(null, "ERR_INVALID_USAGE");
 
 			const u = await msg.getUserFromArgs();
@@ -181,7 +180,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.args.length < 2) return new CommandError(null, "ERR_INVALID_USAGE");
 
 			const u = await msg.getUserFromArgs();

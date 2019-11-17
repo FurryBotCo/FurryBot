@@ -1,14 +1,14 @@
 import FurryBot from "../../main";
 import config from "../../config";
-import ExtendedMessage from "../../modules/extended/ExtendedMessage";
+import { ExtendedMessage } from "bot-stuff";
 import { mdb } from "../../modules/Database";
 import * as Eris from "eris";
 import phin from "phin";
-import { Command, CommandError } from "../../util/CommandHandler";
 import CmdHandler from "../../util/cmd";
-
-type CommandContext = FurryBot & { _cmd: Command };
-
+import { Logger } from "clustersv2";
+import { CommandError, Command } from "command-handler";
+import GuildConfig from "../../modules/config/GuildConfig";
+import UserConfig from "../../modules/config/UserConfig";
 
 export default [
 	new Command(true, {
@@ -24,7 +24,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.args.length <= 1) return new CommandError(null, "ERR_INVALID_USAGE");
 			let type;
 			switch (msg.args[0].toLowerCase()) {
@@ -50,7 +50,7 @@ export default [
 			msg.args.shift();
 			let status = this.bot.shards.get(0).presence.status;
 			// this.shards.get(0).presence.status
-			// this.guilds.filter(g => g.members.has(this.user.id))[0].members.get(this.user.id).status
+			// this.guilds.filter(g => g.members.has(this.bot.user.id))[0].members.get(this.bot.user.id).status
 			if (!status) status = "online";
 
 			if (type === 1) return this.bot.editStatus(status, { url: msg.args.shift(), name: msg.args.join(" "), type });
@@ -73,7 +73,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.unparsedArgs.length === 0) return new CommandError(null, "ERR_INVALID_USAGE");
 			const set = await phin({ url: msg.unparsedArgs.join("%20"), parse: "none" }).then(res => `data:${res.headers["content-type"]};base64,${res.body.toString("base64")}`);
 			this.bot.editSelf({ avatar: set })
@@ -98,7 +98,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.unparsedArgs.length === 0) return new CommandError(null, "ERR_INVALID_USAGE");
 			let set;
 			set = msg.unparsedArgs.join(" ");
@@ -121,7 +121,7 @@ export default [
 		features: ["devOnly"],
 		subCommands: [],
 		category: null,
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.args.length <= 0) return new CommandError(null, "ERR_INVALID_USAGE");
 			const types = ["online", "idle", "dnd", "invisible"];
 			if (!types.includes(msg.args[0].toLowerCase())) return msg.channel.createMessage(`<@!${msg.author.id}>, invalid type. Possible types: **${types.join("**, **")}**.`);

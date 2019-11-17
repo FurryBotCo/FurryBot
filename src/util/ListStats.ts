@@ -1,4 +1,4 @@
-import { Logger } from "@donovan_dmc/ws-clusters";
+import { Logger } from "clustersv2";
 import config from "../config";
 import blapi from "blapi";
 import phin from "phin";

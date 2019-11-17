@@ -1,6 +1,8 @@
 import * as Eris from "eris";
-import MessageCollector from "./MessageCollector";
+import { MessageCollector, ExtendedMessage } from "bot-stuff";
 import FurryBot from "@FurryBot";
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 
 interface Question {
 	createdBy: string;
@@ -17,7 +19,7 @@ export default class Questions {
 	private _channel: Eris.TextableChannel;
 	private _user: Eris.Member | Eris.User;
 	private _defaultTimeout: number;
-	private _MessageCollector: MessageCollector;
+	private _MessageCollector: MessageCollector<FurryBot, ExtendedMessage<FurryBot, UserConfig, GuildConfig>>;
 	private _client: FurryBot;
 	constructor(channel: Eris.PrivateChannel, user: Eris.User, timeout: number, client: FurryBot);
 	constructor(channel: Eris.TextChannel, user: Eris.Member, timeout: number, client: FurryBot);
