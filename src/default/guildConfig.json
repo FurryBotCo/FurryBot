@@ -19,5 +19,9 @@
         "commandImages": false,
         "lang": "en",
         "prefix": "f!"
+    },
+    "snipe": {
+        "delete": {},
+        "edit": {}
     }
 }

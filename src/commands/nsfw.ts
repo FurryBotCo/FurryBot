@@ -74,13 +74,14 @@ CmdHandler
 				red: 15158332
 			};
 
-			const tags = msg.args.map(a => a.replace(/,\|/g, "")).filter(t => !t.toLowerCase().startsWith("order:"));
+			const tags = msg.args.map(a => a.replace(/,\|/g, ""));
 			if (tags.length > 5) return msg.reply("you can only specify up to five (5) tags.");
 
 			const bl = tags.filter(t => config.tagBlacklist.includes(t.toLowerCase()));
 			if (bl !== null && bl.length > 0) return msg.channel.createMessage(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
+			if (!tags.some(t => t.match(new RegExp("order:(((score|tagcount|desclength|comments|mpixels|filesize|set)(_asc|_desc)?)|(id|landscape|portrait))", "gi")))) tags.push("order:score");
 
-			const e = await this.e6.listPosts([...tags, "order:score"], 50, 1, null, config.tagBlacklist);
+			const e = await this.e6.listPosts(tags, 50, 1, null, config.tagBlacklist);
 
 			if (e.length === 0) return msg.reply("Your search returned no results.");
 

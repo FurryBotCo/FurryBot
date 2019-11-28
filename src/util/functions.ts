@@ -62,7 +62,7 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 			filetype: string;
 			name: string;
 		};
-		error?: "invalid category" | {
+		error?: {
 			code: number;
 			description: string;
 		}

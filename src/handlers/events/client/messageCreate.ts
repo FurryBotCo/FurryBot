@@ -10,9 +10,15 @@ import * as os from "os";
 import phin from "phin";
 import * as fs from "fs-extra";
 import CmdHandler from "../../../util/cmd";
+import { performance } from "perf_hooks";
 
 export default new ClientEvent<FurryBot>("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
 	/* dev only */
+	const start = performance.now();
+
+	if (config.timers && !config.developers.includes(message.author.id)) return;
+
+	if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: track start`);
 	await this.a.track("message", {
 		messageId: message.id,
 		userId: message.author.id,
@@ -29,10 +35,13 @@ export default new ClientEvent<FurryBot>("messageCreate", (async function (this:
 		shardId: (message.channel as Eris.TextChannel).guild ? (message.channel as Eris.TextChannel).guild.shard.id : null,
 		timestamp: Date.now()
 	});
+	if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: track end`);
 	if (!message || (config.beta && !config.developers.includes(message.author.id))) return;
 
+	if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: message configure`);
 	const msg = new ExtendedMessage<FurryBot, UserConfig, GuildConfig>(message, this, mdb, UserConfig, GuildConfig);
 	await msg._load.call(msg, config, Logger);
+	if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: message configure end`);
 
 
 	if (msg.author.bot || msg.uConfig.dmActive) return;
@@ -63,6 +72,8 @@ export default new ClientEvent<FurryBot>("messageCreate", (async function (this:
 
 	try {
 
+
+		if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: dm start`);
 		if (msg.channel.type === 1) {
 
 			if (bl) {
@@ -140,6 +151,10 @@ export default new ClientEvent<FurryBot>("messageCreate", (async function (this:
 			if (dmAds) return;
 		}
 
+		if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: dm end`);
+
+
+		if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: mention check start`);
 		if ([`<@!${this.bot.user.id}>`, `<@${this.bot.user.id}>`].includes(msg.content) && !bl) {
 			const p = [
 				"kickMembers",
@@ -195,6 +210,10 @@ export default new ClientEvent<FurryBot>("messageCreate", (async function (this:
 				});
 			}
 		}
+
+		if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: mention check end`);
+
+		if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: autoresponse check start`);
 
 		if (["f", "rip"].includes(msg.content.toLowerCase()) && msg.gConfig.settings.fResponse) {
 
@@ -273,9 +292,14 @@ export default new ClientEvent<FurryBot>("messageCreate", (async function (this:
 			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects,\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings fResponse disabled\``);
 		}
 
+		if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: autoresponse check end`);
+
 		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()) || msg.content.toLowerCase() === msg.prefix.toLowerCase()) return;
 
+		if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: cmd handle start`);
 		const h = await CmdHandler.handleCommand(msg).catch(err => err);
+		if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: cmd handle end`);
+
 		if (h instanceof Error) throw h;
 
 	} catch (e) {

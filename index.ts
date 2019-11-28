@@ -15,12 +15,9 @@ if (__filename.endsWith(".js") && !fs.existsSync(`${__dirname}/src/assets`)) {
 const manager = new ClusterManager(config.bot.token, `${__dirname}/src/main.js`, config.bot.options);
 manager.launch();
 
-manager.on("stats", (st: ManagerStats) => {
-	if (config.beta) return;
-	// if (!main.ready) Logger.warn("Main", `Skipped stats as main instance is not ready.`);
+manager.on("stats", (st: ManagerStats) => { });
 
-	ListStats(st.shards.map(s => s.guildCount));
-});
+if (!config.beta) setInterval(() => ListStats(manager.stats.shards.map(s => s.guildCount)), 9e5);
 
 fs.writeFileSync(`${config.rootDir}/../process.pid`, process.pid);
 export default manager;

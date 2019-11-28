@@ -1,5 +1,14 @@
 import phin from "phin";
+import * as os from "os";
+import https from "https";
+import * as fs from "fs-extra";
 
+const agent = new https.Agent({
+	rejectUnauthorized: false,
+	ca: fs.readFileSync("/etc/ssl/local/X1/intermediate/CA-Chain.crt").toString(),
+	cert: fs.readFileSync("/etc/ssl/local/X1/certs/localhost.crt").toString(),
+	key: fs.readFileSync("/etc/ssl/local/X1/certs/localhost.key").toString()
+});
 interface AnalyticsResponse {
 	id: string;
 	type: string;
@@ -20,68 +29,11 @@ export default class Analytics {
 		this.userAgent = userAgent;
 	}
 
-	// overloads screw up everything
-	/*track(event: "command", extra: {
-		messageId: string;
-		userId: string;
-		channelid: string;
-		guildId: string;
-		content: string;
-		command: string;
-		args: string[];
-		timestamp: number;
-	}): Promise<AnalyticsResponse>;
-	track(event: "message", extra: {
-		messageId: string;
-		userId: string;
-		channelid: string;
-		guildId: string;
-		mentionEveryone: boolean;
-		mentions: string[];
-		roleMentions: string[];
-		channelMentions: string[];
-		messageTimestamp: number;
-		tts: boolean;
-		type: number;
-		clusterId: number;
-		shardId: number;
-		timestamp: number;
-	}): Promise<AnalyticsResponse>;
-	track(event: "debug" | "error" | "warn", extra: {
-		clusterId: number;
-		shardId: number;
-		info: any;
-		timestamp: number;
-	}): Promise<AnalyticsResponse>;
-	track(event: "guildCreate" | "guildDelete", extra: {
-		clusterId: number;
-		shardId: number;
-		guildId: string;
-		guildOwner: string;
-		members: {
-			total: number;
-			online: number;
-			idle: number;
-			dnd: number;
-			offline: number;
-			bots: number;
-		};
-		total: number;
-		timestamp: number;
-	}): Promise<AnalyticsResponse>;
-	track(event: "ready", extra: {
-		clusterId: number;
-		shardId: null;
-		users: number;
-		channels: number;
-		guilds: number;
-		timestamp: number;
-	}): Promise<AnalyticsResponse>;*/
-	// track(event: string, extra: {}): Promise<AnalyticsResponse>;
 	async track(event: string, extra: any): Promise<AnalyticsResponse> {
+		return null;
 		const r = await phin({
 			method: "POST",
-			url: `https://analytics.furry.bot/track/${this.type}/${this.group}`,
+			url: `${os.hostname() === "main.extra-v4.furry.bot" ? "https://127.2.3.4" : "https://analytics.furry.bot"}/track/${this.type}/${this.group}`,
 			headers: {
 				"User-Agent": this.userAgent,
 				"Authorization": this.key
@@ -90,7 +42,10 @@ export default class Analytics {
 				event,
 				...extra
 			},
-			parse: "json"
+			parse: "json",
+			core: {
+				agent
+			}
 		});
 
 		if (r.statusCode !== 200 || !r.body.success) throw new Error(`${r.statusCode} ${r.statusMessage}: ${JSON.stringify(r.body)}`);

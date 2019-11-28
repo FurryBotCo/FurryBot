@@ -61,7 +61,7 @@ export default new ClientEvent<FurryBot>("ready", (async function (this: FurryBo
 	Logger.log(`Cluster #${this.cluster.id}`, `Client has started with ${this.bot.users.size} users, in ${Object.keys(this.bot.channelGuildMap).length} channels, of ${this.bot.guilds.size} guilds.`);
 
 	// we aren't posting daily joins if we aren't on the main cluster
-	if (!config.beta && this.cluster.id === 0) setInterval(async () => {
+	if (!config.beta && this.cluster.id === 0 && !this.intr) this.intr = setInterval(async () => {
 		if (new Date().toString().split(" ")[4] === "00:00:00") {
 
 			let d = new Date();

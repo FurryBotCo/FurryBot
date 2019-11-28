@@ -3,11 +3,10 @@ import { Logger } from "clustersv2";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../../../config";
-import { stringify } from "querystring";
 
 export default new ClientEvent<FurryBot>("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
-	const c = await this.cluster.evalAtManager("this.clusters.size");
-	const gc = c.response === 1 ? this.bot.guilds.size : await this.cluster.getManagerStats().then(c => c.guildCount);
+	const st = await this.cluster.getManagerStats();
+	const gc = st.clusters.length === 1 ? this.bot.guilds.size : await this.cluster.getManagerStats().then(c => c.guildCount);
 	await this.f.incrementDailyCounter(true, gc);
 
 	await this.a.track("guildCreate", {
@@ -47,7 +46,22 @@ export default new ClientEvent<FurryBot>("guildCreate", (async function (this: F
 	Logger.info(`Cluster #${this.cluster.id} | Shard #${guild.shard.id} | Client`, `Joined guild ${guild.name} (${guild.id}), owner: ${owner}, this guild has ${guild.memberCount} members! This guild has been placed on shard ${guild.shard.id}.`);
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Joined!",
-		description: `Guild #${gc}\nCurrent Total: ${gc}`,
+		description: [
+			`Guild #${gc}`,
+			`Current Total: ${gc}`,
+			"",
+			"**Guild Info**:",
+			`${"\u25FD"} Name: ${guild.name}`,
+			`${"\u25FD"} **Members**:`,
+			`\t${config.emojis.online}: ${guild.members.filter(m => m.status === "online").length}`,
+			`\t${config.emojis.idle}: ${guild.members.filter(m => m.status === "idle").length}`,
+			`\t${config.emojis.dnd}: ${guild.members.filter(m => m.status === "dnd").length}`,
+			`\t${config.emojis.offline}: ${guild.members.filter(m => m.status === "offline").length}`,
+			`\t${config.emojis.bot}: ${guild.members.filter(m => m.user.bot).length}`,
+			`\t${config.emojis.human}: ${guild.members.filter(m => !m.user.bot).length}`,
+			`${"\u25FD"} Large: ${guild.large ? "Yes" : "No"} (${guild.memberCount})`,
+			`${"\u25FD"} Owner: ${owner}`
+		].join("\n"),
 		author,
 		image: {
 			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://i.furcdn.net/noicon.png"
@@ -55,38 +69,10 @@ export default new ClientEvent<FurryBot>("guildCreate", (async function (this: F
 		thumbnail: {
 			url: "https://i.furcdn.net/noicon.png"
 		},
-		fields: [
-			{
-				name: "Name",
-				value: `${guild.name} (${guild.id})`,
-				inline: false
-			},
-			{
-				name: "Members",
-				value: `Total: ${guild.memberCount}\n\n\
-				<:online:590067324837691401>: ${guild.members.filter(m => m.status === "online").length}\n\
-				<:idle:590067351806803968>: ${guild.members.filter(m => m.status === "idle").length}\n\
-				<:dnd:590067389782032384>: ${guild.members.filter(m => m.status === "dnd").length}\n\
-				<:offline:590067411080970241>: ${guild.members.filter(m => m.status === "offline").length}\n\n\
-				Humans: ${guild.members.filter(m => !m.user.bot).length}\n
-				Bots: ${guild.members.filter(m => m.user.bot).length}`,
-				inline: false
-			},
-			{
-				name: `Large Guild (${this.bot.options.largeThreshold}+ Members)`,
-				value: guild.large ? `Yes (${guild.memberCount})` : `No ${guild.memberCount}`,
-				inline: false
-			},
-			{
-				name: "Guild Owner",
-				value: owner,
-				inline: false
-			}
-		],
 		timestamp: new Date().toISOString(),
 		color: this.f.randomColor(),
 		footer: {
-			text: `Shard ${guild.shard.id + 1}/${this.cluster.maxShards}`,
+			text: `Shard ${guild.shard.id + 1}/${st.shards.length} | Cluster ${this.clusterId + 1}/${st.clusters.length}`,
 			icon_url: "https://i.furry.bot/furry.png"
 		}
 	};
@@ -97,7 +83,7 @@ export default new ClientEvent<FurryBot>("guildCreate", (async function (this: F
 		embeds: [
 			embed
 		],
-		username: `FurryBot Bot Guild Stats${config.beta ? " - Beta" : ""}`,
+		username: `Furry Bot Guild Stats${config.beta ? " - Beta" : ""}`,
 		avatarURL: "https://i.furry.bot/furry.png"
 	});
 }));

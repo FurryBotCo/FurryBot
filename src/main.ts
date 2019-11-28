@@ -37,8 +37,10 @@ export default class FurryBot extends BaseClient {
 	f: Functions;
 	activeReactChannels: string[];
 	a: Analytics;
+	intr: NodeJS.Timeout;
 	constructor(cluster: Cluster) {
 		super(cluster);
+		this.intr = null;
 	}
 
 	async launch(cluster: Cluster) {

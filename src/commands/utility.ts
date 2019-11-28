@@ -312,7 +312,7 @@ CmdHandler
 		features: [],
 		category: "utility",
 		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
-			if (msg.args.length === 0) return msg.channel.createMessage(`This servers prefix is "${msg.gConfig.settings.prefix}", if you want to change this, run this again with the new prefix!`);
+			if (msg.args.length === 0) return msg.channel.createMessage(`This servers prefix is "${msg.gConfig.settings.prefix}", if you want to change this, run this again with the new prefix! (ex: ${msg.gConfig.settings.prefix}prefix <new prefix>)`);
 			if (msg.args.join("").toLowerCase() === msg.gConfig.settings.prefix.toLowerCase()) return msg.reply("that is already this servers prefix.");
 			if ([`<@!${this.bot.user.id}>`, `<@${this.bot.user.id}>`].some(t => msg.args.join("").toLowerCase() === t.toLowerCase())) return msg.reply(`you cannot use ${msg.args.join("").toLowerCase()} as my prefix.`);
 			if (msg.args.join("").length > 15) return msg.reply("the maximum length for my prefix is 15 characters (not counting spaces).");
@@ -438,8 +438,7 @@ CmdHandler
 				muteRole: "role",
 				fResponse: "boolean",
 				commandImages: "boolean",
-				lang: "string",
-				prefix: "string"
+				lang: "string"
 			};
 
 			const booleanChoices = {
@@ -543,6 +542,81 @@ CmdHandler
 			}, `${msg.author.username}#${msg.author.discriminator}: Spacify ${ch.name}`);
 			await msg.gConfig.modlog.add({ blame: this.client.user.id, action: "editChannel", edit: "name", oldValue: o, newValue: ch.name, channelId: ch.id, reason: "spacify command", timestamp: Date.now() });
 			return msg.channel.createMessage(`Spacified <#${ch.id}>!`);
+		})
+	})
+	.addCommand({
+		triggers: [
+			"snipe"
+		],
+		userPermissions: [],
+		botPermissions: [],
+		cooldown: 3e3,
+		donatorCooldown: 3e3,
+		description: "Get the last deleted message in a channel.",
+		usage: "[channel]",
+		features: [],
+		category: "utility",
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			let ch: Eris.TextChannel;
+			if (msg.args.length > 0) ch = await msg.getChannelFromArgs() as Eris.TextChannel;
+
+			if (!ch) ch = msg.channel;
+
+			const s = msg.gConfig.snipe.delete[ch.id];
+
+			if (!s) return msg.reply(`no snipes found for the channel <#${ch.id}>.`);
+
+			const u = await this.bot.getRESTUser(s.authorId);
+			const embed: Eris.EmbedOptions = {
+				title: "Message Delete Snipe",
+				author: {
+					name: `${u.username}#${u.discriminator}`,
+					icon_url: `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`
+				},
+				description: s.content,
+				timestamp: new Date(s.time).toISOString()
+			};
+
+			await msg.gConfig.edit({ snipe: { delete: { [ch.id]: null } } }).then(d => d.reload());
+			return msg.channel.createMessage({ embed });
+		})
+	})
+	.addCommand({
+		triggers: [
+			"editsnipe",
+			"es"
+		],
+		userPermissions: [],
+		botPermissions: [],
+		cooldown: 3e3,
+		donatorCooldown: 3e3,
+		description: "Get the last edited message in a channel.",
+		usage: "[channel]",
+		features: [],
+		category: "utility",
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			let ch: Eris.TextChannel;
+			if (msg.args.length > 0) ch = await msg.getChannelFromArgs() as Eris.TextChannel;
+
+			if (!ch) ch = msg.channel;
+
+			const s = msg.gConfig.snipe.edit[ch.id];
+
+			if (!s) return msg.reply(`no edit snipes found for the channel <#${ch.id}>.`);
+
+			const u = await this.bot.getRESTUser(s.authorId);
+			const embed: Eris.EmbedOptions = {
+				title: "Message Edit Snipe",
+				author: {
+					name: `${u.username}#${u.discriminator}`,
+					icon_url: `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`
+				},
+				description: s.content,
+				timestamp: new Date(s.time).toISOString()
+			};
+
+			await msg.gConfig.edit({ snipe: { edit: { [ch.id]: null } } }).then(d => d.reload());
+			return msg.channel.createMessage({ embed });
 		})
 	});
 

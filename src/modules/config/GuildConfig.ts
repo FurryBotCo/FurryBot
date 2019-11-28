@@ -46,6 +46,15 @@ class GuildConfig {
 		prefix: string;
 	};
 	modlog: DBCollection<ModLogEntry>;
+	snipe: {
+		[k in "delete" | "edit"]?: {
+			[k: string]: {
+				authorId: string;
+				content: string;
+				time: number;
+			};
+		};
+	};
 	constructor(id: string, d) {
 		this.id = id;
 		if (!d) d = data;
@@ -66,6 +75,10 @@ class GuildConfig {
 			lang: d.settings && d.settings.lang ? d.settings.lang : data.settings.lang,
 			prefix: d.settings && d.settings.prefix ? d.settings.prefix : data.settings.prefix
 		};
+		this.snipe = d.snipe ? {
+			delete: d.snipe.delete || data.snipe.delete,
+			edit: d.snipe.edit || data.snipe.edit
+		} : data.snipe;
 		return null;
 	}
 
@@ -103,12 +116,22 @@ class GuildConfig {
 			lang?: "en";
 			prefix?: string;
 		};
+		snipe?: {
+			[k in "delete" | "edit"]?: {
+				[k: string]: {
+					authorId: string;
+					content: string;
+					time: number;
+				};
+			};
+		};
 	}): Promise<GuildConfig> {
 		const g = {
 			blacklist: this.blacklist,
 			premium: this.premium,
 			music: this.music,
-			settings: this.settings
+			settings: this.settings,
+			snipe: this.snipe
 		};
 
 		if (typeof d.blacklist !== "undefined") {
@@ -130,6 +153,11 @@ class GuildConfig {
 			if (typeof d.settings.muteRole !== "undefined") g.settings.muteRole = d.settings.muteRole;
 			if (typeof d.settings.lang !== "undefined") g.settings.lang = d.settings.lang;
 			if (typeof d.settings.prefix !== "undefined") g.settings.prefix = d.settings.prefix;
+		}
+
+		if (typeof d.snipe !== "undefined") {
+			if (typeof d.snipe.delete !== "undefined") g.snipe.delete = { ...g.snipe.delete, ...d.snipe.delete };
+			if (typeof d.snipe.edit !== "undefined") g.snipe.edit = { ...g.snipe.edit, ...d.snipe.edit };
 		}
 
 		try {

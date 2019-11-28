@@ -1,14 +1,22 @@
 import { Logger } from "clustersv2";
 import config from "../config";
-import blapi from "blapi";
 import phin from "phin";
 
 export default (async (shards: number[]) => {
-
+	if (!shards || shards.length === 0) throw new TypeError("invalid shards provided");
 	try {
-		// a bit spammy
-		// blapi.setLogging(true);
-		blapi.manualPost(shards.reduce((a, b) => a + b, 0), config.bot.clientId, config.botLists, null, shards.length, shards);
+		await phin({
+			method: "POST",
+			url: "https://botblock.org/api/count",
+			data: {
+				server_count: shards.reduce((a, b) => a + b, 0),
+				bot_id: config.bot.clientId,
+				shard_count: shards.length,
+				shards,
+				...config.botLists
+			}
+		});
+
 		// botblock was blocked on discordbots.org
 		const rq = await phin({
 			method: "POST",

@@ -3,7 +3,7 @@ import { ExtendedMessage, Permissions } from "bot-stuff";
 import config from "../config";
 import phin from "phin";
 import * as Eris from "eris";
-import { Logger } from "clustersv2";
+import { Logger, VERSION as CLVersion } from "clustersv2";
 import { CommandError } from "command-handler";
 import { mdb } from "../modules/Database";
 import CmdHandler from "../util/cmd";
@@ -124,59 +124,37 @@ CmdHandler
 			const st = await this.cluster.getManagerStats();
 			if (st.clusters.length === 0) return msg.reply("hey, I haven't recieved any stats from other clusters yet, please try again later!");
 
+			// ${"\u25FD"}
+
 			const embed: Eris.EmbedOptions = {
 				title: "Bot Info!",
-				fields: [
-					{
-						name: "Process Memory Usage",
-						value: `${Math.round(st.memoryUsage.heapUsed / 1024 / 1024)}MB/${Math.round(this.f.memory.process.getTotal() / 1024 / 1024)}MB`,
-						inline: false
-					}, {
-						name: "System Memory Usage",
-						value: `${Math.round(this.f.memory.system.getUsed() / 1024 / 1024 / 1024)}GB/${Math.round(this.f.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
-						inline: false
-					}, {
-						name: "Library",
-						value: "Eris",
-						inline: false
-					}, {
-						name: "Uptime",
-						value: `${this.f.parseTime(process.uptime())} (${this.f.secondsToHours(process.uptime())})`,
-						inline: false
-					}, {
-						name: "Stats",
-						value: `Shard: ${msg.guild.shard.id + 1}/${(st.clusters[st.clusters.length - 1].lastShardId) + 1}\nCluster: ${this.cluster.id + 1}/${st.clusters.length}\n Server Count: ${st.guildCount}\n User Count: ${st.userCount}\n Channel Count: ${st.channelCount}\nLarge Guild Count: ${st.largeGuildCount}\nVoice Connection Count: ${st.voiceConnectionCount}\nAverage Ping: ${Math.floor(st.shards.map(s => s.latency).reduce((a, b) => a + b) / st.shards.length)}ms`,
-						inline: false
-					}, {
-						name: "Commands",
-						value: `${CmdHandler.commands.length} total commands`,
-						inline: false
-					}, {
-						name: "API Version",
-						value: "7",
-						inline: false
-					}, {
-						name: "Bot Version",
-						value: config.version,
-						inline: false
-					}, {
-						name: `Eris Version`,
-						value: Eris.VERSION,
-						inline: false
-					}, {
-						name: "Node.JS Version",
-						value: process.version,
-						inline: false
-					}, {
-						name: "Support Server",
-						value: "[https://furry.bot/inv](https://furry.bot/inv)",
-						inline: false
-					}, {
-						name: "Bot Creator",
-						value: "Donovan_DMC#3621, [@Donovan_DMC](https://twitter.com/Donovan_DMC)",
-						inline: false
-					}
-				]
+				description: [
+					"**Stats**:",
+					`${"\u25FD"} Process Memory Usage: ${Math.round(st.memoryUsage.heapUsed / 1024 / 1024)}MB / ${Math.round(this.f.memory.process.getTotal() / 1024 / 1024)}MB`,
+					`${"\u25FD"} System Memory Usage: ${Math.round(this.f.memory.system.getUsed() / 1024 / 1024 / 1024)}GB / ${Math.round(this.f.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
+					`${"\u25FD"} Uptime: ${this.f.parseTime(process.uptime())} (${this.f.secondsToHours(process.uptime())})`,
+					`${"\u25FD"} Shard: ${msg.guild.shard.id + 1}/${st.shards.length}`,
+					`${"\u25FD"} Cluster: ${this.cluster.id + 1}/${st.clusters.length}`,
+					`${"\u25FD"} Server Count: ${st.guildCount}`,
+					`${"\u25FD"} Large Server Count: ${st.largeGuildCount}`,
+					`${"\u25FD"} User Count: ${st.userCount}`,
+					`${"\u25FD"} Channel Count: ${st.channelCount}`,
+					`${"\u25FD"} Voice Connection Count: ${st.voiceConnectionCount}`,
+					`${"\u25FD"} Commands: ${CmdHandler.commands.length}`,
+					"",
+					"**Creator(s)**:",
+					`${"\u25FD"} [Donovan_DMC](https://furry.cool)`,
+					"",
+					"**Other Info**:",
+					`${"\u25FD"} Library: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev)`,
+					`${"\u25FD"} Library Version: ${Eris.VERSION}`,
+					`${"\u25FD"} Cluster Library: [Clusters V2](https://github.com/DonovanDMC/ClustersV2)`,
+					`${"\u25FD"} Cluster library Version: ${CLVersion}`,
+					`${"\u25FD"} API Version: 7`,
+					`${"\u25FD"} Bot Version: ${config.version}`,
+					`${"\u25FD"} Node Version: ${process.version}`,
+					`${"\u25FD"} Support Server: [${config.bot.supportInvite}](${config.bot.supportInvite})`
+				].join("\n")
 			};
 			Object.assign(embed, msg.embed_defaults());
 			msg.channel.createMessage({ embed });
@@ -362,10 +340,11 @@ CmdHandler
 		features: [],
 		category: "information",
 		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			const cl = await this.cluster.getClusterPing();
 			return msg.channel.createMessage("Checking Ping..")
 				.then(m => m.edit("Ping Calculated!"))
 				.then(async (m) => {
-					await msg.channel.createMessage(`Client Ping: ${+m.timestamp - +msg.timestamp}ms${"\n"}Shard Ping: ${Math.round(msg.guild.shard.latency)}ms`);
+					await msg.channel.createMessage(`Client Ping: ${+m.timestamp - +msg.timestamp}ms${"\n"}Shard Ping: ${Math.round(msg.guild.shard.latency)}ms\nCluster Ping: ${Math.round(cl)}ms`);
 					return m.delete();
 				});
 		})
