@@ -15,7 +15,7 @@
                 "main.ts"
             ],
             "@ExtendedMessage": [
-                "modules/extended/ExtendedMessage.ts"
+                "@donovan_dmc/general/BotStuff/Extended/ExtendedMessage"
             ]
         }
     },

@@ -1,11 +1,6 @@
 import config from "../config";
-import deasync from "deasync";
-import { MongoClient, Db } from "mongodb";
+import DB from "@donovan_dmc/db";
 
-const mongo: MongoClient = deasync(MongoClient.connect)(`mongodb${config.db.main.atlas ? "+srv" : ""}://${config.db.main.host}${config.db.main.atlas ? "" : `:${config.db.main.port}`}/${config.db.main.database}?retryWrites=true&w=majority`, config.db.main.opt),
-	mdb: Db = mongo.db(config.db.main.database);
+const db = DB(config.db.host, config.db.port, config.db.database, config.db.opt);
 
-export {
-	mongo,
-	mdb
-};
+export = db;

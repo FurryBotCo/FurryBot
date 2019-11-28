@@ -1,13 +1,14 @@
 import FurryBot from "../main";
-import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import { ExtendedMessage } from "bot-stuff";
 import config from "../config";
-import { Command, CommandError } from "../util/CommandHandler";
 import phin from "phin";
 import * as Eris from "eris";
 import truncate from "truncate";
 import CmdHandler from "../util/cmd";
-
-type CommandContext = FurryBot & { _cmd: Command };
+import { Logger } from "clustersv2";
+import { CommandError } from "command-handler";
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 
 CmdHandler
 	.addCategory({
@@ -28,36 +29,16 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "misc",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
-			let req, counts, content;
-
-			req = await phin({
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			const req = await phin({
 				method: "GET",
-				url: "https://api.furry.bot/counts"
+				url: "https://api.furry.bot/counts",
+				parse: "json"
 			});
-			counts = JSON.parse(req.body);
-
-			// I know this is a mess, but I don't want to rewrite it right now
-			// TODO: Make recursive function for this
-
-			content = "";
-			for (const category in counts) {
-				content += `**${category}**\n`;
-				if (counts[category] instanceof Object) {
-					for (const level1 in counts[category]) {
-						if (counts[category][level1] instanceof Object) {
-							content += `\t${level1}:\n`;
-							for (const level2 in counts[category][level1]) {
-								if (counts[category][level1][level2] instanceof Object) {
-									content += `\t\t${level2}:\n`;
-									for (const level3 in counts[category][level1][level2]) content += `\t\t\t${level3}: ${counts[category][level1][level2][level3]}\n`;
-								} else content += `\t\t${level2}: ${counts[category][level1][level2]}\n`;
-							}
-						} else content += `\t${level1}: ${counts[category][level1]}\n`;
-					}
-				}
-			}
-			return msg.channel.createMessage(content);
+			let txt = "";
+			const recurse = (obj, i, r) => new Promise(async (a, b) => Promise.all(Object.keys(obj).map(async (o) => typeof obj[o] !== "object" ? txt += `${r.repeat(i)}${o}: ${obj[o]}\n` : (txt += `${r.repeat(i)}${o}:\n`, recurse(obj[o] as {}, i + 1, r)))).then(a));
+			await recurse(req.body, 0, "\t");
+			return msg.channel.createMessage(txt);
 		})
 	})
 	.addCommand({
@@ -76,7 +57,7 @@ CmdHandler
 		usage: "[command/category]",
 		features: [],
 		category: "misc",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let embed: Eris.EmbedOptions;
 
 			if (msg.args.length === 0) {
@@ -88,7 +69,7 @@ CmdHandler
 
 				embed = {
 					title: "Command Help",
-					fields: categories.map(c => ({ name: `${c.displayName}`, value: `\`${msg.gConfig.prefix}help ${c.name}\`\n[Hover for more info](https://furry.bot '${c.description}\n${CmdHandler.commands.filter(cmd => cmd.category.name === c.name).length} Commands Total')`, inline: true })),
+					fields: categories.map(c => ({ name: `${c.displayName}`, value: `\`${msg.gConfig.settings.prefix}help ${c.name}\`\n[Hover for more info](https://furry.bot '${c.description}\n${CmdHandler.commands.filter(cmd => cmd.category.name === c.name).length} Commands Total')`, inline: true })),
 					author: {
 						name: msg.author.tag,
 						icon_url: msg.author.avatarURL
@@ -102,7 +83,6 @@ CmdHandler
 
 			if (CmdHandler.commandTriggers.includes(msg.args[0].toLowerCase())) {
 				const cmd = CmdHandler.getCommand(msg.args[0].toLowerCase());
-				const cat = CmdHandler.getCategoryByCommand(msg.args[0].toLowerCase());
 
 				if (!cmd) return msg.reply("Command not found.");
 
@@ -112,7 +92,7 @@ CmdHandler
 					fields: [
 						{
 							name: "Usage",
-							value: `\`${msg.gConfig.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
+							value: `\`${msg.gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
 							inline: false
 						},
 						{
@@ -137,7 +117,7 @@ CmdHandler
 						},
 						{
 							name: "Category",
-							value: cat.name,
+							value: cmd.category.displayName,
 							inline: false
 						}
 					],
@@ -216,7 +196,7 @@ CmdHandler
 		usage: "<suggestion>",
 		features: [],
 		category: "misc",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			// return msg.reply("We are not accepting suggestions at this time.");
 
 			let card, embed: Eris.EmbedOptions;
@@ -269,9 +249,63 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "misc",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.uConfig.tips) return msg.uConfig.edit({ tips: false }).then(d => d.reload()).then(() => msg.reply("Disabled tips."));
 			else return msg.uConfig.edit({ tips: true }).then(d => d.reload()).then(() => msg.reply("Enabled tips."));
+		})
+	})
+	.addCommand({
+		triggers: [
+			"preferences"
+		],
+		userPermissions: [],
+		botPermissions: [],
+		cooldown: 1e3,
+		donatorCooldown: 1e3,
+		description: "Manage your personal preferences.",
+		usage: "",
+		features: [],
+		category: "misc",
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			const settings = {
+				mention: "boolean"
+			};
+
+			const booleanChoices = {
+				enabled: true,
+				enable: true,
+				e: true,
+				true: true,
+				disabled: false,
+				disable: false,
+				d: false,
+				false: false
+			};
+
+			if (msg.args.length === 0 || ["list", "ls"].some(s => msg.args[0].toLowerCase().indexOf(s) !== -1)) return msg.reply(`valid preferences: **${Object.keys(settings).join("**, **")}**`);
+			const c = msg.args[0].toLowerCase();
+			const s = Object.values(settings)[Object.keys(settings).map(s => s.toLowerCase()).indexOf(c.toLowerCase())];
+			const set = Object.keys(settings)[Object.keys(settings).map(s => s.toLowerCase()).indexOf(c.toLowerCase())];
+			if (!Object.keys(settings).map(s => s.toLowerCase()).includes(c)) return msg.reply(`Invalid setting. You can use \`${msg.gConfig.settings.prefix}preferences list\` to list preferences.`);
+			if (msg.args.length === 1) return msg.reply(`The preference ${set} is currently set to ${msg.uConfig.preferences[set]}.`);
+			else {
+				let o;
+				switch (s) {
+					case "boolean":
+						if (!Object.keys(booleanChoices).includes(msg.args[1].toLowerCase())) return msg.reply(`Invalid choice, must be one of "enabled", "disabled".`);
+						o = msg.uConfig.preferences[set];
+						await msg.uConfig.edit({ preferences: { [set]: booleanChoices[msg.args[1].toLowerCase()] } });
+						return msg.reply(`Changed the preference **${set}** from "${o ? "enabled" : "disabled"}" to "${booleanChoices[msg.args[1].toLowerCase()] ? "enabled" : "disabled"}".`);
+						break;
+
+					case "string":
+						o = msg.uConfig.preferences[set];
+						await msg.uConfig.edit({ preferences: { [set]: msg.unparsedArgs.slice(1, msg.unparsedArgs.length).join(" ") } });
+						return msg.reply(`Changed the preference **${set}** from "${o}" to "${msg.unparsedArgs.slice(1, msg.unparsedArgs.length).join(" ")}"`);
+						break;
+
+				}
+			}
 		})
 	});
 

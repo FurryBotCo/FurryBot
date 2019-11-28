@@ -5,7 +5,7 @@ import uuid from "uuid/v4";
 import uConfig from "../../default/userConfig.json";
 import * as eris from "eris";
 import apiFunctions from "../functions";
-import { Logger } from "@donovan_dmc/ws-clusters";
+import { Logger } from "clustersv2";
 import FurryBot from "@FurryBot";
 
 export default (async (client: FurryBot) => {

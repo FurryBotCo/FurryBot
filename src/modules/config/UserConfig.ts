@@ -34,9 +34,12 @@ class UserConfig {
 		donator?: boolean;
 		patronId: string;
 	};
+	preferences: {
+		mention: boolean;
+	};
 	// voteCount: number;
 	// lastVote: number;
-	constructor(id, data) {
+	constructor(id: string, data) {
 		this.id = id;
 		if (!data) data = config;
 		this._load.call(this, data);
@@ -50,6 +53,7 @@ class UserConfig {
 		this.tips = ![undefined, null].includes(data.tips) ? data.tips : config.tips;
 		this.dmActive = ![undefined, null].includes(data.dmActive) ? data.dmActive : config.dmActive;
 		this.patreon = ![undefined, null].includes(data.patreon) ? data.patreon : config.patreon;
+		this.preferences = ![undefined, null].includes(data.preferences) ? data.preferences : config.preferences;
 		// this.voteCount = ![undefined, null].includes(data.voteCount) ? data.voteCount : config.voteCount;
 		// this.lastVote = ![undefined, null].includes(data.lastVote) ? data.lastVote : config.lastVote;
 
@@ -83,6 +87,9 @@ class UserConfig {
 			donator?: boolean;
 			patronId?: string;
 		};
+		preferences?: {
+			mention?: boolean;
+		};
 	}): Promise<UserConfig> {
 		const u = {
 			blacklist: this.blacklist,
@@ -91,7 +98,8 @@ class UserConfig {
 			bal: this.bal,
 			tips: this.tips,
 			dmActive: this.dmActive,
-			patreon: this.patreon
+			patreon: this.patreon,
+			preferences: this.preferences
 		};
 
 		if (typeof data.blacklist !== "undefined") {
@@ -116,6 +124,11 @@ class UserConfig {
 			if (typeof data.patreon.donator) u.patreon.donator = data.patreon.donator;
 			if (typeof data.patreon.patronId) u.patreon.patronId = data.patreon.patronId;
 		}
+
+		if (typeof data.preferences !== "undefined") {
+			if (typeof data.preferences.mention) u.preferences.mention = data.preferences.mention;
+		}
+
 		try {
 			await mdb.collection("users").findOneAndUpdate({
 				id: this.id

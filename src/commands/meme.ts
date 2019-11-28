@@ -1,12 +1,12 @@
 import FurryBot from "../main";
-import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import { ExtendedMessage } from "bot-stuff";
 import config from "../config";
-import { Command, CommandError } from "../util/CommandHandler";
 import * as Eris from "eris";
 import CmdHandler from "../util/cmd";
-import { Logger } from "@donovan_dmc/ws-clusters";
-
-type CommandContext = FurryBot & { _cmd: Command };
+import { Logger } from "clustersv2";
+import { CommandError } from "command-handler";
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 
 CmdHandler
 	.addCategory({
@@ -30,7 +30,7 @@ CmdHandler
 		usage: "[image]",
 		features: [],
 		category: "meme",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let user, imgurl, req, j;
 			if (msg.args.length >= 1) {
 				// get member from message
@@ -72,7 +72,7 @@ CmdHandler
 		usage: "[image]",
 		features: [],
 		category: "meme",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let user, imgurl, req, j;
 			if (msg.args.length >= 1) {
 				// get member from message
@@ -114,7 +114,7 @@ CmdHandler
 		usage: "<text>",
 		features: [],
 		category: "meme",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let text, req, j;
 			text = msg.unparsedArgs.join(" ");
 			if (text.length === 0) text = "Provide some text";
@@ -148,7 +148,7 @@ CmdHandler
 		usage: "<text>",
 		features: [],
 		category: "meme",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let text, req, j;
 			text = msg.unparsedArgs.join(" ");
 			if (text.length === 0) text = "Image api, not providing text";
@@ -183,7 +183,7 @@ CmdHandler
 		usage: "[image]",
 		features: [],
 		category: "meme",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let user, imgurl, req, j;
 			if (msg.args.length >= 1) {
 				// get member from message
@@ -226,7 +226,7 @@ CmdHandler
 		usage: "<text>",
 		features: [],
 		category: "meme",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.unparsedArgs.length < 1) throw new CommandError(null, "ERR_INVALID_USAGE");
 
 			const embed: Eris.EmbedOptions = {

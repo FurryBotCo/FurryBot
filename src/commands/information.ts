@@ -1,16 +1,14 @@
 import FurryBot from "../main";
-import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import { ExtendedMessage, Permissions } from "bot-stuff";
 import config from "../config";
-import { Command, CommandError } from "../util/CommandHandler";
 import phin from "phin";
 import * as Eris from "eris";
-import Permissions from "../util/Permissions";
-import UserConfig from "../modules/config/UserConfig";
+import { Logger, VERSION as CLVersion } from "clustersv2";
+import { CommandError } from "command-handler";
 import { mdb } from "../modules/Database";
 import CmdHandler from "../util/cmd";
-import { Logger } from "@donovan_dmc/ws-clusters";
-
-type CommandContext = FurryBot & { _cmd: Command };
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 
 CmdHandler
 	.addCategory({
@@ -34,7 +32,7 @@ CmdHandler
 		usage: "<@bot/id>",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let list;
 			if (msg.args.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			// get user from message
@@ -122,63 +120,41 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
-			const st = await this.cluster.getMainStats();
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			const st = await this.cluster.getManagerStats();
 			if (st.clusters.length === 0) return msg.reply("hey, I haven't recieved any stats from other clusters yet, please try again later!");
+
+			// ${"\u25FD"}
 
 			const embed: Eris.EmbedOptions = {
 				title: "Bot Info!",
-				fields: [
-					{
-						name: "Process Memory Usage",
-						value: `${Math.round(st.memoryUsage.heapUsed / 1024 / 1024)}MB/${Math.round(this.f.memory.process.getTotal() / 1024 / 1024)}MB`,
-						inline: false
-					}, {
-						name: "System Memory Usage",
-						value: `${Math.round(this.f.memory.system.getUsed() / 1024 / 1024 / 1024)}GB/${Math.round(this.f.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
-						inline: false
-					}, {
-						name: "Library",
-						value: "Eris",
-						inline: false
-					}, {
-						name: "Uptime",
-						value: `${this.f.parseTime(process.uptime())} (${this.f.secondsToHours(process.uptime())})`,
-						inline: false
-					}, {
-						name: "Stats",
-						value: `Shard: ${msg.guild.shard.id + 1}/${(st.clusters[st.clusters.length - 1].lastShardId) + 1}\nCluster: ${this.cluster.id + 1}/${st.clusters.length}\n Server Count: ${st.guildCount}\n User Count: ${st.userCount}\n Channel Count: ${st.channelCount}\nLarge Guild Count: ${st.largeGuildCount}\nVoice Connection Count: ${st.voiceConnectionCount}`,
-						inline: false
-					}, {
-						name: "Commands",
-						value: `${CmdHandler.commands.length} total commands`,
-						inline: false
-					}, {
-						name: "API Version",
-						value: "7",
-						inline: false
-					}, {
-						name: "Bot Version",
-						value: config.version,
-						inline: false
-					}, {
-						name: `Eris Version`,
-						value: Eris.VERSION,
-						inline: false
-					}, {
-						name: "Node.JS Version",
-						value: process.version,
-						inline: false
-					}, {
-						name: "Support Server",
-						value: "[https://furry.bot/inv](https://furry.bot/inv)",
-						inline: false
-					}, {
-						name: "Bot Creator",
-						value: "Donovan_DMC#3621, [@Donovan_DMC](https://twitter.com/Donovan_DMC)",
-						inline: false
-					}
-				]
+				description: [
+					"**Stats**:",
+					`${"\u25FD"} Process Memory Usage: ${Math.round(st.memoryUsage.heapUsed / 1024 / 1024)}MB / ${Math.round(this.f.memory.process.getTotal() / 1024 / 1024)}MB`,
+					`${"\u25FD"} System Memory Usage: ${Math.round(this.f.memory.system.getUsed() / 1024 / 1024 / 1024)}GB / ${Math.round(this.f.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
+					`${"\u25FD"} Uptime: ${this.f.parseTime(process.uptime())} (${this.f.secondsToHours(process.uptime())})`,
+					`${"\u25FD"} Shard: ${msg.guild.shard.id + 1}/${st.shards.length}`,
+					`${"\u25FD"} Cluster: ${this.cluster.id + 1}/${st.clusters.length}`,
+					`${"\u25FD"} Server Count: ${st.guildCount}`,
+					`${"\u25FD"} Large Server Count: ${st.largeGuildCount}`,
+					`${"\u25FD"} User Count: ${st.userCount}`,
+					`${"\u25FD"} Channel Count: ${st.channelCount}`,
+					`${"\u25FD"} Voice Connection Count: ${st.voiceConnectionCount}`,
+					`${"\u25FD"} Commands: ${CmdHandler.commands.length}`,
+					"",
+					"**Creator(s)**:",
+					`${"\u25FD"} [Donovan_DMC](https://furry.cool)`,
+					"",
+					"**Other Info**:",
+					`${"\u25FD"} Library: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev)`,
+					`${"\u25FD"} Library Version: ${Eris.VERSION}`,
+					`${"\u25FD"} Cluster Library: [Clusters V2](https://github.com/DonovanDMC/ClustersV2)`,
+					`${"\u25FD"} Cluster library Version: ${CLVersion}`,
+					`${"\u25FD"} API Version: 7`,
+					`${"\u25FD"} Bot Version: ${config.version}`,
+					`${"\u25FD"} Node Version: ${process.version}`,
+					`${"\u25FD"} Support Server: [${config.bot.supportInvite}](${config.bot.supportInvite})`
+				].join("\n")
 			};
 			Object.assign(embed, msg.embed_defaults());
 			msg.channel.createMessage({ embed });
@@ -200,7 +176,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			const botPerms = [
 				"kickMembers",
 				"banMembers",
@@ -255,7 +231,7 @@ CmdHandler
 		usage: "<ip>",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			if (msg.unparsedArgs.length === 0) throw new CommandError(null, "ERR_INVALID_USAGE");
 			// if(config.apis.ipinfo.regex.ipv4.test(msg.unparsedArgs.join(" ")) || config.apis.ipinfo.regex.ipv6.test(msg.unparsedArgs.join(" "))) {
 			const req = await phin({
@@ -310,7 +286,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			const allowUser = [],
 				denyUser = [],
 				allowBot = [],
@@ -363,67 +339,14 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			const cl = await this.cluster.getClusterPing();
 			return msg.channel.createMessage("Checking Ping..")
 				.then(m => m.edit("Ping Calculated!"))
 				.then(async (m) => {
-					await msg.channel.createMessage(`Client Ping: ${+m.timestamp - +msg.timestamp}ms${"\n"}Shard Ping: ${Math.round(msg.guild.shard.latency)}ms`);
+					await msg.channel.createMessage(`Client Ping: ${+m.timestamp - +msg.timestamp}ms${"\n"}Shard Ping: ${Math.round(msg.guild.shard.latency)}ms\nCluster Ping: ${Math.round(cl)}ms`);
 					return m.delete();
 				});
-		})
-	})
-	.addCommand({
-		triggers: [
-			"seen",
-			"seenon"
-		],
-		userPermissions: [],
-		botPermissions: [
-			"embedLinks"
-		],
-		cooldown: 2e3,
-		donatorCooldown: 1e3,
-		description: "Get the servers I share with a user.",
-		usage: "<@member/id>",
-		features: [],
-		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
-			const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
-
-			if (!user) return msg.errorEmbed("INVALID_USER");
-
-			const a = this.bot.guilds.filter(g => g.members.has(user.id)),
-				b = a.map(g => `${g.name} (${g.id})`),
-				guilds = [],
-				fields = [];
-
-			let i = 0;
-
-			for (const key in b) {
-				if (!guilds[i]) guilds[i] = "";
-				if (guilds[i].length > 1000 || +guilds[i].length + b[key].length > 1000) {
-					i++;
-					guilds[i] = b[key];
-				} else {
-					guilds[i] += `\n${b[key]}`;
-				}
-			}
-
-			guilds.forEach((g, c) => {
-				fields.push({
-					name: `Server List #${+c + 1}`,
-					value: g,
-					inline: false
-				});
-			});
-
-			const embed = {
-				title: `Seen On ${b.length} Servers - ${user.user.username}#${user.user.discriminator} (${user.id})`,
-				description: `I see this user in ${b.length} other guilds.`,
-				fields
-			};
-
-			msg.channel.createMessage({ embed });
 		})
 	})
 	.addCommand({
@@ -440,7 +363,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			const embed: Eris.EmbedOptions = {
 				title: "Shard Info",
 				description: `Guilds: ${this.bot.guilds.filter(g => g.shard.id === msg.guild.shard.id).length}\nPing: ${msg.guild.shard.latency}ms`,
@@ -467,7 +390,7 @@ CmdHandler
 		usage: "[cluster id]",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			const st =
 				!isNaN(msg.args[0] as any) ?
 					await this.cluster.getClusterStats(parseInt(msg.args[0], 10)) :
@@ -479,7 +402,7 @@ CmdHandler
 				title: "Shard Info",
 				fields: st.shards.map(s => ({
 					name: `Shard #${s.id}`,
-					value: `Guilds: ${st.guildCount}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
+					value: `Guilds: ${s.guildCount}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
 					inline: true
 				})),
 				color: this.f.randomColor(),
@@ -487,6 +410,46 @@ CmdHandler
 			};
 
 			if (st.shards.map(s => s.id).includes(msg.guild.shard.id)) embed.fields.find(f => f.name === `Shard #${msg.guild.shard.id}`).name = `Shard #${msg.guild.shard.id} (current)`;
+
+			return msg.channel.createMessage({
+				embed
+			});
+		})
+	})
+	.addCommand({
+		triggers: [
+			"clusters"
+		],
+		userPermissions: [],
+		botPermissions: [
+			"embedLinks"
+		],
+		cooldown: 2e3,
+		donatorCooldown: 1e3,
+		description: "Get some info about my clusters.",
+		usage: "",
+		features: [],
+		category: "information",
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			const st = await this.cluster.getManagerStats();
+
+			if (!st) return msg.reply("I have not recieved any stats from my manager, please wait a bit!");
+
+			const embed: Eris.EmbedOptions = {
+				title: "Cluster Info",
+				fields: st.clusters.map(c => ({
+					name: `Cluster #${c.id}`,
+					value: `Shards ${c.firstShardId} - ${c.lastShardId} (${c.shards.length})\nAverage Ping: ${Math.floor(c.shards.map(s => s.latency).reduce((a, b) => a + b) / c.shards.length)}ms\nGuilds: ${c.guildCount} (${c.largeGuildCount} large)`,
+					inline: true
+				})),
+				color: this.f.randomColor(),
+				timestamp: new Date().toISOString(),
+				footer: {
+					text: `Total Guild Count: ${st.guildCount}`
+				}
+			};
+
+			embed.fields[this.cluster.id].name = `Cluster #${this.cluster.id} (current)`;
 
 			return msg.channel.createMessage({
 				embed
@@ -510,7 +473,7 @@ CmdHandler
 		usage: "",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			const textChCount = msg.guild.channels.filter(c => c.type === 0).length,
 				voiceChCount = msg.guild.channels.filter(c => c.type === 2).length,
 				categoryChCount = msg.guild.channels.filter(c => c.type === 4).length;
@@ -646,7 +609,7 @@ CmdHandler
 		usage: "[@member/id]",
 		features: [],
 		category: "information",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
 			if (!user) return msg.errorEmbed("INVALID_USER");
@@ -673,7 +636,7 @@ CmdHandler
 					inline: true
 				}, {
 					name: `Roles [${roles.length}]`,
-					value: roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.prefix}roles ${user.user.id}\`` : roles.length === 0 ? "NONE" : roles.toString(),
+					value: roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.settings.prefix}roles ${user.user.id}\`` : roles.length === 0 ? "NONE" : roles.toString(),
 					inline: false
 				}]
 			};

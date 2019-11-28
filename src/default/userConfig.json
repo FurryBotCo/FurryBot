@@ -8,9 +8,7 @@
         "married": false,
         "partner": null
     },
-    "warnings": [
-
-    ],
+    "warnings": [],
     "bal": 100,
     "tips": true,
     "dmActive": false,
@@ -20,5 +18,8 @@
         "declinedAt": null,
         "donator": false,
         "patronId": null
+    },
+    "preferences": {
+        "mention": true
     }
 }

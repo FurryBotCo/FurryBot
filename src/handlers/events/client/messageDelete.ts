@@ -7,19 +7,18 @@ import { mdb } from "../../../modules/Database";
 import GuildConfig from "../../../modules/config/GuildConfig";
 import { channelType } from "../../../util/Constants.json";
 
-export default new ClientEvent<FurryBot>("messageUpdate", (async function (this: FurryBot, message: Eris.Message, oldMessage: PartialMessage) {
-	if (!this || !message || !message.author || message.author.bot || !oldMessage || ![channelType.GUILD_NEWS, channelType.GUILD_STORE, channelType.GUILD_TEXT].includes(message.channel.type) || message.content === oldMessage.content) return;
+export default new ClientEvent<FurryBot>("messageDelete", (async function (this: FurryBot, message: Eris.Message) {
+	if (!this || !message || !message.author || message.author.bot || ![channelType.GUILD_NEWS, channelType.GUILD_STORE, channelType.GUILD_TEXT].includes(message.channel.type)) return;
 	const g = await mdb.collection("guilds").findOne({ id: (message.channel as Eris.TextChannel).guild.id }).then(res => new GuildConfig((message.channel as Eris.TextChannel).guild.id, res));
 	await g.edit({
 		snipe: {
-			edit: {
+			delete: {
 				[message.channel.id]: {
-					content: oldMessage.content,
+					content: message.content,
 					authorId: message.author.id,
 					time: Date.now()
 				}
 			}
 		}
 	}).then(d => d.reload());
-	this.bot.emit("messageCreate", message);
 }));

@@ -1,15 +1,14 @@
 import FurryBot from "../main";
-import ExtendedMessage from "../modules/extended/ExtendedMessage";
+import { ExtendedMessage, ReactionQueue } from "bot-stuff";
 import config from "../config";
-import { Command, CommandError } from "../util/CommandHandler";
 import * as Eris from "eris";
 import phin from "phin";
 import { mongo } from "../modules/Database";
-import ReactionQueue from "../util/queue/ReactionQeueue";
 import CmdHandler from "../util/cmd";
-import { Logger } from "@donovan_dmc/ws-clusters";
-
-type CommandContext = FurryBot & { _cmd: Command };
+import { Logger } from "clustersv2";
+import { CommandError } from "command-handler";
+import UserConfig from "../modules/config/UserConfig";
+import GuildConfig from "../modules/config/GuildConfig";
 
 CmdHandler
 	.addCategory({
@@ -33,7 +32,7 @@ CmdHandler
 		usage: "",
 		features: ["nsfw"],
 		category: "nsfw",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let img, short, extra;
 			img = await this.f.imageAPIRequest(false, "bulge", true, false);
 			if (img.success !== true) {
@@ -62,10 +61,10 @@ CmdHandler
 		donatorCooldown: 3e3,
 		description: "Get some content from E621!",
 		usage: "[tags]",
-		features: ["nsfw", "devOnly"],
+		features: ["nsfw"],
 		category: "nsfw",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
-			if (this.activeReactChannels.includes(msg.channel.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout before starting another.");
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			if (this.activeReactChannels.includes(msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout, or react to the old one with \"⏹\" before starting another.");
 
 			const client = this; // tslint:disable-line no-this-assignment
 
@@ -75,13 +74,16 @@ CmdHandler
 				red: 15158332
 			};
 
-			const tags = msg.args.map(a => a.replace(/,\|/g, "")).filter(t => !t.toLowerCase().startsWith("order:"));
+			const tags = msg.args.map(a => a.replace(/,\|/g, ""));
 			if (tags.length > 5) return msg.reply("you can only specify up to five (5) tags.");
 
 			const bl = tags.filter(t => config.tagBlacklist.includes(t.toLowerCase()));
 			if (bl !== null && bl.length > 0) return msg.channel.createMessage(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
+			if (!tags.some(t => t.match(new RegExp("order:(((score|tagcount|desclength|comments|mpixels|filesize|set)(_asc|_desc)?)|(id|landscape|portrait))", "gi")))) tags.push("order:score");
 
-			const e = await this.e6.listPosts([...tags, "order:score"], 50, 1, null, config.tagBlacklist);
+			const e = await this.e6.listPosts(tags, 50, 1, null, config.tagBlacklist);
+
+			if (e.length === 0) return msg.reply("Your search returned no results.");
 
 			let currentPost = 1;
 
@@ -153,6 +155,7 @@ CmdHandler
 						clearInterval(rl);
 						this.activeReactChannels.splice(this.activeReactChannels.indexOf(msg.channel.id), 1);
 					}
+					return;
 				} else currentPost = p as number;
 
 				if (currentPost === 0) currentPost = e.length;
@@ -242,7 +245,7 @@ CmdHandler
 		usage: "",
 		features: ["nsfw"],
 		category: "nsfw",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let img, short, extra;
 			img = await phin({
 				url: "https://api.fursuitbutts.com/butts",
@@ -276,7 +279,7 @@ CmdHandler
 		usage: "",
 		features: ["nsfw"],
 		category: "nsfw",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let embed;
 
 			let s: any[] | any = await mongo.db("furrybot").collection("shorturl").find().toArray();
@@ -310,7 +313,7 @@ CmdHandler
 		usage: "[gay/straight/lesbian/dickgirl]",
 		features: ["nsfw"],
 		category: "nsfw",
-		run: (async function (this: FurryBot, msg: ExtendedMessage) {
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
 			let extra = "", type, embed, short;
 			if (msg.args.length === 0) {
 				for (const ytype of config.yiff.types) {
