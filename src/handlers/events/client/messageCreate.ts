@@ -288,7 +288,7 @@ export default new ClientEvent<FurryBot>("messageCreate", (async function (this:
 
 			let count = await mdb.collection("stats").findOne({ id: "fCount" }).then(res => parseInt(res.count, 10)).catch(err => 1);
 			await mdb.collection("stats").findOneAndUpdate({ id: "fCount" }, { $set: { count: ++count } });
-			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects,\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings fResponse disabled\``);
+			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings fResponse disabled\``);
 		}
 
 		if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: autoresponse check end`);
