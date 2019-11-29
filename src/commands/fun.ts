@@ -42,10 +42,26 @@ CmdHandler
 				"Ask again later",
 				"My answer is no",
 				"No",
-				"Very doubtful"
-			],
-				response = responses[Math.floor(Math.random() * responses.length)];
-			return msg.reply(`The Magic 8ball said **${response}**.`);
+				"Very doubtful",
+				"Concentrate and ask again",
+				"As I see it, yes"
+			];
+
+			return msg.channel.createMessage({
+				embed: {
+					title: `${msg.author.tag}'s Magic 8ball Game`,
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					},
+					description: `The Magic 8ball said: "**${responses[Math.floor(Math.random() * responses.length)]}**."`,
+					footer: {
+						text: "Disclaimer: Do not take any answers seriously!",
+						icon_url: "https://i.furry.bot/furry.png"
+					},
+					timestamp: new Date().toISOString()
+				}
+			});
 		})
 	})
 	.addCommand({
