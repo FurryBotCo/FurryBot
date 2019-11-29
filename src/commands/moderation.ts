@@ -9,6 +9,7 @@ import { Logger } from "clustersv2";
 import { CommandError } from "command-handler";
 import UserConfig from "../modules/config/UserConfig";
 import GuildConfig from "../modules/config/GuildConfig";
+import { Warning } from "../util/types";
 
 CmdHandler
 	.addCategory({
@@ -381,6 +382,134 @@ CmdHandler
 				}*/
 			});
 			if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
+		})
+	})
+	.addCommand({
+		triggers: [
+			"warn"
+		],
+		userPermissions: [
+			"kickMembers"
+		],
+		botPermissions: [],
+		cooldown: 3e3,
+		donatorCooldown: 3e3,
+		description: "Add a warning to someone.",
+		usage: "<@member/id> [reason]",
+		features: [],
+		category: "moderation",
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			const member = await msg.getMemberFromArgs();
+
+			if (!member) return msg.errorEmbed("INVALID_MEMBER");
+
+			const reason = msg.args.length > 1 ? msg.args.slice(1).join(" ") : "None Provided";
+
+			await mdb.collection("warnings").insertOne({
+				blameId: msg.author.id,
+				guildId: msg.channel.guild.id,
+				userId: member.id,
+				id: this.f.random(7),
+				reason,
+				date: Date.now()
+			} as Warning);
+
+			return msg.channel.createMessage(`Warned user **${member.username}#${member.discriminator}**, *${reason}*`);
+		})
+	})
+	.addCommand({
+		triggers: [
+			"warnings"
+		],
+		userPermissions: [
+			"kickMembers"
+		],
+		botPermissions: [],
+		cooldown: 3e3,
+		donatorCooldown: 3e3,
+		description: "Add a warning to someone.",
+		usage: "<@member/id> [page]",
+		features: [],
+		category: "moderation",
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			const member = await msg.getMemberFromArgs();
+
+			if (!member) return msg.errorEmbed("INVALID_MEMBER");
+
+			const w: Warning[] = await mdb.collection("warnings").find({ userId: member.id, guildId: msg.channel.guild.id } as Warning).toArray().then((res: Warning[]) => res.sort((a, b) => a.date - b.date));
+
+			const fields = chunk(await Promise.all(w.map(async (k: Warning, i) => {
+				const u = await this.bot.getRESTUser(k.userId);
+				return {
+					name: `Warning #${i + 1}`,
+					value: `Blame: ${u.username}#${u.discriminator}\nReason: ${k.reason}\nDate: ${new Date(k.date).toDateString()}\nID: ${k.id}`,
+					inline: false
+				};
+			}, 5)));
+
+			let p;
+			if (msg.args.length > 1) {
+				const pg = parseInt(msg.args[1], 10);
+				if (isNaN(pg) || !pg || pg < 1 || pg > fields.length) return msg.reply("invalid page number.");
+				p = pg;
+			} else p = 1;
+
+			const embed: Eris.EmbedOptions = {
+				title: `Warnings for ${member.username}#${member.discriminator}`,
+				fields: fields[p - 1],
+				timestamp: new Date().toISOString(),
+				color: this.f.randomColor()
+			};
+
+			return msg.channel.createMessage({
+				embed
+			});
+		})
+	})
+	.addCommand({
+		triggers: [
+			"delwarning",
+			"delwarn"
+		],
+		userPermissions: [
+			"kickMembers"
+		],
+		botPermissions: [],
+		cooldown: 3e3,
+		donatorCooldown: 3e3,
+		description: "Delete a guild members warning.",
+		usage: "<@member/id> <warning id>",
+		features: [],
+		category: "moderation",
+		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
+			if (msg.args.length > 2) return new Error("ERR_INVALID_USAGE");
+
+			const member = await msg.getMemberFromArgs();
+
+			if (!member) return msg.errorEmbed("INVALID_MEMBER");
+
+			const w: Warning = await mdb.collection("warnings").findOne({ userId: member.id, guildId: msg.channel.guild.id, id: msg.args[1] } as Warning);
+
+			if (!w) return msg.reply("invalid warning.");
+
+			await mdb.collection("warnings").findOneAndDelete({ userId: member.id, guildId: msg.channel.guild.id, id: msg.args[1] } as Warning);
+
+			const u = await this.bot.getRESTUser(w.blameId);
+
+			const embed: Eris.EmbedOptions = {
+				title: "Warning Deletion",
+				description: `User: ${member.username}#${member.discriminator} (${member.id})\nReason: ${w.reason}\nBlame: ${u.username}#${u.discriminator} (${u.id})\nDate: ${new Date(w.date).toDateString()}`,
+				timestamp: new Date().toISOString(),
+				color: this.f.randomColor(),
+				author: {
+					name: msg.author.tag,
+					icon_url: msg.author.avatarURL
+				}
+			};
+
+			return msg.channel.createMessage({
+				embed
+			});
 		})
 	});
 
