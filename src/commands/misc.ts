@@ -197,43 +197,40 @@ CmdHandler
 		features: [],
 		category: "misc",
 		run: (async function (this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>) {
-			// return msg.reply("We are not accepting suggestions at this time.");
-
-			let card, embed: Eris.EmbedOptions;
-
-			if (msg.unparsedArgs.length < 1 || !msg.unparsedArgs[0]) throw new CommandError(null, "ERR_INVALID_USAGE");
-			try {
-				card = await this.tclient.addCard(msg.unparsedArgs.join(" "), `Suggestion by ${msg.author.tag} (${msg.author.id}) from guild ${msg.guild.name} (${msg.guild.id})`, config.apis.trello.list);
-			} catch (e) {
-				return msg.reply(`Failed to create suggestion, **${e.message}**`);
-			}
-
-			await this.tclient.addLabelToCard(card.id, config.apis.trello.labels.unapproved).catch(err => null);
-			await msg.reply(`Suggestion posted!\nView it here: ${card.shortUrl}`);
-
-			embed = {
-				title: `Suggestion by ${msg.author.tag} (${msg.author.id}) from guild ${msg.guild.name} (${msg.guild.id})`,
-				description: truncate(msg.unparsedArgs.join(" "), 950),
-				thumbnail: {
-					url: msg.author.avatarURL
-				},
-				fields: [
+			const m = await this.bot.executeWebhook(config.webhooks.suggestion.id, config.webhooks.suggestion.token, {
+				embeds: [
 					{
-						name: "Trello Card",
-						value: card.shortUrl,
-						inline: false
+						title: `Suggestion by ${msg.author.tag} from guild ${msg.guild.name}`,
+						description: `${truncate(msg.unparsedArgs.join(" "), 950)}`,
+						thumbnail: {
+							url: msg.author.avatarURL
+						},
+						timestamp: new Date().toISOString(),
+						color: this.f.randomColor(),
+						footer: {
+							text: `User ID: ${msg.author.id} | Guild ID: ${msg.channel.guild.id}`
+						}
 					}
 				],
-				timestamp: new Date().toISOString(),
-				color: this.f.randomColor()
-			};
-
-			return this.bot.executeWebhook(config.webhooks.suggestion.id, config.webhooks.suggestion.token, {
-				embeds: [
-					embed
-				],
 				username: `Bot Suggestion${config.beta ? " - Beta" : ""}`,
-				avatarURL: "https://i.furry.bot/furry.png"
+				avatarURL: "https://i.furry.bot/furry.png",
+				wait: true
+			});
+			try {
+				await m.addReaction(config.emojis.upvote);
+				await m.addReaction(config.emojis.downvote);
+			} catch (e) { }
+			return msg.channel.createMessage({
+				embed: {
+					title: "Suggestion Posted!",
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					},
+					description: `Your suggestion was posted! You can view it [here](https://discord.gg/CQMx76B).`,
+					timestamp: new Date().toISOString(),
+					color: this.f.randomColor()
+				}
 			});
 		})
 	})
