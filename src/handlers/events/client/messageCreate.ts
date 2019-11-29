@@ -15,7 +15,6 @@ import { performance } from "perf_hooks";
 export default new ClientEvent<FurryBot>("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
 	/* dev only */
 	const start = performance.now();
-
 	if (config.timers && !config.developers.includes(message.author.id)) return;
 
 	if (config.timers) Logger.debug(`Cluster #${this.clusterId}`, `[${(performance.now() - start).toFixed(3)}ms]: track start`);

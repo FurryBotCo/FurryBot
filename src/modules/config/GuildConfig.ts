@@ -17,6 +17,7 @@ interface RegistrationQuestion {
 		[q: string]: string;
 	};
 }
+
 class GuildConfig {
 	id: string;
 	blacklist: {
