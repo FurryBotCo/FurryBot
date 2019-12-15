@@ -1,1 +1,1 @@
-module.exports = require("./build").default;
+module.exports = require("./build");

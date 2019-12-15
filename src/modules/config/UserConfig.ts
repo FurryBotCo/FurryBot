@@ -1,4 +1,4 @@
-import config from "../../default/userConfig.json";
+import config from "../../config";
 import { mdb } from "../Database";
 
 // I considered adding votes onto user objects, bot tracking them separately will work out
@@ -39,58 +39,50 @@ class UserConfig {
 	};
 	// voteCount: number;
 	// lastVote: number;
-	constructor(id: string, data) {
+	constructor(id: string, data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		this.id = id;
-		if (!data) data = config;
+		if (!data) data = config.defaults.userConfig;
 		this._load.call(this, data);
 	}
 
-	_load(data) {
-		this.blacklist = ![undefined, null].includes(data.blacklist) ? data.blacklist : config.blacklist;
-		this.marriage = ![undefined, null].includes(data.marriage) ? data.marriage : config.marriage;
-		this.warnings = ![undefined, null].includes(data.warnings) ? data.warnings : config.warnings;
-		this.bal = ![undefined, null].includes(data.bal) ? data.bal : config.bal;
-		this.tips = ![undefined, null].includes(data.tips) ? data.tips : config.tips;
-		this.dmActive = ![undefined, null].includes(data.dmActive) ? data.dmActive : config.dmActive;
-		this.patreon = ![undefined, null].includes(data.patreon) ? data.patreon : config.patreon;
-		this.preferences = ![undefined, null].includes(data.preferences) ? data.preferences : config.preferences;
+	_load(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
+		this.blacklist = ![undefined, null].includes(data.blacklist) ? {
+			blacklisted: !!data.blacklist.blacklisted,
+			reason: data.blacklist.reason || null,
+			blame: data.blacklist.blame || null
+		} : config.defaults.userConfig.blacklist;
+		this.marriage = ![undefined, null].includes(data.marriage) ? {
+			married: !!data.marriage.married,
+			partner: data.marriage.partner || null
+		} : config.defaults.userConfig.marriage;
+		this.warnings = ![undefined, null].includes(data.warnings) ? data.warnings : config.defaults.userConfig.warnings;
+		this.bal = ![undefined, null].includes(data.bal) ? data.bal : config.defaults.userConfig.bal;
+		this.tips = ![undefined, null].includes(data.tips) ? data.tips : config.defaults.userConfig.tips;
+		this.dmActive = ![undefined, null].includes(data.dmActive) ? data.dmActive : config.defaults.userConfig.dmActive;
+		this.patreon = ![undefined, null].includes(data.patreon) ? {
+			amount: data.patreon.amount || 0,
+			createdAt: data.patreon.createdAt || null,
+			declinedAt: data.patreon.declinedAt || null,
+			donator: !!data.patreon.donator,
+			patronId: data.patreon.patronId || null
+		} : config.defaults.userConfig.patreon;
+		this.preferences = ![undefined, null].includes(data.preferences) ? {
+			mention: !!data.preferences.mention
+		} : config.defaults.userConfig.preferences;
 		// this.voteCount = ![undefined, null].includes(data.voteCount) ? data.voteCount : config.voteCount;
 		// this.lastVote = ![undefined, null].includes(data.lastVote) ? data.lastVote : config.lastVote;
 
 		return null;
 	}
 
-	async reload(): Promise<UserConfig> {
+	async reload() {
 		const r = await mdb.collection("users").findOne({ id: this.id });
 		this._load.call(this, r);
 
 		return this;
 	}
 
-	async edit(data: {
-		blacklist?: {
-			blacklisted?: boolean;
-			reason?: string;
-			blame?: string;
-		};
-		marriage?: {
-			married?: boolean;
-			partner?: string;
-		}
-		bal?: number;
-		tips?: boolean;
-		dmActive?: boolean;
-		patreon?: {
-			amount?: number;
-			createdAt?: number;
-			declinedAt?: number;
-			donator?: boolean;
-			patronId?: string;
-		};
-		preferences?: {
-			mention?: boolean;
-		};
-	}): Promise<UserConfig> {
+	async edit(data: DeepPartial<Omit<{ [K in keyof UserConfig]: UserConfig[K]; }, "warnings">>) {
 		const u = {
 			blacklist: this.blacklist,
 			marriage: this.marriage,
@@ -143,14 +135,14 @@ class UserConfig {
 		return this.reload();
 	}
 
-	async delete(): Promise<void> {
+	async delete() {
 		await mdb.collection("users").findOneAndDelete({ id: this.id });
 	}
 
-	async reset(): Promise<UserConfig> {
+	async reset() {
 		await this.delete();
 		await mdb.collection("users").insertOne({ ...{}, ...config, ...{ id: this.id } });
-		await this._load(config);
+		await this._load(config.defaults.userConfig);
 		return this;
 	}
 }

@@ -1,6 +1,12 @@
 import config from "../config";
-import DB from "@donovan_dmc/db";
+import DB from "../util/db";
 
-const db = DB(config.db.host, config.db.port, config.db.database, config.db.opt);
+const db = new DB(config.db.host, config.db.port, config.db.database, config.db.opt, config.beta);
 
-export = db;
+const mdb = db.mdb;
+const mongo = db.mongo;
+
+export { mdb };
+export { mongo };
+export { db };
+export default db;

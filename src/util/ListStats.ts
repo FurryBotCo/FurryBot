@@ -30,9 +30,9 @@ export default (async (shards: number[]) => {
 			}
 		})
 			.then(req => JSON.parse(req.body.toString()));
-		Logger.log("Cluster Manager | Bot List Stats", `Posted guild counts: ${shards.reduce((a, b) => a + b, 0)}`);
+		Logger.log("Bot List Stats", `Posted guild counts: ${shards.reduce((a, b) => a + b, 0)}`);
 	} catch (e) {
-		Logger.error("Cluster Manager | Bot List Stats", e);
+		Logger.error("Bot List Stats", e);
 	}
 	return {
 		count: shards.reduce((a, b) => a + b, 0)
