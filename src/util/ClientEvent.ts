@@ -1,6 +1,5 @@
 import * as Eris from "eris";
 import PartialMessage from "./PartialMessage";
-import { BaseClient } from "clustersv2";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 

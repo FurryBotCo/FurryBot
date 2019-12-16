@@ -2,7 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import util from "util";
 import * as Eris from "eris";
@@ -42,7 +42,8 @@ export default new Command({
 		url: `https://api2.sofurry.com/browse/search?search=${tags}&format=json&minlevel=0&maxlevel=0`,
 		headers: {
 			"User-Agent": config.web.userAgent
-		}
+		},
+		timeout: 5e3
 	});
 	if (req.body.toString().indexOf("block.opendns.com") !== -1) return msg.reply("This command is blocked on the current network the bot is being ran on.");
 	try {

@@ -7,7 +7,6 @@
     "@donovan_dmc/db": "^1.0.0",
     "chalk": "^3.0.0",
     "chunk": "0.0.2",
-    "clustersv2": "npm:@donovan_dmc/clustersv2@^1.0.33",
     "cookie-parser": "^1.4.4",
     "deasync": "^0.1.16",
     "e6api": "^1.0.6",

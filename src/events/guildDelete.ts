@@ -1,14 +1,14 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "clustersv2";
+import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 	this.decrement([
-		"events.guildCreate"
+		"events.guildDelete"
 	]);
-	this.decrement("dailyJoins");
+	await this.f.incrementDailyCounter(false);
 
 	let author = {
 		name: "Unknown#0000",

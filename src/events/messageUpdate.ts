@@ -1,6 +1,6 @@
 import ClientEvent from "../util/ClientEvent";
 import PartialMessage from "../util/PartialMessage";
-import { Logger } from "clustersv2";
+import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";

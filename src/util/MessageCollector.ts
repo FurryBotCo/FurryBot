@@ -1,5 +1,4 @@
 import * as Eris from "eris";
-import { BaseClient } from "clustersv2";
 import ExtendedMessage from "@ExtendedMessage";
 import FurryBot from "@FurryBot";
 

@@ -1,5 +1,5 @@
 import Command from "./Command";
-import { Logger } from "clustersv2";
+import { Logger } from "../../../util/LoggerV8";
 
 export default class Category {
 	name: string;

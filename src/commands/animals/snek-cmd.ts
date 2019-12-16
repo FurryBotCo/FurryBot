@@ -2,7 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 
 export default new Command({
@@ -30,7 +30,8 @@ export default new Command({
 			headers: {
 				"User-Agent": config.web.userAgent,
 				"Authorization": config.apis.chewyBot.key
-			}
+			},
+			timeout: 5e3
 		});
 		j = JSON.parse(req.body);
 

@@ -17,8 +17,8 @@ export default class Queue {
 		return rand;
 	}
 
-	_add(...entries: Omit<QueueEntry, "id">[]) {
-		return this._entries.push(...entries.map(e => ({ ...e, id: this._genId() })));
+	_add(...entries: (Omit<QueueEntry, "id"> & { id?: string; })[]) {
+		return entries.map(e => typeof e.id === "string" ? this._entries.push(e as any) : this._entries.push({ ...e, id: this._genId() }));
 	}
 
 	clear() {

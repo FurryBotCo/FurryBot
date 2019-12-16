@@ -2,7 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import * as Eris from "eris";
 import { db, mdb, mongo } from "../../modules/Database";
@@ -25,7 +25,8 @@ export default new Command({
 	const img = await phin({
 		method: "GET",
 		url: "https://api.fursuitbutts.com/butts",
-		parse: "json"
+		parse: "json",
+		timeout: 5e3
 	});
 
 	if (img.statusCode !== 200) {

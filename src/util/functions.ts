@@ -229,7 +229,8 @@ export default {
 				s = await phin({
 					method: "GET",
 					url: `https://api.furry.bot/${animal ? "animals" : `furry/${safe ? "sfw" : "nsfw"}`}/${category ? category.toLowerCase() : safe ? "hug" : "bulge"}${json ? "" : "/image"}`.replace(/\s/g, ""),
-					parse: "json"
+					parse: "json",
+					timeout: 5e3
 				});
 				resolve(s.body);
 			} catch (error) {
@@ -255,7 +256,7 @@ export default {
 		a.map((b) => args[e2(b)] !== undefined ? res = res.replace(new RegExp(e(b), "g"), args[e2(b)]) : null);
 		return res;
 	})),
-	downloadImage: (async (url: string, filename: string): Promise<fs.WriteStream> => phin({ url }).then(res => res.pipe(fs.createWriteStream(filename)))),
+	downloadImage: (async (url: string, filename: string): Promise<fs.WriteStream> => phin({ url, timeout: 5e3 }).then(res => res.pipe(fs.createWriteStream(filename)))),
 	shortenURL: (async (url: string): Promise<{
 		success: boolean;
 		code: string;
@@ -286,7 +287,8 @@ export default {
 				headers: {
 					"User-Agent": config.web.userAgent
 				},
-				parse: "json"
+				parse: "json",
+				timeout: 5e3
 			});
 
 			if (cr.statusCode !== 200) return null;
@@ -311,7 +313,8 @@ export default {
 				avatars,
 				text
 			},
-			parse: "none"
+			parse: "none",
+			timeout: 5e3
 		});
 	}),
 	compareMembers: ((member1: Eris.Member, member2: Eris.Member): {
@@ -411,7 +414,8 @@ export default {
 	validateURL: ((url: string) =>
 		URL.parse(url).hostname ? phin({
 			method: "HEAD",
-			url
+			url,
+			timeout: 5e3
 		}).then(d => d.statusCode === 200) : false
 	),
 	memberIsBooster: (async (m: Eris.Member): Promise<boolean> => {
@@ -585,5 +589,16 @@ export default {
 	},
 	get refreshPareonToken() {
 		return refreshPareonToken;
-	}
+	},
+	incrementDailyCounter: (async (increment = true) => {
+		const d = new Date();
+		const id = `${d.getMonth()}-${d.getDate()}-${d.getFullYear()}`;
+
+		const j = await mdb.collection("dailyjoins").findOne({ id });
+		const count = j ? increment ? j.count + 1 : j.count - 1 : increment ? -1 : 1;
+		await mdb.collection("dailyjoins").findOneAndDelete({ id });
+		await mdb.collection("dailyjoins").insertOne({ count, id });
+
+		return count;
+	})
 };

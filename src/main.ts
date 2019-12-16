@@ -3,14 +3,13 @@ import * as fs from "fs-extra";
 import config from "./config";
 import MessageCollector from "./util/MessageCollector";
 import Temp from "./util/Temp";
-import { Logger } from "clustersv2";
+import { Logger } from "./util/LoggerV8";
 import E6API from "e6api";
 import E9API from "e9api";
 import { StatsD } from "node-statsd";
 import functions from "./util/Functions";
 import ErrorHandler from "./util/ErrorHandler";
 import ClientEvent from "./util/ClientEvent";
-import cmd from "./commands";
 import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
 
 export default class FurryBot extends Eris.Client {
@@ -39,6 +38,22 @@ export default class FurryBot extends Eris.Client {
 	errorHandler: ErrorHandler;
 	ddog: StatsD;
 	cmd: CommandHolder;
+	stats: {
+		messageCount: number;
+		dmMessageCount: number;
+		readonly guildCount: number;
+		readonly userCount: number;
+		readonly channelCount: number;
+		readonly shardCount: number;
+		readonly largeGuildCount: number;
+		readonly voiceConnectionCount: number;
+		readonly commandStats: {
+			[k: string]: number;
+		};
+	};
+	commandStats: {
+		[k: string]: number;
+	};
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
 		fs.readdirSync(`${__dirname}/events`).map((d) => {
@@ -68,24 +83,69 @@ export default class FurryBot extends Eris.Client {
 			)
 			.on("uncaughtException", (error) =>
 				this.errorHandler.globalHandler.bind(this.errorHandler, "uncaughtException")({ error })
-			)
-			.on("SIGINT", (signal) =>
-				this.errorHandler.globalHandler.bind(this.errorHandler, "SIGINT")({ signal })
-			)
-			.on("SIGTERM", (signal) =>
-				this.errorHandler.globalHandler.bind(this.errorHandler, "SIGTERM")({ signal })
-			)
-			.on("beforeExit", (code) =>
-				this.errorHandler.globalHandler.bind(this.errorHandler, "beforeExit")({ code })
-			)
-			.on("exit", (code) =>
-				this.errorHandler.globalHandler.bind(this.errorHandler, "exit")({ code })
 			);
+		/*.on("SIGINT", (signal) =>
+			this.errorHandler.globalHandler.bind(this.errorHandler, "SIGINT")({ signal })
+		)
+		.on("SIGTERM", (signal) =>
+			this.errorHandler.globalHandler.bind(this.errorHandler, "SIGTERM")({ signal })
+		)
+		.on("beforeExit", (code) =>
+			this.errorHandler.globalHandler.bind(this.errorHandler, "beforeExit")({ code })
+		)
+		.on("exit", (code) =>
+			this.errorHandler.globalHandler.bind(this.errorHandler, "exit")({ code })
+		);*/
 
 		this.f = functions;
 		this.messageCollector = new MessageCollector(this);
 
-		cmd.map(c => this.cmd.addCategory(c));
+		const client = this; // tslint:disable-line no-this-assignment
+
+		this.commandStats = {};
+		this.stats = {
+			messageCount: 0,
+			dmMessageCount: 0
+		} as any;
+
+		Object.defineProperties(this.stats, {
+			guildCount: {
+				get: () => {
+					return client.guilds.size;
+				},
+				enumerable: true
+			},
+			userCount: {
+				get: () => {
+					return client.users.size;
+				},
+				enumerable: true
+			},
+			shardCount: {
+				get: () => {
+					return client.shards.size;
+				},
+				enumerable: true
+			},
+			largeGuildCount: {
+				get: () => {
+					return client.guilds.filter(g => g.large).length;
+				},
+				enumerable: true
+			},
+			voiceConnectionCount: {
+				get: () => {
+					return client.voiceConnections.size;
+				},
+				enumerable: true
+			},
+			commandStats: {
+				get: () => {
+					return client.commandStats;
+				},
+				enumerable: true
+			}
+		});
 	}
 
 	async increment(stat: string | string[], tags?: string[]): Promise<string> {

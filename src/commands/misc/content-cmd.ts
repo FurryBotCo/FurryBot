@@ -2,7 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import * as Eris from "eris";
 import { db, mdb, mongo } from "../../modules/Database";
@@ -22,7 +22,8 @@ export default new Command({
 	const req = await phin({
 		method: "GET",
 		url: "https://api.furry.bot/counts",
-		parse: "json"
+		parse: "json",
+		timeout: 5e3
 	});
 	let txt = "";
 	const recurse = (obj, i, r) => new Promise(async (a, b) => Promise.all(Object.keys(obj).map(async (o) => typeof obj[o] !== "object" ? txt += `${r.repeat(i)}${o}: ${obj[o]}\n` : (txt += `${r.repeat(i)}${o}:\n`, recurse(obj[o] as {}, i + 1, r)))).then(a));

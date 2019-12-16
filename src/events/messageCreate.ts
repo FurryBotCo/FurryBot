@@ -1,5 +1,5 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "clustersv2";
+import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
@@ -11,6 +11,8 @@ import { ChannelNamesCamelCase } from "../util/Constants";
 import Permissions from "../util/Permissions";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
+	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) this.stats.dmMessageCount++;
+	else this.stats.messageCount++;
 	let msg: ExtendedMessage;
 	try {
 		const t = new Timers();
@@ -27,9 +29,35 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		// if (config.beta && !config.developers.includes(message.author.id) return;
 		t.start("messageProcess");
 		msg = new ExtendedMessage(message, this);
+		await msg._load();
 		t.end("messageProcess");
 
-		const bl = msg.uConfig.blacklist.blacklisted || [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(msg.channel.type) ? msg.gConfig && msg.gConfig.blacklist.blacklisted : false;
+		let bl = false;
+
+		if ([Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(msg.channel.type) && msg.gConfig && msg.gConfig.blacklist.blacklisted === true) bl = true;
+		if (msg.uConfig.blacklist.blacklisted === true) bl = true;
+
+		if (bl) {
+			if (!fs.existsSync(`${config.rootDir}/src/config/json/other/blNoticeViewed.json`)) fs.writeFileSync(`${config.rootDir}/src/config/json/other/blNoticeViewed.json`, JSON.stringify([]));
+			if (msg.cmd) {
+				const b: string[] = JSON.parse(fs.readFileSync(`${config.rootDir}/src/config/json/other/blNoticeViewed.json`).toString());
+				if (msg.uConfig.blacklist.blacklisted && !b.includes(msg.author.id)) {
+					b.push(msg.author.id);
+					fs.writeFileSync(`${config.rootDir}/src/config/json/other/blNoticeViewed.json`, JSON.stringify(b));
+					if (msg.uConfig.blacklist.reason !== null) return msg.reply(`you have been blacklisted. Reason: ${msg.uConfig.blacklist.reason}, blame: ${msg.uConfig.blacklist.blame}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`);
+					else return;
+				}
+
+				if ([Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(msg.channel.type) && msg.gConfig.blacklist.blacklisted && !b.includes(msg.channel.guild.id)) {
+					b.push(msg.channel.guild.id);
+					fs.writeFileSync(`${config.rootDir}/src/config/json/other/blNoticeViewed.json`, JSON.stringify(b));
+					if (msg.gConfig.blacklist.reason !== null) return msg.reply(`this server has been blacklisted. Reason: ${msg.gConfig.blacklist.reason}, blame: ${msg.gConfig.blacklist.blame}.`);
+					else return;
+				}
+			}
+
+			return;
+		}
 
 		t.start("dm");
 		if (message.channel.type === Eris.Constants.ChannelTypes.DM) {
@@ -82,8 +110,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 		t.end("dm");
-
-		if (bl) return;
 
 		if ([`<@!${this.user.id}>`, `<@${this.user.id}>`].includes(msg.content)) {
 			this.increment([
@@ -227,6 +253,69 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 		t.end("autoResponse");
 
+		if (!config.developers.includes(msg.author.id)) {
+			const sp = [...this.spamCounter.filter(s => s.user === msg.author.id)];
+			let spC = sp.length;
+			if (sp.length >= config.antiSpam.cmd.start && sp.length % config.antiSpam.cmd.warning === 0) {
+				let report: any = {
+					userTag: msg.author.tag,
+					userId: msg.author.id,
+					generatedTimestamp: Date.now(),
+					entries: sp.map(s => ({ cmd: s.cmd, time: s.time })),
+					type: "cmd",
+					beta: config.beta
+				};
+
+				const d = fs.readdirSync(`${config.logsDir}/spam`).filter(d => !fs.lstatSync(`${config.logsDir}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.logsDir}/spam/${d}`).birthtimeMs + 1.2e5 > Date.now());
+
+				if (d.length > 0) {
+					report = this.f.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.logsDir}/spam/${f}`).toString())), report);
+					spC = report.entries.length;
+					d.map(f => fs.unlinkSync(`${config.logsDir}/spam/${f}`));
+				}
+
+				const reportId = this.f.random(10);
+
+				fs.writeFileSync(`${config.logsDir}/spam/${msg.author.id}-${reportId}-cmd.json`, JSON.stringify(report));
+
+				Logger.log(`Shard #${msg.guild.shard.id} | Command Handler`, `Possible command spam from "${msg.author.tag}" (${msg.author.id}), VL: ${spC}, Report: ${config.beta ? `https://${config.apiBindIp}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`);
+				await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+					embeds: [
+						{
+							title: `Possible Command Spam From ${msg.author.tag} (${msg.author.id}) | VL: ${spC}`,
+							description: `Report: ${config.beta ? `https://${config.apiBindIp}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`
+						}
+					],
+					username: `Furry Bot Spam Logs${config.beta ? " - Beta" : ""}`,
+					avatarURL: "https://assets.furry.bot/blacklist_logs.png"
+				});
+
+				if (spC >= config.antiSpam.cmd.blacklist) {
+					await msg.uConfig.edit({
+						blacklist: {
+							blacklisted: true,
+							reason: `Spamming Commands. Automatic Blacklist.`,
+							blame: "Automatic"
+						}
+					});
+
+					Logger.log(`Shard #${msg.guild.shard.id} | Command Handler`, `User "${msg.author.tag}" (${msg.author.id}) blacklisted for spamming, VL: ${spC}, Report: ${config.beta ? `https://${config.apiBindIp}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`);
+					await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
+						embeds: [
+							{
+								title: "User Blacklisted",
+								description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. Automatic Blacklist.\nReport: ${config.beta ? `https://${config.apiBindIp}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}\nBlame: Automatic`,
+								timestamp: new Date().toISOString(),
+								color: this.f.randomColor()
+							}
+						],
+						username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
+						avatarURL: "https://assets.furry.bot/blacklist_logs.png"
+					});
+				}
+			}
+		}
+
 		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()) || msg.content.toLowerCase() === msg.prefix.toLowerCase() || !msg.cmd || !msg.cmd.cmd) return;
 		const cmd = msg.cmd.cmd;
 		this.increment(
@@ -235,6 +324,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				`shardId:${msg.channel.guild.shard.id}`
 			]
 		);
+		this.commandStats[cmd.triggers[0]]++;
 
 		if (cmd.features.includes("betaOnly") && !config.beta) return;
 
@@ -264,7 +354,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						icon_url: msg.author.avatarURL
 					},
 					title: "NSFW Commands Disabled",
-					description: `NSFW commands have been explicitly disabled in this channel, to reenable them, remove **${st.join("**, **")}** from the channel topic.`,
+					description: `NSFW commands have been explicitly disabled in this channel. To reenable them, remove **${st.join("**, **")}** from the channel topic.`,
 					color: Math.floor(Math.random() * 0xFFFFFF),
 					timestamp: new Date().toISOString()
 				};
@@ -288,8 +378,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 
-		if (cmd.botPermissions.length > 0 && !config.developers.includes(msg.author.username)) {
-			if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(this.user.id).has(perm))) {
+		if (cmd.botPermissions.length > 0) {
+			if (cmd.botPermissions.some(perm => !msg.channel.permissionsOf(this.user.id).has(perm))) {
 				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(this.user.id).has(perm));
 
 				const embed: Eris.EmbedOptions = {
@@ -304,7 +394,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 
-		Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}" ran with the arguments "${msg.args.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}" ran with the arguments "${msg.args.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 
 		t.start("cmd");
 		const c = await cmd.run.call(this, msg, cmd);
@@ -315,7 +405,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		t.end("main");
 	} catch (e) {
 		const err: Error = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
-		const cmd = msg.cmd.cmd;
+		const cmd = msg.cmd !== null ? msg.cmd.cmd : null;
+		Logger.error(`Shard #${msg.channel.guild.shard.id}`, err);
+		if (!cmd) return;
+		if (cmd) return;
 		switch (err.message) {
 			case "ERR_INVALID_USAGE":
 				const embed: Eris.EmbedOptions = {

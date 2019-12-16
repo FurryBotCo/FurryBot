@@ -1,4 +1,4 @@
-import { Logger } from "clustersv2";
+import { Logger } from "../util/LoggerV8";
 import config from "../config";
 import phin from "phin";
 
@@ -14,7 +14,8 @@ export default (async (shards: number[]) => {
 				shard_count: shards.length,
 				shards,
 				...config.botLists
-			}
+			},
+			timeout: 1e4
 		});
 
 		// botblock was blocked on discordbots.org
@@ -27,7 +28,8 @@ export default (async (shards: number[]) => {
 			headers: {
 				"Content-Type": "application/json",
 				"Authorization": config.botLists["discordbots.org"]
-			}
+			},
+			timeout: 1e4
 		})
 			.then(req => JSON.parse(req.body.toString()));
 		Logger.log("Bot List Stats", `Posted guild counts: ${shards.reduce((a, b) => a + b, 0)}`);

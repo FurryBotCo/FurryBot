@@ -2,7 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../util/LoggerV8";
 import _eval from "../../util/eval";
 import phin from "phin";
 import util from "util";
@@ -90,7 +90,8 @@ export default new Command({
 					api_paste_private: "2",
 					api_paste_name: "Furry Bot Eval",
 					api_paste_expire_date: "1D"
-				}
+				},
+				timeout: 5e3
 			});
 			res = `Uploaded ${req.body.toString()}`;
 		}
@@ -131,7 +132,8 @@ export default new Command({
 					api_paste_private: "2",
 					api_paste_name: "Furry Bot Silent Eval",
 					api_paste_expire_date: "1D"
-				}
+				},
+				timeout: 5e3
 			});
 			res = `Uploaded ${req.body.toString()}`;
 		}

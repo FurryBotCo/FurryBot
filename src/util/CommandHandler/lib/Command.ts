@@ -4,7 +4,7 @@ import ExtendedMessage from "@ExtendedMessage";
 import SubCommand from "./SubCommand";
 import Eris from "eris";
 import config from "../../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../LoggerV8";
 import * as fs from "fs";
 
 export default class Command {

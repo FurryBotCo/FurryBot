@@ -3,7 +3,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import Eris from "eris";
 import config from "../../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../LoggerV8";
 import * as fs from "fs";
 import Command from "./Command";
 

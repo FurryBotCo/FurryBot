@@ -1,11 +1,13 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "clustersv2";
+import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
 import ExtendedMessage from "@ExtendedMessage";
 
-export default new ClientEvent("error", (async function (this: FurryBot, info, id?: number) {
+// this cannot be async due to "unhandledRejection" (unhandled promise rejection)'s not
+// being able to be handled asynchronously
+export default new ClientEvent("error", (function (this: FurryBot, info, id?: number) {
 	this.increment([
 		"events.error"
 	]);
@@ -14,13 +16,11 @@ export default new ClientEvent("error", (async function (this: FurryBot, info, i
 		else return console.error(info);
 	} else {
 		switch (info.type) {
-			case "SIGINT":
-			case "SIGTERM":
-				Logger.error("Client", `${info.type} recieved, signal: ${info.data.signal}. Killing process.`);
-				this.disconnect({ reconnect: false });
-				process.kill(process.pid);
-				break;
-
+			// case "SIGINT":
+			// 	Logger.error("Client", `${info.type} recieved, signal: ${info.data.signal}. Killing process.`);
+			// 	this.disconnect({ reconnect: false });
+			// 	process.kill(process.pid);
+			// 	break;
 			case "uncaughtException":
 				return Logger.error("Uncaught Exception", info.data.error);
 				break;

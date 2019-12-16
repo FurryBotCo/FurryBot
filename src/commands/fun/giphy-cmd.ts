@@ -2,7 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import * as Eris from "eris";
 import { db, mdb, mongo } from "../../modules/Database";
@@ -27,7 +27,8 @@ export default new Command({
 	const rq = await phin({
 		method: "GET",
 		url: `https://api.giphy.com/v1/gifs/search?api_key=${config.apis.giphy.apikey}&q=${msg.args.join("%20")}&limit=50&offset=7&rating=G&lang=en`,
-		parse: "json"
+		parse: "json",
+		timeout: 5e3
 	});
 
 	if (rq.body.data.length === 0) return msg.reply(`No results were found for "${msg.args.join(" ")}".`);

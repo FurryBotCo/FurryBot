@@ -2,7 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import * as Eris from "eris";
 import { db, mdb, mongo } from "../../modules/Database";
@@ -16,7 +16,8 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [
 		"embedLinks",
-		"attachFiles"
+		"attachFiles",
+		"addReactions"
 	],
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
@@ -24,6 +25,7 @@ export default new Command({
 	usage: "[tags]",
 	features: ["nsfw"]
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	if (!msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly, because I don't have the `manageMessages` permission!");
 	if (this.activeReactChannels.includes(msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout, or react to the old one with \"⏹\" before starting another.");
 
 	const client = this; // tslint:disable-line no-this-assignment

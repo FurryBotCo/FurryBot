@@ -2,7 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 
 export default new Command({
@@ -28,7 +28,8 @@ export default new Command({
 			url: "https://dog.ceo/api/breeds/image/random",
 			headers: {
 				"User-Agent": config.web.userAgent
-			}
+			},
+			timeout: 5e3
 		});
 		j = JSON.parse(req.body);
 		parts = j.message.replace("https://", "").split("/");

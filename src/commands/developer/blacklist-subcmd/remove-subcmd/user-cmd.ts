@@ -2,7 +2,7 @@ import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../../../util/LoggerV8";
 import { db, mdb } from "../../../../modules/Database";
 import Eris from "eris";
 

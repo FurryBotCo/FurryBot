@@ -3,7 +3,7 @@ import FurryBot from "@FurryBot";
 import UserConfig from "./config/UserConfig";
 import GuildConfig from "./config/GuildConfig";
 import config from "../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../util/LoggerV8";
 import deasync from "deasync";
 import Command from "../util/CommandHandler/lib/Command";
 import Category from "../util/CommandHandler/lib/Category";
@@ -127,17 +127,9 @@ class ExtendedMessage extends Eris.Message {
 		});
 	}
 
-	async fetchDBConfig(type: "user"): Promise<UserConfig>;
-	async fetchDBConfig(type: "guild"): Promise<GuildConfig>;
-	async fetchDBConfig(type: "user" | "guild", cb?: (err: Error, cnf: UserConfig | GuildConfig) => any) {
-		const k = await new Promise((a, b) => {
-			if (type === "user") return db.getUser(this.author.id).then(a).catch(err => b(err));
-			else if (type === "guild") return db.getGuild(this.channel.guild.id).then(a).catch(err => b(err));
-			else throw new TypeError("Invalid fetch type.");
-		}).catch(err => !cb ? () => { throw err; } : cb(err, null));
-
-		if (!cb) return k;
-		else return cb(null, k as UserConfig | GuildConfig);
+	async _load() {
+		this._uConfig = await db.getUser(this.author.id);
+		this._gConfig = ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type) ? null : await db.getGuild(this.channel.guild.id);
 	}
 
 	get prefix() {
@@ -186,7 +178,6 @@ class ExtendedMessage extends Eris.Message {
 	}
 
 	get uConfig() {
-		if (!this._uConfig) this._uConfig = deasync(this.fetchDBConfig).call(this, "user");
 		return this._uConfig;
 	}
 
@@ -196,7 +187,6 @@ class ExtendedMessage extends Eris.Message {
 	}*/
 
 	get gConfig() {
-		if (!this._gConfig) this._gConfig = deasync(this.fetchDBConfig).call(this, "guild");
 		return this._gConfig;
 	}
 

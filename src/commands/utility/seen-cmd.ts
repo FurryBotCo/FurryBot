@@ -2,7 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "clustersv2";
+import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import * as Eris from "eris";
 import { db, mdb, mongo } from "../../modules/Database";
@@ -53,9 +53,15 @@ export default new Command({
 
 	const embed: Eris.EmbedOptions = {
 		title: `Seen On ${b.length} Servers - ${user.user.username}#${user.user.discriminator} (${user.id})`,
-		description: `I see this user in ${b.length} other guilds.`,
-		fields
+		description: `I see this user in ${a.length} other servers.`,
+		fields,
+		timestamp: new Date().toISOString()
 	};
+
+	if (a.length > 30) {
+		embed.fields = [];
+		embed.description += "\nNot showing names/ids, user has too many in common (>30).";
+	}
 
 	msg.channel.createMessage({ embed });
 }));
