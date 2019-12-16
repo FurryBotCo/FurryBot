@@ -9,7 +9,7 @@ export default (async (client: FurryBot) => {
 
 	app.get("/", async (req, res) => res.status(200).json({
 		success: true,
-		clientStatus: "online"
+		clientStatus: client.shards.get(0).presence.status
 	}));
 
 	return app;

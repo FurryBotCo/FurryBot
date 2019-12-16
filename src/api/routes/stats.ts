@@ -2,7 +2,6 @@ import express from "express";
 import { mdb } from "../../modules/Database";
 import config from "../../config";
 import apiFunctions from "../functions";
-import CmdHandler from "../../util/cmd";
 import FurryBot from "@FurryBot";
 
 export default (async (client: FurryBot) => {
@@ -12,35 +11,34 @@ export default (async (client: FurryBot) => {
 	app.get("/", async (req, res) => {
 		const d = new Date(),
 			date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
-			dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null);
+			dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null),
+			m = await mdb.collection("stats").findOne({ id: "messages" }).catch(err => null);
 
-		const st = await client.cluster.getManagerStats();
 		return res.status(200).json({
 			success: true,
 			clientStatus: "online",
-			guildCount: st.guildCount,
-			userCount: st.userCount,
-			shardCount: st.shards.length,
-			clusterCount: st.clusters.length,
+			guildCount: client.guilds.size,
+			userCount: client.users.size,
+			shardCount: client.shards.size,
 			memoryUsage: {
 				process: {
-					used: st.memoryUsage.heapUsed,
-					total: st.memoryUsage.heapTotal
+					used: client.f.memory.process.getUsed(),
+					total: client.f.memory.process.getTotal()
 				},
 				system: {
 					used: client.f.memory.system.getUsed(),
 					total: client.f.memory.system.getTotal()
 				}
 			},
-			largeGuildCount: st.largeGuildCount,
+			largeGuildCount: client.guilds.filter(g => g.large).length,
 			botVersion: config.version,
 			library: "eris",
 			libraryVersion: require("eris").VERSION,
 			nodeVersion: process.version,
 			dailyJoins,
-			commandCount: CmdHandler.commands.length,
-			messageCount: 0,
-			dmMessageCount: 0
+			commandCount: client.cmd.commands.length,
+			messageCount: m.messageCount || 0,
+			dmMessageCount: m.dmMessageCount || 0
 		});
 	});
 

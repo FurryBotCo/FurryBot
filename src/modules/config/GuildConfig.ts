@@ -1,8 +1,5 @@
 import config from "../../config";
-import data from "../../default/guildConfig.json";
 import { mdb } from "../Database";
-import DBCollection from "../../util/DBCollection";
-import { Entries as ModLogEntry } from "./ModLog";
 
 interface CommandConfigEntry {
 	type: "command" | "category";
@@ -17,6 +14,7 @@ interface RegistrationQuestion {
 		[q: string]: string;
 	};
 }
+
 class GuildConfig {
 	id: string;
 	blacklist: {
@@ -42,12 +40,20 @@ class GuildConfig {
 		muteRole?: string;
 		fResponse: boolean;
 		commandImages: boolean;
-		lang: "en";
+		lang: string;
 		prefix: string;
+		deleteModCmds: boolean;
 	};
-	modlog: DBCollection<ModLogEntry>;
 	snipe: {
-		[k in "delete" | "edit"]?: {
+		edit: {
+			[k: string]: {
+				authorId: string;
+				content: string;
+				oldContent: string;
+				time: number;
+			};
+		};
+		delete: {
 			[k: string]: {
 				authorId: string;
 				content: string;
@@ -55,110 +61,92 @@ class GuildConfig {
 			};
 		};
 	};
-	constructor(id: string, d) {
+	logEvents: {
+		[k in
+		"channelCreate" | "channelDelete" | "channelUpdate" |                         // channel
+		"memberBan" | "memberUnban" | "memberJoin" | "memberLeave" | "memberUpdate" | // member
+		"roleCreate" | "roleDelete" | "roleUpdate" |                                  // role
+		"messageDelete" | "bulkMessageDelete" | "messageEdit" |                       // message
+		"presenceUpdate" | "userUpdate" |                                             // user
+		"voiceJoin" | "voiceLeave" | "voiceSwitch" | "voiceStateUpdate" |             // voice
+		"guildUpdate"
+		]: {
+			enabled: boolean;
+			channel?: string;
+		}
+	};
+	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		this.id = id;
-		if (!d) d = data;
-		this._load.call(this, d);
+		if (!data) data = config.defaults.guildConfig;
+		this._load.call(this, data);
 	}
 
-	_load(d) {
-		this.blacklist = ![undefined, null].includes(d.blacklist) ? d.blacklist : data.blacklist;
-		this.premium = ![undefined, null].includes(d.premium) ? d.premium : data.premium;
-		this.selfAssignableRoles = ![undefined, null].includes(d.selfAssignableRoles) ? d.selfAssignableRoles : data.selfAssignableRoles;
-		this.music = ![undefined, null].includes(d.music) ? d.music : data.music;
-		this.modlog = new DBCollection(config.db.database, "guilds", "modlog", this.id);
+	private _load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
+		this.blacklist = ![undefined, null].includes(data.blacklist) ? {
+			blacklisted: !!data.blacklist.blacklisted,
+			reason: data.blacklist.reason || null,
+			blame: data.blacklist.blame || null
+		} : config.defaults.guildConfig.blacklist;
+		this.premium = ![undefined, null].includes(data.premium) ? data.premium : config.defaults.guildConfig.premium;
+		this.selfAssignableRoles = ![undefined, null].includes(data.selfAssignableRoles) ? data.selfAssignableRoles : config.defaults.guildConfig.selfAssignableRoles;
+		this.music = ![undefined, null].includes(data.music) ? {
+			volume: data.music.volume || 100,
+			textChannel: data.music.textChannel || null,
+			queue: data.music.queue || []
+		} : config.defaults.guildConfig.music;
 		this.settings = {
-			nsfw: d.settings && d.settings.nsfw ? true : false,
-			muteRole: d.settings && d.settings.muteRole ? d.settings.muteRole : null,
-			fResponse: d.settings && d.settings.fResponse ? true : false,
-			commandImages: d.settings && d.settings.commandImages ? true : false,
-			lang: d.settings && d.settings.lang ? d.settings.lang : data.settings.lang,
-			prefix: d.settings && d.settings.prefix ? d.settings.prefix : data.settings.prefix
+			nsfw: data.settings && data.settings.nsfw ? true : false,
+			muteRole: data.settings && data.settings.muteRole ? data.settings.muteRole : null,
+			fResponse: data.settings && data.settings.fResponse ? true : false,
+			commandImages: data.settings && data.settings.commandImages ? true : false,
+			lang: data.settings && data.settings.lang ? data.settings.lang : config.defaults.guildConfig.settings.lang,
+			prefix: data.settings && data.settings.prefix ? data.settings.prefix : config.defaultPrefix,
+			deleteModCmds: data.settings && data.settings.deleteModCmds ? data.settings.deleteModCmds : config.defaults.guildConfig.settings.deleteModCmds
 		};
-		this.snipe = d.snipe ? {
-			delete: d.snipe.delete || data.snipe.delete,
-			edit: d.snipe.edit || data.snipe.edit
-		} : data.snipe;
+		this.snipe = data.snipe ? {
+			delete: data.snipe.delete || config.defaults.guildConfig.snipe.delete,
+			edit: data.snipe.edit || config.defaults.guildConfig.snipe.edit
+		} : config.defaults.guildConfig.snipe;
+		this.logEvents = {} as any;
+		Object.keys(config.defaults.guildConfig.logEvents).map(k => data.logEvents && data.logEvents[k] ? this.logEvents[k] = data.logEvents[k] : this.logEvents[k] = config.defaults.guildConfig.logEvents[k]);
 		return null;
 	}
 
-	async reload(): Promise<GuildConfig> {
+	async reload() {
 		const r = await mdb.collection("guilds").findOne({ id: this.id });
 		this._load.call(this, r);
 
 		return this;
 	}
 
-	async edit(d: {
-		id?: string;
-		blacklist?: {
-			blacklisted?: boolean;
-			reason?: string;
-			blame?: string;
-		};
-		premium?: boolean;
-		music?: {
-			volume?: number;
-			textChannel?: string;
-			queue?: {
-				link: string;
-				channel: string;
-				length: number;
-				title: string;
-				blame: string;
-			}[];
-		};
-		settings?: {
-			nsfw?: boolean;
-			muteRole?: string;
-			fResponse?: boolean;
-			commandImages?: boolean;
-			lang?: "en";
-			prefix?: string;
-		};
-		snipe?: {
-			[k in "delete" | "edit"]?: {
-				[k: string]: {
-					authorId: string;
-					content: string;
-					time: number;
-				};
-			};
-		};
-	}): Promise<GuildConfig> {
+	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
 		const g = {
 			blacklist: this.blacklist,
 			premium: this.premium,
 			music: this.music,
 			settings: this.settings,
-			snipe: this.snipe
+			snipe: this.snipe,
+			logEvents: this.logEvents
 		};
 
-		if (typeof d.blacklist !== "undefined") {
-			if (typeof d.blacklist.blacklisted !== "undefined") g.blacklist.blacklisted = d.blacklist.blacklisted;
-			if (typeof d.blacklist.reason !== "undefined") g.blacklist.reason = d.blacklist.reason;
-			if (typeof d.blacklist.blame !== "undefined") g.blacklist.blame = d.blacklist.blame;
-		}
-		if (typeof d.premium !== "undefined") g.premium = d.premium;
-
-		if (typeof d.music !== "undefined") {
-			if (typeof d.music.volume !== "undefined") g.music.volume = d.music.volume;
-			if (typeof d.music.textChannel !== "undefined") g.music.textChannel = d.music.textChannel;
+		function replaceArray(keys: string[], check: any, update: any) {
+			return keys.map(k => typeof check[k] !== "undefined" ? update[k] = check[k] : null);
 		}
 
-		if (typeof d.settings !== "undefined") {
-			if (typeof d.settings.commandImages !== "undefined") g.settings.commandImages = d.settings.commandImages;
-			if (typeof d.settings.fResponse !== "undefined") g.settings.fResponse = d.settings.fResponse;
-			if (typeof d.settings.nsfw !== "undefined") g.settings.nsfw = d.settings.nsfw;
-			if (typeof d.settings.muteRole !== "undefined") g.settings.muteRole = d.settings.muteRole;
-			if (typeof d.settings.lang !== "undefined") g.settings.lang = d.settings.lang;
-			if (typeof d.settings.prefix !== "undefined") g.settings.prefix = d.settings.prefix;
+		if (typeof data.blacklist !== "undefined") replaceArray(["blacklisted", "reason", "blame"], data.blacklist, g.blacklist);
+
+		if (typeof data.premium !== "undefined") g.premium = data.premium;
+
+		if (typeof data.music !== "undefined") replaceArray(["volume", "textChannel"], data.music, g.music);
+
+		if (typeof data.settings !== "undefined") replaceArray(Object.keys(config.defaults.guildConfig.settings), data.settings, g.settings);
+
+		if (typeof data.snipe !== "undefined") {
+			if (typeof data.snipe.delete !== "undefined") g.snipe.delete = { ...g.snipe.delete, ...data.snipe.delete };
+			if (typeof data.snipe.edit !== "undefined") g.snipe.edit = { ...g.snipe.edit, ...data.snipe.edit };
 		}
 
-		if (typeof d.snipe !== "undefined") {
-			if (typeof d.snipe.delete !== "undefined") g.snipe.delete = { ...g.snipe.delete, ...d.snipe.delete };
-			if (typeof d.snipe.edit !== "undefined") g.snipe.edit = { ...g.snipe.edit, ...d.snipe.edit };
-		}
+		if (typeof data.logEvents !== "undefined") replaceArray(Object.keys(config.defaults.guildConfig.logEvents), data.logEvents, g.logEvents);
 
 		try {
 			await mdb.collection("guilds").findOneAndUpdate({
@@ -174,15 +162,15 @@ class GuildConfig {
 		return this.reload();
 	}
 
-	async delete(): Promise<void> {
+	async delete() {
 		await mdb.collection("guilds").findOneAndDelete({ id: this.id });
 	}
 
-	async reset(): Promise<GuildConfig> {
+	async reset() {
 		// await this.delete();
 		// awaitz mdb.collection("guilds").insertOne(Object.assign({}, config, { id: this.id }));
-		await this.edit(config as any);
-		await this._load(config);
+		await this.edit(config.defaults.guildConfig);
+		await this._load(config.defaults.guildConfig);
 		return this;
 	}
 }

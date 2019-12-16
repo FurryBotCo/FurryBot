@@ -15,7 +15,10 @@
                 "main.ts"
             ],
             "@ExtendedMessage": [
-                "@donovan_dmc/general/BotStuff/Extended/ExtendedMessage"
+                "modules/ExtendedMessage.ts"
+            ],
+            "@Command": [
+                "util/CommandHandler/lib/Command.ts"
             ]
         }
     },

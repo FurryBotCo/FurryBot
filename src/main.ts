@@ -1,25 +1,23 @@
 import * as Eris from "eris";
 import * as fs from "fs-extra";
 import config from "./config";
-import Functions from "./util/functions";
-import { MessageCollector, ClientEvent, Temp, ExtendedMessage } from "bot-stuff";
-import { BaseClient, Cluster, Logger } from "clustersv2";
-// import { Logger } from "clustersv2";
-import Trello from "trello";
+import MessageCollector from "./util/MessageCollector";
+import Temp from "./util/Temp";
+import { Logger } from "./util/LoggerV8";
 import E6API from "e6api";
 import E9API from "e9api";
-import FurryBotAPI from "furrybotapi";
-import UserConfig from "./modules/config/UserConfig";
-import GuildConfig from "./modules/config/GuildConfig";
-import Analytics from "./util/Analytics";
+import { StatsD } from "node-statsd";
+import functions from "./util/Functions";
+import ErrorHandler from "./util/ErrorHandler";
+import ClientEvent from "./util/ClientEvent";
+import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
 
-export default class FurryBot extends BaseClient {
+export default class FurryBot extends Eris.Client {
 	srv: any;
 	ls: any;
-	Temp: Temp; // tslint:disable-line: variable-name
-	MessageCollector: MessageCollector<FurryBot, ExtendedMessage<FurryBot, UserConfig, GuildConfig>>; // tslint:disable-line: variable-name
+	temp: Temp;
+	messageCollector: MessageCollector;
 	yiffNoticeViewed: Set<string>;
-	tclient: Trello;
 	spamCounter: {
 		time: number;
 		user: string;
@@ -33,38 +31,128 @@ export default class FurryBot extends BaseClient {
 	}[];
 	e6: E6API;
 	e9: E9API;
-	fb: FurryBotAPI;
-	f: Functions;
+	f: typeof functions;
 	activeReactChannels: string[];
-	a: Analytics;
+	// a: Analytics;
 	intr: NodeJS.Timeout;
-	constructor(cluster: Cluster) {
-		super(cluster);
-		this.intr = null;
-	}
-
-	async launch(cluster: Cluster) {
-		Logger.log(`Cluster #${cluster.id}`, `Launched as ${this.client.user.username}#${this.bot.user.discriminator}`);
-
-		this.f = new Functions(this);
-		fs.readdirSync(`${__dirname}/handlers/events/client`).map(d => {
-			const e: ClientEvent<FurryBot> = require(`${__dirname}/handlers/events/client/${d}`).default;
-			this.bot.on(e.event, e.listener.bind(this));
+	errorHandler: ErrorHandler;
+	ddog: StatsD;
+	cmd: CommandHolder;
+	stats: {
+		messageCount: number;
+		dmMessageCount: number;
+		readonly guildCount: number;
+		readonly userCount: number;
+		readonly channelCount: number;
+		readonly shardCount: number;
+		readonly largeGuildCount: number;
+		readonly voiceConnectionCount: number;
+		readonly commandStats: {
+			[k: string]: number;
+		};
+	};
+	commandStats: {
+		[k: string]: number;
+	};
+	constructor(token: string, options: Eris.ClientOptions) {
+		super(token, options);
+		fs.readdirSync(`${__dirname}/events`).map((d) => {
+			const e: ClientEvent = require(`${__dirname}/events/${d}`).default;
+			this.on(e.event, e.listener.bind(this));
 		});
+
+		this.intr = null;
 
 		this.spamCounter = [];
 		this.responseSpamCounter = [];
 		this.activeReactChannels = [];
 		this.yiffNoticeViewed = new Set();
-		this.MessageCollector = new MessageCollector(this);
-		this.tclient = new Trello(config.apis.trello.apiKey, config.apis.trello.apiToken);
 		this.e6 = new E6API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
 		});
 		this.e9 = new E9API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
 		});
-		this.fb = new FurryBotAPI(config.web.userAgent);
-		this.a = new Analytics(config.universalKey, "bots", config.beta ? "furrybotbeta" : "furrybot", config.web.userAgent);
+		this.errorHandler = new ErrorHandler(this);
+		this.ddog = new StatsD(config.apis.ddog);
+		this.cmd = new CommandHolder(this);
+
+		process
+			.on("unhandledRejection", (reason, promise) =>
+				this.errorHandler.globalHandler.bind(this.errorHandler, "unhandledRejection")({ reason, promise })
+			)
+			.on("uncaughtException", (error) =>
+				this.errorHandler.globalHandler.bind(this.errorHandler, "uncaughtException")({ error })
+			);
+		/*.on("SIGINT", (signal) =>
+			this.errorHandler.globalHandler.bind(this.errorHandler, "SIGINT")({ signal })
+		)
+		.on("SIGTERM", (signal) =>
+			this.errorHandler.globalHandler.bind(this.errorHandler, "SIGTERM")({ signal })
+		)
+		.on("beforeExit", (code) =>
+			this.errorHandler.globalHandler.bind(this.errorHandler, "beforeExit")({ code })
+		)
+		.on("exit", (code) =>
+			this.errorHandler.globalHandler.bind(this.errorHandler, "exit")({ code })
+		);*/
+
+		this.f = functions;
+		this.messageCollector = new MessageCollector(this);
+
+		const client = this; // tslint:disable-line no-this-assignment
+
+		this.commandStats = {};
+		this.stats = {
+			messageCount: 0,
+			dmMessageCount: 0
+		} as any;
+
+		Object.defineProperties(this.stats, {
+			guildCount: {
+				get: () => {
+					return client.guilds.size;
+				},
+				enumerable: true
+			},
+			userCount: {
+				get: () => {
+					return client.users.size;
+				},
+				enumerable: true
+			},
+			shardCount: {
+				get: () => {
+					return client.shards.size;
+				},
+				enumerable: true
+			},
+			largeGuildCount: {
+				get: () => {
+					return client.guilds.filter(g => g.large).length;
+				},
+				enumerable: true
+			},
+			voiceConnectionCount: {
+				get: () => {
+					return client.voiceConnections.size;
+				},
+				enumerable: true
+			},
+			commandStats: {
+				get: () => {
+					return client.commandStats;
+				},
+				enumerable: true
+			}
+		});
+	}
+
+	async increment(stat: string | string[], tags?: string[]): Promise<string> {
+		return new Promise((a, b) => this.ddog.increment(stat, 1, 1, tags, (err, v) => err ? b(err) : a(v.toString())));
+	}
+
+	async decrement(stat: string | string[], tags?: string[]): Promise<string> {
+		return new Promise((a, b) => this.ddog.decrement(stat, 1, 1, tags, (err, v) => err ? b(err) : a(v.toString())));
 	}
 }

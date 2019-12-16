@@ -1,72 +1,226 @@
-import * as os from "os";
-import phin from "phin";
-import config from "../config";
-import * as util from "util";
-import * as fs from "fs-extra";
-import * as Eris from "eris";
-import FurryBot from "@FurryBot";
-import { mdb } from "../modules/Database";
-import { ErrorHandler, Functions, ExtendedMessage, ExtendedTextChannel, ExtendedUser } from "bot-stuff";
-import { Command } from "command-handler";
-import { Logger } from "clustersv2";
-import UserConfig from "../modules/config/UserConfig";
-import GuildConfig from "../modules/config/GuildConfig";
+import FurryBot from "../main";
 import youtubesearch from "youtube-search";
 import ytdl from "ytdl-core";
 import * as URL from "url";
-import refreshPatreonToken from "./patreon/refreshPatreonToken";
+import * as os from "os";
+import phin from "phin";
+import semver from "semver";
+import * as fs from "fs-extra";
+import * as Eris from "eris";
+import util from "util";
+import config from "../config";
+import { mdb } from "../modules/Database";
+import Command from "./CommandHandler/lib/Command";
 import loopPatrons from "./patreon/loopPatrons";
+import refreshPareonToken from "./patreon/refreshPatreonToken";
 
-export { ErrorHandler };
+export default {
+	checkSemVer: ((ver: string) => semver.valid(ver) === ver),
+	secondsToHours: ((sec: number) => {
+		let hours: string | number = Math.floor(sec / 3600);
+		let minutes: string | number = Math.floor((sec - (hours * 3600)) / 60);
+		let seconds: string | number = Math.floor(sec - (hours * 3600) - (minutes * 60));
 
-export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, UserConfig, GuildConfig>> {
-	client: FurryBot;
-	constructor(client: FurryBot) {
-		super(client, config);
-		this.client = client;
-	}
-
-	async sendCommandEmbed(msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>): Promise<Eris.Message> {
-		if (!msg || !(msg instanceof ExtendedMessage)) throw new TypeError("invalid message");
-		if (!cmd) throw new TypeError("missing command");
-
-		let embed;
-		if (cmd.subCommands.length > 0) {
-			embed = {
-				title: `Subcommand List: ${this.ucwords(cmd.triggers[0])}`,
-				description: `\`command\` (\`alias\`) - description\n\n${cmd.subCommands.map(s => s.triggers.length > 1 ? `\`${s.triggers[0]}\` (\`${s.triggers[1]}\`) - ${s.description}` : `\`${s.triggers[0]}\` - ${s.description}`).join("\n")}`
-			};
-		} else {
-			embed = {
-				title: `Command Help: ${this.ucwords(cmd.triggers[0])}`,
-				description: `Usage: ${cmd.usage}\nDescription: ${cmd.description}`
-			};
+		if (hours < 10) hours = `0${hours}`;
+		if (minutes < 10) minutes = `0${minutes}`;
+		if (seconds < 10) seconds = `0${seconds}`;
+		return `${hours}:${minutes}:${seconds}`;
+	}),
+	memory: {
+		process: {
+			getTotal: ((): number => process.memoryUsage().heapTotal),
+			getUsed: ((): number => process.memoryUsage().heapUsed),
+			getRSS: ((): number => process.memoryUsage().rss),
+			getExternal: ((): number => process.memoryUsage().external),
+			getAll: ((): {
+				total: number,
+				used: number,
+				rss: number,
+				external: number
+			} => ({
+				total: process.memoryUsage().heapTotal,
+				used: process.memoryUsage().heapUsed,
+				rss: process.memoryUsage().rss,
+				external: process.memoryUsage().external
+			}))
+		},
+		system: {
+			getTotal: ((): number => os.totalmem()),
+			getUsed: ((): number => os.totalmem() - os.freemem()),
+			getFree: ((): number => os.freemem()),
+			getAll: ((): {
+				total: number,
+				used: number,
+				free: number
+			} => ({
+				total: os.totalmem(),
+				used: os.totalmem() - os.freemem(),
+				free: os.freemem()
+			}))
 		}
-		return msg.channel.createMessage({
-			embed
+	},
+	ucwords: ((str: string) => str.toString().toLowerCase().replace(/^(.)|\s+(.)/g, (r) => r.toUpperCase())),
+	toReadableDate: ((date: Date) => {
+		if (!(date instanceof Date)) throw new Error("must provide javascript Date object.");
+		const a = date.toISOString().replace("Z", "").split("T");
+		return `${a[0]} ${a[1].split(".")[0]} UTC`;
+	}),
+	ms: (async (data: number | {
+		ms?: number;
+		s?: number;
+		m?: number;
+		h?: number;
+		d?: number;
+		w?: number;
+		mn?: number;
+		y?: number;
+	}, words?: boolean): Promise<string | {
+		ms: number;
+		s: number;
+		m: number;
+		h: number;
+		d: number;
+		w: number;
+		mn: number;
+		y: number;
+	}> => {
+		const t = await new Promise((a, b) => {
+			const t = {
+				ms: 0,
+				s: 0,
+				m: 0,
+				h: 0,
+				d: 0,
+				w: 0,
+				mn: 0,
+				y: 0
+			};
+
+			if (typeof data === "number") t.ms = data;
+			else if (typeof data !== "object") throw new Error("invalid input");
+			else {
+				if (data.ms) t.ms = data.ms;
+				if (data.s) t.s = data.s;
+				if (data.m) t.m = data.m;
+				if (data.h) t.h = data.h;
+				if (data.d) t.d = data.d;
+				if (data.w) t.w = data.w;
+				if (data.m) t.mn = data.mn;
+				if (data.y) t.y = data.y;
+			}
+
+			const shorten = (() => {
+				if (t.ms >= 1000) {
+					t.ms -= 1000;
+					t.s += 1;
+				}
+
+				if (t.s >= 60) {
+					t.s -= 60;
+					t.m += 1;
+				}
+
+				if (t.m >= 60) {
+					t.m -= 60;
+					t.h += 1;
+				}
+
+				if (t.h >= 24) {
+					t.h -= 24;
+					t.d += 1;
+				}
+
+				if (t.d >= 30) {
+					t.d -= 30;
+					t.mn += 1;
+				}
+
+				if ((t.mn * 30) + t.d >= 365) {
+					t.d = ((t.mn * 30) + t.d) - 365;
+					t.mn -= 12;
+					t.y += 1;
+				}
+			});
+
+			const c = () => (t.ms >= 1000) || (t.s >= 60) || (t.m >= 60) || (t.h >= 24) || (t.d >= 30) || (t.w >= 4) || (t.mn >= 12);
+			const d = () => t.d >= 7;
+			while (c()) {
+				shorten();
+				if (!c()) {
+					if (!d()) return a(t);
+
+					while (d()) {
+						t.d -= 7;
+						t.w += 1;
+						if (!d()) return a(t);
+					}
+				}
+			}
 		});
-	}
 
-	_getDate(date = new Date()) {
-		return `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`;
-	}
+		if (!words) return t as any;
+		else {
+			const full = {
+				ms: "millisecond",
+				s: "second",
+				m: "minute",
+				h: "hour",
+				d: "day",
+				w: "week",
+				mn: "month",
+				y: "year"
+			};
 
-	async getImageFromURL(url: string): Promise<Buffer> {
-		return phin({ url }).then(res => res.body);
-	}
+			const j = {};
 
-	async imageAPIRequest(animal = true, category: string = null, json = true, safe = false): Promise<{
-		success: boolean;
-		response?: {
-			image: string;
-			filetype: string;
-			name: string;
-		};
-		error?: {
-			code: number;
-			description: string;
+			Object.keys(t).forEach((k) => {
+				if (t[k] !== 0) j[k] = t[k];
+			});
+
+			if (Object.keys(j).length < 1) return {} as any;
+
+			const useFull = Object.keys(j).length < 4;
+
+			return Object.keys(j).reverse().map((k, i, a) => `${i === a.length - 1 && a.length !== 1 ? "and " : ""}${j[k]}${useFull ? ` ${full[k]}${j[k] > 1 ? "s" : ""}` : k}`).join(", ").trim();
 		}
-	}> {
+	}),
+	parseTime: ((time: number, full = false, ms = false) => {
+		if (ms) time = time / 1000;
+		const methods = [
+			{ name: full ? " day" : "d", count: 86400 },
+			{ name: full ? " hour" : "h", count: 3600 },
+			{ name: full ? " minute" : "m", count: 60 },
+			{ name: full ? " second" : "s", count: 1 }
+		];
+
+		const timeStr = [`${Math.floor(time / methods[0].count).toString()}${methods[0].name}${Math.floor(time / methods[0].count) > 1 && full ? "s" : ""}`];
+		for (let i = 0; i < 3; i++) {
+			timeStr.push(`${Math.floor(time % methods[i].count / methods[i + 1].count).toString()}${methods[i + 1].name}${Math.floor(time % methods[i].count / methods[i + 1].count) > 1 && full ? "s" : ""}`);
+		}
+		let j = timeStr.filter(g => !g.startsWith("0")).join(", ");
+		if (j.length === 0) j = "no time";
+		return j;
+	}),
+	randomColor: (() => Math.floor(Math.random() * 0xFFFFFF)),
+	removeDuplicates: (<T>(array: T[]) => Array.from(new Set(array))),
+	_getDate: ((date = new Date()) => `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`),
+	getImageFromURL: (async (url: string) => phin({ url }).then(res => res.body)),
+	imageAPIRequest: (async (animal = true, category: string = null, json = true, safe = false): Promise<(
+		{
+			success: true;
+			response: {
+				image: string;
+				filetype: string;
+				name: string;
+			};
+		} | {
+			success: false;
+			error: {
+				code: number;
+				description: string;
+			}
+		}
+	)> => {
 		return new Promise(async (resolve, reject) => {
 			let s;
 			if ([undefined, null].includes(json)) json = true;
@@ -75,7 +229,8 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 				s = await phin({
 					method: "GET",
 					url: `https://api.furry.bot/${animal ? "animals" : `furry/${safe ? "sfw" : "nsfw"}`}/${category ? category.toLowerCase() : safe ? "hug" : "bulge"}${json ? "" : "/image"}`.replace(/\s/g, ""),
-					parse: "json"
+					parse: "json",
+					timeout: 5e3
 				});
 				resolve(s.body);
 			} catch (error) {
@@ -85,32 +240,24 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 				});
 			}
 		});
-	}
-
-	random(len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"): string {
+	}),
+	random: ((len = 10, keyset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") => {
 		let rand = "";
 		for (let i = 0; i < len; i++) rand += keyset.charAt(Math.floor(Math.random() * keyset.length));
 		return rand;
-	}
+	}),
 
-	formatStr(str: string | ExtendedUser | Eris.User | Eris.Member | ExtendedTextChannel | Eris.GuildChannel, ...args: any[]): string {
-		let res;
-		if (str instanceof ExtendedUser || str instanceof Eris.User || str instanceof Eris.Member) res = `<@!${str.id}>`;
-		else if (str instanceof ExtendedTextChannel || str instanceof Eris.GuildChannel) res = str.name;
-		else res = str.toString();
+	formatStr: (((str: string, ...args: string[]) => {
+		let res = str.toString();
 		args = args.map(a => a.toString());
 		const a = res.match(/({\d})/g);
 		const e = ((s) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"));
 		const e2 = ((s) => s.replace(/\{/g, "").replace(/\}/g, ""));
 		a.map((b) => args[e2(b)] !== undefined ? res = res.replace(new RegExp(e(b), "g"), args[e2(b)]) : null);
 		return res;
-	}
-
-	async downloadImage(url: string, filename: string): Promise<fs.WriteStream> {
-		return phin({ url }).then(res => res.pipe(fs.createWriteStream(filename)));
-	}
-
-	async shortenURL(url: string): Promise<{
+	})),
+	downloadImage: (async (url: string, filename: string): Promise<fs.WriteStream> => phin({ url, timeout: 5e3 }).then(res => res.pipe(fs.createWriteStream(filename)))),
+	shortenURL: (async (url: string): Promise<{
 		success: boolean;
 		code: string;
 		url: string;
@@ -120,7 +267,7 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 		created: string;
 		length: number;
 		new: boolean;
-	}> {
+	}> => {
 		const req = await phin({
 			url: `https://r.furry.services/get?url=${encodeURIComponent(url)}`,
 			headers: {
@@ -140,7 +287,8 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 				headers: {
 					"User-Agent": config.web.userAgent
 				},
-				parse: "json"
+				parse: "json",
+				timeout: 5e3
 			});
 
 			if (cr.statusCode !== 200) return null;
@@ -150,9 +298,8 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 			};
 		}
 		else throw new Error(`furry.services api returned non 200/404 response: ${req.statusCode}, body: ${req.body}`);
-	}
-
-	async memeRequest(path: string, avatars: string[] | string = [], text = ""): Promise<phin.JsonResponse> {
+	}),
+	memeRequest: (async (path: string, avatars: string[] | string = [], text = ""): Promise<any> => {
 		avatars = typeof avatars === "string" ? [avatars] : avatars;
 		return phin({
 			method: "POST",
@@ -166,11 +313,11 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 				avatars,
 				text
 			},
-			parse: "none"
+			parse: "none",
+			timeout: 5e3
 		});
-	}
-
-	compareMembers(member1: Eris.Member, member2: Eris.Member): {
+	}),
+	compareMembers: ((member1: Eris.Member, member2: Eris.Member): {
 		member1: {
 			higher: boolean;
 			lower: boolean;
@@ -181,7 +328,7 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 			lower: boolean;
 			same: boolean;
 		};
-	} {
+	} => {
 		const a = member1.roles.map(r => member1.guild.roles.get(r));
 		let b: Eris.Role;
 		if (a.length > 0) b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
@@ -240,13 +387,12 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 				same: d.position === b.position
 			}
 		};
-	}
-
-	compareMemberWithRole(member: Eris.Member, role: Eris.Role): {
+	}),
+	compareMemberWithRole: ((member: Eris.Member, role: Eris.Role): {
 		higher: boolean;
 		lower: boolean;
 		same: boolean;
-	} {
+	} => {
 		const a = member.roles.map(r => member.guild.roles.get(r));
 		const b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
 
@@ -255,47 +401,32 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 			lower: b.position > role.position,
 			same: b.position === role.position
 		};
-	}
-
-	everyOtherUpper(str: string): string {
+	}),
+	everyOtherUpper: ((str: string) => {
 		let res = "";
 		for (let i = 0; i < str.length; i++) {
 			res += i % 2 === 0 ? str.charAt(i).toUpperCase() : str.charAt(i);
 		}
 		return res;
-	}
-
-	async incrementDailyCounter(positive = true, guildCount: number) {
-		const d = new Date(),
-			date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-
-		const a = await mdb.collection("dailyjoins").findOne({ date });
-		let count;
-		if (!a) {
-			count = 0;
-			await mdb.collection("dailyjoins").insertOne({ date, count, guildCount });
-		}
-		else count = a.count;
-
-		count = parseInt(count, 10);
-
-		if (isNaN(count)) count = 0;
-
-		if (positive) count++; else count--;
-
-		return mdb.collection("dailyjoins").findOneAndUpdate({ date }, { $set: { count, guildCount } });
-	}
-
-	async memberIsBooster(m: Eris.Member): Promise<boolean> {
+	}),
+	ytsearch: ((q = "") => util.promisify(youtubesearch)(q, config.ytSearchOptions ? config.ytSearchOptions : {}).then(res => res.filter(y => y.kind === "youtube#video").slice(0, 10))),
+	ytinfo: ((url: string): Promise<ytdl.videoInfo> => ytdl.getInfo(url)),
+	validateURL: ((url: string) =>
+		URL.parse(url).hostname ? phin({
+			method: "HEAD",
+			url,
+			timeout: 5e3
+		}).then(d => d.statusCode === 200) : false
+	),
+	memberIsBooster: (async (m: Eris.Member): Promise<boolean> => {
 		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
 		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
 		const guild = await this.client.bot.getRESTGuild(config.bot.mainGuild);
 		if (!guild) throw new TypeError("failed to find main guild");
 		if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
 		return true;
-	}
-
-	async calculateMultiplier(m: Eris.Member): Promise<{ amount: number, multi: { [s: string]: boolean } }> {
+	}),
+	calculateMultiplier: (async (m: Eris.Member): Promise<{ amount: number, multi: { [s: string]: boolean } }> => {
 		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
 		const member = m;
 		const guild = m.guild;
@@ -347,48 +478,8 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 
 
 		return { multi, amount };
-	}
-
-	async fetchDBUser(id: string, createIfNotFound = false): Promise<UserConfig> {
-		let m = await mdb.collection("users").findOne({ id });
-		if (!m) {
-			if (createIfNotFound === true) {
-				Logger.log(`Cluster #${this.client.clusterId}`, `Created non existent user entry "${id}"`);
-				await mdb.collection("users").insertOne({ id, ...config.defaults.userConfig });
-				m = await mdb.collection("users").findOne({ id });
-			} else return null;
-		}
-		return new UserConfig(id, m);
-	}
-
-	async fetchDBGuild(id: string, createIfNotFound = false): Promise<GuildConfig> {
-		let g = await mdb.collection("guilds").findOne({ id });
-		if (!g) {
-			if (createIfNotFound === true) {
-				Logger.log(`Cluster #${this.client.clusterId}`, `Created non existent guild entry "${id}"`);
-				await mdb.collection("guilds").insertOne({ id, ...config.defaults.guildConfig });
-				g = await mdb.collection("guilds").findOne({ id });
-			} else return null;
-		}
-		return new GuildConfig(id, g);
-	}
-
-	async ytsearch(q = "") {
-		return util.promisify(youtubesearch)(q, config.ytSearchOptions).then(res => res.filter(y => y.kind === "youtube#video").slice(0, 10));
-	}
-
-	async ytinfo(url: string): Promise<ytdl.videoInfo> {
-		return util.promisify(ytdl.getInfo)(url) as any;
-	}
-
-	async validateURL(url: string): Promise<boolean> {
-		return URL.parse(url).hostname ? phin({
-			method: "HEAD",
-			url
-		}).then(d => d.statusCode === 200) : false;
-	}
-
-	combineReports(...reports: {
+	}),
+	combineReports: ((...reports: {
 		userTag: string;
 		userId: string;
 		generatedTimestamp: number;
@@ -414,7 +505,7 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 			time: number;
 			response: string;
 		}[];
-	} {
+	} => {
 		if (Array.from(new Set(reports.map(r => r.userId))).length > 1) throw new TypeError("Cannot combine reports of different users.");
 		if (Array.from(new Set(reports.map(r => r.type))).length > 1) throw new TypeError("Cannot combine reports of different types.");
 		if (Array.from(new Set(reports.map(r => r.beta))).length > 1) throw new TypeError("Cannot combine beta, and non-beta reports.");
@@ -428,22 +519,86 @@ export default class F extends Functions<FurryBot, ExtendedMessage<FurryBot, Use
 			beta: reports[0].beta,
 			entries
 		};
-	}
+	}),
+	fetchAuditLogEntries: (async (guild: Eris.Guild, type: number, targetID: string, fetchAmount = 5): Promise<({
+		success: true;
+		blame: Eris.User;
+		reason: string;
+	} | {
+		success: false;
+		error: {
+			text: string;
+			code: number;
+		};
+	})> => {
+		if (!guild.members.get(this.client.user.id).permission.has("viewAuditLogs")) return {
+			success: false,
+			error: {
+				text: "Missing `auditLog` permissions.",
+				code: 3
+			}
+		};
+		const logs = await guild.getAuditLogs(fetchAmount, null, type).then(j => j.entries);
+		if (logs.length > 0) {
+			let et = -1;
+			for (const entry of logs) {
+				if (entry.actionType === type && entry.targetID === targetID) {
+					et = logs.indexOf(entry);
+					break;
+				}
+				continue;
+			}
 
-	get refreshPatreonToken() {
-		return refreshPatreonToken;
-	}
-
-	get loopPatrons() {
-		return loopPatrons;
-	}
-
-	fetchLangMessage(lang: string, cmd: Command<ExtendedMessage<FurryBot, UserConfig, GuildConfig>, FurryBot>) {
+			if (et !== -1) {
+				const entry = logs[et];
+				if (logs[et].reason) return {
+					success: true,
+					blame: entry.user,
+					reason: entry.reason
+				};
+				else return {
+					success: true,
+					blame: entry.user,
+					reason: "Couldn't find a reason."
+				};
+			} else return {
+				success: false,
+				error: {
+					text: "Failed to fetch audit log entry.",
+					code: 1
+				}
+			};
+		} else return {
+			success: false,
+			error: {
+				text: "Failed to fetch audit log entry.",
+				code: 2
+			}
+		};
+	}),
+	fetchLangMessage: ((lang: string, cmd: Command) => {
 		if (!lang || !Object.keys(config.lang).includes(lang.toLowerCase())) throw new TypeError("invalid language provided");
 		if (!cmd) throw new TypeError("invalid command provided");
 
 		const l = config.lang[lang.toLowerCase()][cmd.triggers[0].toLowerCase()];
 		if (!l) return "";
 		return l[Math.floor(Math.random() * l.length)];
-	}
-}
+	}),
+	get loopPatrons() {
+		return loopPatrons;
+	},
+	get refreshPareonToken() {
+		return refreshPareonToken;
+	},
+	incrementDailyCounter: (async (increment = true) => {
+		const d = new Date();
+		const id = `${d.getMonth()}-${d.getDate()}-${d.getFullYear()}`;
+
+		const j = await mdb.collection("dailyjoins").findOne({ id });
+		const count = j ? increment ? j.count + 1 : j.count - 1 : increment ? -1 : 1;
+		await mdb.collection("dailyjoins").findOneAndDelete({ id });
+		await mdb.collection("dailyjoins").insertOne({ count, id });
+
+		return count;
+	})
+};
