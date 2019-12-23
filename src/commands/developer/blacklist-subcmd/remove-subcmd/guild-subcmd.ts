@@ -37,7 +37,7 @@ export default new SubCommand({
 				name: msg.author.tag,
 				icon_url: msg.author.avatarURL
 			},
-			description: `ID: \`${id}\`\nPrevious Reason: ${srv.blacklist.reason}\nBlame: ${msg.author.tag}`,
+			description: `ID: \`${id}\`\nPrevious Reason: ${srv.blacklist.reason}\nPrevious Blame: ${srv.blacklist.blame}\nBlame: ${msg.author.tag}`,
 			color: Math.floor(Math.random() * 0xFFFFFF),
 			timestamp: new Date().toISOString(),
 			footer: {
@@ -50,6 +50,6 @@ export default new SubCommand({
 			username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
 			avatarURL: "https://assets.furry.bot/blacklist_logs.png"
 		});
-		return msg.reply(`removed **${id}** from the blacklist, previous reason: ${srv.blacklist.reason}.`);
+		return msg.reply(`removed **${id}** from the blacklist, previous reason: ${srv.blacklist.reason}, previous blame: ${srv.blacklist.blame}`);
 	}
 }));

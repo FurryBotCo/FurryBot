@@ -1,13 +1,15 @@
 import Command from "./Command";
 import FurryBot from "@FurryBot";
 import Category from "./Category";
-
+import CooldownHandler from "./CooldownHandler";
 export default class CommandHolder {
 	client: FurryBot;
 	categories: Category[];
+	cool: CooldownHandler;
 	constructor(client: FurryBot) {
 		this.client = client;
 		this.categories = [];
+		this.cool = new CooldownHandler();
 	}
 
 	get commands() {

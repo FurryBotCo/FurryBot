@@ -3,6 +3,7 @@ import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
+import { Colors } from "../util/Constants";
 
 export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
 	this.increment([
@@ -54,7 +55,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 			url: "https://i.furcdn.net/noicon.png"
 		},
 		timestamp: new Date().toISOString(),
-		color: this.f.randomColor(),
+		color: Colors.green,
 		footer: {
 			text: `Shard ${guild.shard.id + 1}/${this.shards.size}`,
 			icon_url: "https://i.furry.bot/furry.png"

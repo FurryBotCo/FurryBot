@@ -22,5 +22,6 @@ export default new Command({
 	usage: "<@member1> [@member2]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+	await msg.channel.startTyping();
 	return msg.reply("this command has been temporarily disabled, as it does not work properly. There is not an estimated time in which this will be fixed.");
 }));

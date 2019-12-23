@@ -54,6 +54,7 @@ export default class FurryBot extends Eris.Client {
 	commandStats: {
 		[k: string]: number;
 	};
+	channelTyping: Map<string, NodeJS.Timeout>;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
 		fs.readdirSync(`${__dirname}/events`).map((d) => {
@@ -76,6 +77,7 @@ export default class FurryBot extends Eris.Client {
 		this.errorHandler = new ErrorHandler(this);
 		this.ddog = new StatsD(config.apis.ddog);
 		this.cmd = new CommandHolder(this);
+		this.channelTyping = new Map();
 
 		process
 			.on("unhandledRejection", (reason, promise) =>

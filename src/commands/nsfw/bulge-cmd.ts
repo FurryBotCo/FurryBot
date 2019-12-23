@@ -22,6 +22,7 @@ export default new Command({
 	usage: "",
 	features: ["nsfw"]
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	const img = await this.f.imageAPIRequest(false, "bulge", true, false);
 	if (img.success !== true) {
 		Logger.error(`Shard #${msg.channel.guild.shard.id}`, img);

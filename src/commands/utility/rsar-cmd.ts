@@ -22,6 +22,7 @@ export default new Command({
 	usage: "<@role/id/name>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	const role = await msg.getRoleFromArgs(0, true, true);
 	if (!role) return msg.errorEmbed("INVALID_ROLE");
 	const roles = msg.gConfig.selfAssignableRoles;

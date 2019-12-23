@@ -21,6 +21,7 @@ export default new Command({
 	usage: "",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	try {
 		return msg.channel.createMessage("", {
 			file: await this.f.getImageFromURL("https://foxrudor.de/"),

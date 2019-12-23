@@ -2,6 +2,7 @@ import chalk from "chalk";
 import util from "util";
 import * as fs from "fs-extra";
 import config from "../config";
+import deasync from "deasync";
 
 const colors = {
 	log: "grey",
@@ -19,11 +20,17 @@ class LoggerV8 {
 	constructor() { }
 
 	get log() { return this._log("info"); }
+	get logSync() { return this._logSync("info"); }
 	get info() { return this._log("info"); }
+	get infoSync() { return this._logSync("info"); }
 	get warn() { return this._log("warn"); }
+	get warnSync() { return this._logSync("warn"); }
 	get error() { return this._log("error"); }
+	get errorSync() { return this._logSync("error"); }
 	get data() { return this._log("data"); }
+	get dataSync() { return this._logSync("data"); }
 	get debug() { return this._log("debug"); }
+	get debugSync() { return this._logSync("debug"); }
 
 	_log(type: string) {
 		return (async (source: string, msg?: any): Promise<boolean> => {
@@ -63,10 +70,15 @@ class LoggerV8 {
 			if (msg.indexOf(config.universalKey)) msg = msg.replace(config.universalKey, "[KEY]");
 
 			// .replace(/[^\[\]\w\s:\(\)#\|\.,_-]/gmi, "")
+			if (!fs.existsSync(`${config.logsDir}/client/${d.getMonth()}-${d.getDate()}-${d.getFullYear()}.log`)) fs.writeFileSync(`${config.logsDir}/client/${d.getMonth()}-${d.getDate()}-${d.getFullYear()}.log`, "");
 			fs.appendFileSync(`${config.logsDir}/client/${d.getMonth()}-${d.getDate()}-${d.getFullYear()}.log`, `[${d.toTimeString().split(" ")[0]}][${type.toUpperCase()}] ${source} | ${mn}\n`);
 			process.stdout.write(`${chalk.grey(`[${d.toTimeString().split(" ")[0]}]`)} ${source} | ${chalk[colors[type]](msg)}\n`);
 			return true;
 		});
+	}
+
+	_logSync(type: string): (source: string, msg?: any) => boolean {
+		return deasync(this._log(type)).bind(this);
 	}
 }
 

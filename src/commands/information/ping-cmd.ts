@@ -20,6 +20,7 @@ export default new Command({
 	usage: "",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	return msg.channel.createMessage("Checking Ping..")
 		.then(m => m.edit("Ping Calculated!"))
 		.then(async (m) => {

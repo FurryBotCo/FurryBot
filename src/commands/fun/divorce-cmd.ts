@@ -19,6 +19,7 @@ export default new Command({
 	usage: "<@member>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+	await msg.channel.startTyping();
 	if (!msg.uConfig.marriage.married) return msg.reply("You have to marry someone before you can divorce them..");
 
 	const m = await db.getUser(msg.uConfig.marriage.partner);

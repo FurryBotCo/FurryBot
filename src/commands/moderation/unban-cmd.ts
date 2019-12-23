@@ -24,6 +24,7 @@ export default new Command({
 	usage: "<id> [reason]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	// get member from message
 	if (!msg.args[0]) return msg.channel.createMessage("Please provide a user id.");
 

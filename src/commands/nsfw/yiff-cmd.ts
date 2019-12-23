@@ -21,6 +21,7 @@ export default new Command({
 	usage: "[gay/straight/lesbian/dickgirl]",
 	features: ["nsfw"]
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	let extra = "", type;
 	if (msg.args.length === 0) {
 		for (const ytype of config.yiff.types) {

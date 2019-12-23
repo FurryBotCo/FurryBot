@@ -22,18 +22,21 @@ export default new Command({
 	usage: "[@user]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	let user: Eris.User;
 	if (msg.args.length < 1) user = msg.author;
 	else user = await msg.getUserFromArgs();
+
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
 	let color;
 	if (msg.channel.guild.members.has(user.id)) {
 		const member = msg.channel.guild.members.get(user.id);
-		const role = msg.channel.guild.roles.get(member.roles[member.roles.length]);
+		const r = member.roles.map(r => msg.channel.guild.roles.get(r)).filter(r => r.color !== 0);
+		const role = r[r.length - 1];
 		if (role.color) color = role.color;
 	}
-	if (!color) color = this.f.randomColor();
+	if ([undefined, null].includes(color)) color = this.f.randomColor();
 
 	const embed: Eris.EmbedOptions = {
 		title: "Avatar",

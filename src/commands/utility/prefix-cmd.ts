@@ -21,6 +21,7 @@ export default new Command({
 	usage: "[new prefix]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	if (msg.args.length === 0) return msg.channel.createMessage(`This servers prefix is "${msg.gConfig.settings.prefix}", if you want to change this, run this again with the new prefix! (ex: ${msg.gConfig.settings.prefix}prefix <new prefix>)`);
 	if (msg.args.join("").toLowerCase() === msg.gConfig.settings.prefix.toLowerCase()) return msg.reply("that is already this servers prefix.");
 	if ([`<@!${this.user.id}>`, `<@${this.user.id}>`].some(t => msg.args.join("").toLowerCase() === t.toLowerCase())) return msg.reply(`you cannot use ${msg.args.join("").toLowerCase()} as my prefix.`);

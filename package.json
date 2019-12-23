@@ -1,10 +1,11 @@
 {
   "name": "furrybot",
-  "version": "7.0.0",
+  "version": "7.0.1",
   "description": "Furry Bot for Discord!",
   "main": "index.js",
   "dependencies": {
     "@donovan_dmc/db": "^1.0.0",
+    "big-integer": "^1.6.48",
     "chalk": "^3.0.0",
     "chunk": "0.0.2",
     "cookie-parser": "^1.4.4",

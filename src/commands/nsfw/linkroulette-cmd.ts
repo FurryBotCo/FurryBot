@@ -22,6 +22,7 @@ export default new Command({
 	usage: "",
 	features: ["nsfw"]
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	let s: any[] | any = await mongo.db("furrybot").collection("shorturl").find().toArray();
 
 	if (s.length === 0) return msg.reply("No results were found.");

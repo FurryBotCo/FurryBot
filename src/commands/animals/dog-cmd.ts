@@ -21,6 +21,7 @@ export default new Command({
 	usage: "",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	let req, j, parts;
 	try {
 		req = await phin({

@@ -22,6 +22,7 @@ export default new Command({
 	usage: "<@member/id>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
 	if (!user) return msg.errorEmbed("INVALID_USER");

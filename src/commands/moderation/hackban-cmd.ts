@@ -24,6 +24,7 @@ export default new Command({
 	usage: "<@user/id> [reason]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	// get user from message
 	let user: Eris.User;
 	user = await msg.getUserFromArgs();

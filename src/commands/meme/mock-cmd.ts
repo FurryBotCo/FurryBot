@@ -26,7 +26,7 @@ export default new Command({
 
 	const embed: Eris.EmbedOptions = {
 		title: "Mocking Text",
-		description: this.f.everyOtherUpper(msg.unparsedArgs.join(" ")),
+		description: this.f.everyOtherUpper(msg.unparsedArgs.join(" ").toLowerCase()),
 		image: {
 			url: "https://assets.furry.bot/mock.png"
 		},

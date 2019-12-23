@@ -21,6 +21,7 @@ export default new Command({
 	usage: "[type/list]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+	await msg.channel.startTyping();
 	const types = [
 		"boop",
 		"cuddle",
@@ -40,21 +41,12 @@ export default new Command({
 		type = msg.args[0].toLowerCase();
 		if (type === "list") return msg.channel.createMessage(`<@!${msg.author.id}>, Valid Values:\n**${types.join("**\n**")}**.`);
 	}
-	try {
-		if (!type) type = "hug";
-		req = await this.f.imageAPIRequest(false, type, true, true);
-		short = await this.f.shortenURL(req.response.image);
-		extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
-		return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${this.f.ucwords(type)}`, {
-			file: await this.f.getImageFromURL(req.response.image),
-			name: req.response.name
-		});
-	} catch (error) {
-		Logger.error(`Error:\n${error}`, msg.guild.shard.id);
-		Logger.log(`Body: ${req}`, msg.guild.shard.id);
-		return msg.channel.createMessage("Unknown API Error", {
-			file: await this.f.getImageFromURL("https://fb.furcdn.net/NotFound.png"),
-			name: "NotFound.png"
-		});
-	}
+	if (!type) type = "hug";
+	req = await this.f.imageAPIRequest(false, type, true, true);
+	short = await this.f.shortenURL(req.response.image);
+	extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
+	return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${this.f.ucwords(type)}`, {
+		file: await this.f.getImageFromURL(req.response.image),
+		name: req.response.name
+	});
 }));

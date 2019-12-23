@@ -19,6 +19,7 @@ export default new Command({
 	usage: "<question>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	return msg.channel.createMessage({
 		embed: {

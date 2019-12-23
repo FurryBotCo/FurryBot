@@ -1,0 +1,16 @@
+Bulk Message Delete Report, generated 13:38:10 11/3/2019 for guild Private Bot Testing (329498711338123268)
+
+[11/3/2019 13:38:7] Donovan_DMC#3621 (242843345402069002): fb!purge 6
+[11/3/2019 13:38:1] Furry Bot#7119 (398251412246495233): No Content
+[11/3/2019 13:38:0] Donovan_DMC#3621 (242843345402069002): f!help
+[11/3/2019 13:37:52] Message Not Cached; Cannot Display Content.
+[11/3/2019 13:37:18] Message Not Cached; Cannot Display Content.
+[11/3/2019 13:37:18] Message Not Cached; Cannot Display Content.
+[11/3/2019 13:37:17] Message Not Cached; Cannot Display Content.
+
+== General Disclaimers ==
+If you do not want these reports generated when messages are deleted in bulk, disable the logging by running "f!log disable bulkMessageDelete" (without quotes, replace "f!" with your servers specific prefix if you have changed it).
+These reports do not expire, and we do not have a way to request deletions.
+We cannot support tracking deleted images due to limited server space and copyright reasons.
+Messages that say "Message Not Cached; Cannot Display Content." were made before the bot was launched.
+We cannot fetch the content of messages that were made before launch. (and we will not store messages to make this possible).

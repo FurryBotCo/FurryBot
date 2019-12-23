@@ -26,4 +26,40 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 		}
 	}).then(d => d.reload());
 	this.emit("messageCreate", message);
+
+	const e = g.logEvents.messageEdit;
+	if (!e.enabled || !e.channel) return;
+	const ch = await this.getRESTChannel(e.channel) as Eris.GuildTextableChannel;
+	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
+		logEvents: {
+			messageEdit: {
+				enabled: false,
+				channel: null
+			}
+		}
+	});
+
+	const embed: Eris.EmbedOptions = {
+		title: "Message Edited",
+		author: {
+			name: `${message.author.username}#${message.author.discriminator}`,
+			icon_url: message.author.avatarURL
+		},
+		description: `Message by <@!${message.author.id}> deleted in <#${message.channel.id}>`,
+		timestamp: new Date().toISOString(),
+		fields: [
+			{
+				name: "Old Content",
+				value: oldMessage.content || "None",
+				inline: false
+			},
+			{
+				name: "New Content",
+				value: message.content || "None",
+				inline: false
+			}
+		]
+	};
+
+	return ch.createMessage({ embed });
 }));

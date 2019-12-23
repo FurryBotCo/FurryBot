@@ -24,6 +24,7 @@ export default new Command({
 	usage: "<@member/id>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	let m;
 	// get member from message

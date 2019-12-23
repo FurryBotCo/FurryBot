@@ -20,6 +20,7 @@ export default new Command({
 	usage: "",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+	await msg.channel.startTyping();
 	const req = await phin({
 		method: "GET",
 		url: "https://icanhazdadjoke.com",

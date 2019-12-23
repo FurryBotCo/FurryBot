@@ -26,7 +26,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		if (!message || !message.author || message.author.bot) return;
 
-		// if (config.beta && !config.developers.includes(message.author.id) return;
+		if (config.beta && !config.developers.includes(message.author.id)) return;
 		t.start("messageProcess");
 		msg = new ExtendedMessage(message, this);
 		await msg._load();
@@ -253,7 +253,16 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 		t.end("autoResponse");
 
+		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()) || msg.content.toLowerCase() === msg.prefix.toLowerCase() || !msg.cmd || !msg.cmd.cmd) return;
+		const cmd = msg.cmd.cmd;
+
 		if (!config.developers.includes(msg.author.id)) {
+			this.spamCounter.push({
+				time: Date.now(),
+				user: msg.author.id,
+				cmd: msg.cmd.cmd.triggers[0]
+			});
+
 			const sp = [...this.spamCounter.filter(s => s.user === msg.author.id)];
 			let spC = sp.length;
 			if (sp.length >= config.antiSpam.cmd.start && sp.length % config.antiSpam.cmd.warning === 0) {
@@ -316,8 +325,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 
-		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()) || msg.content.toLowerCase() === msg.prefix.toLowerCase() || !msg.cmd || !msg.cmd.cmd) return;
-		const cmd = msg.cmd.cmd;
 		this.increment(
 			`commands.${cmd.triggers[0].toLowerCase()}`,
 			[
@@ -390,25 +397,36 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				};
 
 				Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${(msg.channel as Eris.TextChannel).guild.name} (${(msg.channel as Eris.TextChannel).guild.id})`);
-				return msg.channel.createMessage({ embed });
+				return msg.channel.createMessage({ embed }).catch(err => null);
 			}
 		}
+
+		if (!config.developers.includes(msg.author.id)) {
+			const cool = this.cmd.cool.checkCooldown(cmd, msg.author.id);
+			const time = cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;
+			if (cool.c && cmd.cooldown !== 0 && cool.time !== 0) {
+				let t = await this.f.ms(time, true) as string;
+				t = t.split(" ").slice(0, 2).join(" ").replace(",", "");
+				return msg.reply(`hey, this command is on cooldown! Please wait **${t}**..`);
+			}
+		}
+
+		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cmd.cool.setCooldown(cmd, null, msg.author.id);
 
 		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}" ran with the arguments "${msg.args.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 
 		t.start("cmd");
-		const c = await cmd.run.call(this, msg, cmd);
+		const c = await cmd.run.call(this, msg, cmd).catch(err => err);
 		t.end("cmd");
 		Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `Command handler for "${cmd.triggers[0]}" took ${t.calc("cmd", "cmd")}ms`);
+		if (cmd.triggers[0] !== "eval" && msg.channel.isTyping) await msg.channel.stopTyping();
 		if (c instanceof Error) throw c;
-
 		t.end("main");
 	} catch (e) {
 		const err: Error = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
 		const cmd = msg.cmd !== null ? msg.cmd.cmd : null;
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, err);
+		if (!["ERR_INVALID_USAGE", "RETURN"].includes(err.message)) Logger.error(`Shard #${msg.channel.guild.shard.id}`, err);
 		if (!cmd) return;
-		if (cmd) return;
 		switch (err.message) {
 			case "ERR_INVALID_USAGE":
 				const embed: Eris.EmbedOptions = {
@@ -446,15 +464,18 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						icon_url: msg.author.avatarURL
 					}
 				};
-				return msg.channel.createMessage({ embed });
+				return msg.channel.createMessage({ embed }).catch(err => null);
 				break;
+
+			case "RETURN": return; break;
 
 			default:
 				Logger.error(`Shard #${msg.channel.guild.shard.id}`, err);
-				return msg.reply(`there was an error while doing something:\n${err.name}: ${err.message}`, {
+				if (msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.reply(`there was an error while doing something:\n${err.name}: ${err.message}`, {
 					file: await this.f.getImageFromURL(config.images.serverError),
 					name: "error.png"
-				});
+				}).catch(err => null);
+				else return msg.reply(`there was an error while doing something:\n${err.name}: ${err.message}`).catch(err => null);
 		}
 	}
 }));

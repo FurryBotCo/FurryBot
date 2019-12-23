@@ -4,7 +4,7 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
 import { db } from "../modules/Database";
-import { ChannelNames, ChannelNamesCamelCase } from "../util/Constants";
+import { ChannelNames, ChannelNamesCamelCase, Colors } from "../util/Constants";
 
 export default new ClientEvent("channelUpdate", (async function (this: FurryBot, channel: Eris.AnyGuildChannel, oldChannel: Eris.OldGuildChannel) {
 	if (!this || !db || !channel || !oldChannel || [Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(channel.type as any)) return;
@@ -18,8 +18,8 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 		if (!g) return;
 		const e = g.logEvents.channelUpdate;
 		if (!e.enabled || !e.channel) return;
-		const ch = channel.guild.channels.get(e.channel) as Eris.Textable;
-		if (!ch) return g.edit({
+		const ch = channel.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+		if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
 			logEvents: {
 				channelUpdate: {
 					enabled: false,
@@ -105,7 +105,7 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 				})))
 			].join("\n"),
 			timestamp: new Date().toISOString(),
-			color: this.f.randomColor()
+			color: Colors.orange
 		};
 
 		const log = await this.f.fetchAuditLogEntries(channel.guild, Eris.Constants.AuditLogActions.CHANNEL_UPDATE, channel.id);

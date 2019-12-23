@@ -23,6 +23,7 @@ export default new Command({
 	usage: "[command/category]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	let embed: Eris.EmbedOptions;
 
 	if (msg.args.length === 0) {

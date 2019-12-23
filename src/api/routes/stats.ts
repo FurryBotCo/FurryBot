@@ -11,8 +11,7 @@ export default (async (client: FurryBot) => {
 	app.get("/", async (req, res) => {
 		const d = new Date(),
 			date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
-			dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null),
-			m = await mdb.collection("stats").findOne({ id: "messages" }).catch(err => null);
+			dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null);
 
 		return res.status(200).json({
 			success: true,
@@ -37,8 +36,8 @@ export default (async (client: FurryBot) => {
 			nodeVersion: process.version,
 			dailyJoins,
 			commandCount: client.cmd.commands.length,
-			messageCount: m.messageCount || 0,
-			dmMessageCount: m.dmMessageCount || 0
+			messageCount: client.stats.messageCount,
+			dmMessageCount: client.stats.dmMessageCount
 		});
 	});
 

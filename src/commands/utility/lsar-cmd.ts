@@ -21,6 +21,7 @@ export default new Command({
 	usage: "[page]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	const roles = msg.gConfig.selfAssignableRoles;
 	const page = msg.args.length > 0 ? parseInt(msg.args[0], 10) : 1;
 	if (roles.length === 0) return msg.reply("There are no roles set as self assignable.");
