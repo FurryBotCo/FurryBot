@@ -11,7 +11,7 @@ import GenericMemeCommand from "../../util/CommandHandler/lib/generics/GenericMe
 export default new Command({
 	// this is misspelled on purpose, `slap` is used by a command in the fun category
 	triggers: [
-		"splap"
+		"mslap"
 	],
 	userPermissions: [],
 	botPermissions: [
@@ -24,7 +24,17 @@ export default new Command({
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
-	const a = msg.args.shift();
-	msg.args = ["https://i.furry.bot/furry.png"];
+	let a = "https://i.furry.bot/furry.png";
+	if (msg.args.length === 0) {
+		a = msg.author.avatarURL;
+		msg.args = ["https://i.furry.bot/furry.png"];
+	} else {
+		if (msg.mentions.length > 0 && msg.args[0].match(new RegExp(`<@!?${msg.mentions[0].id}>`))) {
+			const u = msg.mentions.shift();
+			msg.args = msg.args.slice(1);
+			a = u.avatarURL;
+		}
+		msg.args = [msg.author.avatarURL];
+	}
 	return GenericMemeCommand.handleImage(this, msg, "slap", { avatars: [a || msg.author.avatarURL] });
 }));
