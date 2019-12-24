@@ -174,6 +174,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		t.start("autoResponse");
 		if (["f", "rip"].includes(msg.content.toLowerCase()) && msg.gConfig.settings.fResponse) {
+			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return;
 			this.increment([
 				"other.autoResponse.f"
 			], [`channelType:${ChannelNamesCamelCase[message.channel.type]}`]);
