@@ -13,6 +13,7 @@ import Command from "./CommandHandler/lib/Command";
 import loopPatrons from "./patreon/loopPatrons";
 import refreshPareonToken from "./patreon/refreshPatreonToken";
 import client from "../../";
+import testCmd from "commands/developer/test-cmd";
 
 export default {
 	checkSemVer: ((ver: string) => semver.valid(ver) === ver),
@@ -343,6 +344,14 @@ export default {
 	memeRequest: (async (path: string, avatars: string[] | string = [], usernames: string[] | string = [], text = ""): Promise<any> => {
 		avatars = typeof avatars === "string" ? [avatars] : avatars;
 		usernames = typeof usernames === "string" ? [usernames] : usernames;
+		const data: {
+			avatars?: string[];
+			usernames?: string[];
+			text?: string;
+		} = {};
+		if (avatars && avatars.length > 0) data.avatars = avatars;
+		if (usernames && usernames.length > 0) data.usernames = usernames;
+		if (text && text.length > 0) data.text = text;
 		return phin({
 			method: "POST",
 			url: `https://dankmemer.services/api${path}`,
@@ -351,11 +360,7 @@ export default {
 				"User-Agent": config.userAgent,
 				"Content-Type": "application/json"
 			},
-			data: {
-				avatars,
-				usernames,
-				text
-			},
+			data,
 			parse: "none",
 			timeout: 3e4
 		});
