@@ -24,27 +24,15 @@ export default new ClientEvent("voiceChannelLeave", (async function (this: Furry
 	});
 
 	const embed: Eris.EmbedOptions = {
-		title: "Member {REPLACE} Voice Channel",
+		title: "Member Left A Voice Channel",
 		author: {
 			name: `${member.username}#${member.discriminator}`,
 			icon_url: member.avatarURL
 		},
-		description: `Member ${member.username}#${member.discriminator} {REPLACE} voice channel ${oldChannel.name}`,
+		description: `Member ${member.username}#${member.discriminator} left the voice channel **${oldChannel.name}**`,
 		timestamp: new Date().toISOString(),
 		color: Colors.red
 	};
-
-	const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_DISCONNECT, null);
-	if (log.success === false) {
-		embed.description += `\n${log.error.text} (${log.error.code}) { they may have left on their own }`;
-		embed.title = embed.title.replace("{REPLACE}", "Left A");
-		embed.description = embed.description.replace("{REPLACE}", "left the");
-	}
-	else if (log.success) {
-		embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
-		embed.title = embed.title.replace("{REPLACE}", "Disconnected From A");
-		embed.description = embed.description.replace("{REPLACE}", "disconnected from the");
-	}
 
 	return ch.createMessage({ embed });
 }));

@@ -34,8 +34,8 @@ export default new ClientEvent("voiceChannelSwitch", (async function (this: Furr
 		color: Colors.orange
 	};
 
-	const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_MOVE, null);
-	if (log.success) embed.description += `\nMoved By ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
+	// const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_MOVE, null);
+	// if (log.success) embed.description += `\nMoved By ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
 	return ch.createMessage({ embed });
 }));
