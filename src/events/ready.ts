@@ -90,7 +90,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 	setInterval(async () => {
 		if (new Date().toString().split(" ")[4] === "00:00:00") {
 			const d = new Date(Date.now() + 432e5);
-			const id = `${d.getMonth()}-${d.getDay()}-${d.getFullYear()}`;
+			const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 			let k = await mdb.collection("dailyjoins").findOne({ id }).catch(err => null);
 			if (!k) k = "Unknown.";
 			Logger.log("Daily Joins", `Daily joins for ${id}: ${k}`);
