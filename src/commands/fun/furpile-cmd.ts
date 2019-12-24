@@ -22,7 +22,7 @@ export default new Command({
 	await msg.channel.startTyping();
 	if (msg.args.length === 0) {
 		if (msg.channel.furpile !== undefined && msg.channel.furpile.active) {
-			if (msg.channel.furpile.inPile.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this furpile!`);
+			if (msg.channel.furpile.inPile.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this furpile!`);
 			clearTimeout(msg.channel.furpile.timeout);
 			msg.channel.furpile.inPile.push(msg.author.id);
 			msg.channel.createMessage(`<@!${msg.author.id}> joined a furpile on <@!${msg.channel.furpile.member.id}>!\n<@!${msg.channel.furpile.member.id}> now has ${msg.channel.furpile.inPile.length} furs on them!\nJoin in using \`${msg.gConfig.settings.prefix}furpile\`.`);
