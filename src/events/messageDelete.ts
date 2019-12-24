@@ -25,7 +25,7 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 		}
 	}).then(d => d.reload());
 
-	const e = g.logEvents.channelDelete;
+	const e = g.logEvents.messageDelete;
 	if (!e.enabled || !e.channel) return;
 	const ch = (message.channel as Eris.GuildTextableChannel).guild.channels.get(e.channel) as Eris.GuildTextableChannel;
 	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({

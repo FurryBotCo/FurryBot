@@ -20,7 +20,7 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Enable or disable logging.",
 	usage: "[enable/disable] [event/all] [channel]",
-	features: ["devOnly"]
+	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	await msg.channel.startTyping();
 	const a = ["enable", "disable"];

@@ -29,7 +29,7 @@ export default new ClientEvent("voiceChannelJoin", (async function (this: FurryB
 			name: `${member.username}#${member.discriminator}`,
 			icon_url: member.avatarURL
 		},
-		description: `Member ${member.username}#${member.discriminator} joined the voice channel ${newChannel.name}`,
+		description: `Member ${member.username}#${member.discriminator} joined the voice channel **${newChannel.name}**`,
 		timestamp: new Date().toISOString(),
 		color: Colors.green
 	};

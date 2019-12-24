@@ -24,6 +24,8 @@ export default new ClientEvent("voiceStateUpdate", (async function (this: FurryB
 		}
 	});
 
+	if (!vc) return;
+
 	if (member.voiceState.selfDeaf !== oldState.selfDeaf) {
 		const embed: Eris.EmbedOptions = {
 			title: `Member Voice Self ${member.voiceState.selfDeaf ? "Deafened" : "Undeafened"}`,

@@ -37,6 +37,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 			"",
 			"**Guild Info**:",
 			`${"\u25FD"} Name: ${guild.name}`,
+			`${"\u25FD"} ID: ${guild.id}`,
 			`${"\u25FD"} **Members**:`,
 			`\t<:${config.emojis.online}>: ${guild.members.filter(m => m.status === "online").length}`,
 			`\t<:${config.emojis.idle}>: ${guild.members.filter(m => m.status === "idle").length}`,

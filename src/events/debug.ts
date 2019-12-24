@@ -12,7 +12,7 @@ export default new ClientEvent("debug", (async function (this: FurryBot, info: s
 	if (typeof config !== "undefined" && config.debug === true) {
 		// too many for this
 		if (["Duplicate presence update"].some(t => info.toLowerCase().indexOf(t.toLowerCase()) !== -1)) return;
-		if (Logger !== undefined) return !id ? Logger.debug("Debug", info) : Logger.debug(`Debug | Shard #${id}`, info);
+		if (Logger !== undefined) return [undefined, null].includes(id) ? Logger.debug("Debug", info) : Logger.debug(`Debug | Shard #${id}`, info);
 		else return console.debug(info);
 	}
 }));

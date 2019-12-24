@@ -56,7 +56,7 @@ export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBo
 	if (role.color !== oldRole.color) changes.push("color");
 	if (role.mentionable !== oldRole.mentionable) changes.push("mentionable");
 	if (role.managed !== oldRole.managed) changes.push("managed");
-	if (role.position !== oldRole.position) changes.push("position");
+	// if (role.position !== oldRole.position) changes.push("position");
 	if (role.hoist !== oldRole.hoist) changes.push("hoist");
 
 	if (changes.length === 0) return;

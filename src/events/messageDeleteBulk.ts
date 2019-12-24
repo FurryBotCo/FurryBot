@@ -19,12 +19,12 @@ export default new ClientEvent("messageDeleteBulk", (async function (this: Furry
 	if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(messages[0].channel.type as any)) return;
 	const guild = (messages[0].channel as Eris.GuildChannel).guild;
 	const g = await db.getGuild(guild.id);
-	const e = g.logEvents.roleDelete;
+	const e = g.logEvents.messageBulkDelete;
 	if (!e.enabled || !e.channel) return;
 	const ch = await this.getRESTChannel(e.channel) as Eris.GuildTextableChannel;
 	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
 		logEvents: {
-			roleDelete: {
+			messageBulkDelete: {
 				enabled: false,
 				channel: null
 			}

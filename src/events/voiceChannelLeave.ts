@@ -34,7 +34,7 @@ export default new ClientEvent("voiceChannelLeave", (async function (this: Furry
 		color: Colors.red
 	};
 
-	const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_DISCONNECT, member.id);
+	const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_DISCONNECT, null);
 	if (log.success === false) {
 		embed.description += `\n${log.error.text} (${log.error.code}) { they may have left on their own }`;
 		embed.title = embed.title.replace("{REPLACE}", "Left A");

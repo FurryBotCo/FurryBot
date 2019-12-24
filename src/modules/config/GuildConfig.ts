@@ -66,7 +66,7 @@ class GuildConfig {
 		"channelCreate" | "channelDelete" | "channelUpdate" |                         // channel
 		"memberBan" | "memberUnban" | "memberJoin" | "memberLeave" | "memberUpdate" | // member
 		"roleCreate" | "roleDelete" | "roleUpdate" |                                  // role
-		"messageDelete" | "bulkMessageDelete" | "messageEdit" |                       // message
+		"messageDelete" | "messageBulkDelete" | "messageEdit" |                       // message
 		"presenceUpdate" | "userUpdate" |                                             // user
 		"voiceJoin" | "voiceLeave" | "voiceSwitch" | "voiceStateUpdate" |             // voice
 		"guildUpdate"
