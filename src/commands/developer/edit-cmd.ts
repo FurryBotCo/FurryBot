@@ -9,7 +9,7 @@ import { db, mdb, mongo } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
-		"eco"
+		"edit"
 	],
 	userPermissions: [],
 	botPermissions: [],
