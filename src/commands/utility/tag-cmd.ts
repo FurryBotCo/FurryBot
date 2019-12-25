@@ -37,14 +37,14 @@ export default new Command({
 		switch (msg.args[0].toLowerCase()) {
 			case "create":
 				if (Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`a tag with the name "${msg.args[1].toLowerCase()}" already exists.`);
-				const content = msg.args.slice(2).map(c => c.toLowerCase()).join(" ");
-				await msg.gConfig.edit({ tags: { [msg.args[2].toLowerCase()]: content } });
+				const content = msg.args.slice(2).join(" ");
+				await msg.gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
 				const embed: Eris.EmbedOptions = {
 					title: "Tag Created",
 					fields: [
 						{
 							name: "Tag Name",
-							value: msg.args[2].toLowerCase(),
+							value: msg.args[1].toLowerCase(),
 							inline: false
 						},
 						{
@@ -63,7 +63,7 @@ export default new Command({
 			case "delete":
 				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`a tag with the name "${msg.args[1].toLowerCase()}" does not exist.`);
 				await msg.gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: null } });
-				return msg.reply(`deleted the tag ${msg.args[1].toLowerCase()}.`);
+				return msg.reply(`deleted the tag **${msg.args[1].toLowerCase()}**.`);
 				break;
 		}
 	}
