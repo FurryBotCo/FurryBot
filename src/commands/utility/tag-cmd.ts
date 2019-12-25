@@ -63,13 +63,14 @@ export default new Command({
 
 		return msg.channel.createMessage(tags[msg.args[0].toLowerCase()]);
 	} else {
+		let content: string, embed: Eris.EmbedOptions;
 		if (!msg.args[1]) return msg.reply("please provide a tag name.");
 		switch (msg.args[0].toLowerCase()) {
 			case "create":
 				if (Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`a tag with the name "${msg.args[1].toLowerCase()}" already exists.`);
-				const content = msg.args.slice(2).join(" ");
+				content = msg.args.slice(2).join(" ");
 				await msg.gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
-				const embed: Eris.EmbedOptions = {
+				embed = {
 					title: "Tag Created",
 					fields: [
 						{
@@ -79,6 +80,37 @@ export default new Command({
 						},
 						{
 							name: "Tag Content",
+							value: content,
+							inline: false
+						}
+					],
+					color: Math.floor(Math.random() * 0xFFFFFF),
+					timestamp: new Date().toISOString()
+				};
+
+				return msg.channel.createMessage({ embed });
+				break;
+
+			case "edit":
+				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`a tag with the name "${msg.args[1].toLowerCase()}" does not exist.`);
+				const c = tags[msg.args[1].toLowerCase()];
+				content = msg.args.slice(2).join(" ");
+				await msg.gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
+				embed = {
+					title: "Tag Edited",
+					fields: [
+						{
+							name: "Tag Name",
+							value: msg.args[1].toLowerCase(),
+							inline: false
+						},
+						{
+							name: "Old Content",
+							value: c,
+							inline: false
+						},
+						{
+							name: "New Content",
 							value: content,
 							inline: false
 						}
