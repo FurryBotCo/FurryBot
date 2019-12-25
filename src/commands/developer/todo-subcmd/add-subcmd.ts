@@ -51,7 +51,7 @@ export default new SubCommand({
 		});
 		return msg.reply("request failed, check console.");
 	}
-	console.log(p.body);
+
 	return msg.reply({
 		embed: {
 			title: "Item Added To To-Do List",
