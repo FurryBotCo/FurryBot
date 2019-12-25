@@ -23,7 +23,17 @@ export default new Command({
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
-	const a = msg.args.shift();
-	msg.args = ["https://i.furry.bot/furry.png"];
-	return GenericMemeCommand.handleImage(this, msg, cmd.triggers[0], { avatars: [a || msg.author.avatarURL] });
+	let a = "https://i.furry.bot/furry.png";
+	if (msg.args.length === 0) {
+		a = msg.author.avatarURL;
+		msg.args = ["https://i.furry.bot/furry.png"];
+	} else {
+		if (msg.mentions.length > 0 && msg.args[0].match(new RegExp(`<@!?${msg.mentions[0].id}>`))) {
+			const u = msg.mentions.shift();
+			msg.args = msg.args.slice(1);
+			a = u.avatarURL;
+		}
+		msg.args = [msg.author.avatarURL];
+	}
+	return GenericMemeCommand.handleImage(this, msg, "spank", { avatars: [a || msg.author.avatarURL] });
 }));
