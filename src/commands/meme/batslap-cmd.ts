@@ -9,9 +9,8 @@ import { db, mdb, mongo } from "../../modules/Database";
 import GenericMemeCommand from "../../util/CommandHandler/lib/generics/GenericMemeCommand";
 
 export default new Command({
-	// this is misspelled on purpose, `slap` is used by a command in the fun category
 	triggers: [
-		"mslap"
+		"batslap"
 	],
 	userPermissions: [],
 	botPermissions: [
