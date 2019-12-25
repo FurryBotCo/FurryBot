@@ -58,7 +58,7 @@ export default new Command({
 	if (msg.args.length === 1 || !["create", "delete", "edit"].includes(msg.args[0].toLowerCase())) {
 		if (msg.args[0].toLowerCase() === "create") return msg.reply(`provide a tag name and content. Usage: \`${msg.gConfig.settings.prefix}tag create <name> <content>\``);
 		if (msg.args[0].toLowerCase() === "delete") return msg.reply(`provide a tag name to delete. Usage: \`${msg.gConfig.settings.prefix}tag delete <name>\``);
-		if (msg.args[0].toLowerCase() === "edit") return msg.reply(`provide a tag name to delete. Usage: \`${msg.gConfig.settings.prefix}tag edit <name> <content>\``);
+		if (msg.args[0].toLowerCase() === "edit") return msg.reply(`provide a tag name to edit. Usage: \`${msg.gConfig.settings.prefix}tag edit <name> <content>\``);
 		if (!Object.keys(tags).includes(msg.args[0].toLowerCase())) return msg.reply(`invalid tag.`);
 
 		return msg.channel.createMessage(tags[msg.args[0].toLowerCase()]);
