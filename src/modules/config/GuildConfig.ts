@@ -75,6 +75,9 @@ class GuildConfig {
 			channel?: string;
 		}
 	};
+	tags: {
+		[k: string]: string;
+	};
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		this.id = id;
 		if (!data) data = config.defaults.guildConfig;
@@ -109,6 +112,7 @@ class GuildConfig {
 		} : config.defaults.guildConfig.snipe;
 		this.logEvents = {} as any;
 		Object.keys(config.defaults.guildConfig.logEvents).map(k => data.logEvents && data.logEvents[k] ? this.logEvents[k] = data.logEvents[k] : this.logEvents[k] = config.defaults.guildConfig.logEvents[k]);
+		this.tags = data.tags ? data.tags : config.defaults.guildConfig.tags;
 		return null;
 	}
 
@@ -126,8 +130,14 @@ class GuildConfig {
 			music: this.music,
 			settings: this.settings,
 			snipe: this.snipe,
-			logEvents: this.logEvents
+			logEvents: this.logEvents,
+			tags: {
+				...this.tags,
+				...(data.tags && Object.keys(data).length > 0 ? data.tags : {})
+			}
 		};
+
+		Object.keys(g.tags).map(t => g.tags[t] === null ? delete g.tags[t] : null);
 
 		function replaceArray(keys: string[], check: any, update: any) {
 			return keys.map(k => typeof check[k] !== "undefined" ? update[k] = check[k] : null);
