@@ -53,7 +53,8 @@ const Colors = {
 	green: 0x2ecc71,
 	gold: 0xf1c40f,
 	red: 0xcd0000,
-	orange: 0xd2691e
+	orange: 0xd2691e,
+	fur: 0x4d8abe
 };
 
 /* tslint:enable variable-name */
