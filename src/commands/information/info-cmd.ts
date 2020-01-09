@@ -50,7 +50,8 @@ export default new Command({
 			"**Other Info**:",
 			`${"\u25FD"} Library: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev)`,
 			`${"\u25FD"} Library Version: ${Eris.VERSION}`,
-			`${"\u25FD"} API Version: 7`,
+			`${"\u25FD"} API Version: ${Eris.Constants.REST_VERSION}`,
+			`${"\u25FD"} Gateway Version: ${Eris.Constants.GATEWAY_VERSION}`,
 			`${"\u25FD"} Bot Version: ${config.version}`,
 			`${"\u25FD"} Node Version: ${process.version}`,
 			`${"\u25FD"} Support Server: [${config.bot.supportInvite}](${config.bot.supportInvite})`
