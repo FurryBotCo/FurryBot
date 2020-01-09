@@ -45,7 +45,7 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 			name: `${message.author.username}#${message.author.discriminator}`,
 			icon_url: message.author.avatarURL
 		},
-		description: `Message by <@!${message.author.id}> deleted in <#${message.channel.id}>`,
+		description: `Message by <@!${message.author.id}> edited in <#${message.channel.id}>`,
 		timestamp: new Date().toISOString(),
 		fields: [
 			{
