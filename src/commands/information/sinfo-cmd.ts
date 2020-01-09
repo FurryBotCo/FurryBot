@@ -24,20 +24,10 @@ export default new Command({
 	usage: "",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	const textChCount = msg.guild.channels.filter(c => c.type === 0).length,
-		voiceChCount = msg.guild.channels.filter(c => c.type === 2).length,
-		categoryChCount = msg.guild.channels.filter(c => c.type === 4).length;
-	let owner;
-	const o = msg.guild.members.find(m => m.id === msg.guild.ownerID);
-	if (!o) {
-		owner = "Unknown";
-	} else {
-		owner = `${o.user.username}#${o.user.discriminator} (${o.id})`;
-	}
+	const o: Eris.User = await this.getRESTUser(msg.guild.ownerID).catch(err => null);
+	const owner = !o ? `Unknwon ${msg.channel.guild.ownerID}` : `${o.username}#${o.discriminator} (${o.id})`;
 
-	let features = "";
-
-	const f = {
+	const fStr = {
 		INVITE_SPLASH: "Invite Splash",
 		VIP_REGIONS: "Vip Voice Regions/320kbps Voice Channels",
 		VANITY_URL: "Vanity URL",
@@ -53,8 +43,9 @@ export default new Command({
 		PUBLIC: "Public"
 	};
 
-	Object.keys(f).forEach((k) => msg.guild.features.includes(k) ? features += `**${k}** - ${f[k]}\n` : null);
+	let features = msg.channel.guild.features.map(f => fStr[f] || `${f}`).join("\n");
 	if (features === "") features = "NONE";
+
 	const verificationLevel = [
 		"**NONE** - unrestricted",
 		"**LOW** - 	must have verified email on account",
@@ -74,8 +65,7 @@ export default new Command({
 		"All Messages",
 		"Only Mentions"
 	];
-	const roles = msg.guild.roles.map(role => role.name === "@everyone" ? "@everyone" : `<@&${role.id}>`).join(",");
-	const rr = roles.length > 1000 ? `Too many to list.` : roles;
+
 	const embed = {
 		title: `Server Info - **${msg.guild.name}**`,
 		image: {
@@ -85,17 +75,22 @@ export default new Command({
 			{
 				name: "Guild ID",
 				value: msg.channel.guild.id,
-				inline: false
+				inline: true
 			},
 			{
 				name: "Guild Owner",
 				value: owner,
-				inline: false
+				inline: true
+			},
+			{
+				name: "Region",
+				value: msg.guild.region,
+				inline: true
 			},
 			{
 				name: "Members",
 				value: [
-					`Total: ${msg.guild.memberCount}`,
+					`Total: ${msg.guild.memberCount} ([note](https://botapi.furry.bot/note/sinfo 'status counts are based on cached users, and may not include all server members'))`,
 					"",
 					`<:${config.emojis.online}>: ${msg.guild.members.filter(m => m.status === "online").length}`,
 					`<:${config.emojis.idle}>: ${msg.guild.members.filter(m => m.status === "idle").length}`,
@@ -105,43 +100,48 @@ export default new Command({
 					`Non Bots: ${msg.channel.guild.members.filter(m => !m.bot).length}`,
 					`Bots: ${msg.channel.guild.members.filter(m => m.bot).length}`
 				].join("\n"),
-				inline: false
+				inline: true
 			},
 			{
 				name: "Channels",
-				value: `Total: ${msg.guild.channels.size}\n\
-	Text: ${textChCount}\n\
-	Voice: ${voiceChCount}\n\
-	Category: ${categoryChCount}`,
-				inline: false
+				value: [
+					`Total: ${msg.channel.guild.channels.size}`,
+					`Text: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_TEXT).length}`,
+					`Voice: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_VOICE).length}`,
+					`Category: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_CATEGORY).length}`,
+					`News: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_NEWS).length}`,
+					`Store: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_STORE).length}`
+				].join("\n"),
+				inline: true
 			},
 			{
 				name: "Guild Creation Date",
-				value: new Date(msg.guild.createdAt).toString().split("GMT")[0],
-				inline: false
+				value: this.f.formatDateWithPadding(new Date(msg.guild.createdAt), true),
+				inline: true
 			},
 			{
-				name: "Region",
-				value: msg.guild.region,
-				inline: false
+				name: "Features",
+				value: features,
+				inline: true
 			},
 			{
-				name: `Roles [${msg.guild.roles.size - 1}]`,
-				value: rr,
-				inline: false
+				name: "Nitro Boosters",
+				value: `Nitro Boosts: ${msg.channel.guild.premiumSubscriptionCount || "None"}\nBoost Tier: ${msg.channel.guild.premiumTier || "None"}`,
+				inline: true
+			},
+			{
+				name: "UwU",
+				value: "ÓwÒ what's this?!?",
+				inline: true
 			},
 			{
 				name: "Extra",
-				value: `**Large Guild**: ${msg.guild.large ? "Yes" : "No"}\n**Verification**: ${verificationLevel[msg.guild.verificationLevel]}\n**2FA**: ${mfaLevel[msg.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[msg.guild.defaultNotifications]}\n**[Features](https://discordapp.com/developers/docs/resources/guild#guild-object-guild-features)**:\n${features}`,
+				value: `**Large Guild**: ${msg.guild.large ? "Yes" : "No"}\n**Verification**: ${verificationLevel[msg.guild.verificationLevel]}\n**2FA**: ${mfaLevel[msg.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[msg.guild.defaultNotifications]}${msg.channel.guild.features.includes("VANITY_URL") ? `\nVanity URL: [https://discord.gg/${msg.channel.guild.vanityURL}](https://discord.gg/${msg.channel.guild.vanityURL})` : ""}`,
 				inline: false
-			}/*, {
-	name: "Counters",
-	value: !s ? "Guild is too large to display counts." : `OwO Counts: ${s.map(j => j.owoCount).reduce((a, b) => a + b)}\nUwU Counts: ${s.map(j => j.uwuCount).reduce((a, b) => a + b)}`,
-	inline: false
-			}*/
+			}
 		],
 		timestamp: new Date().toISOString(),
-		color: this.f.randomColor()
+		color: Math.floor(Math.random() * 0xFFFFFF)
 	};
 
 	return msg.channel.createMessage({ embed });
