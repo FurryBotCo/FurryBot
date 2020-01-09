@@ -63,7 +63,7 @@ export default new Command({
 				},
 				{
 					name: "Restrictions",
-					value: `NSFW: **${cmd.features.includes("nsfw") ? "Yes" : "No"}**\nDeveloper Only: **${cmd.features.includes("devOnly") ? "Yes" : "No"}**\nBeta Only: **${cmd.features.includes("betaOnly") ? "Yes" : "No"}**\nGuild Owner Only: **${cmd.features.includes("guildOwnerOnly") ? "Yes" : "No"}**`,
+					value: `NSFW: **${cmd.features.includes("nsfw") ? "Yes" : "No"}**\nDeveloper Only: **${cmd.features.includes("devOnly") ? "Yes" : "No"}**\nBeta Only: **${cmd.features.includes("betaOnly") ? "Yes" : "No"}**\nGuild Owner Only: **${cmd.features.includes("guildOwnerOnly") ? "Yes" : "No"}**\nSupport Server Only: **${cmd.features.includes("supportOnly") ? "Yes" : "No"}**`,
 					inline: false
 				},
 				{
