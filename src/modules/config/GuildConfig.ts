@@ -1,5 +1,6 @@
 import config from "../../config";
 import { mdb } from "../Database";
+import { DeepPartial } from "../../util/@types/Misc";
 
 interface CommandConfigEntry {
 	type: "command" | "category";
@@ -17,11 +18,6 @@ interface RegistrationQuestion {
 
 class GuildConfig {
 	id: string;
-	blacklist: {
-		blacklisted: boolean;
-		reason: string;
-		blame: string;
-	};
 	premium: boolean;
 	selfAssignableRoles: string[];
 	music: {
@@ -85,11 +81,6 @@ class GuildConfig {
 	}
 
 	private _load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
-		this.blacklist = ![undefined, null].includes(data.blacklist) ? {
-			blacklisted: !!data.blacklist.blacklisted,
-			reason: data.blacklist.reason || null,
-			blame: data.blacklist.blame || null
-		} : config.defaults.guildConfig.blacklist;
 		this.premium = ![undefined, null].includes(data.premium) ? data.premium : config.defaults.guildConfig.premium;
 		this.selfAssignableRoles = ![undefined, null].includes(data.selfAssignableRoles) ? data.selfAssignableRoles : config.defaults.guildConfig.selfAssignableRoles;
 		this.music = ![undefined, null].includes(data.music) ? {
@@ -125,7 +116,6 @@ class GuildConfig {
 
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
 		const g = {
-			blacklist: this.blacklist,
 			premium: this.premium,
 			music: this.music,
 			settings: this.settings,
@@ -142,8 +132,6 @@ class GuildConfig {
 		function replaceArray(keys: string[], check: any, update: any) {
 			return keys.map(k => typeof check[k] !== "undefined" ? update[k] = check[k] : null);
 		}
-
-		if (typeof data.blacklist !== "undefined") replaceArray(["blacklisted", "reason", "blame"], data.blacklist, g.blacklist);
 
 		if (typeof data.premium !== "undefined") g.premium = data.premium;
 

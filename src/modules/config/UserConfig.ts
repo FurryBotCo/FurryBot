@@ -1,5 +1,6 @@
 import config from "../../config";
 import { mdb } from "../Database";
+import { DeepPartial } from "../../util/@types/Misc";
 
 // I considered adding votes onto user objects, bot tracking them separately will work out
 // better in the long run.
@@ -14,11 +15,6 @@ interface Warning {
 
 class UserConfig {
 	id: string;
-	blacklist: {
-		blacklisted: boolean;
-		reason: string;
-		blame: string;
-	};
 	marriage: {
 		married: boolean;
 		partner: string;
@@ -46,11 +42,6 @@ class UserConfig {
 	}
 
 	_load(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
-		this.blacklist = ![undefined, null].includes(data.blacklist) ? {
-			blacklisted: !!data.blacklist.blacklisted,
-			reason: data.blacklist.reason || null,
-			blame: data.blacklist.blame || null
-		} : config.defaults.userConfig.blacklist;
 		this.marriage = ![undefined, null].includes(data.marriage) ? {
 			married: !!data.marriage.married,
 			partner: data.marriage.partner || null
@@ -84,7 +75,6 @@ class UserConfig {
 
 	async edit(data: DeepPartial<Omit<{ [K in keyof UserConfig]: UserConfig[K]; }, "warnings">>) {
 		const u = {
-			blacklist: this.blacklist,
 			marriage: this.marriage,
 			id: this.id,
 			bal: this.bal,
@@ -93,12 +83,6 @@ class UserConfig {
 			patreon: this.patreon,
 			preferences: this.preferences
 		};
-
-		if (typeof data.blacklist !== "undefined") {
-			if (typeof data.blacklist.blacklisted !== "undefined") u.blacklist.blacklisted = data.blacklist.blacklisted;
-			if (typeof data.blacklist.reason !== "undefined") u.blacklist.reason = data.blacklist.reason;
-			if (typeof data.blacklist.blame !== "undefined") u.blacklist.blame = data.blacklist.blame;
-		}
 
 		if (typeof data.marriage !== "undefined") {
 			if (typeof data.marriage.married !== "undefined") u.marriage.married = data.marriage.married;
