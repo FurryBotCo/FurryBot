@@ -15,7 +15,7 @@ export default class SubCommand {
 	donatorCooldown: number;
 	description: string;
 	usage: string;
-	features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
+	features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly" | "supportOnly")[];
 	category: string;
 	subCommands: SubCommand[];
 	parent: Command;
@@ -28,7 +28,7 @@ export default class SubCommand {
 		donatorCooldown?: number;
 		description?: string;
 		usage?: string;
-		features?: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly")[];
+		features?: SubCommand["features"];
 		category?: string;
 		subCommandDir?: string | string[];
 	}, run: (this: FurryBot, msg: ExtendedMessage, cmd: SubCommand) => Promise<unknown>) {
@@ -119,6 +119,8 @@ export default class SubCommand {
 			client.increment(`commands.${cmd.triggers[0].toLowerCase()}.missingPermissions`, ["missing:dev"]);
 			return msg.reply(`you must be a developer to use this command.`);
 		}
+
+		if (cmd.features.includes("supportOnly") && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("this command may only be ran in my support server.");
 
 		if (cmd.features.includes("guildOwnerOnly") && msg.author.id !== msg.channel.guild.ownerID) return msg.reply("only this servers owner may use this command.");
 
