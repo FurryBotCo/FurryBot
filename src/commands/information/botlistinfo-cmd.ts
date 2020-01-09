@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 1e4,
 	description: "Get some info about a bot from some botlists.",
 	usage: "<@bot/id>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	await msg.channel.startTyping();
 	let list;

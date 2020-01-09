@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 5e3,
 	description: "Lookup a Discord server by its id.",
 	usage: "<id>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 

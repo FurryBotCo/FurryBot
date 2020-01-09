@@ -18,7 +18,8 @@ export default new Command({
 	donatorCooldown: 18e5,
 	description: "Suggest something for me!",
 	usage: "<suggestion>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	await msg.channel.startTyping();
 	if (msg.args.length < 1 || msg.args.join(" ").length === 0) return msg.reply("please provide something to suggest.");

@@ -21,7 +21,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Remove a warning from someone.",
 	usage: "<@member/id> <warning id>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length < 2) return new Error("ERR_INVALID_USAGE");
 	const member = await msg.getMemberFromArgs();

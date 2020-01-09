@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: .5e3,
 	description: "Wag your little tail!",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	return msg.channel.createMessage(`<@!${msg.author.id}> wags their little tail, aren't they cute ^-^`);
 }));

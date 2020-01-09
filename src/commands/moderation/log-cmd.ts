@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Enable or disable logging.",
 	usage: "[enable/disable] [event/all] [channel]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const a = ["enable", "disable"];
 	const b = [...Object.keys(config.defaults.guildConfig.logEvents).map(e => e.toLowerCase()), "all"];

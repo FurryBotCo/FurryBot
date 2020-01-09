@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 5e3,
 	description: "List this servers self assignable roles.",
 	usage: "[page]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const roles = msg.gConfig.selfAssignableRoles;
 	const page = msg.args.length > 0 ? parseInt(msg.args[0], 10) : 1;

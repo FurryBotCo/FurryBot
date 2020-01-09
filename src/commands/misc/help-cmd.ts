@@ -21,7 +21,8 @@ export default new Command({
 	donatorCooldown: .5e3,
 	description: "Get some help with the bot.",
 	usage: "[command/category]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	await msg.channel.startTyping();
 	let embed: Eris.EmbedOptions;

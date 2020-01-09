@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Get bot statistics",
 	usage: "[stat]",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const stats = {
 		guilds: this.guilds.size,

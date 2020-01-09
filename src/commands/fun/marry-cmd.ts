@@ -18,7 +18,8 @@ export default new Command({
 	donatorCooldown: 1.5e4,
 	description: "Propose to someone!",
 	usage: "<@member>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	const member = await msg.getMemberFromArgs();
 	if (!member) return msg.errorEmbed("INVALID_USER");

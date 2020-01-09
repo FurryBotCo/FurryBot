@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "Start a furpile on someone, or join in!",
 	usage: "[@user]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length === 0) {
 		if (msg.channel.furpile !== undefined && msg.channel.furpile.active) {

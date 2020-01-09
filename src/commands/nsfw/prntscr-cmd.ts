@@ -23,7 +23,8 @@ export default new Command({
 	donatorCooldown: 1.5e3,
 	description: "Fetch a random image from print screen (lightshot)",
 	usage: "",
-	features: ["nsfw"]
+	features: ["nsfw"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const alphabet = "abcdefghijklmnopqrstuvwxyz";
 	const num = "0123456789";

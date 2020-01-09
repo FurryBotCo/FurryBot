@@ -18,7 +18,8 @@ export default new Command({
 	donatorCooldown: 2e3,
 	description: "Get a dadjoke!",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	const req = await phin({

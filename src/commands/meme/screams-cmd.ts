@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "WhY CaN'T YoU Be nOrMaL",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	await msg.channel.startTyping();

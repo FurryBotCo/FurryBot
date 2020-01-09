@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Pounce onto someone lovingly~!",
 	usage: "<@member/text>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	const input = msg.args.join(" ");

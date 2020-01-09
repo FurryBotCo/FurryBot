@@ -23,7 +23,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Get some content from E926 (SFW E621)!",
 	usage: "[tags]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	if (!msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly without the `manageMessages` permission!");

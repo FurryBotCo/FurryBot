@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 1.5e4,
 	description: "Revoke your marriage..",
 	usage: "<@member>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (!msg.uConfig.marriage.married) return msg.reply("You have to marry someone before you can divorce them..");
 

@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Get a random fursuit image!",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	const img = await this.f.imageAPIRequest(false, "fursuit", true, true);

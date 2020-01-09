@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Play Russian Roulette!",
 	usage: "[bullets]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	const val = Math.floor(Math.random() * 6);
 	const bullets = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 3;

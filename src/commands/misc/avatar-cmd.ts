@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Get a users avatar.",
 	usage: "[@user]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	await msg.channel.startTyping();
 	let user: Eris.User;

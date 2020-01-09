@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 15e3,
 	description: "Look for your Patreon subscription.",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.uConfig.patreon.donator) return msg.reply("you are already marked as a donator.");
 

@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: .5e3,
 	description: "Who's a good boy?!",
 	usage: "[@user]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length === 0) return msg.reply("Yip! Yip! I am!");
 	else return msg.reply(`Yip! Yip! ${msg.args.join(" ")} is!`);

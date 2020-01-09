@@ -18,7 +18,8 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Add to someones economy balance.",
 	usage: "<id> <amount>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length < 2) return new Error("ERR_INVALID_USAGE");
 

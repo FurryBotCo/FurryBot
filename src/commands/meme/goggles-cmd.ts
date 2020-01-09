@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "Put on your saftey goggles",
 	usage: "[image/@user]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	return GenericMemeCommand.handleImage(this, msg, cmd.triggers[0]);

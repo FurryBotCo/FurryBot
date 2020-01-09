@@ -9,7 +9,8 @@ const cat = new Category({
 	name: "animals",
 	displayName: ":dog: Animals",
 	devOnly: false,
-	description: "Cute little animals to brighten your day!"
+	description: "Cute little animals to brighten your day!",
+	file: __filename
 });
 
 cmd.map(c => cat.addCommand(c.setCategory(cat.name)));

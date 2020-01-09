@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Mock some text",
 	usage: "<text>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.unparsedArgs.length < 1) throw new Error("ERR_INVALID_USAGE");
 

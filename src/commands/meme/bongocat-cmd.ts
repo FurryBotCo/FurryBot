@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "Bongo Bongo Bongo!",
 	usage: "[image/@user]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	// need to fix this to make the default avatars user/bot

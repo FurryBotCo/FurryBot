@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "That's a massive sword",
 	usage: "<text>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	return GenericMemeCommand.handleText(this, msg, cmd.triggers[0], { usernames: [msg.author.username] });

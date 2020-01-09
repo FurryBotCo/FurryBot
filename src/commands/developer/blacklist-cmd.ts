@@ -19,7 +19,8 @@ export default new Command({
 	description: "Manage the bots blacklist.",
 	usage: "<add/check/list/remove> [user(s)/server(s)] [id] [reason]",
 	features: ["devOnly"],
-	subCommandDir: `${__dirname}/blacklist-subcmd`
+	subCommandDir: `${__dirname}/blacklist-subcmd`,
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length === 0) return cmd.sendSubCommandEmbed(msg);
 	else return cmd.handleSubCommand(msg, this);

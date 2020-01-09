@@ -19,6 +19,7 @@ export default class SubCommand {
 	features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly" | "supportOnly")[];
 	category: string;
 	subCommands: SubCommand[];
+	file: string;
 	parent: Command;
 	run: (this: FurryBot, msg: ExtendedMessage, cmd: SubCommand) => Promise<unknown>;
 	constructor(d: {
@@ -32,6 +33,7 @@ export default class SubCommand {
 		features?: SubCommand["features"];
 		category?: string;
 		subCommandDir?: string | string[];
+		file: string;
 	}, run: (this: FurryBot, msg: ExtendedMessage, cmd: SubCommand) => Promise<unknown>) {
 		if (!d.triggers || d.triggers.length < 1) throw new TypeError("Invalid command triggers provided.");
 		// category is set at addition time
@@ -48,6 +50,7 @@ export default class SubCommand {
 		this.category = d.category || null;
 		this.subCommands = [];
 		this.parent = null;
+		this.file = d.file;
 
 		if (!!d.subCommandDir) {
 			if (d.subCommandDir instanceof Array) d.subCommandDir.map(dir => !fs.existsSync(dir) ? Logger.error("Command Handler", `Invalid sub command directory "${dir}" for command ${this.triggers[0]}.`) : this.fillInSubCommands(dir));

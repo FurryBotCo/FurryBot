@@ -16,7 +16,8 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Change the bots game.",
 	usage: "<type> <game>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length <= 1) return new Error("ERR_INVALID_USAGE");
 	let type;

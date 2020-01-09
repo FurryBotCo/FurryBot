@@ -9,7 +9,8 @@ const cat = new Category({
 	name: "nsfw",
 	displayName: ":smirk: NSFW",
 	devOnly: false,
-	description: "That stuff your parents warned you about >~>"
+	description: "That stuff your parents warned you about >~>",
+	file: __filename
 });
 
 cmd.map(c => cat.addCommand(c.setCategory(cat.name)));

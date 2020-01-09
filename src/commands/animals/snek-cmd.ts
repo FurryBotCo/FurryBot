@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 1.5e3,
 	description: "Get a picture of a snek!",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	await msg.channel.startTyping();
 	let req, j;

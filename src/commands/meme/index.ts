@@ -9,7 +9,8 @@ const cat = new Category({
 	name: "meme",
 	displayName: ":joy: Memey",
 	devOnly: false,
-	description: "Let's get this bread."
+	description: "Let's get this bread.",
+	file: __filename
 });
 
 cmd.map(c => cat.addCommand(c.setCategory(cat.name)));

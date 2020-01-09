@@ -22,7 +22,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Get some info about the current server.",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const o: Eris.User = await this.getRESTUser(msg.guild.ownerID).catch(err => null);
 	const owner = !o ? `Unknwon ${msg.channel.guild.ownerID}` : `${o.username}#${o.discriminator} (${o.id})`;

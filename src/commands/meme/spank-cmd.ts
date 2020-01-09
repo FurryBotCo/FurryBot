@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "Spank someone",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	let a = "https://i.furry.bot/furry.png";

@@ -18,7 +18,8 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Send a direct message to a user.",
 	usage: "<id> <message>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length > 0) return new Error("ERR_INVALID_USAGE");
 

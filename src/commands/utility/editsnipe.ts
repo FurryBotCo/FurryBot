@@ -18,7 +18,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Get the last edited message in a channel.",
 	usage: "[channel]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	let ch: Eris.TextChannel;
 	if (msg.args.length > 0) ch = await msg.getChannelFromArgs() as Eris.TextChannel;

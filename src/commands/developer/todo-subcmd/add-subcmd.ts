@@ -19,7 +19,8 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Add an item to the todo list",
 	usage: "<item>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 

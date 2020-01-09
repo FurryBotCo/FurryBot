@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "List this servers prefix, or change my prefix for this server.",
 	usage: "[new prefix]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length === 0) return msg.channel.createMessage(`This servers prefix is "${msg.gConfig.settings.prefix}", if you want to change this, run this again with the new prefix! (ex: ${msg.gConfig.settings.prefix}prefix <new prefix>)`);
 	if (msg.args.join("").toLowerCase() === msg.gConfig.settings.prefix.toLowerCase()) return msg.reply("that is already this servers prefix.");

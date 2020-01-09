@@ -18,7 +18,8 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "Get a yomomma joke",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	const txt = await this.f.memeRequest("/yomomma");

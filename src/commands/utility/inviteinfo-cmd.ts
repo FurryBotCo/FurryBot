@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 5e3,
 	description: "Get info about a Discord invite.",
 	usage: "<code>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const k = msg.unparsedArgs.join("").match(new RegExp("^((https?\:\/\/)?(discord\.gg|discordapp\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"));

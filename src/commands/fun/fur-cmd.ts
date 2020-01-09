@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Get a random fur image! Use **fur list** to get a list of valid types.",
 	usage: "[type/list]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	await msg.channel.startTyping();
 	const types = [

@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Some stuff for testing",
 	usage: "",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (!msg.args[0]) return msg.reply("tested..");
 

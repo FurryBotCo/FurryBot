@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Get some info about your servers current shard.",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const embed: Eris.EmbedOptions = {
 		title: "Shard Info",

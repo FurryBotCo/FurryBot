@@ -22,7 +22,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Get some invite links for me!",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const botPerms = config.bot.permissions.map(perm => Permissions.constant[perm] || 0).reduce((a, b) => a + b, 0);
 

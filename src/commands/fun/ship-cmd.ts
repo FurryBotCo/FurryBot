@@ -23,7 +23,8 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "Ship some people!",
 	usage: "<@member1> [@member2]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 
 	let member1 = msg.member, member2: Eris.Member;
@@ -36,8 +37,6 @@ export default new Command({
 	}
 
 	if (!member1 || !member2) return msg.errorEmbed("INVALID_MEMBER");
-
-	const amount = Math.floor(Math.random() * 100);
 
 	const ship = {
 		amount: Math.floor(Math.random() * 100),

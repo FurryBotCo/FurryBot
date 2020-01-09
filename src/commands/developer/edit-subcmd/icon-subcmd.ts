@@ -17,7 +17,8 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Check the bots icon.",
 	usage: "<url>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
 	const set = await phin({

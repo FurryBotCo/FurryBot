@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Get the servers I share with a user.",
 	usage: "<@member/id>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 

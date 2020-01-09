@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 2e3,
 	description: "Manages tags for this server.",
 	usage: "<tag/create/delete/edit/list>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const tags: { [k: string]: string; } = {};
 	Object.keys(msg.gConfig.tags).map(t =>

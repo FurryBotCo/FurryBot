@@ -21,7 +21,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Replaces dashes with 'spaces' in channel names.",
 	usage: "<channel>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	const ch = await msg.getChannelFromArgs();

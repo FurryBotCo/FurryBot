@@ -9,7 +9,8 @@ const cat = new Category({
 	name: "fun",
 	displayName: ":smile: Fun",
 	devOnly: false,
-	description: "Some commands to spice up your chat"
+	description: "Some commands to spice up your chat",
+	file: __filename
 });
 
 cmd.map(c => cat.addCommand(c.setCategory(cat.name)));

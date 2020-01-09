@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 5e3,
 	description: "Get a self assignable role.",
 	usage: "<role>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	const roles = msg.gConfig.selfAssignableRoles.map(a => {

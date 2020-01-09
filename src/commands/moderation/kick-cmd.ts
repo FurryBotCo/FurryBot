@@ -22,7 +22,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Kick members from your server.",
 	usage: "<@member/id> [reason]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	let m;

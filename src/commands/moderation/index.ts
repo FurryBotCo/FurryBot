@@ -9,7 +9,8 @@ const cat = new Category({
 	name: "moderation",
 	displayName: ":hammer: Moderation",
 	devOnly: false,
-	description: "Stomp down the server baddies with your ban hammer."
+	description: "Stomp down the server baddies with your ban hammer.",
+	file: __filename
 });
 
 cmd.map(c => cat.addCommand(c.setCategory(cat.name)));

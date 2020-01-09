@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Make me restart.",
 	usage: "",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const time = await this.f.ms((this.shards.size * 7) * 1e3, true);
 	return msg.reply(`restarting.. This may take ${time} or more.`).then(() => process.exit());

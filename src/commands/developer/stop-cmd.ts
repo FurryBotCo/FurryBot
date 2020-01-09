@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Make me stop.",
 	usage: "",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	return msg.reply("stopping..").then(() => process.exit());
 }));

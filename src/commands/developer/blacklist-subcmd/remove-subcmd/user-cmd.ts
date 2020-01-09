@@ -18,7 +18,8 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Remove a user from the blacklist.",
 	usage: "<id>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");

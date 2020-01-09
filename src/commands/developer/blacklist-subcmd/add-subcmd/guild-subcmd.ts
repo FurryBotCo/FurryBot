@@ -20,7 +20,8 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Add a server to the blacklist.",
 	usage: "<id> <reason>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const id = msg.args[0];

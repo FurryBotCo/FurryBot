@@ -18,7 +18,8 @@ export default new Command({
 	description: "Manage the bots economy.",
 	usage: "",
 	features: ["devOnly"],
-	subCommandDir: `${__dirname}/eco-subcmd`
+	subCommandDir: `${__dirname}/eco-subcmd`,
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length === 0) return cmd.sendSubCommandEmbed(msg);
 	else return cmd.handleSubCommand(msg, this);

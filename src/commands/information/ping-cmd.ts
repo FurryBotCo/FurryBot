@@ -18,7 +18,8 @@ export default new Command({
 	donatorCooldown: .25e3,
 	description: "Get my average ping.",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	await msg.channel.startTyping();
 	return msg.channel.createMessage("Checking Ping..")

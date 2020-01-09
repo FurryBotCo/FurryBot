@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 2e3,
 	description: "Remove a self assignable role",
 	usage: "<@role/id/name>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const role = await msg.getRoleFromArgs(0, true, true);
 	if (!role) return msg.errorEmbed("INVALID_ROLE");
