@@ -57,6 +57,8 @@ export default class FurryBot extends Eris.Client {
 	channelTyping: Map<string, NodeJS.Timeout>;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
+		const client = this; // tslint:disable-line no-this-assignment
+
 		fs.readdirSync(`${__dirname}/events`).map((d) => {
 			const e: ClientEvent = require(`${__dirname}/events/${d}`).default;
 			this.on(e.event, e.listener.bind(this));
@@ -101,8 +103,6 @@ export default class FurryBot extends Eris.Client {
 
 		this.f = functions;
 		this.messageCollector = new MessageCollector(this);
-
-		const client = this; // tslint:disable-line no-this-assignment
 
 		this.commandStats = {};
 		this.stats = {
@@ -151,10 +151,10 @@ export default class FurryBot extends Eris.Client {
 	}
 
 	async increment(stat: string | string[], tags?: string[]): Promise<string> {
-		return new Promise((a, b) => this.ddog.increment(stat, 1, 1, tags, (err, v) => err ? b(err) : a(v.toString())));
+		return new Promise((a, b) => !this || !this.ddog ? null : this.ddog.increment(stat, 1, 1, tags, (err, v) => err ? b(err) : a(v.toString())));
 	}
 
 	async decrement(stat: string | string[], tags?: string[]): Promise<string> {
-		return new Promise((a, b) => this.ddog.decrement(stat, 1, 1, tags, (err, v) => err ? b(err) : a(v.toString())));
+		return new Promise((a, b) => !this || !this.ddog ? null : this.ddog.decrement(stat, 1, 1, tags, (err, v) => err ? b(err) : a(v.toString())));
 	}
 }
