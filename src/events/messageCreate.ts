@@ -40,7 +40,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		if (bl && !config.developers.includes(msg.author.id)) {
 			if (msg.channel.guild && msg.channel.guild.id === config.bot.mainGuild) {
-				if (!msg.member.roles.includes(config.blacklistRoleId)) await msg.member.addRole(config.blacklistRoleId, "user is blacklisted");
+				if (!msg.member.roles.includes(config.blacklistRoleId)) await msg.member.addRole(config.blacklistRoleId, "user is blacklisted").catch(err => null);
 			}
 
 			if (msg.cmd && msg.cmd.cmd) {
@@ -49,7 +49,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					if (n.length > 0) {
 						await mdb.collection("blacklist").findOneAndUpdate({ id: n[0].id }, { $set: { noticeShown: true } });
 						const expiry = [0, null].includes(n[0].expire) ? "Never" : this.f.formatDateWithPadding(new Date(n[0].expire));
-						return msg.reply(`you have been blacklisted. Reason: ${n[0].reason}, blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`);
+						return msg.reply(`you have been blacklisted. Reason: ${n[0].reason}, blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
 					} else return;
 				}
 
@@ -58,7 +58,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					if (n.length > 0) {
 						await mdb.collection("blacklist").findOneAndUpdate({ id: n[0].id }, { $set: { noticeShown: true } });
 						const expiry = [0, null].includes(n[0].expire) ? "Never" : this.f.formatDateWithPadding(new Date(n[0].expire));
-						return msg.reply(`this server has been blacklisted. Reason: ${n[0].reason}. Blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`);
+						return msg.reply(`this server has been blacklisted. Reason: ${n[0].reason}. Blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
 					} else return;
 				}
 			}
@@ -79,17 +79,16 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				// const g = await this.getRESTGuild(config.bot.mainGuild);
 				// await g.banMember(message.author.id, 0, "Advertising in bots dms.");
 
-				const embed: Eris.EmbedOptions = {
-					title: `DM Invite from ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
-					fields: [{
-						name: "Content",
-						value: msg.content,
-						inline: false
-					}]
-				};
-
 				await this.executeWebhook(config.webhooks.directMessage.id, config.webhooks.directMessage.token, {
-					embeds: [embed],
+					embeds: [{
+						title: `DM Invite from ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
+						fields: [{
+							name: "Content",
+							value: msg.content,
+							inline: false
+						}],
+						timestamp: new Date().toISOString()
+					}],
 					username: `Direct Messages${config.beta ? " - Beta" : ""}`,
 					avatarURL: "https://i.furry.bot/furry.png"
 				});
@@ -97,17 +96,16 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				await msg.author.getDMChannel().then(dm => dm.createMessage(config.bot.directMessage.invite)).catch(err => null);
 				return Logger.log("Direct Message", `DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`);
 			} else {
-				const embed: Eris.EmbedOptions = {
-					title: `Direct Message from ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
-					fields: [{
-						name: "Content",
-						value: msg.content,
-						inline: false
-					}]
-				};
-
 				await this.executeWebhook(config.webhooks.directMessage.id, config.webhooks.directMessage.token, {
-					embeds: [embed],
+					embeds: [{
+						title: `Direct Message from ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
+						fields: [{
+							name: "Content",
+							value: msg.content,
+							inline: false
+						}],
+						timestamp: new Date().toISOString()
+					}],
 					username: `Direct Messages${config.beta ? " - Beta" : ""}`,
 					avatarURL: "https://i.furry.bot/furry.png"
 				});
@@ -226,7 +224,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						],
 						username: `FurryBot Spam Logs${config.beta ? " - Beta" : ""}`,
 						avatarURL: "https://assets.furry.bot/blacklist_logs.png"
-					});
+					}).catch(err => null);
 
 					if (spC >= config.antiSpam.response.blacklist) {
 						const id = this.f.random(7);
@@ -255,7 +253,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 							],
 							username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
 							avatarURL: "https://assets.furry.bot/blacklist_logs.png"
-						});
+						}).catch(err => null);
 					}
 
 					return;
@@ -264,7 +262,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			let count = await mdb.collection("stats").findOne({ id: "fCount" }).then(res => parseInt(res.count, 10)).catch(err => 1);
 			await mdb.collection("stats").findOneAndUpdate({ id: "fCount" }, { $set: { count: ++count } });
-			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings fResponse disabled\``);
+			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings fResponse disabled\``).catch(err => null);
 		}
 		t.end("autoResponse");
 
@@ -360,37 +358,37 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) {
 			Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `${msg.author.tag} (${msg.author.id}) attempted to run developer command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 			this.increment(`commands.${cmd.triggers[0].toLowerCase()}.missingPermissions`, ["missing:dev"]);
-			return msg.reply(`you must be a developer to use this command.`);
+			return msg.reply(`you must be a developer to use this command.`).catch(err => null);
 		}
 
-		if (cmd.features.includes("supportOnly") && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("this command may only be ran in my support server.");
+		if (cmd.features.includes("supportOnly") && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("this command may only be ran in my support server.").catch(err => null);
 
-		if (cmd.features.includes("guildOwnerOnly") && msg.author.id !== msg.channel.guild.ownerID) return msg.reply("only this servers owner may use this command.");
+		if (cmd.features.includes("guildOwnerOnly") && msg.author.id !== msg.channel.guild.ownerID) return msg.reply("only this servers owner may use this command.").catch(err => null);
 
 		if (cmd.features.includes("nsfw")) {
 			if (!msg.channel.nsfw) return msg.reply(`this command can only be ran in nsfw channels.`, {
 				file: await this.f.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
 				name: "nsfw.gif"
-			});
+			}).catch(err => null);
 
-			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw enable\`.`);
+			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw enable\`.`).catch(err => null);
 
 			if (msg.channel.topic && config.yiff.disableStatements.some(t => msg.channel.topic.indexOf(t) !== -1)) {
 				const st = config.yiff.disableStatements.filter(t => msg.channel.topic.indexOf(t) !== -1);
 				st.map(k => this.increment("other.nsfwDisabled", [`statment:${k}`]));
 
-				const embed: Eris.EmbedOptions = {
-					author: {
-						name: msg.author.tag,
-						icon_url: msg.author.avatarURL
-					},
-					title: "NSFW Commands Disabled",
-					description: `NSFW commands have been explicitly disabled in this channel. To reenable them, remove **${st.join("**, **")}** from the channel topic.`,
-					color: Math.floor(Math.random() * 0xFFFFFF),
-					timestamp: new Date().toISOString()
-				};
-
-				return msg.channel.createMessage({ embed });
+				return msg.channel.createMessage({
+					embed: {
+						author: {
+							name: msg.author.tag,
+							icon_url: msg.author.avatarURL
+						},
+						title: "NSFW Commands Disabled",
+						description: `NSFW commands have been explicitly disabled in this channel. To reenable them, remove **${st.join("**, **")}** from the channel topic.`,
+						color: Colors.red,
+						timestamp: new Date().toISOString()
+					}
+				}).catch(err => null);
 			}
 		}
 
@@ -405,7 +403,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						color: Colors.red,
 						timestamp: new Date().toISOString()
 					}
-				});
+				}).catch(err => null);
 			}
 		}
 
@@ -430,7 +428,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			const time = cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;
 			if (cool.c && cmd.cooldown !== 0 && cool.time !== 0) {
 				const t = await this.f.ms(time, true).then((k: string) => k.split(" ").slice(0, 2).join(" ").replace(",", ""));
-				return msg.reply(`hey, this command is on cooldown! Please wait **${t}**..`);
+				return msg.reply(`hey, this command is on cooldown! Please wait **${t}**..`).catch(err => null);
 			}
 		}
 

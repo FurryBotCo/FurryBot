@@ -6,6 +6,7 @@ import Eris from "eris";
 import config from "../../../config";
 import { Logger } from "../../LoggerV8";
 import * as fs from "fs";
+import { Colors } from "../../Constants";
 
 export default class Command {
 	triggers: UT.ArrayOneOrMore<string>;
@@ -86,29 +87,31 @@ export default class Command {
 	}
 
 	async sendSubCommandEmbed(msg: ExtendedMessage) {
-		const embed: Eris.EmbedOptions = {
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			title: "Sub Command Help",
-			description: `\`command\` - ** description **\n\n${this.subCommands.length === 0 ? "No Sub Commands Found" : this.subCommands.map(s => `\`${s.triggers[0]}\` - **${s.description}**`).join("\n")}`,
-			timestamp: new Date().toISOString(),
-			color: Math.floor(Math.random() * 0xFFFFFF),
-			footer: {
-				text: `Command: ${this.triggers[0]}`,
-				icon_url: "https://i.furry.bot/furry.png"
-			}
-		};
+		if (!msg.channel.permissionsOf(msg.client.user.id).has("embedLinks")) return msg.reply(`I require the \`embedLinks\` permission for this to work.`).catch(err => null);
 
-		return msg.channel.createMessage({ embed });
+		return msg.channel.createMessage({
+			embed: {
+				author: {
+					name: msg.author.tag,
+					icon_url: msg.author.avatarURL
+				},
+				title: "Sub Command Help",
+				description: `\`command\` - ** description **\n\n${this.subCommands.length === 0 ? "No Sub Commands Found" : this.subCommands.map(s => `\`${s.triggers[0]}\` - **${s.description}**`).join("\n")}`,
+				timestamp: new Date().toISOString(),
+				color: Colors.fur,
+				footer: {
+					text: `Command: ${this.triggers[0]}`,
+					icon_url: "https://i.furry.bot/furry.png"
+				}
+			}
+		});
 	}
 
 	async handleSubCommand(msg: ExtendedMessage, client: FurryBot) {
 		const cmd = this.getSubCommand(msg.args[0]);
 		// setter
 		msg.args = msg.args.slice(1);
-		if (!cmd) return new Error("ERR_NO_SUBCMD");
+		if (!cmd) return msg.reply(`invalid subcommand.`);
 
 		if (cmd.features.includes("betaOnly") && !config.beta) return;
 
@@ -126,26 +129,26 @@ export default class Command {
 			if (!msg.channel.nsfw) return msg.reply(`this command can only be ran in nsfw channels.`, {
 				file: await client.f.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
 				name: "nsfw.gif"
-			});
+			}).catch(err => null);
 
-			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw enable\`.`);
+			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw enable\`.`).catch(err => null);
 
 			if (msg.channel.topic && config.yiff.disableStatements.some(t => msg.channel.topic.indexOf(t) !== -1)) {
 				const st = config.yiff.disableStatements.filter(t => msg.channel.topic.indexOf(t) !== -1);
 				st.map(k => client.increment("other.nsfwDisabled", [`statment:${k}`]));
 
-				const embed: Eris.EmbedOptions = {
-					author: {
-						name: msg.author.tag,
-						icon_url: msg.author.avatarURL
-					},
-					title: "NSFW Commands Disabled",
-					description: `NSFW commands have been explicitly disabled in this channel, to reenable them, remove **${st.join("**, **")}** from the channel topic.`,
-					color: Math.floor(Math.random() * 0xFFFFFF),
-					timestamp: new Date().toISOString()
-				};
-
-				return msg.channel.createMessage({ embed });
+				return msg.channel.createMessage({
+					embed: {
+						author: {
+							name: msg.author.tag,
+							icon_url: msg.author.avatarURL
+						},
+						title: "NSFW Commands Disabled",
+						description: `NSFW commands have been explicitly disabled in this channel, to reenable them, remove **${st.join("**, **")}** from the channel topic.`,
+						color: Colors.red,
+						timestamp: new Date().toISOString()
+					}
+				}).catch(err => null);
 			}
 		}
 
@@ -153,14 +156,15 @@ export default class Command {
 			if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(msg.author.id).has(perm))) {
 				const p = cmd.userPermissions.filter(perm => !msg.channel.permissionsOf(msg.author.id).has(perm));
 
-				const embed: Eris.EmbedOptions = {
-					title: "You do not have the required permission(s) to use this!",
-					description: `You require the permission(s) **${p.join("**, **")}** to run this, which you do not have.`,
-					color: Math.floor(Math.random() * 0xFFFFFF),
-					timestamp: new Date().toISOString()
-				};
 				Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `user ${msg.author.username}#${msg.author.discriminator} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`);
-				return msg.channel.createMessage({ embed });
+				return msg.channel.createMessage({
+					embed: {
+						title: "You do not have the required permission(s) to use this!",
+						description: `You require the permission(s) **${p.join("**, **")}** to run this, which you do not have.`,
+						color: Colors.red,
+						timestamp: new Date().toISOString()
+					}
+				}).catch(err => null);
 			}
 		}
 
@@ -168,58 +172,58 @@ export default class Command {
 			if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(client.user.id).has(perm))) {
 				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(client.user.id).has(perm));
 
-				const embed: Eris.EmbedOptions = {
-					title: "I do not have the required permission(s) to use this!",
-					description: `I need the permission(s) **${p.join("**, **")}** for this command to function properly, please add these to me and try again.`,
-					color: Math.floor(Math.random() * 0xFFFFFF),
-					timestamp: new Date().toISOString()
-				};
-
 				Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${(msg.channel as Eris.TextChannel).guild.name} (${(msg.channel as Eris.TextChannel).guild.id})`);
-				return msg.channel.createMessage({ embed });
+				return msg.channel.createMessage({
+					embed: {
+						title: "I do not have the required permission(s) to use this!",
+						description: `I need the permission(s) **${p.join("**, **")}** for this command to function properly, please add these to me and try again.`,
+						color: Colors.red,
+						timestamp: new Date().toISOString()
+					}
+				}).catch(err => null);
 			}
 		}
 
 		const c = await cmd.run.call(client, msg, cmd);
 
 		if (c instanceof Error && c.message === "ERR_INVALID_USAGE") {
-			const embed: Eris.EmbedOptions = {
-				title: ":x: Invalid Command Usage",
-				fields: [
-					{
-						name: "Command",
-						value: `${this.triggers[0]} > ${cmd.triggers[0]}`,
-						inline: false
-					},
-					{
-						name: "Usage",
-						value: `\`${msg.gConfig.settings.prefix}${this.triggers[0]} ${cmd.triggers[0]} ${cmd.usage}\``,
-						inline: false
-					},
-					{
-						name: "Description",
-						value: cmd.description || "No Description Found.",
-						inline: false
-					},
-					{
-						name: "Category",
-						value: `(subcommand) ${this.category}`,
-						inline: false
-					},
-					{
-						name: "Arguments",
-						value: msg.args.length < 1 ? "NONE" : msg.args.join(" "),
-						inline: false
+			return msg.channel.createMessage({
+				embed: {
+					title: ":x: Invalid Command Usage",
+					fields: [
+						{
+							name: "Command",
+							value: `${this.triggers[0]} > ${cmd.triggers[0]}`,
+							inline: false
+						},
+						{
+							name: "Usage",
+							value: `\`${msg.gConfig.settings.prefix}${this.triggers[0]} ${cmd.triggers[0]} ${cmd.usage}\``,
+							inline: false
+						},
+						{
+							name: "Description",
+							value: cmd.description || "No Description Found.",
+							inline: false
+						},
+						{
+							name: "Category",
+							value: `(subcommand) ${this.category}`,
+							inline: false
+						},
+						{
+							name: "Arguments",
+							value: msg.args.length < 1 ? "NONE" : msg.args.join(" "),
+							inline: false
+						}
+					],
+					color: Colors.red,
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
 					}
-				],
-				color: 13434880,
-				author: {
-					name: msg.author.tag,
-					icon_url: msg.author.avatarURL
 				}
-			};
-
-			return msg.channel.createMessage({ embed });
+			}).catch(err => null);
 		}
 
 		return c;
