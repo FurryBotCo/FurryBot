@@ -7,6 +7,7 @@
     "@donovan_dmc/db": "^1.0.0",
     "big-integer": "^1.6.48",
     "chalk": "^3.0.0",
+    "cheerio": "^1.0.0-rc.3",
     "chunk": "0.0.2",
     "cookie-parser": "^1.4.4",
     "deasync": "^0.1.16",
@@ -34,6 +35,7 @@
     "ytdl-core": "^1.0.3"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.15",
     "@types/chunk": "0.0.0",
     "@types/cookie-parser": "^1.4.2",
     "@types/deasync": "^0.1.0",
