@@ -59,18 +59,6 @@ export default new Command({
 	if (!user.user.bot) {
 		const u = await db.getUser(user.id);
 
-		if (u.blacklist.blacklisted) embed.fields.push({
-			name: "Blacklist",
-			value: `User is blacklisted.\nReason: ${u.blacklist.reason}\nBlame: ${u.blacklist.blame}`,
-			inline: true
-		});
-
-		else embed.fields.push({
-			name: "Blacklist",
-			value: "User is not blacklisted.",
-			inline: true
-		});
-
 		if (u.marriage.married) embed.fields.push({
 			name: "Marriage Status (on this bot)",
 			value: `Married to ${await this.getRESTUser(u.marriage.partner).then(usr => `${usr.username}#${usr.discriminator}`).catch(err => "Unknown#0000")}`,
@@ -83,8 +71,8 @@ export default new Command({
 			inline: false
 		});
 	} else embed.fields.push({
-		name: "Blacklist",
-		value: "Bots cannot be blacklisted.",
+		name: "Marriage Status (on this bot)",
+		value: "Bots cannot be married.",
 		inline: false
 	});
 	return msg.channel.createMessage({
