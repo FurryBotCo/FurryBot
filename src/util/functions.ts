@@ -650,7 +650,7 @@ export default {
 
 		return count;
 	}),
-	formatDateWithPadding: ((d = new Date(), ms = false) => `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()} ${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`),
+	formatDateWithPadding: ((d = new Date(), seconds = true, ms = false) => `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()} ${seconds ? `${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`),
 	toASCIIEscape: ((str) => {
 		const r = [];
 		for (let i = 0; i < str.length; i++) r.push(str.charCodeAt(i).toString(16).toUpperCase());
