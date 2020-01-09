@@ -15,7 +15,7 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 3e3,
 	donatorCooldown: 2e3,
-	description: "Manages",
+	description: "Manages tags for this server.",
 	usage: "<tag/create/delete/edit/list>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
@@ -69,6 +69,7 @@ export default new Command({
 			case "create":
 				if (Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`a tag with the name "${msg.args[1].toLowerCase()}" already exists.`);
 				content = msg.args.slice(2).join(" ");
+				if (!content || content.length === 0) return msg.reply("please provide some content for the tag.");
 				await msg.gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
 				embed = {
 					title: "Tag Created",
@@ -95,6 +96,7 @@ export default new Command({
 				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`a tag with the name "${msg.args[1].toLowerCase()}" does not exist.`);
 				const c = tags[msg.args[1].toLowerCase()];
 				content = msg.args.slice(2).join(" ");
+				if (!content || content.length === 0) return msg.reply("please provide some content for the tag.");
 				await msg.gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
 				embed = {
 					title: "Tag Edited",
