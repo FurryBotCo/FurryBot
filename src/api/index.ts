@@ -14,11 +14,11 @@ export default (async (client: FurryBot) => {
 	const app: express.Application = express();
 
 	app.use(session({
-		name: "fb-sess.id",
+		name: "owo",
 		secret: config.web.cookieSecret,
 		cookie: {
 			maxAge: 8.64e7,
-			secure: false // since the api server is ran as http, we have to save it as non-secure (it will be secured through the proxy when properly accesed)
+			secure: true
 		},
 		resave: false,
 		saveUninitialized: true
