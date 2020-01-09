@@ -5,6 +5,7 @@ import config from "../../../../config";
 import { Logger } from "../../../../util/LoggerV8";
 import { db, mdb } from "../../../../modules/Database";
 import Eris from "eris";
+import { BlacklistEntry } from "../../../../util/@types/Misc";
 
 export default new SubCommand({
 	triggers: [
@@ -24,20 +25,31 @@ export default new SubCommand({
 	const u = await msg.getUserFromArgs();
 	if (!u) return msg.reply(`**${msg.args[0]}** isn't a valid user.`);
 	const { id } = u;
-	const usr = await db.getUser(id);
-
-	if (!usr) return msg.reply(`Failed to fetch user entry for **${id}**`);
-	if (usr.blacklist.blacklisted) return msg.reply(`**${id}** is already blacklisted, reason: ${usr.blacklist.reason}.`);
-	else {
-		const blacklistReason = msg.args.length > 1 ? msg.args.slice(1, msg.args.length).join(" ") : "No Reason Specified";
-		await mdb.collection("users").findOneAndUpdate({ id }, { $set: { blacklist: { blacklisted: true, reason: blacklistReason, blame: msg.author.tag } } });
+	const ubl: BlacklistEntry = await mdb.collection("blacklist").find({ userId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())[0]);
+	if (!!ubl) {
+		const expiry = [0, null].includes(ubl.expire) ? "Never" : this.f.formatDateWithPadding(new Date(ubl.expire));
+		return msg.reply(`**${u.username}#${u.discriminator}** (${u.id}) is already blacklisted. Reason: ${ubl.reason}. Blame: ${ubl.blame}. Expiry: ${expiry}.`);
+	} else {
+		const reason = msg.args.length > 1 ? msg.args.slice(1, msg.args.length).join(" ") : "No Reason Specified";
+		const k = this.f.random(7);
+		await mdb.collection("blacklist").insertOne({
+			created: Date.now(),
+			type: "user",
+			blame: msg.author.tag,
+			blameId: msg.author.id,
+			reason,
+			userId: id,
+			id: k,
+			noticeShown: false,
+			expire: null
+		});
 		const embed: Eris.EmbedOptions = {
 			title: "User Blacklisted",
 			author: {
 				name: msg.author.tag,
 				icon_url: msg.author.avatarURL
 			},
-			description: `ID: \`${id}\`\nTag: ${u.username}#${u.discriminator}\nReason: ${blacklistReason}\nBlame: ${msg.author.tag}`,
+			description: `ID: \`${id}\`\nTag: ${u.username}#${u.discriminator}\nReason: ${reason}\nBlame: ${msg.author.tag}\nExpiry: Never\nBlacklist ID: ${k}`,
 			timestamp: new Date().toISOString(),
 			color: Math.floor(Math.random() * 0xFFFFFF),
 			footer: {
@@ -46,11 +58,16 @@ export default new SubCommand({
 			}
 		};
 
+		const g = this.guilds.get(config.bot.mainGuild);
+		if (g && g.members.has(u.id)) {
+			const m = g.members.get(u.id);
+			if (!m.roles.includes(config.blacklistRoleId)) await m.addRole(config.blacklistRoleId, `user blacklisted by ${msg.author.tag}`);
+		}
 		await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 			embeds: [embed],
 			username: `Blacklist Logs${config.beta ? " - Beta" : ""}`,
 			avatarURL: "https://assets.furry.bot/blacklist_logs.png"
 		});
-		return msg.reply(`Added **${u.username}#${u.discriminator}** (${id}) to the blacklist, reason: ${blacklistReason}.`);
+		return msg.reply(`Added **${u.username}#${u.discriminator}** (${id}) to the blacklist, reason: ${reason}.`);
 	}
 }));
