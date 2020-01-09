@@ -61,5 +61,5 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 		]
 	};
 
-	return ch.createMessage({ embed });
+	return ch.createMessage({ embed }).catch(err => null);
 }));

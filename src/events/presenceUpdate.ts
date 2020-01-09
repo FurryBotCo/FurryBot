@@ -70,6 +70,6 @@ export default new ClientEvent("presenceUpdate", (async function (this: FurryBot
 		if (other.game.type !== oldPresence.game.type) embed.description += `\nGame Type: **${oldPresence.game.type}** -> **${other.game.type}**`;
 		if (other.game.url !== oldPresence.game.url) embed.description += `\nGame URL: **${oldPresence.game.url}** -> **${other.game.url}**`;
 
-		return ch.createMessage({ embed });
+		return ch.createMessage({ embed }).catch(err => null);
 	}*/
 }));

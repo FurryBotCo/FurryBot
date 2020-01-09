@@ -45,5 +45,5 @@ export default new ClientEvent("guildRoleCreate", (async function (this: FurryBo
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-	return ch.createMessage({ embed });
+	return ch.createMessage({ embed }).catch(err => null);
 }));

@@ -109,7 +109,7 @@ export default new ClientEvent("voiceStateUpdate", (async function (this: FurryB
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-		await ch.createMessage({ embed });
+		await ch.createMessage({ embed }).catch(err => null);
 	}
 
 	return;

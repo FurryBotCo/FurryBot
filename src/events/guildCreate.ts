@@ -71,5 +71,5 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 		],
 		username: `Furry Bot Guild Stats${config.beta ? " - Beta" : ""}`,
 		avatarURL: "https://i.furry.bot/furry.png"
-	});
+	}).catch(err => null);
 }));

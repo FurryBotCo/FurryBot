@@ -18,5 +18,5 @@ export default new ClientEvent("shardReady", (async function (this: FurryBot, id
 		],
 		username: `Furry Bot${config.beta ? " - Beta" : ""} Status`,
 		avatarURL: "https://i.furry.bot/furry.png"
-	});
+	}).catch(err => null);
 }));

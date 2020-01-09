@@ -37,5 +37,5 @@ export default new ClientEvent("voiceChannelSwitch", (async function (this: Furr
 	// const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_MOVE, null);
 	// if (log.success) embed.description += `\nMoved By ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-	return ch.createMessage({ embed });
+	return ch.createMessage({ embed }).catch(err => null);
 }));

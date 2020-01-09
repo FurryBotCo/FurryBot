@@ -72,7 +72,7 @@ export default new ClientEvent("userUpdate", (async function (this: FurryBot, us
 					}
 				};
 
-				await ch.createMessage({ embed });
+				await ch.createMessage({ embed }).catch(err => null);
 			}
 		} catch (e) { }
 	}));

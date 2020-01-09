@@ -34,5 +34,5 @@ export default new ClientEvent("voiceChannelLeave", (async function (this: Furry
 		color: Colors.red
 	};
 
-	return ch.createMessage({ embed });
+	return ch.createMessage({ embed }).catch(err => null);
 }));

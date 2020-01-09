@@ -47,5 +47,5 @@ export default new ClientEvent("guildMemberRemove", (async function (this: Furry
 		embed.description = embed.description.replace("{REPLACE}", "was Kicked");
 	} embed.description = embed.description.replace("{REPLACE}", "Left");
 
-	return ch.createMessage({ embed });
+	return ch.createMessage({ embed }).catch(err => null);
 }));

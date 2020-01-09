@@ -34,5 +34,5 @@ export default new ClientEvent("voiceChannelJoin", (async function (this: FurryB
 		color: Colors.green
 	};
 
-	return ch.createMessage({ embed });
+	return ch.createMessage({ embed }).catch(err => null);
 }));
