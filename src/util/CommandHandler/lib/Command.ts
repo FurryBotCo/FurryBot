@@ -157,6 +157,7 @@ export default class Command {
 				const p = cmd.userPermissions.filter(perm => !msg.channel.permissionsOf(msg.author.id).has(perm));
 
 				Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `user ${msg.author.username}#${msg.author.discriminator} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`);
+				if (!msg.channel.permissionsOf(msg.client.user.id).has("embedLinks")) return msg.reply(`you're missing some permissions to be able to run that, but I need the \`embedLinks\` permission to tell you which.`).catch(err => null);
 				return msg.channel.createMessage({
 					embed: {
 						title: "You do not have the required permission(s) to use this!",
@@ -171,6 +172,7 @@ export default class Command {
 		if (cmd.botPermissions.length > 0 && !config.developers.includes(msg.author.username)) {
 			if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(client.user.id).has(perm))) {
 				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(client.user.id).has(perm));
+				if (!msg.channel.permissionsOf(msg.client.user.id).has("embedLinks")) return msg.reply(`I am missing some permissions to be able to run that, but I need the \`embedLinks\` permission to tell you which.`).catch(err => null);
 
 				Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${(msg.channel as Eris.TextChannel).guild.name} (${(msg.channel as Eris.TextChannel).guild.id})`);
 				return msg.channel.createMessage({

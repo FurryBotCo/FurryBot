@@ -395,6 +395,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
 			if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(msg.author.id).has(perm))) {
 				const p = cmd.userPermissions.filter(perm => !msg.channel.permissionsOf(msg.author.id).has(perm));
+				if (!msg.channel.permissionsOf(msg.client.user.id).has("embedLinks")) return msg.reply(`you're missing some permissions to be able to run that, but I need the \`embedLinks\` permission to tell you which.`).catch(err => null);
 				Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `user ${msg.author.username}#${msg.author.discriminator} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`);
 				return msg.channel.createMessage({
 					embed: {
@@ -410,7 +411,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.botPermissions.length > 0) {
 			if (cmd.botPermissions.some(perm => !msg.channel.permissionsOf(this.user.id).has(perm))) {
 				const p = cmd.botPermissions.filter(perm => !msg.channel.permissionsOf(this.user.id).has(perm));
-				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply("I'm missing the `embedLinks` permission, which is required for a lot of my functionality. Please ask a staff member of this server to add this to me.");
+				if (!msg.channel.permissionsOf(msg.client.user.id).has("embedLinks")) return msg.reply(`I am missing some permissions to be able to run that, but I need the \`embedLinks\` permission to tell you which.`).catch(err => null);
 				Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${(msg.channel as Eris.TextChannel).guild.name} (${(msg.channel as Eris.TextChannel).guild.id})`);
 				return msg.channel.createMessage({
 					embed: {
