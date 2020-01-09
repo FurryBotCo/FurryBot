@@ -52,7 +52,7 @@ const Colors = {
 	blue: 0x4169e1,
 	green: 0x2ecc71,
 	gold: 0xf1c40f,
-	red: 0xe74c3c,
+	red: 0xcd0000,
 	orange: 0xd2691e
 };
 
