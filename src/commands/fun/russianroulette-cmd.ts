@@ -21,7 +21,6 @@ export default new Command({
 	usage: "[bullets]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
 	const val = Math.floor(Math.random() * 6);
 	const bullets = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 3;
 

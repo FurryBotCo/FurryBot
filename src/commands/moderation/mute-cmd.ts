@@ -24,7 +24,6 @@ export default new Command({
 	usage: "<@member/id> [reason]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	// get member from message
 	const user = await msg.getMemberFromArgs();
 

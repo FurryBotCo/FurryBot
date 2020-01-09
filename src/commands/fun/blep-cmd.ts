@@ -21,7 +21,6 @@ export default new Command({
 	usage: "<@member/text>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
 	try {
 		const img = await this.f.imageAPIRequest(true, "blep");
 		if (img.success === false) return msg.reply(`Image API returned an error: ${img.error.description}`);

@@ -11,7 +11,8 @@ import chunk from "chunk";
 
 export default new Command({
 	triggers: [
-		"warnings"
+		"warnings",
+		"warnlog"
 	],
 	userPermissions: [
 		"kickMembers"
@@ -23,12 +24,12 @@ export default new Command({
 	usage: "<@member/id> [page]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	const member = await msg.getMemberFromArgs();
 
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 
 	const w: Warning[] = await mdb.collection("warnings").find({ userId: member.id, guildId: msg.channel.guild.id } as Warning).toArray().then((res: Warning[]) => res.sort((a, b) => a.date - b.date));
+	if (w.length === 0) return msg.reply(`couldn't find any warnings for the user **${member.username}#${member.discriminator}**.`);
 
 	const fields = chunk(await Promise.all(w.map(async (k: Warning, i) => {
 		const u = await this.getRESTUser(k.blameId);

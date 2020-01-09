@@ -22,7 +22,6 @@ export default new Command({
 	usage: "[enable/disable] [event/all] [channel]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	const a = ["enable", "disable"];
 	const b = [...Object.keys(config.defaults.guildConfig.logEvents).map(e => e.toLowerCase()), "all"];
 	if (msg.args.length >= 2) {

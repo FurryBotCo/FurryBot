@@ -20,7 +20,6 @@ export default new Command({
 	usage: "<@member>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
 	const member = await msg.getMemberFromArgs();
 	if (!member) return msg.errorEmbed("INVALID_USER");
 	const m = await db.getUser(member.id);

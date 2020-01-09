@@ -23,7 +23,6 @@ export default new Command({
 	usage: "<role>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	const roles = msg.gConfig.selfAssignableRoles.map(a => {
 		const b = msg.channel.guild.roles.get(a);

@@ -23,7 +23,6 @@ export default new Command({
 	usage: "<channel>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	const ch = await msg.getChannelFromArgs();
 	if (!ch) return msg.errorEmbed("INVALID_CHANNEL");

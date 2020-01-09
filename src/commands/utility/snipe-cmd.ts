@@ -19,7 +19,6 @@ export default new Command({
 	usage: "[channel]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	let ch: Eris.TextChannel;
 	if (msg.args.length > 0) ch = await msg.getChannelFromArgs() as Eris.TextChannel;
 

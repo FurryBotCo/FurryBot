@@ -20,7 +20,6 @@ export default new Command({
 	usage: "",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
 	const min = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 1;
 	const max = typeof msg.args[1] !== "undefined" ? parseInt(msg.args[1], 10) : 20;
 

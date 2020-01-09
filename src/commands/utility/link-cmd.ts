@@ -19,7 +19,6 @@ export default new Command({
 	usage: "",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	if (msg.uConfig.patreon.donator) return msg.reply("you are already marked as a donator.");
 
 	const p = await this.f.loopPatrons();

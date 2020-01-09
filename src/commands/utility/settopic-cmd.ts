@@ -24,7 +24,6 @@ export default new Command({
 	usage: "<topic>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	const o = msg.channel.topic;
 	return msg.channel.edit({ topic: msg.unparsedArgs.join(" ") }, `Command: ${msg.author.username}#${msg.author.discriminator}`).then(async (c: Eris.TextChannel) => {
 		// await msg.gConfig.modlog.add({ blame: this.client.user.id, action: "editChannel", edit: "topic", oldValue: o, newValue: c.topic, channelId: c.id, reason: "topic command", timestamp: Date.now() });

@@ -20,7 +20,6 @@ export default new Command({
 	usage: "",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	if (msg.channel.awoo !== undefined && msg.channel.awoo.active) {
 		if (msg.channel.awoo.inAwoo.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this awoo!`);
 		clearTimeout(msg.channel.awoo.timeout);

@@ -21,7 +21,6 @@ export default new Command({
 	usage: "<@member/text>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	return msg.channel.createMessage(this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" ")), {
 		file: await this.f.getImageFromURL("https://assets.furry.bot/pounce.gif"),

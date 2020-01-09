@@ -23,7 +23,6 @@ export default new Command({
 	usage: "",
 	features: ["guildOwnerOnly"]
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	msg.channel.createMessage("this will erase ALL guild (server) settings, are you sure you want to do this?\nType **yes** or **no**.");
 	const d = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);
 	if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply("that wasn't a valid option..");

@@ -25,7 +25,6 @@ export default new Command({
 	usage: "<2-100>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	let count = parseInt(msg.args[0], 10);
 	if (msg.args.length === 0 || isNaN(count)) throw new Error("ERR_INVALID_USAGE");
 	if (count < 2 || count > 100) return msg.reply("Please provide a valid number between two (2) and 100.");

@@ -22,7 +22,6 @@ export default new Command({
 	usage: "[@user]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
 	if (msg.args.length === 0) return msg.reply("Yip! Yip! I am!");
 	else return msg.reply(`Yip! Yip! ${msg.args.join(" ")} is!`);
 }));

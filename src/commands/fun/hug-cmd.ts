@@ -19,7 +19,6 @@ export default new Command({
 	usage: "<@member/text>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	const input = msg.args.join(" ");
 	const text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, input);

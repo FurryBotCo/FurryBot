@@ -19,7 +19,6 @@ export default new Command({
 	usage: "[@user]",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
 	if (msg.args.length === 0) {
 		if (msg.channel.furpile !== undefined && msg.channel.furpile.active) {
 			if (msg.channel.furpile.inPile.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this furpile!`);

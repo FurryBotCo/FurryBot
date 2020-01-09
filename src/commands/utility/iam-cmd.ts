@@ -22,7 +22,6 @@ export default new Command({
 	usage: "<role>",
 	features: []
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	const roles = msg.gConfig.selfAssignableRoles.map(a => {
 		const b = msg.channel.guild.roles.get(a);
@@ -37,11 +36,11 @@ export default new Command({
 	role = roles.filter(r => r.name === msg.args.join(" ").toLowerCase());
 	if (!role || role.length === 0) return msg.channel.createMessage("Role not found.");
 	role = role[0];
-	if (!msg.member.roles.includes(role.id)) return msg.channel.createMessage("You don't have this role.");
+	if (msg.member.roles.includes(role.id)) return msg.channel.createMessage("You already have this role.");
 	const a = this.f.compareMemberWithRole(msg.guild.members.get(this.user.id), role);
 	if (a.higher || a.same) return msg.channel.createMessage(`<@!${msg.author.id}>, That role is higher than, or as high as my highest role.`);
-	await msg.member.removeRole(role.id, "iamnot command");
+	await msg.member.addRole(role.id, "iam command");
 
 	// await msg.gConfig.modlog.add({ blame: this.client.user.id, action: "removeRole", role: role.id, reason: "iamnot command", userId: msg.author.id, timestamp: Date.now() });
-	return msg.channel.createMessage(`<@!${msg.author.id}>, You no longer have the **${role.name}** role.`);
+	return msg.channel.createMessage(`<@!${msg.author.id}>, You now have the **${role.name}** role.`);
 }));
