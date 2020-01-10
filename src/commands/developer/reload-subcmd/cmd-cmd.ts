@@ -52,17 +52,24 @@ export default new SubCommand({
 			break;
 	}
 
-	if (rebuild) {
-		await m.edit("Rebuilding code, please wait..");
-		const start = performance.now();
-		const rb = execSync("npm run build", {
-			cwd: config.rootDir
-		});
-		const end = performance.now();
-		await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
-	} else await msg.edit("not rebuilding code.");
 	try {
+		if (rebuild) {
+			await m.edit("Rebuilding code, please wait..");
+			const start = performance.now();
+			const rb = execSync("npm run build", {
+				cwd: config.rootDir
+			});
+			const end = performance.now();
+			await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
+		} else await m.edit("not rebuilding code.");
+
 		delete require.cache[cmd.file];
+		function loopSub(o: SubCommand) {
+			if (o.subCommands.length > 0) o.subCommands.map(s => loopSub(s));
+
+			delete require.cache[o.file];
+		}
+		if (cmd.subCommands.length > 0) cmd.subCommands.map(s => loopSub(s));
 		cat.removeCommand(cmd);
 		const n = require(cmd.file).default;
 		cat.addCommand(n);
@@ -76,6 +83,10 @@ export default new SubCommand({
 				author: {
 					name: msg.author.tag,
 					icon_url: msg.author.avatarURL
+				},
+				footer: {
+					text: "(a full restart will most likely be required)",
+					icon_url: "https://i.furry.bot/furry.png"
 				}
 			}
 		});

@@ -58,16 +58,17 @@ export default new SubCommand({
 			break;
 	}
 
-	if (rebuild) {
-		await m.edit("Rebuilding code, please wait..");
-		const start = performance.now();
-		const rb = execSync("npm run build", {
-			cwd: config.rootDir
-		});
-		const end = performance.now();
-		await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
-	} else await msg.edit("not rebuilding code.");
 	try {
+		if (rebuild) {
+			await m.edit("Rebuilding code, please wait..");
+			const start = performance.now();
+			const rb = execSync("npm run build", {
+				cwd: config.rootDir
+			});
+			const end = performance.now();
+			await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
+		} else await m.edit("not rebuilding code.");
+
 		delete require.cache[ev];
 		this.removeAllListeners(msg.args[0]);
 		const e: ClientEvent = require(ev).default;
@@ -82,6 +83,10 @@ export default new SubCommand({
 				author: {
 					name: msg.author.tag,
 					icon_url: msg.author.avatarURL
+				},
+				footer: {
+					text: "(a full restart will most likely be required)",
+					icon_url: "https://i.furry.bot/furry.png"
 				}
 			}
 		});
