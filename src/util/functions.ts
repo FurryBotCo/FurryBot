@@ -14,6 +14,7 @@ import loopPatrons from "./patreon/loopPatrons";
 import refreshPareonToken from "./patreon/refreshPatreonToken";
 import client from "../../";
 import testCmd from "commands/developer/test-cmd";
+import FurryBot from "@FurryBot";
 
 export default {
 	checkSemVer: ((ver: string) => semver.valid(ver) === ver),
@@ -658,5 +659,14 @@ export default {
 			escape: r,
 			string: `\\u${r.join("\\u")}`
 		};
+	}),
+	checkBooster: (async (userId: string, client: FurryBot) => {
+		const g = client.guilds.has(config.bot.mainGuild) ? client.guilds.get(config.bot.mainGuild) : await client.getRESTGuild(config.bot.mainGuild);
+
+		if (!g.members.has(userId)) return false;
+		else {
+			const m = g.members.get(userId);
+			return m.roles.includes(config.nitroBoosterRole);
+		}
 	})
 };

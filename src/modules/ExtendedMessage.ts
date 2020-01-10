@@ -62,6 +62,7 @@ class ExtendedMessage extends Eris.Message {
 	c: string;
 	user: {
 		isDeveloper: boolean;
+		isBooster: boolean;
 	};
 	private _gConfig: GuildConfig;
 	private _uConfig: UserConfig;
@@ -131,10 +132,26 @@ class ExtendedMessage extends Eris.Message {
 	}
 
 	async _load() {
-		this._uConfig = await db.getUser(this.author.id);
-		this._gConfig = ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type) ? null : await db.getGuild(this.channel.guild.id);
-		const ch = this.channel;
 		const client = this.client;
+		this._uConfig = await db.getUser(this.author.id);
+		if ([Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) {
+			this._gConfig = await db.getGuild(this.channel.guild.id);
+			this.user = {
+				get isDeveloper() {
+					return config.developers.includes(this.user.id);
+				},
+				isBooster: await client.f.checkBooster(this.author.id, client)
+			};
+		} else {
+			this._gConfig = null;
+			this.user = {
+				get isDeveloper() {
+					return config.developers.includes(this.user.id);
+				},
+				isBooster: false
+			};
+		}
+		const ch = this.channel;
 
 		if (typeof this.channel.startTyping === "undefined") Object.defineProperty(this.channel, "startTyping", {
 			value: (async (maxRounds = 6) => {
