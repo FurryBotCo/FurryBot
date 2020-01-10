@@ -9,7 +9,8 @@ const cat = new Category({
 	name: "misc",
 	displayName: ":thumbsup: Miscellaneous",
 	devOnly: false,
-	description: "Miscellaneous stuff."
+	description: "Miscellaneous stuff.",
+	file: __filename
 });
 
 cmd.map(c => cat.addCommand(c.setCategory(cat.name)));

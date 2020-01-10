@@ -4,6 +4,7 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
 import { db } from "../modules/Database";
+import { Colors } from "../util/Constants";
 
 export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBot, guild: Eris.Guild, role: Eris.Role, oldRole: Eris.OldRole) {
 	this.increment([
@@ -13,8 +14,8 @@ export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBo
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.roleDelete;
 	if (!e.enabled || !e.channel) return;
-	const ch = guild.channels.get(e.channel) as Eris.Textable;
-	if (!ch) return g.edit({
+	const ch = guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
 		logEvents: {
 			roleDelete: {
 				enabled: false,
@@ -55,7 +56,7 @@ export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBo
 	if (role.color !== oldRole.color) changes.push("color");
 	if (role.mentionable !== oldRole.mentionable) changes.push("mentionable");
 	if (role.managed !== oldRole.managed) changes.push("managed");
-	if (role.position !== oldRole.position) changes.push("position");
+	// if (role.position !== oldRole.position) changes.push("position");
 	if (role.hoist !== oldRole.hoist) changes.push("hoist");
 
 	if (changes.length === 0) return;
@@ -90,12 +91,12 @@ export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBo
 			})))
 		].join("\n"),
 		timestamp: new Date().toISOString(),
-		color: this.f.randomColor()
+		color: Colors.orange
 	};
 
 	const log = await this.f.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.ROLE_UPDATE, role.id);
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-	return ch.createMessage({ embed });
+	return ch.createMessage({ embed }).catch(err => null);
 }));

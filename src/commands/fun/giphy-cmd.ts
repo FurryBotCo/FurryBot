@@ -21,8 +21,10 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Get a gif from giphy",
 	usage: "<keywords>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+	await msg.channel.startTyping();
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	const rq = await phin({
 		method: "GET",

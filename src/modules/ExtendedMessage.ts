@@ -27,6 +27,9 @@ interface ExtendedTextChannel extends Eris.TextChannel {
 		inAwoo: string[];
 		timeout: NodeJS.Timeout;
 	};
+	startTyping: (maxRounds?: number) => Promise<Map<string, NodeJS.Timeout>>;
+	stopTyping: () => Promise<boolean>;
+	readonly isTyping: boolean;
 }
 
 class ExtendedMessage extends Eris.Message {
@@ -59,6 +62,7 @@ class ExtendedMessage extends Eris.Message {
 	c: string;
 	user: {
 		isDeveloper: boolean;
+		isBooster: boolean;
 	};
 	private _gConfig: GuildConfig;
 	private _uConfig: UserConfig;
@@ -128,8 +132,57 @@ class ExtendedMessage extends Eris.Message {
 	}
 
 	async _load() {
+		const client = this.client;
 		this._uConfig = await db.getUser(this.author.id);
-		this._gConfig = ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type) ? null : await db.getGuild(this.channel.guild.id);
+		if ([Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) {
+			this._gConfig = await db.getGuild(this.channel.guild.id);
+			this.user = {
+				get isDeveloper() {
+					return config.developers.includes(this.user.id);
+				},
+				isBooster: await client.f.checkBooster(this.author.id, client)
+			};
+		} else {
+			this._gConfig = null;
+			this.user = {
+				get isDeveloper() {
+					return config.developers.includes(this.user.id);
+				},
+				isBooster: false
+			};
+		}
+		const ch = this.channel;
+
+		if (typeof this.channel.startTyping === "undefined") Object.defineProperty(this.channel, "startTyping", {
+			value: (async (maxRounds = 6) => {
+				ch.sendTyping();
+				let i = 1;
+				const k = setInterval(async () => {
+					if (i >= maxRounds) clearInterval(k);
+					else {
+						await ch.sendTyping();
+						i++;
+					}
+				}, 1e4);
+				client.channelTyping.set(ch.id, k);
+				return k;
+			})
+		});
+
+		if (typeof this.channel.stopTyping === "undefined") Object.defineProperty(this.channel, "stopTyping", {
+			value: (async () => {
+				if (client.channelTyping.has(ch.id)) {
+					clearInterval(client.channelTyping.get(ch.id));
+					return client.channelTyping.delete(ch.id);
+				} else return false;
+			})
+		});
+
+		if (typeof this.channel.isTyping === "undefined") Object.defineProperty(this.channel, "isTyping", {
+			get() {
+				return client.channelTyping.has(ch.id);
+			}
+		});
 	}
 
 	get prefix() {

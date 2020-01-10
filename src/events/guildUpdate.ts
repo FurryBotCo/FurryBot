@@ -4,6 +4,7 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
 import { db } from "../modules/Database";
+import { Colors } from "../util/Constants";
 
 export default new ClientEvent("guildUpdate", (async function (this: FurryBot, guild: Eris.Guild, oldGuild) {
 	this.increment([
@@ -12,8 +13,8 @@ export default new ClientEvent("guildUpdate", (async function (this: FurryBot, g
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.guildUpdate;
 	if (!e.enabled || !e.channel) return;
-	const ch = guild.channels.get(e.channel) as Eris.Textable;
-	if (!ch) return g.edit({
+	const ch = guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
 		logEvents: {
 			guildUpdate: {
 				enabled: false,
@@ -62,12 +63,12 @@ export default new ClientEvent("guildUpdate", (async function (this: FurryBot, g
 			})))
 		].join("\n"),
 		timestamp: new Date().toISOString(),
-		color: this.f.randomColor()
+		color: Colors.orange
 	};
 
 	const log = await this.f.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.GUILD_UPDATE, guild.id);
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-	return ch.createMessage({ embed });
+	return ch.createMessage({ embed }).catch(err => null);
 }));

@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Some stuff for testing",
 	usage: "",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (!msg.args[0]) return msg.reply("tested..");
 
@@ -25,6 +26,9 @@ export default new Command({
 		case "err":
 			throw new Error("ERR_TESTING");
 			break;
+
+		case "reload":
+			return msg.reply("hello.");
 
 		default:
 			return msg.reply("invalid test.");

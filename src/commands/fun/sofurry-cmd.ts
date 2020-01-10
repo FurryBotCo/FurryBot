@@ -22,8 +22,10 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Get a random post from sofurry!",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+	await msg.channel.startTyping();
 	// saved for when sofurry api has issues
 	// return msg.channel.createMessage(`<@!${msg.author.id}>, Sorry, sofurry is having issues right now, and we cannot fetch anything from their api.\n(if it's back, and I haven't noticed, let me know in my support server - https://discord.gg/SuccpZw)`);
 	const contentType = [

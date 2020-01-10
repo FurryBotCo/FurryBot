@@ -16,7 +16,8 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Change the bots status.",
 	usage: "<status>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length <= 0) return new Error("ERR_INVALID_USAGE");
 	const types = ["online", "idle", "dnd", "invisible"];

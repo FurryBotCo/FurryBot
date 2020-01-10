@@ -17,8 +17,10 @@ export default new Command({
 	donatorCooldown: 2e3,
 	description: "Get the content types for our image types",
 	usage: "",
-	features: ["nsfw"]
+	features: ["nsfw"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	const req = await phin({
 		method: "GET",
 		url: "https://api.furry.bot/counts",

@@ -4,6 +4,7 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
 import { db } from "../modules/Database";
+import { Colors } from "../util/Constants";
 
 export default new ClientEvent("guildMemberAdd", (async function (this: FurryBot, guild: Eris.Guild, member: Eris.Member) {
 	this.increment([
@@ -12,8 +13,8 @@ export default new ClientEvent("guildMemberAdd", (async function (this: FurryBot
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.memberJoin;
 	if (!e.enabled || !e.channel) return;
-	const ch = guild.channels.get(e.channel) as Eris.Textable;
-	if (!ch) return g.edit({
+	const ch = guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
 		logEvents: {
 			memberJoin: {
 				enabled: false,
@@ -33,7 +34,7 @@ export default new ClientEvent("guildMemberAdd", (async function (this: FurryBot
 			`Account Creation Date: ${this.f.toReadableDate(new Date(member.createdAt)).split(" ").slice(0, 2).join(" ").replace(/-/g, "/")}`
 		].join("\n"),
 		timestamp: new Date().toISOString(),
-		color: this.f.randomColor(),
+		color: Colors.green,
 		thumbnail: {
 			url: member.avatarURL
 		}
@@ -43,5 +44,5 @@ export default new ClientEvent("guildMemberAdd", (async function (this: FurryBot
 	// if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	// else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-	return ch.createMessage({ embed });
+	return ch.createMessage({ embed }).catch(err => null);
 }));

@@ -1,5 +1,6 @@
 import config from "../../config";
 import { mdb } from "../Database";
+import { DeepPartial } from "../../util/@types/Misc";
 
 interface CommandConfigEntry {
 	type: "command" | "category";
@@ -17,11 +18,6 @@ interface RegistrationQuestion {
 
 class GuildConfig {
 	id: string;
-	blacklist: {
-		blacklisted: boolean;
-		reason: string;
-		blame: string;
-	};
 	premium: boolean;
 	selfAssignableRoles: string[];
 	music: {
@@ -66,7 +62,7 @@ class GuildConfig {
 		"channelCreate" | "channelDelete" | "channelUpdate" |                         // channel
 		"memberBan" | "memberUnban" | "memberJoin" | "memberLeave" | "memberUpdate" | // member
 		"roleCreate" | "roleDelete" | "roleUpdate" |                                  // role
-		"messageDelete" | "bulkMessageDelete" | "messageEdit" |                       // message
+		"messageDelete" | "messageBulkDelete" | "messageEdit" |                       // message
 		"presenceUpdate" | "userUpdate" |                                             // user
 		"voiceJoin" | "voiceLeave" | "voiceSwitch" | "voiceStateUpdate" |             // voice
 		"guildUpdate"
@@ -75,6 +71,9 @@ class GuildConfig {
 			channel?: string;
 		}
 	};
+	tags: {
+		[k: string]: string;
+	};
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		this.id = id;
 		if (!data) data = config.defaults.guildConfig;
@@ -82,11 +81,6 @@ class GuildConfig {
 	}
 
 	private _load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
-		this.blacklist = ![undefined, null].includes(data.blacklist) ? {
-			blacklisted: !!data.blacklist.blacklisted,
-			reason: data.blacklist.reason || null,
-			blame: data.blacklist.blame || null
-		} : config.defaults.guildConfig.blacklist;
 		this.premium = ![undefined, null].includes(data.premium) ? data.premium : config.defaults.guildConfig.premium;
 		this.selfAssignableRoles = ![undefined, null].includes(data.selfAssignableRoles) ? data.selfAssignableRoles : config.defaults.guildConfig.selfAssignableRoles;
 		this.music = ![undefined, null].includes(data.music) ? {
@@ -109,6 +103,7 @@ class GuildConfig {
 		} : config.defaults.guildConfig.snipe;
 		this.logEvents = {} as any;
 		Object.keys(config.defaults.guildConfig.logEvents).map(k => data.logEvents && data.logEvents[k] ? this.logEvents[k] = data.logEvents[k] : this.logEvents[k] = config.defaults.guildConfig.logEvents[k]);
+		this.tags = data.tags ? data.tags : config.defaults.guildConfig.tags;
 		return null;
 	}
 
@@ -121,19 +116,22 @@ class GuildConfig {
 
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
 		const g = {
-			blacklist: this.blacklist,
 			premium: this.premium,
 			music: this.music,
 			settings: this.settings,
 			snipe: this.snipe,
-			logEvents: this.logEvents
+			logEvents: this.logEvents,
+			tags: {
+				...this.tags,
+				...(data.tags && Object.keys(data).length > 0 ? data.tags : {})
+			}
 		};
+
+		Object.keys(g.tags).map(t => g.tags[t] === null ? delete g.tags[t] : null);
 
 		function replaceArray(keys: string[], check: any, update: any) {
 			return keys.map(k => typeof check[k] !== "undefined" ? update[k] = check[k] : null);
 		}
-
-		if (typeof data.blacklist !== "undefined") replaceArray(["blacklisted", "reason", "blame"], data.blacklist, g.blacklist);
 
 		if (typeof data.premium !== "undefined") g.premium = data.premium;
 

@@ -22,7 +22,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Set a text channel's topic",
 	usage: "<topic>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const o = msg.channel.topic;
 	return msg.channel.edit({ topic: msg.unparsedArgs.join(" ") }, `Command: ${msg.author.username}#${msg.author.discriminator}`).then(async (c: Eris.TextChannel) => {

@@ -18,7 +18,8 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "Start a howl, or join in!",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.channel.awoo !== undefined && msg.channel.awoo.active) {
 		if (msg.channel.awoo.inAwoo.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this awoo!`);

@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Spray someone with a bottle of water..",
 	usage: "<@member/text>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	const text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" "));

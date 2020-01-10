@@ -3,6 +3,7 @@ import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
+import { Colors } from "../util/Constants";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 	this.decrement([
@@ -36,6 +37,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 			"",
 			"**Guild Info**:",
 			`${"\u25FD"} Name: ${guild.name}`,
+			`${"\u25FD"} ID: ${guild.id}`,
 			`${"\u25FD"} **Members**:`,
 			`\t<:${config.emojis.online}>: ${guild.members.filter(m => m.status === "online").length}`,
 			`\t<:${config.emojis.idle}>: ${guild.members.filter(m => m.status === "idle").length}`,
@@ -54,7 +56,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 			url: "https://i.furcdn.net/noicon.png"
 		},
 		timestamp: new Date().toISOString(),
-		color: this.f.randomColor(),
+		color: Colors.red,
 		footer: {
 			text: `Shard ${guild.shard.id + 1}/${this.shards.size}`,
 			icon_url: "https://i.furry.bot/furry.png"
@@ -69,5 +71,5 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		],
 		username: `Furry Bot Guild Stats${config.beta ? " - Beta" : ""}`,
 		avatarURL: "https://i.furry.bot/furry.png"
-	});
+	}).catch(err => null);
 }));

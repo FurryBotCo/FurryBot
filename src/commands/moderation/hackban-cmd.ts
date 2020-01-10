@@ -22,7 +22,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Ban someone that isn't in your server.",
 	usage: "<@user/id> [reason]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	// get user from message
 	let user: Eris.User;

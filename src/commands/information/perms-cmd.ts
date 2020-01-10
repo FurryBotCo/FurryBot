@@ -21,7 +21,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Check your permissions, and my permissions.",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const allowUser = [],
 		denyUser = [],

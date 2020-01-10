@@ -9,7 +9,8 @@ const cat = new Category({
 	name: "information",
 	displayName: ":tools: Information",
 	devOnly: false,
-	description: "Some information that may be useful to you, may not be, I don't know."
+	description: "Some information that may be useful to you, may not be, I don't know.",
+	file: __filename
 });
 
 cmd.map(c => cat.addCommand(c.setCategory(cat.name)));

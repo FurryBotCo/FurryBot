@@ -9,6 +9,7 @@ import { db, mdb, mongo } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
+		"log",
 		"logevents"
 	],
 	userPermissions: [
@@ -18,11 +19,12 @@ export default new Command({
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
 	description: "Enable or disable logging.",
-	usage: "[enable/disable] [event] [channel]",
-	features: ["devOnly"]
+	usage: "[enable/disable] [event/all] [channel]",
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const a = ["enable", "disable"];
-	const b = Object.keys(config.defaults.guildConfig.logEvents).map(e => e.toLowerCase());
+	const b = [...Object.keys(config.defaults.guildConfig.logEvents).map(e => e.toLowerCase()), "all"];
 	if (msg.args.length >= 2) {
 		if (!a.includes(msg.args[0].toLowerCase())) return msg.reply(`invalid option, valid options: **${a.join("**, **")}**.`);
 		if (!b.includes(msg.args[1].toLowerCase())) return msg.reply(`invalid option, valid options: **${b.join("**, **")}**.`);
@@ -30,17 +32,34 @@ export default new Command({
 		let ch = await msg.getChannelFromArgs(2);
 		if (!ch) ch = msg.channel;
 
-		const ev = Object.keys(config.defaults.guildConfig.logEvents)[Object.keys(config.defaults.guildConfig.logEvents).map(k => k.toLowerCase()).indexOf(msg.args[1].toLowerCase())];
-		await msg.gConfig.edit({
-			logEvents: {
-				[ev]: {
-					channel: ch.id,
-					enabled: c
+		if (msg.args[1].toLowerCase() === "all") {
+			await msg.gConfig.edit({
+				logEvents: Object.keys(config.defaults.guildConfig.logEvents)
+					.map(e => ({
+						[e]: {
+							channel: ch.id,
+							enabled: c
+						}
+					})).reduce((a, b) => ({ ...a, ...b }), {})
+			}).then(d => d.reload());
+
+			if (c) return msg.reply(`enabled the logging of everything in channel <#${ch.id}>.`);
+			else return msg.reply(`disabled the logging of everything.`);
+		} else {
+			const ev = Object.keys(config.defaults.guildConfig.logEvents)[Object.keys(config.defaults.guildConfig.logEvents).map(k => k.toLowerCase()).indexOf(msg.args[1].toLowerCase())];
+
+			await msg.gConfig.edit({
+				logEvents: {
+					[ev]: {
+						channel: ch.id,
+						enabled: c
+					}
 				}
-			}
-		}).then(d => d.reload());
-		if (c) return msg.reply(`enabled the logging of **${ev}** in channel <#${ch.id}>.`);
-		else return msg.reply(`disabled the logging of **${ev}**.`);
+			}).then(d => d.reload());
+
+			if (c) return msg.reply(`enabled the logging of **${ev}** in channel <#${ch.id}>.`);
+			else return msg.reply(`disabled the logging of **${ev}**.`);
+		}
 	} else if (msg.args.length === 0) {
 		const d = [];
 		await Promise.all(Object.keys(config.defaults.guildConfig.logEvents).map(async (k) => {

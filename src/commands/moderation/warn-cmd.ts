@@ -20,7 +20,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Add a warning to someone.",
 	usage: "<@member/id> [reason]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const member = await msg.getMemberFromArgs();
 

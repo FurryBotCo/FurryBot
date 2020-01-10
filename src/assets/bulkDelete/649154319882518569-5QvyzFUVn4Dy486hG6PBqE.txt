@@ -1,0 +1,8 @@
+Bulk Message Delete Report, generated 11:42:56 11/3/2019 for guild Private Bot Testing (329498711338123268)
+
+[11:42:55 11/3/2019] Donovan_DMC#3621 (242843345402069002): fb!purge 5
+[11:42:53 11/3/2019] Donovan_DMC#3621 (242843345402069002): test
+[11:42:43 11/3/2019] Unknown Author: {fetch failed}
+[11:42:43 11/3/2019] Unknown Author: {fetch failed}
+[11:42:42 11/3/2019] Unknown Author: {fetch failed}
+[10:52:39 11/3/2019] Unknown Author: {fetch failed}

@@ -19,7 +19,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Give someone a nice belly rub -w-",
 	usage: "<@member/text>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	try {
 		const img = await this.f.imageAPIRequest(true, "blep");

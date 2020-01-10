@@ -41,7 +41,6 @@ typings/
 
 # Config files
 src/config
-db.*
 *.protected
 *.hidden
 

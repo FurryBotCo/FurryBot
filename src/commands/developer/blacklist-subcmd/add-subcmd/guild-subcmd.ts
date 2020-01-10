@@ -5,6 +5,7 @@ import config from "../../../../config";
 import { Logger } from "../../../../util/LoggerV8";
 import { db, mdb } from "../../../../modules/Database";
 import Eris from "eris";
+import { BlacklistEntry } from "../../../../util/@types/Misc";
 
 export default new SubCommand({
 	triggers: [
@@ -19,26 +20,37 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Add a server to the blacklist.",
 	usage: "<id> <reason>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const id = msg.args[0];
 	if (id.length < 17 || id.length > 18) return msg.reply(`**${id}** isn't a valid server id.`);
-	const srv = await db.getGuild(id);
-	if (!srv) return msg.reply(`Failed to fetch guild entry for **${id}**`);
-
-	if (typeof srv.blacklist === "undefined") await srv.edit({ blacklist: { blacklisted: false, reason: null, blame: null } }).then(d => d.reload());
-	if (srv.blacklist.blacklisted) return msg.reply(`**${id}** is already blacklisted, reason: ${srv.blacklist.reason}.`);
-	else {
+	const gbl: BlacklistEntry = await mdb.collection("blacklist").find({ guildId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())[0]);
+	if (!!gbl) {
+		const expiry = [0, null].includes(gbl.expire) ? "Never" : this.f.formatDateWithPadding(new Date(gbl.expire));
+		return msg.reply(`**${id}** is already blacklisted. Reason: ${gbl.reason}. Blame: ${gbl.blame}. Expiry: ${expiry}.`);
+	} else {
 		const reason = msg.args.length > 1 ? msg.args.slice(1, msg.args.length).join(" ") : "No Reason Specified";
-		await mdb.collection("guilds").findOneAndUpdate({ id }, { $set: { blacklist: { blacklisted: true, reason, blame: msg.author.tag } } });
+		const k = this.f.random(7);
+		await mdb.collection("blacklist").insertOne({
+			created: Date.now(),
+			type: "guild",
+			blame: msg.author.tag,
+			blameId: msg.author.id,
+			reason,
+			guildId: id,
+			id: k,
+			noticeShown: false,
+			expire: null
+		});
 		const embed: Eris.EmbedOptions = {
 			title: "Server Blacklisted",
 			author: {
 				name: msg.author.tag,
 				icon_url: msg.author.avatarURL
 			},
-			description: `ID: \`${id}\`\nReason: ${reason}\nBlame: ${msg.author.tag}`,
+			description: `ID: \`${id}\`\nReason: ${reason}\nBlame: ${msg.author.tag}\nExpiry: Never\nBlacklist ID: ${k}`,
 			color: Math.floor(Math.random() * 0xFFFFFF),
 			timestamp: new Date().toISOString(),
 			footer: {

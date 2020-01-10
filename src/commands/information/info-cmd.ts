@@ -21,8 +21,10 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Get some info about me.",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	// const st = await this.cluster.getManagerStats();
 	// if (st.clusters.length === 0) return msg.reply("hey, I haven't recieved any stats from other clusters yet, please try again later!");
 
@@ -49,7 +51,8 @@ export default new Command({
 			"**Other Info**:",
 			`${"\u25FD"} Library: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev)`,
 			`${"\u25FD"} Library Version: ${Eris.VERSION}`,
-			`${"\u25FD"} API Version: 7`,
+			`${"\u25FD"} API Version: ${Eris.Constants.REST_VERSION}`,
+			`${"\u25FD"} Gateway Version: ${Eris.Constants.GATEWAY_VERSION}`,
 			`${"\u25FD"} Bot Version: ${config.version}`,
 			`${"\u25FD"} Node Version: ${process.version}`,
 			`${"\u25FD"} Support Server: [${config.bot.supportInvite}](${config.bot.supportInvite})`

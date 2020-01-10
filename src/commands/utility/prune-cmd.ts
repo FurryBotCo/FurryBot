@@ -23,7 +23,8 @@ export default new Command({
 	donatorCooldown: 1.5e3,
 	description: "Clear messages in a channel.",
 	usage: "<2-100>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	let count = parseInt(msg.args[0], 10);
 	if (msg.args.length === 0 || isNaN(count)) throw new Error("ERR_INVALID_USAGE");

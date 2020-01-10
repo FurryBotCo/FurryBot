@@ -18,8 +18,9 @@ export default new Command({
 	cooldown: 2e3,
 	donatorCooldown: 1e3,
 	description: "Get some info about my shards.",
-	usage: "[cluster id]",
-	features: []
+	usage: "",
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const embed: Eris.EmbedOptions = {
 		title: "Shard Info",
@@ -29,10 +30,13 @@ export default new Command({
 			inline: true
 		})),
 		color: this.f.randomColor(),
-		timestamp: new Date().toISOString()
+		timestamp: new Date().toISOString(),
+		footer: {
+			text: `Current Shard: #${msg.channel.guild.shard.id}`
+		}
 	};
 
-	if (this.shards.map(s => s.id).includes(msg.channel.guild.shard.id)) embed.fields.find(f => f.name === `Shard #${msg.guild.shard.id}`).name = `Shard #${msg.guild.shard.id} (current)`;
+	// if (this.shards.map(s => s.id).includes(msg.channel.guild.shard.id)) embed.fields.find(f => f.name === `Shard #${msg.guild.shard.id}`).name = `Shard #${msg.guild.shard.id} (current)`;
 
 	return msg.channel.createMessage({
 		embed

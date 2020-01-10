@@ -9,7 +9,8 @@ const cat = new Category({
 	name: "dev",
 	displayName: ":tools: Developer",
 	devOnly: true,
-	description: "The fun developer stuffs"
+	description: "The fun developer stuffs",
+	file: __filename
 });
 
 cmd.map(c => cat.addCommand(c.setCategory(cat.name)));

@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Ask the magic 8ball a question!",
 	usage: "<question>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	return msg.channel.createMessage({

@@ -9,7 +9,8 @@ const cat = new Category({
 	name: "utility",
 	displayName: ":tools: Utility",
 	devOnly: false,
-	description: "Helpful things for the bot, and your server."
+	description: "Helpful things for the bot, and your server.",
+	file: __filename
 });
 
 cmd.map(c => cat.addCommand(c.setCategory(cat.name)));

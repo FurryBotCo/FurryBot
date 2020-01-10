@@ -18,7 +18,8 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Roll the dice.",
 	usage: "",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	const min = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 1;
 	const max = typeof msg.args[1] !== "undefined" ? parseInt(msg.args[1], 10) : 20;

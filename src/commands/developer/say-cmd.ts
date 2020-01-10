@@ -17,7 +17,8 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Make me say something.",
 	usage: "<text>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	await msg.delete().catch(err => null);
 	return msg.channel.createMessage(msg.unparsedArgs.join(" "));

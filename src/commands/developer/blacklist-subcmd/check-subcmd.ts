@@ -17,7 +17,8 @@ export default new SubCommand({
 	description: "Check if a user/server is blacklisted.",
 	usage: "<user/server> <id>",
 	features: ["devOnly"],
-	subCommandDir: `${__dirname}/check-subcmd`
+	subCommandDir: `${__dirname}/check-subcmd`,
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: SubCommand) {
 	if (msg.args.length === 0) return cmd.sendSubCommandEmbed(msg);
 	else return cmd.handleSubCommand(msg, this);

@@ -7,6 +7,7 @@ import phin from "phin";
 import * as Eris from "eris";
 import { db, mdb, mongo } from "../../modules/Database";
 import ReactionQueue from "../../util/queue/ReactionQueue";
+import { ErisPermissions } from "../../util/CommandHandler/lib/utilTypes";
 
 export default new Command({
 	triggers: [
@@ -16,15 +17,16 @@ export default new Command({
 	userPermissions: [],
 	botPermissions: [
 		"embedLinks",
-		"attachFiles",
-		"addReactions"
+		"attachFiles"
 	],
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
 	description: "Get some content from E926 (SFW E621)!",
 	usage: "[tags]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+	await msg.channel.startTyping();
 	if (!msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly without the `manageMessages` permission!");
 	if (this.activeReactChannels.includes(msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout, or react to the old one with \"⏹\" before starting another.");
 
@@ -46,6 +48,33 @@ export default new Command({
 	const e = await this.e9.listPosts(tags, 50, 1, null, config.tagBlacklist).then(res => res.filter(p => p.rating === "s"));
 
 	if (e.length === 0) return msg.reply("Your search returned no results.");
+	const perm = ["manageMessages", "addReactions"] as ErisPermissions[];
+	if (!perm.some(p => msg.channel.permissionsOf(this.user.id).has(p))) {
+		const p = perm.filter(p => !msg.channel.permissionsOf(this.user.id).has(p));
+		const embed: Eris.EmbedOptions = {
+			title: `#${e[0].id}: ${e[0].artist.join(", ").length > 256 ? "Too many artists to list." : e[0].artist.join(", ")}`,
+			url: `https://e621.net/post/show/${e[0].id}`,
+			footer: {
+				icon_url: "https://e621.net/favicon-32x32.png",
+				text: `Rating: ${e[0].rating === "s" ? "Safe" : e[0].rating === "q" ? "Questionable" : "Explicit"} | Score: ${e[0].score} - 1/${e.length}`
+			},
+			color: e[0].rating === "s" ? colors.green : e[0].rating === "q" ? colors.gold : colors.red,
+			timestamp: new Date().toISOString()
+		};
+
+		if (["jpg", "png", "gif"].includes(e[0].file_ext)) embed.image = {
+			width: e[0].width,
+			height: e[0].height,
+			url: e[0].file_url
+		};
+		else if (e[0].file_ext === "swf") embed.description = `This post is a flash animation, please directly view [the post](https://e926.net/post/show/${e[0].id}) on e926`;
+		else embed.description = `This post appears to be a video, please directly view [the post](https://e926.net/post/show/${e[0].id}) on e926`;
+
+		return msg.channel.createMessage({
+			content: `I couldn't properly display the output, as I am missing the **${p.join("**, **")}** permission(s). Please give me this permission to be able to navigate posts.`,
+			embed
+		});
+	}
 
 	let currentPost = 1;
 
@@ -62,6 +91,7 @@ export default new Command({
 
 
 	let ratelimit = false;
+	let rt = false;
 
 	const rl = setInterval(() => ratelimit = false, 3e3);
 
@@ -93,6 +123,15 @@ export default new Command({
 
 	let t = setTimeout(setPost.bind(this), 6e4, "EXIT");
 	async function setPost(this: FurryBot, p: string | number) {
+		if (!perm.some(pm => msg.channel.permissionsOf(this.user.id).has(pm))) {
+			if (rt === true) return;
+			try {
+				rt = true;
+				client.removeListener("messageReactionAdd", f);
+				await msg.reply("I seem to be missing some permissions. Please try again, and pay attention to any permission warnings!");
+			} catch (e) { }
+			return;
+		}
 		if (ratelimit && !config.developers.includes(msg.author.id)) return msg.reply("You are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(err => null), 5e3)).catch(err => null);
 		ratelimit = true;
 		clearTimeout(t);
@@ -147,6 +186,15 @@ export default new Command({
 	}
 
 	const f = (async (ms: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, user: string) => {
+		if (!perm.some(pm => msg.channel.permissionsOf(this.user.id).has(pm))) {
+			if (rt === true) return;
+			try {
+				rt = true;
+				client.removeListener("messageReactionAdd", f);
+				await msg.reply("I seem to be missing some permissions. Please try again, and pay attention to any permission warnings!");
+			} catch (e) { }
+			return;
+		}
 		if (ms.id !== m.id || user !== msg.author.id || !r.includes(emoji.name)) {
 			if (user !== this.user.id && r.includes(emoji.name)) return q.add({
 				type: "remove",

@@ -7,11 +7,13 @@ export default class Category {
 	devOnly: boolean;
 	description: string;
 	commands: Command[];
+	file: string;
 	constructor(d: {
 		name: string;
 		displayName?: string;
 		devOnly?: boolean;
 		description?: string;
+		file: string;
 	}) {
 		if (!d.name) throw new TypeError("Category name not provided.");
 		this.name = d.name;
@@ -19,6 +21,7 @@ export default class Category {
 		this.devOnly = !!d.devOnly;
 		this.description = d.description || "";
 		this.commands = [];
+		this.file = d.file;
 	}
 
 	get commandTriggers(): string[] {

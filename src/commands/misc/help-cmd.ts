@@ -21,8 +21,10 @@ export default new Command({
 	donatorCooldown: .5e3,
 	description: "Get some help with the bot.",
 	usage: "[command/category]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	let embed: Eris.EmbedOptions;
 
 	if (msg.args.length === 0) {
@@ -62,7 +64,7 @@ export default new Command({
 				},
 				{
 					name: "Restrictions",
-					value: `NSFW: **${cmd.features.includes("nsfw") ? "Yes" : "No"}**\nDeveloper Only: **${cmd.features.includes("devOnly") ? "Yes" : "No"}**\nBeta Only: **${cmd.features.includes("betaOnly") ? "Yes" : "No"}**\nGuild Owner Only: **${cmd.features.includes("guildOwnerOnly") ? "Yes" : "No"}**`,
+					value: `NSFW: **${cmd.features.includes("nsfw") ? "Yes" : "No"}**\nDeveloper Only: **${cmd.features.includes("devOnly") ? "Yes" : "No"}**\nBeta Only: **${cmd.features.includes("betaOnly") ? "Yes" : "No"}**\nGuild Owner Only: **${cmd.features.includes("guildOwnerOnly") ? "Yes" : "No"}**\nSupport Server Only: **${cmd.features.includes("supportOnly") ? "Yes" : "No"}**`,
 					inline: false
 				},
 				{

@@ -21,7 +21,8 @@ export default new Command({
 	donatorCooldown: 36e5,
 	description: "Reset the current servers settings.",
 	usage: "",
-	features: ["guildOwnerOnly"]
+	features: ["guildOwnerOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	msg.channel.createMessage("this will erase ALL guild (server) settings, are you sure you want to do this?\nType **yes** or **no**.");
 	const d = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);

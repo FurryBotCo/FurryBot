@@ -19,8 +19,10 @@ export default new Command({
 	donatorCooldown: 1.5e3,
 	description: "Get some yiff!",
 	usage: "[gay/straight/lesbian/dickgirl]",
-	features: ["nsfw"]
+	features: ["nsfw"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	let extra = "", type;
 	if (msg.args.length === 0) {
 		for (const ytype of config.yiff.types) {

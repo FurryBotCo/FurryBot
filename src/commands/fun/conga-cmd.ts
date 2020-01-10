@@ -17,11 +17,12 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	description: "Start a conga with someone, or join in!",
 	usage: "[@user]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length === 0) {
 		if (msg.channel.conga !== undefined && msg.channel.conga.active) {
-			if (msg.channel.conga.inConga.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this conga!`);
+			if (msg.channel.conga.inConga.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this conga!`);
 			clearTimeout(msg.channel.conga.timeout);
 			msg.channel.conga.inConga.push(msg.author.id);
 			const txt = "<a:furdancing:596817635023519777>".repeat(msg.channel.conga.inConga.length);

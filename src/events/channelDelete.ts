@@ -4,7 +4,7 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
 import { db } from "../modules/Database";
-import { ChannelNames, ChannelNamesCamelCase } from "../util/Constants";
+import { ChannelNames, ChannelNamesCamelCase, Colors } from "../util/Constants";
 
 export default new ClientEvent("channelDelete", (async function (this: FurryBot, channel: Eris.AnyChannel) {
 	this.increment([
@@ -17,8 +17,8 @@ export default new ClientEvent("channelDelete", (async function (this: FurryBot,
 		if (!g) return;
 		const e = g.logEvents.channelDelete;
 		if (!e.enabled || !e.channel) return;
-		const ch = channel.guild.channels.get(e.channel) as Eris.Textable;
-		if (!ch) return g.edit({
+		const ch = channel.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+		if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
 			logEvents: {
 				channelDelete: {
 					enabled: false,
@@ -37,13 +37,14 @@ export default new ClientEvent("channelDelete", (async function (this: FurryBot,
 				`${ChannelNames[channel.type]} Channel Deleted`,
 				`Name: ${channel.name} (${channel.id})`
 			].join("\n"),
-			timestamp: new Date().toISOString()
+			timestamp: new Date().toISOString(),
+			color: Colors.red
 		};
 
 		const log = await this.f.fetchAuditLogEntries(channel.guild, Eris.Constants.AuditLogActions.CHANNEL_DELETE, channel.id);
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-		return ch.createMessage({ embed });
+		return ch.createMessage({ embed }).catch(err => null);
 	}
 }));

@@ -22,7 +22,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Remove bans for people that are already banned.",
 	usage: "<id> [reason]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	// get member from message
 	if (!msg.args[0]) return msg.channel.createMessage("Please provide a user id.");

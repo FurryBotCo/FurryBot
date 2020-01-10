@@ -21,7 +21,8 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Execute shell code.",
 	usage: "<code>",
-	features: ["devOnly"]
+	features: ["devOnly"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	let silent = false;
 	let error = false;

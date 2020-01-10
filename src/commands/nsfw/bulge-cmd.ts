@@ -20,8 +20,10 @@ export default new Command({
 	donatorCooldown: 1.5e3,
 	description: "*notices bulge* OwO",
 	usage: "",
-	features: ["nsfw"]
+	features: ["nsfw"],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	await msg.channel.startTyping();
 	const img = await this.f.imageAPIRequest(false, "bulge", true, false);
 	if (img.success !== true) {
 		Logger.error(`Shard #${msg.channel.guild.shard.id}`, img);

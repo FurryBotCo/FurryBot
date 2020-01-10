@@ -1,4 +1,3 @@
-import FurryBot from "../main";
 import youtubesearch from "youtube-search";
 import ytdl from "ytdl-core";
 import * as URL from "url";
@@ -13,6 +12,8 @@ import { mdb } from "../modules/Database";
 import Command from "./CommandHandler/lib/Command";
 import loopPatrons from "./patreon/loopPatrons";
 import refreshPareonToken from "./patreon/refreshPatreonToken";
+import client from "../../";
+import FurryBot from "@FurryBot";
 
 export default {
 	checkSemVer: ((ver: string) => semver.valid(ver) === ver),
@@ -84,6 +85,47 @@ export default {
 		mn: number;
 		y: number;
 	}> => {
+		if (typeof data === "number") {
+			if (data === 0) {
+				if (words) return "0 seconds";
+				else return {
+					ms: 0,
+					s: 0,
+					m: 0,
+					h: 0,
+					d: 0,
+					w: 0,
+					mn: 0,
+					y: 0
+				};
+			} else if (data < 1000) {
+				if (words) return `${data} milliseconds`;
+				else return {
+					ms: data,
+					s: 0,
+					m: 0,
+					h: 0,
+					d: 0,
+					w: 0,
+					mn: 0,
+					y: 0
+				};
+			}
+		} else {
+			if (data.ms < 1000 && (Object.keys(data).map(k => data[k]).reduce((a, b) => a + b) - data.ms) === 0) {
+				if (words) return `${data.ms} milliseconds`;
+				else return {
+					ms: data.ms,
+					s: 0,
+					m: 0,
+					h: 0,
+					d: 0,
+					w: 0,
+					mn: 0,
+					y: 0
+				};
+			}
+		}
 		const t = await new Promise((a, b) => {
 			const t = {
 				ms: 0,
@@ -299,8 +341,17 @@ export default {
 		}
 		else throw new Error(`furry.services api returned non 200/404 response: ${req.statusCode}, body: ${req.body}`);
 	}),
-	memeRequest: (async (path: string, avatars: string[] | string = [], text = ""): Promise<any> => {
+	memeRequest: (async (path: string, avatars: string[] | string = [], usernames: string[] | string = [], text = ""): Promise<any> => {
 		avatars = typeof avatars === "string" ? [avatars] : avatars;
+		usernames = typeof usernames === "string" ? [usernames] : usernames;
+		const data: {
+			avatars?: string[];
+			usernames?: string[];
+			text?: string;
+		} = {};
+		if (avatars && avatars.length > 0) data.avatars = avatars;
+		if (usernames && usernames.length > 0) data.usernames = usernames;
+		if (text && text.length > 0) data.text = text;
 		return phin({
 			method: "POST",
 			url: `https://dankmemer.services/api${path}`,
@@ -309,12 +360,9 @@ export default {
 				"User-Agent": config.userAgent,
 				"Content-Type": "application/json"
 			},
-			data: {
-				avatars,
-				text
-			},
+			data,
 			parse: "none",
-			timeout: 5e3
+			timeout: 3e4
 		});
 	}),
 	compareMembers: ((member1: Eris.Member, member2: Eris.Member): {
@@ -421,7 +469,7 @@ export default {
 	memberIsBooster: (async (m: Eris.Member): Promise<boolean> => {
 		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
 		if (!(m instanceof Eris.Member)) throw new TypeError("invalid member provided");
-		const guild = await this.client.bot.getRESTGuild(config.bot.mainGuild);
+		const guild = await client.getRESTGuild(config.bot.mainGuild);
 		if (!guild) throw new TypeError("failed to find main guild");
 		if (!guild.members.has(m.user.id) || !guild.members.get(m.user.id).roles.includes(config.nitroBoosterRole)) return false;
 		return true;
@@ -520,7 +568,7 @@ export default {
 			entries
 		};
 	}),
-	fetchAuditLogEntries: (async (guild: Eris.Guild, type: number, targetID: string, fetchAmount = 5): Promise<({
+	fetchAuditLogEntries: (async (guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<({
 		success: true;
 		blame: Eris.User;
 		reason: string;
@@ -531,7 +579,7 @@ export default {
 			code: number;
 		};
 	})> => {
-		if (!guild.members.get(this.client.user.id).permission.has("viewAuditLogs")) return {
+		if (!guild.members.get(client.user.id).permission.has("viewAuditLogs")) return {
 			success: false,
 			error: {
 				text: "Missing `auditLog` permissions.",
@@ -542,8 +590,9 @@ export default {
 		if (logs.length > 0) {
 			let et = -1;
 			for (const entry of logs) {
-				if (entry.actionType === type && entry.targetID === targetID) {
-					et = logs.indexOf(entry);
+				if (entry.actionType === type) {
+					if (targetID === null) et = logs.indexOf(entry);
+					if (entry.targetID === targetID) et = logs.indexOf(entry);
 					break;
 				}
 				continue;
@@ -600,5 +649,23 @@ export default {
 		await mdb.collection("dailyjoins").insertOne({ count, id });
 
 		return count;
+	}),
+	formatDateWithPadding: ((d = new Date(), seconds = true, ms = false) => `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()} ${seconds ? `${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`),
+	toASCIIEscape: ((str) => {
+		const r = [];
+		for (let i = 0; i < str.length; i++) r.push(str.charCodeAt(i).toString(16).toUpperCase());
+		return {
+			escape: r,
+			string: `\\u${r.join("\\u")}`
+		};
+	}),
+	checkBooster: (async (userId: string, client: FurryBot) => {
+		const g = client.guilds.has(config.bot.mainGuild) ? client.guilds.get(config.bot.mainGuild) : await client.getRESTGuild(config.bot.mainGuild);
+
+		if (!g.members.has(userId)) return false;
+		else {
+			const m = g.members.get(userId);
+			return m.roles.includes(config.nitroBoosterRole);
+		}
 	})
 };

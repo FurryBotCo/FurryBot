@@ -20,13 +20,14 @@ export default new Command({
 	donatorCooldown: 1e3,
 	description: "Mock some text",
 	usage: "<text>",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.unparsedArgs.length < 1) throw new Error("ERR_INVALID_USAGE");
 
 	const embed: Eris.EmbedOptions = {
 		title: "Mocking Text",
-		description: this.f.everyOtherUpper(msg.unparsedArgs.join(" ")),
+		description: this.f.everyOtherUpper(msg.unparsedArgs.join(" ").toLowerCase()),
 		image: {
 			url: "https://assets.furry.bot/mock.png"
 		},

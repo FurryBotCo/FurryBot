@@ -22,7 +22,8 @@ export default new Command({
 	donatorCooldown: 3e3,
 	description: "Stop someone from chatting.",
 	usage: "<@member/id> [reason]",
-	features: []
+	features: [],
+	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	// get member from message
 	const user = await msg.getMemberFromArgs();
