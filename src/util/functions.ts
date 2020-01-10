@@ -13,7 +13,6 @@ import Command from "./CommandHandler/lib/Command";
 import loopPatrons from "./patreon/loopPatrons";
 import refreshPareonToken from "./patreon/refreshPatreonToken";
 import client from "../../";
-import testCmd from "commands/developer/test-cmd";
 import FurryBot from "@FurryBot";
 
 export default {
