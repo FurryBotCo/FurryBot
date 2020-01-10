@@ -25,7 +25,7 @@ export default new Command({
 	return msg.channel.createMessage("Checking Ping..")
 		.then(m => m.edit("Ping Calculated!"))
 		.then(async (m) => {
-			await msg.channel.createMessage(`Client Ping: ${+m.timestamp - +msg.timestamp}ms${"\n"}Shard Ping: ${Math.round(msg.guild.shard.latency)}ms`);
+			await msg.channel.createMessage(`Client Ping: ${Number(m.timestamp - msg.timestamp).toLocaleString()}ms${"\n"}Shard Ping: ${Number(msg.guild.shard.latency).toLocaleString()}ms`);
 			return m.delete();
 		});
 }));
