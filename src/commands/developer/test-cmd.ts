@@ -27,6 +27,9 @@ export default new Command({
 			throw new Error("ERR_TESTING");
 			break;
 
+		case "reload":
+			return msg.reply("hello.");
+
 		default:
 			return msg.reply("invalid test.");
 	}
