@@ -26,8 +26,8 @@ export default class CommandHolder {
 	}
 
 	addCategory(catOrName: Category): Category;
-	addCategory(catOrName: string, displayName?: string, devOnly?: boolean, description?: string): Category;
-	addCategory(catOrName: Category | string, displayName?: string, devOnly?: boolean, description?: string) {
+	addCategory(catOrName: string, file: string, displayName?: string, devOnly?: boolean, description?: string): Category;
+	addCategory(catOrName: Category | string, file?: string, displayName?: string, devOnly?: boolean, description?: string) {
 		const n = this.categories.map(c => c.name);
 		const dn = this.categories.map(c => c.displayName);
 		if (typeof catOrName === "string") {
@@ -38,7 +38,8 @@ export default class CommandHolder {
 				name: catOrName,
 				displayName,
 				devOnly,
-				description
+				description,
+				file
 			});
 
 			this.categories.push(cat);
@@ -63,7 +64,7 @@ export default class CommandHolder {
 		if (typeof nameOrCat === "string") {
 			const cat = this.categories.find(c => c.name === nameOrCat);
 			if (!cat) return false;
-			this.commands.splice(this.categories.indexOf(cat), 1);
+			this.categories.splice(this.categories.indexOf(cat), 1);
 			return true;
 		} else {
 			if (!this.categories.includes(nameOrCat)) return false;
