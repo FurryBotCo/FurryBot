@@ -41,6 +41,8 @@ export default new SubCommand({
 		const b = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 15e3);
 		if (!b || !b.content || !["false", "true", "no", "yes"].includes(b.content.toLowerCase())) return msg.reply("invalid response.");
 		a = b.content.toLowerCase();
+
+		await b.delete().catch(err => null);
 	} else {
 		a = msg.args[1].toLowerCase();
 		m = await msg.channel.createMessage("Processing..");
@@ -60,14 +62,14 @@ export default new SubCommand({
 	try {
 
 		if (rebuild) {
-			await m.edit("Rebuilding code, please wait..");
+			m = await m.edit("Rebuilding code, please wait..");
 			const start = performance.now();
 			const rb = execSync("npm run build", {
 				cwd: config.rootDir
 			});
 			const end = performance.now();
-			await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
-		} else await m.edit("not rebuilding code.");
+			m = await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
+		} else m = await m.edit("not rebuilding code.");
 
 		this.cmd.removeCategory(cat);
 		delete require.cache[cat.file];
@@ -115,5 +117,5 @@ export default new SubCommand({
 	if (added.length !== 0) added.map(a => change.push(`+ ${a}`));
 	if (removed.length !== 0) removed.map(r => change.push(`- ${r}`));
 
-	return msg.channel.createMessage(`Reloaded ${newCat.commands.length} commands from the category **${cat.name}** in ${Number((end - start).toFixed(3)).toLocaleString()}ms\n${change.length === 0 ? "No Command Additions/Removals Detected." : `\`\`\`diff\n${change.join("\n")}\n\`\`\``}`);
+	return m.edit(`${m.content}\n\nReloaded ${newCat.commands.length} commands from the category **${cat.name}** in ${Number((end - start).toFixed(3)).toLocaleString()}ms\n${change.length === 0 ? "No Command Additions/Removals Detected." : `\`\`\`diff\n${change.join("\n")}\n\`\`\``}`);
 }));
