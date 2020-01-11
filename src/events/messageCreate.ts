@@ -10,6 +10,7 @@ import Timers from "../util/Timers";
 import { ChannelNamesCamelCase, Colors } from "../util/Constants";
 import Permissions from "../util/Permissions";
 import { BlacklistEntry } from "../util/@types/Misc";
+import { uuid } from "short-uuid";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
 	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) this.stats.dmMessageCount++;
@@ -33,6 +34,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		await msg._load();
 		t.end("messageProcess");
 
+		t.start("blacklist");
 		const gbl: BlacklistEntry[] = [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(msg.channel.type) ? await mdb.collection("blacklist").find({ guildId: msg.channel.guild.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())) : [];
 		const ubl: BlacklistEntry[] = await mdb.collection("blacklist").find({ userId: msg.author.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now()));
 		const bl = gbl.length > 0 || ubl.length > 0;
@@ -65,6 +67,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			return;
 		}
+		t.end("blacklist");
 
 		t.start("dm");
 		if (message.channel.type === Eris.Constants.ChannelTypes.DM) {
@@ -444,6 +447,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.triggers[0] !== "eval" && msg.channel.isTyping) await msg.channel.stopTyping();
 		if (c instanceof Error) throw c;
 		t.end("main");
+
+		// timing command processing
+		if (msg.cmd.cat.name !== "dev") await mdb.collection("timing").insertOne({ times: t.timers, cmd: cmd.triggers[0], id: uuid() });
 	} catch (e) {
 		const err: Error = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
 		const cmd = msg.cmd !== null ? msg.cmd.cmd : null;

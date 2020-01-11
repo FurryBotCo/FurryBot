@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+	<title>Chart</title>
+</head>
+
+<body>
+	<canvas id="main" width="400" height="200"></canvas>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"
+		integrity="sha384-i+dHPTzZw7YVZOx9lbH5l6lP74sLRtMtwN2XjVqjf3uAGAREAF4LMIUDTWEVs4LI" crossorigin="anonymous">
+	</script>
+	<script>
+		const ctx = document.querySelector("#main").getContext("2d");
+		const myChart = new Chart(ctx, {
+			type: "bar",
+			data: {
+				labels: ["Message Process", "Blacklist", "DM", "Auto Response", "Command", "Total"],
+				datasets: [{
+					label: '<%- locals.title %>',
+					data: JSON.parse(
+						"[<%= locals.times.messageProcess %>, <%= locals.times.blacklist %>, <%= locals.times.dm %>, <%= locals.times.autoResponse %>, <%= locals.times.cmd %>, <%= locals.times.main %>]"
+					),
+					backgroundColor: [
+						"rgba(255, 99, 132, 0.2)",
+						"rgba(54, 162, 235, 0.2)",
+						"rgba(255, 206, 86, 0.2)",
+						"rgba(75, 192, 192, 0.2)",
+						"rgba(153, 102, 255, 0.2)",
+						"rgba(255, 159, 64, 0.2)"
+					],
+					borderColor: [
+						"rgba(255, 99, 132, 1)",
+						"rgba(54, 162, 235, 1)",
+						"rgba(255, 206, 86, 1)",
+						"rgba(75, 192, 192, 1)",
+						"rgba(153, 102, 255, 1)",
+						"rgba(255, 159, 64, 1)"
+					],
+					borderWidth: 1
+				}]
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero: true
+						}
+					}]
+				}
+			}
+		});
+	</script>
+</body>
+
+</html>
