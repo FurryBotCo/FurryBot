@@ -5,7 +5,6 @@ import * as fs from "fs-extra";
 import session from "express-session";
 import cookieParser from "cookie-parser";
 import chalk from "chalk";
-import bodyParser from "body-parser";
 import http from "http";
 import https from "https";
 import FurryBot from "@FurryBot";
@@ -23,10 +22,12 @@ export default (async (client: FurryBot) => {
 		resave: false,
 		saveUninitialized: true
 	}))
+		.set("view engine", "ejs")
+		.set("views", `${config.rootDir}/src/api/views/templates`)
 		.use(cookieParser(config.web.cookieSecret))
 		.use(logger("dev"))
-		.use(bodyParser.json())
-		.use(bodyParser.urlencoded({
+		.use(express.json())
+		.use(express.urlencoded({
 			extended: true
 		}));
 
