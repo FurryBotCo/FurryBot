@@ -59,6 +59,7 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 		};
 		const changes: ("nsfw" | "name" | "parentID" | "topic" | "rateLimitPerUser" | "bitrate" | "userLimit")[] = [];
 
+		// @FIXME fix false positives with nsfw/topic and their nullability
 		if (channel.nsfw !== oldChannel.nsfw) changes.push("nsfw");
 		if (channel.name !== oldChannel.name) changes.push("name");
 		if (channel.parentID !== oldChannel.parentID) changes.push("parentID");
@@ -67,8 +68,7 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 			if (channel.rateLimitPerUser !== oldChannel.rateLimitPerUser) changes.push("rateLimitPerUser");
 		} else if (channel instanceof Eris.VoiceChannel) {
 			if (channel.bitrate !== oldChannel.bitrate) changes.push("bitrate");
-			// @FIXME when Eris is updated, uncomment this
-			// if (channel.userLimit !== oldChannel.userLimit) changes.push("userLimit");
+			if (channel.userLimit !== oldChannel.userLimit) changes.push("userLimit");
 		}
 
 		if (changes.length === 0) return;
