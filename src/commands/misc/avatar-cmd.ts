@@ -1,11 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
@@ -37,7 +33,7 @@ export default new Command({
 		const role = r[r.length - 1];
 		if (role.color) color = role.color;
 	}
-	if ([undefined, null].includes(color)) color = this.f.randomColor();
+	if ([undefined, null].includes(color)) color = Math.floor(Math.random() * 0xFFFFFF);
 
 	const embed: Eris.EmbedOptions = {
 		title: "Avatar",

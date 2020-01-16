@@ -2,10 +2,10 @@ import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../../config";
-import { Logger } from "../../../../util/LoggerV8";
-import { db, mdb } from "../../../../modules/Database";
+import { mdb } from "../../../../modules/Database";
 import Eris from "eris";
-import { BlacklistEntry } from "../../../../util/@types/Misc";
+import { Blacklist } from "../../../../util/@types/Misc";
+import { Strings, Time } from "../../../../util/Functions";
 
 export default new SubCommand({
 	triggers: [
@@ -26,13 +26,13 @@ export default new SubCommand({
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const id = msg.args[0];
 	if (id.length < 17 || id.length > 18) return msg.reply(`**${id}** isn't a valid server id.`);
-	const gbl: BlacklistEntry = await mdb.collection("blacklist").find({ guildId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())[0]);
+	const gbl: Blacklist.GuildEntry = await mdb.collection("blacklist").find({ guildId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())[0]);
 	if (!!gbl) {
-		const expiry = [0, null].includes(gbl.expire) ? "Never" : this.f.formatDateWithPadding(new Date(gbl.expire));
+		const expiry = [0, null].includes(gbl.expire) ? "Never" : Time.formatDateWithPadding(new Date(gbl.expire));
 		return msg.reply(`**${id}** is already blacklisted. Reason: ${gbl.reason}. Blame: ${gbl.blame}. Expiry: ${expiry}.`);
 	} else {
 		const reason = msg.args.length > 1 ? msg.args.slice(1, msg.args.length).join(" ") : "No Reason Specified";
-		const k = this.f.random(7);
+		const k = Strings.random(7);
 		await mdb.collection("blacklist").insertOne({
 			created: Date.now(),
 			type: "guild",

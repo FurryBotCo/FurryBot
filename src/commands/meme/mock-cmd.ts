@@ -1,11 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Strings } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -27,7 +24,7 @@ export default new Command({
 
 	const embed: Eris.EmbedOptions = {
 		title: "Mocking Text",
-		description: this.f.everyOtherUpper(msg.unparsedArgs.join(" ").toLowerCase()),
+		description: Strings.everyOtherUpper(msg.unparsedArgs.join(" ").toLowerCase()),
 		image: {
 			url: "https://assets.furry.bot/mock.png"
 		},

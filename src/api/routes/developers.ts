@@ -1,7 +1,5 @@
 import express from "express";
 import config from "../../config";
-import util from "util";
-import apiFunctions from "../functions";
 import FurryBot from "@FurryBot";
 
 export default (async (client: FurryBot) => {

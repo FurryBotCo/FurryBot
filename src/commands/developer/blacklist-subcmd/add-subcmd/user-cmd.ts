@@ -2,10 +2,10 @@ import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../../config";
-import { Logger } from "../../../../util/LoggerV8";
-import { db, mdb } from "../../../../modules/Database";
+import { mdb } from "../../../../modules/Database";
 import Eris from "eris";
-import { BlacklistEntry } from "../../../../util/@types/Misc";
+import { Blacklist } from "../../../../util/@types/Misc";
+import { Strings, Time } from "../../../../util/Functions";
 
 export default new SubCommand({
 	triggers: [
@@ -26,13 +26,13 @@ export default new SubCommand({
 	const u = await msg.getUserFromArgs();
 	if (!u) return msg.reply(`**${msg.args[0]}** isn't a valid user.`);
 	const { id } = u;
-	const ubl: BlacklistEntry = await mdb.collection("blacklist").find({ userId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())[0]);
+	const ubl: Blacklist.UserEntry = await mdb.collection("blacklist").find({ userId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())[0]);
 	if (!!ubl) {
-		const expiry = [0, null].includes(ubl.expire) ? "Never" : this.f.formatDateWithPadding(new Date(ubl.expire));
+		const expiry = [0, null].includes(ubl.expire) ? "Never" : Time.formatDateWithPadding(new Date(ubl.expire));
 		return msg.reply(`**${u.username}#${u.discriminator}** (${u.id}) is already blacklisted. Reason: ${ubl.reason}. Blame: ${ubl.blame}. Expiry: ${expiry}.`);
 	} else {
 		const reason = msg.args.length > 1 ? msg.args.slice(1, msg.args.length).join(" ") : "No Reason Specified";
-		const k = this.f.random(7);
+		const k = Strings.random(7);
 		await mdb.collection("blacklist").insertOne({
 			created: Date.now(),
 			type: "user",

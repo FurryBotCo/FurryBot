@@ -1,11 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
@@ -25,7 +22,7 @@ export default new Command({
 	const embed: Eris.EmbedOptions = {
 		title: "Shard Info",
 		description: `Guilds: ${this.guilds.filter(g => g.shard.id === msg.guild.shard.id).length}\nPing: ${msg.guild.shard.latency}ms`,
-		color: this.f.randomColor(),
+		color: Colors.gold,
 		timestamp: new Date().toISOString()
 	};
 

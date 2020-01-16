@@ -12,7 +12,7 @@
 	</script>
 	<script>
 		const ctx = document.querySelector("#main").getContext("2d");
-		const myChart = new Chart(ctx, {
+		const bargraph = new Chart(ctx, {
 			type: "bar",
 			data: {
 				labels: ["Message Process", "Blacklist", "DM", "Auto Response", "Command", "Total"],
@@ -50,6 +50,25 @@
 				}
 			}
 		});
+
+		setInterval(() => {
+			const xhr = new XMLHttpRequest();
+			xhr.open("GET", `${window.location.href}?content=json`);
+			xhr.addEventListener("readystatechange", () => {
+				if (xhr.readyState === 4) {
+					const d = JSON.parse(xhr.responseText).data.times;
+					bargraph.data.datasets[0].data = [
+						d.messageProcess,
+						d.blacklist,
+						d.dm,
+						d.autoResponse,
+						d.cmd, d.main
+					];
+					bargraph.update();
+				}
+			});
+			xhr.send();
+		}, 5e3);
 	</script>
 </body>
 

@@ -4,6 +4,7 @@ import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
+import { Request } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -38,14 +39,14 @@ export default new Command({
 		j = JSON.parse(req.body);
 
 		return msg.channel.createMessage("", {
-			file: await this.f.getImageFromURL(j.data),
+			file: await Request.getImageFromURL(j.data),
 			name: j.data.split("/").reverse()[0]
 		});
 	} catch (e) {
 		Logger.error(`Shard #${msg.channel.guild.shard.id}`, e);
 		Logger.error(`Shard #${msg.channel.guild.shard.id}`, j);
 		return msg.channel.createMessage("unknown api error", {
-			file: await this.f.getImageFromURL(config.images.serverError),
+			file: await Request.getImageFromURL(config.images.serverError),
 			name: "error.png"
 		});
 	}

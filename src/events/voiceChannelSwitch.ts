@@ -1,8 +1,6 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "../config";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
 
@@ -34,7 +32,7 @@ export default new ClientEvent("voiceChannelSwitch", (async function (this: Furr
 		color: Colors.orange
 	};
 
-	// const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_MOVE, null);
+	// const log = await Utility.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_MOVE, null);
 	// if (log.success) embed.description += `\nMoved By ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
 	return ch.createMessage({ embed }).catch(err => null);

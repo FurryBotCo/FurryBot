@@ -2,10 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
 import { Colors } from "../../util/Constants";
 
 export default new Command({
@@ -26,8 +23,7 @@ export default new Command({
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	await msg.channel.startTyping();
-	// if (!msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly, because I don't have the `manageMessages` permission!");
-	if (this.activeReactChannels.includes(msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active reaction menu in this channel. Please wait for that one to timeout, or react to the old one with \"⏹\" before starting another.");
+	if (this.activeReactChannels.includes(msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active paginated command in this channel. Please either wait for that one to time out, or say **stop** to stop it.");
 
 	const tags = msg.args.map(a => a.replace(/,\|/g, ""));
 	if (tags.length > 5) return msg.reply("you can only specify up to five (5) tags.");

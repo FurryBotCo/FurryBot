@@ -1,10 +1,9 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "../config";
 import { db } from "../modules/Database";
 import { ChannelNamesCamelCase, Colors, MessageTypes } from "../util/Constants";
+import { Utility } from "../util/Functions";
 
 export default new ClientEvent("messageDelete", (async function (this: FurryBot, message: Eris.Message) {
 	if (!this || !message || !message.author || message.author.bot || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any)) return;
@@ -53,7 +52,7 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 		timestamp: new Date().toISOString(),
 		color: Colors.red
 	};
-	const log = await this.f.fetchAuditLogEntries((message.channel as Eris.GuildTextableChannel).guild, Eris.Constants.AuditLogActions.MESSAGE_DELETE, message.id);
+	const log = await Utility.fetchAuditLogEntries((message.channel as Eris.GuildTextableChannel).guild, Eris.Constants.AuditLogActions.MESSAGE_DELETE, message.id);
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 

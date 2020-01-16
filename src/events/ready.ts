@@ -2,13 +2,11 @@ import ClientEvent from "../util/ClientEvent";
 import Temp from "../util/Temp";
 import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
-import * as Eris from "eris";
 import config from "../config";
 import sv from "../api";
 import express from "express";
 import http from "http";
-import { mdb, mongo } from "../modules/Database";
-import * as fs from "fs-extra";
+import { mdb } from "../modules/Database";
 import cmd from "../commands";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
@@ -44,7 +42,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	const svr = http.createServer(express())
 		.on("error", () => (Logger.warn("APIServer", "Attempted to start api server, but the port is in use."), this.increment("other.apiServerLaunchFailed")))
-		.on("listening", () => (svr.close(), this.srv = srv.listen(config.apiPort, config.apiBindIp), this.increment("other.apiServerLaunch")))
+		.on("listening", () => (svr.close(), this.srv = srv.listen(config.apiPort, config.apiBindIp, () => Logger.debug("APIServer", `Listening on ${config.apiBindIp}:${config.apiPort}`)), this.increment("other.apiServerLaunch")))
 		.on("close", () => Logger.debug("APIServer", "Port test server closed, starting bot api server."))
 		.listen(config.apiPort, config.apiBindIp);
 

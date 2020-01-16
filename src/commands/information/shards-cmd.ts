@@ -1,11 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
@@ -29,7 +26,7 @@ export default new Command({
 			value: `Guilds: ${this.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
 			inline: true
 		})),
-		color: this.f.randomColor(),
+		color: Colors.gold,
 		timestamp: new Date().toISOString(),
 		footer: {
 			text: `Current Shard: #${msg.channel.guild.shard.id}`

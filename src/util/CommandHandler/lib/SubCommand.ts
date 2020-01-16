@@ -7,6 +7,7 @@ import { Logger } from "../../LoggerV8";
 import * as fs from "fs";
 import Command from "./Command";
 import { Colors } from "../../Constants";
+import { Request } from "../../Functions";
 
 export default class SubCommand {
 	triggers: UT.ArrayOneOrMore<string>;
@@ -132,7 +133,7 @@ export default class SubCommand {
 
 		if (cmd.features.includes("nsfw")) {
 			if (!msg.channel.nsfw) return msg.reply(`this command can only be ran in nsfw channels.`, {
-				file: await client.f.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
+				file: await Request.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
 				name: "nsfw.gif"
 			}).catch(err => null);
 

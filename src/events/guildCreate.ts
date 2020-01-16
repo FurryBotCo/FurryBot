@@ -4,12 +4,14 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
 import { Colors } from "../util/Constants";
+import { Internal } from "../util/Functions";
 
 export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
 	this.increment([
 		"events.guildCreate"
 	]);
-	await this.f.incrementDailyCounter(true);
+
+	await Internal.incrementDailyCounter(true);
 
 	let author = {
 		name: "Unknown#0000",

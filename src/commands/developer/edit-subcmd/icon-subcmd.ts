@@ -1,11 +1,8 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../../config";
-import { Logger } from "../../../util/LoggerV8";
-import { db, mdb } from "../../../modules/Database";
-import Eris from "eris";
 import phin from "phin";
+import { Request } from "../../../util/Functions";
 
 export default new SubCommand({
 	triggers: [
@@ -28,7 +25,7 @@ export default new SubCommand({
 	}).then(res => `data:${res.headers["content-type"]};base64,${res.body.toString("base64")}`);
 	this.editSelf({ avatar: set })
 		.then(async (user) => msg.channel.createMessage(`<@!${msg.author.id}>, Set Avatar to (attachment)`, {
-			file: await this.f.getImageFromURL(user.avatarURL),
+			file: await Request.getImageFromURL(user.avatarURL),
 			name: "avatar.png"
 		}))
 		.catch((err) => msg.channel.createMessage(`There was an error while doing this: ${err}`));

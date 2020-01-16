@@ -1,11 +1,9 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Utility, Request } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -35,10 +33,10 @@ export default new Command({
 		Logger.error(`Shard #${msg.channel.guild.shard.id}`, img);
 		return msg.channel.createMessage(`<@!${msg.author.id}>, Unknown api error.`);
 	}
-	const short = await this.f.shortenURL(img.body.response.image);
+	const short = await Utility.shortenURL(img.body.response.image);
 	const extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
 	return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
-		file: await this.f.getImageFromURL(img.body.response.image),
+		file: await Request.getImageFromURL(img.body.response.image),
 		name: img.body.response.name
 	});
 }));

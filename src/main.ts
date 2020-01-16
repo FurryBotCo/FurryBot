@@ -3,11 +3,9 @@ import * as fs from "fs-extra";
 import config from "./config";
 import MessageCollector from "./util/MessageCollector";
 import Temp from "./util/Temp";
-import { Logger } from "./util/LoggerV8";
 import E6API from "e6api";
 import E9API from "e9api";
 import { StatsD } from "node-statsd";
-import functions from "./util/Functions";
 import ErrorHandler from "./util/ErrorHandler";
 import ClientEvent from "./util/ClientEvent";
 import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
@@ -31,7 +29,6 @@ export default class FurryBot extends Eris.Client {
 	}[];
 	e6: E6API;
 	e9: E9API;
-	f: typeof functions;
 	activeReactChannels: string[];
 	// a: Analytics;
 	intr: NodeJS.Timeout;
@@ -101,7 +98,6 @@ export default class FurryBot extends Eris.Client {
 			this.errorHandler.globalHandler.bind(this.errorHandler, "exit")({ code })
 		);*/
 
-		this.f = functions;
 		this.messageCollector = new MessageCollector(this);
 
 		this.commandStats = {};

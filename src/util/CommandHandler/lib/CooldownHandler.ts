@@ -1,8 +1,5 @@
 import Command from "./Command";
-import chalk from "chalk";
-import * as Eris from "eris";
 import Logger from "../../LoggerV8";
-import CommandHolder from "./CommandHolder";
 
 export default class CooldownHandler {
 	private _cooldowns: {

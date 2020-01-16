@@ -1,11 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { mdb } from "../../modules/Database";
+import { Utility } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -27,8 +24,8 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const role = await msg.getRoleFromArgs(0, true, true);
 	if (!role) return msg.errorEmbed("INVALID_ROLE");
-	const a = this.f.compareMemberWithRole(msg.member, role);
-	const b = this.f.compareMemberWithRole(msg.guild.members.get(this.user.id), role);
+	const a = Utility.compareMemberWithRole(msg.member, role);
+	const b = Utility.compareMemberWithRole(msg.guild.members.get(this.user.id), role);
 	if ((a.higher || a.same) && msg.channel.guild.ownerID !== msg.member.id) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot add roles as high as, or higher than you.`);
 	if (b.higher || b.same) return msg.channel.createMessage(`<@!${msg.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
 	if (role.managed) return msg.channel.createMessage(`<@!${msg.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);

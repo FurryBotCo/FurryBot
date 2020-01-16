@@ -1,9 +1,6 @@
 import ClientEvent from "../util/ClientEvent";
 import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
-import * as Eris from "eris";
-import config from "../config";
-import ExtendedMessage from "@ExtendedMessage";
 
 // this cannot be async due to "unhandledRejection" (unhandled promise rejection)'s not
 // being able to be handled asynchronously

@@ -1,10 +1,9 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "../config";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
+import { Utility, Time } from "../util/Functions";
 
 export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBot, guild: Eris.Guild, role: Eris.Role, oldRole: Eris.OldRole) {
 	this.increment([
@@ -85,7 +84,7 @@ export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBo
 						break;
 
 					case "time":
-						return `${ch.name}: **${this.f.ms((oldRole[c] || 0 as any) * 1000, true)}** -> **${this.f.ms((role[c] || 0 as any) * 1000, true)}**`;
+						return `${ch.name}: **${Time.ms((oldRole[c] || 0 as any) * 1000, true)}** -> **${Time.ms((role[c] || 0 as any) * 1000, true)}**`;
 						break;
 				}
 			})))
@@ -94,7 +93,7 @@ export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBo
 		color: Colors.orange
 	};
 
-	const log = await this.f.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.ROLE_UPDATE, role.id);
+	const log = await Utility.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.ROLE_UPDATE, role.id);
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 

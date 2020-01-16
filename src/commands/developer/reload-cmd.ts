@@ -1,15 +1,6 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
-import { Colors } from "../../util/Constants";
-import { performance } from "perf_hooks";
-import * as fs from "fs-extra";
-import { execSync } from "child_process";
 
 export default new Command({
 	triggers: [

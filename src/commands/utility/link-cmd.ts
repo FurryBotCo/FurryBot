@@ -1,11 +1,6 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
@@ -17,10 +12,10 @@ export default new Command({
 	donatorCooldown: 15e3,
 	description: "Look for your Patreon subscription.",
 	usage: "",
-	features: [],
+	features: ["devOnly"],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	if (msg.uConfig.patreon.donator) return msg.reply("you are already marked as a donator.");
+	/*if (msg.uConfig.patreon.donator) return msg.reply("you are already marked as a donator.");
 
 	const p = await this.f.loopPatrons();
 
@@ -71,5 +66,5 @@ export default new Command({
 		}
 
 		return msg.reply(`We were unable to link your Discord account with your Patreon account, make sure you have donated, and that the payment was successful. If you need more help, you can visit us here: ${config.bot.supportInvite}`);
-	}
+	}*/
 }));

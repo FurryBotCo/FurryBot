@@ -1,11 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Utility } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -33,7 +29,7 @@ export default new Command({
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
 	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.reply("Pretty sure you don't want to do this to yourself.");
-	const a = this.f.compareMembers(user, msg.member);
+	const a = Utility.compareMembers(user, msg.member);
 	if ((a.member2.higher || a.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot kick ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
 	// if(!user.kickable) return msg.channel.createMessage(`I cannot kick ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have kick permissions?`);
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";

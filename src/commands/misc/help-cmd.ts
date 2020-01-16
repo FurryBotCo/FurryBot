@@ -2,10 +2,8 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Time } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -42,7 +40,7 @@ export default new Command({
 				icon_url: msg.author.avatarURL
 			},
 			timestamp: new Date().toISOString(),
-			color: this.f.randomColor()
+			color: Math.floor(Math.random() * 0xFFFFFF)
 		};
 
 		return msg.channel.createMessage({ embed });
@@ -79,7 +77,7 @@ export default new Command({
 				},
 				{
 					name: "Cooldown",
-					value: await this.f.ms(cmd.cooldown, true) as string,
+					value: await Time.ms(cmd.cooldown, true) as string,
 					inline: false
 				},
 				{
@@ -93,7 +91,7 @@ export default new Command({
 				icon_url: msg.author.avatarURL
 			},
 			timestamp: new Date().toISOString(),
-			color: this.f.randomColor()
+			color: Math.floor(Math.random() * 0xFFFFFF)
 		};
 
 
@@ -142,7 +140,7 @@ export default new Command({
 				icon_url: msg.author.avatarURL
 			},
 			timestamp: new Date().toISOString(),
-			color: this.f.randomColor()
+			color: Math.floor(Math.random() * 0xFFFFFF)
 		};
 
 		return msg.channel.createMessage({ embed });

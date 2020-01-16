@@ -6,7 +6,6 @@ import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import util from "util";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
 import { execSync } from "child_process";
 import { performance } from "perf_hooks";
 
@@ -84,7 +83,7 @@ export default new Command({
 				icon_url: msg.author.avatarURL
 			},
 			timestamp: new Date().toISOString(),
-			color: error ? 16711680 : this.f.randomColor(),
+			color: error ? 16711680 : Math.floor(Math.random() * 0xFFFFFF),
 			fields: [
 				{
 					name: ":inbox_tray: Input",

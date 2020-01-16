@@ -3,7 +3,6 @@ import config from "../../config";
 import { mdb } from "../../modules/Database";
 import uuid from "uuid/v4";
 import * as eris from "eris";
-import apiFunctions from "../functions";
 import { Logger } from "../../util/LoggerV8";
 import FurryBot from "@FurryBot";
 
@@ -54,7 +53,7 @@ export default (async (client: FurryBot) => {
 						title: "Thanks for voting for me!",
 						description: `Hey, thanks for voting for me on that bot list!\nYou've been gifted **${config.eco.voteAmount}**${config.eco.emoji}!`,
 						timestamp: new Date().toISOString(),
-						color: client.f.randomColor()
+						color: Math.floor(Math.random() * 0xFFFFFF)
 					}
 				})).catch(err => null);
 
@@ -66,7 +65,7 @@ export default (async (client: FurryBot) => {
 					},
 					description: `[voted on dbl](https://discordbots.org/bot/398251412246495233/vote)`,
 					timestamp: new Date().toISOString(),
-					color: client.f.randomColor()
+					color: Math.floor(Math.random() * 0xFFFFFF)
 				};
 
 				await client.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {

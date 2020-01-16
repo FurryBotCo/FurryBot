@@ -1,11 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Utility } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -65,7 +62,7 @@ export default new Command({
 
 		return msg.channel.createMessage({ embed });
 	}
-	const a = this.f.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(msg.gConfig.settings.muteRole));
+	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(msg.gConfig.settings.muteRole));
 	if (a.higher || a.same) {
 		const embed: Eris.EmbedOptions = {
 			title: "Invalid mute role",

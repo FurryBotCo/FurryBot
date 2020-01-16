@@ -2,10 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
@@ -33,7 +30,8 @@ export default new Command({
 				text: "Disclaimer: Do not take any answers seriously!",
 				icon_url: "https://i.furry.bot/furry.png"
 			},
-			timestamp: new Date().toISOString()
+			timestamp: new Date().toISOString(),
+			color: Colors.gold
 		}
 	});
 }));

@@ -1,12 +1,9 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { mdb } from "../../modules/Database";
 import Warning from "../../util/@types/Warning";
+import { Strings } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -33,7 +30,7 @@ export default new Command({
 		blameId: msg.author.id,
 		guildId: msg.channel.guild.id,
 		userId: member.id,
-		id: this.f.random(7),
+		id: Strings.random(7),
 		reason,
 		date: Date.now()
 	} as Warning);

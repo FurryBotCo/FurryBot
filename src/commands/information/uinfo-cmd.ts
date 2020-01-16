@@ -1,11 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Time, Internal } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -32,33 +29,17 @@ export default new Command({
 
 	const embed: Eris.EmbedOptions = {
 		title: "User info",
-		fields: [
-			{
-				name: "Tag",
-				value: `${user.user.username}#${user.user.discriminator}`,
-				inline: true
-			}, {
-				name: "User ID",
-				value: user.id,
-				inline: true
-			}, {
-				name: "Joined Server",
-				value: new Date(user.joinedAt).toString().split("GMT")[0],
-				inline: true
-			}, {
-				name: "Joined Discord",
-				value: new Date(user.user.createdAt).toString().split("GMT")[0],
-				inline: true
-			}, {
-				name: `Roles [${roles.length}]`,
-				value: roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.settings.prefix}roles ${user.user.id}\`` : roles.length === 0 ? "NONE" : roles.toString(),
-				inline: false
-			}
-		]
+		description: [
+			`\u25FD Tag: ${user.username}#${user.discriminator} (<@!${user.id}>)`,
+			`\u25FD ID: ${user.id}`,
+			`\u25FD Server Join Date: ${Time.formatDateWithPadding(user.joinedAt, true)}`,
+			`\u25FD Account Creation Date: ${Time.formatDateWithPadding(user.createdAt, true)}`,
+			`\u25FD Roles [${roles.length}]: ${roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.settings.prefix}roles ${user.user.id}\`` : roles.length === 0 ? "NONE" : roles.toString()}`
+		].join("\n")
 	};
 
 	if (!user.user.bot) {
-		const u = await db.getUser(user.id);
+		const u = await Internal.getUser(user.id);
 
 		if (u.marriage.married) embed.fields.push({
 			name: "Marriage Status (on this bot)",

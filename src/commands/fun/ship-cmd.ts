@@ -2,13 +2,11 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
 import * as fs from "fs-extra";
 import { Canvas } from "canvas-constructor";
 import { Colors } from "../../util/Constants";
+import { Request } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -27,19 +25,24 @@ export default new Command({
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 
-	let member1 = msg.member, member2: Eris.Member;
+	let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1;
+	if (config.developers.includes(msg.author.id) && Object.keys(msg.dashedArgs.keyValue).includes("percent")) {
+		amount = Number(msg.dashedArgs.keyValue.percent);
+		msg.args = msg.args.filter(a => a !== `--percent=${amount}`);
+	}
+
 
 	if (msg.args.length === 0) member2 = msg.channel.guild.members.random();
 	else if (msg.args.length === 1) member2 = await msg.getMemberFromArgs(0, false);
 	else {
-		member1 = await msg.getMemberFromArgs(0, false);
-		member2 = await msg.getMemberFromArgs(1, false);
+		member1 = await msg.getMemberFromArgs(0, false, false, 0);
+		member2 = await msg.getMemberFromArgs(1, false, false, 0);
 	}
 
 	if (!member1 || !member2) return msg.errorEmbed("INVALID_MEMBER");
 
 	const ship = {
-		amount: Math.floor(Math.random() * 100),
+		amount,
 		name: member1.username.slice(0, Math.floor(Math.random() * 5) + 3) + member2.username.slice(-(Math.floor(Math.random() * 5) + 3)),
 		get image(this: typeof ship) {
 			if (this.amount === 1) return "ship-1-percent";
@@ -53,8 +56,8 @@ export default new Command({
 	};
 
 	const sh = fs.readFileSync(`${config.rootDir}/src/assets/images/ship/${ship.image}.png`);
-	const av1 = await this.f.getImageFromURL(member1.user.avatarURL);
-	const av2 = await this.f.getImageFromURL(member2.user.avatarURL);
+	const av1 = await Request.getImageFromURL(member1.user.avatarURL);
+	const av2 = await Request.getImageFromURL(member2.user.avatarURL);
 
 	const img = new
 		Canvas(768, 256)

@@ -12,6 +12,7 @@ import { db, mdb, mongo } from "../../modules/Database";
 import * as os from "os";
 import { performance } from "perf_hooks";
 import Permissions from "../../util/Permissions";
+import * as F from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -48,14 +49,16 @@ export default new Command({
 			config,
 			msg,
 			phin,
-			functions: this.f,
 			util,
 			fs,
 			db,
 			mdb,
 			mongo,
 			Permissions,
-			os
+			os,
+			F,
+			Functions: F,
+			...F
 		});
 	} catch (e) {
 		res = e;
@@ -104,7 +107,7 @@ export default new Command({
 				icon_url: msg.author.avatarURL
 			},
 			timestamp: new Date().toISOString(),
-			color: error ? 16711680 : this.f.randomColor(),
+			color: error ? 16711680 : Math.floor(Math.random() * 0xFFFFFF),
 			fields: [
 				{
 					name: ":inbox_tray: Input",

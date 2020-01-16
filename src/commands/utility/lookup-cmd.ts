@@ -2,12 +2,11 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
 import { Colors, ChannelNames } from "../../util/Constants";
 import BigInt from "big-integer";
+import { Time } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -23,6 +22,8 @@ export default new Command({
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+
+	if (msg.args[0].length < 17 || msg.args.length > 18) return msg.reply("that doesn't seem to be a valid server id..");
 
 	const w = await phin({
 		method: "GET",
@@ -51,7 +52,7 @@ export default new Command({
 					name: "Info",
 					value: [
 						`\u25FD Server Name: ${w.body.name}`,
-						`\u25FD Creation Date: ${this.f.formatDateWithPadding(new Date(BigInt(w.body.id).divide("4194304").add("1420070400000").toJSNumber()), true)}`,
+						`\u25FD Creation Date: ${Time.formatDateWithPadding(new Date(BigInt(w.body.id).divide("4194304").add("1420070400000").toJSNumber()), true)}`,
 						`\u25FD Online/Idle/DnD Members: ${w.body.presence_count}`,
 						`\t<:${config.emojis.online}> ${w.body.members.filter(m => m.status === "online").length}`,
 						`\t<:${config.emojis.idle}> ${w.body.members.filter(m => m.status === "idle").length}`,

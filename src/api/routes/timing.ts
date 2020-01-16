@@ -1,8 +1,5 @@
 import express from "express";
-import { mdb, mongo } from "../../modules/Database";
-import config from "../../config";
-import util from "util";
-import apiFunctions from "../functions";
+import { mdb } from "../../modules/Database";
 import FurryBot from "@FurryBot";
 import { ObjectID } from "mongodb";
 
@@ -23,18 +20,34 @@ export default (async (client: FurryBot) => {
 			};
 		}>({}).sort({ _id: 1 }).limit(100).toArray();
 
-		if (timing.length === 0) return res.status(404).render("timing", {
-			times: {
-				main: 0,
-				messageProcess: 0,
-				blacklist: 0,
-				dm: 0,
-				autoResponse: 0,
-				cmd: 0
-			},
-			timing: [],
-			title: "Average Processing Time (no data)"
-		});
+		if (timing.length === 0) {
+			if (typeof req.query.content !== "undefined" && req.query.content === "json") return res.status(200).json({
+				success: true,
+				data: {
+					times: {
+						main: 0,
+						messageProcess: 0,
+						blacklist: 0,
+						dm: 0,
+						autoResponse: 0,
+						cmd: 0
+					},
+					timing: []
+				}
+			});
+			else return res.status(200).render("timing", {
+				times: {
+					main: 0,
+					messageProcess: 0,
+					blacklist: 0,
+					dm: 0,
+					autoResponse: 0,
+					cmd: 0
+				},
+				timing: [],
+				title: "Average Processing Time (no data)"
+			});
+		}
 
 		const times: {
 			[k: string]: number;
@@ -68,18 +81,33 @@ export default (async (client: FurryBot) => {
 				};
 			}>({ cmd: req.params.cmd }).sort({ _id: 1 }).limit(100).toArray();
 
-			if (timing.length === 0) return res.status(404).render("timing", {
-				times: {
-					main: 0,
-					messageProcess: 0,
-					blacklist: 0,
-					dm: 0,
-					autoResponse: 0,
-					cmd: 0
-				},
-				timing: [],
-				title: `Average Processing Time for "${req.params.cmd}" (no data)`
-			});
+			if (timing.length === 0) {
+				if (typeof req.query.content !== "undefined" && req.query.content === "json") return res.status(200).json({
+					success: true,
+					data: {
+						times: {
+							main: 0,
+							messageProcess: 0,
+							blacklist: 0,
+							dm: 0,
+							autoResponse: 0,
+							cmd: 0
+						},
+						timing: []
+					}
+				}); else return res.status(200).render("timing", {
+					times: {
+						main: 0,
+						messageProcess: 0,
+						blacklist: 0,
+						dm: 0,
+						autoResponse: 0,
+						cmd: 0
+					},
+					timing: [],
+					title: `Average Processing Time for "${req.params.cmd}" (no data)`
+				});
+			}
 
 			const times: {
 				[k: string]: number;

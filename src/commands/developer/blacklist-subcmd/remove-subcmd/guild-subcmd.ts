@@ -2,10 +2,10 @@ import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../../config";
-import { Logger } from "../../../../util/LoggerV8";
-import { db, mdb } from "../../../../modules/Database";
+import { mdb } from "../../../../modules/Database";
 import Eris from "eris";
-import { BlacklistEntry } from "../../../../util/@types/Misc";
+import { Blacklist } from "../../../../util/@types/Misc";
+import { Time } from "../../../../util/Functions";
 
 export default new SubCommand({
 	triggers: [
@@ -26,14 +26,14 @@ export default new SubCommand({
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const id = msg.args[0];
 	if (id.length < 17 || id.length > 18) return msg.reply(`**${id}** isn't a valid server id.`);
-	const gbl: BlacklistEntry[] = await mdb.collection("blacklist").find({ guildId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now()));
+	const gbl: Blacklist.GuildEntry[] = await mdb.collection("blacklist").find({ guildId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now()));
 
 	if (gbl.length === 0) return msg.reply(`doesn't look like **${id}** has any blacklists.`);
 
 	await msg.channel.createMessage({
 		embed: {
 			title: `Blacklist Entries For ${id}`,
-			fields: gbl.map(b => ({ name: `Date: ${this.f.formatDateWithPadding(new Date(b.created), true)}`, value: `Blame: ${b.blame}\nExpiry: ${[0, null].includes(b.expire) ? "Never" : this.f.formatDateWithPadding(new Date(b.expire), true)}\nReason: ${b.reason}\nNotice Shown: ${b.noticeShown ? "Yes" : "No"}\nID: **${b.id}**`, inline: false }))
+			fields: gbl.map(b => ({ name: `Date: ${Time.formatDateWithPadding(new Date(b.created), true)}`, value: `Blame: ${b.blame}\nExpiry: ${[0, null].includes(b.expire) ? "Never" : Time.formatDateWithPadding(new Date(b.expire), true)}\nReason: ${b.reason}\nNotice Shown: ${b.noticeShown ? "Yes" : "No"}\nID: **${b.id}**`, inline: false }))
 		}
 	});
 	await msg.channel.createMessage("Please either provide one of the ids to remove it, or say `cancel` to cancel.");

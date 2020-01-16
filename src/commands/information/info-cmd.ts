@@ -2,10 +2,9 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Colors } from "../../util/Constants";
+import { Internal, Time } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -24,45 +23,85 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
 	// const st = await this.cluster.getManagerStats();
 	// if (st.clusters.length === 0) return msg.reply("hey, I haven't recieved any stats from other clusters yet, please try again later!");
 
-	// ${"\u25FD"}
+	// \u25FD
+
+	const info = {
+		processUsage: `${Math.round(Internal.memory.process.getUsed() / 1024 / 1024)}MB / ${Math.round(Internal.memory.process.getTotal() / 1024 / 1024)}MB`,
+		systemUsage: `${Math.round(Internal.memory.system.getUsed() / 1024 / 1024 / 1024)}GB / ${Math.round(Internal.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
+		uptime: `${Time.parseTime(process.uptime())} (${Time.secondsToHours(process.uptime())})`,
+		shard: `${msg.channel.guild.shard.id + 1}/${this.shards.size}`,
+		guilds: this.guilds.size,
+		largeGuilds: this.guilds.filter(g => g.large).length,
+		users: this.users.size,
+		channels: Object.keys(this.channelGuildMap).length,
+		voiceConnections: this.voiceConnections.size,
+		commands: `${this.cmd.commands.length} (${this.cmd.categories.length} categories)`,
+		creators: [
+			`[Donovan_DMC](https://furry.cool)`
+		].join("\n"),
+		library: `[Eris Dev](https://github.com/abalabahaha/eris/tree/dev)`,
+		libraryVersion: Eris.VERSION,
+		apiVersion: Eris.Constants.REST_VERSION,
+		gatewayVersion: Eris.Constants.GATEWAY_VERSION,
+		botVersion: config.version,
+		nodeVersion: process.version,
+		supportServer: `[${config.bot.supportInvite}](${config.bot.supportInvite})`
+	};
+
+	if (msg.args.length > 0) {
+		if (Object.keys(info).map(k => k.toLowerCase()).includes(msg.args[0].toLowerCase())) {
+			const inf = Object.keys(info).find(k => k.toLowerCase() === msg.args[0].toLowerCase());
+			return msg.channel.createMessage({
+				embed: {
+					title: "Bot Info!",
+					timestamp: new Date().toISOString(),
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					},
+					color: Colors.gold,
+					description: info[inf]
+				}
+			});
+		}
+	}
 
 	const embed: Eris.EmbedOptions = {
 		title: "Bot Info!",
 		description: [
 			"**Stats**:",
-			`${"\u25FD"} Process Memory Usage: ${Math.round(this.f.memory.process.getUsed() / 1024 / 1024)}MB / ${Math.round(this.f.memory.process.getTotal() / 1024 / 1024)}MB`,
-			`${"\u25FD"} System Memory Usage: ${Math.round(this.f.memory.system.getUsed() / 1024 / 1024 / 1024)}GB / ${Math.round(this.f.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
-			`${"\u25FD"} Uptime: ${this.f.parseTime(process.uptime())} (${this.f.secondsToHours(process.uptime())})`,
-			`${"\u25FD"} Shard: ${msg.channel.guild.shard.id + 1}/${this.shards.size}`,
-			`${"\u25FD"} Server Count: ${this.guilds.size}`,
-			`${"\u25FD"} Large Server Count: ${this.guilds.filter(g => g.large).length}`,
-			`${"\u25FD"} User Count: ${this.users.size}`,
-			`${"\u25FD"} Channel Count: ${Object.keys(this.channelGuildMap).length}`,
-			`${"\u25FD"} Voice Connection Count: ${this.voiceConnections.size}`,
-			`${"\u25FD"} Commands: ${this.cmd.commands.length}`,
+			`\u25FD Process Memory Usage: ${info.processUsage}`,
+			`\u25FD System Memory Usage: ${info.systemUsage}`,
+			`\u25FD Uptime: ${info.uptime}`,
+			`\u25FD Shard: ${info.shard}`,
+			`\u25FD Server Count: ${info.guilds}`,
+			`\u25FD Large Server Count: ${info.largeGuilds}`,
+			`\u25FD User Count: ${info.users}`,
+			`\u25FD Channel Count: ${info.channels}`,
+			`\u25FD Voice Connection Count: ${info.voiceConnections}`,
+			`\u25FD Commands: ${info.commands}`,
 			"",
 			"**Creator(s)**:",
-			`${"\u25FD"} [Donovan_DMC](https://furry.cool)`,
+			`\u25FD ${info.creators.split("\n").join("\n\u25FD")}`,
 			"",
 			"**Other Info**:",
-			`${"\u25FD"} Library: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev)`,
-			`${"\u25FD"} Library Version: ${Eris.VERSION}`,
-			`${"\u25FD"} API Version: ${Eris.Constants.REST_VERSION}`,
-			`${"\u25FD"} Gateway Version: ${Eris.Constants.GATEWAY_VERSION}`,
-			`${"\u25FD"} Bot Version: ${config.version}`,
-			`${"\u25FD"} Node Version: ${process.version}`,
-			`${"\u25FD"} Support Server: [${config.bot.supportInvite}](${config.bot.supportInvite})`
+			`\u25FD Library: ${info.library}`,
+			`\u25FD Library Version: ${info.libraryVersion}`,
+			`\u25FD API Version: ${info.apiVersion}`,
+			`\u25FD Gateway Version: ${info.gatewayVersion}`,
+			`\u25FD Bot Version: ${info.botVersion}`,
+			`\u25FD Node Version: ${info.nodeVersion}`,
+			`\u25FD Support Server: ${info.supportServer}`
 		].join("\n"),
 		timestamp: new Date().toISOString(),
 		author: {
 			name: msg.author.tag,
 			icon_url: msg.author.avatarURL
 		},
-		color: Math.floor(Math.random() * 0xFFFFFF)
+		color: Colors.gold
 	};
 
 	msg.channel.createMessage({ embed });

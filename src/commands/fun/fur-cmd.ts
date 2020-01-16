@@ -1,11 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Request, Utility, Strings } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -34,7 +30,7 @@ export default new Command({
 		"propose"
 	];
 	let ln, type, req, short, extra;
-	if (msg.args.length === 0) {
+	if (msg.args.length < 1) {
 		ln = Math.floor(Math.random() * (types.length));
 		// 0 (1) - 25: Inkbunny
 		type = types[Math.floor(ln / 25)];
@@ -43,11 +39,11 @@ export default new Command({
 		if (type === "list") return msg.channel.createMessage(`<@!${msg.author.id}>, Valid Values:\n**${types.join("**\n**")}**.`);
 	}
 	if (!type) type = "hug";
-	req = await this.f.imageAPIRequest(false, type, true, true);
-	short = await this.f.shortenURL(req.response.image);
+	req = await Request.imageAPIRequest(false, type, true, true);
+	short = await Utility.shortenURL(req.response.image);
 	extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
-	return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${this.f.ucwords(type)}`, {
-		file: await this.f.getImageFromURL(req.response.image),
+	return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nType: ${Strings.ucwords(type)}`, {
+		file: await Request.getImageFromURL(req.response.image),
 		name: req.response.name
 	});
 }));

@@ -4,7 +4,6 @@ import express from "express";
 import * as fs from "fs-extra";
 import session from "express-session";
 import cookieParser from "cookie-parser";
-import chalk from "chalk";
 import http from "http";
 import https from "https";
 import FurryBot from "@FurryBot";

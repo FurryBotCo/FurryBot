@@ -1,10 +1,9 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "../config";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
+import { Utility } from "../util/Functions";
 
 export default new ClientEvent("voiceStateUpdate", (async function (this: FurryBot, member: Eris.Member, oldState: Eris.OldVoiceState) {
 	this.increment([
@@ -86,7 +85,7 @@ export default new ClientEvent("voiceStateUpdate", (async function (this: FurryB
 			color: Colors.orange
 		};
 
-		const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_UPDATE, member.id);
+		const log = await Utility.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_UPDATE, member.id);
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
@@ -105,7 +104,7 @@ export default new ClientEvent("voiceStateUpdate", (async function (this: FurryB
 			color: Colors.orange
 		};
 
-		const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_UPDATE, member.id);
+		const log = await Utility.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_UPDATE, member.id);
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
@@ -175,7 +174,7 @@ export default new ClientEvent("voiceStateUpdate", (async function (this: FurryB
 	};
 
 	if ((["mute", "deaf"] as typeof changes).some(c => changes.includes(c))) {
-		const log = await this.f.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_UPDATE, member.id);
+		const log = await Utility.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_UPDATE, member.id);
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 	}

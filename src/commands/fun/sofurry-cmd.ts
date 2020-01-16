@@ -5,8 +5,7 @@ import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import util from "util";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Utility, Request, Strings } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -58,18 +57,18 @@ export default new Command({
 			Logger.log(`Body: ${util.inspect(jsn, { depth: null })}`, msg.guild.shard.id);
 			return msg.edit("Image API returned a non-safe image! Please try again later.").catch(err => msg.channel.createMessage(`Command failed: ${err}`));
 		}
-		const short = await this.f.shortenURL(`http://www.sofurry.com/view/${submission.id}`);
+		const short = await Utility.shortenURL(`http://www.sofurry.com/view/${submission.id}`);
 		const extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
-		if ([1, 4].includes(submission.contentType)) return m.edit(`${extra}${submission.title} (type ${this.f.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`)).then(async () => msg.channel.createMessage("", {
-			file: await this.f.getImageFromURL(submission.full),
+		if ([1, 4].includes(submission.contentType)) return m.edit(`${extra}${submission.title} (type ${Strings.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<${short.url}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf a bad image is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`)).then(async () => msg.channel.createMessage("", {
+			file: await Request.getImageFromURL(submission.full),
 			name: "sofurry.png"
 		}));
-		else return m.edit(`${extra}${submission.title} (type ${this.f.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf something bad is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`));
+		else return m.edit(`${extra}${submission.title} (type ${Strings.ucwords(contentType[submission.contentType])}) by ${submission.artistName}\n<http://www.sofurry.com/view/${submission.id}>\nRequested By: ${msg.author.username}#${msg.author.discriminator}\nIf something bad is returned, blame the service, not the bot author!`).catch(err => msg.channel.createMessage(`Command failed: ${err}`));
 	} catch (e) {
 		Logger.error(`Error:\n${e}`, msg.guild.shard.id);
 		Logger.log(`Body: ${req.body}`, msg.guild.shard.id);
 		return m.edit("Unknown API Error").then(async () => msg.channel.createMessage("", {
-			file: await this.f.getImageFromURL(config.images.serverError),
+			file: await Request.getImageFromURL(config.images.serverError),
 			name: "error.png"
 		})).catch(err => msg.channel.createMessage(`Command failed: ${err}`));
 	}

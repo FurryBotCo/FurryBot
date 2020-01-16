@@ -2,10 +2,8 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Request, Utility } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -55,16 +53,16 @@ export default new Command({
 		}
 	}
 
-	const img = await this.f.imageAPIRequest(false, `yiff/${type}`, true, false);
+	const img = await Request.imageAPIRequest(false, `yiff/${type}`, true, false);
 
 	if (img.success !== true) {
 		if (typeof img.error === "object") return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 		else return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\n${img.error}`);
 	}
-	const short = await this.f.shortenURL(img.response.image);
+	const short = await Utility.shortenURL(img.response.image);
 	extra += short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
 	return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nType: ${type}\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
-		file: await this.f.getImageFromURL(img.response.image),
+		file: await Request.getImageFromURL(img.response.image),
 		name: img.response.name
 	});
 }));

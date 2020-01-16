@@ -4,10 +4,10 @@ import UserConfig from "./config/UserConfig";
 import GuildConfig from "./config/GuildConfig";
 import config from "../config";
 import { Logger } from "../util/LoggerV8";
-import deasync from "deasync";
 import Command from "../util/CommandHandler/lib/Command";
 import Category from "../util/CommandHandler/lib/Category";
-import { db, mdb } from "./Database";
+import { db } from "./Database";
+import * as F from "../util/Functions";
 
 interface ExtendedTextChannel extends Eris.TextChannel {
 	furpile: {
@@ -140,7 +140,7 @@ class ExtendedMessage extends Eris.Message {
 				get isDeveloper() {
 					return config.developers.includes(this.user.id);
 				},
-				isBooster: await client.f.checkBooster(this.author.id, client)
+				isBooster: await F.Internal.checkBooster(this.author.id, client)
 			};
 		} else {
 			this._gConfig = null;
