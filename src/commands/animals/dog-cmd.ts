@@ -126,9 +126,7 @@ export default new Command({
 			].join("\n"),
 			color: Colors.green,
 			image: {
-				url: img.url,
-				width: img.width,
-				height: img.height
+				url: img.url
 			},
 			timestamp: new Date().toISOString()
 		}

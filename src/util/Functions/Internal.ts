@@ -211,26 +211,26 @@ export default class Internal {
 	 * @static
 	 * @memberof Internal
 	 */
-	static get getUser() { return db.getUser; }
+	static get getUser() { return db.getUser.bind(db); }
 	/**
 	 * get a user from the database (synchronous)
 	 * @readonly
 	 * @static
 	 * @memberof Internal
 	 */
-	static get getUserSync() { return db.getUserSync; }
+	static get getUserSync() { return db.getUserSync.bind(db); }
 	/**
 	 * get a guild from the database
 	 * @readonly
 	 * @static
 	 * @memberof Internal
 	 */
-	static get getGuild() { return db.getGuild; }
+	static get getGuild() { return db.getGuild.bind(db); }
 	/**
 	 * get a guild from the database (synchronous)
 	 * @readonly
 	 * @static
 	 * @memberof Internal
 	 */
-	static get getGuildSync() { return db.getGuildSync; }
+	static get getGuildSync() { return db.getGuildSync.bind(db); }
 }

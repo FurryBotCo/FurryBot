@@ -13,6 +13,10 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 	this.increment([
 		"events.ready"
 	]);
+
+	if (this.firstReady) return Logger.warn("Ready", "Skipping ready event as it has already fired.");
+	this.firstReady = true;
+
 	const srv = await sv(this);
 
 	this.editStatus("online", {

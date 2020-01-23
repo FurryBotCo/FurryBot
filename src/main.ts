@@ -35,6 +35,7 @@ export default class FurryBot extends Eris.Client {
 	errorHandler: ErrorHandler;
 	ddog: StatsD;
 	cmd: CommandHolder;
+	firstReady: boolean;
 	stats: {
 		messageCount: number;
 		dmMessageCount: number;
@@ -77,6 +78,7 @@ export default class FurryBot extends Eris.Client {
 		this.ddog = new StatsD(config.apis.ddog);
 		this.cmd = new CommandHolder(this);
 		this.channelTyping = new Map();
+		this.firstReady = false;
 
 		process
 			.on("unhandledRejection", (reason, promise) =>

@@ -2,7 +2,7 @@ import ClientEvent from "../util/ClientEvent";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 
-export default new ClientEvent("presenceUpdate", (async function (this: FurryBot, other: Eris.Member | Eris.Relationship, oldPresence?: Eris.OldPresence) {
+export default new ClientEvent("presenceUpdate", (async function (this: FurryBot, other: Eris.Member | Eris.Relationship, oldPresence?: Eris.Presence) {
 	// @TODO we can do this later
 	return;
 	/*if (!this || !other || !oldPresence) return;

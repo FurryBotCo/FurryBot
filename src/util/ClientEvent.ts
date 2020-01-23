@@ -100,7 +100,7 @@ class ClientEvent {
 	);
 	constructor(
 		event: "presenceUpdate",
-		listener: (this: FurryBot, other: Eris.Member | Eris.Relationship, oldPresence?: Eris.OldPresence) => void
+		listener: (this: FurryBot, other: Eris.Member | Eris.Relationship, oldPresence?: Eris.Presence) => void
 	);
 	constructor(
 		event: "rawWS" | "unknown",

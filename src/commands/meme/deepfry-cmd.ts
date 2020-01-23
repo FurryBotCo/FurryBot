@@ -11,8 +11,8 @@ export default new Command({
 	botPermissions: [
 		"attachFiles"
 	],
-	cooldown: 5e3,
-	donatorCooldown: 2.5e3,
+	cooldown: 2.5e3,
+	donatorCooldown: 2e3,
 	description: "Deep fry that image",
 	usage: "[image/@user]",
 	features: [],

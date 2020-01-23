@@ -13,7 +13,7 @@ export default new ClientEvent("shardDisconnect", (async function (this: FurryBo
 				title: "Shard Disconnect",
 				description: `Shard #${id} disconnected.`,
 				timestamp: new Date().toISOString(),
-				color: Colors.green
+				color: Colors.red
 			}
 		],
 		username: `Furry Bot${config.beta ? " - Beta" : ""} Status`,

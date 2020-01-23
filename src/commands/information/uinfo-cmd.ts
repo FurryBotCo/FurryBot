@@ -3,6 +3,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import { Time, Internal } from "../../util/Functions";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
@@ -35,10 +36,16 @@ export default new Command({
 			`\u25FD Server Join Date: ${Time.formatDateWithPadding(user.joinedAt, true)}`,
 			`\u25FD Account Creation Date: ${Time.formatDateWithPadding(user.createdAt, true)}`,
 			`\u25FD Roles [${roles.length}]: ${roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.settings.prefix}roles ${user.user.id}\`` : roles.length === 0 ? "NONE" : roles.toString()}`
-		].join("\n")
+		].join("\n"),
+		thumbnail: {
+			url: user.avatarURL
+		},
+		timestamp: new Date().toISOString(),
+		color: Colors.gold
 	};
 
-	if (!user.user.bot) {
+	// @FIXME fix this eventually
+	/*if (!user.user.bot) {
 		const u = await Internal.getUser(user.id);
 
 		if (u.marriage.married) embed.fields.push({
@@ -56,7 +63,8 @@ export default new Command({
 		name: "Marriage Status (on this bot)",
 		value: "Bots cannot be married.",
 		inline: false
-	});
+	});*/
+
 	return msg.channel.createMessage({
 		embed
 	});

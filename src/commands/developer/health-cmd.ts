@@ -31,7 +31,7 @@ export default new Command({
 			flag: "🇪🇺"
 		},
 		{
-			host: "se.ping-test.furry.bot",
+			host: "sa.ping-test.furry.bot",
 			flag: "🇧🇷"
 		},
 		{
@@ -45,8 +45,9 @@ export default new Command({
 			method: "GET",
 			url: `https://${p.host}/ping/164.68.110.213`,
 			parse: "json"
-		});
+		}).catch(err => null);
 
+		if (!k) return `${p.flag} **Failed**`;
 		return `${p.flag} **${k.body.data.time}ms**`;
 	}));
 	return msg.channel.createMessage({

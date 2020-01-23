@@ -55,8 +55,6 @@ export default new Command({
 	const rl = setInterval(() => ratelimit = false, 3e3);
 
 	if (["jpg", "png", "gif"].includes(e[currentPost - 1].file_ext)) embed.image = {
-		width: e[currentPost - 1].width,
-		height: e[currentPost - 1].height,
 		url: e[currentPost - 1].file_url
 	};
 	else if (e[currentPost - 1].file_ext === "swf") embed.description = `This post is a flash animation, please directly view [the post](https://e926.net/post/show/${e[currentPost - 1].id}) on e926`;
@@ -134,8 +132,6 @@ export default new Command({
 		};
 
 		if (["jpg", "png", "gif"].includes(e[currentPost - 1].file_ext)) embed.image = {
-			width: e[currentPost - 1].width,
-			height: e[currentPost - 1].height,
 			url: e[currentPost - 1].file_url
 		};
 		else if (e[currentPost - 1].file_ext === "swf") embed.description = `This post is a flash animation, please directly view [the post](https://e926.net/post/show/${e[currentPost - 1].id}) on e926`;

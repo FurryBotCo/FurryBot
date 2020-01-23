@@ -11,8 +11,8 @@ export default new Command({
 	botPermissions: [
 		"attachFiles"
 	],
-	cooldown: 5e3,
-	donatorCooldown: 2.5e3,
+	cooldown: 2.5e3,
+	donatorCooldown: 2e3,
 	description: "This is big brain time",
 	usage: "<text>",
 	features: [],

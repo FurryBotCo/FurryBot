@@ -37,8 +37,9 @@ export default new Command({
 	});
 
 	const a = msg.dashedArgs;
-	let ch: Eris.GuildChannel;
-	if (msg.args.length > 0) ch = await msg.getChannelFromArgs();
+	// add store channel when eris fixes their stuff
+	let ch: Eris.TextChannel | Eris.NewsChannel | Eris.VoiceChannel;
+	if (msg.args.length > 0) ch = await msg.getChannelFromArgs<typeof ch>();
 	else ch = msg.channel;
 
 	if (!ch) ch = msg.channel;

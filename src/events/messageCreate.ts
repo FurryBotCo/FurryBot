@@ -29,12 +29,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		if (!message || !message.author || message.author.bot) return;
 
-		// @FIXME
-		if (config.beta && (message.channel as any).guild.id !== config.bot.mainGuild) return;
-		// if (config.beta && !config.developers.includes(message.author.id)) return;
+		if (config.beta && !config.developers.includes(message.author.id)) return;
 		t.start("messageProcess");
-		msg = new ExtendedMessage(message, this);
-		await msg._load();
+		msg = await new ExtendedMessage(message, this)._load();
 		t.end("messageProcess");
 
 		t.start("blacklist");
