@@ -18,7 +18,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	let avatar = msg.author.avatarURL,
 		username = msg.author.username;
 	if (msg.mentions.length > 0 && msg.args[0].match(new RegExp(`<@!?${msg.mentions[0].id}>`))) {

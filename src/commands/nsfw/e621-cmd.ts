@@ -22,7 +22,7 @@ export default new Command({
 	features: ["nsfw"],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	if (this.activeReactChannels.includes(msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active paginated command in this channel. Please either wait for that one to time out, or say **stop** to stop it.");
 
 	const tags = msg.args.map(a => a.replace(/,\|/g, ""));

@@ -20,7 +20,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	let list;
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 	// get user from message

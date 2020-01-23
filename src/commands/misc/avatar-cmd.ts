@@ -19,7 +19,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	let user: Eris.User;
 	if (msg.args.length < 1) user = msg.author;
 	else user = await msg.getUserFromArgs();

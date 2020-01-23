@@ -23,7 +23,7 @@ export default new Command({
 	features: ["nsfw"],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	const img = await phin({
 		method: "GET",
 		url: "https://api.fursuitbutts.com/butts",

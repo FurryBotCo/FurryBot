@@ -24,12 +24,12 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	let req, j;
 	try {
 		req = await phin({
 			method: "GET",
-			url: "https://api.chewey-bot.ga/snake",
+			url: "https://api.chewey-bot.top/snake",
 			headers: {
 				"User-Agent": config.web.userAgent,
 				"Authorization": config.apis.chewyBot.key

@@ -18,8 +18,8 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	const a = msg.args.shift();
 	msg.args = ["https://i.furry.bot/furry.png"];
 	return GenericMemeCommand.handleImage(this, msg, cmd.triggers[0], { avatars: [a || msg.author.avatarURL] });

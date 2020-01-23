@@ -18,7 +18,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	const img = await Request.imageAPIRequest(false, "fursuit", true, true);
 	if (img.success !== true) return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
 	const short = await Utility.shortenURL(img.response.image);

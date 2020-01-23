@@ -18,7 +18,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	let a = "https://i.furry.bot/furry.png";
 	if (msg.args.length === 0) {
 		a = msg.author.avatarURL;

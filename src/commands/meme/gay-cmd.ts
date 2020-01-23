@@ -19,6 +19,6 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	return GenericMemeCommand.handleImage(this, msg, cmd.triggers[0]);
 }));

@@ -18,7 +18,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	// need to fix this to make the default avatars user/bot
 	return GenericMemeCommand.handleImage(this, msg, cmd.triggers[0]);
 }));

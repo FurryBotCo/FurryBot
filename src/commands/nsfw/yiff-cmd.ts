@@ -22,7 +22,7 @@ export default new Command({
 	features: ["nsfw"],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	let type, content = "";
 	if (msg.args.length === 0) {
 		for (const ytype of config.yiff.types) {

@@ -17,7 +17,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	if (msg.args.length < 1 || msg.args.join(" ").length === 0) return msg.reply("please provide something to suggest.");
 	const m = await this.executeWebhook(config.webhooks.suggestion.id, config.webhooks.suggestion.token, {
 		embeds: [

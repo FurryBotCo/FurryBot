@@ -3,12 +3,13 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
+import phin from "phin";
 import { Request } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
-		"bird",
-		"bird"
+		"otter",
+		"waterdog"
 	],
 	userPermissions: [],
 	botPermissions: [
@@ -16,21 +17,32 @@ export default new Command({
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Get a picture of a birb!",
+	description: "Get a picture of an otter!",
 	usage: "",
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	// await msg.channel.startTyping();
-	const img = await Request.imageAPIRequest(true, "birb");
-	if (img.success === false) return msg.reply(`Image API returned an error: ${img.error.description}`);
+	let req, j;
 	try {
+		req = await phin({
+			method: "GET",
+			url: "https://api.chewey-bot.top/otter",
+			headers: {
+				"User-Agent": config.web.userAgent,
+				"Authorization": config.apis.chewyBot.key
+			},
+			timeout: 5e3
+		});
+		j = JSON.parse(req.body);
+
 		return msg.channel.createMessage("", {
-			file: await Request.getImageFromURL(img.response.image),
-			name: img.response.name
+			file: await Request.getImageFromURL(j.data),
+			name: j.data.split("/").reverse()[0]
 		});
 	} catch (e) {
 		Logger.error(`Shard #${msg.channel.guild.shard.id}`, e);
+		Logger.error(`Shard #${msg.channel.guild.shard.id}`, j);
 		return msg.channel.createMessage("unknown api error", {
 			file: await Request.getImageFromURL(config.images.serverError),
 			name: "error.png"
