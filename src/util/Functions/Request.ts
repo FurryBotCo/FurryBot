@@ -44,25 +44,15 @@ export default class Request {
 			}
 		}
 	)> {
-		return new Promise(async (resolve, reject) => {
-			let s;
-			if ([undefined, null].includes(json)) json = true;
-
-			try {
-				s = await phin({
-					method: "GET",
-					url: `https://api.furry.bot/${animal ? "animals" : `furry/${safe ? "sfw" : "nsfw"}`}/${category ? category.toLowerCase() : safe ? "hug" : "bulge"}${json ? "" : "/image"}`.replace(/\s/g, ""),
-					parse: "json",
-					timeout: 5e3
-				});
-				resolve(s.body);
-			} catch (error) {
-				reject({
-					error,
-					response: s.body
-				});
-			}
+		if ([undefined, null].includes(json)) json = true;
+		const s = await phin({
+			method: "GET",
+			url: `https://api.furry.bot/${animal ? "animals" : `furry/${safe ? "sfw" : "nsfw"}`}/${category ? category.toLowerCase() : safe ? "hug" : "bulge"}${json ? "" : "/image"}`.replace(/\s/g, ""),
+			parse: "json",
+			timeout: 5e3
 		});
+
+		return s.body;
 	}
 
 	/**
