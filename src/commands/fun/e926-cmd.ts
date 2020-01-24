@@ -35,7 +35,7 @@ export default new Command({
 	if (!tags.some(t => t.match(new RegExp("order:(((score|tagcount|desclength|comments|mpixels|filesize|set)(_asc|_desc)?)|(id|landscape|portrait))", "gi")))) tags.push("order:score");
 	const e = await this.e9.listPosts(tags, 50, 1, null, config.tagBlacklist).then(res => res.filter(p => p.rating === "s"));
 
-	if (e.length === 0) return msg.reply("Your search returned no results.");
+	if (e.length === 0) return msg.reply("your search returned no results.");
 
 	let currentPost = 1;
 
@@ -96,7 +96,7 @@ export default new Command({
 				break;
 
 			default:
-				return;
+				return f();
 		}
 
 		if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) await d.delete().catch(err => null);
@@ -107,7 +107,7 @@ export default new Command({
 	async function setPost(this: FurryBot, p: "EXIT");
 	async function setPost(this: FurryBot, p: number);
 	async function setPost(this: FurryBot, p: string | number) {
-		if (ratelimit && !config.developers.includes(msg.author.id)) return msg.reply("You are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(err => null), 5e3)).catch(err => null);
+		if (ratelimit && !config.developers.includes(msg.author.id)) return msg.reply("you are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(err => null), 5e3)).catch(err => null);
 		ratelimit = true;
 
 		if (p === "EXIT") {
