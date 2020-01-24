@@ -452,7 +452,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (msg.cmd.cat.name !== "dev") await mdb.collection("timing").insertOne({ times: t.timers, cmd: cmd.triggers[0], id: uuid() });
 	} catch (e) {
 		const err: Error = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
-		if (!["ERR_INVALID_USAGE", "RETURN"].includes(err.message)) Logger.error(`Shard #${msg.channel.guild.shard.id}`, err);
+		if (!["ERR_INVALID_USAGE", "RETURN"].includes(err.message)) {
+			Logger.error(msg && msg.channel && msg.channel.guild && msg.channel.guild.shard ? `Shard #${msg.channel.guild.shard.id}` : "Error", err);
+			if (!msg || !msg.channel || !msg.channel.guild || !msg.channel.guild.shard) return;
+		}
 		const cmd = msg.cmd !== null ? msg.cmd.cmd : null;
 		if (!cmd) return;
 		switch (err.message) {
