@@ -1,4 +1,4 @@
-
+import { Time as T } from "./TypeDefs";
 
 export default class Time {
 	private constructor() {
@@ -37,191 +37,46 @@ export default class Time {
 	}
 
 	/**
-	 *
+	 * Conver milliseconds into readable time
 	 * @static
-	 * @param {(number | {
-	 * 		ms?: number;
-	 * 		s?: number;
-	 * 		m?: number;
-	 * 		h?: number;
-	 * 		d?: number;
-	 * 		w?: number;
-	 * 		mn?: number;
-	 * 		y?: number;
-	 * 	})} data
+	 * @param {number} time
 	 * @param {boolean} [words]
 	 * @returns {(Promise<string | T.MsResponse>)}
 	 * @memberof Time
 	 */
-	static async ms(data: number | {
-		ms?: number;
-		s?: number;
-		m?: number;
-		h?: number;
-		d?: number;
-		w?: number;
-		mn?: number;
-		y?: number;
-	}, words?: boolean): Promise<string | {
-		ms: number;
-		s: number;
-		m: number;
-		h: number;
-		d: number;
-		w: number;
-		mn: number;
-		y: number;
-	}> {
-		if (typeof data === "number") {
-			if (data === 0) {
-				if (words) return "0 seconds";
-				else return {
-					ms: 0,
-					s: 0,
-					m: 0,
-					h: 0,
-					d: 0,
-					w: 0,
-					mn: 0,
-					y: 0
-				};
-			} else if (data < 1000) {
-				if (words) return `${data} milliseconds`;
-				else return {
-					ms: data,
-					s: 0,
-					m: 0,
-					h: 0,
-					d: 0,
-					w: 0,
-					mn: 0,
-					y: 0
-				};
-			}
-		} else {
-			if (data.ms < 1000 && (Object.keys(data).map(k => data[k]).reduce((a, b) => a + b) - data.ms) === 0) {
-				if (words) return `${data.ms} milliseconds`;
-				else return {
-					ms: data.ms,
-					s: 0,
-					m: 0,
-					h: 0,
-					d: 0,
-					w: 0,
-					mn: 0,
-					y: 0
-				};
-			}
-		}
+	static ms(time: number, words: true): string;
+	static ms(time: number, words: false): T.MsResponse;
+	static ms(time: number, words = false): string | T.MsResponse {
+		if (time === 0) return words ? "0 seconds" : "0s";
+		const r = {
+			s: 0,
+			m: 0,
+			h: 0,
+			d: 0,
+			w: 0,
+			mn: 0,
+			y: 0
+		};
 
-		const t = await new Promise((a, b) => {
-			const t = {
-				ms: 0,
-				s: 0,
-				m: 0,
-				h: 0,
-				d: 0,
-				w: 0,
-				mn: 0,
-				y: 0
-			};
+		while (time >= 1e3) { r.s++; time -= 1e3; }
+		while (r.s >= 60) { r.m++; r.s -= 60; }
+		while (r.m >= 60) { r.h++; r.m -= 60; }
+		while (r.h >= 24) { r.d++; r.h -= 24; }
+		while (r.d >= 7) { r.w++; r.d -= 7; }
+		while (r.w >= 4) { r.mn++; r.w -= 4; }
+		while (r.mn >= 12) { r.y++; r.mn -= 12; }
+		if (time > 0) r.s += time / 1000;
 
+		const str = [];
+		if (r.s > 0) str.push(`${r.s} second${r.s === 1 ? "" : "s"}`);
+		if (r.m > 0) str.push(`${r.m} minute${r.m === 1 ? "" : "s"}`);
+		if (r.h > 0) str.push(`${r.h} hour${r.h === 1 ? "" : "s"}`);
+		if (r.d > 0) str.push(`${r.d} day${r.d === 1 ? "" : "s"}`);
+		if (r.w > 0) str.push(`${r.w} week${r.w === 1 ? "" : "s"}`);
+		if (r.mn > 0) str.push(`${r.mn} month${r.mn === 1 ? "" : "s"}`);
+		if (r.y > 0) str.push(`${r.y} year${r.y === 1 ? "" : "s"}`);
 
-			const k = setTimeout(b, 3e4, new Error("ERR_TIMEOUT_REACHED"));
-
-			if (typeof data === "number") t.ms = data;
-			else if (typeof data !== "object") throw new Error("invalid input");
-			else {
-				if (data.ms) t.ms = data.ms;
-				if (data.s) t.s = data.s;
-				if (data.m) t.m = data.m;
-				if (data.h) t.h = data.h;
-				if (data.d) t.d = data.d;
-				if (data.w) t.w = data.w;
-				if (data.m) t.mn = data.mn;
-				if (data.y) t.y = data.y;
-			}
-
-			const shorten = (() => {
-				if (t.ms >= 1000) {
-					t.ms -= 1000;
-					t.s += 1;
-				}
-
-				if (t.s >= 60) {
-					t.s -= 60;
-					t.m += 1;
-				}
-
-				if (t.m >= 60) {
-					t.m -= 60;
-					t.h += 1;
-				}
-
-				if (t.h >= 24) {
-					t.h -= 24;
-					t.d += 1;
-				}
-
-				if (t.d >= 30) {
-					t.d -= 30;
-					t.mn += 1;
-				}
-
-				if ((t.mn * 30) + t.d >= 365) {
-					t.d = ((t.mn * 30) + t.d) - 365;
-					t.mn -= 12;
-					t.y += 1;
-				}
-			});
-
-			const c = () => (t.ms >= 1000) || (t.s >= 60) || (t.m >= 60) || (t.h >= 24) || (t.d >= 30) || (t.w >= 4) || (t.mn >= 12);
-			const d = () => t.d >= 7;
-			while (c()) {
-				shorten();
-				if (!c()) {
-					if (!d()) {
-						clearTimeout(k);
-						return a(t);
-					}
-
-					while (d()) {
-						t.d -= 7;
-						t.w += 1;
-						if (!d()) {
-							clearTimeout(k);
-							return a(t);
-						}
-					}
-				}
-			}
-		});
-
-		if (!words) return t as any;
-		else {
-			const full = {
-				ms: "millisecond",
-				s: "second",
-				m: "minute",
-				h: "hour",
-				d: "day",
-				w: "week",
-				mn: "month",
-				y: "year"
-			};
-
-			const j = {};
-
-			Object.keys(t).forEach((k) => {
-				if (t[k] !== 0) j[k] = t[k];
-			});
-
-			if (Object.keys(j).length < 1) return {} as any;
-
-			const useFull = Object.keys(j).length < 4;
-
-			return Object.keys(j).reverse().map((k, i, a) => `${i === a.length - 1 && a.length !== 1 ? "and " : ""}${j[k]}${useFull ? ` ${full[k]}${j[k] > 1 ? "s" : ""}` : k}`).join(", ").trim();
-		}
+		return words ? str.join(", ") : Object.keys(r).filter(k => r[k] > 0).map(k => `${r[k]}${k}`).reduce((a, b) => a + b, "");
 	}
 
 	/**
