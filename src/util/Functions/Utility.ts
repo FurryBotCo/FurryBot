@@ -298,4 +298,31 @@ export default class Utility {
 			}
 		};
 	}
+
+	static toStringFormat<T>(d: T) {
+		function format(obj: T, props: string[]) {
+			const str: [string, string][] = [] as any;
+			for (const p of props) {
+				if (obj[p] instanceof Object) {
+					let f = false;
+					for (const o of config.toStringFormatNames) {
+						if (o.test(obj[p])) {
+							f = true;
+							str.push([p, format(obj[p], o.props)]);
+						} else continue;
+					}
+					if (!f) str.push([p, obj[p].toString()]);
+				} else str.push([p, obj[p]]);
+			}
+
+			return `<${obj.constructor.name}${str.reduce((a, b) => typeof b[1] === "string" && ["<"].some(j => !b[1].startsWith(j)) ? `${a} ${b[0]}="${b[1]}"` : `${a} ${b[0]}=${b[1]}`, "")}>`;
+		}
+
+		for (const o of config.toStringFormatNames) {
+			if (o.test(d)) return format(d, o.props);
+			else continue;
+		}
+
+		return d.toString();
+	}
 }
