@@ -29,10 +29,11 @@ export default new Command({
 	let color;
 	if (msg.channel.guild.members.has(user.id)) {
 		const member = msg.channel.guild.members.get(user.id);
-		const r = member.roles.map(r => msg.channel.guild.roles.get(r)).filter(r => r.color !== 0);
+		const r = member.roles.map(r => msg.channel.guild.roles.get(r)).filter(r => !!r && r.color !== 0);
 		const role = r[r.length - 1];
-		if (role.color) color = role.color;
+		if (role && role.color) color = role.color;
 	}
+
 	if ([undefined, null].includes(color)) color = Math.floor(Math.random() * 0xFFFFFF);
 
 	const embed: Eris.EmbedOptions = {
@@ -46,9 +47,9 @@ export default new Command({
 		},
 		footer: {
 			text: `${user.username}#${user.discriminator}`,
-			icon_url: user.avatarURL
+			icon_url: `${msg.author.avatarURL.split("?")[0]}?size=1024`
 		},
-		description: `[Link](${user.avatarURL})`,
+		description: `[Link](${msg.author.avatarURL.split("?")[0]}?size=1024)`,
 		color
 	};
 
