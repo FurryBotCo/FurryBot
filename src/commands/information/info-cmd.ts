@@ -46,9 +46,10 @@ export default new Command({
 		libraryVersion: Eris.VERSION,
 		apiVersion: Eris.Constants.REST_VERSION,
 		gatewayVersion: Eris.Constants.GATEWAY_VERSION,
-		botVersion: config.version,
+		version: config.version,
 		nodeVersion: process.version,
-		supportServer: `[${config.bot.supportInvite}](${config.bot.supportInvite})`
+		supportServer: `[${config.bot.supportInvite}](${config.bot.supportInvite})`,
+		donate: `[${config.bot.patreon}](${config.bot.patreon})`
 	};
 
 	if (msg.args.length > 0) {
@@ -92,9 +93,10 @@ export default new Command({
 			`\u25FD Library Version: ${info.libraryVersion}`,
 			`\u25FD API Version: ${info.apiVersion}`,
 			`\u25FD Gateway Version: ${info.gatewayVersion}`,
-			`\u25FD Bot Version: ${info.botVersion}`,
+			`\u25FD Bot Version: ${info.version}`,
 			`\u25FD Node Version: ${info.nodeVersion}`,
-			`\u25FD Support Server: ${info.supportServer}`
+			`\u25FD Support Server: ${info.supportServer}`,
+			`\u25FD Donate: ${info.donate}`
 		].join("\n"),
 		timestamp: new Date().toISOString(),
 		author: {
