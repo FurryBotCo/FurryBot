@@ -18,8 +18,20 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
 
-	msg.channel.createMessage(Strings.formatStr(Strings.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" ")), {
-		file: await Request.getImageFromURL("https://assets.furry.bot/huff.gif"),
-		name: "huff.gif"
-	});
+	return msg
+		.channel
+		.createMessage({
+			embed: {
+				description: Strings.formatStr(Strings.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" ")),
+				image: {
+					url: "https://assets.furry.bot/huff.gif"
+				},
+				author: {
+					name: msg.author.tag,
+					icon_url: msg.author.avatarURL
+				},
+				timestamp: new Date().toISOString(),
+				color: Math.floor(Math.random() * 0xFFFFFF)
+			}
+		});
 }));

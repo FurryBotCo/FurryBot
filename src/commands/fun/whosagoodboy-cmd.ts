@@ -18,6 +18,15 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	if (msg.args.length === 0) return msg.channel.createMessage("Yip! Yip! I am!");
-	else return msg.channel.createMessage(`Yip! Yip! ${msg.args.join(" ")} is!`);
+	return msg.channel.createMessage({
+		embed: {
+			description: msg.args.length === 0 ? "Yip! Yip! I am!" : `Yip! Yip! ${msg.args.join(" ")} is!`,
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			timestamp: new Date().toISOString(),
+			color: Math.floor(Math.random() * 0xFFFFFF)
+		}
+	});
 }));

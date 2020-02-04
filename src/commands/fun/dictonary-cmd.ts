@@ -20,5 +20,15 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
 
-	msg.channel.createMessage(Strings.formatStr(Strings.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" ")));
+	msg.channel.createMessage({
+		embed: {
+			description: Strings.formatStr(Strings.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" ")),
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			timestamp: new Date().toISOString(),
+			color: Math.floor(Math.random() * 0xFFFFFF)
+		}
+	});
 }));

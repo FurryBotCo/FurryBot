@@ -9,7 +9,9 @@ export default new Command({
 		"howl"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"externalEmojis"
+	],
 	cooldown: 5e3,
 	donatorCooldown: 2.5e3,
 	description: "Start a howl, or join in!",
@@ -17,7 +19,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	if (msg.channel.awoo !== undefined && msg.channel.awoo.active) {
+	if (typeof msg.channel.awoo !== "undefined" && msg.channel.awoo.active) {
 		if (msg.channel.awoo.inAwoo.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this howl!`);
 		clearTimeout(msg.channel.awoo.timeout);
 		msg.channel.awoo.inAwoo.push(msg.author.id);

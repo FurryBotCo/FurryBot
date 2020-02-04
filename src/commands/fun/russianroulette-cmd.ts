@@ -20,6 +20,6 @@ export default new Command({
 	const val = Math.floor(Math.random() * 6);
 	const bullets = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 3;
 
-	if (val <= bullets - 1) return msg.channel.createMessage(`<@!${msg.author.id}>, You died!`);
-	return msg.channel.createMessage(`<@!${msg.author.id}>, You lived!`);
+	return msg
+		.reply(val <= bullets - 1 ? "you died!" : "you lived!");
 }));

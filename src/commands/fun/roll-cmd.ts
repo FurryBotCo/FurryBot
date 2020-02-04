@@ -20,5 +20,5 @@ export default new Command({
 
 	if (min > max) return msg.reply("the minimum must be less than the maximum.");
 
-	return msg.channel.createMessage(`<@!${msg.author.id}>, you rolled a ${Math.floor(Math.random() * (max - min)) + min}!`);
+	return msg.reply(`you rolled a ${Math.floor(Math.random() * (max - min)) + min}!`);
 }));

@@ -9,7 +9,7 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [
-		"attachFiles"
+		"embedLinks"
 	],
 	cooldown: 2e3,
 	donatorCooldown: 1e3,
@@ -18,9 +18,20 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
-	return msg.channel.createMessage(Strings.formatStr(Strings.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" ")), {
-		file: await Request.getImageFromURL("https://assets.furry.bot/pounce.gif"),
-		name: "pounce.gif"
+	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
+
+	return msg.channel.createMessage({
+		embed: {
+			description: Strings.formatStr(Strings.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" ")),
+			image: {
+				url: "https://assets.furry.bot/pounce.gif"
+			},
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			timestamp: new Date().toISOString(),
+			color: Math.floor(Math.random() * 0xFFFFFF)
+		}
 	});
 }));

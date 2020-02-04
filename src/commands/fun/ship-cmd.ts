@@ -26,9 +26,9 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 
 	let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1;
-	if (Object.keys(msg.dashedArgs.keyValue).includes("percent")) {
+	if (Object.keys(msg.dashedArgs.parsed.keyValue).includes("percent")) {
 		if (!config.developers.includes(msg.author.id)) return msg.reply("this option, `percent` is developer only.");
-		amount = Number(msg.dashedArgs.keyValue.percent);
+		amount = Number(msg.dashedArgs.parsed.keyValue.percent);
 		msg.args = msg.args.filter(a => a !== `--percent=${amount}`);
 	}
 
