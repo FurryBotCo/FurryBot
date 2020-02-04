@@ -3,6 +3,12 @@ import { mdb, db } from "../../modules/Database";
 import { Blacklist } from "../@types/Misc";
 import * as os from "os";
 import FurryBot from "@FurryBot";
+import loopPatrons from "../patreon/loopPatrons";
+import refreshPatreonToken from "../patreon/refreshPatreonToken";
+import GuildConfig from "../../modules/config/GuildConfig";
+import Eris from "eris";
+import { Request, Utility, Time, Strings } from ".";
+import Logger from "../LoggerV8";
 
 export default class Internal {
 	private constructor() {
@@ -233,4 +239,66 @@ export default class Internal {
 	 * @memberof Internal
 	 */
 	static get getGuildSync() { return db.getGuildSync.bind(db); }
+
+	static get loopPatrons() { return loopPatrons; }
+	static get refreshPatreonToken() { return refreshPatreonToken; }
+
+	/**
+	 * Run auto content systems
+	 * @static
+	 * @param {number} time
+	 * @param {FurryBot} client
+	 * @memberof Internal
+	 */
+	static async runAuto(time: number, client: FurryBot) {
+		const guilds = await mdb
+			.collection("guilds")
+			.find<GuildConfig>({})
+			.toArray()
+			.then(g =>
+				g.filter(k => k.auto && k.auto.length > 0)
+			);
+
+		const counter = {
+			gay: 0,
+			straight: 0,
+			lesbian: 0,
+			dickgirl: 0
+		};
+		for (const g of guilds) for (const w of g.auto.filter(a => a.time === (time / 6e4))) {
+			switch (w.type.toLowerCase() as typeof w.type) {
+				case "yiff": {
+					const img = await Request.imageAPIRequest(false, `yiff/${w.cat}`, true, false);
+					const embed: Eris.EmbedOptions = {
+						title: "Auto Yiff",
+						color: Math.floor(Math.random() * 0xFFFFFF),
+						timestamp: new Date().toISOString(),
+						footer: {
+							text: `Disable this using "${g.settings.prefix}auto yiff disable ${w.cat}" (without quotes)`
+						}
+					};
+					if (img.success !== true) embed.description = `API Error encountered while fetching image.\nCode: ${img.error.code} \nDescription: \`${img.error.description}\`\nReport this to my [support server](${config.bot.supportInvite})`;
+					else {
+						const short = await Utility.shortenURL(img.response.image);
+						embed.description = `Type: ${w.cat}\nShort URL: ${short.link}`;
+						embed.image = {
+							url: img.response.image
+						};
+					}
+
+					await client.executeWebhook(w.webhook.id, w.webhook.token, {
+						embeds: [
+							embed
+						]
+					}).then(() => counter[w.cat]++);
+					break;
+				}
+
+				default:
+					Logger.error("Auto", `unknown type "${w.type.toLowerCase()}"`);
+			}
+		}
+
+		Logger.debug("Auto", `${time / 6e4}m Processed\nTotal Ran:\n${Object.keys(counter).map(k => `${Strings.ucwords(k)}: ${counter[k]}`).join("\n")}`);
+	}
 }
