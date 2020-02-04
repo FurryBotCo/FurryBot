@@ -30,23 +30,16 @@ export default new Command({
 	features: ["devOnly"],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	let silent = false;
+	const
+		silent = msg.dashedArgs.unparsed.value.includes("s"),
+		deleteInvoke = msg.dashedArgs.unparsed.value.includes("d");
 	let error = false;
-	let deleteInvoke = false;
-	let ev = msg.unparsedArgs.join(" ");
-	if (ev.indexOf("-s") !== -1) {
-		silent = true;
-		ev = ev.replace("-s", "");
-	}
-	if (ev.indexOf("-d") !== -1) {
-		deleteInvoke = true;
-		ev = ev.replace("-d", "");
-	}
+
 	const start = performance.now();
 	let res, o;
 	try {
 		// an external functions is used because typescript screws with the context and the variables
-		res = await _eval.call(this, ev, {
+		res = await _eval.call(this, msg.unparsedArgs.join(" "), {
 			config,
 			msg,
 			phin,
@@ -121,7 +114,7 @@ export default new Command({
 				fields: [
 					{
 						name: ":inbox_tray: Input",
-						value: `\`\`\`js\n${ev}\`\`\``,
+						value: `\`\`\`js\n${msg.unparsedArgs.join(" ")}\`\`\``,
 						inline: false
 					},
 					{
