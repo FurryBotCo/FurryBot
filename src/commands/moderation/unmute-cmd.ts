@@ -3,6 +3,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import { Utility } from "../../util/Functions";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
@@ -93,11 +94,37 @@ export default new Command({
 		return msg.channel.createMessage({ embed });
 	}
 
-	user.removeRole(msg.gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(() =>
-		// msg.gConfig.modlog.add({ blame: this.bot.user.id, action: "unmute", userId: user.id, reason, timestamp: Date.now() }).then(() =>
-		msg.channel.createMessage(`***User ${user.username}#${user.discriminator} was unmuted, ${reason}***`).catch(noerr => null)
-		// )
-	).catch(async (err) => {
+	user.removeRole(msg.gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+		await msg.channel.createMessage(`***User ${user.username}#${user.discriminator} was unmuted, ${reason}***`).catch(noerr => null);
+		if (!!msg.gConfig.settings.modlog) {
+			if (!msg.channel.guild.channels.has(msg.gConfig.settings.modlog)) await msg.reply(`failed to create mod log entry, as I could not find the mod log channel.`);
+			else {
+				const ch = msg.channel.guild.channels.get(msg.gConfig.settings.modlog) as Eris.GuildTextableChannel;
+				if (!ch.permissionsOf(this.user.id).has("sendMessages")) await msg.reply(`failed to create mod log entry, as I cannot send messages in the mod log channel.`);
+				else if (!ch.permissionsOf(this.user.id).has("embedLinks")) await msg.reply(`failed to create mod log entry, as I cannot send embeds in the mod log channel.`);
+				else {
+					await ch.createMessage({
+						embed: {
+							title: "Member Unmuted",
+							description: [
+								`Offender: ${user.username}#${user.discriminator} <@!${user.id}>`,
+								`Reason: ${reason}`
+							].join("\n"),
+							timestamp: new Date().toISOString(),
+							color: Colors.red,
+							author: {
+								name: msg.channel.guild.name,
+								icon_url: msg.channel.guild.iconURL
+							},
+							footer: {
+								text: `Action carried out by ${msg.author.tag}`
+							}
+						}
+					});
+				}
+			}
+		}
+	}).catch(async (err) => {
 		msg.channel.createMessage(`I couldn't unmute **${user.username}#${user.discriminator}**, ${err}`);
 		/*if (m !== undefined) {
 			await m.delete();
