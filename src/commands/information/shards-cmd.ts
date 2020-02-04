@@ -29,7 +29,7 @@ export default new Command({
 		color: Colors.gold,
 		timestamp: new Date().toISOString(),
 		footer: {
-			text: `Current Shard: #${msg.channel.guild.shard.id}`
+			text: `Current Shard: #${msg.channel.guild.shard.id} | Total Guilds: ${this.guilds.size}`
 		}
 	};
 
