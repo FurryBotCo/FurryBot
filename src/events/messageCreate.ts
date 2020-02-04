@@ -29,7 +29,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		if (!message || !message.author || message.author.bot) return;
 
-		if (config.beta && !config.developers.includes(message.author.id)) return;
+		if (config.beta && !config.betaAccess.includes(message.author.id)) return;
 		t.start("messageProcess");
 		msg = await new ExtendedMessage(message, this)._load();
 		t.end("messageProcess");
@@ -395,6 +395,38 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 
+		const donator = await msg.uConfig.premiumCheck();
+		if (cmd.features.includes("donatorOnly") && !config.developers.includes(msg.author.id)) {
+			if (!donator.active) return msg.channel.createMessage({
+				embed: {
+					title: "Usage Not Allowed",
+					description: `You must be a donator to use this command.\nYou can donate [here](${config.bot.patreon}).`,
+					color: Colors.red,
+					timestamp: new Date().toISOString(),
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					}
+				}
+			});
+		}
+
+		const premium = await msg.gConfig.premiumCheck();
+		if (cmd.features.includes("premiumGuildOnly") && !config.developers.includes(msg.author.id)) {
+			if (!premium.active) return msg.channel.createMessage({
+				embed: {
+					title: "Usage Not Allowed",
+					description: `This command can only be used in premium servers.\nYou can donate [here](${config.bot.patreon}), and can activate a premium server using \`${msg.gConfig.settings.prefix}pserver add\`.`,
+					color: Colors.red,
+					timestamp: new Date().toISOString(),
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					}
+				}
+			});
+		}
+
 		if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
 			if (cmd.userPermissions.some(perm => !msg.channel.permissionsOf(msg.author.id).has(perm))) {
 				const p = cmd.userPermissions.filter(perm => !msg.channel.permissionsOf(msg.author.id).has(perm));
@@ -431,14 +463,30 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			const cool = this.cmd.cool.checkCooldown(cmd, msg.author.id);
 			const time = cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;
 			if (cool.c && cmd.cooldown !== 0 && cool.time !== 0) {
-				const t = await Time.ms(time, true).then((k: string) => k.split(" ").slice(0, 2).join(" ").replace(",", ""));
-				return msg.reply(`hey, this command is on cooldown! Please wait **${t}**..`).catch(err => null);
+				const t = Time.ms(time, true);
+				const n = Time.ms(cmd.cooldown, true);
+				const d = Time.ms(cmd.donatorCooldown, true);
+				return msg.channel.createMessage({
+					embed: {
+						title: "Command On Cooldown",
+						color: Colors.red,
+						description: [
+							`Please wait **${t}** before trying to use this command again!`,
+							donator.active ? `You are a [donator](${config.bot.patreon}), so you get shorter cooldowns!` : `Normal users have to wait **${n}**, meanwhile [donators](${config.bot.patreon}) only have to wait **${d}**.`
+						].join("\n"),
+						timestamp: new Date().toISOString(),
+						author: {
+							name: msg.author.tag,
+							icon_url: msg.author.avatarURL
+						}
+					}
+				});
 			}
 		}
 
-		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cmd.cool.setCooldown(cmd, null, msg.author.id);
+		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cmd.cool.setCooldown(cmd, donator.active ? cmd.donatorCooldown : cmd.cooldown, msg.author.id);
 
-		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}" ran with the arguments "${msg.args.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}" ran with the arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 
 		t.start("cmd");
 		const c = await cmd.run.call(this, msg, cmd).catch(err => err);
@@ -463,33 +511,15 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				return msg.channel.createMessage({
 					embed: {
 						title: ":x: Invalid Command Usage",
-						fields: [
-							{
-								name: "Command",
-								value: cmd.triggers[0],
-								inline: false
-							},
-							{
-								name: "Usage",
-								value: `\`${msg.gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
-								inline: false
-							},
-							{
-								name: "Description",
-								value: cmd.description || "No Description Found.",
-								inline: false
-							},
-							{
-								name: "Category",
-								value: cmd.category,
-								inline: false
-							},
-							{
-								name: "Arguments",
-								value: msg.args.length < 1 ? "NONE" : msg.args.join(" "),
-								inline: false
-							}
-						],
+						description: [
+							"**Info**:",
+							`\u25FD Command: ${cmd.triggers[0]}`,
+							`\u25FD Usage: \`${msg.gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
+							`\u25FD Description: ${cmd.description || "No Description Found."}`,
+							`\u25FD Category: ${cmd.category}`,
+							`\u25FD Provided Arguments: **${msg.unparsedArgs.length < 1 ? "NONE" : msg.unparsedArgs.join(" ")}**`
+						].join("\n"),
+						timestamp: new Date().toISOString(),
 						color: Colors.red,
 						author: {
 							name: msg.author.tag,
