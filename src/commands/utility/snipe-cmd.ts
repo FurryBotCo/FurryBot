@@ -17,7 +17,7 @@ export default new Command({
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	let ch: Eris.TextChannel;
-	if (msg.args.length > 0) ch = await msg.getChannelFromArgs() as Eris.TextChannel;
+	if (msg.args.length > 0) ch = await msg.getChannelFromArgs();
 
 	if (!ch) ch = msg.channel;
 
@@ -25,6 +25,8 @@ export default new Command({
 
 	if (!s) return msg.reply(`no snipes found for the channel <#${ch.id}>.`);
 
+	const i = s.content.match(new RegExp("((https?:\/\/)?(discord(app\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
+	i.map(k => s.content = s.content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
 	const u = await this.getRESTUser(s.authorId);
 	const embed: Eris.EmbedOptions = {
 		title: "Message Delete Snipe",
