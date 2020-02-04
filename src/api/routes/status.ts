@@ -7,7 +7,7 @@ export default (async (client: FurryBot) => {
 
 	app.get("/", async (req, res) => res.status(200).json({
 		success: true,
-		clientStatus: client.shards.get(0).presence.status
+		clientStatus: !client.shards.has(0) || client.shards.get(0).status !== "ready" ? null : client.shards.get(0).presence.status
 	}));
 
 	return app;
