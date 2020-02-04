@@ -15,5 +15,15 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	return msg.channel.createMessage(`<@!${msg.author.id}> wags their little tail, aren't they cute ^-^`);
+	return msg.channel.createMessage({
+		embed: {
+			description: `<@!${msg.author.id}> wags their little tail, aren't they cute ^-^`,
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			timestamp: new Date().toISOString(),
+			color: Math.floor(Math.random() * 0xFFFFFF)
+		}
+	});
 }));
