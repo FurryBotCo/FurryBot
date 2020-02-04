@@ -27,7 +27,7 @@ export default (async (shards: number[]) => {
 			},
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": config.botLists["discordbots.org"]
+				"Authorization": config.botLists["top.gg"]
 			},
 			timeout: 1e4
 		})
