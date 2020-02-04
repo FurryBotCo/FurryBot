@@ -36,7 +36,7 @@ export default new Command({
 		}
 	});
 
-	const a = msg.dashedArgs;
+	const a = msg.dashedArgs.parsed;
 	// add store channel when eris fixes their stuff
 	let ch: Eris.TextChannel | Eris.NewsChannel | Eris.VoiceChannel;
 	if (msg.args.length > 0) ch = await msg.getChannelFromArgs<typeof ch>();
