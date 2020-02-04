@@ -6,6 +6,7 @@ import { Colors } from "../util/Constants";
 
 export default new ClientEvent("shardReady", (async function (this: FurryBot, id: number) {
 	Logger.log("Shard Ready", `Shard #${id} is ready.`);
+	if (!this.firstReady) this.shards.get(id).editStatus("idle", { name: "Not ready yet..", type: 0 });
 	return this.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
 		embeds: [
 			{
