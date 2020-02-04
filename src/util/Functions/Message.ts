@@ -205,30 +205,39 @@ export default class Message {
 		});
 	}
 
-	static parseDashedArgs(originalArgs: string[]): {
-		keyValue: {
-			[k: string]: string;
-		};
-		value: string[];
-		args: string[];
+	static parseDashedArgs(originalArgs: string[], originalUnparsedArgs?: string[]): {
+		[k in "parsed" | "unparsed"]: {
+			keyValue: {
+				[k: string]: string;
+			};
+			value: string[];
+			args: string[];
+		}
 	} {
-		const keyValue = {};
-		const value = [];
-		const rm = [];
-		const args = [...originalArgs];
+		function d(args: string[]) {
+			const keyValue = {};
+			const value = [];
+			const rm = [];
 
-		args.map((a, i) => a.startsWith("--") ? (() => {
-			const b = a.split("=");
-			if (!b[1]) (value.push(b[0].slice(2)), rm.push(a));
-			else (keyValue[b[0].slice(2)] = b[1], rm.push(a));
-		})() : a.startsWith("-") ? (value.push(a.slice(1)), rm.push(a)) : null);
 
-		rm.map(r => args.splice(args.indexOf(r)));
+			args.map(a => a.startsWith("--") ? (() => {
+				const b = a.split("=");
+				if (!b[1]) (value.push(b[0].slice(2)), rm.push(a));
+				else (keyValue[b[0].slice(2)] = b[1], rm.push(a));
+			})() : a.startsWith("-") ? (value.push(a.slice(1)), rm.push(a)) : null);
+
+			rm.map(r => args.splice(args.indexOf(r)));
+
+			return {
+				keyValue,
+				value,
+				args
+			};
+		}
 
 		return {
-			keyValue,
-			value,
-			args
+			parsed: d([...originalArgs]),
+			unparsed: d(originalUnparsedArgs && originalUnparsedArgs.length > 0 ? [...originalUnparsedArgs] : [...originalArgs])
 		};
 	}
 

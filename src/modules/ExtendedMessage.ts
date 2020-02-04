@@ -180,7 +180,7 @@ class ExtendedMessage extends Eris.Message<ExtendedTextChannel> {
 	get args() { return this._args instanceof Array ? this._args : this._args = F.Message.parseArgs(this.content, this.prefix); }
 	set args(a: string[]) { this._args = a; }
 	get unparsedArgs() { return this.content.slice(this.prefix.length).trim().split(/\s+/).slice(1); }
-	get dashedArgs() { return F.Message.parseDashedArgs(this.args); }
+	get dashedArgs() { return F.Message.parseDashedArgs(this.args, this.unparsedArgs); }
 	get cmd() { return this._cmd ? this._cmd : this._cmd = F.Message.parseCmd(this.content, this.prefix, this.client); }
 	get uConfig() { return this._uConfig; }
 	get gConfig() { return this._gConfig; }
