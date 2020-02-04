@@ -8,6 +8,7 @@ import express from "express";
 import http from "http";
 import { mdb } from "../modules/Database";
 import cmd from "../commands";
+import { Internal } from "../util/Functions";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
 	this.increment([
@@ -109,5 +110,31 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 			});
 		}
 	}, 1e3);
+
+	const
+		go = (async (t: number) => {
+			for (let i = 0; i < (36e5 / t); i++) {
+				setTimeout(() => Internal.runAuto(t, this), t * (i + 1));
+			}
+		}),
+		setupAll = (() => {
+			// 5 minutes
+			go(3e5);
+
+			// 10 minutes
+			go(6e5);
+
+			// 15 minutes
+			go(9e5);
+
+			// 30 minutes
+			go(18e5);
+
+			// 60 minutes
+			go(36e5);
+		});
+
+	setupAll();
+	this._autoyiffLoop = setInterval(setupAll, 36e5);
 	Logger.log("Ready", `Client ready with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds, with ${this.cmd.commands.length} commands.`);
 }));
