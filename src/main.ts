@@ -9,6 +9,7 @@ import { StatsD } from "node-statsd";
 import ErrorHandler from "./util/ErrorHandler";
 import ClientEvent from "./util/ClientEvent";
 import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
+import DeadShardTest from "./util/DeadShardTest";
 
 export default class FurryBot extends Eris.Client {
 	srv: any;
@@ -53,6 +54,8 @@ export default class FurryBot extends Eris.Client {
 		[k: string]: number;
 	};
 	channelTyping: Map<string, NodeJS.Timeout>;
+	_autoyiffLoop: NodeJS.Timeout;
+	shardTest: DeadShardTest;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
 		const client = this; // tslint:disable-line no-this-assignment
@@ -64,6 +67,7 @@ export default class FurryBot extends Eris.Client {
 
 		this.intr = null;
 
+		this._autoyiffLoop = null;
 		this.spamCounter = [];
 		this.responseSpamCounter = [];
 		this.activeReactChannels = [];
@@ -79,6 +83,7 @@ export default class FurryBot extends Eris.Client {
 		this.cmd = new CommandHolder(this);
 		this.channelTyping = new Map();
 		this.firstReady = false;
+		this.shardTest = new DeadShardTest(this);
 
 		process
 			.on("unhandledRejection", (reason, promise) =>
