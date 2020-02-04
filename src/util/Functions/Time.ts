@@ -44,8 +44,8 @@ export default class Time {
 	 * @returns {(Promise<string | T.MsResponse>)}
 	 * @memberof Time
 	 */
-	static ms(time: number, words: true): string;
-	static ms(time: number, words: false): T.MsResponse;
+	static ms(time: number, words?: true): string;
+	static ms(time: number, words?: false): T.MsResponse;
 	static ms(time: number, words = false): string | T.MsResponse {
 		if (time === 0) return words ? "0 seconds" : "0s";
 		const r = {
@@ -76,7 +76,7 @@ export default class Time {
 		if (r.mn > 0) str.push(`${r.mn} month${r.mn === 1 ? "" : "s"}`);
 		if (r.y > 0) str.push(`${r.y} year${r.y === 1 ? "" : "s"}`);
 
-		return words ? str.join(", ") : Object.keys(r).filter(k => r[k] > 0).map(k => `${r[k]}${k}`).reduce((a, b) => a + b, "");
+		return words ? str.reverse().join(", ") : Object.keys(r).filter(k => r[k] > 0).map(k => `${r[k]}${k}`).reverse().reduce((a, b) => a + b, "");
 	}
 
 	/**
