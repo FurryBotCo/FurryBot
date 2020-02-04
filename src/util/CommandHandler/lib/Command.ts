@@ -17,7 +17,7 @@ export default class Command {
 	donatorCooldown: number;
 	description: string;
 	usage: string;
-	features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly" | "supportOnly")[];
+	features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "premiumGuildOnly" | "guildOwnerOnly" | "supportOnly")[];
 	category: string;
 	subCommands: SubCommand[];
 	file: string;
@@ -154,6 +154,38 @@ export default class Command {
 					}
 				}).catch(err => null);
 			}
+		}
+
+		const donator = await msg.uConfig.premiumCheck();
+		if (cmd.features.includes("donatorOnly") && !config.developers.includes(msg.author.id)) {
+			if (!donator.active) return msg.channel.createMessage({
+				embed: {
+					title: "Usage Not Allowed",
+					description: `You must be a donator to use this command.\nYou can donate [here](${config.bot.patreon}).`,
+					color: Colors.red,
+					timestamp: new Date().toISOString(),
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					}
+				}
+			});
+		}
+
+		const premium = await msg.gConfig.premiumCheck();
+		if (cmd.features.includes("premiumGuildOnly") && !config.developers.includes(msg.author.id)) {
+			if (!premium.active) return msg.channel.createMessage({
+				embed: {
+					title: "Usage Not Allowed",
+					description: `This command can only be used in premium servers.\nYou can donate [here](${config.bot.patreon}), and can activate a premium server using \`${msg.gConfig.settings.prefix}pserver add\`.`,
+					color: Colors.red,
+					timestamp: new Date().toISOString(),
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					}
+				}
+			});
 		}
 
 		if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
