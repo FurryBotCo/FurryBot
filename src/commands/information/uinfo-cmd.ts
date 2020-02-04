@@ -28,6 +28,13 @@ export default new Command({
 
 	const roles = user.roles.map(role => role !== msg.channel.guild.id ? `<@&${role}>` : "@everyone");
 
+	// @TODO member number
+	// const members = Array.from(msg.channel.guild.members.values()).sort((a, b) => a.joinedAt < b.joinedAt ? -1 : a.joinedAt > b.joinedAt ? 1 : 0).map(m => m.id);
+	// console.log(members.length);
+	// const pos = members.indexOf(user.id);
+	// const around = members.slice(pos <= 2 ? 0 : pos - 2, pos <= 2 ? 5 : pos + 2);
+	// console.log(around.length);
+	// console.log(pos);
 	const embed: Eris.EmbedOptions = {
 		title: "User info",
 		description: [
