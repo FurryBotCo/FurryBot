@@ -2,8 +2,9 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
-import { Utility } from "../../util/Functions";
+import { Utility, Time } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
+import { mdb } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
@@ -19,25 +20,46 @@ export default new Command({
 	cooldown: 1e3,
 	donatorCooldown: 1e3,
 	description: "Ban members from your server.",
-	usage: "<@member/id> [--days=<0-14>]",
+	usage: "<@member/id> [time] [--days=<0-14>]",
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
-	let m, deleteDays = 0;
+	let m, deleteDays = 0, time = 0;
 	if (Object.keys(msg.dashedArgs.parsed.keyValue).includes("days")) {
 		deleteDays = Number(msg.dashedArgs.parsed.keyValue.days);
+		const a = [...msg.args];
+		a.splice(a.indexOf(`--days=${msg.dashedArgs.parsed.keyValue.days}`));
+		msg.args = a;
 		if (deleteDays < 1) return msg.reply(`delete days cannot be less than zero.`);
 		if (deleteDays > 14) return msg.reply(`delete days cannot be more than 14.`);
 	}
+
+	if (msg.args[1].match(/[0-9]{1,4}[ymdh]/i)) {
+		const labels = {
+			h: 3.6e+6,
+			d: 8.64e+7,
+			m: 2.628e+9,
+			y: 3.154e+10
+		};
+		const t = Number(msg.args[1].slice(0, msg.args[1].length - 1).toLowerCase());
+		const i = msg.args[1].slice(msg.args[1].length - 1).toLowerCase();
+		if (t < 1) return msg.reply("time cannot be less than one (1).");
+		if (!Object.keys(labels).includes(i)) return msg.reply("invalid time.");
+		const a = [...msg.args];
+		a.splice(1, 1);
+		msg.args = a;
+		time = labels[i] * t;
+	}
+
 	// get member from message
 	const user = await msg.getMemberFromArgs();
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
 	if (msg.channel.permissionsOf(this.user.id).has("viewAuditLogs")) {
-		if (await msg.channel.guild.getBans().then(res => res.map(u => u.user.id).includes(user.id))) {
-			const embed: Eris.EmbedOptions = {
+		if (await msg.channel.guild.getBans().then(res => res.map(u => u.user.id).includes(user.id))) return msg.channel.createMessage({
+			embed: {
 				title: "User already banned",
 				description: `It looks like ${user.username}#${user.discriminator} is already banned here..`,
 				timestamp: new Date().toISOString(),
@@ -46,10 +68,8 @@ export default new Command({
 					icon_url: msg.author.avatarURL
 				},
 				color: Math.floor(Math.random() * 0xFFFFFF)
-			};
-
-			return msg.channel.createMessage({ embed });
-		}
+			}
+		});
 	}
 
 	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.reply("Pretty sure you don't want to do this to yourself.");
@@ -72,9 +92,10 @@ export default new Command({
 						embed: {
 							title: "Member Banned",
 							description: [
-								`Offender: ${user.username}#${user.discriminator} <@!${user.id}>`,
+								`Target: ${user.username}#${user.discriminator} <@!${user.id}>`,
 								`Reason: ${reason}`,
-								`Message Delete Days: ${deleteDays}`
+								`Message Delete Days: ${deleteDays}`,
+								`Time: ${time === 0 ? "Permanent" : Time.ms(time, true)}`
 							].join("\n"),
 							timestamp: new Date().toISOString(),
 							color: Colors.red,
@@ -90,6 +111,14 @@ export default new Command({
 				}
 			}
 		}
+		if (time !== 0) await mdb.collection<GlobalTypes.TimedEntry>("timed").insertOne({
+			time,
+			expiry: Date.now() + time,
+			userId: user.id,
+			guildId: msg.channel.guild.id,
+			type: "ban",
+			reason
+		});
 	}).catch(async (err) => {
 		msg.channel.createMessage(`I couldn't ban **${user.username}#${user.discriminator}**, ${err}`);
 		if (typeof m !== "undefined") await m.delete();

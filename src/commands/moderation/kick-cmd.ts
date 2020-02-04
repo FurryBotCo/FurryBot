@@ -49,7 +49,7 @@ export default new Command({
 						embed: {
 							title: "Member Kicked",
 							description: [
-								`Offender: ${user.username}#${user.discriminator} <@!${user.id}>`,
+								`Target: ${user.username}#${user.discriminator} <@!${user.id}>`,
 								`Reason: ${reason}`
 							].join("\n"),
 							timestamp: new Date().toISOString(),

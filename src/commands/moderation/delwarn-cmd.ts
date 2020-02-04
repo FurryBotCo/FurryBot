@@ -54,7 +54,7 @@ export default new Command({
 						embed: {
 							title: "Warning Deleted",
 							description: [
-								`Offender: ${member.username}#${member.discriminator} <@!${member.id}>`,
+								`Target: ${member.username}#${member.discriminator} <@!${member.id}>`,
 								`Warning ID: ${id}`
 							].join("\n"),
 							timestamp: new Date().toISOString(),

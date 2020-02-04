@@ -55,6 +55,7 @@ export default class FurryBot extends Eris.Client {
 	};
 	channelTyping: Map<string, NodeJS.Timeout>;
 	_autoyiffLoop: NodeJS.Timeout;
+	_timedLoop: NodeJS.Timeout;
 	shardTest: DeadShardTest;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);

@@ -2,8 +2,9 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
-import { Utility } from "../../util/Functions";
+import { Utility, Time } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
+import { mdb } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
@@ -19,10 +20,11 @@ export default new Command({
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
 	description: "Stop someone from chatting.",
-	usage: "<@member/id> [reason]",
+	usage: "<@member/id> [time] [reason]",
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	let time = 0;
 	// get member from message
 	const user = await msg.getMemberFromArgs();
 
@@ -42,6 +44,7 @@ export default new Command({
 
 		return msg.channel.createMessage({ embed });
 	}
+
 	if (!msg.channel.guild.roles.has(msg.gConfig.settings.muteRole)) {
 		const embed: Eris.EmbedOptions = {
 			title: "Mute role not found",
@@ -57,6 +60,8 @@ export default new Command({
 
 		return msg.channel.createMessage({ embed });
 	}
+
+
 	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(msg.gConfig.settings.muteRole));
 	if (a.higher || a.same) {
 		const embed: Eris.EmbedOptions = {
@@ -73,8 +78,8 @@ export default new Command({
 		return msg.channel.createMessage({ embed });
 	}
 
-	if (user.roles.includes(msg.gConfig.settings.muteRole)) {
-		const embed: Eris.EmbedOptions = {
+	if (user.roles.includes(msg.gConfig.settings.muteRole)) return msg.channel.createMessage({
+		embed: {
 			title: "User already muted",
 			description: `The user **${user.username}#${user.discriminator}** seems to already be muted.. You can unmute them with \`${msg.gConfig.settings.prefix}unmute @${user.username}#${user.discriminator} [reason]\``,
 			color: 15601937,
@@ -83,9 +88,24 @@ export default new Command({
 				name: msg.author.tag,
 				icon_url: msg.author.avatarURL
 			}
-		};
+		}
+	});
 
-		return msg.channel.createMessage({ embed });
+	if (msg.args[1].match(/[0-9]{1,4}[ymdh]/i)) {
+		const labels = {
+			h: 3.6e+6,
+			d: 8.64e+7,
+			m: 2.628e+9,
+			y: 3.154e+10
+		};
+		const t = Number(msg.args[1].slice(0, msg.args[1].length - 1).toLowerCase());
+		const i = msg.args[1].slice(msg.args[1].length - 1).toLowerCase();
+		if (t < 1) return msg.reply("time cannot be less than one (1).");
+		if (!Object.keys(labels).includes(i)) return msg.reply("invalid time.");
+		const a = [...msg.args];
+		a.splice(1, 1);
+		msg.args = a;
+		time = labels[i] * t;
 	}
 
 	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.channel.createMessage(`${msg.author.id}>, Pretty sure you don't want to do this to yourself.`);
@@ -107,8 +127,9 @@ export default new Command({
 						embed: {
 							title: "Member Muted",
 							description: [
-								`Offender: ${user.username}#${user.discriminator} <@!${user.id}>`,
-								`Reason: ${reason}`
+								`Target: ${user.username}#${user.discriminator} <@!${user.id}>`,
+								`Reason: ${reason}`,
+								`Time: ${time === 0 ? "Permanent" : Time.ms(time, true)}`
 							].join("\n"),
 							timestamp: new Date().toISOString(),
 							color: Colors.red,
@@ -124,6 +145,14 @@ export default new Command({
 				}
 			}
 		}
+		if (time !== 0) await mdb.collection<GlobalTypes.TimedEntry>("timed").insertOne({
+			time,
+			expiry: Date.now() + time,
+			userId: user.id,
+			guildId: msg.channel.guild.id,
+			type: "mute",
+			reason
+		});
 	}).catch(async (err) => {
 		msg.channel.createMessage(`<@!${msg.author.id}>, I couldn't mute **${user.username}#${user.discriminator}**, ${err}`);
 		/*if (m !== undefined) {

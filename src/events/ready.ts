@@ -136,5 +136,6 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	setupAll();
 	this._autoyiffLoop = setInterval(setupAll, 36e5);
+	this._timedLoop = setInterval(() => Internal.timedCheck(this), 3e4);
 	Logger.log("Ready", `Client ready with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds, with ${this.cmd.commands.length} commands.`);
 }));

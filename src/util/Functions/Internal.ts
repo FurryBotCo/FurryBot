@@ -9,6 +9,7 @@ import GuildConfig from "../../modules/config/GuildConfig";
 import Eris from "eris";
 import { Request, Utility, Time, Strings } from ".";
 import Logger from "../LoggerV8";
+import { Colors } from "../Constants";
 
 export default class Internal {
 	private constructor() {
@@ -300,5 +301,162 @@ export default class Internal {
 		}
 
 		Logger.debug("Auto", `${time / 6e4}m Processed\nTotal Ran:\n${Object.keys(counter).map(k => `${Strings.ucwords(k)}: ${counter[k]}`).join("\n")}`);
+	}
+
+
+	static async timedCheck(client: FurryBot) {
+		const col = mdb.collection<GlobalTypes.TimedEntry>("timed");
+		const e = await col.find({}).toArray();
+
+		for (const entry of e) {
+			if (!client.guilds.has(entry.guildId)) {
+				await col.findOneAndDelete({ _id: entry._id });
+				Logger.warn("Timed Check", `skipped timed ${entry.type} for user "${entry.userId}" because the guild "${entry.guildId}" is no longer present.`);
+				continue;
+			}
+
+			if (Date.now() < entry.expiry) continue;
+
+			switch (entry.type) {
+				case "ban": {
+					const g = client.guilds.get(entry.guildId);
+					await g.unbanMember(entry.userId, `Automatic Unban`).catch(err => null);
+					const u = client.users.has(entry.userId) ? client.users.get(entry.userId) : await client.getRESTUser(entry.userId);
+					const c = await db.getGuild(entry.guildId);
+					if (!c.settings.modlog) {
+						await col.findOneAndDelete({ _id: entry._id });
+						continue;
+					}
+					const ch = g.channels.get(c.settings.modlog) as Eris.GuildTextableChannel;
+					if (!ch) {
+						await col.findOneAndDelete({ _id: entry._id });
+						await c.edit({ settings: { modlog: null } });
+						Logger.warn("Timed Check", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`);
+						continue;
+					}
+
+					if (!["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
+						await col.findOneAndDelete({ _id: entry._id });
+						await c.edit({ settings: { modlog: null } });
+						Logger.warn("Timed Check", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`);
+						continue;
+					}
+
+					await ch.createMessage({
+						embed: {
+							title: "Member Unbanned",
+							description: [
+								`Target: ${u.username}#${u.discriminator} <@!${u.id}>`,
+								`Reason: Automatic action due to expiry.`
+							].join("\n"),
+							timestamp: new Date().toISOString(),
+							color: Colors.green,
+							author: {
+								name: `${client.user.username}#${client.user.discriminator}`,
+								icon_url: client.user.avatarURL
+							},
+							footer: {
+								text: `Action was automatically performed.`
+							}
+						}
+					});
+					await col.findOneAndDelete({ _id: entry._id });
+					break;
+				}
+
+				case "mute": {
+					const g = client.guilds.get(entry.guildId);
+					const m = g.members.get(entry.userId);
+					const c = await db.getGuild(entry.guildId);
+					const r = g.roles.get(c.settings.muteRole);
+					if (!c.settings.modlog) {
+						await col.findOneAndDelete({ _id: entry._id });
+						continue;
+					}
+
+					const ch = g.channels.get(c.settings.modlog) as Eris.GuildTextableChannel;
+					if (!ch) {
+						await col.findOneAndDelete({ _id: entry._id });
+						await c.edit({ settings: { modlog: null } });
+						Logger.warn("Timed Check", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`);
+						continue;
+					}
+
+					if (!["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
+						await col.findOneAndDelete({ _id: entry._id });
+						await c.edit({ settings: { modlog: null } });
+						Logger.warn("Timed Check", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`);
+						continue;
+					}
+
+					if (!m) {
+						await ch.createMessage({
+							embed: {
+								title: "Automatic Unmute Failed",
+								description: `I failed to automatically unmute **${m.username}#${m.discriminator}** (<@!${m.id}>)\nReason: The user is not in the server.`,
+								timestamp: new Date().toISOString(),
+								color: Colors.red,
+								author: {
+									name: `${client.user.username}#${client.user.discriminator}`,
+									icon_url: client.user.avatarURL
+								}
+							}
+						});
+						await col.findOneAndDelete({ _id: entry._id });
+						continue;
+					}
+
+					if (!m.roles.includes(c.settings.muteRole)) {
+						await col.findOneAndDelete({ _id: entry._id });
+						continue;
+					}
+
+					if (!r) {
+						await ch.createMessage({
+							embed: {
+								title: "Automatic Unmute Failed",
+								description: `I failed to automatically unmute **${m.username}#${m.discriminator}** (<@!${m.id}>)\nReason: Couldn't find mute role.`,
+								timestamp: new Date().toISOString(),
+								color: Colors.red,
+								author: {
+									name: `${client.user.username}#${client.user.discriminator}`,
+									icon_url: client.user.avatarURL
+								}
+							}
+						});
+						await col.findOneAndDelete({ _id: entry._id });
+						continue;
+					}
+
+					await m.removeRole(r.id, "Automatic Unmute").catch(err => null);
+
+					await ch.createMessage({
+						embed: {
+							title: "Member Unmuted",
+							description: [
+								`Target: ${m.username}#${m.discriminator} <@!${m.id}>`,
+								`Reason: Automatic action due to expiry.`
+							].join("\n"),
+							timestamp: new Date().toISOString(),
+							color: Colors.green,
+							author: {
+								name: `${client.user.username}#${client.user.discriminator}`,
+								icon_url: client.user.avatarURL
+							},
+							footer: {
+								text: `Action was automatically performed.`
+							}
+						}
+					});
+					await col.findOneAndDelete({ _id: entry._id });
+					break;
+				}
+
+				default: {
+					await col.findOneAndDelete({ _id: entry._id });
+					Logger.warn("Timed Check", `Unknown timed type "${entry.type}" found.`);
+				}
+			}
+		}
 	}
 }
