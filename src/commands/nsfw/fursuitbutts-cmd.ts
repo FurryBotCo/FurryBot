@@ -1,11 +1,10 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Utility, Request } from "../../util/Functions";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
@@ -14,7 +13,8 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [
-		"attachFiles"
+		"attachFiles",
+		"embedLinks"
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
@@ -23,7 +23,7 @@ export default new Command({
 	features: ["nsfw"],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	const img = await phin({
 		method: "GET",
 		url: "https://api.fursuitbutts.com/butts",
@@ -35,10 +35,24 @@ export default new Command({
 		Logger.error(`Shard #${msg.channel.guild.shard.id}`, img);
 		return msg.channel.createMessage(`<@!${msg.author.id}>, Unknown api error.`);
 	}
-	const short = await this.f.shortenURL(img.body.response.image);
-	const extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
-	return msg.channel.createMessage(`${extra}Short URL: <${short.link}>\n\nRequested By: ${msg.author.username}#${msg.author.discriminator}`, {
-		file: await this.f.getImageFromURL(img.body.response.image),
-		name: img.body.response.name
+	const short = await Utility.shortenURL(img.body.response.image);
+	const extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
+
+	return msg.channel.createMessage({
+		embed: {
+			color: Colors.gold,
+			description: `${extra}Short URL: <${short.link}>`,
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			image: {
+				url: img.body.response.image
+			},
+			timestamp: new Date().toISOString(),
+			footer: {
+				text: "powered by furry.bot"
+			}
+		}
 	});
 }));

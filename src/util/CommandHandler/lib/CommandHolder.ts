@@ -2,6 +2,7 @@ import Command from "./Command";
 import FurryBot from "@FurryBot";
 import Category from "./Category";
 import CooldownHandler from "./CooldownHandler";
+import Logger from "../../LoggerV8";
 export default class CommandHolder {
 	client: FurryBot;
 	categories: Category[];
@@ -41,7 +42,7 @@ export default class CommandHolder {
 				description,
 				file
 			});
-
+			Logger.debug("Command Handler", `Added the category "${cat.name}"`);
 			this.categories.push(cat);
 			return cat;
 		} else {
@@ -54,21 +55,24 @@ export default class CommandHolder {
 					throw new TypeError(`Duplicate command trigger "${t}" (cat: ${cat.name})`);
 				}
 			}
+			Logger.debug("Command Handler", `Added the category "${catOrName.name}"`);
 			this.categories.push(catOrName);
 			// catOrName.commands.map(c => this.addCommand(c));
 			return catOrName;
 		}
 	}
 
-	removeCategory(nameOrCat: string | Category) {
-		if (typeof nameOrCat === "string") {
-			const cat = this.categories.find(c => c.name === nameOrCat);
+	removeCategory(catOrName: string | Category) {
+		if (typeof catOrName === "string") {
+			const cat = this.categories.find(c => c.name === catOrName);
 			if (!cat) return false;
 			this.categories.splice(this.categories.indexOf(cat), 1);
+			Logger.debug("Command Handler", `Removed the category "${cat.name}"`);
 			return true;
 		} else {
-			if (!this.categories.includes(nameOrCat)) return false;
-			this.categories.splice(this.categories.indexOf(nameOrCat), 1);
+			if (!this.categories.includes(catOrName)) return false;
+			this.categories.splice(this.categories.indexOf(catOrName), 1);
+			Logger.debug("Command Handler", `Removed the category "${catOrName.name}"`);
 			return true;
 		}
 	}

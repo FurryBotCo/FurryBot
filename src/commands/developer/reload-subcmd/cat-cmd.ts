@@ -2,10 +2,7 @@ import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../config";
-import { Logger } from "../../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../../modules/Database";
 import { Colors } from "../../../util/Constants";
 import { performance } from "perf_hooks";
 import * as fs from "fs-extra";
@@ -41,6 +38,8 @@ export default new SubCommand({
 		const b = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 15e3);
 		if (!b || !b.content || !["false", "true", "no", "yes"].includes(b.content.toLowerCase())) return msg.reply("invalid response.");
 		a = b.content.toLowerCase();
+
+		await b.delete().catch(err => null);
 	} else {
 		a = msg.args[1].toLowerCase();
 		m = await msg.channel.createMessage("Processing..");
@@ -57,20 +56,29 @@ export default new SubCommand({
 			rebuild = true;
 			break;
 	}
-
-	if (rebuild) {
-		await m.edit("Rebuilding code, please wait..");
-		const start = performance.now();
-		const rb = execSync("npm run build", {
-			cwd: config.rootDir
-		});
-		const end = performance.now();
-		await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
-	} else await msg.edit("not rebuilding code.");
 	try {
+
+		if (rebuild) {
+			m = await m.edit("Rebuilding code, please wait..");
+			const start = performance.now();
+			const rb = execSync("npm run build", {
+				cwd: config.rootDir
+			});
+			const end = performance.now();
+			m = await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
+		} else m = await m.edit("not rebuilding code.");
+
 		this.cmd.removeCategory(cat);
 		delete require.cache[cat.file];
-		cat.commands.map(c => delete require.cache[c.file]);
+		cat.commands.map(c => {
+			delete require.cache[c.file];
+			function loopSub(o: SubCommand) {
+				if (o.subCommands.length > 0) o.subCommands.map(s => loopSub(s));
+
+				delete require.cache[o.file];
+			}
+			if (c.subCommands.length > 0) c.subCommands.map(s => loopSub(s));
+		});
 		const n = require(cat.file).default;
 		this.cmd.addCategory(n);
 	} catch (e) {
@@ -83,6 +91,10 @@ export default new SubCommand({
 				author: {
 					name: msg.author.tag,
 					icon_url: msg.author.avatarURL
+				},
+				footer: {
+					text: "(a full restart will most likely be required)",
+					icon_url: "https://i.furry.bot/furry.png"
 				}
 			}
 		});
@@ -102,5 +114,5 @@ export default new SubCommand({
 	if (added.length !== 0) added.map(a => change.push(`+ ${a}`));
 	if (removed.length !== 0) removed.map(r => change.push(`- ${r}`));
 
-	return msg.channel.createMessage(`Reloaded ${newCat.commands.length} commands from the category **${cat.name}** in ${Number((end - start).toFixed(3)).toLocaleString()}ms\n${change.length === 0 ? "No Command Additions/Removals Detected." : `\`\`\`diff\n${change.join("\n")}\n\`\`\``}`);
+	return m.edit(`${m.content}\n\nReloaded ${newCat.commands.length} commands from the category **${cat.name}** in ${Number((end - start).toFixed(3)).toLocaleString()}ms\n${change.length === 0 ? "No Command Additions/Removals Detected." : `\`\`\`diff\n${change.join("\n")}\n\`\`\``}`);
 }));

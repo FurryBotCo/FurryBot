@@ -2,11 +2,8 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
-import Permissions from "../../util/Permissions";
 
 export default new Command({
 	triggers: [
@@ -24,7 +21,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	if (msg.unparsedArgs.length === 0) throw new Error("ERR_INVALID_USAGE");
 	// if(config.apis.ipinfo.regex.ipv4.test(msg.unparsedArgs.join(" ")) || config.apis.ipinfo.regex.ipv6.test(msg.unparsedArgs.join(" "))) {
 	const req = await phin({

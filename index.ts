@@ -21,3 +21,10 @@ fs.writeFileSync(`${__dirname}/${__filename.endsWith(".ts") ? "" : "../"}process
 bot.connect();
 
 export default bot;
+
+process.on("SIGINT", () => {
+	bot
+		.removeAllListeners()
+		.disconnect({ reconnect: false });
+	process.kill(process.pid);
+});

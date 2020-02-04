@@ -1,11 +1,9 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Utility } from "../../util/Functions";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
@@ -59,7 +57,7 @@ export default new Command({
 
 		return msg.channel.createMessage({ embed });
 	}
-	const a = this.f.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(msg.gConfig.settings.muteRole));
+	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(msg.gConfig.settings.muteRole));
 	if (a.higher || a.same) {
 		const embed: Eris.EmbedOptions = {
 			title: "Invalid mute role",
@@ -91,16 +89,42 @@ export default new Command({
 	}
 
 	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.channel.createMessage(`${msg.author.id}>, Pretty sure you don't want to do this to yourself.`);
-	const b = this.f.compareMembers(user, msg.member);
+	const b = Utility.compareMembers(user, msg.member);
 	if ((b.member2.higher || b.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
 	if (user.permission.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
 
-	user.addRole(msg.gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(() =>
-		// msg.gConfig.modlog.add({ blame: this.bot.user.id, action: "mute", userId: user.id, reason, timestamp: Date.now() }).then(() =>
-		msg.channel.createMessage(`***User ${user.username}#${user.discriminator} was muted, ${reason}***`).catch(noerr => null)
-		// )
-	).catch(async (err) => {
+	user.addRole(msg.gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+		await msg.channel.createMessage(`***User ${user.username}#${user.discriminator} was muted, ${reason}***`).catch(noerr => null);
+		if (!!msg.gConfig.settings.modlog) {
+			if (!msg.channel.guild.channels.has(msg.gConfig.settings.modlog)) await msg.reply(`failed to create mod log entry, as I could not find the mod log channel.`);
+			else {
+				const ch = msg.channel.guild.channels.get(msg.gConfig.settings.modlog) as Eris.GuildTextableChannel;
+				if (!ch.permissionsOf(this.user.id).has("sendMessages")) await msg.reply(`failed to create mod log entry, as I cannot send messages in the mod log channel.`);
+				else if (!ch.permissionsOf(this.user.id).has("embedLinks")) await msg.reply(`failed to create mod log entry, as I cannot send embeds in the mod log channel.`);
+				else {
+					await ch.createMessage({
+						embed: {
+							title: "Member Muted",
+							description: [
+								`Offender: ${user.username}#${user.discriminator} <@!${user.id}>`,
+								`Reason: ${reason}`
+							].join("\n"),
+							timestamp: new Date().toISOString(),
+							color: Colors.red,
+							author: {
+								name: msg.channel.guild.name,
+								icon_url: msg.channel.guild.iconURL
+							},
+							footer: {
+								text: `Action carried out by ${msg.author.tag}`
+							}
+						}
+					});
+				}
+			}
+		}
+	}).catch(async (err) => {
 		msg.channel.createMessage(`<@!${msg.author.id}>, I couldn't mute **${user.username}#${user.discriminator}**, ${err}`);
 		/*if (m !== undefined) {
 			await m.delete();

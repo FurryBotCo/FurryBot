@@ -1,11 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Utility } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -39,7 +35,7 @@ export default new Command({
 	if (!role || role.length === 0) return msg.channel.createMessage("Role not found.");
 	role = role[0];
 	if (!msg.member.roles.includes(role.id)) return msg.channel.createMessage("You don't have this role.");
-	const a = this.f.compareMemberWithRole(msg.guild.members.get(this.user.id), role);
+	const a = Utility.compareMemberWithRole(msg.guild.members.get(this.user.id), role);
 	if (a.higher || a.same) return msg.channel.createMessage(`<@!${msg.author.id}>, That role is higher than, or as high as my highest role.`);
 	await msg.member.removeRole(role.id, "iamnot command");
 

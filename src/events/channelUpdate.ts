@@ -1,10 +1,9 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
 import * as Eris from "eris";
-import config from "../config";
 import { db } from "../modules/Database";
 import { ChannelNames, ChannelNamesCamelCase, Colors } from "../util/Constants";
+import { Utility, Time } from "../util/Functions";
 
 export default new ClientEvent("channelUpdate", (async function (this: FurryBot, channel: Eris.AnyGuildChannel, oldChannel: Eris.OldGuildChannel) {
 	if (!this || !db || !channel || !oldChannel || [Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(channel.type as any)) return;
@@ -59,6 +58,7 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 		};
 		const changes: ("nsfw" | "name" | "parentID" | "topic" | "rateLimitPerUser" | "bitrate" | "userLimit")[] = [];
 
+		// @FIXME fix false positives with nsfw/topic and their nullability
 		if (channel.nsfw !== oldChannel.nsfw) changes.push("nsfw");
 		if (channel.name !== oldChannel.name) changes.push("name");
 		if (channel.parentID !== oldChannel.parentID) changes.push("parentID");
@@ -67,8 +67,7 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 			if (channel.rateLimitPerUser !== oldChannel.rateLimitPerUser) changes.push("rateLimitPerUser");
 		} else if (channel instanceof Eris.VoiceChannel) {
 			if (channel.bitrate !== oldChannel.bitrate) changes.push("bitrate");
-			// @FIXME when Eris is updated, uncomment this
-			// if (channel.userLimit !== oldChannel.userLimit) changes.push("userLimit");
+			if (channel.userLimit !== oldChannel.userLimit) changes.push("userLimit");
 		}
 
 		if (changes.length === 0) return;
@@ -99,7 +98,7 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 							break;
 
 						case "time":
-							return `${ch.name}: **${this.f.ms((oldChannel[c] || 0 as any) * 1000, true)}** -> **${this.f.ms((channel[c] || 0) * 1000, true)}**`;
+							return `${ch.name}: **${Time.ms((oldChannel[c] || 0 as any) * 1000, true)}** -> **${Time.ms((channel[c] || 0) * 1000, true)}**`;
 							break;
 					}
 				})))
@@ -108,7 +107,7 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 			color: Colors.orange
 		};
 
-		const log = await this.f.fetchAuditLogEntries(channel.guild, Eris.Constants.AuditLogActions.CHANNEL_UPDATE, channel.id);
+		const log = await Utility.fetchAuditLogEntries(channel.guild, Eris.Constants.AuditLogActions.CHANNEL_UPDATE, channel.id);
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 

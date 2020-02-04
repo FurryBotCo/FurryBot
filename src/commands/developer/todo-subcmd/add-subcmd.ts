@@ -3,8 +3,6 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../config";
 import { Logger } from "../../../util/LoggerV8";
-import { db, mdb } from "../../../modules/Database";
-import Eris from "eris";
 import phin from "phin";
 import short from "short-uuid";
 const uuid = short().generate;

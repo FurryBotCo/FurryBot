@@ -7,6 +7,7 @@ import config from "../../../config";
 import { Logger } from "../../LoggerV8";
 import * as fs from "fs";
 import { Colors } from "../../Constants";
+import { Request } from "../../Functions";
 
 export default class Command {
 	triggers: UT.ArrayOneOrMore<string>;
@@ -16,7 +17,7 @@ export default class Command {
 	donatorCooldown: number;
 	description: string;
 	usage: string;
-	features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "guildOwnerOnly" | "supportOnly")[];
+	features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "premiumGuildOnly" | "guildOwnerOnly" | "supportOnly")[];
 	category: string;
 	subCommands: SubCommand[];
 	file: string;
@@ -130,7 +131,7 @@ export default class Command {
 
 		if (cmd.features.includes("nsfw")) {
 			if (!msg.channel.nsfw) return msg.reply(`this command can only be ran in nsfw channels.`, {
-				file: await client.f.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
+				file: await Request.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
 				name: "nsfw.gif"
 			}).catch(err => null);
 
@@ -153,6 +154,38 @@ export default class Command {
 					}
 				}).catch(err => null);
 			}
+		}
+
+		const donator = await msg.uConfig.premiumCheck();
+		if (cmd.features.includes("donatorOnly") && !config.developers.includes(msg.author.id)) {
+			if (!donator.active) return msg.channel.createMessage({
+				embed: {
+					title: "Usage Not Allowed",
+					description: `You must be a donator to use this command.\nYou can donate [here](${config.bot.patreon}).`,
+					color: Colors.red,
+					timestamp: new Date().toISOString(),
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					}
+				}
+			});
+		}
+
+		const premium = await msg.gConfig.premiumCheck();
+		if (cmd.features.includes("premiumGuildOnly") && !config.developers.includes(msg.author.id)) {
+			if (!premium.active) return msg.channel.createMessage({
+				embed: {
+					title: "Usage Not Allowed",
+					description: `This command can only be used in premium servers.\nYou can donate [here](${config.bot.patreon}), and can activate a premium server using \`${msg.gConfig.settings.prefix}pserver add\`.`,
+					color: Colors.red,
+					timestamp: new Date().toISOString(),
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					}
+				}
+			});
 		}
 
 		if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {

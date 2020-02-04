@@ -1,8 +1,8 @@
 import express from "express";
 import { mdb } from "../../modules/Database";
 import config from "../../config";
-import apiFunctions from "../functions";
 import FurryBot from "@FurryBot";
+import { Internal } from "../../util/Functions";
 
 export default (async (client: FurryBot) => {
 
@@ -21,12 +21,12 @@ export default (async (client: FurryBot) => {
 			shardCount: client.shards.size,
 			memoryUsage: {
 				process: {
-					used: client.f.memory.process.getUsed(),
-					total: client.f.memory.process.getTotal()
+					used: Internal.memory.process.getUsed(),
+					total: Internal.memory.process.getTotal()
 				},
 				system: {
-					used: client.f.memory.system.getUsed(),
-					total: client.f.memory.system.getTotal()
+					used: Internal.memory.system.getUsed(),
+					total: Internal.memory.system.getTotal()
 				}
 			},
 			largeGuildCount: client.guilds.filter(g => g.large).length,

@@ -1,5 +1,5 @@
 import DB from "@donovan_dmc/db";
-import { Db, MongoClientOptions, MongoClient, Collection } from "mongodb";
+import { Db, MongoClientOptions, MongoClient, Collection, MongoError } from "mongodb";
 import UserConfig from "../modules/config/UserConfig";
 import deasync from "deasync";
 import GuildConfig from "../modules/config/GuildConfig";
@@ -40,7 +40,13 @@ export default class Database {
 		let u = await this.collection("users").findOne({ id }).then(res => res ? new UserConfig(id, res) : null);
 
 		if (!u) {
-			await this.mdb.collection("users").insertOne({ ...config.defaults.userConfig, id });
+			await this.mdb.collection("users").insertOne({ ...config.defaults.userConfig, id }).catch((err: MongoError) => {
+				switch (err.code) {
+					case 11000: return Logger.warn("Database", `Duplicate key error (key: ${(err as any).keyValue.id})`);
+					default:
+						return Logger.error("Database", err);
+				}
+			});
 			Logger.debug("Database", `Created user entry "${id}".`);
 			u = await this.collection("users").findOne({ id }).then(res => res ? new UserConfig(id, res) : null);
 		}
@@ -66,7 +72,13 @@ export default class Database {
 			// this mess is to set the prefix to the config default instead of what's in the guildConfig defaults
 			const t = { ...config.defaults.guildConfig };
 			delete t.settings;
-			await this.mdb.collection("guilds").insertOne({ ...t, settings: { ...config.defaults.guildConfig.settings, prefix: config.defaultPrefix }, id });
+			await this.mdb.collection("guilds").insertOne({ ...t, settings: { ...config.defaults.guildConfig.settings, prefix: config.defaultPrefix }, id }).catch((err: MongoError) => {
+				switch (err.code) {
+					case 11000: return Logger.warn("Database", `Duplicate key error (key: ${(err as any).keyValue.id})`);
+					default:
+						return Logger.error("Database", err);
+				}
+			});
 			Logger.debug("Database", `Created guild entry "${id}".`);
 			g = await this.collection("guilds").findOne({ id }).then(res => res ? new GuildConfig(id, res) : null);
 		}

@@ -2,19 +2,22 @@ import ClientEvent from "../util/ClientEvent";
 import Temp from "../util/Temp";
 import { Logger } from "../util/LoggerV8";
 import FurryBot from "@FurryBot";
-import * as Eris from "eris";
 import config from "../config";
 import sv from "../api";
 import express from "express";
 import http from "http";
-import { mdb, mongo } from "../modules/Database";
-import * as fs from "fs-extra";
+import { mdb } from "../modules/Database";
 import cmd from "../commands";
+import { Internal } from "../util/Functions";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
 	this.increment([
 		"events.ready"
 	]);
+
+	if (this.firstReady) return Logger.warn("Ready", "Skipping ready event as it has already fired.");
+	this.firstReady = true;
+
 	const srv = await sv(this);
 
 	this.editStatus("online", {
@@ -44,7 +47,7 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	const svr = http.createServer(express())
 		.on("error", () => (Logger.warn("APIServer", "Attempted to start api server, but the port is in use."), this.increment("other.apiServerLaunchFailed")))
-		.on("listening", () => (svr.close(), this.srv = srv.listen(config.apiPort, config.apiBindIp), this.increment("other.apiServerLaunch")))
+		.on("listening", () => (svr.close(), this.srv = srv.listen(config.apiPort, config.apiBindIp, () => Logger.debug("APIServer", `Listening on ${config.apiBindIp}:${config.apiPort}`)), this.increment("other.apiServerLaunch")))
 		.on("close", () => Logger.debug("APIServer", "Port test server closed, starting bot api server."))
 		.listen(config.apiPort, config.apiBindIp);
 
@@ -107,5 +110,31 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 			});
 		}
 	}, 1e3);
+
+	const
+		go = (async (t: number) => {
+			for (let i = 0; i < (36e5 / t); i++) {
+				setTimeout(() => Internal.runAuto(t, this), t * (i + 1));
+			}
+		}),
+		setupAll = (() => {
+			// 5 minutes
+			go(3e5);
+
+			// 10 minutes
+			go(6e5);
+
+			// 15 minutes
+			go(9e5);
+
+			// 30 minutes
+			go(18e5);
+
+			// 60 minutes
+			go(36e5);
+		});
+
+	setupAll();
+	this._autoyiffLoop = setInterval(setupAll, 36e5);
 	Logger.log("Ready", `Client ready with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds, with ${this.cmd.commands.length} commands.`);
 }));

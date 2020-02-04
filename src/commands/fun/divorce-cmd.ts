@@ -1,11 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Internal } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -20,9 +16,9 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	if (!msg.uConfig.marriage.married) return msg.reply("You have to marry someone before you can divorce them..");
+	if (!msg.uConfig.marriage.married) return msg.reply("you have to marry someone before you can divorce them..");
 
-	const m = await db.getUser(msg.uConfig.marriage.partner);
+	const m = await Internal.getUser(msg.uConfig.marriage.partner);
 
 	if ([undefined, null].includes(msg.uConfig.marriage)) await msg.uConfig.edit({
 		marriage: {
@@ -32,7 +28,7 @@ export default new Command({
 	}).then(d => d.reload());
 
 	const u = await this.getRESTUser(msg.uConfig.marriage.partner).catch(err => ({ username: "Unknown", discriminator: "0000" }));
-	msg.channel.createMessage(`Are you sure you want to divorce **${u.username}#${u.discriminator}**? **yes** or **no**.`).then(async () => {
+	await msg.channel.createMessage(`Are you sure you want to divorce **${u.username}#${u.discriminator}**? **yes** or **no**.`).then(async () => {
 		const d = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);
 		if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply("that wasn't a valid option..");
 		if (d.content.toLowerCase() === "yes") {
@@ -48,7 +44,7 @@ export default new Command({
 					partner: null
 				}
 			}).then(d => d.reload());
-			return msg.channel.createMessage(`You've divorced **${u.username}#${u.discriminator}**...`);
-		} else return msg.reply(`You've stayed with **${u}**!`);
+			return msg.reply(`you've divorced **${u.username}#${u.discriminator}**...`);
+		} else return msg.reply(`you've stayed with **${u}**!`);
 	});
 }));

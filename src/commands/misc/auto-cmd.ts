@@ -1,24 +1,26 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
-		"eco"
+		"auto"
 	],
-	userPermissions: [],
-	botPermissions: [],
-	cooldown: 0,
-	donatorCooldown: 0,
-	description: "Manage the bots economy.",
+	userPermissions: [
+		"manageChannels",
+		"manageGuild"
+	],
+	botPermissions: [
+		"attachFiles",
+		"embedLinks",
+		"manageWebhooks"
+	],
+	cooldown: 3e3,
+	donatorCooldown: 3e3,
+	description: "Toggle automated posting of content in a channel.",
 	usage: "",
-	features: ["devOnly"],
-	subCommandDir: `${__dirname}/eco-subcmd`,
+	features: ["premiumGuildOnly"],
+	subCommandDir: `${__dirname}/auto-subcmd`,
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length === 0) return cmd.sendSubCommandEmbed(msg);

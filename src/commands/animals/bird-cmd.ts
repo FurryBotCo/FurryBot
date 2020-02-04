@@ -3,6 +3,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
+import { Request } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -20,19 +21,25 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
-	const img = await this.f.imageAPIRequest(true, "birb");
+	// await msg.channel.startTyping();
+	const img = await Request.imageAPIRequest(true, "birb");
 	if (img.success === false) return msg.reply(`Image API returned an error: ${img.error.description}`);
-	try {
-		return msg.channel.createMessage("", {
-			file: await this.f.getImageFromURL(img.response.image),
-			name: img.response.name
-		});
-	} catch (e) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, e);
-		return msg.channel.createMessage("unknown api error", {
-			file: await this.f.getImageFromURL(config.images.serverError),
-			name: "error.png"
-		});
-	}
+	return msg
+		.channel
+		.createMessage({
+			embed: {
+				title: "Birb!",
+				description: `[Image URL](${img.response.image})`,
+				timestamp: new Date().toISOString(),
+				author: {
+					name: msg.author.tag,
+					icon_url: msg.author.avatarURL
+				},
+				color: Math.floor(Math.random() * 0xFFFFFF),
+				image: {
+					url: img.response.image
+				}
+			}
+		})
+		.catch(err => null);
 }));

@@ -24,7 +24,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 
 	interface Breeds {
 		breeds: {
@@ -126,9 +126,7 @@ export default new Command({
 			].join("\n"),
 			color: Colors.green,
 			image: {
-				url: img.url,
-				width: img.width,
-				height: img.height
+				url: img.url
 			},
 			timestamp: new Date().toISOString()
 		}

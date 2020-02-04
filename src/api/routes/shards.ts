@@ -1,7 +1,4 @@
 import express from "express";
-import { mdb } from "../../modules/Database";
-import config from "../../config";
-import apiFunctions from "../functions";
 import FurryBot from "@FurryBot";
 
 export default (async (client: FurryBot) => {

@@ -2,10 +2,8 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Time } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -26,33 +24,33 @@ export default new Command({
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	const o: Eris.User = await this.getRESTUser(msg.guild.ownerID).catch(err => null);
-	const owner = !o ? `Unknwon ${msg.channel.guild.ownerID}` : `${o.username}#${o.discriminator} (${o.id})`;
+	const owner = !o ? `Unknown ${msg.channel.guild.ownerID}` : `${o.username}#${o.discriminator} (${o.id})`;
 
+	const fDocsUrl = "https://discordapp.com/developers/docs/resources/guild#guild-object-guild-features";
 	const fStr = {
-		INVITE_SPLASH: "Invite Splash",
-		VIP_REGIONS: "Vip Voice Regions/320kbps Voice Channels",
-		VANITY_URL: "Vanity URL",
-		VERIFIED: "Verified",
-		PARTNERED: "Partnered",
-		LURKABLE: "Lurkable",
-		COMMERCE: "Store Channels",
-		NEWS: "News Channels",
-		DISCOVERABLE: "Discoverable",
-		FEATURABLE: "Featurable",
-		ANIMATED_ICON: "Animated Icon",
-		BANNER: "Guild Banner",
-		PUBLIC: "Public"
+		INVITE_SPLASH: `[Invite Splash](${fDocsUrl} 'guild has access to set an invite splash background')`,
+		VIP_REGIONS: `[Vip Voice Regions/320kbps Voice Channels](${fDocsUrl} 'guild has access to set 384kbps bitrate in voice (previously VIP voice servers)')`,
+		VANITY_URL: `[Vanity URL](${fDocsUrl} 'guild has access to set a vanity URL')`,
+		VERIFIED: `[Verified](${fDocsUrl} 'guild is verified')`,
+		PARTNERED: `[Partnered](${fDocsUrl} 'guild is partnered')`,
+		PUBLIC: `[Public](${fDocsUrl} 'guild is public')`,
+		COMMERCE: `[Store Channels](${fDocsUrl} 'guild has access to use commerce features (i.e. create store channels)')`,
+		NEWS: `[News Channels](${fDocsUrl} 'guild has access to create news channels')`,
+		DISCOVERABLE: `[Discoverable](${fDocsUrl} 'guild is able to be discovered in the directory')`,
+		FEATURABLE: `[Featurable](${fDocsUrl} 'guild is able to be featured in the directory')`,
+		ANIMATED_ICON: `[Animated Icon](${fDocsUrl} 'guild has access to set an animated guild icon')`,
+		BANNER: `[Guild Banner](${fDocsUrl} 'guild has access to set a guild banner image')`
 	};
 
-	let features = msg.channel.guild.features.map(f => fStr[f] || `${f}`).join("\n");
-	if (features === "") features = "NONE";
+	let features = msg.channel.guild.features.map(f => `\u25FD ${fStr[f] || `${f}`}`).join("\n");
+	if (features === "") features = "\u25FD NONE";
 
 	const verificationLevel = [
-		"**NONE** - unrestricted",
-		"**LOW** - 	must have verified email on account",
-		"**MEDIUM** - 	must be registered on Discord for longer than 5 minutes",
-		"**HIGH** - (╯°□°）╯︵ ┻━┻ - must be a member of the server for longer than 10 minutes",
-		"**VERY HIGH** - ┻━┻ミヽ(ಠ益ಠ)ﾉ彡┻━┻ - must have a verified phone number"
+		"[NONE](https://furry.bot 'unrestricted')",
+		"[LOW](https://furry.bot 'must have verified email on account')",
+		"[MEDIUM](https://furry.bot 'must be registered on Discord for longer than 5 minutes')",
+		"[HIGH](https://furry.bot '(╯°□°）╯︵ ┻━┻ - must be a member of the server for longer than 10 minutes')",
+		"[VERY HIGH](https://furry.bot '┻━┻ミヽ(ಠ益ಠ)ﾉ彡┻━┻ - must have a verified phone number')"
 	];
 	// let s;
 	// if (msg.channel.guild.memberCount < 1000) s = await Promise.all(msg.guild.members.filter(m => !m.user.bot).map((m) => mdb.collection("users").findOne({ id: m.id }))).then(res => res.map(m => m === null ? config.defaults.userConfig : m).map(m => ({ owoCount: m.owoCount === undefined ? 0 : m.owoCount, uwuCount: m.uwuCount === undefined ? 0 : m.uwuCount })));
@@ -67,83 +65,48 @@ export default new Command({
 		"Only Mentions"
 	];
 
-	const embed = {
-		title: `Server Info - **${msg.guild.name}**`,
-		image: {
-			url: msg.guild.iconURL
-		},
-		fields: [
-			{
-				name: "Guild ID",
-				value: msg.channel.guild.id,
-				inline: true
+	return msg.channel.createMessage({
+		embed: {
+			title: `Server Info - **${msg.guild.name}**`,
+			image: {
+				url: msg.guild.iconURL
 			},
-			{
-				name: "Guild Owner",
-				value: owner,
-				inline: true
-			},
-			{
-				name: "Region",
-				value: msg.guild.region,
-				inline: true
-			},
-			{
-				name: "Members",
-				value: [
-					`Total: ${msg.guild.memberCount} ([note](https://botapi.furry.bot/note/sinfo 'status counts are based on cached users, and may not include all server members'))`,
-					"",
-					`<:${config.emojis.online}>: ${msg.guild.members.filter(m => m.status === "online").length}`,
-					`<:${config.emojis.idle}>: ${msg.guild.members.filter(m => m.status === "idle").length}`,
-					`<:${config.emojis.dnd}>: ${msg.guild.members.filter(m => m.status === "dnd").length}`,
-					`<:${config.emojis.offline}>: ${msg.guild.members.filter(m => m.status === "offline").length}`,
-					"",
-					`Non Bots: ${msg.channel.guild.members.filter(m => !m.bot).length}`,
-					`Bots: ${msg.channel.guild.members.filter(m => m.bot).length}`
-				].join("\n"),
-				inline: true
-			},
-			{
-				name: "Channels",
-				value: [
-					`Total: ${msg.channel.guild.channels.size}`,
-					`Text: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_TEXT).length}`,
-					`Voice: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_VOICE).length}`,
-					`Category: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_CATEGORY).length}`,
-					`News: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_NEWS).length}`,
-					`Store: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_STORE).length}`
-				].join("\n"),
-				inline: true
-			},
-			{
-				name: "Guild Creation Date",
-				value: this.f.formatDateWithPadding(new Date(msg.guild.createdAt), true),
-				inline: true
-			},
-			{
-				name: "Features",
-				value: features,
-				inline: true
-			},
-			{
-				name: "Nitro Boosters",
-				value: `Nitro Boosts: ${msg.channel.guild.premiumSubscriptionCount || "None"}\nBoost Tier: ${msg.channel.guild.premiumTier || "None"}`,
-				inline: true
-			},
-			{
-				name: "UwU",
-				value: "ÓwÒ what's this?!?",
-				inline: true
-			},
-			{
-				name: "Extra",
-				value: `**Large Guild**: ${msg.guild.large ? "Yes" : "No"}\n**Verification**: ${verificationLevel[msg.guild.verificationLevel]}\n**2FA**: ${mfaLevel[msg.guild.mfaLevel]}\n**Default Notifications**: ${defaultNotifications[msg.guild.defaultNotifications]}${msg.channel.guild.features.includes("VANITY_URL") ? `\nVanity URL: [https://discord.gg/${msg.channel.guild.vanityURL}](https://discord.gg/${msg.channel.guild.vanityURL})` : ""}`,
-				inline: false
-			}
-		],
-		timestamp: new Date().toISOString(),
-		color: Math.floor(Math.random() * 0xFFFFFF)
-	};
-
-	return msg.channel.createMessage({ embed });
+			description: [
+				`\u25FD Name: **${msg.channel.guild.name}**`,
+				`\u25FD ID: **${msg.channel.guild.id}**`,
+				`\u25FD Owner:** ${owner}**`,
+				`\u25FD Region: **${msg.channel.guild.region}**`,
+				`\u25FD Creation Date: **${Time.formatDateWithPadding(msg.channel.guild.createdAt, true)}**`,
+				`\u25FD Nitro Boosts: **${msg.channel.guild.premiumSubscriptionCount || "None"}**`,
+				`\u25FD Boost Tier: **${msg.channel.guild.premiumTier || "None"}**`,
+				`\u25FD Large: **${msg.channel.guild.large ? "Yes" : "No"}**`,
+				`\u25FD Verification Level: **${verificationLevel[msg.channel.guild.verificationLevel]}**`,
+				`\u25FD 2FA Requirement: **${mfaLevel[msg.channel.guild.mfaLevel]}**`,
+				`\u25FD Default Notifications: **${defaultNotifications[msg.channel.guild.defaultNotifications]}**`,
+				`\u25FD Vanity URL: **${msg.channel.guild.features.includes("VANITY_URL") ? `[https://discord.gg/${msg.channel.guild.vanityURL}](https://discord.gg/${msg.channel.guild.vanityURL})` : "None"}**`,
+				"",
+				`**[Features](${fDocsUrl})**:`,
+				features,
+				"",
+				"**Members**:",
+				`\u25FD Total: ${msg.guild.memberCount} ([note](https://botapi.furry.bot/note/sinfo 'status counts are based on cached users, and may not include all server members'))`,
+				`\u25FD <:${config.emojis.online}>: ${msg.guild.members.filter(m => m.status === "online").length}`,
+				`\u25FD <:${config.emojis.idle}>: ${msg.guild.members.filter(m => m.status === "idle").length}`,
+				`\u25FD <:${config.emojis.dnd}>: ${msg.guild.members.filter(m => m.status === "dnd").length}`,
+				`\u25FD <:${config.emojis.offline}>: ${msg.guild.members.filter(m => m.status === "offline").length}`,
+				`\u25FD Non Bots: ${msg.channel.guild.members.filter(m => !m.bot).length}`,
+				`\u25FD Bots: ${msg.channel.guild.members.filter(m => m.bot).length}`,
+				"",
+				"**Channels**:",
+				`\u25FD Total: ${msg.channel.guild.channels.size}`,
+				`\u25FD Text: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_TEXT).length}`,
+				`\u25FD Voice: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_VOICE).length}`,
+				`\u25FD Category: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_CATEGORY).length}`,
+				`\u25FD News: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_NEWS).length}`,
+				`\u25FD Store: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_STORE).length}`
+			].join("\n"),
+			timestamp: new Date().toISOString(),
+			color: Math.floor(Math.random() * 0xFFFFFF)
+		}
+	});
 }));

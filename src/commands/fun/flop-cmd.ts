@@ -1,11 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Strings } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -22,7 +18,15 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
 
-	const input = msg.args.join(" ");
-	const text = this.f.formatStr(this.f.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, input);
-	msg.channel.createMessage(text);
+	return msg.channel.createMessage({
+		embed: {
+			description: Strings.formatStr(Strings.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" ")),
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			timestamp: new Date().toISOString(),
+			color: Math.floor(Math.random() * 0xFFFFFF)
+		}
+	});
 }));

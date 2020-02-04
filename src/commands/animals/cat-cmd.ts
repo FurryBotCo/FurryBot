@@ -3,6 +3,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
+import { Request } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -19,17 +20,18 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
-	try {
-		return msg.channel.createMessage("", {
-			file: await this.f.getImageFromURL("https://cataas.com/cat/gif"),
-			name: "cat.gif"
-		});
-	} catch (e) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, e);
-		return msg.channel.createMessage("unknown api error", {
-			file: await this.f.getImageFromURL(config.images.serverError),
-			name: "error.png"
-		});
-	}
+	return msg.channel.createMessage({
+		embed: {
+			title: "Kitty!",
+			timestamp: new Date().toISOString(),
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			color: Math.floor(Math.random() * 0xFFFFFF),
+			image: {
+				url: "https://cataas.com/cat/gif"
+			}
+		}
+	}).catch(err => null);
 }));

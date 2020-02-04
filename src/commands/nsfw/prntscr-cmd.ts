@@ -2,12 +2,10 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
 import cheerio from "cheerio";
 import { Colors } from "../../util/Constants";
+import { Strings } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -36,13 +34,13 @@ export default new Command({
 			let n: string, char: string, link: string;
 
 			if (t) {
-				n = this.f.random(2, num);
-				char = this.f.random(4, alphabet);
+				n = Strings.random(2, num);
+				char = Strings.random(4, alphabet);
 
 				link = `https://prnt.sc/${n}${char}`;
 			} else {
-				n = this.f.random(3, num);
-				char = this.f.random(3, alphabet);
+				n = Strings.random(3, num);
+				char = Strings.random(3, alphabet);
 
 				link = `https://prnt.sc/${n}${char}`;
 			}

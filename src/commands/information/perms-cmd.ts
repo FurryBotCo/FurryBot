@@ -1,11 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
 import Permissions from "../../util/Permissions";
 
 export default new Command({
@@ -28,14 +24,17 @@ export default new Command({
 		denyUser = [],
 		allowBot = [],
 		denyBot = [],
-		b = msg.channel.permissionsOf(this.user.id);
+		b = msg.channel.permissionsOf(this.user.id),
+		remove = ["all", "allGuild", "allText", "allVoice"];
 
 	for (const p in Permissions.constant) {
+		if (remove.includes(p)) continue;
 		if (msg.member.permission.allow & Permissions.constant[p]) allowUser.push(p);
 		else denyUser.push(p);
 	}
 
 	for (const p in Permissions.constant) {
+		if (remove.includes(p)) continue;
 		if (b.allow & Permissions.constant[p]) allowBot.push(p);
 		else denyBot.push(p);
 	}
@@ -44,27 +43,28 @@ export default new Command({
 	const du = denyUser.length === Object.keys(Permissions.constant).length ? "NONE" : denyUser.join("**, **");
 	const ab = allowBot.length === 0 ? "NONE" : allowBot.join("**, **");
 	const db = denyBot.length === Object.keys(Permissions.constant).length ? "NONE" : denyBot.join("**, **");
-	const embed: Eris.EmbedOptions = {
-		title: "Permission Info",
-		author: {
-			name: msg.author.tag,
-			icon_url: msg.author.avatarURL
-		},
-		fields: [
-			{
-				name: "User",
-				value: `__Allow__:\n**${au.length === 0 ? "NONE" : au
-					}**\n\n\n__Deny__:\n**${du.length === 0 ? "NONE" : du}**`,
-				inline: false
-			}, {
-				name: "Bot",
-				value: `__Allow__:\n**${ab.length === 0 ? "NONE" : ab}**\n\n\n__Deny__:\n**${db.length === 0 ? "NONE" : db}**`,
-				inline: false
-			}
-		],
-		timestamp: new Date().toISOString(),
-		color: Math.floor(Math.random() * 0xFFFFFF)
-	};
 
-	return msg.channel.createMessage({ embed });
+	return msg.channel.createMessage({
+		embed: {
+			title: "Permission Info",
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			fields: [
+				{
+					name: "User",
+					value: `__Allow__:\n**${au.length === 0 ? "NONE" : au
+						}**\n\n\n__Deny__:\n**${du.length === 0 ? "NONE" : du}**`,
+					inline: false
+				}, {
+					name: "Bot",
+					value: `__Allow__:\n**${ab.length === 0 ? "NONE" : ab}**\n\n\n__Deny__:\n**${db.length === 0 ? "NONE" : db}**`,
+					inline: false
+				}
+			],
+			timestamp: new Date().toISOString(),
+			color: Math.floor(Math.random() * 0xFFFFFF)
+		}
+	});
 }));

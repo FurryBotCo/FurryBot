@@ -1,11 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
-import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { db } from "../../modules/Database";
+import { Request } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -42,7 +39,7 @@ export default new Command({
 		return msg.reply(`hey, hey! They're already married to **${u}**!`);
 	}
 
-	const img = await this.f.imageAPIRequest(false, "propose", true, true);
+	const img = await Request.imageAPIRequest(false, "propose", true, true);
 
 	if (["embedLinks", "attachFiles"].some(p => msg.channel.permissionsOf(this.user.id).has(p)) && img.success === true) await msg.channel.createMessage({
 		embed: {
@@ -60,7 +57,7 @@ export default new Command({
 		},
 		content: `<@!${msg.author.id}> has proposed to <@!${member.id}>!\n<@!${member.id}> do you accept? **yes** or **no**.`
 	}, {
-		file: await this.f.getImageFromURL(img.response.image),
+		file: await Request.getImageFromURL(img.response.image),
 		name: "marry.png"
 	});
 	else await msg.channel.createMessage(`<@!${msg.author.id}> has proposed to <@!${member.id}>!\n<@!${member.id}> do you accept? **yes** or **no**.${img.success ? "\n\n(TIP: you could get images in this command if I had the `attachFiles`, and `embedLinks` permissions!)" : ""}`);

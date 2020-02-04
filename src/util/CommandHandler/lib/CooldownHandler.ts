@@ -1,8 +1,5 @@
 import Command from "./Command";
-import chalk from "chalk";
-import * as Eris from "eris";
 import Logger from "../../LoggerV8";
-import CommandHolder from "./CommandHolder";
 
 export default class CooldownHandler {
 	private _cooldowns: {
@@ -35,7 +32,7 @@ export default class CooldownHandler {
 		if (!this._inHandler) throw new TypeError("Cooldown handler set called with invalid context.");
 		let c;
 		if (cmd instanceof Command) {
-			if (!time) time = cmd.cooldown;
+			if ([undefined, null].includes(time)) time = cmd.cooldown;
 			c = cmd.triggers[0].toLowerCase();
 		}
 		else {

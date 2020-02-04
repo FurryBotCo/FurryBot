@@ -3,14 +3,13 @@ import * as fs from "fs-extra";
 import config from "./config";
 import MessageCollector from "./util/MessageCollector";
 import Temp from "./util/Temp";
-import { Logger } from "./util/LoggerV8";
 import E6API from "e6api";
 import E9API from "e9api";
 import { StatsD } from "node-statsd";
-import functions from "./util/Functions";
 import ErrorHandler from "./util/ErrorHandler";
 import ClientEvent from "./util/ClientEvent";
 import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
+import DeadShardTest from "./util/DeadShardTest";
 
 export default class FurryBot extends Eris.Client {
 	srv: any;
@@ -31,13 +30,13 @@ export default class FurryBot extends Eris.Client {
 	}[];
 	e6: E6API;
 	e9: E9API;
-	f: typeof functions;
 	activeReactChannels: string[];
 	// a: Analytics;
 	intr: NodeJS.Timeout;
 	errorHandler: ErrorHandler;
 	ddog: StatsD;
 	cmd: CommandHolder;
+	firstReady: boolean;
 	stats: {
 		messageCount: number;
 		dmMessageCount: number;
@@ -55,6 +54,8 @@ export default class FurryBot extends Eris.Client {
 		[k: string]: number;
 	};
 	channelTyping: Map<string, NodeJS.Timeout>;
+	_autoyiffLoop: NodeJS.Timeout;
+	shardTest: DeadShardTest;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
 		const client = this; // tslint:disable-line no-this-assignment
@@ -66,6 +67,7 @@ export default class FurryBot extends Eris.Client {
 
 		this.intr = null;
 
+		this._autoyiffLoop = null;
 		this.spamCounter = [];
 		this.responseSpamCounter = [];
 		this.activeReactChannels = [];
@@ -80,6 +82,8 @@ export default class FurryBot extends Eris.Client {
 		this.ddog = new StatsD(config.apis.ddog);
 		this.cmd = new CommandHolder(this);
 		this.channelTyping = new Map();
+		this.firstReady = false;
+		this.shardTest = new DeadShardTest(this);
 
 		process
 			.on("unhandledRejection", (reason, promise) =>
@@ -101,7 +105,6 @@ export default class FurryBot extends Eris.Client {
 			this.errorHandler.globalHandler.bind(this.errorHandler, "exit")({ code })
 		);*/
 
-		this.f = functions;
 		this.messageCollector = new MessageCollector(this);
 
 		this.commandStats = {};

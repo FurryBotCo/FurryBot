@@ -68,8 +68,10 @@ class LoggerV8 {
 					if (mn instanceof Function) mn = mn.toString();
 				}
 
-				if (msg.indexOf(config.bot.token)) msg = msg.replace(config.bot.token, "[TOKEN]");
-				if (msg.indexOf(config.universalKey)) msg = msg.replace(config.universalKey, "[KEY]");
+				if (typeof msg.indexOf !== "undefined") {
+					if (msg.indexOf(config.bot.token)) msg = msg.replace(config.bot.token, "[TOKEN]");
+					if (msg.indexOf(config.universalKey)) msg = msg.replace(config.universalKey, "[KEY]");
+				}
 
 				// .replace(/[^\[\]\w\s:\(\)#\|\.,_-]/gmi, "")
 				if (!fs.existsSync(`${config.logsDir}/client/${d}.log`)) fs.writeFileSync(`${config.logsDir}/client/${d}.log`, "");

@@ -4,12 +4,14 @@ import FurryBot from "@FurryBot";
 import * as Eris from "eris";
 import config from "../config";
 import { Colors } from "../util/Constants";
+import { Internal } from "../util/Functions";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 	this.decrement([
 		"events.guildDelete"
 	]);
-	await this.f.incrementDailyCounter(false);
+
+	await Internal.incrementDailyCounter(false);
 
 	let author = {
 		name: "Unknown#0000",

@@ -1,4 +1,4 @@
-import * as Eris from "eris";
+
 import ExtendedMessage from "@ExtendedMessage";
 import FurryBot from "@FurryBot";
 

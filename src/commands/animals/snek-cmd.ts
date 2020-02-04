@@ -4,6 +4,7 @@ import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
+import { Request } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -23,30 +24,25 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
-	let req, j;
-	try {
-		req = await phin({
-			method: "GET",
-			url: "https://api.chewey-bot.ga/snake",
-			headers: {
-				"User-Agent": config.web.userAgent,
-				"Authorization": config.apis.chewyBot.key
-			},
-			timeout: 5e3
-		});
-		j = JSON.parse(req.body);
+	const img = await Request.chewyBotAPIRequest("snake").catch(err => null);
 
-		return msg.channel.createMessage("", {
-			file: await this.f.getImageFromURL(j.data),
-			name: j.data.split("/").reverse()[0]
+	if (!img) return msg.reply("failed to fetch image from api, please try again later.");
+
+	return msg
+		.channel
+		.createMessage({
+			embed: {
+				title: "Snek!",
+				description: `[Image URL](${img})`,
+				timestamp: new Date().toISOString(),
+				author: {
+					name: msg.author.tag,
+					icon_url: msg.author.avatarURL
+				},
+				color: Math.floor(Math.random() * 0xFFFFFF),
+				image: {
+					url: img
+				}
+			}
 		});
-	} catch (e) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, e);
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, j);
-		return msg.channel.createMessage("unknown api error", {
-			file: await this.f.getImageFromURL(config.images.serverError),
-			name: "error.png"
-		});
-	}
 }));

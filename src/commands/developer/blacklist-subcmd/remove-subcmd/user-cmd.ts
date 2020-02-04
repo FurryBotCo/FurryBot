@@ -2,10 +2,10 @@ import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../../config";
-import { Logger } from "../../../../util/LoggerV8";
-import { db, mdb } from "../../../../modules/Database";
+import { mdb } from "../../../../modules/Database";
 import Eris from "eris";
-import { BlacklistEntry } from "../../../../util/@types/Misc";
+import { Blacklist } from "../../../../util/@types/Misc";
+import { Time } from "../../../../util/Functions";
 
 export default new SubCommand({
 	triggers: [
@@ -26,13 +26,13 @@ export default new SubCommand({
 	const u = await msg.getUserFromArgs();
 	if (!u) return msg.reply(`**${msg.args[0]}** isn't a valid user.`);
 	const { id } = u;
-	const ubl: BlacklistEntry[] = await mdb.collection("blacklist").find({ userId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now()));
+	const ubl: Blacklist.UserEntry[] = await mdb.collection("blacklist").find({ userId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now()));
 
 	if (ubl.length === 0) return msg.reply(`it doesn't look like **${u.username}#${u.discriminator}** has any blacklists.`);
 	await msg.channel.createMessage({
 		embed: {
 			title: `Blacklist Entries For ${u.username}#${u.discriminator}`,
-			fields: ubl.map(b => ({ name: `Date: ${this.f.formatDateWithPadding(new Date(b.created), true)}`, value: `Blame: ${b.blame}\nExpiry: ${[0, null].includes(b.expire) ? "Never" : this.f.formatDateWithPadding(new Date(b.expire), true)}\nReason: ${b.reason}\nNotice Shown: ${b.noticeShown ? "Yes" : "No"}\nID: **${b.id}**`, inline: false }))
+			fields: ubl.map(b => ({ name: `Date: ${Time.formatDateWithPadding(new Date(b.created), true)}`, value: `Blame: ${b.blame}\nExpiry: ${[0, null].includes(b.expire) ? "Never" : Time.formatDateWithPadding(new Date(b.expire), true)}\nReason: ${b.reason}\nNotice Shown: ${b.noticeShown ? "Yes" : "No"}\nID: **${b.id}**`, inline: false }))
 		}
 	});
 	await msg.channel.createMessage("Please either provide one of the ids to remove it, or say `cancel` to cancel.");

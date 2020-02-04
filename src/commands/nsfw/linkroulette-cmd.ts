@@ -1,11 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { mongo } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
@@ -23,7 +20,7 @@ export default new Command({
 	features: ["nsfw"],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
 	let s: any[] | any = await mongo.db("furrybot").collection("shorturl").find().toArray();
 
 	if (s.length === 0) return msg.reply("No results were found.");

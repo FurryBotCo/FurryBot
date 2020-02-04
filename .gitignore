@@ -75,6 +75,7 @@ tmp/*
 test.js
 run.sh
 src/util/AnalyticsWebsocketV2.ts
+src/assets/bulkDelete
 
 # tsc output
 build/

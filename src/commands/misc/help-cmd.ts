@@ -2,10 +2,8 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../modules/Database";
+import { Time } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -24,7 +22,8 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	await msg.channel.startTyping();
+	// await msg.channel.startTyping();
+	// \u25FD
 	let embed: Eris.EmbedOptions;
 
 	if (msg.args.length === 0) {
@@ -42,7 +41,7 @@ export default new Command({
 				icon_url: msg.author.avatarURL
 			},
 			timestamp: new Date().toISOString(),
-			color: this.f.randomColor()
+			color: Math.floor(Math.random() * 0xFFFFFF)
 		};
 
 		return msg.channel.createMessage({ embed });
@@ -55,45 +54,35 @@ export default new Command({
 
 		embed = {
 			title: cmd.triggers[0],
-			description: cmd.description,
-			fields: [
-				{
-					name: "Usage",
-					value: `\`${msg.gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
-					inline: false
-				},
-				{
-					name: "Restrictions",
-					value: `NSFW: **${cmd.features.includes("nsfw") ? "Yes" : "No"}**\nDeveloper Only: **${cmd.features.includes("devOnly") ? "Yes" : "No"}**\nBeta Only: **${cmd.features.includes("betaOnly") ? "Yes" : "No"}**\nGuild Owner Only: **${cmd.features.includes("guildOwnerOnly") ? "Yes" : "No"}**\nSupport Server Only: **${cmd.features.includes("supportOnly") ? "Yes" : "No"}**`,
-					inline: false
-				},
-				{
-					name: "Permissions",
-					value: `Bot: **${cmd.botPermissions.length === 0 ? "NONE" : cmd.botPermissions.join("**, **")}**\nUser: **${cmd.userPermissions.length === 0 ? "NONE" : cmd.userPermissions.join("**, **")}**`,
-					inline: false
-				},
-				{
-					name: "Aliases",
-					value: cmd.triggers.join(", "),
-					inline: false
-				},
-				{
-					name: "Cooldown",
-					value: await this.f.ms(cmd.cooldown, true) as string,
-					inline: false
-				},
-				{
-					name: "Category",
-					value: cat.displayName,
-					inline: false
-				}
-			],
+			description: [
+				cmd.description,
+				"",
+				`**Restrictions**:`,
+				`\u25FD NSFW: **${cmd.features.includes("nsfw") ? "Yes" : "No"}**`,
+				`\u25FD Developer Only: **${cmd.features.includes("devOnly") ? "Yes" : "No"}**`,
+				`\u25FD Beta Only: **${cmd.features.includes("betaOnly") ? "Yes" : "No"}**`,
+				`\u25FD Guild Owner Only: **${cmd.features.includes("guildOwnerOnly") ? "Yes" : "No"}**`,
+				`\u25FD Support Server Only: **${cmd.features.includes("supportOnly") ? "Yes" : "No"}**`,
+				`\u25FD Donator Only: **${cmd.features.includes("donatorOnly") ? "Yes" : "No"}**`,
+				`\u25FD Premium Guild Only: **${cmd.features.includes("premiumGuildOnly") ? "Yes" : "No"}**`,
+				"",
+				`**Permissions**:`,
+				`\u25FD Bot: **${cmd.botPermissions.length === 0 ? "NONE" : cmd.botPermissions.join("**, **")}**`,
+				`\u25FD User: **${cmd.userPermissions.length === 0 ? "NONE" : cmd.userPermissions.join("**, **")}**`,
+				"",
+				"**Extra**:",
+				`\u25FD Usage: \`${msg.gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
+				`\u25FD Aliases: ${cmd.triggers.join(", ")}`,
+				`\u25FD Normal Cooldown: ${Time.ms(cmd.cooldown, true)}`,
+				`\u25FD Donator Cooldown: ${Time.ms(cmd.donatorCooldown, true)}`,
+				`\u25FD Category: ${cat.displayName}`
+			].join("\n"),
 			author: {
 				name: msg.author.tag,
 				icon_url: msg.author.avatarURL
 			},
 			timestamp: new Date().toISOString(),
-			color: this.f.randomColor()
+			color: Math.floor(Math.random() * 0xFFFFFF)
 		};
 
 
@@ -142,7 +131,7 @@ export default new Command({
 				icon_url: msg.author.avatarURL
 			},
 			timestamp: new Date().toISOString(),
-			color: this.f.randomColor()
+			color: Math.floor(Math.random() * 0xFFFFFF)
 		};
 
 		return msg.channel.createMessage({ embed });

@@ -2,10 +2,7 @@ import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../config";
-import { Logger } from "../../../util/LoggerV8";
-import phin from "phin";
 import * as Eris from "eris";
-import { db, mdb, mongo } from "../../../modules/Database";
 import { Colors } from "../../../util/Constants";
 import { performance } from "perf_hooks";
 import * as fs from "fs-extra";
@@ -41,6 +38,8 @@ export default new SubCommand({
 		const b = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 15e3);
 		if (!b || !b.content || !["false", "true", "no", "yes"].includes(b.content.toLowerCase())) return msg.reply("invalid response.");
 		a = b.content.toLowerCase();
+
+		await b.delete().catch(err => null);
 	} else {
 		a = msg.args[1].toLowerCase();
 		m = await msg.channel.createMessage("Processing..");
@@ -58,16 +57,17 @@ export default new SubCommand({
 			break;
 	}
 
-	if (rebuild) {
-		await m.edit("Rebuilding code, please wait..");
-		const start = performance.now();
-		const rb = execSync("npm run build", {
-			cwd: config.rootDir
-		});
-		const end = performance.now();
-		await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
-	} else await msg.edit("not rebuilding code.");
 	try {
+		if (rebuild) {
+			m = await m.edit("Rebuilding code, please wait..");
+			const start = performance.now();
+			const rb = execSync("npm run build", {
+				cwd: config.rootDir
+			});
+			const end = performance.now();
+			m = await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);
+		} else m = await m.edit("not rebuilding code.");
+
 		delete require.cache[ev];
 		this.removeAllListeners(msg.args[0]);
 		const e: ClientEvent = require(ev).default;
@@ -82,11 +82,15 @@ export default new SubCommand({
 				author: {
 					name: msg.author.tag,
 					icon_url: msg.author.avatarURL
+				},
+				footer: {
+					text: "(a full restart will most likely be required)",
+					icon_url: "https://i.furry.bot/furry.png"
 				}
 			}
 		});
 	}
 	const end = performance.now();
 
-	return msg.channel.createMessage(`Reloaded the event **${msg.args[0]}** in ${Number((end - start).toFixed(3)).toLocaleString()}ms`);
+	return m.edit(`${m.content}\n\nReloaded the event **${msg.args[0]}** in ${Number((end - start).toFixed(3)).toLocaleString()}ms`);
 }));
