@@ -2,23 +2,8 @@ import config from "../../config";
 import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
 
-interface CommandConfigEntry {
-	type: "command" | "category";
-	selectionType: "channel" | "user" | "role" | "server";
-	selection: string;
-}
-
-interface RegistrationQuestion {
-	createdBy: string;
-	question: string;
-	options: {
-		[q: string]: string;
-	};
-}
-
 class GuildConfig {
 	id: string;
-	premium: boolean;
 	selfAssignableRoles: string[];
 	music: {
 		volume: number;
@@ -39,6 +24,8 @@ class GuildConfig {
 		lang: string;
 		prefix: string;
 		deleteModCmds: boolean;
+		ecoEmoji: string;
+		modlog?: string;
 	};
 	snipe: {
 		edit: {
@@ -74,6 +61,10 @@ class GuildConfig {
 	tags: {
 		[k: string]: string;
 	};
+	auto: (
+		GlobalTypes.Auto.Yiff<"gay" | "straight" | "lesbian" | "dickgirl"> |
+		GlobalTypes.Auto.Animals<"bird" | "bunny" | "cat" | "dog" | "duck" | "fox" | "otter" | "panda" | "snek" | "turtle" | "wolf">
+	)[];
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		this.id = id;
 		if (!data) data = config.defaults.guildConfig;
@@ -81,7 +72,6 @@ class GuildConfig {
 	}
 
 	private _load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
-		this.premium = ![undefined, null].includes(data.premium) ? data.premium : config.defaults.guildConfig.premium;
 		this.selfAssignableRoles = ![undefined, null].includes(data.selfAssignableRoles) ? data.selfAssignableRoles : config.defaults.guildConfig.selfAssignableRoles;
 		this.music = ![undefined, null].includes(data.music) ? {
 			volume: data.music.volume || 100,
@@ -95,7 +85,9 @@ class GuildConfig {
 			commandImages: data.settings && data.settings.commandImages ? true : false,
 			lang: data.settings && data.settings.lang ? data.settings.lang : config.defaults.guildConfig.settings.lang,
 			prefix: data.settings && data.settings.prefix ? data.settings.prefix : config.defaultPrefix,
-			deleteModCmds: data.settings && data.settings.deleteModCmds ? data.settings.deleteModCmds : config.defaults.guildConfig.settings.deleteModCmds
+			deleteModCmds: data.settings && data.settings.deleteModCmds ? data.settings.deleteModCmds : config.defaults.guildConfig.settings.deleteModCmds,
+			ecoEmoji: data.settings && data.settings.ecoEmoji ? data.settings.ecoEmoji : config.defaults.guildConfig.settings.ecoEmoji,
+			modlog: data.settings && data.settings.modlog ? data.settings.modlog : config.defaults.guildConfig.settings.modlog
 		};
 		this.snipe = data.snipe ? {
 			delete: data.snipe.delete || config.defaults.guildConfig.snipe.delete,
@@ -104,6 +96,7 @@ class GuildConfig {
 		this.logEvents = {} as any;
 		Object.keys(config.defaults.guildConfig.logEvents).map(k => data.logEvents && data.logEvents[k] ? this.logEvents[k] = data.logEvents[k] : this.logEvents[k] = config.defaults.guildConfig.logEvents[k]);
 		this.tags = data.tags ? data.tags : config.defaults.guildConfig.tags;
+		this.auto = ![undefined, null].includes(data.auto) ? data.auto : config.defaults.guildConfig.auto;
 		return null;
 	}
 
@@ -114,9 +107,8 @@ class GuildConfig {
 		return this;
 	}
 
-	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
+	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles" | "autoyiff">>) {
 		const g = {
-			premium: this.premium,
 			music: this.music,
 			settings: this.settings,
 			snipe: this.snipe,
@@ -132,8 +124,6 @@ class GuildConfig {
 		function replaceArray(keys: string[], check: any, update: any) {
 			return keys.map(k => typeof check[k] !== "undefined" ? update[k] = check[k] : null);
 		}
-
-		if (typeof data.premium !== "undefined") g.premium = data.premium;
 
 		if (typeof data.music !== "undefined") replaceArray(["volume", "textChannel"], data.music, g.music);
 
@@ -170,6 +160,18 @@ class GuildConfig {
 		await this.edit(config.defaults.guildConfig);
 		await this._load(config.defaults.guildConfig);
 		return this;
+	}
+
+	async premiumCheck(): Promise<GlobalTypes.PremiumGuildEntry> {
+		const r = await mdb.collection("premium").find<GlobalTypes.PremiumGuildEntry>({ guildId: this.id }).toArray();
+		if (!r || r.length === 0) return {
+			type: "guild",
+			guildId: this.id,
+			user: null,
+			active: false,
+			activationDate: null
+		};
+		else return r[0];
 	}
 }
 

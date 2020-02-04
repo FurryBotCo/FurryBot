@@ -23,13 +23,6 @@ class UserConfig {
 	bal: number;
 	tips: boolean;
 	dmActive: boolean;
-	patreon: {
-		amount: number;
-		createdAt: number;
-		declinedAt: number;
-		donator?: boolean;
-		patronId: string;
-	};
 	preferences: {
 		mention: boolean;
 	};
@@ -50,13 +43,6 @@ class UserConfig {
 		this.bal = ![undefined, null].includes(data.bal) ? data.bal : config.defaults.userConfig.bal;
 		this.tips = ![undefined, null].includes(data.tips) ? data.tips : config.defaults.userConfig.tips;
 		this.dmActive = ![undefined, null].includes(data.dmActive) ? data.dmActive : config.defaults.userConfig.dmActive;
-		this.patreon = ![undefined, null].includes(data.patreon) ? {
-			amount: data.patreon.amount || 0,
-			createdAt: data.patreon.createdAt || null,
-			declinedAt: data.patreon.declinedAt || null,
-			donator: !!data.patreon.donator,
-			patronId: data.patreon.patronId || null
-		} : config.defaults.userConfig.patreon;
 		this.preferences = ![undefined, null].includes(data.preferences) ? {
 			mention: !!data.preferences.mention
 		} : config.defaults.userConfig.preferences;
@@ -80,7 +66,6 @@ class UserConfig {
 			bal: this.bal,
 			tips: this.tips,
 			dmActive: this.dmActive,
-			patreon: this.patreon,
 			preferences: this.preferences
 		};
 
@@ -92,14 +77,6 @@ class UserConfig {
 		if (typeof data.bal !== "undefined") u.bal = data.bal;
 		if (typeof data.tips !== "undefined") u.tips = data.tips;
 		if (typeof data.dmActive !== "undefined") u.dmActive = data.dmActive;
-
-		if (typeof data.patreon !== "undefined") {
-			if (typeof data.patreon.amount) u.patreon.amount = data.patreon.amount;
-			if (typeof data.patreon.createdAt) u.patreon.createdAt = data.patreon.createdAt;
-			if (typeof data.patreon.declinedAt) u.patreon.declinedAt = data.patreon.declinedAt;
-			if (typeof data.patreon.donator) u.patreon.donator = data.patreon.donator;
-			if (typeof data.patreon.patronId) u.patreon.patronId = data.patreon.patronId;
-		}
 
 		if (typeof data.preferences !== "undefined") {
 			if (typeof data.preferences.mention) u.preferences.mention = data.preferences.mention;
@@ -128,6 +105,19 @@ class UserConfig {
 		await mdb.collection("users").insertOne({ ...{}, ...config, ...{ id: this.id } });
 		await this._load(config.defaults.userConfig);
 		return this;
+	}
+
+	async premiumCheck(): Promise<GlobalTypes.PremiumUserEntry> {
+		const r = await mdb.collection("premium").find<GlobalTypes.PremiumUserEntry>({ userId: this.id }).toArray();
+		if (!r || r.length === 0) return {
+			type: "user",
+			userId: this.id,
+			amount: 0,
+			active: false,
+			activationDate: null,
+			patronId: null
+		};
+		else return r[0];
 	}
 }
 
