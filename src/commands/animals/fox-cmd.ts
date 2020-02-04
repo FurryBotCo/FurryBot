@@ -22,17 +22,18 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// await msg.channel.startTyping();
-	try {
-		return msg.channel.createMessage("", {
-			file: await Request.getImageFromURL("https://foxrudor.de/"),
-			name: "foxrudor.de.png"
-		});
-	} catch (e) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, e);
-		return msg.channel.createMessage("unknown api error", {
-			file: await Request.getImageFromURL(config.images.serverError),
-			name: "error.png"
-		});
-	}
+	return msg.channel.createMessage({
+		embed: {
+			title: "Foxxo!",
+			timestamp: new Date().toISOString(),
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			color: Math.floor(Math.random() * 0xFFFFFF),
+			image: {
+				url: "https://foxrudor.de"
+			}
+		}
+	}).catch(err => null);
 }));

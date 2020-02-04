@@ -8,7 +8,7 @@ import { Request } from "../../util/Functions";
 export default new Command({
 	triggers: [
 		"bird",
-		"bird"
+		"birb"
 	],
 	userPermissions: [],
 	botPermissions: [
@@ -24,16 +24,22 @@ export default new Command({
 	// await msg.channel.startTyping();
 	const img = await Request.imageAPIRequest(true, "birb");
 	if (img.success === false) return msg.reply(`Image API returned an error: ${img.error.description}`);
-	try {
-		return msg.channel.createMessage("", {
-			file: await Request.getImageFromURL(img.response.image),
-			name: img.response.name
-		});
-	} catch (e) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, e);
-		return msg.channel.createMessage("unknown api error", {
-			file: await Request.getImageFromURL(config.images.serverError),
-			name: "error.png"
-		});
-	}
+	return msg
+		.channel
+		.createMessage({
+			embed: {
+				title: "Birb!",
+				description: `[Image URL](${img.response.image})`,
+				timestamp: new Date().toISOString(),
+				author: {
+					name: msg.author.tag,
+					icon_url: msg.author.avatarURL
+				},
+				color: Math.floor(Math.random() * 0xFFFFFF),
+				image: {
+					url: img.response.image
+				}
+			}
+		})
+		.catch(err => null);
 }));
