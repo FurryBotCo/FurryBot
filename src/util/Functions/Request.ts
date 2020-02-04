@@ -1,6 +1,7 @@
 import config from "../../config";
 import phin from "phin";
 import * as fs from "fs-extra";
+import Logger from "../LoggerV8";
 
 export default class Request {
 	private constructor() {
@@ -45,12 +46,15 @@ export default class Request {
 		}
 	)> {
 		if ([undefined, null].includes(json)) json = true;
+		const url = `https://api.furry.bot/V1/${animal ? "animals" : `furry/${safe ? "sfw" : "nsfw"}`}/${category ? category.toLowerCase() : safe ? "hug" : "bulge"}${json ? "" : "/image"}`.replace(/\s/g, "");
 		const s = await phin({
 			method: "GET",
-			url: `https://api.furry.bot/${animal ? "animals" : `furry/${safe ? "sfw" : "nsfw"}`}/${category ? category.toLowerCase() : safe ? "hug" : "bulge"}${json ? "" : "/image"}`.replace(/\s/g, ""),
+			url,
 			parse: "json",
 			timeout: 5e3
 		});
+
+		if (s.statusCode !== 200) Logger.error("Request", `URL: ${url}, Status: ${s.statusCode} ${s.statusMessage}`);
 
 		return s.body;
 	}
@@ -98,5 +102,29 @@ export default class Request {
 			parse: "none",
 			timeout: 3e4
 		});
+	}
+
+	static async chewyBotAPIRequest(cat: string): Promise<string> {
+		let r: phin.BufferResponse;
+		try {
+			r = await phin({
+				method: "GET",
+				url: `https://api.chewey-bot.top/${cat}`,
+				headers: {
+					"User-Agent": config.web.userAgent,
+					"Authorization": config.apis.chewyBot.key
+				},
+				timeout: 5e3
+			});
+			const b = JSON.parse(r.body.toString());
+			return b.data;
+		} catch (e) { // cannot annotate try-catch clauses
+			const err = e as Error;
+			Logger.error("Request", `${r.statusCode} ${r.statusMessage}`);
+			Logger.error("Request", err);
+			Logger.error("Request", r.body.toString());
+			if (err.message.indexOf("JSON") !== -1 && err.stack.indexOf("JSON.parse") !== -1) return null;
+			throw err;
+		}
 	}
 }
