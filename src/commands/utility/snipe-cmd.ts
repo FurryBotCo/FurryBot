@@ -26,7 +26,7 @@ export default new Command({
 	if (!s) return msg.reply(`no snipes found for the channel <#${ch.id}>.`);
 
 	const i = s.content.match(new RegExp("((https?:\/\/)?(discord(app\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
-	i.map(k => s.content = s.content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
+	if (!!i) i.map(k => s.content = s.content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
 	const u = await this.getRESTUser(s.authorId);
 	const embed: Eris.EmbedOptions = {
 		title: "Message Delete Snipe",
