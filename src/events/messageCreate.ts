@@ -49,9 +49,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				if (ubl.length > 0) {
 					const n = ubl.filter(u => !u.noticeShown);
 					if (n.length > 0) {
+
 						await mdb.collection("blacklist").findOneAndUpdate({ id: n[0].id }, { $set: { noticeShown: true } });
 						const expiry = [0, null].includes(n[0].expire) ? "Never" : Time.formatDateWithPadding(new Date(n[0].expire));
-						return msg.reply(`you have been blacklisted. Reason: ${n[0].reason}, blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
+						return msg.reply(`you were blacklisted on ${Time.formatDateWithPadding(n[0].created)}. Reason: ${n[0].reason}, blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
 					} else return;
 				}
 
@@ -60,7 +61,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					if (n.length > 0) {
 						await mdb.collection("blacklist").findOneAndUpdate({ id: n[0].id }, { $set: { noticeShown: true } });
 						const expiry = [0, null].includes(n[0].expire) ? "Never" : Time.formatDateWithPadding(new Date(n[0].expire));
-						return msg.reply(`this server has been blacklisted. Reason: ${n[0].reason}. Blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
+						return msg.reply(`this server was blacklisted on ${Time.formatDateWithPadding(n[0].created)}. Reason: ${n[0].reason}. Blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
 					} else return;
 				}
 			}
