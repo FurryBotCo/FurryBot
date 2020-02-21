@@ -184,8 +184,8 @@ export default class Utility {
 		const b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
 
 		return {
-			higher: b.position < role.position,
-			lower: b.position > role.position,
+			higher: b.position > role.position,
+			lower: b.position < role.position,
 			same: b.position === role.position
 		};
 	}
