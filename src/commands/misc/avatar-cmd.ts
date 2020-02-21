@@ -39,7 +39,7 @@ export default new Command({
 	const embed: Eris.EmbedOptions = {
 		title: "Avatar",
 		image: {
-			url: user.avatarURL
+			url: `${user.avatarURL.split("?")[0]}?size=1024`
 		},
 		author: {
 			name: msg.author.tag,
@@ -49,7 +49,7 @@ export default new Command({
 			text: `${user.username}#${user.discriminator}`,
 			icon_url: `${msg.author.avatarURL.split("?")[0]}?size=1024`
 		},
-		description: `[Link](${msg.author.avatarURL.split("?")[0]}?size=1024)`,
+		description: `[Link](${user.avatarURL.split("?")[0]}?size=1024)`,
 		color
 	};
 
