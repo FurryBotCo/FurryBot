@@ -193,53 +193,33 @@ export default class Internal {
 	}
 
 	/**
-	 * check if a user is a booster
-	 *
-	 * will fail if the main guild is not present
-	 * @static
-	 * @param {string} userId - the users id
-	 * @param {FurryBot} client - the bot client
-	 * @returns
-	 * @memberof Internal
-	 */
-	static async checkBooster(userId: string, client: FurryBot) {
-		const g = client.guilds.get(config.bot.mainGuild);
-		if (!g) return false;
-		if (!g.members.has(userId)) return false;
-		else {
-			const m = g.members.get(userId);
-			return m.roles.includes(config.nitroBoosterRole);
-		}
-	}
-
-	/**
 	 * get a user from the database
 	 * @readonly
 	 * @static
 	 * @memberof Internal
 	 */
-	static get getUser() { return db.getUser.bind(db); }
+	static get getUser(): typeof db["getUser"] { return db.getUser.bind(db); }
 	/**
 	 * get a user from the database (synchronous)
 	 * @readonly
 	 * @static
 	 * @memberof Internal
 	 */
-	static get getUserSync() { return db.getUserSync.bind(db); }
+	static get getUserSync(): typeof db["getUserSync"] { return db.getUserSync.bind(db); }
 	/**
 	 * get a guild from the database
 	 * @readonly
 	 * @static
 	 * @memberof Internal
 	 */
-	static get getGuild() { return db.getGuild.bind(db); }
+	static get getGuild(): typeof db["getGuild"] { return db.getGuild.bind(db); }
 	/**
 	 * get a guild from the database (synchronous)
 	 * @readonly
 	 * @static
 	 * @memberof Internal
 	 */
-	static get getGuildSync() { return db.getGuildSync.bind(db); }
+	static get getGuildSync(): typeof db["getGuildSync"] { return db.getGuildSync.bind(db); }
 
 	static get loopPatrons() { return loopPatrons; }
 	static get refreshPatreonToken() { return refreshPatreonToken; }
@@ -252,6 +232,7 @@ export default class Internal {
 	 * @memberof Internal
 	 */
 	static async runAuto(time: number, client: FurryBot) {
+		// @TODO clean this crap up
 		const guilds = await mdb
 			.collection("guilds")
 			.find<GuildConfig>({})
