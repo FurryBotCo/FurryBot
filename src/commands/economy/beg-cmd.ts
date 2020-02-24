@@ -4,6 +4,7 @@ import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Colors } from "../../util/Constants";
 import { db } from "../../modules/Database";
+import { Economy } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -21,6 +22,7 @@ export default new Command({
 	features: ["devOnly"],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	const { multi, multiStr } = await Economy.calculateMulti(msg.author.id, this);
 	const names = [
 		...config.eco.people,
 		msg.channel.guild.members.random().username,
@@ -30,7 +32,7 @@ export default new Command({
 
 	const person = names[Math.floor(Math.random() * names.length)];
 
-	const amount = Math.floor(Math.random() * 75) + 25;
+	const amount = Math.floor(((Math.random() * 75) + 25) * (multi + 1));
 
 	await msg.uConfig.edit({ bal: msg.uConfig.bal + amount });
 
@@ -43,6 +45,9 @@ export default new Command({
 			author: {
 				name: msg.author.tag,
 				icon_url: msg.author.avatarURL
+			},
+			footer: {
+				text: `Multiplier: ${multiStr}%`
 			}
 		}
 	});
