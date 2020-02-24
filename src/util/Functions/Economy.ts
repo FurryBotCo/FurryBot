@@ -124,4 +124,20 @@ export default class Economy {
 			}
 		};
 	}
+
+	static async calculateMulti(userId: string, client: FurryBot) {
+
+		let multi = 0;
+		const av: string[] = [];
+		for (const k of Object.keys(this.multi)) {
+			const m = this.multi[k];
+			if (await m.check(userId, client)) (av.push(k), multi += m.p);
+		}
+
+		return {
+			multi,
+			multiStr: parseFloat((multi * 100).toFixed(2)),
+			list: av
+		};
+	}
 }
