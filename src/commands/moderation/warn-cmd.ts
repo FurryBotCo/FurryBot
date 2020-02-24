@@ -50,7 +50,7 @@ export default new Command({
 						embed: {
 							title: "Member Warned",
 							description: [
-								`Offender: ${member.username}#${member.discriminator} <@!${member.id}>`,
+								`Target: ${member.username}#${member.discriminator} <@!${member.id}>`,
 								`Reason: ${reason}`
 							].join("\n"),
 							timestamp: new Date().toISOString(),

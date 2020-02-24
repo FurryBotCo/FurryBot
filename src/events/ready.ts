@@ -8,7 +8,9 @@ import express from "express";
 import http from "http";
 import { mdb } from "../modules/Database";
 import cmd from "../commands";
-import { Internal } from "../util/Functions";
+import { Internal, Time } from "../util/Functions";
+import * as fs from "fs-extra";
+import Eris from "eris";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
 	this.increment([
@@ -62,9 +64,9 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 
 	cmd.map(c => this.cmd.addCategory(c));
 
-	this.cmd.commands.map(c => this.commandStats[c.triggers[0]] = 0);
+	// this.cmd.commands.map(c => this.commandStats[c.triggers[0]] = 0);
 
-	setInterval(async () => {
+	/*setInterval(async () => {
 		let o = {
 			messageCount: 0,
 			dmMessageCount: 0
@@ -88,53 +90,65 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		this.stats.messageCount = 0;
 		this.stats.dmMessageCount = 0;
 		// Logger.debug("Stats", "Posted message stats.");
-	}, 1e4);
+	}, 1e4);*/
 
-	setInterval(async () => {
-		if (new Date().toString().split(" ")[4] === "00:00:00") {
-			const d = new Date(Date.now() + 432e5);
-			const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-			let k = await mdb.collection("dailyjoins").findOne({ id }).catch(err => null);
-			if (!k) k = "Unknown.";
-			Logger.log("Daily Joins", `Daily joins for ${id}: ${k}`);
-			await this.executeWebhook(config.webhooks.dailyjoins.id, config.webhooks.dailyjoins.token, {
-				embeds: [
-					{
-						title: `Daily Joins for ${id}`,
-						description: `Total Servers Joined Today: ${k}\nTotal Servers: ${this.guilds.size}`,
-						timestamp: new Date().toISOString()
-					}
-				],
-				username: `Daily Joins${config.beta ? " - Beta" : ""}`,
-				avatarURL: "https://i.furry.bot/furry.png"
-			});
-		}
-	}, 1e3);
-
-	const
-		go = (async (t: number) => {
-			for (let i = 0; i < (36e5 / t); i++) {
-				setTimeout(() => Internal.runAuto(t, this), t * (i + 1));
+	if (!config.beta) {
+		setInterval(async () => {
+			if (new Date().toString().split(" ")[4] === "00:00:00") {
+				const d = new Date(Date.now() + 432e5);
+				const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
+				let k = await mdb.collection("dailyjoins").findOne({ id }).catch(err => null);
+				if (!k) k = "Unknown.";
+				Logger.log("Daily Joins", `Daily joins for ${id}: ${k}`);
+				await this.executeWebhook(config.webhooks.dailyjoins.id, config.webhooks.dailyjoins.token, {
+					embeds: [
+						{
+							title: `Daily Joins for ${id}`,
+							description: `Total Servers Joined Today: ${k}\nTotal Servers: ${this.guilds.size}`,
+							timestamp: new Date().toISOString()
+						}
+					],
+					username: `Daily Joins${config.beta ? " - Beta" : ""}`,
+					avatarURL: "https://i.furry.bot/furry.png"
+				});
 			}
-		}),
-		setupAll = (() => {
-			// 5 minutes
-			go(3e5);
+		}, 1e3);
 
-			// 10 minutes
-			go(6e5);
+		const
+			go = (async (t: number) => {
+				for (let i = 0; i < (36e5 / t); i++) {
+					setTimeout(() => Internal.runAuto(t, this), t * (i + 1));
+				}
+			}),
+			setupAll = (() => {
+				// 5 minutes
+				go(3e5);
 
-			// 15 minutes
-			go(9e5);
+				// 10 minutes
+				go(6e5);
 
-			// 30 minutes
-			go(18e5);
+				// 15 minutes
+				go(9e5);
 
-			// 60 minutes
-			go(36e5);
-		});
+				// 30 minutes
+				go(18e5);
 
-	setupAll();
-	this._autoyiffLoop = setInterval(setupAll, 36e5);
+				// 60 minutes
+				go(36e5);
+			});
+
+		setupAll();
+		this._autoyiffLoop = setInterval(setupAll, 36e5);
+		this._timedLoop = setInterval(() => Internal.timedCheck(this), 3e4);
+	}
+
 	Logger.log("Ready", `Client ready with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds, with ${this.cmd.commands.length} commands.`);
+
+	if (fs.existsSync(`${config.rootDir}/restart.json`)) {
+		const t = Date.now();
+		const r = JSON.parse(fs.readFileSync(`${config.rootDir}/restart.json`).toString());
+		fs.unlinkSync(`${config.rootDir}/restart.json`);
+
+		await this.getRESTChannel(r.channel).then((ch: Eris.GuildTextableChannel) => ch.createMessage(`<@!${r.user}>, restart took **${Time.ms(t - r.time, true)}**.`));
+	}
 }));

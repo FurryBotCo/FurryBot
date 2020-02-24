@@ -57,9 +57,9 @@ export default new Command({
 				else {
 					await ch.createMessage({
 						embed: {
-							title: "Member Banned",
+							title: "Member Hackbanned",
 							description: [
-								`Offender: ${user.username}#${user.discriminator} <@!${user.id}>`,
+								`Target: ${user.username}#${user.discriminator} <@!${user.id}>`,
 								`Reason: ${reason}`
 							].join("\n"),
 							timestamp: new Date().toISOString(),

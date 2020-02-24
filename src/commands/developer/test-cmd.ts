@@ -18,14 +18,23 @@ export default new Command({
 	if (!msg.args[0]) return msg.reply("tested..");
 
 	switch (msg.args[0].toLowerCase()) {
-		case "err":
+		case "err": {
 			throw new Error("ERR_TESTING");
 			break;
+		}
 
-		case "reload":
+		case "reload": {
 			return msg.reply("hello.");
+			break;
+		}
 
-		default:
+		case "ban": {
+			return msg.member.ban(0, "test");
+			break;
+		}
+
+		default: {
 			return msg.reply("invalid test.");
+		}
 	}
 }));

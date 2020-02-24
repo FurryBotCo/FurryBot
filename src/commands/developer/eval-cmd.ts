@@ -13,7 +13,6 @@ import * as os from "os";
 import { performance } from "perf_hooks";
 import Permissions from "../../util/Permissions";
 import * as F from "../../util/Functions";
-import Redis from "../../util/Redis";
 
 export default new Command({
 	triggers: [
@@ -52,8 +51,7 @@ export default new Command({
 			os,
 			F,
 			Functions: F,
-			...F,
-			Redis
+			...F
 		});
 	} catch (e) {
 		res = e;

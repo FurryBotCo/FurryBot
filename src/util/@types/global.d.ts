@@ -3,6 +3,10 @@ declare const __line: number;
 declare const __function: string;
 
 declare namespace GlobalTypes {
+	interface DBEntry {
+		_id: string;
+	}
+
 	export type PremiumEntry = PremiumGuildEntry | PremiumUserEntry;
 
 	interface PremiumGuildEntry {
@@ -20,6 +24,15 @@ declare namespace GlobalTypes {
 		amount: number;
 		activationDate: number;
 		patronId: string;
+	}
+
+	interface TimedEntry extends DBEntry {
+		time: number;
+		expiry: number;
+		userId: string;
+		guildId: string;
+		type: "mute" | "ban";
+		reason: string;
 	}
 }
 

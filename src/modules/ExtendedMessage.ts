@@ -141,7 +141,7 @@ class ExtendedMessage extends Eris.Message<ExtendedTextChannel> {
 				get isDeveloper() {
 					return config.developers.includes(this.user.id);
 				},
-				isBooster: await F.Internal.checkBooster(this.author.id, client)
+				isBooster: await F.Economy.checkBooster(this.author.id, client)
 			};
 		} else {
 			this._gConfig = null;

@@ -12,10 +12,11 @@ import Permissions from "../util/Permissions";
 import { Blacklist } from "../util/@types/Misc";
 import { uuid } from "short-uuid";
 import { Time, Internal, Strings, Request } from "../util/Functions";
+import phin from "phin";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
-	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) this.stats.dmMessageCount++;
-	else this.stats.messageCount++;
+	// if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) this.stats.dmMessageCount++;
+	// else this.stats.messageCount++;
 	let msg: ExtendedMessage;
 	try {
 		const t = new Timers();
@@ -49,9 +50,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				if (ubl.length > 0) {
 					const n = ubl.filter(u => !u.noticeShown);
 					if (n.length > 0) {
+
 						await mdb.collection("blacklist").findOneAndUpdate({ id: n[0].id }, { $set: { noticeShown: true } });
 						const expiry = [0, null].includes(n[0].expire) ? "Never" : Time.formatDateWithPadding(new Date(n[0].expire));
-						return msg.reply(`you have been blacklisted. Reason: ${n[0].reason}, blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
+						return msg.reply(`you were blacklisted on ${Time.formatDateWithPadding(n[0].created)}. Reason: ${n[0].reason}, blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
 					} else return;
 				}
 
@@ -60,7 +62,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					if (n.length > 0) {
 						await mdb.collection("blacklist").findOneAndUpdate({ id: n[0].id }, { $set: { noticeShown: true } });
 						const expiry = [0, null].includes(n[0].expire) ? "Never" : Time.formatDateWithPadding(new Date(n[0].expire));
-						return msg.reply(`this server has been blacklisted. Reason: ${n[0].reason}. Blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
+						return msg.reply(`this server was blacklisted on ${Time.formatDateWithPadding(n[0].created)}. Reason: ${n[0].reason}. Blame: ${n[0].blame}. Expiry: ${expiry}. You can ask about your blacklist in our support server: <${config.bot.supportInvite}>`).catch(err => null);
 					} else return;
 				}
 			}
@@ -354,7 +356,25 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				`shardId:${msg.channel.guild.shard.id}`
 			]
 		);
-		this.commandStats[cmd.triggers[0]]++;
+		// this.commandStats[cmd.triggers[0]]++;
+		type UsageStats = {
+			[k: string]: number;
+		} | {
+			id: "commandUsage";
+		};
+		let st = await mdb.collection<UsageStats>("stats").findOne({ id: "commandUsage" });
+		if (!st || Object.keys(st).length === 0) {
+			Logger.warn("Message Create", "Stats entry is empty, recreating.");
+			st = {
+				id: "commandUsage"
+			};
+			await mdb.collection<UsageStats>("stats").insertOne(st);
+		}
+
+		if (typeof st[cmd.triggers[0]] === "undefined") st[cmd.triggers[0]] = 0;
+		st[cmd.triggers[0]]++;
+
+		await mdb.collection<UsageStats>("stats").findOneAndUpdate({ _id: "commandUsage" }, { $set: st });
 
 		if (cmd.features.includes("betaOnly") && !config.beta) return;
 
@@ -507,7 +527,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const cmd = msg.cmd !== null ? msg.cmd.cmd : null;
 		if (!cmd) return;
 		switch (err.message) {
-			case "ERR_INVALID_USAGE":
+			case "ERR_INVALID_USAGE": {
+
 				return msg.channel.createMessage({
 					embed: {
 						title: ":x: Invalid Command Usage",
@@ -528,16 +549,63 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					}
 				}).catch(err => null);
 				break;
+			}
 
-			case "RETURN": return; break;
+			case "RETURN": { return; break; }
 
-			default:
+			default: {
+				const r = Strings.random(10);
+				const ecode = `err.${cmd !== null ? cmd.triggers[0] : "general"}.${config.beta ? "beta" : "prod"}.${r}`;
+				Logger.error(`Shard #${msg.channel.guild.shard.id}`, ecode);
 				Logger.error(`Shard #${msg.channel.guild.shard.id}`, err);
-				if (msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.reply(`there was an error while doing something:\n${err.name}: ${err.message}`, {
-					file: await Request.getImageFromURL(config.images.serverError),
-					name: "error.png"
-				}).catch(err => null);
-				else return msg.reply(`there was an error while doing something:\n${err.name}: ${err.message}`).catch(err => null);
+
+				const s = await phin({
+					method: "POST",
+					url: "https://pastebin.com/api/api_post.php",
+					form: {
+						api_dev_key: config.apis.pastebin.devKey,
+						api_user_key: config.apis.pastebin.userKey,
+						api_option: "paste",
+						api_paste_code: err.stack,
+						api_paste_private: "2",
+						api_paste_name: "Furry Bot Error",
+						api_paste_expire_date: "1W"
+					},
+					timeout: 5e3
+				}).then(k => k.body.toString());
+
+				await this.w.get("errors").execute({
+					embeds: [
+						{
+							title: ":x: Error",
+							description: [
+								"**Error**:",
+								`\u25FD Stack: ${s}`,
+								`\u25FD Error Name: ${err.name}`,
+								`\u25FD Error Message: ${err.message}`,
+								"",
+								"**Other Info**:",
+								`\u25FD User: ${msg.author.tag} (<@!${msg.author.id}>)`,
+								`\u25FD Code: \`${ecode}\``,
+								`\u25FD Command: ${cmd !== null ? cmd.triggers[0] : "none"}`,
+								"",
+								"**Location**:",
+								`\u25FD Message Content: **${msg.content}**`,
+								`\u25FD Message ID: \`${msg.id}\``,
+								`\u25FD Channel: **${msg.channel.name}**`,
+								`\u25FD Channel ID: \`${msg.channel.id}\``,
+								`\u25FD Guild: **${msg.channel.guild.name}**`,
+								`\u25FD Guild ID: \`${msg.channel.guild.id}\``,
+								`\u25FD Shard: #${msg.channel.guild.shard.id}`,
+								`\u25FD Time: ${Time.formatDateWithPadding(Date.now(), true, false)}`
+							].join("\n"),
+							timestamp: new Date().toISOString(),
+							color: Colors.red
+						}
+					]
+				});
+				return msg.channel.createMessage(`There was an issue while doing something..\nPlease join our support server and report this, along with the code.\nSupport Server: ${config.bot.supportInvite}\nCode: \`${ecode}\`\n\nError:\n**${err.name}: ${err.message}** `).catch(err => null);
+			}
 		}
 	}
 }));

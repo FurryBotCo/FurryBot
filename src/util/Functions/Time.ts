@@ -37,7 +37,7 @@ export default class Time {
 	}
 
 	/**
-	 * Conver milliseconds into readable time
+	 * Convert milliseconds into readable time.
 	 * @static
 	 * @param {number} time
 	 * @param {boolean} [words]
