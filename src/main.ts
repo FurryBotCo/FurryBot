@@ -10,6 +10,7 @@ import ErrorHandler from "./util/ErrorHandler";
 import ClientEvent from "./util/ClientEvent";
 import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
 import DeadShardTest from "./util/DeadShardTest";
+import WebhookStore from "./util/WebhookStore";
 
 export default class FurryBot extends Eris.Client {
 	srv: any;
@@ -57,6 +58,7 @@ export default class FurryBot extends Eris.Client {
 	_autoyiffLoop: NodeJS.Timeout;
 	_timedLoop: NodeJS.Timeout;
 	shardTest: DeadShardTest;
+	w: WebhookStore;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
 		const client = this; // tslint:disable-line no-this-assignment
@@ -152,6 +154,8 @@ export default class FurryBot extends Eris.Client {
 				enumerable: true
 			}
 		});*/
+		const w = this.w = new WebhookStore(this);
+		Object.keys(config.webhooks).map(h => w.add(h, config.webhooks[h].id, config.webhooks[h].token));
 	}
 
 	async increment(stat: string | string[], tags?: string[]): Promise<string> {
