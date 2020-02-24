@@ -12,6 +12,7 @@ import Permissions from "../util/Permissions";
 import { Blacklist } from "../util/@types/Misc";
 import { uuid } from "short-uuid";
 import { Time, Internal, Strings, Request } from "../util/Functions";
+import phin from "phin";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
 	// if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) this.stats.dmMessageCount++;
@@ -526,7 +527,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const cmd = msg.cmd !== null ? msg.cmd.cmd : null;
 		if (!cmd) return;
 		switch (err.message) {
-			case "ERR_INVALID_USAGE":
+			case "ERR_INVALID_USAGE": {
+
 				return msg.channel.createMessage({
 					embed: {
 						title: ":x: Invalid Command Usage",
@@ -547,16 +549,63 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					}
 				}).catch(err => null);
 				break;
+			}
 
-			case "RETURN": return; break;
+			case "RETURN": { return; break; }
 
-			default:
+			default: {
+				const r = Strings.random(10);
+				const ecode = `err.${cmd !== null ? cmd.triggers[0] : "general"}.${config.beta ? "beta" : "prod"}.${r}`;
+				Logger.error(`Shard #${msg.channel.guild.shard.id}`, ecode);
 				Logger.error(`Shard #${msg.channel.guild.shard.id}`, err);
-				if (msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.reply(`there was an error while doing something:\n${err.name}: ${err.message}`, {
-					file: await Request.getImageFromURL(config.images.serverError),
-					name: "error.png"
-				}).catch(err => null);
-				else return msg.reply(`there was an error while doing something:\n${err.name}: ${err.message}`).catch(err => null);
+
+				const s = await phin({
+					method: "POST",
+					url: "https://pastebin.com/api/api_post.php",
+					form: {
+						api_dev_key: config.apis.pastebin.devKey,
+						api_user_key: config.apis.pastebin.userKey,
+						api_option: "paste",
+						api_paste_code: err.stack,
+						api_paste_private: "2",
+						api_paste_name: "Furry Bot Error",
+						api_paste_expire_date: "1W"
+					},
+					timeout: 5e3
+				}).then(k => k.body.toString());
+
+				await this.w.get("errors").execute({
+					embeds: [
+						{
+							title: ":x: Error",
+							description: [
+								"**Error**:",
+								`\u25FD Stack: ${s}`,
+								`\u25FD Error Name: ${err.name}`,
+								`\u25FD Error Message: ${err.message}`,
+								"",
+								"**Other Info**:",
+								`\u25FD User: ${msg.author.tag} (<@!${msg.author.id}>)`,
+								`\u25FD Code: \`${ecode}\``,
+								`\u25FD Command: ${cmd !== null ? cmd.triggers[0] : "none"}`,
+								"",
+								"**Location**:",
+								`\u25FD Message Content: **${msg.content}**`,
+								`\u25FD Message ID: \`${msg.id}\``,
+								`\u25FD Channel: **${msg.channel.name}**`,
+								`\u25FD Channel ID: \`${msg.channel.id}\``,
+								`\u25FD Guild: **${msg.channel.guild.name}**`,
+								`\u25FD Guild ID: \`${msg.channel.guild.id}\``,
+								`\u25FD Shard: #${msg.channel.guild.shard.id}`,
+								`\u25FD Time: ${Time.formatDateWithPadding(Date.now(), true, false)}`
+							].join("\n"),
+							timestamp: new Date().toISOString(),
+							color: Colors.red
+						}
+					]
+				});
+				return msg.channel.createMessage(`There was an issue while doing something..\nPlease join our support server and report this, along with the code.\nSupport Server: ${config.bot.supportInvite}\nCode: \`${ecode}\`\n\nError:\n**${err.name}: ${err.message}** `).catch(err => null);
+			}
 		}
 	}
 }));
