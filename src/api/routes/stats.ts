@@ -35,9 +35,9 @@ export default (async (client: FurryBot) => {
 			libraryVersion: require("eris").VERSION,
 			nodeVersion: process.version,
 			dailyJoins,
-			commandCount: client.cmd.commands.length,
+			commandCount: client.cmd.commands.length/*,
 			messageCount: client.stats.messageCount,
-			dmMessageCount: client.stats.dmMessageCount
+			dmMessageCount: client.stats.dmMessageCount*/
 		});
 	});
 

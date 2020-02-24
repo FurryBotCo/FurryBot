@@ -37,7 +37,7 @@ export default class FurryBot extends Eris.Client {
 	ddog: StatsD;
 	cmd: CommandHolder;
 	firstReady: boolean;
-	stats: {
+	/*stats: {
 		messageCount: number;
 		dmMessageCount: number;
 		readonly guildCount: number;
@@ -52,7 +52,7 @@ export default class FurryBot extends Eris.Client {
 	};
 	commandStats: {
 		[k: string]: number;
-	};
+	};*/
 	channelTyping: Map<string, NodeJS.Timeout>;
 	_autoyiffLoop: NodeJS.Timeout;
 	_timedLoop: NodeJS.Timeout;
@@ -108,7 +108,7 @@ export default class FurryBot extends Eris.Client {
 
 		this.messageCollector = new MessageCollector(this);
 
-		this.commandStats = {};
+		/* this.commandStats = {};
 		this.stats = {
 			messageCount: 0,
 			dmMessageCount: 0
@@ -151,7 +151,7 @@ export default class FurryBot extends Eris.Client {
 				},
 				enumerable: true
 			}
-		});
+		});*/
 	}
 
 	async increment(stat: string | string[], tags?: string[]): Promise<string> {

@@ -14,8 +14,8 @@ import { uuid } from "short-uuid";
 import { Time, Internal, Strings, Request } from "../util/Functions";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message) {
-	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) this.stats.dmMessageCount++;
-	else this.stats.messageCount++;
+	// if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) this.stats.dmMessageCount++;
+	// else this.stats.messageCount++;
 	let msg: ExtendedMessage;
 	try {
 		const t = new Timers();
@@ -355,7 +355,25 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				`shardId:${msg.channel.guild.shard.id}`
 			]
 		);
-		this.commandStats[cmd.triggers[0]]++;
+		// this.commandStats[cmd.triggers[0]]++;
+		type UsageStats = {
+			[k: string]: number;
+		} | {
+			id: "commandUsage";
+		};
+		let st = await mdb.collection<UsageStats>("stats").findOne({ id: "commandUsage" });
+		if (!st || Object.keys(st).length === 0) {
+			Logger.warn("Message Create", "Stats entry is empty, recreating.");
+			st = {
+				id: "commandUsage"
+			};
+			await mdb.collection<UsageStats>("stats").insertOne(st);
+		}
+
+		if (typeof st[cmd.triggers[0]] === "undefined") st[cmd.triggers[0]] = 0;
+		st[cmd.triggers[0]]++;
+
+		await mdb.collection<UsageStats>("stats").findOneAndUpdate({ _id: "commandUsage" }, { $set: st });
 
 		if (cmd.features.includes("betaOnly") && !config.beta) return;
 
