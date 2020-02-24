@@ -63,7 +63,7 @@ export default new Command({
 
 
 	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(msg.gConfig.settings.muteRole));
-	if (a.higher || a.same) {
+	if (a.same || a.lower) {
 		const embed: Eris.EmbedOptions = {
 			title: "Invalid mute role",
 			description: `The current mute role <@&${msg.gConfig.settings.muteRole}> (${msg.gConfig.settings.muteRole}) seems to be higher than me, please move it below me. You can set a new one with \`${msg.gConfig.settings.prefix}settings muteRole <role>\``,
@@ -109,9 +109,9 @@ export default new Command({
 	}
 
 	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.channel.createMessage(`${msg.author.id}>, Pretty sure you don't want to do this to yourself.`);
-	const b = Utility.compareMembers(user, msg.member);
+	const b = Utility.compareMembers(msg.member, user);
 	if ((b.member2.higher || b.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
-	if (user.permission.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
+	// if (user.permission.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
 
 	user.addRole(msg.gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {

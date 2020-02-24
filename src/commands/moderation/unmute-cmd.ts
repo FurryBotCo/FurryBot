@@ -64,7 +64,7 @@ export default new Command({
 		return msg.channel.createMessage({ embed });
 	}
 	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(msg.gConfig.settings.muteRole));
-	if (a.higher || a.same) {
+	if (a.same || a.lower) {
 		const embed: Eris.EmbedOptions = {
 			title: "Invalid mute role",
 			description: `The current mute role <@&${msg.gConfig.settings.muteRole}> (${msg.gConfig.settings.muteRole}) seems to be higher than me, please move it below me. You can set a new one with \`${msg.gConfig.settings.prefix}settings muteRole <role>\``,
