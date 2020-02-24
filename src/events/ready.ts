@@ -92,53 +92,56 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		// Logger.debug("Stats", "Posted message stats.");
 	}, 1e4);*/
 
-	setInterval(async () => {
-		if (new Date().toString().split(" ")[4] === "00:00:00") {
-			const d = new Date(Date.now() + 432e5);
-			const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-			let k = await mdb.collection("dailyjoins").findOne({ id }).catch(err => null);
-			if (!k) k = "Unknown.";
-			Logger.log("Daily Joins", `Daily joins for ${id}: ${k}`);
-			await this.executeWebhook(config.webhooks.dailyjoins.id, config.webhooks.dailyjoins.token, {
-				embeds: [
-					{
-						title: `Daily Joins for ${id}`,
-						description: `Total Servers Joined Today: ${k}\nTotal Servers: ${this.guilds.size}`,
-						timestamp: new Date().toISOString()
-					}
-				],
-				username: `Daily Joins${config.beta ? " - Beta" : ""}`,
-				avatarURL: "https://i.furry.bot/furry.png"
-			});
-		}
-	}, 1e3);
-
-	const
-		go = (async (t: number) => {
-			for (let i = 0; i < (36e5 / t); i++) {
-				setTimeout(() => Internal.runAuto(t, this), t * (i + 1));
+	if (!config.beta) {
+		setInterval(async () => {
+			if (new Date().toString().split(" ")[4] === "00:00:00") {
+				const d = new Date(Date.now() + 432e5);
+				const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
+				let k = await mdb.collection("dailyjoins").findOne({ id }).catch(err => null);
+				if (!k) k = "Unknown.";
+				Logger.log("Daily Joins", `Daily joins for ${id}: ${k}`);
+				await this.executeWebhook(config.webhooks.dailyjoins.id, config.webhooks.dailyjoins.token, {
+					embeds: [
+						{
+							title: `Daily Joins for ${id}`,
+							description: `Total Servers Joined Today: ${k}\nTotal Servers: ${this.guilds.size}`,
+							timestamp: new Date().toISOString()
+						}
+					],
+					username: `Daily Joins${config.beta ? " - Beta" : ""}`,
+					avatarURL: "https://i.furry.bot/furry.png"
+				});
 			}
-		}),
-		setupAll = (() => {
-			// 5 minutes
-			go(3e5);
+		}, 1e3);
 
-			// 10 minutes
-			go(6e5);
+		const
+			go = (async (t: number) => {
+				for (let i = 0; i < (36e5 / t); i++) {
+					setTimeout(() => Internal.runAuto(t, this), t * (i + 1));
+				}
+			}),
+			setupAll = (() => {
+				// 5 minutes
+				go(3e5);
 
-			// 15 minutes
-			go(9e5);
+				// 10 minutes
+				go(6e5);
 
-			// 30 minutes
-			go(18e5);
+				// 15 minutes
+				go(9e5);
 
-			// 60 minutes
-			go(36e5);
-		});
+				// 30 minutes
+				go(18e5);
 
-	setupAll();
-	this._autoyiffLoop = setInterval(setupAll, 36e5);
-	this._timedLoop = setInterval(() => Internal.timedCheck(this), 3e4);
+				// 60 minutes
+				go(36e5);
+			});
+
+		setupAll();
+		this._autoyiffLoop = setInterval(setupAll, 36e5);
+		this._timedLoop = setInterval(() => Internal.timedCheck(this), 3e4);
+	}
+
 	Logger.log("Ready", `Client ready with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds, with ${this.cmd.commands.length} commands.`);
 
 	if (fs.existsSync(`${config.rootDir}/restart.json`)) {
