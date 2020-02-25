@@ -8,7 +8,7 @@ const cmd: Command[] = fs.readdirSync(`${__dirname}`).filter(f => f.endsWith(ext
 const cat = new Category({
 	name: "economy",
 	displayName: ":moneybag: Economy",
-	devOnly: true,
+	devOnly: false,
 	description: "Fun money things",
 	file: __filename
 });
