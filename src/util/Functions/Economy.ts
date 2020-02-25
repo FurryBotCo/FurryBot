@@ -121,6 +121,18 @@ export default class Economy {
 				check: this.checkTips,
 				name: "Tips",
 				hidden: false
+			},
+			firstBooster: {
+				p: 0.050,
+				check: (userId: string) => userId === "603060182288695316",
+				name: "First Booster",
+				hidden: true
+			},
+			developer: {
+				p: 0.200,
+				check: (userid: string) => config.developers.includes(userid),
+				name: "Developer",
+				hidden: true
 			}
 		};
 	}
