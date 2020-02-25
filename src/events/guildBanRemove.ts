@@ -32,7 +32,7 @@ export default new ClientEvent("guildBanRemove", (async function (this: FurryBot
 			`Member ${user.username}#${user.discriminator} (<@!${user.id}>) was unbanned.`
 		].join("\n"),
 		timestamp: new Date().toISOString(),
-		color: Colors.red
+		color: Colors.green
 	};
 
 	const log = await Utility.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.MEMBER_BAN_REMOVE, user.id);

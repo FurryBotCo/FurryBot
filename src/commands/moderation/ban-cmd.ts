@@ -35,7 +35,7 @@ export default new Command({
 		if (deleteDays > 14) return msg.reply(`delete days cannot be more than 14.`);
 	}
 
-	if (msg.args[1].match(/[0-9]{1,4}[ymdh]/i)) {
+	if (msg.args.length > 1 && msg.args[1].match(/[0-9]{1,4}[ymdh]/i)) {
 		const labels = {
 			h: 3.6e+6,
 			d: 8.64e+7,

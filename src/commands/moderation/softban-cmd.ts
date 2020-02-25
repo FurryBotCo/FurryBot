@@ -71,7 +71,7 @@ export default new Command({
 								`Reason: ${reason}`
 							].join("\n"),
 							timestamp: new Date().toISOString(),
-							color: Colors.red,
+							color: Colors.orange,
 							author: {
 								name: msg.channel.guild.name,
 								icon_url: msg.channel.guild.iconURL

@@ -32,7 +32,7 @@ export default new ClientEvent("guildBanAdd", (async function (this: FurryBot, g
 			`Member ${user.username}#${user.discriminator} (<@!${user.id}>) was banned.`
 		].join("\n"),
 		timestamp: new Date().toISOString(),
-		color: Colors.green
+		color: Colors.red
 	};
 
 	const log = await Utility.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.MEMBER_BAN_ADD, user.id);
