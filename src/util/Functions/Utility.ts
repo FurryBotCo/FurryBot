@@ -6,6 +6,7 @@ import ytdl from "ytdl-core";
 import * as URL from "url";
 import util from "util";
 import client from "../../../";
+import { Utility as T } from "./TypeDefs";
 
 export default class Utility {
 	private constructor() {
@@ -91,18 +92,7 @@ export default class Utility {
 	 * 	}}
 	 * @memberof Utility
 	 */
-	static compareMembers(member1: Eris.Member, member2: Eris.Member): {
-		member1: {
-			higher: boolean;
-			lower: boolean;
-			same: boolean;
-		};
-		member2: {
-			higher: boolean;
-			lower: boolean;
-			same: boolean;
-		};
-	} {
+	static compareMembers(member1: Eris.Member, member2: Eris.Member): T.CompareMembersResult {
 		const a = member1.roles.map(r => member1.guild.roles.get(r));
 		let b: Eris.Role;
 		if (a.length > 0) b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
@@ -168,25 +158,16 @@ export default class Utility {
 	 * @static
 	 * @param {Eris.Member} member
 	 * @param {Eris.Role} role
-	 * @returns {{
-	 * 		higher: boolean;
-	 * 		lower: boolean;
-	 * 		same: boolean;
-	 * 	}}
+	 * @returns {T.CompareMemberWithRoleResult}
 	 * @memberof Utility
 	 */
-	static compareMemberWithRole(member: Eris.Member, role: Eris.Role): {
-		higher: boolean;
-		lower: boolean;
-		same: boolean;
-	} {
-		const a = member.roles.map(r => member.guild.roles.get(r));
-		const b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
+	static compareMemberWithRole(member: Eris.Member, role: Eris.Role): T.CompareMemberWithRoleResult {
+		const a = member.roles.map(r => member.guild.roles.get(r)).map(r => r.position).sort().reverse()[0];
 
 		return {
-			higher: b.position > role.position,
-			lower: b.position < role.position,
-			same: b.position === role.position
+			higher: a > role.position,
+			lower: a < role.position,
+			same: a === role.position
 		};
 	}
 
