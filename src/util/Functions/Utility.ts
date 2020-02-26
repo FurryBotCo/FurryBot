@@ -78,18 +78,8 @@ export default class Utility {
 	 * @static
 	 * @param {Eris.Member} member1
 	 * @param {Eris.Member} member2
-	 * @returns {{
-	 * 		member1: {
-	 * 			higher: boolean;
-	 * 			lower: boolean;
-	 * 			same: boolean;
-	 * 		};
-	 * 		member2: {
-	 * 			higher: boolean;
-	 * 			lower: boolean;
-	 * 			same: boolean;
-	 * 		};
-	 * 	}}
+	 * @returns {T.CompareMembersResult}
+	 * 
 	 * @memberof Utility
 	 */
 	static compareMembers(member1: Eris.Member, member2: Eris.Member): T.CompareMembersResult {
