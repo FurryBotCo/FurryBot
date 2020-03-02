@@ -20,7 +20,7 @@ export default new Command({
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (typeof msg.channel.awoo !== "undefined" && msg.channel.awoo.active) {
-		if (msg.channel.awoo.inAwoo.includes(msg.author.id) && !msg.user.isDeveloper) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this howl!`);
+		if (msg.channel.awoo.inAwoo.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this howl!`);
 		clearTimeout(msg.channel.awoo.timeout);
 		msg.channel.awoo.inAwoo.push(msg.author.id);
 		await msg.channel.createMessage(`<@!${msg.author.id}> joined a howl with ${msg.channel.awoo.inAwoo.length} furs!\nJoin in using \`${msg.gConfig.settings.prefix}awoo\`.\n${msg.channel.awoo.inAwoo.length > 30 ? "This howl is too large for emojis!" : `<:${config.emojis.awoo}>`.repeat(msg.channel.awoo.inAwoo.length)}`);
