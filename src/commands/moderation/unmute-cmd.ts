@@ -30,7 +30,7 @@ export default new Command({
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
-	// if(user.id === msg.member.id && !msg.user.isDeveloper) return msg.channel.createMessage("Pretty sure you don't want to do this to yourthis.");
+	// if(user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.channel.createMessage("Pretty sure you don't want to do this to yourthis.");
 	// if(user.roles.highest.rawPosition >= msg.member.roles.highest.rawPosition && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`You cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
 	// if(user.permissions.has("administrator")) return msg.channel.createMessage("That user has `ADMINISTRATOR`, that would literally do nothing.");
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";

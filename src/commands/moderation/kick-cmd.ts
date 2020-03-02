@@ -30,7 +30,7 @@ export default new Command({
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
-	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.reply("Pretty sure you don't want to do this to yourself.");
+	if (user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.reply("Pretty sure you don't want to do this to yourself.");
 	const a = Utility.compareMembers(user, msg.member);
 	if ((a.member2.higher || a.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot kick ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
 	// if(!user.kickable) return msg.channel.createMessage(`I cannot kick ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have kick permissions?`);

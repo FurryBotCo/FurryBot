@@ -5,6 +5,7 @@ import * as Eris from "eris";
 import { Utility, Time } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
 import { mdb } from "../../modules/Database";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -72,7 +73,7 @@ export default new Command({
 		});
 	}
 
-	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.reply("Pretty sure you don't want to do this to yourself.");
+	if (user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.reply("Pretty sure you don't want to do this to yourself.");
 	if (user.id === msg.guild.ownerID) return msg.reply("You cannot ban the server owner.");
 	const a = Utility.compareMembers(user, msg.member);
 	if ((a.member1.higher || a.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(`You cannot ban ${user.username}#${user.discriminator} as their highest role is higher than yours!`);

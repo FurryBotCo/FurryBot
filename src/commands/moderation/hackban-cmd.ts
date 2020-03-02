@@ -3,6 +3,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import { Colors } from "../../util/Constants";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -44,7 +45,7 @@ export default new Command({
 		return msg.channel.createMessage({ embed });
 	}
 
-	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.reply("Pretty sure you don't want to do this to yourself.");
+	if (user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.reply("Pretty sure you don't want to do this to yourself.");
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
 	msg.channel.guild.banMember(user.id, 7, `Hackban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 		await msg.channel.createMessage(`***User ${user.username}#${user.discriminator} was banned, ${reason}***`).catch(noerr => null);
