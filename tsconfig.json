@@ -20,7 +20,11 @@
             "@Command": [
                 "util/CommandHandler/lib/Command.ts"
             ]
-        }
+        },
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/util/@types"
+        ]
     },
     "include": [
         "**/*"
