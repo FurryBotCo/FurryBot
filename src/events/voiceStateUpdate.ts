@@ -12,16 +12,8 @@ export default new ClientEvent("voiceStateUpdate", (async function (this: FurryB
 	const g = await db.getGuild(member.guild.id);
 	const e = g.logEvents.voiceStateUpdate;
 	if (!e.enabled || !e.channel) return;
-	const ch = member.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
-	const vc = member.guild.channels.get(member.voiceState.channelID) as Eris.VoiceChannel;
-	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
-		logEvents: {
-			voiceStateUpdate: {
-				enabled: false,
-				channel: null
-			}
-		}
-	});
+	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+	const vc = member.guild.channels.get<Eris.VoiceChannel>(member.voiceState.channelID);
 
 	if (!vc) return;
 
@@ -108,7 +100,14 @@ export default new ClientEvent("voiceStateUpdate", (async function (this: FurryB
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-		await ch.createMessage({ embed }).catch(err => null);
+		await ch.createMessage({ embed }).catch(err => g.edit({
+			logEvents: {
+				voiceStateUpdate: {
+					enabled: false,
+					channel: null
+				}
+			}
+		}));
 	}
 
 	return;

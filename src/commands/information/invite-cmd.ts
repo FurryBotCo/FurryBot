@@ -26,7 +26,7 @@ export default new Command({
 
 	const embed: Eris.EmbedOptions = {
 		title: "Discord",
-		description: `[Join Our Discord Server!](${config.bot.supportInvite})\n[Invite Me To Your Server](https://discordapp.com/oauth2/authorize?client_id=${this.user.id}&scope=bot&permissions=${botPerms})`,
+		description: `[Join Our Discord Server!](${config.bot.supportInvite})\n[Invite Me To Your Server!](https://discordapp.com/oauth2/authorize?client_id=${this.user.id}&scope=bot&permissions=${botPerms})`,
 		thumbnail: {
 			url: "https://cdn.discordapp.com/embed/avatars/0.png"
 		},

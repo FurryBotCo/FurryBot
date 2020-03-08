@@ -267,7 +267,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			let count = await mdb.collection("stats").findOne({ id: "fCount" }).then(res => parseInt(res.count, 10)).catch(err => 1);
 			await mdb.collection("stats").findOneAndUpdate({ id: "fCount" }, { $set: { count: ++count } });
-			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings fResponse disabled\``).catch(err => null);
+			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings f response disabled\``).catch(err => null);
 		}
 		t.end("autoResponse");
 
@@ -394,7 +394,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				name: "nsfw.gif"
 			}).catch(err => null);
 
-			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw enable\`.`).catch(err => null);
+			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw commands enabled\`.`).catch(err => null);
 
 			if (msg.channel.topic && config.yiff.disableStatements.some(t => msg.channel.topic.indexOf(t) !== -1)) {
 				const st = config.yiff.disableStatements.filter(t => msg.channel.topic.indexOf(t) !== -1);
@@ -519,7 +519,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		// timing command processing
 		if (msg.cmd.cat.name !== "dev") await mdb.collection("timing").insertOne({ times: t.timers, cmd: cmd.triggers[0], id: uuid() });
 	} catch (e) {
-		const err: Error = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
+		const err: Error & { code?: string; } = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
 		if (!["ERR_INVALID_USAGE", "RETURN"].includes(err.message)) {
 			Logger.error(msg && msg.channel && msg.channel.guild && msg.channel.guild.shard ? `Shard #${msg.channel.guild.shard.id}` : "Error", err);
 			if (!msg || !msg.channel || !msg.channel.guild || !msg.channel.guild.shard) return;
@@ -573,38 +573,48 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					},
 					timeout: 5e3
 				}).then(k => k.body.toString());
-
-				await this.w.get("errors").execute({
-					embeds: [
-						{
-							title: ":x: Error",
-							description: [
-								"**Error**:",
-								`\u25FD Stack: ${s}`,
-								`\u25FD Error Name: ${err.name}`,
-								`\u25FD Error Message: ${err.message}`,
-								"",
-								"**Other Info**:",
-								`\u25FD User: ${msg.author.tag} (<@!${msg.author.id}>)`,
-								`\u25FD Code: \`${ecode}\``,
-								`\u25FD Command: ${cmd !== null ? cmd.triggers[0] : "none"}`,
-								"",
-								"**Location**:",
-								`\u25FD Message Content: **${msg.content}**`,
-								`\u25FD Message ID: \`${msg.id}\``,
-								`\u25FD Channel: **${msg.channel.name}**`,
-								`\u25FD Channel ID: \`${msg.channel.id}\``,
-								`\u25FD Guild: **${msg.channel.guild.name}**`,
-								`\u25FD Guild ID: \`${msg.channel.guild.id}\``,
-								`\u25FD Shard: #${msg.channel.guild.shard.id}`,
-								`\u25FD Time: ${Time.formatDateWithPadding(Date.now(), true, false)}`
-							].join("\n"),
-							timestamp: new Date().toISOString(),
-							color: Colors.red
+				const embed: Eris.EmbedOptions = {
+					title: ":x: Error",
+					description: [
+						"**Error**:",
+						`\u25FD Stack: ${s}`,
+						`\u25FD Error Name: ${err.name}`,
+						`\u25FD Error Message: ${err.message}`,
+						`\u25FD Error Code: ${err.code || "None"}`,
+						"",
+						"**Other Info**:",
+						`\u25FD User: ${msg.author.tag} (<@!${msg.author.id}>)`,
+						`\u25FD Code: \`${ecode}\``,
+						`\u25FD Command: ${cmd !== null ? cmd.triggers[0] : "none"}`,
+						"",
+						"**Location**:",
+						`\u25FD Message Content: **${msg.content}**`,
+						`\u25FD Message ID: \`${msg.id}\``,
+						`\u25FD Channel: **${msg.channel.name}**`,
+						`\u25FD Channel ID: \`${msg.channel.id}\``,
+						`\u25FD Guild: **${msg.channel.guild.name}**`,
+						`\u25FD Guild ID: \`${msg.channel.guild.id}\``,
+						`\u25FD Shard: #${msg.channel.guild.shard.id}`,
+						`\u25FD Time: ${Time.formatDateWithPadding(Date.now(), true, false)}`
+					].join("\n"),
+					timestamp: new Date().toISOString(),
+					color: Colors.red
+				};
+				let k = "";
+				if (config.developers.includes(msg.author.id)) return msg.channel.createMessage({ embed });
+				else {
+					await this.w.get("errors").execute({
+						embeds: [embed]
+					});
+					switch (err.code) {
+						case "ECONNRESET": {
+							k = "Some network issue happened on our side, please try again later. (do not report these unless they are very frequent)";
+							break;
 						}
-					]
-				});
-				return msg.channel.createMessage(`There was an issue while doing something..\nPlease join our support server and report this, along with the code.\nSupport Server: ${config.bot.supportInvite}\nCode: \`${ecode}\`\n\nError:\n**${err.name}: ${err.message}** `).catch(err => null);
+					}
+					if (!k) k = "There was an issue while doing something..";
+					return msg.channel.createMessage(`${k}\nPlease join our support server and report this, along with the code.\nSupport Server: ${config.bot.supportInvite}\nCode: \`${ecode}\`\n\nError:\n**${err.name}: ${err.message}** `).catch(err => null);
+				}
 			}
 		}
 	}

@@ -11,15 +11,7 @@ export default new ClientEvent("voiceChannelLeave", (async function (this: Furry
 	const g = await db.getGuild(member.guild.id);
 	const e = g.logEvents.voiceLeave;
 	if (!e.enabled || !e.channel) return;
-	const ch = member.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
-	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
-		logEvents: {
-			voiceLeave: {
-				enabled: false,
-				channel: null
-			}
-		}
-	});
+	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {
 		title: "Member Left A Voice Channel",
@@ -32,5 +24,12 @@ export default new ClientEvent("voiceChannelLeave", (async function (this: Furry
 		color: Colors.red
 	};
 
-	return ch.createMessage({ embed }).catch(err => null);
+	return ch.createMessage({ embed }).catch(err => g.edit({
+		logEvents: {
+			voiceLeave: {
+				enabled: false,
+				channel: null
+			}
+		}
+	}));
 }));

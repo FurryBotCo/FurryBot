@@ -29,4 +29,8 @@ declare module "Eris" {
 		values<V = T>(): IterableIterator<V>;
 		entries<V = T>(): IterableIterator<[string | number, V]>;
 	}
+
+	export interface Client {
+		getRESTChannel<T = AnyChannel>(channelID: string): Promise<T>;
+	}
 }

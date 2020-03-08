@@ -11,15 +11,7 @@ export default new ClientEvent("voiceChannelSwitch", (async function (this: Furr
 	const g = await db.getGuild(member.guild.id);
 	const e = g.logEvents.voiceSwitch;
 	if (!e.enabled || !e.channel) return;
-	const ch = member.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
-	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
-		logEvents: {
-			voiceSwitch: {
-				enabled: false,
-				channel: null
-			}
-		}
-	});
+	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {
 		title: "Member Switched Voice Channels",
@@ -35,5 +27,12 @@ export default new ClientEvent("voiceChannelSwitch", (async function (this: Furr
 	// const log = await Utility.fetchAuditLogEntries(member.guild, Eris.Constants.AuditLogActions.MEMBER_MOVE, null);
 	// if (log.success) embed.description += `\nMoved By ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-	return ch.createMessage({ embed }).catch(err => null);
+	return ch.createMessage({ embed }).catch(err => g.edit({
+		logEvents: {
+			voiceSwitch: {
+				enabled: false,
+				channel: null
+			}
+		}
+	}));
 }));

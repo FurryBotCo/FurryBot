@@ -40,7 +40,7 @@ export default new Command({
 	let currentPost = 1;
 
 	const embed: Eris.EmbedOptions = {
-		title: `#${e[currentPost - 1].id}: ${e[currentPost - 1].artist.join(", ").length > 256 ? "Too many artists to list." : e[currentPost - 1].artist.join(", ")}`,
+		title: `#${e[currentPost - 1].id}: ${e[currentPost - 1].tags.artist.join(", ").length > 256 ? "Too many artists to list." : e[currentPost - 1].tags.artist.join(", ")}`,
 		url: `https://e926.net/post/show/${e[currentPost - 1].id}`,
 		footer: {
 			icon_url: "https://e926.net/favicon-32x32.png",
@@ -54,10 +54,10 @@ export default new Command({
 
 	const rl = setInterval(() => ratelimit = false, 3e3);
 
-	if (["jpg", "png", "gif"].includes(e[currentPost - 1].file_ext)) embed.image = {
-		url: e[currentPost - 1].file_url
+	if (["jpg", "png", "gif"].includes(e[currentPost - 1].file.ext)) embed.image = {
+		url: e[currentPost - 1].file.url
 	};
-	else if (e[currentPost - 1].file_ext === "swf") embed.description = `This post is a flash animation, please directly view [the post](https://e926.net/post/show/${e[currentPost - 1].id}) on e926`;
+	else if (e[currentPost - 1].file.ext === "swf") embed.description = `This post is a flash animation, please directly view [the post](https://e926.net/post/show/${e[currentPost - 1].id}) on e926`;
 	else embed.description = `This post appears to be a video, please directly view [the post](https://e926.net/post/show/${e[currentPost - 1].id}) on e926`;
 	/*else embed.image = {
 		width: e[currentPost - 1].width,
@@ -121,7 +121,7 @@ export default new Command({
 		if (currentPost === e.length + 1) currentPost = 1;
 
 		const embed: Eris.EmbedOptions = {
-			title: `#${e[currentPost - 1].id}: ${e[currentPost - 1].artist.join(", ").length > 256 ? "Too many artists to list." : e[currentPost - 1].artist.join(", ")}`,
+			title: `#${e[currentPost - 1].id}: ${e[currentPost - 1].tags.artist.join(", ").length > 256 ? "Too many artists to list." : e[currentPost - 1].tags.artist.join(", ")}`,
 			url: `https://e926.net/post/show/${e[currentPost - 1].id}`,
 			footer: {
 				icon_url: "https://e926.net/favicon-32x32.png",
@@ -131,10 +131,10 @@ export default new Command({
 			timestamp: new Date().toISOString()
 		};
 
-		if (["jpg", "png", "gif"].includes(e[currentPost - 1].file_ext)) embed.image = {
-			url: e[currentPost - 1].file_url
+		if (["jpg", "png", "gif"].includes(e[currentPost - 1].file.ext)) embed.image = {
+			url: e[currentPost - 1].file.url
 		};
-		else if (e[currentPost - 1].file_ext === "swf") embed.description = `This post is a flash animation, please directly view [the post](https://e926.net/post/show/${e[currentPost - 1].id}) on e926`;
+		else if (e[currentPost - 1].file.ext === "swf") embed.description = `This post is a flash animation, please directly view [the post](https://e926.net/post/show/${e[currentPost - 1].id}) on e926`;
 		else embed.description = `This post appears to be a video, please directly view [the post](https://e926.net/post/show/${e[currentPost - 1].id}) on e621`;
 
 		await m.edit({ embed });

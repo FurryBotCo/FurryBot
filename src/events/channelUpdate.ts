@@ -17,15 +17,8 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 		if (!g) return;
 		const e = g.logEvents.channelUpdate;
 		if (!e.enabled || !e.channel) return;
-		const ch = channel.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
-		if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
-			logEvents: {
-				channelUpdate: {
-					enabled: false,
-					channel: null
-				}
-			}
-		});
+		const ch = channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+
 		const props: { [k: string]: { type: string; name: string; } } = {
 			nsfw: {
 				type: "boolean",
@@ -111,6 +104,13 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-		return ch.createMessage({ embed }).catch(err => null);
+		return ch.createMessage({ embed }).catch(err => g.edit({
+			logEvents: {
+				channelUpdate: {
+					enabled: false,
+					channel: null
+				}
+			}
+		}));
 	}
 }));

@@ -5,6 +5,7 @@ import * as Eris from "eris";
 import { Utility, Time } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
 import { mdb } from "../../modules/Database";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -33,7 +34,7 @@ export default new Command({
 	if (msg.gConfig.settings.muteRole === null) {
 		const embed: Eris.EmbedOptions = {
 			title: "No mute role",
-			description: `this server does not have a mute role set, you can set this with \`${msg.gConfig.settings.prefix}settings muteRole <role>\``,
+			description: `this server does not have a mute role set, you can set this with \`${msg.gConfig.settings.prefix}settings mute role <role>\``,
 			color: 15601937,
 			timestamp: new Date().toISOString(),
 			author: {
@@ -48,7 +49,7 @@ export default new Command({
 	if (!msg.channel.guild.roles.has(msg.gConfig.settings.muteRole)) {
 		const embed: Eris.EmbedOptions = {
 			title: "Mute role not found",
-			description: `The mute role specified for this server <@&${msg.gConfig.settings.muteRole}> (${msg.gConfig.settings.muteRole}) was not found, it has been reset. You can set a new one with \`${msg.gConfig.settings.prefix}settings muteRole <role>\``,
+			description: `The mute role specified for this server <@&${msg.gConfig.settings.muteRole}> (${msg.gConfig.settings.muteRole}) was not found, it has been reset. You can set a new one with \`${msg.gConfig.settings.prefix}settings mute role <role>\``,
 			color: 15601937,
 			timestamp: new Date().toISOString(),
 			author: {
@@ -66,7 +67,7 @@ export default new Command({
 	if (a.same || a.lower) {
 		const embed: Eris.EmbedOptions = {
 			title: "Invalid mute role",
-			description: `The current mute role <@&${msg.gConfig.settings.muteRole}> (${msg.gConfig.settings.muteRole}) seems to be higher than me, please move it below me. You can set a new one with \`${msg.gConfig.settings.prefix}settings muteRole <role>\``,
+			description: `The current mute role <@&${msg.gConfig.settings.muteRole}> (${msg.gConfig.settings.muteRole}) seems to be higher than me, please move it below me. You can set a new one with \`${msg.gConfig.settings.prefix}settings mute role <role>\``,
 			color: 15601937,
 			timestamp: new Date().toISOString(),
 			author: {

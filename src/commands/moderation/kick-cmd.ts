@@ -4,6 +4,7 @@ import ExtendedMessage from "@ExtendedMessage";
 import { Utility } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
 import Eris from "eris";
+import config from "../../config";
 
 export default new Command({
 	triggers: [

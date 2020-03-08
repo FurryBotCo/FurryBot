@@ -11,6 +11,7 @@ import ClientEvent from "./util/ClientEvent";
 import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
 import DeadShardTest from "./util/DeadShardTest";
 import WebhookStore from "./util/WebhookStore";
+import { ModLogHolder } from "./util/ModLogHandler";
 
 export default class FurryBot extends Eris.Client {
 	srv: any;
@@ -59,10 +60,9 @@ export default class FurryBot extends Eris.Client {
 	_timedLoop: NodeJS.Timeout;
 	shardTest: DeadShardTest;
 	w: WebhookStore;
+	m: ModLogHolder;
 	constructor(token: string, options: Eris.ClientOptions) {
 		super(token, options);
-		const client = this; // tslint:disable-line no-this-assignment
-
 		fs.readdirSync(`${__dirname}/events`).map((d) => {
 			const e: ClientEvent = require(`${__dirname}/events/${d}`).default;
 			this.on(e.event, e.listener.bind(this));
@@ -156,6 +156,8 @@ export default class FurryBot extends Eris.Client {
 		});*/
 		const w = this.w = new WebhookStore(this);
 		Object.keys(config.webhooks).map(h => w.add(h, config.webhooks[h].id, config.webhooks[h].token));
+
+		this.m = new ModLogHolder(this);
 	}
 
 	async increment(stat: string | string[], tags?: string[]): Promise<string> {

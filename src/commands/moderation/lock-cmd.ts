@@ -24,8 +24,10 @@ export default new Command({
 	if (msg.args.length > 0) ch = await msg.getChannelFromArgs();
 	if (!ch) return msg.errorEmbed("INVALID_CHANNEL");
 	const o = ch.permissionOverwrites.get(msg.channel.guild.id);
-	if (o.allow & 2048) o.allow -= 2048;
-	if (o.deny & 2048) return msg.reply(`the send messages permission seems to already be denied ${ch.id === msg.channel.id ? "in this" : "on that"}  channel.`);
+	if (![undefined, null].includes(o)) {
+		if (o.allow & 2048) o.allow -= 2048;
+		if (o.deny & 2048) return msg.reply(`the send messages permission seems to already be denied ${ch.id === msg.channel.id ? "in this" : "on that"}  channel.`);
+	}
 
 	await ch.editPermission(msg.channel.guild.id, o.allow, o.deny + 2048, "role");
 

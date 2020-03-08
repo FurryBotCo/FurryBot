@@ -16,6 +16,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
+	if (!msg.gConfig.settings.snipeCommand) return msg.reply("this command has been disabled in this servers settings.");
 	let ch: Eris.TextChannel;
 	if (msg.args.length > 0) ch = await msg.getChannelFromArgs();
 

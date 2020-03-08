@@ -12,15 +12,7 @@ export default new ClientEvent("guildBanAdd", (async function (this: FurryBot, g
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.memberBan;
 	if (!e.enabled || !e.channel) return;
-	const ch = guild.channels.get(e.channel) as Eris.GuildTextableChannel;
-	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
-		logEvents: {
-			memberBan: {
-				enabled: false,
-				channel: null
-			}
-		}
-	});
+	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {
 		title: "Member Banned",
@@ -35,9 +27,40 @@ export default new ClientEvent("guildBanAdd", (async function (this: FurryBot, g
 		color: Colors.red
 	};
 
+	let blame: Eris.User, reason: string;
 	const log = await Utility.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.MEMBER_BAN_ADD, user.id);
-	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
-	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
+	if (log.success === false) {
+		blame = null;
+		reason = "Unknown.";
+		embed.description += `\n${log.error.text} (${log.error.code})`;
+	} else if (log.success) {
+		blame = log.blame;
+		reason = log.reason || "None Provided.";
+		embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
+	}
 
-	return ch.createMessage({ embed }).catch(err => null);
+	await ch.createMessage({ embed }).catch(err => g.edit({
+		logEvents: {
+			memberBan: {
+				enabled: false,
+				channel: null
+			}
+		}
+	}));
+
+	/*if (g.settings.modlog && guild.channels.has(g.settings.modlog)) {
+		const ml = guild.channels.get<Eris.GuildTextableChannel>(g.settings.modlog);
+		const ms = ml.messages.get(ml.lastMessageID);
+		if (ms && ms.embeds.length > 0 && ms.embeds.find(e => e.description.indexOf(user.id) !== -1)) return console.log("a");
+		await this.m.get(g.settings.modlog).create({
+			target: user.id,
+			blame: blame ? blame.id : null,
+			reason,
+			color: Colors.red,
+			time: 0,
+			actionName: "Member Banned",
+			extra: "",
+			timestamp: Date.now()
+		});
+	}*/
 }));

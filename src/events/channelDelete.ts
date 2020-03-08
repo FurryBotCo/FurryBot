@@ -16,15 +16,7 @@ export default new ClientEvent("channelDelete", (async function (this: FurryBot,
 		if (!g) return;
 		const e = g.logEvents.channelDelete;
 		if (!e.enabled || !e.channel) return;
-		const ch = channel.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
-		if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
-			logEvents: {
-				channelDelete: {
-					enabled: false,
-					channel: null
-				}
-			}
-		});
+		const ch = channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 		const embed: Eris.EmbedOptions = {
 			title: "Channel Deleted",
@@ -44,6 +36,13 @@ export default new ClientEvent("channelDelete", (async function (this: FurryBot,
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-		return ch.createMessage({ embed }).catch(err => null);
+		return ch.createMessage({ embed }).catch(err => g.edit({
+			logEvents: {
+				channelDelete: {
+					enabled: false,
+					channel: null
+				}
+			}
+		}));
 	}
 }));
