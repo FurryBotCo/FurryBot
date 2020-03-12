@@ -26,7 +26,7 @@ export default new Command({
 	if (this.activeReactChannels.includes(msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active paginated command in this channel. Please either wait for that one to time out, or say **stop** to stop it.");
 
 	const tags = msg.args.map(a => a.replace(/,\|/g, ""));
-	if (tags.length > 5) return msg.reply("you can only specify up to five (5) tags.");
+	if (tags.length > 40) return msg.reply("you can only specify up to fourty (40) tags.");
 
 	const bl = tags.filter(t => config.tagBlacklist.includes(t.toLowerCase()));
 	if (bl !== null && bl.length > 0) return msg.channel.createMessage(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
@@ -43,7 +43,7 @@ export default new Command({
 		url: `https://e621.net/post/show/${e[currentPost - 1].id}`,
 		footer: {
 			icon_url: "https://e621.net/favicon-32x32.png",
-			text: `Rating: ${e[currentPost - 1].rating === "s" ? "Safe" : e[currentPost - 1].rating === "q" ? "Questionable" : "Explicit"} | Score: ${e[currentPost - 1].score} - ${currentPost}/${e.length}`
+			text: `Rating: ${e[currentPost - 1].rating === "s" ? "Safe" : e[currentPost - 1].rating === "q" ? "Questionable" : "Explicit"} | Score: ${e[currentPost - 1].score.total} - ${currentPost}/${e.length}`
 		},
 		color: e[currentPost - 1].rating === "s" ? Colors.green : e[currentPost - 1].rating === "q" ? Colors.gold : Colors.red,
 		timestamp: new Date().toISOString()
@@ -124,7 +124,7 @@ export default new Command({
 			url: `https://e621.net/post/show/${e[currentPost - 1].id}`,
 			footer: {
 				icon_url: "https://e621.net/favicon-32x32.png",
-				text: `Rating: ${e[currentPost - 1].rating === "s" ? "Safe" : e[currentPost - 1].rating === "q" ? "Questionable" : "Explicit"} | Score: ${e[currentPost - 1].score} - ${currentPost}/${e.length}`
+				text: `Rating: ${e[currentPost - 1].rating === "s" ? "Safe" : e[currentPost - 1].rating === "q" ? "Questionable" : "Explicit"} | Score: ${e[currentPost - 1].score.total} - ${currentPost}/${e.length}`
 			},
 			color: e[currentPost - 1].rating === "s" ? Colors.green : e[currentPost - 1].rating === "q" ? Colors.gold : Colors.red,
 			timestamp: new Date().toISOString()

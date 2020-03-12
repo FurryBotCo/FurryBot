@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "7.1.7",
+  "version": "7.1.9",
   "description": "Furry Bot for Discord!",
   "main": "index.js",
   "dependencies": {
@@ -13,8 +13,8 @@
     "chunk": "0.0.2",
     "cookie-parser": "^1.4.4",
     "deasync": "^0.1.16",
-    "e6api": "^1.0.8",
-    "e9api": "^1.0.8",
+    "e6api": "^1.0.10",
+    "e9api": "^1.0.10",
     "ejs": "^3.0.1",
     "eris": "github:abalabahaha/eris#dev",
     "eventemitter3": "^4.0.0",

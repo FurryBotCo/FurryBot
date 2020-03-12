@@ -52,7 +52,7 @@ export default new Command({
 		if (!!msg.gConfig.settings.modlog) {
 			if (!msg.channel.guild.channels.has(msg.gConfig.settings.modlog)) await msg.reply(`failed to create mod log entry, as I could not find the mod log channel.`);
 			else {
-				const ch = msg.channel.guild.channels.get(msg.gConfig.settings.modlog) as Eris.GuildTextableChannel;
+				const ch = msg.channel.guild.channels.get<Eris.GuildTextableChannel>(msg.gConfig.settings.modlog);
 				if (!ch.permissionsOf(this.user.id).has("sendMessages")) await msg.reply(`failed to create mod log entry, as I cannot send messages in the mod log channel.`);
 				else if (!ch.permissionsOf(this.user.id).has("embedLinks")) await msg.reply(`failed to create mod log entry, as I cannot send embeds in the mod log channel.`);
 				else {

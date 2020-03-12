@@ -52,6 +52,8 @@ export default new Command({
 
 		if (!cmd) return msg.reply("Command not found.");
 
+		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) return msg.reply("you must be a developer to see this command.");
+
 		embed = {
 			title: cmd.triggers[0],
 			description: [
@@ -94,6 +96,8 @@ export default new Command({
 
 		if (!cat) return msg.reply("Category not found.");
 
+		if (cat.devOnly && !config.developers.includes(msg.author.id)) return msg.reply("you must be a developer to see this category.");
+
 		const fields: {
 			name: string;
 			value: string;
@@ -102,23 +106,25 @@ export default new Command({
 
 		let i = 0;
 		cat.commands.forEach((c) => {
-			if (!fields[i]) fields[i] = {
-				name: `Command List #${i + 1}`,
-				value: "",
-				inline: false
-			};
-
-			const txt = `\`${c.triggers[0]}\` - ${c.description}`;
-
-			if (fields[i].value.length > 1000 || fields[i].value.length + txt.length > 1000) {
-				i++;
-				return fields[i] = {
+			if (!(c.features.includes("devOnly") && !config.developers.includes(msg.author.id))) {
+				if (!fields[i]) fields[i] = {
 					name: `Command List #${i + 1}`,
-					value: txt,
+					value: "",
 					inline: false
 				};
-			} else {
-				return fields[i].value = `${fields[i].value}\n${txt}`;
+
+				const txt = `\`${c.triggers[0]}\` - ${c.description}`;
+
+				if (fields[i].value.length > 1000 || fields[i].value.length + txt.length > 1000) {
+					i++;
+					return fields[i] = {
+						name: `Command List #${i + 1}`,
+						value: txt,
+						inline: false
+					};
+				} else {
+					return fields[i].value = `${fields[i].value}\n${txt}`;
+				}
 			}
 		});
 

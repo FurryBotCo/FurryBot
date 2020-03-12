@@ -92,7 +92,7 @@ export default new Command({
 		}
 	});
 
-	if (msg.args[1].match(/[0-9]{1,4}[ymdh]/i)) {
+	if (msg.args.length > 1 && msg.args[1].match(/[0-9]{1,4}[ymdh]/i)) {
 		const labels = {
 			h: 3.6e+6,
 			d: 8.64e+7,
@@ -109,9 +109,10 @@ export default new Command({
 		time = labels[i] * t;
 	}
 
-	if (user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.channel.createMessage(`${msg.author.id}>, Pretty sure you don't want to do this to yourself.`);
+	if (user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.reply("pretty sure you don't want to do this to yourself.");
+	if (user.id === msg.channel.guild.ownerID) return msg.reply("you cannot do this to the server owner.");
 	const b = Utility.compareMembers(msg.member, user);
-	if ((b.member2.higher || b.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
+	if ((b.member2.higher || b.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(`you cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
 	// if (user.permission.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
 
@@ -120,7 +121,7 @@ export default new Command({
 		if (!!msg.gConfig.settings.modlog) {
 			if (!msg.channel.guild.channels.has(msg.gConfig.settings.modlog)) await msg.reply(`failed to create mod log entry, as I could not find the mod log channel.`);
 			else {
-				const ch = msg.channel.guild.channels.get(msg.gConfig.settings.modlog) as Eris.GuildTextableChannel;
+				const ch = msg.channel.guild.channels.get<Eris.GuildTextableChannel>(msg.gConfig.settings.modlog);
 				if (!ch.permissionsOf(this.user.id).has("sendMessages")) await msg.reply(`failed to create mod log entry, as I cannot send messages in the mod log channel.`);
 				else if (!ch.permissionsOf(this.user.id).has("embedLinks")) await msg.reply(`failed to create mod log entry, as I cannot send embeds in the mod log channel.`);
 				else {

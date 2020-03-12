@@ -33,7 +33,7 @@ export default new Command({
 	role = roles.filter(r => r.name === msg.args.join(" ").toLowerCase());
 	if (!role || role.length === 0) return msg.channel.createMessage("Role not found.");
 	role = role[0];
-	if (msg.member.roles.includes(role.id)) return msg.channel.createMessage("You already have this role.");
+	if (msg.member.roles.includes(role.id)) return msg.reply(`you already have this role.\n(you can remove a role using \`${msg.gConfig.settings.prefix}iamn\`)`);
 	const a = Utility.compareMemberWithRole(msg.guild.members.get(this.user.id), role);
 	if (a.higher || a.same) return msg.channel.createMessage(`<@!${msg.author.id}>, That role is higher than, or as high as my highest role.`);
 	await msg.member.addRole(role.id, "iam command");

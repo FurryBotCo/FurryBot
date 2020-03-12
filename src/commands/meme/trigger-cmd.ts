@@ -19,5 +19,5 @@ export default new Command({
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
 	// await msg.channel.startTyping();
-	return GenericMemeCommand.handleImage(this, msg, cmd.triggers[0]);
+	return GenericMemeCommand.handleImage(this, msg, cmd.triggers[0], { fileType: "gif" });
 }));

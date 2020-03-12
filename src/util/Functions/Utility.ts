@@ -79,10 +79,47 @@ export default class Utility {
 	 * @param {Eris.Member} member1
 	 * @param {Eris.Member} member2
 	 * @returns {T.CompareMembersResult}
-	 * 
 	 * @memberof Utility
 	 */
 	static compareMembers(member1: Eris.Member, member2: Eris.Member): T.CompareMembersResult {
+		// some things that we can immediately return so we don't process them
+		if (member1.id === member2.id) return {
+			member1: {
+				higher: false,
+				lower: false,
+				same: true
+			},
+			member2: {
+				higher: false,
+				lower: false,
+				same: true
+			}
+		};
+		else if (member1.id === member1.guild.ownerID) return {
+			member1: {
+				higher: true,
+				lower: false,
+				same: false
+			},
+			member2: {
+				higher: false,
+				lower: true,
+				same: false
+			}
+		};
+		else if (member2.id === member1.guild.ownerID) return {
+			member1: {
+				higher: false,
+				lower: false,
+				same: false
+			},
+			member2: {
+				higher: true,
+				lower: false,
+				same: false
+			}
+		};
+
 		const a = member1.roles.map(r => member1.guild.roles.get(r));
 		let b: Eris.Role;
 		if (a.length > 0) b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
