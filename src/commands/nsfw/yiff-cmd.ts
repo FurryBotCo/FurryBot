@@ -30,11 +30,19 @@ export default new Command({
 		}
 
 		if (!type) {
-			type = config.yiff.types[0];
-			if (!this.yiffNoticeViewed.has(msg.channel.guild.id)) {
+			type = msg.gConfig.settings.defaultYiff;
+			if (!config.yiff.types.includes(type)) {
+				await msg.gConfig.edit({
+					settings: {
+						defaultYiff: config.yiff.types[0]
+					}
+				});
+				content = `The default type "${msg.gConfig.settings.defaultYiff}" set by this servers settings is invalid, is has been changed to the config set default "${config.yiff.types[0]}".`;
+			}
+			/*if (!this.yiffNoticeViewed.has(msg.channel.guild.id)) {
 				this.yiffNoticeViewed.add(msg.channel.guild.id);
 				content = `Showing default yiff type **${type}**\nTo change this, add one of these values somewhere in the channel __name__: **${config.yiff.types.join("**, **")}**.\n\n`;
-			}
+			}*/
 		}
 
 	} else {

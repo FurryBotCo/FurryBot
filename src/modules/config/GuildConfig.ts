@@ -18,6 +18,7 @@ class GuildConfig {
 	};
 	settings: {
 		nsfw: boolean;
+		defaultYiff: string;
 		snipeCommand: boolean;
 		muteRole?: string;
 		fResponse: boolean;
@@ -27,6 +28,13 @@ class GuildConfig {
 		deleteModCmds: boolean;
 		ecoEmoji: string;
 		modlog?: string;
+		joinEnabled: boolean;
+		joinMessage: string;
+		joinChannel?: string;
+		leaveEnabled: boolean;
+		leaveMessage: string;
+		leaveChannel?: string;
+		welcomeDeleteTime: number;
 	};
 	snipe: {
 		edit: {
@@ -85,18 +93,7 @@ class GuildConfig {
 			textChannel: data.music.textChannel || null,
 			queue: data.music.queue || []
 		} : config.defaults.guildConfig.music;
-		this.settings = {
-			nsfw: data.settings && ![undefined, null].includes(data.settings.nsfw) ? data.settings.nsfw : config.defaults.guildConfig.settings.nsfw,
-			snipeCommand: data.settings && ![undefined, null].includes(data.settings.snipeCommand) ? data.settings.snipeCommand : config.defaults.guildConfig.settings.snipeCommand,
-			muteRole: data.settings && data.settings.muteRole ? data.settings.muteRole : null,
-			fResponse: data.settings && !!data.settings.fResponse,
-			commandImages: data.settings && !!data.settings.commandImages,
-			lang: data.settings && data.settings.lang ? data.settings.lang : config.defaults.guildConfig.settings.lang,
-			prefix: data.settings && data.settings.prefix ? data.settings.prefix : config.defaultPrefix,
-			deleteModCmds: data.settings && ![undefined, null].includes(data.settings.deleteModCmds) ? data.settings.deleteModCmds : config.defaults.guildConfig.settings.deleteModCmds,
-			ecoEmoji: data.settings && data.settings.ecoEmoji ? data.settings.ecoEmoji : config.defaults.guildConfig.settings.ecoEmoji,
-			modlog: data.settings && data.settings.modlog ? data.settings.modlog : config.defaults.guildConfig.settings.modlog
-		};
+		this.settings = Object.keys(config.defaults.guildConfig.settings).map(k => ({ [k]: data.settings && ![undefined, null].includes(data.settings[k]) ? data.settings[k] : config.defaults.guildConfig.settings[k] })).reduce((a, b) => ({ ...a, ...b })) as any;
 		this.snipe = data.snipe ? {
 			delete: data.snipe.delete || config.defaults.guildConfig.snipe.delete,
 			edit: data.snipe.edit || config.defaults.guildConfig.snipe.edit
