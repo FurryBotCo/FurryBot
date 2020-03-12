@@ -11,7 +11,7 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 		"events.guildCreate"
 	]);
 
-	await Internal.incrementDailyCounter(true);
+	await Internal.incrementDailyCounter(this, true);
 
 	let author = {
 		name: "Unknown#0000",

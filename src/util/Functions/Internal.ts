@@ -180,14 +180,14 @@ export default class Internal {
 	 * @returns {Promise<number>}
 	 * @memberof Internal
 	 */
-	static async incrementDailyCounter(increment = true): Promise<number> {
+	static async incrementDailyCounter(client: FurryBot, increment = true): Promise<number> {
 		const d = new Date();
-		const id = `${d.getMonth()}-${d.getDate()}-${d.getFullYear()}`;
+		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 
 		const j = await mdb.collection("dailyjoins").findOne({ id });
-		const count = j ? increment ? j.count + 1 : j.count - 1 : increment ? -1 : 1;
+		const count = j ? increment ? j.count + 1 : j.count - 1 : increment ? 1 : -1;
 		await mdb.collection("dailyjoins").findOneAndDelete({ id });
-		await mdb.collection("dailyjoins").insertOne({ count, id });
+		await mdb.collection("dailyjoins").insertOne({ count, id, guildCount: client.guilds.size });
 
 		return count;
 	}

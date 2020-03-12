@@ -1,3 +1,5 @@
+import Eris from "eris";
+
 declare namespace TypeDefs.Internal {
 	interface ProcessMemory {
 		total: number;
@@ -109,6 +111,18 @@ declare namespace TypeDefs.Utility {
 			same: boolean;
 		};
 	}
+
+	type AuditLogReturn = {
+		success: true;
+		blame: Eris.User;
+		reason: string;
+	} | {
+		success: false;
+		error: {
+			text: string;
+			code: number;
+		};
+	};
 }
 
 export = TypeDefs;

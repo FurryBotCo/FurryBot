@@ -236,30 +236,10 @@ export default class Utility {
 	 * @param {number} type
 	 * @param {string} [targetID]
 	 * @param {number} [fetchAmount=5]
-	 * @returns {(Promise<({
-	 * 		success: true;
-	 * 		blame: Eris.User;
-	 * 		reason: string;
-	 * 	} | {
-	 * 		success: false;
-	 * 		error: {
-	 * 			text: string;
-	 * 			code: number;
-	 * 		};
-	 * 	})>)}
+	 * @returns {(Promise<T.AuditLogReturn>}
 	 * @memberof Utility
 	 */
-	static async fetchAuditLogEntries(guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<({
-		success: true;
-		blame: Eris.User;
-		reason: string;
-	} | {
-		success: false;
-		error: {
-			text: string;
-			code: number;
-		};
-	})> {
+	static async fetchAuditLogEntries(guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<T.AuditLogReturn> {
 		if (!guild.members.get(client.user.id).permission.has("viewAuditLogs")) return {
 			success: false,
 			error: {

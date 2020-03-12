@@ -183,7 +183,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 
 		t.start("autoResponse");
-		if (["f", "rip"].includes(msg.content.toLowerCase()) && msg.gConfig.settings.fResponse) {
+		if (["f", "rip"].includes(msg.content.toLowerCase()) && msg.gConfig.settings.fResponse && msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
 			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return;
 			this.increment([
 				"other.autoResponse.f"
@@ -267,7 +267,20 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			let count = await mdb.collection("stats").findOne({ id: "fCount" }).then(res => parseInt(res.count, 10)).catch(err => 1);
 			await mdb.collection("stats").findOneAndUpdate({ id: "fCount" }, { $set: { count: ++count } });
-			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings f response disabled\``).catch(err => null);
+			if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.channel.createMessage({
+				embed: {
+					title: "Paying Respects.",
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					},
+					description: `**${msg.author.username}** has paid respects.\nRespects Paid Total: **${count}**`,
+					footer: {
+						text: `This can be disabled by using "${msg.gConfig.settings.prefix}settings f response disabled" (no quotes)`
+					},
+					color: Colors.gold
+				}
+			}); else return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings f response disabled\``).catch(err => null);
 		}
 		t.end("autoResponse");
 
@@ -376,6 +389,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		await mdb.collection<UsageStats>("stats").findOneAndUpdate({ _id: "commandUsage" }, { $set: st });
 
+		if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage(`You attempted to run the command "${msg.cmd.cmd.triggers[0]}" in the channel <#${msg.channel.id}>, but I'm missing the **sendMessages** permission.\n\nContent:\n> ${msg.content}`)).catch(err => null);
+
 		if (cmd.features.includes("betaOnly") && !config.beta) return;
 
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) {
@@ -397,6 +412,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw commands enabled\`.`).catch(err => null);
 
 			if (msg.channel.topic && config.yiff.disableStatements.some(t => msg.channel.topic.indexOf(t) !== -1)) {
+				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
 				const st = config.yiff.disableStatements.filter(t => msg.channel.topic.indexOf(t) !== -1);
 				st.map(k => this.increment("other.nsfwDisabled", [`statment:${k}`]));
 
@@ -417,6 +433,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		const donator = await msg.uConfig.premiumCheck();
 		if (cmd.features.includes("donatorOnly") && !config.developers.includes(msg.author.id)) {
+			if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
 			if (!donator.active) return msg.channel.createMessage({
 				embed: {
 					title: "Usage Not Allowed",
@@ -433,6 +450,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		const premium = await msg.gConfig.premiumCheck();
 		if (cmd.features.includes("premiumGuildOnly") && !config.developers.includes(msg.author.id)) {
+			if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
 			if (!premium.active) return msg.channel.createMessage({
 				embed: {
 					title: "Usage Not Allowed",
