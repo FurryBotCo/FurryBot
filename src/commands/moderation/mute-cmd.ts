@@ -154,7 +154,7 @@ export default new Command({
 			guildId: msg.channel.guild.id,
 			type: "mute",
 			reason
-		});
+		} as any); // apparently mongodb's types require specifying "_id" so we'll do this now
 	}).catch(async (err) => {
 		msg.channel.createMessage(`<@!${msg.author.id}>, I couldn't mute **${user.username}#${user.discriminator}**, ${err}`);
 		/*if (m !== undefined) {

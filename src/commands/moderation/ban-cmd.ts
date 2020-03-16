@@ -119,7 +119,7 @@ export default new Command({
 			guildId: msg.channel.guild.id,
 			type: "ban",
 			reason
-		});
+		} as any); // apparently mongodb's types require specifying "_id" so we'll do this now
 	}).catch(async (err) => {
 		msg.channel.createMessage(`I couldn't ban **${user.username}#${user.discriminator}**, ${err}`);
 		if (typeof m !== "undefined") await m.delete();
