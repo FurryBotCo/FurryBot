@@ -29,7 +29,7 @@ export default new Command({
 		color: Colors.gold,
 		timestamp: new Date().toISOString(),
 		footer: {
-			text: `Current Shard: #${msg.channel.guild.shard.id} | Total Guilds: ${this.guilds.size}`
+			text: `Current Shard: #${msg.channel.guild.shard.id} | Total Guilds: ${this.guilds.size} | Average Ping: ${Math.floor(this.shards.map(s => s.latency).reduce((a, b) => a + b) / this.shards.size)}ms`
 		}
 	};
 
