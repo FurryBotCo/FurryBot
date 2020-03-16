@@ -1,0 +1,457 @@
+commands:
+  animals:
+    bird:
+      description: "Get a picture of a birb!"
+      usage: ""
+      title: "Birb!"
+    bunny:
+      description: "Get a picture of a bunny!"
+      usage: ""
+      title: "Bunny!"
+    cat:
+      description: "Get a picture of a cat!"
+      usage: ""
+      title: "Kitty!"
+    dog:
+      description: "Get a picture of a doggo!"
+      usage: ""
+      refresh: "Refreshing dog breeds."
+      validBreeds: "Valid Dog Breeds"
+      invalidBreeds: "**{0}** is not a valid breed. You can use {1} to list breeds, or provide none to get a random breed."
+      bredFor: "Bred For"
+      breedGroup: "Breed Group"
+      lifeSpam: "Life Span"
+      temperament: "Temperament"
+      origin: "Origin"
+    duck:
+      description: "Get a picture of a duck!"
+      usage: ""
+      title: "Ducky!"
+    fox:
+      description: "Get a picture of a fox!"
+      usage: ""
+      title: "Foxxo!"
+    otter:
+      description: "Get a picture of an otter!"
+      usage: ""
+      title: "Otter!"
+    panda:
+      description: "Get a picture of a panda!"
+      usage: ""
+      title: "Panda!"
+    snek:
+      description: "Get a picture of a snek!"
+      usage: ""
+      title: "Snek!"
+    turtle:
+      description: "Get a picture of a turtle!"
+      usage: ""
+      title: "Turtle"
+    wolf:
+      description: "Get a picture of a wolf!"
+      usage: ""
+      title: "Wolfie!"
+  economy:
+    bal:
+      description: "Check your balance."
+      usage: "[@user]"
+    beg:
+      description: "Beg for money."
+      usage: ""
+      title: "Begging For Money"
+      gave: "**{0}** gave you {1}{2}"
+      possible:
+        - "**{0}** gave you {1}{2}"
+        - "you found {1}{2} that **{0}** left behind a dumpster.."
+      multiplier: "Multiplier: {0}%"
+    multiplier:
+      description: "Get your current economy multiplier."
+      usage: ""
+      title: "Multiplier"
+  fun:
+    8ball:
+      description: "Ask the magic 8ball a question!"
+      title: "{0}'s Magic 8ball Game'"
+      usage: "<question>"
+      said: "The Magic 8ball said: **{0}**."
+      disclaimer: "Disclaimer: Do not take any answers seriously!"
+      possible:
+        - "It is certain"
+        - "Without a doubt"
+        - "Most likely"
+        - "Yes"
+        - "Reply was hazy, try again later"
+        - "Ask again later"
+        - "My answer is no"
+        - "No"
+        - "Very doubtful"
+        - "Concentrate and ask again"
+        - "As I see it, yes"
+    awoo:
+      description: "Start a howl, or join in!"
+      usage: ""
+      join: "<@!{0}> joined a howl with {1} furs!\nJoin in using `{2}awoo`\n{3}"
+      tooLarge: "This howl is too large for emojis!"
+      start: "<@!{0}> started a howl!\nJoin in using `{1}awoo`.\n{2}"
+      alreadyPresent: "you are already in this howl!"
+    bap:
+      description: "Bap someone! Ouch!"
+      usage: "<@member/text>"
+      possible:
+        - "<@!{0}> smacks {1} hard on the snoot with a rolled up news paper!"
+        - "<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit themselves!"
+        - "<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit <@!{2}>!"
+    bellyrub:
+      description: "Give someone a nice belly rub -w-"
+      usage: "<@member/text>"
+    blep:
+      description: "Do a little blep!"
+      usage: ""
+      possible:
+        - "{0} did a little blep!"
+        - "{0} stuck their tongue out cutely!"
+    boop:
+      description: "Boop someones snoot!"
+      usage: "<@member/text>"
+      possible:
+        - "{0} has booped {1}!\nOwO"
+        - "{0} lightly pokes the nose of {1}!\nOwO"
+    conga:
+      description: "Start a conga with someone, or join in!"
+      usage: "[@user]"
+      join: "<@!{0}> joined a conga with <@!{1}>!\n<@!{1}> now has {2} furs congaing with them!\nJoin in using `{3}conga`\n{4}"
+      tooLarge: "This conga is too large for emojis!"
+      start: "<@!{0}> started a conga with <@!{1}>!\nJoin in using `{2}conga`.\n{3}"
+      alreadyPresent: "you are already in this conga!"
+    cuddle:
+      description: "Cuddle someone!"
+      usage: "<@member/text>"
+      possible:
+        - "{0} has cuddled {1}\nThey're so cute"
+        - "{0} sneaks up behind {1} and cuddles them\nIsn't that sweet"
+    dadjoke:
+      description: "Get a dadjoke"
+      usage: ""
+    dictionary:
+      description: "Throw a dictionary at someone to teach them some knowledge!"
+      usage: "<@member/text>"
+      possible:
+        - '{0} throws a dictionary at {1} screaming "KNOWLEDGE"!'
+        - "{0} drops some knowledge on {1}, with their dictionary!"
+        - "{0} drops their entire english folder onto {1}, it seems to have flattened them!"
+    divorce:
+      description: "Revoke your marriage.."
+      usage: "<@member>"
+      notMarried: "you have to marry someone before you can divorce them.."
+      confirm: "Are you sure you want to divorce **{0}**? **yes** or **no**."
+      invalidOption: "that wasn't a valid option.."
+      done: "you've divorced **{0}**..."
+      canceled: "you've stayed with **{0}**!"
+    e926:
+      description: "Get some content from E926 (SWF E621)!"
+      usage: "[tags]"
+      maxTags: "you can only specify up to fourty (40) tags."
+      blacklistedTags: "Your search contained blacklisted tags, **{0}**"
+      noResults: "your search returned no results."
+      flash: "This post is a flash animation, please directly view [the post]({0}) on e926"
+      video: "This post appears to be a video, please directly view [the post]({0}) on e926"
+      navigate: "To navigate posts, you can reply with one of the following:\n**first**, **back**, **stop**, **next**, **last**."
+      ratelimited: "you are being ratelimited! Please wait a bit more for navigating posts."
+      inactive: "Navigating not active, it either timed out or the started exited."
+    flop:
+      description: "Flop onto someone! OwO"
+      usage: "<@member/text>"
+      possible:
+        - "<@!{0}> flops over onto <@!{1}>!\nOof"
+        - "<@!{0}> lays on <@!{1}>.. owo"
+    furpile:
+      description: "Start a furpile on someone, or join in!"
+      usage: "[@user]"
+      start: "<@!{0}> started a furpile on <@!{1}>\nJoin in using `{2}`."
+      join: "<@!{0}> joined a furpile on <@!{1}>!\n<@!{1}> now has {2} furs on them!\nJoin in using `{3}furpile`/"
+      alreadyPresent: "you are already in this furpile!"
+    fursuit:
+      description: "Get a random fursuit image!"
+      usage: ""
+    giphy:
+      description: "Get a gif from giphy"
+      usage: "<keywords>"
+      noResults: 'no results were found for "{0}".'
+      title: 'Results for "{0}" on giphy'
+      footer: "These results are not curated by us!"
+    glomp:
+      description: "Pounce onto someone lovingly~!"
+      usage: "<@member/text>"
+      possible:
+        - '{0} pounced onto {1}, tackling them to the floor in a giant hug! {0} whispers "I love you~" quietly into {1}''s ear.'
+    huff:
+      description: "Blow someone's house down.."
+      usage: "<@member/text>"
+    hug:
+      description: "Hug someone!"
+      usage: "<@member/text>"
+      possible:
+        - "{0} sneaks up behind {1}, and when they aren't looking, tackles them from behind in the biggest hug ever!"
+        - "{0} gently wraps their arms around {1}!"
+        - "{0} wraps their arms around {1}, giving them a big warm hug"
+    kiss:
+      description: "Kiss someone 0.0"
+      usage: "<@member/text>"
+      possible:
+        - "{0} kisses {1}\nThey must be in love!\n:blue_heart:"
+        - "{0} kisses {1}\nCute!"
+    lick:
+      description: "Lick someone.. owo"
+      usage: "<@member/text>"
+      possible:
+        - "{0} licks {1}\nUwU"
+        - "{0} decides to make {1}'s fur a little slimy...'"
+    marry:
+      description: "Promose to someone!"
+      usage: "<@member>"
+      selfAlreadyMarried: "hey, hey! You're already married to **{0}**! You can get a divorce though.."
+      otherAlreadyMarried: "hey, hey! They're already married to **{0}**!"
+      title: "Marriage Proposal"
+      text: "<@!{0}> has proposed to <@!{1}>!"
+      content: "<@!{0}> has proposed to <@!{1}>!\n<@!{1}> do you accept? **yes** or **no**."
+      noReply: "seems like we didn't get a reply.."
+      invalidOption: "<@!{0}>, that wasn't a valid option.."
+      accepted: "Congrats <@!{0}> and <@!{1}> :ring:!"
+      denied: "better luck next time!"
+    nap:
+      description: "Flop onto someone.. then take a nap?"
+      usage: "<@member/text>"
+      possible:
+        - "{0} decided to take a nap on {1}.. {1} might need a forklift for this one!"
+    nuzzle:
+      description: "Nuzzle someone!"
+      usage: "<@member/text>"
+      possible:
+        - "{0} nuzzles {1} gently\nIsn't that cute!"
+    pat:
+      description: "Pat someone uwu"
+      usage: "<@member/text>"
+      possible:
+        - "{0} pats {1} on the head for being a good boi (or girl/other)"
+        - "{0} gently pets {1}"
+    poke:
+      description: "Poke someone!"
+      usage: "<@member/text>"
+      possible:
+        - "{0} pokes {1}\nDon't make them mad.."
+    pounce:
+      description: "Pounce on someone! uwu"
+      usage: "<@member/text>"
+      possible:
+        - "{0} pounces onto {1} uwu"
+    roll:
+      description: "Roll the dice."
+      usage: "[min] [max]"
+      minLess: "the minimum must be less than the maximum."
+      text: "you rolled a {0}!"
+    russianroulette:
+      description: "Play Russian Roulette"
+      usage: "[bullets]"
+      die: "You Died!"
+      live: "You Lived!"
+    ship:
+      description: "Ship some people!"
+      usage: "[@member1] [@member2]"
+      devOnlyOption: "this option, `{0}` is developer only."
+      title: "Shipping Users"
+      text: "Shipping <@!{0}> and <@!{1}>\n**{2}**%"
+    slap:
+      description: "Slap someone.."
+      possible:
+        - "{0} slaps {1}.. ouch"
+      usage: "<@member/text>"
+    sniff:
+      description: "Sniff someone..?"
+      usage: "<@member/text>"
+      possible:
+        - "{0} siffs {1}\nMaybe they smell good..?"
+    snowball:
+      description: "Throw a snowball at someone!"
+      usage: "<@member/text>"
+      possible:
+        - "{0} throws a snowball at {1}!"
+    spray:
+      description: "Spray someone with a bottle of water.."
+      usage: "<@member/text>"
+      possible:
+        - '{0} sprays {1} with a bottle of water, yelling "bad fur"!'
+    wag:
+      description: "Wag your little tail!"
+      usage: ""
+      possible:
+        - "<@!{0}> wags their little tail, aren't they cute ^-^"
+    whosagoodboy:
+      description: "Who's a good boy?!"
+      usage: "[@user]"
+      me: "Yip! Yip! I am!"
+      other: "Yip! Yip! {0} is!"
+  information:
+    info:
+      description: "Get some info about me."
+      usage: ""
+      title: "Bot Info!"
+      stats: "Stats"
+      processUsage: "Process Memory Usage"
+      ststemUsage: "System Memory Usage"
+      uptime: "Uptime"
+      shard: "Shard"
+      serverCount: "Server Count"
+      largeServerCount: "Large Server Count"
+      userCount: "User Count"
+      channelCount: "Channel Count"
+      voiceConnectionCount: "Voice Connection Count"
+      commands: "Commands"
+      creators: "Creator(s)"
+      other: "Other Info"
+      library: "Library"
+      libraryVersion: "Library Version"
+      apiVersion: "API Version"
+      gatewayVersion: "Gateway Version"
+      botVersion: "Bot Version"
+      nodeVersion: "Node Version"
+      supportServer: "Support Server"
+      donate: "Donate"
+    invite:
+      description: "Get some invite links for me!"
+      usage: ""
+      title: "Discord"
+      join: "Join Our Discord Server!"
+      invite: "Invite Me To Your Server!"
+    ipinfo:
+      description: "Get info about an ip address."
+      usage: "<ip>"
+      error: "error processing request"
+      reserved: "the supplied ip is a reserved ip, these have no specific information associated with them."
+      title: "IP Info for {0}"
+      location: "Location"
+      lat: "lat"
+      long: "long"
+      owner: "Owner"
+      timezone: "Timezone"
+    perms:
+      description: "Check your permissions, and my permissions."
+      usage: ""
+      title: "Permission Info"
+      user: "User"
+      bot: "Bot"
+      none: "NONE"
+      allow: "Allow"
+      deny: "Deny"
+    ping:
+      description: "Get my average ping."
+      usage: ""
+      check: "Checking ping.."
+      calc: "Ping Calculated!"
+      client: "Client Ping"
+      shard: "Shard Ping"
+    shard:
+      description: "Get some info about your servers current shard."
+      usage: ""
+      title: "Shard Info"
+      guilds: "Guilds"
+      ping: "Ping"
+    shards:
+      description: "Get some info about my shards."
+      usage: ""
+      title: "Shard Info"
+      name: "Shard #{0}"
+      guilds: "Guilds"
+      ping: "Ping"
+      current: "Current Shard"
+      total: "Total Guilds"
+      average: "Average Ping"
+    sinfo:
+      description: "Get some info about the current server."
+      usage: ""
+      features:
+        inviteSplash: "Invite Splash"
+        inviteSlashDesc: "guild has access to set an invite splash background"
+        vipRegions: "Vip Voice Regions/320kbps Voice Channels"
+        vipRegionsDesc: "guild has access to set 384kbps bitrate in voice (previously VIP voice servers)"
+        vanityUrl: "Vanity URL"
+        vanityUrlDesc: "guild has access to set a vanity URL"
+        verified: "Verified"
+        verifiedDesc: "guild is verified"
+        partnered: "Partnered"
+        partneredDesc: "guild is partnered"
+        public: "Public"
+        publicDesc: "guild is public"
+        commerce: "Store Channels"
+        commerceDesc: guild has access to use commerce features (i.e. create store channels)""
+        news: "News Channels"
+        newsDesc: "guild has access to create news channels"
+        discoverable: "Discoverable"
+        discoverableDesc: "guild is able to be discovered in the directory"
+        featurable: "Featurable"
+        featurableDesc: "guild is able to be featured in the directory"
+        animatedIcon: "Animated Icon"
+        animatedIconDesc: "guild has access to set an animated guild icon"
+        banner: "Banner"
+        bannerDesc: "guild has access to set a guild banner image"
+        none: "NONE"
+      verification:
+        none: "NONE"
+        noneDesc: "unrestricted"
+        low: "LOW"
+        lowDesc: "must have verified email on account"
+        medium: "MEDIUM"
+        mediumDesc: "must be registered on Discord for longer than 5 minutes"
+        high: "HIGH"
+        highDesc: "(╯°□°）╯︵ ┻━┻ - must be a member of the server for longer than 10 minutes"
+        veryHigh: "VERY HIGH"
+        veryHighDesc: "┻━┻ミヽ(ಠ益ಠ)ﾉ彡┻━┻ - must have a verified phone number"
+      mfa:
+        notEnabled: "Not Enabled"
+        enabled: "Enabled"
+      defaultNotifications:
+        allMessages: "All Messages"
+        onlyMentions: "Only Mentions"
+      title: "Server Info"
+      name: "Name"
+      id: "ID"
+      owner: "Owner"
+      region: "Region"
+      creationDate: "Creation Date"
+      nitroBoosts: "Nitro Boosts"
+      boostTier: "Boos Tier"
+      large: "Large"
+      verificationLevel: "Verification Level"
+      2faRequirement: "2FA Requirement"
+      defaultNotificationsLabel: "Default Notifications"
+      vanityUrl: "Vanity URL"
+      featuresLabel: "Features"
+      members: "Members"
+      note: "note"
+      nonBots: "Non Bots"
+      bots: "Bots"
+      channels: "Channels"
+      total: "Total"
+      text: "Text"
+      voice: "Voice"
+      category: "Category"
+      news: "News"
+      store: "Store"
+      hiddenYou: "Hidden (for you)"
+      visibleYou: "Visible (for you)"
+      hiddenMe: "Hidden (for me)"
+      visibleMe: "Hidden (for me)"
+    uinfo:
+      description: "Get some info about a user."
+      usage: "[@member/id]"
+      title: "User Info"
+      tag: "Tag"
+      id: "ID"
+      joinDate: "Server Join Date"
+      creationDate: "Account Creation Date"
+      roles: "Roles"
+      tooManyRoles: "Too many roles to list, please use `{0}roles {1}` to list them."
+    whoisplaying:
+      description: "Get a list of users playing the specified game."
+      usage: "<game>"
+      title: "Who Is Playing: {0}"
+      total: "Total: **{0}**"

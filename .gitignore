@@ -40,7 +40,30 @@ typings/
 .next
 
 # Config files
-src/config
+src/config/*
+!src/config/extra
+src/config/extra/*
+
+# config defaults
+src/config/extra/defaults/*
+!src/config/extra/defaults
+!src/config/extra/defaults/guildConfig.json
+!src/config/extra/defaults/userConfig.json
+
+# config lang
+!src/config/extra/lang
+src/config/extra/lang/*
+!src/config/extra/lang/en.yaml
+!src/config/extra/lang/Language.ts
+
+#config other
+!src/config/extra/other
+src/config/extra/other/*
+!src/config/extra/other/dm.json
+!src/config/extra/other/emojis.json
+!src/config/extra/other/leveling.json
+!src/config/extra/other/settings.json
+!src/config/extra/other/toStringFormatNames.ts
 *.protected
 *.hidden
 
