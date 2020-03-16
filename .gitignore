@@ -39,7 +39,7 @@ typings/
 # next.js build output
 .next
 
-# Config files
+# config
 src/config/*
 !src/config/extra
 src/config/extra/*
@@ -64,8 +64,6 @@ src/config/extra/other/*
 !src/config/extra/other/leveling.json
 !src/config/extra/other/settings.json
 !src/config/extra/other/toStringFormatNames.ts
-*.protected
-*.hidden
 
 # test directory
 test/
