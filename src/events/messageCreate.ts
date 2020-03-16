@@ -35,6 +35,43 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		msg = await new ExtendedMessage(message, this)._load();
 		t.end("messageProcess");
 
+		t.start("leveling");
+		if ([Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(msg.channel.type)) {
+			const c = this.cd.check(msg.author.id, "leveling", { guild: msg.channel.guild.id });
+			if (!c.found) {
+				this.cd.add(msg.author.id, "leveling", 6e4, { guild: msg.channel.guild.id });
+				const lvl = config.leveling.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
+				const l = Math.floor(Math.random() * 10) + 5;
+				await msg.uConfig.edit({
+					levels: {
+						[msg.channel.guild.id]: msg.uConfig.getLevel(msg.channel.guild.id) + l
+					}
+				});
+				const nlvl = config.leveling.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
+				if (nlvl.level > lvl.level && msg.gConfig.settings.announceLevelUp) {
+					if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
+						let m: Eris.Message;
+						if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) m = await msg.channel.createMessage({
+							embed: {
+								title: "Level Up!",
+								color: Colors.green,
+								timestamp: new Date().toISOString(),
+								author: {
+									name: msg.author.tag,
+									icon_url: msg.author.avatarURL
+								},
+								description: `You leveled up to level **${nlvl.level}**!`
+							}
+						});
+						else msg.channel.createMessage(`<@!${msg.author.id}> leveled up to level **${nlvl.level}** in the server **${msg.channel.guild.name}**!\n(This would look different if I had the permission **embedLinks**.)`);
+
+						setTimeout(() => m.delete(), 2e4);
+					} else msg.author.getDMChannel().then(dm => dm.createMessage(`You leveled up to level **${nlvl.level}** in the server **${msg.channel.guild.name}**!\n(I sent this here because I cannot send messages in the channel you actually leveled up in)`)).catch(err => null);
+				}
+			}
+		}
+		t.end("leveling");
+
 		t.start("blacklist");
 		const gbl: Blacklist.GuildEntry[] = [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(msg.channel.type) ? await mdb.collection("blacklist").find({ guildId: msg.channel.guild.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())) : [];
 		const ubl: Blacklist.UserEntry[] = await mdb.collection("blacklist").find({ userId: msg.author.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now()));
@@ -183,7 +220,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 
 		t.start("autoResponse");
-		if (["f", "rip"].includes(msg.content.toLowerCase()) && msg.gConfig.settings.fResponse) {
+		if (["f", "rip"].includes(msg.content.toLowerCase()) && msg.gConfig.settings.fResponse && msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
 			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return;
 			this.increment([
 				"other.autoResponse.f"
@@ -267,7 +304,20 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			let count = await mdb.collection("stats").findOne({ id: "fCount" }).then(res => parseInt(res.count, 10)).catch(err => 1);
 			await mdb.collection("stats").findOneAndUpdate({ id: "fCount" }, { $set: { count: ++count } });
-			return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings fResponse disabled\``).catch(err => null);
+			if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.channel.createMessage({
+				embed: {
+					title: "Paying Respects.",
+					author: {
+						name: msg.author.tag,
+						icon_url: msg.author.avatarURL
+					},
+					description: `**${msg.author.username}** has paid respects.\nRespects Paid Total: **${count}**`,
+					footer: {
+						text: `This can be disabled by using "${msg.gConfig.settings.prefix}settings f response disabled" (no quotes)`
+					},
+					color: Colors.gold
+				}
+			}); else return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${msg.gConfig.settings.prefix}settings f response disabled\``).catch(err => null);
 		}
 		t.end("autoResponse");
 
@@ -376,6 +426,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		await mdb.collection<UsageStats>("stats").findOneAndUpdate({ _id: "commandUsage" }, { $set: st });
 
+		if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage(`You attempted to run the command "${msg.cmd.cmd.triggers[0]}" in the channel <#${msg.channel.id}>, but I'm missing the **sendMessages** permission.\n\nContent:\n> ${msg.content}`)).catch(err => null);
+
 		if (cmd.features.includes("betaOnly") && !config.beta) return;
 
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) {
@@ -394,9 +446,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				name: "nsfw.gif"
 			}).catch(err => null);
 
-			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw enable\`.`).catch(err => null);
+			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw commands enabled\`.`).catch(err => null);
 
 			if (msg.channel.topic && config.yiff.disableStatements.some(t => msg.channel.topic.indexOf(t) !== -1)) {
+				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
 				const st = config.yiff.disableStatements.filter(t => msg.channel.topic.indexOf(t) !== -1);
 				st.map(k => this.increment("other.nsfwDisabled", [`statment:${k}`]));
 
@@ -417,6 +470,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		const donator = await msg.uConfig.premiumCheck();
 		if (cmd.features.includes("donatorOnly") && !config.developers.includes(msg.author.id)) {
+			if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
 			if (!donator.active) return msg.channel.createMessage({
 				embed: {
 					title: "Usage Not Allowed",
@@ -433,6 +487,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		const premium = await msg.gConfig.premiumCheck();
 		if (cmd.features.includes("premiumGuildOnly") && !config.developers.includes(msg.author.id)) {
+			if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
 			if (!premium.active) return msg.channel.createMessage({
 				embed: {
 					title: "Usage Not Allowed",
@@ -480,9 +535,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 
 		if (!config.developers.includes(msg.author.id)) {
-			const cool = this.cmd.cool.checkCooldown(cmd, msg.author.id);
+			const cool = this.cd.check(msg.author.id, "cmd", { cmd: cmd.triggers[0] });
 			const time = cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;
-			if (cool.c && cmd.cooldown !== 0 && cool.time !== 0) {
+			if (cool.found && cmd.cooldown !== 0 && cool.time !== 0) {
 				const t = Time.ms(time, true);
 				const n = Time.ms(cmd.cooldown, true);
 				const d = Time.ms(cmd.donatorCooldown, true);
@@ -504,7 +559,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 
-		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cmd.cool.setCooldown(cmd, donator.active ? cmd.donatorCooldown : cmd.cooldown, msg.author.id);
+		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cd.add(msg.author.id, "cmd", donator.active ? cmd.donatorCooldown : cmd.cooldown, { cmd: cmd.triggers[0] });
 
 		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}" ran with the arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 
@@ -519,7 +574,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		// timing command processing
 		if (msg.cmd.cat.name !== "dev") await mdb.collection("timing").insertOne({ times: t.timers, cmd: cmd.triggers[0], id: uuid() });
 	} catch (e) {
-		const err: Error = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
+		const err: Error & { code?: string; } = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
 		if (!["ERR_INVALID_USAGE", "RETURN"].includes(err.message)) {
 			Logger.error(msg && msg.channel && msg.channel.guild && msg.channel.guild.shard ? `Shard #${msg.channel.guild.shard.id}` : "Error", err);
 			if (!msg || !msg.channel || !msg.channel.guild || !msg.channel.guild.shard) return;
@@ -573,38 +628,48 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					},
 					timeout: 5e3
 				}).then(k => k.body.toString());
-
-				await this.w.get("errors").execute({
-					embeds: [
-						{
-							title: ":x: Error",
-							description: [
-								"**Error**:",
-								`\u25FD Stack: ${s}`,
-								`\u25FD Error Name: ${err.name}`,
-								`\u25FD Error Message: ${err.message}`,
-								"",
-								"**Other Info**:",
-								`\u25FD User: ${msg.author.tag} (<@!${msg.author.id}>)`,
-								`\u25FD Code: \`${ecode}\``,
-								`\u25FD Command: ${cmd !== null ? cmd.triggers[0] : "none"}`,
-								"",
-								"**Location**:",
-								`\u25FD Message Content: **${msg.content}**`,
-								`\u25FD Message ID: \`${msg.id}\``,
-								`\u25FD Channel: **${msg.channel.name}**`,
-								`\u25FD Channel ID: \`${msg.channel.id}\``,
-								`\u25FD Guild: **${msg.channel.guild.name}**`,
-								`\u25FD Guild ID: \`${msg.channel.guild.id}\``,
-								`\u25FD Shard: #${msg.channel.guild.shard.id}`,
-								`\u25FD Time: ${Time.formatDateWithPadding(Date.now(), true, false)}`
-							].join("\n"),
-							timestamp: new Date().toISOString(),
-							color: Colors.red
+				const embed: Eris.EmbedOptions = {
+					title: ":x: Error",
+					description: [
+						"**Error**:",
+						`\u25FD Stack: ${s}`,
+						`\u25FD Error Name: ${err.name}`,
+						`\u25FD Error Message: ${err.message}`,
+						`\u25FD Error Code: ${err.code || "None"}`,
+						"",
+						"**Other Info**:",
+						`\u25FD User: ${msg.author.tag} (<@!${msg.author.id}>)`,
+						`\u25FD Code: \`${ecode}\``,
+						`\u25FD Command: ${cmd !== null ? cmd.triggers[0] : "none"}`,
+						"",
+						"**Location**:",
+						`\u25FD Message Content: **${msg.content}**`,
+						`\u25FD Message ID: \`${msg.id}\``,
+						`\u25FD Channel: **${msg.channel.name}**`,
+						`\u25FD Channel ID: \`${msg.channel.id}\``,
+						`\u25FD Guild: **${msg.channel.guild.name}**`,
+						`\u25FD Guild ID: \`${msg.channel.guild.id}\``,
+						`\u25FD Shard: #${msg.channel.guild.shard.id}`,
+						`\u25FD Time: ${Time.formatDateWithPadding(Date.now(), true, false)}`
+					].join("\n"),
+					timestamp: new Date().toISOString(),
+					color: Colors.red
+				};
+				let k = "";
+				if (config.developers.includes(msg.author.id)) return msg.channel.createMessage({ embed });
+				else {
+					await this.w.get("errors").execute({
+						embeds: [embed]
+					});
+					switch (err.code) {
+						case "ECONNRESET": {
+							k = "Some network issue happened on our side, please try again later. (do not report these unless they are very frequent)";
+							break;
 						}
-					]
-				});
-				return msg.channel.createMessage(`There was an issue while doing something..\nPlease join our support server and report this, along with the code.\nSupport Server: ${config.bot.supportInvite}\nCode: \`${ecode}\`\n\nError:\n**${err.name}: ${err.message}** `).catch(err => null);
+					}
+					if (!k) k = "There was an issue while doing something..";
+					return msg.channel.createMessage(`${k}\nPlease join our support server and report this, along with the code.\nSupport Server: ${config.bot.supportInvite}\nCode: \`${ecode}\`\n\nError:\n**${err.name}: ${err.message}** `).catch(err => null);
+				}
 			}
 		}
 	}

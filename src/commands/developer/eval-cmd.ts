@@ -51,7 +51,8 @@ export default new Command({
 			os,
 			F,
 			Functions: F,
-			...F
+			...F,
+			Eris
 		});
 	} catch (e) {
 		res = e;

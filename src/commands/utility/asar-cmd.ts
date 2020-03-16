@@ -27,7 +27,7 @@ export default new Command({
 	const a = Utility.compareMemberWithRole(msg.member, role);
 	const b = Utility.compareMemberWithRole(msg.guild.members.get(this.user.id), role);
 	if ((a.higher || a.same) && msg.channel.guild.ownerID !== msg.member.id) return msg.channel.createMessage(`<@!${msg.author.id}>, You cannot add roles as high as, or higher than you.`);
-	if (b.higher || b.same) return msg.channel.createMessage(`<@!${msg.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
+	if (b.lower || b.same) return msg.channel.createMessage(`<@!${msg.author.id}>, this role is higher than, or as high as me, I cannot remove or assign it.`);
 	if (role.managed) return msg.channel.createMessage(`<@!${msg.author.id}>, this role is managed (likely permissions for a bot), these cannot be removed or assigned.`);
 	const roles = msg.gConfig.selfAssignableRoles;
 	if (roles.includes(role.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, this role is already listed as a self assignable role.`);

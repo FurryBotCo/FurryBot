@@ -5,6 +5,7 @@ import * as Eris from "eris";
 import { Utility, Time } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
 import { mdb } from "../../modules/Database";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -35,7 +36,7 @@ export default new Command({
 		if (deleteDays > 14) return msg.reply(`delete days cannot be more than 14.`);
 	}
 
-	if (msg.args[1].match(/[0-9]{1,4}[ymdh]/i)) {
+	if (msg.args.length > 1 && msg.args[1].match(/[0-9]{1,4}[ymdh]/i)) {
 		const labels = {
 			h: 3.6e+6,
 			d: 8.64e+7,
@@ -72,8 +73,8 @@ export default new Command({
 		});
 	}
 
-	if (user.id === msg.member.id && !msg.user.isDeveloper) return msg.reply("Pretty sure you don't want to do this to yourself.");
-	if (user.id === msg.guild.ownerID) return msg.reply("You cannot ban the server owner.");
+	if (user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.reply("pretty sure you don't want to do this to yourself.");
+	if (user.id === msg.guild.ownerID) return msg.reply("you cannot ban the server owner.");
 	const a = Utility.compareMembers(user, msg.member);
 	if ((a.member1.higher || a.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(`You cannot ban ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
 	// if(!user.bannable) return msg.channel.createMessage(`<@!${msg.author.id}>, I cannot ban ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have ban permissions?`);
@@ -84,7 +85,7 @@ export default new Command({
 		if (!!msg.gConfig.settings.modlog) {
 			if (!msg.channel.guild.channels.has(msg.gConfig.settings.modlog)) await msg.reply(`failed to create mod log entry, as I could not find the mod log channel.`);
 			else {
-				const ch = msg.channel.guild.channels.get(msg.gConfig.settings.modlog) as Eris.GuildTextableChannel;
+				const ch = msg.channel.guild.channels.get<Eris.GuildTextableChannel>(msg.gConfig.settings.modlog);
 				if (!ch.permissionsOf(this.user.id).has("sendMessages")) await msg.reply(`failed to create mod log entry, as I cannot send messages in the mod log channel.`);
 				else if (!ch.permissionsOf(this.user.id).has("embedLinks")) await msg.reply(`failed to create mod log entry, as I cannot send embeds in the mod log channel.`);
 				else {
@@ -118,7 +119,7 @@ export default new Command({
 			guildId: msg.channel.guild.id,
 			type: "ban",
 			reason
-		});
+		} as any); // apparently mongodb's types require specifying "_id" so we'll do this now
 	}).catch(async (err) => {
 		msg.channel.createMessage(`I couldn't ban **${user.username}#${user.discriminator}**, ${err}`);
 		if (typeof m !== "undefined") await m.delete();

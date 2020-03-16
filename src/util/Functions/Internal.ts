@@ -180,14 +180,14 @@ export default class Internal {
 	 * @returns {Promise<number>}
 	 * @memberof Internal
 	 */
-	static async incrementDailyCounter(increment = true): Promise<number> {
+	static async incrementDailyCounter(client: FurryBot, increment = true): Promise<number> {
 		const d = new Date();
-		const id = `${d.getMonth()}-${d.getDate()}-${d.getFullYear()}`;
+		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 
 		const j = await mdb.collection("dailyjoins").findOne({ id });
-		const count = j ? increment ? j.count + 1 : j.count - 1 : increment ? -1 : 1;
+		const count = j ? increment ? j.count + 1 : j.count - 1 : increment ? 1 : -1;
 		await mdb.collection("dailyjoins").findOneAndDelete({ id });
-		await mdb.collection("dailyjoins").insertOne({ count, id });
+		await mdb.collection("dailyjoins").insertOne({ count, id, guildCount: client.guilds.size });
 
 		return count;
 	}
@@ -308,7 +308,7 @@ export default class Internal {
 						await col.findOneAndDelete({ _id: entry._id });
 						continue;
 					}
-					const ch = g.channels.get(c.settings.modlog) as Eris.GuildTextableChannel;
+					const ch = g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog);
 					if (!ch) {
 						await col.findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
@@ -347,7 +347,8 @@ export default class Internal {
 
 				case "mute": {
 					const g = client.guilds.get(entry.guildId);
-					const m = g.members.get(entry.userId);
+					// fetch user from api if they aren't in the server
+					const m = g.members.has(entry.userId) ? g.members.get(entry.userId) : await client.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
 					const r = g.roles.get(c.settings.muteRole);
 					if (!c.settings.modlog) {
@@ -355,7 +356,7 @@ export default class Internal {
 						continue;
 					}
 
-					const ch = g.channels.get(c.settings.modlog) as Eris.GuildTextableChannel;
+					const ch = g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog);
 					if (!ch) {
 						await col.findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
@@ -370,7 +371,7 @@ export default class Internal {
 						continue;
 					}
 
-					if (!m) {
+					if (!g.members.has(entry.userId)) {
 						await ch.createMessage({
 							embed: {
 								title: "Automatic Unmute Failed",
@@ -387,49 +388,51 @@ export default class Internal {
 						continue;
 					}
 
-					if (!m.roles.includes(c.settings.muteRole)) {
-						await col.findOneAndDelete({ _id: entry._id });
-						continue;
-					}
+					if (m instanceof Eris.Member) {
+						if (!m.roles.includes(c.settings.muteRole)) {
+							await col.findOneAndDelete({ _id: entry._id });
+							continue;
+						}
 
-					if (!r) {
+						if (!r) {
+							await ch.createMessage({
+								embed: {
+									title: "Automatic Unmute Failed",
+									description: `I failed to automatically unmute **${m.username}#${m.discriminator}** (<@!${m.id}>)\nReason: Couldn't find mute role.`,
+									timestamp: new Date().toISOString(),
+									color: Colors.red,
+									author: {
+										name: `${client.user.username}#${client.user.discriminator}`,
+										icon_url: client.user.avatarURL
+									}
+								}
+							});
+							await col.findOneAndDelete({ _id: entry._id });
+							continue;
+						}
+
+						await m.removeRole(r.id, "Automatic Unmute").catch(err => null);
+
 						await ch.createMessage({
 							embed: {
-								title: "Automatic Unmute Failed",
-								description: `I failed to automatically unmute **${m.username}#${m.discriminator}** (<@!${m.id}>)\nReason: Couldn't find mute role.`,
+								title: "Member Unmuted",
+								description: [
+									`Target: ${m.username}#${m.discriminator} <@!${m.id}>`,
+									`Reason: Automatic action due to expiry.`
+								].join("\n"),
 								timestamp: new Date().toISOString(),
-								color: Colors.red,
+								color: Colors.green,
 								author: {
 									name: `${client.user.username}#${client.user.discriminator}`,
 									icon_url: client.user.avatarURL
+								},
+								footer: {
+									text: `Action was automatically performed.`
 								}
 							}
 						});
 						await col.findOneAndDelete({ _id: entry._id });
-						continue;
 					}
-
-					await m.removeRole(r.id, "Automatic Unmute").catch(err => null);
-
-					await ch.createMessage({
-						embed: {
-							title: "Member Unmuted",
-							description: [
-								`Target: ${m.username}#${m.discriminator} <@!${m.id}>`,
-								`Reason: Automatic action due to expiry.`
-							].join("\n"),
-							timestamp: new Date().toISOString(),
-							color: Colors.green,
-							author: {
-								name: `${client.user.username}#${client.user.discriminator}`,
-								icon_url: client.user.avatarURL
-							},
-							footer: {
-								text: `Action was automatically performed.`
-							}
-						}
-					});
-					await col.findOneAndDelete({ _id: entry._id });
 					break;
 				}
 
@@ -439,5 +442,33 @@ export default class Internal {
 				}
 			}
 		}
+	}
+
+	static sanitize(str: string) {
+		console.log(str);
+		if (typeof str !== "string") str = (str as any).toString();
+		["*", "_", "@"].map(s => str = str.replace(new RegExp(`\\${s}`, "gi"), `\\${s}`));
+		return str;
+	}
+
+	static formatWelcome(str: string, user: Eris.User, guild: Eris.Guild) {
+		const d = new Date(user.createdAt);
+		const f = {
+			"user.username": user.username,
+			"user.discriminator": user.discriminator,
+			"user.tag": `${user.username}#${user.discriminator}`,
+			"user.id": user.id,
+			"user.mention": `<@!${user.id}>`,
+			"user.creationAgo": Time.formatAgo(d),
+			"user.creationUS": `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear}`,
+			"user.creationUK": `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear}`,
+			"user.creationISO": `${d.getFullYear}-${d.getMonth() + 1}-${d.getDate()}`,
+			"server.name": guild.name,
+			"server.id": guild.id
+		};
+
+		Object.keys(f).map(k => str = str.replace(new RegExp(`\\{${k}\\}`, "g"), f[k]));
+
+		return str;
 	}
 }

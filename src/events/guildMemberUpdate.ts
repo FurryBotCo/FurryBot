@@ -12,15 +12,7 @@ export default new ClientEvent("guildMemberUpdate", (async function (this: Furry
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.memberJoin;
 	if (!e.enabled || !e.channel) return;
-	const ch = guild.channels.get(e.channel) as Eris.GuildTextableChannel;
-	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
-		logEvents: {
-			memberJoin: {
-				enabled: false,
-				channel: null
-			}
-		}
-	});
+	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const props: { [k: string]: { type: string; name: string; } } = {
 		nick: {
@@ -88,5 +80,12 @@ export default new ClientEvent("guildMemberUpdate", (async function (this: Furry
 		if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 		else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 	}
-	return ch.createMessage({ embed }).catch(err => null);
+	return ch.createMessage({ embed }).catch(err => g.edit({
+		logEvents: {
+			memberJoin: {
+				enabled: false,
+				channel: null
+			}
+		}
+	}));
 }));

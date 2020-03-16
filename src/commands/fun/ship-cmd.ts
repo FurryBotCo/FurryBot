@@ -24,7 +24,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-
+	// @FIXME not using second user
 	let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1;
 	if (Object.keys(msg.dashedArgs.parsed.keyValue).includes("percent")) {
 		if (!config.developers.includes(msg.author.id)) return msg.reply("this option, `percent` is developer only.");

@@ -6,6 +6,7 @@ import ytdl from "ytdl-core";
 import * as URL from "url";
 import util from "util";
 import client from "../../../";
+import { Utility as T } from "./TypeDefs";
 
 export default class Utility {
 	private constructor() {
@@ -77,32 +78,48 @@ export default class Utility {
 	 * @static
 	 * @param {Eris.Member} member1
 	 * @param {Eris.Member} member2
-	 * @returns {{
-	 * 		member1: {
-	 * 			higher: boolean;
-	 * 			lower: boolean;
-	 * 			same: boolean;
-	 * 		};
-	 * 		member2: {
-	 * 			higher: boolean;
-	 * 			lower: boolean;
-	 * 			same: boolean;
-	 * 		};
-	 * 	}}
+	 * @returns {T.CompareMembersResult}
 	 * @memberof Utility
 	 */
-	static compareMembers(member1: Eris.Member, member2: Eris.Member): {
-		member1: {
-			higher: boolean;
-			lower: boolean;
-			same: boolean;
+	static compareMembers(member1: Eris.Member, member2: Eris.Member): T.CompareMembersResult {
+		// some things that we can immediately return so we don't process them
+		if (member1.id === member2.id) return {
+			member1: {
+				higher: false,
+				lower: false,
+				same: true
+			},
+			member2: {
+				higher: false,
+				lower: false,
+				same: true
+			}
 		};
-		member2: {
-			higher: boolean;
-			lower: boolean;
-			same: boolean;
+		else if (member1.id === member1.guild.ownerID) return {
+			member1: {
+				higher: true,
+				lower: false,
+				same: false
+			},
+			member2: {
+				higher: false,
+				lower: true,
+				same: false
+			}
 		};
-	} {
+		else if (member2.id === member1.guild.ownerID) return {
+			member1: {
+				higher: false,
+				lower: false,
+				same: false
+			},
+			member2: {
+				higher: true,
+				lower: false,
+				same: false
+			}
+		};
+
 		const a = member1.roles.map(r => member1.guild.roles.get(r));
 		let b: Eris.Role;
 		if (a.length > 0) b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
@@ -168,25 +185,16 @@ export default class Utility {
 	 * @static
 	 * @param {Eris.Member} member
 	 * @param {Eris.Role} role
-	 * @returns {{
-	 * 		higher: boolean;
-	 * 		lower: boolean;
-	 * 		same: boolean;
-	 * 	}}
+	 * @returns {T.CompareMemberWithRoleResult}
 	 * @memberof Utility
 	 */
-	static compareMemberWithRole(member: Eris.Member, role: Eris.Role): {
-		higher: boolean;
-		lower: boolean;
-		same: boolean;
-	} {
-		const a = member.roles.map(r => member.guild.roles.get(r));
-		const b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
+	static compareMemberWithRole(member: Eris.Member, role: Eris.Role): T.CompareMemberWithRoleResult {
+		const a = member.roles.map(r => member.guild.roles.get(r)).map(r => r.position).sort().reverse()[0];
 
 		return {
-			higher: b.position > role.position,
-			lower: b.position < role.position,
-			same: b.position === role.position
+			higher: a > role.position,
+			lower: a < role.position,
+			same: a === role.position
 		};
 	}
 
@@ -228,30 +236,10 @@ export default class Utility {
 	 * @param {number} type
 	 * @param {string} [targetID]
 	 * @param {number} [fetchAmount=5]
-	 * @returns {(Promise<({
-	 * 		success: true;
-	 * 		blame: Eris.User;
-	 * 		reason: string;
-	 * 	} | {
-	 * 		success: false;
-	 * 		error: {
-	 * 			text: string;
-	 * 			code: number;
-	 * 		};
-	 * 	})>)}
+	 * @returns {(Promise<T.AuditLogReturn>}
 	 * @memberof Utility
 	 */
-	static async fetchAuditLogEntries(guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<({
-		success: true;
-		blame: Eris.User;
-		reason: string;
-	} | {
-		success: false;
-		error: {
-			text: string;
-			code: number;
-		};
-	})> {
+	static async fetchAuditLogEntries(guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<T.AuditLogReturn> {
 		if (!guild.members.get(client.user.id).permission.has("viewAuditLogs")) return {
 			success: false,
 			error: {

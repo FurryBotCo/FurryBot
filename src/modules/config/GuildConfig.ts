@@ -17,7 +17,10 @@ class GuildConfig {
 		}[];
 	};
 	settings: {
+		announceLevelUp: boolean;
 		nsfw: boolean;
+		defaultYiff: string;
+		snipeCommand: boolean;
 		muteRole?: string;
 		fResponse: boolean;
 		commandImages: boolean;
@@ -26,6 +29,13 @@ class GuildConfig {
 		deleteModCmds: boolean;
 		ecoEmoji: string;
 		modlog?: string;
+		joinEnabled: boolean;
+		joinMessage: string;
+		joinChannel?: string;
+		leaveEnabled: boolean;
+		leaveMessage: string;
+		leaveChannel?: string;
+		welcomeDeleteTime: number;
 	};
 	snipe: {
 		edit: {
@@ -65,6 +75,12 @@ class GuildConfig {
 		GlobalTypes.Auto.Yiff<"gay" | "straight" | "lesbian" | "dickgirl"> |
 		GlobalTypes.Auto.Animals<"bird" | "bunny" | "cat" | "dog" | "duck" | "fox" | "otter" | "panda" | "snek" | "turtle" | "wolf">
 	)[];
+	disable: {
+		server: string[];
+		channels: {
+			[k: string]: string[];
+		};
+	};
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		this.id = id;
 		if (!data) data = config.defaults.guildConfig;
@@ -78,17 +94,7 @@ class GuildConfig {
 			textChannel: data.music.textChannel || null,
 			queue: data.music.queue || []
 		} : config.defaults.guildConfig.music;
-		this.settings = {
-			nsfw: data.settings && data.settings.nsfw ? true : false,
-			muteRole: data.settings && data.settings.muteRole ? data.settings.muteRole : null,
-			fResponse: data.settings && data.settings.fResponse ? true : false,
-			commandImages: data.settings && data.settings.commandImages ? true : false,
-			lang: data.settings && data.settings.lang ? data.settings.lang : config.defaults.guildConfig.settings.lang,
-			prefix: data.settings && data.settings.prefix ? data.settings.prefix : config.defaultPrefix,
-			deleteModCmds: data.settings && data.settings.deleteModCmds ? data.settings.deleteModCmds : config.defaults.guildConfig.settings.deleteModCmds,
-			ecoEmoji: data.settings && data.settings.ecoEmoji ? data.settings.ecoEmoji : config.defaults.guildConfig.settings.ecoEmoji,
-			modlog: data.settings && data.settings.modlog ? data.settings.modlog : config.defaults.guildConfig.settings.modlog
-		};
+		this.settings = Object.keys(config.defaults.guildConfig.settings).map(k => ({ [k]: data.settings && ![undefined, null].includes(data.settings[k]) ? data.settings[k] : config.defaults.guildConfig.settings[k] })).reduce((a, b) => ({ ...a, ...b })) as any;
 		this.snipe = data.snipe ? {
 			delete: data.snipe.delete || config.defaults.guildConfig.snipe.delete,
 			edit: data.snipe.edit || config.defaults.guildConfig.snipe.edit
@@ -97,6 +103,10 @@ class GuildConfig {
 		Object.keys(config.defaults.guildConfig.logEvents).map(k => data.logEvents && data.logEvents[k] ? this.logEvents[k] = data.logEvents[k] : this.logEvents[k] = config.defaults.guildConfig.logEvents[k]);
 		this.tags = data.tags ? data.tags : config.defaults.guildConfig.tags;
 		this.auto = ![undefined, null].includes(data.auto) ? data.auto : config.defaults.guildConfig.auto;
+		this.disable = data.disable ? {
+			server: data.disable.server || [],
+			channels: data.disable.channels || {}
+		} : config.defaults.guildConfig.disable;
 		return null;
 	}
 

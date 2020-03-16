@@ -30,14 +30,14 @@ export default new Command({
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
-	// if(user.id === msg.member.id && !msg.user.isDeveloper) return msg.channel.createMessage("Pretty sure you don't want to do this to yourthis.");
+	// if(user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.channel.createMessage("Pretty sure you don't want to do this to yourthis.");
 	// if(user.roles.highest.rawPosition >= msg.member.roles.highest.rawPosition && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`You cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
 	// if(user.permissions.has("administrator")) return msg.channel.createMessage("That user has `ADMINISTRATOR`, that would literally do nothing.");
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
 	if (msg.gConfig.settings.muteRole === null) {
 		const embed: Eris.EmbedOptions = {
 			title: "No mute role",
-			description: `this server does not have a mute role set, you can set this with \`${msg.gConfig.settings.prefix}settings muteRole <role>\``,
+			description: `this server does not have a mute role set, you can set this with \`${msg.gConfig.settings.prefix}settings mute role <role>\``,
 			color: 15601937,
 			timestamp: new Date().toISOString(),
 			author: {
@@ -51,7 +51,7 @@ export default new Command({
 	if (!msg.channel.guild.roles.has(msg.gConfig.settings.muteRole)) {
 		const embed: Eris.EmbedOptions = {
 			title: "Mute role not found",
-			description: `The mute role specified for this server <@&${msg.gConfig.settings.muteRole}> (${msg.channel.guild.id}) was not found, it has been reset. You can set a new one with \`${msg.gConfig.settings.prefix}settings muteRole <role>\``,
+			description: `The mute role specified for this server <@&${msg.gConfig.settings.muteRole}> (${msg.channel.guild.id}) was not found, it has been reset. You can set a new one with \`${msg.gConfig.settings.prefix}settings mute role <role>\``,
 			color: 15601937,
 			timestamp: new Date().toISOString(),
 			author: {
@@ -67,7 +67,7 @@ export default new Command({
 	if (a.same || a.lower) {
 		const embed: Eris.EmbedOptions = {
 			title: "Invalid mute role",
-			description: `The current mute role <@&${msg.gConfig.settings.muteRole}> (${msg.gConfig.settings.muteRole}) seems to be higher than me, please move it below me. You can set a new one with \`${msg.gConfig.settings.prefix}settings muteRole <role>\``,
+			description: `The current mute role <@&${msg.gConfig.settings.muteRole}> (${msg.gConfig.settings.muteRole}) seems to be higher than me, please move it below me. You can set a new one with \`${msg.gConfig.settings.prefix}settings mute role <role>\``,
 			color: 15601937,
 			timestamp: new Date().toISOString(),
 			author: {
@@ -99,7 +99,7 @@ export default new Command({
 		if (!!msg.gConfig.settings.modlog) {
 			if (!msg.channel.guild.channels.has(msg.gConfig.settings.modlog)) await msg.reply(`failed to create mod log entry, as I could not find the mod log channel.`);
 			else {
-				const ch = msg.channel.guild.channels.get(msg.gConfig.settings.modlog) as Eris.GuildTextableChannel;
+				const ch = msg.channel.guild.channels.get<Eris.GuildTextableChannel>(msg.gConfig.settings.modlog);
 				if (!ch.permissionsOf(this.user.id).has("sendMessages")) await msg.reply(`failed to create mod log entry, as I cannot send messages in the mod log channel.`);
 				else if (!ch.permissionsOf(this.user.id).has("embedLinks")) await msg.reply(`failed to create mod log entry, as I cannot send embeds in the mod log channel.`);
 				else {

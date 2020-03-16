@@ -1,3 +1,5 @@
+import Eris from "eris";
+
 declare namespace TypeDefs.Internal {
 	interface ProcessMemory {
 		total: number;
@@ -57,6 +59,70 @@ declare namespace TypeDefs.Utility {
 		length: number;
 		new: boolean;
 	}
+
+	interface CompareMemberWithRoleResult {
+		/**
+		 * if true, the bot is higher than the role
+		 */
+		higher: boolean;
+		/**
+		 * if true, the bot is lower than the role
+		 */
+		lower: boolean;
+		/**
+		 * if true, the bot is the same as the role
+		 */
+		same: boolean;
+	}
+
+	interface CompareMembersResult {
+		/**
+		 * stuff about the first member
+		 */
+		member1: {
+			/**
+			 * if true, first is higher than second
+			 */
+			higher: boolean;
+			/**
+			 * if true, second is higher than first
+			 */
+			lower: boolean;
+			/**
+			 * if true, first and second are equal
+			 */
+			same: boolean;
+		};
+		/**
+		 * stuff about the second member
+		 */
+		member2: {
+			/**
+			 * if true, second is higher than first
+			 */
+			higher: boolean;
+			/**
+			 * if true, first is higher than second
+			 */
+			lower: boolean;
+			/**
+			 * if true, first and second are equal
+			 */
+			same: boolean;
+		};
+	}
+
+	type AuditLogReturn = {
+		success: true;
+		blame: Eris.User;
+		reason: string;
+	} | {
+		success: false;
+		error: {
+			text: string;
+			code: number;
+		};
+	};
 }
 
 export = TypeDefs;

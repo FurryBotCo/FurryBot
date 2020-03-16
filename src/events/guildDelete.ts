@@ -11,7 +11,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		"events.guildDelete"
 	]);
 
-	await Internal.incrementDailyCounter(false);
+	await Internal.incrementDailyCounter(this, false);
 
 	let author = {
 		name: "Unknown#0000",

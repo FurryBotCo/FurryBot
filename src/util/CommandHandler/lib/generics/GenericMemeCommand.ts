@@ -5,15 +5,15 @@ import Logger from "../../../LoggerV8";
 import { Utility, Request } from "../../../Functions";
 
 export default {
-	handleImage: (async function (client: FurryBot, msg: ExtendedMessage, path: string, extra?: { avatars?: string[]; usernames?: string[]; text?: string }) {
+	handleImage: (async function (client: FurryBot, msg: ExtendedMessage, path: string, extra?: { avatars?: string[]; usernames?: string[]; text?: string; fileType?: string; }) {
 		let imgurl, j;
 		if (msg.args.length >= 1) {
 			// get member from message
 			const user = await msg.getMemberFromArgs();
 
-			imgurl = user instanceof Eris.Member ? user.user.staticAvatarURL : msg.args.join("%20");
+			imgurl = user instanceof Eris.Member ? `${user.user.staticAvatarURL.split("?")[0]}?size=2048` : msg.args.join("%20");
 		} else if (msg.attachments[0]) imgurl = msg.attachments[0].url;
-		else imgurl = msg.author.staticAvatarURL;
+		else imgurl = `${msg.author.staticAvatarURL.split("?")[0]}?size=2048`;
 		if (!imgurl) return msg.reply("please either attach an image or provide a url");
 		const test = await Utility.validateURL(imgurl);
 		if (!test) return msg.reply("either what you provided wasn't a valid url, or the server responded with a non-200 OK response.\n(either provide a link to an image, a user mention, or nothing.)");
@@ -30,7 +30,7 @@ export default {
 		}
 		return msg.channel.createMessage("", {
 			file: req.body,
-			name: `${path}.png`
+			name: `${path}.${extra && extra.fileType ? extra.fileType : "png"}`
 		}).catch(err => msg.reply(`Error sending: ${err}`));
 	}),
 	handleText: (async function (client: FurryBot, msg: ExtendedMessage, path: string, extra?: { avatars?: string[]; usernames?: string[]; }) {

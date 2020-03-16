@@ -95,9 +95,9 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 	if (!config.beta) {
 		setInterval(async () => {
 			if (new Date().toString().split(" ")[4] === "00:00:00") {
-				const d = new Date(Date.now() + 432e5);
+				const d = new Date(Date.now() - 432e5);
 				const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-				let k = await mdb.collection("dailyjoins").findOne({ id }).catch(err => null);
+				let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.count).catch(err => null);
 				if (!k) k = "Unknown.";
 				Logger.log("Daily Joins", `Daily joins for ${id}: ${k}`);
 				await this.executeWebhook(config.webhooks.dailyjoins.id, config.webhooks.dailyjoins.token, {

@@ -27,15 +27,7 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 
 	const e = g.logEvents.messageEdit;
 	if (!e.enabled || !e.channel) return;
-	const ch = await this.getRESTChannel(e.channel) as Eris.GuildTextableChannel;
-	if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
-		logEvents: {
-			messageEdit: {
-				enabled: false,
-				channel: null
-			}
-		}
-	});
+	const ch = await this.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {
 		title: "Message Edited",
@@ -59,5 +51,12 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 		]
 	};
 
-	return ch.createMessage({ embed }).catch(err => null);
+	return ch.createMessage({ embed }).catch(err => g.edit({
+		logEvents: {
+			messageEdit: {
+				enabled: false,
+				channel: null
+			}
+		}
+	}));
 }));

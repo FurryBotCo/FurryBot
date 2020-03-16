@@ -121,12 +121,35 @@ export default class Economy {
 				check: this.checkTips,
 				name: "Tips",
 				hidden: false
+			},
+			firstBooster: {
+				p: 0.050,
+				check: (userId: string, client: FurryBot) => userId === "603060182288695316",
+				name: "First Booster",
+				hidden: true
+			},
+			developer: {
+				p: 0.200,
+				check: (userId: string, client: FurryBot) => config.developers.includes(userId),
+				name: "Developer",
+				hidden: true
+			},
+			supportStaff: {
+				p: 0.050,
+				check: (userId: string, client: FurryBot) => client.guilds.get(config.bot.mainGuild).members.has(userId) && client.guilds.get(config.bot.mainGuild).members.get(userId).roles.includes("427302201027854337"),
+				name: "Support Server Staff",
+				hidden: true
+			},
+			specialPeeps: {
+				p: 0.050,
+				check: (userId: string, client: FurryBot) => ["192361753693126668"].includes(userId),
+				name: "Special Peeps",
+				hidden: true
 			}
 		};
 	}
 
 	static async calculateMulti(userId: string, client: FurryBot) {
-
 		let multi = 0;
 		const av: string[] = [];
 		for (const k of Object.keys(this.multi)) {

@@ -103,7 +103,13 @@ export default new Command({
 				`\u25FD Voice: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_VOICE).length}`,
 				`\u25FD Category: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_CATEGORY).length}`,
 				`\u25FD News: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_NEWS).length}`,
-				`\u25FD Store: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_STORE).length}`
+				`\u25FD Store: ${msg.channel.guild.channels.filter(c => c.type === Eris.Constants.ChannelTypes.GUILD_STORE).length}`,
+				"",
+				`\u25FD Hidden (for you): ${msg.channel.guild.channels.filter(c => !c.permissionsOf(msg.author.id).has("readMessages")).length}`,
+				`\u25FD Visible (for you): ${msg.channel.guild.channels.filter(c => c.permissionsOf(msg.author.id).has("readMessages")).length}`,
+				"",
+				`\u25FD Hidden (for me): ${msg.channel.guild.channels.filter(c => !c.permissionsOf(this.user.id).has("readMessages")).length}`,
+				`\u25FD Visible (for me): ${msg.channel.guild.channels.filter(c => c.permissionsOf(this.user.id).has("readMessages")).length}`
 			].join("\n"),
 			timestamp: new Date().toISOString(),
 			color: Math.floor(Math.random() * 0xFFFFFF)

@@ -21,7 +21,7 @@ export default new Command({
 			if (msg.channel.furpile.inPile.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this furpile!`);
 			clearTimeout(msg.channel.furpile.timeout);
 			msg.channel.furpile.inPile.push(msg.author.id);
-			msg.channel.furpile.timeout = setTimeout((ch) => delete ch.furpile, 3e5, msg.channel);
+			msg.channel.furpile.timeout = setTimeout((ch) => delete ch.furpile, 18e5, msg.channel);
 			return msg.channel.createMessage(`<@!${msg.author.id}> joined a furpile on <@!${msg.channel.furpile.member.id}>!\n<@!${msg.channel.furpile.member.id}> now has ${msg.channel.furpile.inPile.length} furs on them!\nJoin in using \`${msg.gConfig.settings.prefix}furpile\`.`);
 		}
 		else throw new Error("ERR_INVALID_USAGE");
@@ -32,7 +32,7 @@ export default new Command({
 			active: true,
 			member,
 			inPile: [],
-			timeout: setTimeout((ch) => delete ch.furpile, 3e5, msg.channel)
+			timeout: setTimeout((ch) => delete ch.furpile, 18e5, msg.channel)
 		};
 		msg.channel.furpile.inPile.push(msg.author.id, member.id);
 		return msg.channel.createMessage(`<@!${msg.author.id}> started a furpile on <@!${member.id}>!\nJoin in using \`${msg.gConfig.settings.prefix}furpile\`.`);

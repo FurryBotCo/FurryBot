@@ -12,15 +12,7 @@ export default new ClientEvent("userUpdate", (async function (this: FurryBot, us
 		try {
 			const g = await db.getGuild(guild.id);
 			if (!g.logEvents.userUpdate) return;
-			const ch = guild.channels.get(g.logEvents.userUpdate.channel) as Eris.GuildTextableChannel;
-			if (!ch) await g.edit({
-				logEvents: {
-					userUpdate: {
-						enabled: false,
-						channel: null
-					}
-				}
-			});
+			const ch = guild.channels.get<Eris.GuildTextableChannel>(g.logEvents.userUpdate.channel);
 
 			if (user.username !== oldUser.username) {
 				const embed: Eris.EmbedOptions = {
@@ -70,7 +62,14 @@ export default new ClientEvent("userUpdate", (async function (this: FurryBot, us
 					}
 				};
 
-				await ch.createMessage({ embed }).catch(err => null);
+				await ch.createMessage({ embed }).catch(err => g.edit({
+					logEvents: {
+						userUpdate: {
+							enabled: false,
+							channel: null
+						}
+					}
+				}));
 			}
 		} catch (e) { }
 	}));

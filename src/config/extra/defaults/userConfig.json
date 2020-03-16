@@ -1,0 +1,14 @@
+{
+	"marriage": {
+		"married": false,
+		"partner": null
+	},
+	"warnings": [],
+	"bal": 100,
+	"tips": true,
+	"dmActive": false,
+	"preferences": {
+		"mention": true
+	},
+	"levels": {}
+}
