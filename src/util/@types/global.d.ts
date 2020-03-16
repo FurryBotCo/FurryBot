@@ -2,6 +2,10 @@ declare const __stack: NodeJS.CallSite[];
 declare const __line: number;
 declare const __function: string;
 
+interface String {
+	format<T extends string = string>(...args: T[]): string;
+}
+
 declare namespace GlobalTypes {
 	interface DBEntry {
 		_id: string;
