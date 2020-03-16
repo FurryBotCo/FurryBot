@@ -37,7 +37,7 @@ export default new Command({
 
 	if (msg.args.length === 0 || !isNaN(Number(msg.args[0]))) {
 		const page = msg.args.length < 1 ? 1 : Number(msg.args[0]);
-		const pages = chunk(config.settings, 4).map(s => s.map(ss => ({ ...ss, value: msg.gConfig.settings[ss.dbName] })));
+		const pages = chunk(config.settings, 5).map(s => s.map(ss => ({ ...ss, value: msg.gConfig.settings[ss.dbName] })));
 		if (page > pages.length) return msg.reply("invalid settings page.");
 
 		return msg.channel.createMessage({

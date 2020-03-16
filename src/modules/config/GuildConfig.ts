@@ -17,6 +17,7 @@ class GuildConfig {
 		}[];
 	};
 	settings: {
+		announceLevelUp: boolean;
 		nsfw: boolean;
 		defaultYiff: string;
 		snipeCommand: boolean;

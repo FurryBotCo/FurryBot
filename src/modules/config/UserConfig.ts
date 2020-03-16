@@ -26,6 +26,9 @@ class UserConfig {
 	preferences: {
 		mention: boolean;
 	};
+	levels: {
+		[k: string]: number;
+	};
 	// voteCount: number;
 	// lastVote: number;
 	constructor(id: string, data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
@@ -48,7 +51,7 @@ class UserConfig {
 		} : config.defaults.userConfig.preferences;
 		// this.voteCount = ![undefined, null].includes(data.voteCount) ? data.voteCount : config.voteCount;
 		// this.lastVote = ![undefined, null].includes(data.lastVote) ? data.lastVote : config.lastVote;
-
+		this.levels = ![undefined, null].includes(data.levels) ? data.levels : config.defaults.userConfig.levels;
 		return null;
 	}
 
@@ -66,7 +69,8 @@ class UserConfig {
 			bal: this.bal,
 			tips: this.tips,
 			dmActive: this.dmActive,
-			preferences: this.preferences
+			preferences: this.preferences,
+			levels: this.levels
 		};
 
 		if (typeof data.marriage !== "undefined") {
@@ -81,6 +85,8 @@ class UserConfig {
 		if (typeof data.preferences !== "undefined") {
 			if (typeof data.preferences.mention) u.preferences.mention = data.preferences.mention;
 		}
+
+		if (typeof data.levels !== "undefined") Object.keys(data.levels).map(k => u.levels[k] = data.levels[k]);
 
 		try {
 			await mdb.collection("users").findOneAndUpdate({
@@ -118,6 +124,10 @@ class UserConfig {
 			patronId: null
 		};
 		else return r[0];
+	}
+
+	getLevel(g: string) {
+		return this.levels[g] || 0;
 	}
 }
 

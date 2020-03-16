@@ -35,6 +35,43 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		msg = await new ExtendedMessage(message, this)._load();
 		t.end("messageProcess");
 
+		t.start("leveling");
+		if ([Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(msg.channel.type)) {
+			const c = this.cd.check(msg.author.id, "leveling", { guild: msg.channel.guild.id });
+			if (!c.found) {
+				this.cd.add(msg.author.id, "leveling", 6e4, { guild: msg.channel.guild.id });
+				const lvl = config.leveling.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
+				const l = Math.floor(Math.random() * 10) + 5;
+				await msg.uConfig.edit({
+					levels: {
+						[msg.channel.guild.id]: msg.uConfig.getLevel(msg.channel.guild.id) + l
+					}
+				});
+				const nlvl = config.leveling.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
+				if (nlvl.level > lvl.level && msg.gConfig.settings.announceLevelUp) {
+					if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
+						let m: Eris.Message;
+						if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) m = await msg.channel.createMessage({
+							embed: {
+								title: "Level Up!",
+								color: Colors.green,
+								timestamp: new Date().toISOString(),
+								author: {
+									name: msg.author.tag,
+									icon_url: msg.author.avatarURL
+								},
+								description: `You leveled up to level **${nlvl.level}**!`
+							}
+						});
+						else msg.channel.createMessage(`<@!${msg.author.id}> leveled up to level **${nlvl.level}** in the server **${msg.channel.guild.name}**!\n(This would look different if I had the permission **embedLinks**.)`);
+
+						setTimeout(() => m.delete(), 2e4);
+					} else msg.author.getDMChannel().then(dm => dm.createMessage(`You leveled up to level **${nlvl.level}** in the server **${msg.channel.guild.name}**!\n(I sent this here because I cannot send messages in the channel you actually leveled up in)`)).catch(err => null);
+				}
+			}
+		}
+		t.end("leveling");
+
 		t.start("blacklist");
 		const gbl: Blacklist.GuildEntry[] = [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(msg.channel.type) ? await mdb.collection("blacklist").find({ guildId: msg.channel.guild.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())) : [];
 		const ubl: Blacklist.UserEntry[] = await mdb.collection("blacklist").find({ userId: msg.author.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now()));
@@ -498,9 +535,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 
 		if (!config.developers.includes(msg.author.id)) {
-			const cool = this.cmd.cool.checkCooldown(cmd, msg.author.id);
+			const cool = this.cd.check(msg.author.id, "cmd", { cmd: cmd.triggers[0] });
 			const time = cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;
-			if (cool.c && cmd.cooldown !== 0 && cool.time !== 0) {
+			if (cool.found && cmd.cooldown !== 0 && cool.time !== 0) {
 				const t = Time.ms(time, true);
 				const n = Time.ms(cmd.cooldown, true);
 				const d = Time.ms(cmd.donatorCooldown, true);
@@ -522,7 +559,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 
-		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cmd.cool.setCooldown(cmd, donator.active ? cmd.donatorCooldown : cmd.cooldown, msg.author.id);
+		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cd.add(msg.author.id, "cmd", donator.active ? cmd.donatorCooldown : cmd.cooldown, { cmd: cmd.triggers[0] });
 
 		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}" ran with the arguments "${msg.unparsedArgs.join(" ")}" by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 

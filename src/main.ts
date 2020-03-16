@@ -12,6 +12,8 @@ import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
 import DeadShardTest from "./util/DeadShardTest";
 import WebhookStore from "./util/WebhookStore";
 import { ModLogHolder } from "./util/ModLogHandler";
+import CooldownHandler from "./util/CooldownHandler";
+import Logger from "./util/LoggerV8";
 
 export default class FurryBot extends Eris.Client {
 	srv: any;
@@ -39,22 +41,7 @@ export default class FurryBot extends Eris.Client {
 	ddog: StatsD;
 	cmd: CommandHolder;
 	firstReady: boolean;
-	/*stats: {
-		messageCount: number;
-		dmMessageCount: number;
-		readonly guildCount: number;
-		readonly userCount: number;
-		readonly channelCount: number;
-		readonly shardCount: number;
-		readonly largeGuildCount: number;
-		readonly voiceConnectionCount: number;
-		readonly commandStats: {
-			[k: string]: number;
-		};
-	};
-	commandStats: {
-		[k: string]: number;
-	};*/
+	cd: CooldownHandler;
 	channelTyping: Map<string, NodeJS.Timeout>;
 	_autoyiffLoop: NodeJS.Timeout;
 	_timedLoop: NodeJS.Timeout;
@@ -95,65 +82,20 @@ export default class FurryBot extends Eris.Client {
 			.on("uncaughtException", (error) =>
 				this.errorHandler.globalHandler.bind(this.errorHandler, "uncaughtException")({ error })
 			);
-		/*.on("SIGINT", (signal) =>
-			this.errorHandler.globalHandler.bind(this.errorHandler, "SIGINT")({ signal })
-		)
-		.on("SIGTERM", (signal) =>
-			this.errorHandler.globalHandler.bind(this.errorHandler, "SIGTERM")({ signal })
-		)
-		.on("beforeExit", (code) =>
-			this.errorHandler.globalHandler.bind(this.errorHandler, "beforeExit")({ code })
-		)
-		.on("exit", (code) =>
-			this.errorHandler.globalHandler.bind(this.errorHandler, "exit")({ code })
-		);*/
-
 		this.messageCollector = new MessageCollector(this);
+		this.cd = new CooldownHandler();
 
-		/* this.commandStats = {};
-		this.stats = {
-			messageCount: 0,
-			dmMessageCount: 0
-		} as any;
-
-		Object.defineProperties(this.stats, {
-			guildCount: {
-				get: () => {
-					return client.guilds.size;
-				},
-				enumerable: true
-			},
-			userCount: {
-				get: () => {
-					return client.users.size;
-				},
-				enumerable: true
-			},
-			shardCount: {
-				get: () => {
-					return client.shards.size;
-				},
-				enumerable: true
-			},
-			largeGuildCount: {
-				get: () => {
-					return client.guilds.filter(g => g.large).length;
-				},
-				enumerable: true
-			},
-			voiceConnectionCount: {
-				get: () => {
-					return client.voiceConnections.size;
-				},
-				enumerable: true
-			},
-			commandStats: {
-				get: () => {
-					return client.commandStats;
-				},
-				enumerable: true
-			}
-		});*/
+		this.cd
+			.on("add", (value, type, time, meta) => {
+				if (type === "cmd") {
+					Logger.debug("Cooldown Handler", `Set cooldown for "${value}" on "${meta.cmd}" for "${time}"`);
+				}
+			})
+			.on("remove", (value, type, time, meta) => {
+				if (type === "cmd") {
+					Logger.debug("Cooldown Handler", `Removed cooldown for "${value}" on "${meta.cmd}" (time: ${time})`);
+				}
+			});
 		const w = this.w = new WebhookStore(this);
 		Object.keys(config.webhooks).map(h => w.add(h, config.webhooks[h].id, config.webhooks[h].token));
 
