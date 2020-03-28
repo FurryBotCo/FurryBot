@@ -1,6 +1,6 @@
 import * as UT from "./utilTypes";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import FurryBot from "../../../main";
+import ExtendedMessage from "../../../modules/ExtendedMessage";
 import SubCommand from "./SubCommand";
 import Eris from "eris";
 import config from "../../../config";
@@ -8,6 +8,8 @@ import { Logger } from "../../LoggerV8";
 import * as fs from "fs";
 import { Colors } from "../../Constants";
 import { Request } from "../../Functions";
+import GuildConfig from "../../../modules/config/GuildConfig";
+import UserConfig from "../../../modules/config/UserConfig";
 
 export default class Command {
 	triggers: UT.ArrayOneOrMore<string>;
@@ -21,7 +23,7 @@ export default class Command {
 	category: string;
 	subCommands: SubCommand[];
 	file: string;
-	run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<unknown>;
+	run: (this: FurryBot, msg: ExtendedMessage<Eris.GuildTextableChannel>, uConfig: UserConfig, gConfig: GuildConfig, cmd: Command) => Promise<unknown>;
 	constructor(d: {
 		triggers: UT.ArrayOneOrMore<string>;
 		userPermissions?: UT.ErisPermissions[];
@@ -34,7 +36,7 @@ export default class Command {
 		category?: string;
 		subCommandDir?: string | string[];
 		file: string;
-	}, run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<unknown>) {
+	}, run: (this: FurryBot, msg: ExtendedMessage<Eris.GuildTextableChannel>, uConfig: UserConfig, gConfig: GuildConfig, cmd: Command) => Promise<unknown>) {
 		if (!d.triggers || d.triggers.length < 1) throw new TypeError("Invalid command triggers provided.");
 		// category is set at addition time
 		// if (!d.category) throw new TypeError("Invalid/missing category.");
@@ -42,12 +44,12 @@ export default class Command {
 		this.userPermissions = d.userPermissions || [];
 		this.botPermissions = d.botPermissions || [];
 		this.cooldown = !!d.cooldown ? d.cooldown : 0;
+		this.category = d.category || null;
 		this.donatorCooldown = !!d.donatorCooldown ? d.donatorCooldown : !!d.cooldown ? d.cooldown : 0;
 		this.description = d.description || "";
 		this.usage = d.usage || "";
 		this.features = d.features || [];
 		this.run = run;
-		this.category = d.category || null;
 		this.subCommands = [];
 		this.file = d.file;
 
@@ -59,6 +61,8 @@ export default class Command {
 
 	setCategory(cat: string) {
 		this.category = cat;
+		if (!this.description) this.description = `{lang:commands.${this.category}.${this.triggers[0]}.description}`;
+		if (!this.usage) this.usage = `{lang:commands.${this.category}.${this.triggers[0]}.usage}`;
 		return this;
 	}
 
@@ -111,7 +115,7 @@ export default class Command {
 		});
 	}
 
-	async handleSubCommand(msg: ExtendedMessage, client: FurryBot) {
+	async handleSubCommand(msg: ExtendedMessage<Eris.GuildTextableChannel>, uConfig: UserConfig, gConfig: GuildConfig, client: FurryBot) {
 		const cmd = this.getSubCommand(msg.args[0]);
 		// setter
 		msg.args = msg.args.slice(1);
@@ -121,7 +125,6 @@ export default class Command {
 
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) {
 			Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `${msg.author.tag} (${msg.author.id}) attempted to run developer command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
-			client.increment(`commands.${cmd.triggers[0].toLowerCase()}.missingPermissions`, ["missing:dev"]);
 			return msg.reply(`you must be a developer to use this command.`);
 		}
 
@@ -135,11 +138,10 @@ export default class Command {
 				name: "nsfw.gif"
 			}).catch(err => null);
 
-			if (!msg.gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${msg.gConfig.settings.prefix}settings nsfw commands enabled\`.`).catch(err => null);
+			if (!gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${gConfig.settings.prefix}settings nsfw commands enabled\`.`).catch(err => null);
 
 			if (msg.channel.topic && config.yiff.disableStatements.some(t => msg.channel.topic.indexOf(t) !== -1)) {
 				const st = config.yiff.disableStatements.filter(t => msg.channel.topic.indexOf(t) !== -1);
-				st.map(k => client.increment("other.nsfwDisabled", [`statment:${k}`]));
 
 				return msg.channel.createMessage({
 					embed: {
@@ -156,7 +158,7 @@ export default class Command {
 			}
 		}
 
-		const donator = await msg.uConfig.premiumCheck();
+		const donator = await uConfig.premiumCheck();
 		if (cmd.features.includes("donatorOnly") && !config.developers.includes(msg.author.id)) {
 			if (!donator.active) return msg.channel.createMessage({
 				embed: {
@@ -172,12 +174,12 @@ export default class Command {
 			});
 		}
 
-		const premium = await msg.gConfig.premiumCheck();
+		const premium = await gConfig.premiumCheck();
 		if (cmd.features.includes("premiumGuildOnly") && !config.developers.includes(msg.author.id)) {
 			if (!premium.active) return msg.channel.createMessage({
 				embed: {
 					title: "Usage Not Allowed",
-					description: `This command can only be used in premium servers.\nYou can donate [here](${config.bot.patreon}), and can activate a premium server using \`${msg.gConfig.settings.prefix}pserver add\`.`,
+					description: `This command can only be used in premium servers.\nYou can donate [here](${config.bot.patreon}), and can activate a premium server using \`${gConfig.settings.prefix}pserver add\`.`,
 					color: Colors.red,
 					timestamp: new Date().toISOString(),
 					author: {
@@ -222,7 +224,7 @@ export default class Command {
 			}
 		}
 
-		const c = await cmd.run.call(client, msg, cmd);
+		const c = await cmd.run.call(client, msg, uConfig, gConfig, cmd);
 
 		if (c instanceof Error && c.message === "ERR_INVALID_USAGE") {
 			return msg.channel.createMessage({
@@ -236,7 +238,7 @@ export default class Command {
 						},
 						{
 							name: "Usage",
-							value: `\`${msg.gConfig.settings.prefix}${this.triggers[0]} ${cmd.triggers[0]} ${cmd.usage}\``,
+							value: `\`${gConfig.settings.prefix}${this.triggers[0]} ${cmd.triggers[0]} ${cmd.usage}\``,
 							inline: false
 						},
 						{

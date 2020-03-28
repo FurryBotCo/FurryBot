@@ -1,40 +1,37 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
+import { Logger } from "../../util/LoggerV8";
+import { Request } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import db from "../../modules/Database";
 import { Colors } from "../../util/Constants";
-import { db } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
-		"bal"
+		"bal",
+		"balance"
 	],
 	userPermissions: [],
 	botPermissions: [
-		"embedLinks",
-		"externalEmojis"
+		"embedLinks"
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Check your balance",
-	usage: "[@user]",
-	features: ["devOnly"],
+	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	let member = msg.member;
 	if (msg.args.length > 0) member = await msg.getMemberFromArgs();
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
-	const m = await db.getUser(member.id);
+	const m = member.id === msg.author.id ? uConfig : await db.getUser(member.id);
+
 	return msg.channel.createMessage({
-		embed: {
-			title: member.id === msg.member.id ? "Your Balance" : `Balance of ${member.username}#${member.discriminator}`,
-			color: Colors.gold,
-			timestamp: new Date().toISOString(),
-			description: `${m.bal}${msg.gConfig.settings.ecoEmoji}`,
-			author: {
-				name: `${member.username}#${member.discriminator}`,
-				icon_url: member.avatarURL
-			}
-		}
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle(member.id === msg.member.id ? "{lang:commands.economy.bal.yourBalance}" : `{lang:commands.economy.bal.otherBalance} ${member.username}#${member.discriminator}`)
+			.setColor(Colors.gold)
+			.setTimestamp(new Date().toISOString())
+			.setDescription(`${m.bal}${gConfig.settings.ecoEmoji}`)
+			.setAuthor(`${member.username}#${member.discriminator}`, member.avatarURL)
 	});
 }));

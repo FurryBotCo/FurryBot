@@ -4,6 +4,7 @@ import ExtendedMessage from "@ExtendedMessage";
 import { Logger } from "../../util/LoggerV8";
 import { Request, Utility } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -17,35 +18,27 @@ export default new Command({
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "*notices bulge* OwO",
-	usage: "",
 	features: ["nsfw"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
 	const img = await Request.imageAPIRequest(false, "bulge", true, false);
 	if (img.success === false) {
 		Logger.error(`Shard #${msg.channel.guild.shard.id}`, img);
-		return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
+		return msg.reply(`{lang:other.error.unknownAPIError|${img.error.code}|${img.error.description}}`);
 	}
 	const short = await Utility.shortenURL(img.response.image);
-	const extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n\n` : "";
+	const extra = short.new ? `{lang:other.firstTimeViewed|${short.linkNumber}}\n` : "";
+
 
 	return msg.channel.createMessage({
-		embed: {
-			color: Colors.gold,
-			description: `${extra}Short URL: <${short.link}>`,
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			image: {
-				url: img.response.image
-			},
-			timestamp: new Date().toISOString(),
-			footer: {
-				text: "powered by furry.bot"
-			}
-		}
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setDescription(`${extra}{lang:other.shortURL}:<${short.link}>`)
+			.setTitle("{lang:commands.nsfw.bulge.title}")
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Colors.gold)
+			.setImage(img.response.image)
+			.setFooter("{lang:other.poweredBy.furrybot}")
 	});
 }));

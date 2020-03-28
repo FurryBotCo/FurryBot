@@ -5,7 +5,9 @@ import config from "../../config";
 import * as Eris from "eris";
 import { Request, Utility } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
+// @FIXME lang
 export default new Command({
 	triggers: [
 		"yiff"
@@ -17,11 +19,9 @@ export default new Command({
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Get some yiff!",
-	usage: "[gay/straight/lesbian/dickgirl]",
 	features: ["nsfw"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
 	let type, content = "";
 	if (msg.args.length === 0) {
@@ -30,14 +30,14 @@ export default new Command({
 		}
 
 		if (!type) {
-			type = msg.gConfig.settings.defaultYiff;
+			type = gConfig.settings.defaultYiff;
 			if (!config.yiff.types.includes(type)) {
-				await msg.gConfig.edit({
+				await gConfig.edit({
 					settings: {
 						defaultYiff: config.yiff.types[0]
 					}
 				});
-				content = `The default type "${msg.gConfig.settings.defaultYiff}" set by this servers settings is invalid, is has been changed to the config set default "${config.yiff.types[0]}".`;
+				content = `The default type "${gConfig.settings.defaultYiff}" set by this servers settings is invalid, is has been changed to the config set default "${config.yiff.types[0]}".`;
 			}
 			/*if (!this.yiffNoticeViewed.has(msg.channel.guild.id)) {
 				this.yiffNoticeViewed.add(msg.channel.guild.id);
@@ -64,28 +64,21 @@ export default new Command({
 	const img = await Request.imageAPIRequest(false, `yiff/${type}`, true, false);
 
 	if (img.success !== true) {
-		if (typeof img.error === "object") return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\nCode: ${img.error.code}\nDescription: \`${img.error.description}\``);
-		else return msg.channel.createMessage(`<@!${msg.author.id}>, API Error:\n${img.error}`);
+		if (typeof img.error === "object")
+			return msg.reply(`{lang:other.error.unknownAPIError|${img.error.code}|${img.error.description}}`);
+		else return msg.reply(`{lang:other.error.codeAPIError|${img.error}}`);
 	}
 	const short = await Utility.shortenURL(img.response.image);
-	const extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
+	const extra = short.new ? `{lang:other.firstTimeViewed|${short.linkNumber}}\n` : "";
 
 	return msg.channel.createMessage({
 		content,
-		embed: {
-			color: Colors.gold,
-			description: `${extra}Short URL: <${short.link}>\nType: ${type}`,
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			image: {
-				url: img.response.image
-			},
-			timestamp: new Date().toISOString(),
-			footer: {
-				text: "powered by furry.bot"
-			}
-		}
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setDescription(`${extra}{lang:other.shortURL}: <${short.link}>`)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Colors.gold)
+			.setImage(img.response.image)
+			.setFooter("{lang:other.poweredBy.furrybot}")
 	});
 }));

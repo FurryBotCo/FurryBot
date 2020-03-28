@@ -1,11 +1,9 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
 	triggers: [
-		"blacklist",
-		"bl"
+		"dmuser"
 	],
 	userPermissions: [],
 	botPermissions: [],
@@ -15,7 +13,7 @@ export default new Command({
 	usage: "<id> <message>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	if (msg.args.length > 0) return new Error("ERR_INVALID_USAGE");
 
 	const user = await msg.getUserFromArgs();

@@ -2,6 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -11,19 +12,17 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 3e3,
 	donatorCooldown: 2e3,
-	description: "Manages tags for this server.",
-	usage: "<tag/create/delete/edit/list>",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const tags: { [k: string]: string; } = {};
-	Object.keys(msg.gConfig.tags).map(t =>
-		tags[t.toLowerCase()] = msg.gConfig.tags[t]
+	Object.keys(gConfig.tags).map(t =>
+		tags[t.toLowerCase()] = gConfig.tags[t]
 	);
 	const values = Object.values(tags);
-	if (msg.args.length < 1) return msg.reply(`invalid usage. Either provide a tag name to view tags, or \`create\` / \`delete\` to manage tags.`);
+	if (msg.args.length < 1) return msg.reply(`{lang:commands.utility.tag.invalidUsage}`);
 
-	if (["create", "delete", "edit"].includes(msg.args[0].toLowerCase()) && !msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.reply("you must have the `sendMessages` permission to use the **create**/**delete**/**edit** functionalities.");
+	if (["create", "delete", "edit"].includes(msg.args[0].toLowerCase()) && !msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.reply("{lang:commands.utility.tag.missingPerms}");
 
 	if (msg.args[0].toLowerCase() === "list") {
 		const pages: string[][] = [];
@@ -32,100 +31,76 @@ export default new Command({
 			const name = Object.keys(tags)[values.indexOf(tag)];
 			if (!pages[i]) pages[i] = [];
 			const len = pages[i].reduce((a, b) => a + b.length, 0);
-			if (len + tag.length >= 1000) (i++ , pages[i] = []);
+			if (len + tag.length >= 1000) (i++, pages[i] = []);
 			pages[i].push(tag);
 		}
-		if (pages.length === 0) return msg.reply("no tags were found.");
+		if (pages.length === 0) return msg.reply("{lang:commands.utility.tag.noTags}");
 		const page = msg.args.length >= 2 ? Number(msg.args[1]) : 1;
-		if (page < 0) return msg.reply("please provide a page number that is greater than zero.");
-		if (page > pages.length) return msg.reply(`invalid page number, max page number: **${pages.length}**.`);
+		if (page < 0) return msg.reply("{lang:commands.utility.tag.pageLess}");
+		if (page > pages.length) return msg.reply(`{lang:commands.utility.tag.invalidPage|${pages.length}}`);
 
-		return msg.reply({
-			embed: {
-				title: `Page ${page}/${pages.length}`,
-				description: `\`${pages[page - 1].join("` `")}\`${pages.length > page ? `\n\nUse \`${msg.gConfig.settings.prefix}tag list ${page + 1}\` to view the next page.` : ""}`,
-				footer: {
-					text: `To use a tag, run ${msg.gConfig.settings.prefix}tag <name>`
-				},
-				color: Math.floor(Math.random() * 0xFFFFFF),
-				timestamp: new Date().toISOString()
-			}
+		return msg.channel.createMessage({
+			embed: new EmbedBuilder(gConfig.settings.lang)
+				.setTitle(`{lang:commands.utility.tag.page|${page}|${pages.length}}`)
+				.setDescription(`\`${pages[page - 1].join("` `")}\`${pages.length > page ? `\n\n{lang:commands.utility.tag.next|${gConfig.settings.prefix}|${page + 1}}` : ""}`)
+				.setFooter(`{lang:commands.utility.tag.use|${gConfig.settings.prefix}}`)
+				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+				.setTimestamp(new Date().toISOString())
+
 		});
 	}
 	if (msg.args.length === 1 || !["create", "delete", "edit"].includes(msg.args[0].toLowerCase())) {
-		if (msg.args[0].toLowerCase() === "create") return msg.reply(`provide a tag name and content. Usage: \`${msg.gConfig.settings.prefix}tag create <name> <content>\``);
-		if (msg.args[0].toLowerCase() === "delete") return msg.reply(`provide a tag name to delete. Usage: \`${msg.gConfig.settings.prefix}tag delete <name>\``);
-		if (msg.args[0].toLowerCase() === "edit") return msg.reply(`provide a tag name to edit. Usage: \`${msg.gConfig.settings.prefix}tag edit <name> <content>\``);
-		if (!Object.keys(tags).includes(msg.args[0].toLowerCase())) return msg.reply(`invalid tag.`);
+		if (msg.args[0].toLowerCase() === "create") return msg.reply(`{lang:commands.utility.tag.createUsage|${gConfig.settings.prefix}}`);
+		if (msg.args[0].toLowerCase() === "delete") return msg.reply(`{lang:commands.utility.tag.deleteusage|${gConfig.settings.prefix}}`);
+		if (msg.args[0].toLowerCase() === "edit") return msg.reply(`{lang:commands.utility.tag.editUsage|${gConfig.settings.prefix}}`);
+		if (!Object.keys(tags).includes(msg.args[0].toLowerCase())) return msg.reply(`{lang:commands.utility.tag.invalid.`);
 
 		return msg.channel.createMessage(tags[msg.args[0].toLowerCase()]);
 	} else {
-		let content: string, embed: Eris.EmbedOptions;
-		if (!msg.args[1]) return msg.reply("please provide a tag name.");
+		if (!msg.args[1]) return msg.reply("{lang:commands.utility.tag.needName");
 		switch (msg.args[0].toLowerCase()) {
-			case "create":
-				if (Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`a tag with the name "${msg.args[1].toLowerCase()}" already exists.`);
-				content = msg.args.slice(2).join(" ");
-				if (!content || content.length === 0) return msg.reply("please provide some content for the tag.");
-				await msg.gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
-				embed = {
-					title: "Tag Created",
-					fields: [
-						{
-							name: "Tag Name",
-							value: msg.args[1].toLowerCase(),
-							inline: false
-						},
-						{
-							name: "Tag Content",
-							value: content,
-							inline: false
-						}
-					],
-					color: Math.floor(Math.random() * 0xFFFFFF),
-					timestamp: new Date().toISOString()
-				};
+			case "create": {
+				if (Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.tag.alreadyExists|${msg.args[1].toLowerCase()}}`);
+				const content = msg.args.slice(2).join(" ");
+				if (!content || content.length === 0) return msg.reply("{lang:commands.utility.tag.needContent}");
+				await gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
 
-				return msg.channel.createMessage({ embed });
+				return msg.channel.createMessage({
+					embed: new EmbedBuilder(gConfig.settings.lang)
+						.setTitle("{lang:commands.utility.tag.created}")
+						.addField("{lang:commands.utility.tag.name}", msg.args[1].toLowerCase(), false)
+						.addField("{lang:commands.utility.tag.content}", content, false)
+						.setColor(Math.floor(Math.random() * 0xFFFFFF))
+						.setTimestamp(new Date().toISOString())
+				});
 				break;
+			}
 
-			case "edit":
-				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`a tag with the name "${msg.args[1].toLowerCase()}" does not exist.`);
+			case "edit": {
+				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.tag.doesNotExist|${msg.args[1].toLowerCase()}}`);
 				const c = tags[msg.args[1].toLowerCase()];
-				content = msg.args.slice(2).join(" ");
-				if (!content || content.length === 0) return msg.reply("please provide some content for the tag.");
-				await msg.gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
-				embed = {
-					title: "Tag Edited",
-					fields: [
-						{
-							name: "Tag Name",
-							value: msg.args[1].toLowerCase(),
-							inline: false
-						},
-						{
-							name: "Old Content",
-							value: c,
-							inline: false
-						},
-						{
-							name: "New Content",
-							value: content,
-							inline: false
-						}
-					],
-					color: Math.floor(Math.random() * 0xFFFFFF),
-					timestamp: new Date().toISOString()
-				};
+				const content = msg.args.slice(2).join(" ");
+				if (!content || content.length === 0) return msg.reply("{lang:commands.utility.needContent}");
+				await gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
 
-				return msg.channel.createMessage({ embed });
+				return msg.channel.createMessage({
+					embed: new EmbedBuilder(gConfig.settings.lang)
+						.setTitle("{lang:commands.utility.tag.edited}")
+						.addField("{lang:commands.utility.tag.name}", msg.args[1].toLowerCase(), false)
+						.addField("{lang:commands.utility.tag.oldContent}", c, false)
+						.addField("{lang:commands.utility.tag.newContent}", content, false)
+						.setColor(Math.floor(Math.random() * 0xFFFFFF))
+						.setTimestamp(new Date().toISOString())
+				});
 				break;
+			}
 
-			case "delete":
-				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`a tag with the name "${msg.args[1].toLowerCase()}" does not exist.`);
-				await msg.gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: null } });
-				return msg.reply(`deleted the tag **${msg.args[1].toLowerCase()}**.`);
+			case "delete": {
+				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.doesNotExist|${msg.args[1].toLowerCase()}}`);
+				await gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: null } });
+				return msg.reply(`{lang:commands.utility.deleted|${msg.args[1].toLowerCase()}}`);
 				break;
+			}
 		}
 	}
 }));

@@ -2,6 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -14,11 +15,9 @@ export default new Command({
 	],
 	cooldown: 2e3,
 	donatorCooldown: 1e3,
-	description: "Get the servers I share with a user.",
-	usage: "<@member/id>",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
@@ -26,7 +25,7 @@ export default new Command({
 	const a = this.guilds.filter(g => g.members.has(user.id)),
 		b = a.map(g => `${g.name} (${g.id})`),
 		guilds = [],
-		fields = [];
+		fields: Eris.EmbedField[] = [];
 
 	let i = 0;
 
@@ -48,17 +47,15 @@ export default new Command({
 		})
 	);
 
-	const embed: Eris.EmbedOptions = {
-		title: `Seen On ${b.length} Servers - ${user.user.username}#${user.user.discriminator} (${user.id})`,
-		description: `I see this user in ${a.length} other servers.`,
-		fields,
-		timestamp: new Date().toISOString()
-	};
+	const embed = new EmbedBuilder(gConfig.settings.lang)
+		.setTitle(`{lang:commands.utility.seen.amountTitle|${b.length}|${user.user.username}#${user.user.discriminator}|${user.id}}`)
+		.setDescription(`{lang:commands.utility.seen.amountDesc|${a.length}}`)
+		.setColor(Math.random() * 0xFFFFFF)
+		.setTimestamp(new Date().toISOString());
 
 	if (a.length > 30) {
-		embed.fields = [];
-		embed.description += "\nNot showing names/ids, user has too many in common (>30).";
-	}
+		embed.setDescription(`${embed.getDescription()}\n{lang:commands.utility.seen.tooManyServers}`);
+	} else fields.map(f => embed.addField(f.name, f.value, f.inline));
 
 	msg.channel.createMessage({ embed });
 }));

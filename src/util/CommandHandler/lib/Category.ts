@@ -15,11 +15,10 @@ export default class Category {
 		description?: string;
 		file: string;
 	}) {
-		if (!d.name) throw new TypeError("Category name not provided.");
 		this.name = d.name;
-		this.displayName = d.displayName || d.name;
+		this.displayName = d.displayName || `{lang:category.${d.name}.displayName}`;
 		this.devOnly = !!d.devOnly;
-		this.description = d.description || "";
+		this.description = d.description || `{lang:category.${d.name}.description}`;
 		this.commands = [];
 		this.file = d.file;
 	}

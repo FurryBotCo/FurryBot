@@ -10,8 +10,8 @@ export default (async (client: FurryBot) => {
 	app.get("/", async (req, res) => res.status(400).end("Missing Channel ID."))
 		.get("/:channelId", async (req, res) => res.status(400).end("Missing Report ID."))
 		.get("/:channelId/:reportId", async (req, res) => {
-			if (!fs.existsSync(`${config.rootDir}/src/assets/bulkDelete/${req.params.channelId}-${req.params.reportId}.txt`)) return res.status(404).end("Report not found.");
-			const report = fs.readFileSync(`${config.rootDir}/src/assets/bulkDelete/${req.params.channelId}-${req.params.reportId}.txt`).toString();
+			if (!fs.existsSync(`${config.dir.base}/src/assets/bulkDelete/${req.params.channelId}-${req.params.reportId}.txt`)) return res.status(404).end("Report not found.");
+			const report = fs.readFileSync(`${config.dir.base}/src/assets/bulkDelete/${req.params.channelId}-${req.params.reportId}.txt`).toString();
 			return res.status(200).end(report);
 		});
 

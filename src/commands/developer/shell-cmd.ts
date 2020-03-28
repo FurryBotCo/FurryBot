@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
@@ -22,7 +21,7 @@ export default new Command({
 	usage: "<code>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	let silent = false;
 	let error = false;
 	let deleteInvoke = false;
@@ -63,8 +62,8 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					api_dev_key: config.apis.pastebin.devKey,
-					api_user_key: config.apis.pastebin.userKey,
+					api_dev_key: config.keys.pastebin.devKey,
+					api_user_key: config.keys.pastebin.userKey,
 					api_option: "paste",
 					api_paste_code: res,
 					api_paste_private: "2",
@@ -105,8 +104,8 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					api_dev_key: config.apis.pastebin.devKey,
-					api_user_key: config.apis.pastebin.userKey,
+					api_dev_key: config.keys.pastebin.devKey,
+					api_user_key: config.keys.pastebin.userKey,
 					api_option: "paste",
 					api_paste_code: res,
 					api_paste_private: "2",
@@ -118,6 +117,6 @@ export default new Command({
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		return Logger.log(`Silent shell eval return: ${res}`, msg.guild.shard.id);
+		return Logger.log(`Silent shell eval return: ${res}`, msg.channel.guild.shard.id);
 	}
 }));

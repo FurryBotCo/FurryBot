@@ -1,12 +1,10 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import phin from "phin";
 import * as Eris from "eris";
 import { Colors, ChannelNames } from "../../util/Constants";
-import BigInt from "big-integer";
 import { Time } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -16,20 +14,19 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 5e3,
 	donatorCooldown: 5e3,
-	description: "Lookup a Discord server by its id.",
-	usage: "<id>",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
-	if (msg.args[0].length < 17 || msg.args.length > 18) return msg.reply("that doesn't seem to be a valid server id..");
+	// not 19 yet, bot soon™
+	if (msg.args[0].length < 17 || msg.args.length > 19) return msg.reply("{lang:commands.utility.lookup.invalid}");
 
 	const w = await phin({
 		method: "GET",
 		url: `https://discordapp.com/api/guilds/${msg.args[0]}/widget.json`,
 		headers: {
-			"Authorization": `Bot ${config.bot.token}`,
+			"Authorization": `Bot ${config.bot.client.token}`,
 			"User-Agent": config.web.userAgent
 		},
 		parse: "json"
@@ -37,70 +34,65 @@ export default new Command({
 
 	switch (w.statusCode) {
 		case 200:
-			const embed: Eris.EmbedOptions = {
-				title: "Server Found",
-				description: `A server with the id "${msg.args[0]}" was found.`,
-				color: Colors.green,
-				timestamp: new Date().toISOString(),
-				fields: []
-			};
+			const embed = new EmbedBuilder(gConfig.settings.lang)
+				.setTitle("{lang:commands.utility.lookup.found}")
+				.setDescription(`{lang:commands.utility.lookup.foundDesc|${msg.args[0]}}`)
+				.setColor(Colors.green)
+				.setTimestamp(new Date().toISOString());
 
 			const code = w.body.instant_invite.match(new RegExp("^((https?\:\/\/)?(discord\.gg|discordapp\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"))[4];
 			const inv = (await this.getInvite(code, true).catch(err => null)) as Eris.Invite & { channel: { type: number; }; guild: { vanityUrlCode?: string; }; };
 			if (!inv) {
-				embed.fields.push({
-					name: "Info",
-					value: [
-						`\u25FD Server Name: ${w.body.name}`,
-						`\u25FD Creation Date: ${Time.formatDateWithPadding(new Date(BigInt(w.body.id).divide("4194304").add("1420070400000").toJSNumber()), true)}`,
-						`\u25FD Online/Idle/DnD Members: ${w.body.presence_count}`,
+				embed.addField(
+					"{lang:commands.utility.lookup.info}",
+					[
+						`\u25FD {lang:commands.utility.lookup.serverName}: ${w.body.name}`,
+						`\u25FD {lang:commands.utility.lookup.creation}: ${Time.formatDateWithPadding(new Date(Number(BigInt(w.body.id) / 4194304n + 1420070400000n)), true)}`,
+						`\u25FD {lang:commands.utility.lookup.list}: ${w.body.presence_count}`,
 						`\t<:${config.emojis.online}> ${w.body.members.filter(m => m.status === "online").length}`,
 						`\t<:${config.emojis.idle}> ${w.body.members.filter(m => m.status === "idle").length}`,
 						`\t<:${config.emojis.dnd}> ${w.body.members.filter(m => m.status === "dnd").length}`
 					].join("\n"),
-					inline: false
-				});
+					false
+				);
 			} else {
 				const { guild, inviter, channel } = inv;
-				embed.fields.push({
-					name: "Server/Channel Info",
-					value: [
-						"Extra:",
-						`\u25FD Invite Code: [${inv.code}](https://discord.gg/${inv.code})`,
+				embed.addField(
+					"{lang:commands.utility.lookup.srvChInfo}",
+					[
+						"**{lang:commands.utility.lookup.extra}**:",
+						`\u25FD {lang:commands.utility.lookup.code}: [${inv.code}](https://discord.gg/${inv.code})`,
 						"",
-						"**Server**:",
-						`\u25FD Server Name: [${guild.name}](https://discord.gg/${inv.code})`,
-						`\u25FD Server ID: ${guild.id}`,
-						`\u25FD Member Count: ${inv.memberCount || "Unknown"}`,
-						`\u25FD Presence Count: ${inv.presenceCount || "Unknown"}`,
-						`\u25FD Vanity URL Code: ${inv.guild.vanityUrlCode || "None"}`,
+						"**{lang:commands.utility.lookup.server}**:",
+						`\u25FD {lang:commands.utility.lookup.serverName}: [${guild.name}](https://discord.gg/${inv.code})`,
+						`\u25FD {lang:commands.utility.lookup.serverId}: ${guild.id}`,
+						`\u25FD {lang:commands.utility.lookup.memberCount}: ${inv.memberCount || "{lang:commands.utility.lookup.unknown}"}`,
+						`\u25FD {lang:commands.utility.lookup.presenceCount}: ${inv.presenceCount || "{lang:commands.utility.lookup.unknown}"}`,
+						`\u25FD {lang:commands.utility.lookup.vanityURLCode}: ${inv.guild.vanityUrlCode || "{lang:commands.utility.lookup.none}"}`,
 						"",
-						"Channel:",
-						`\u25FD Channel Name: ${channel.name}`,
-						`\u25FD Channel ID: ${channel.id}`,
-						`\u25FD Channel Type: ${ChannelNames[channel.type]}`
+						"**{lang:commands.utility.lookup.channel}**:",
+						`\u25FD {lang:commands.utility.lookup.channelName}: ${channel.name}`,
+						`\u25FD {lang:commands.utility.lookup.channelId}: ${channel.id}`,
+						`\u25FD {lang:commands.utility.lookup.channelType}: ${ChannelNames[channel.type]}`
 					].join("\n"),
-					inline: false
-				});
+					false
+				);
 
 				if (!!inviter) {
-					embed.fields.push({
-						name: "Inviter",
-						value: [
-							`Name: ${inviter.username}#${inviter.discriminator}`,
-							`ID: ${inviter.id}`,
-							`Bot: ${inviter.bot ? "Yes" : "No"}`,
-							`System: ${inviter.system ? "Yes" : "No"}`
+					embed.addField(
+						"{lang:commands.utility.lookup.inviter}",
+						[
+							`{lang:commands.utility.lookup.name}: ${inviter.username}#${inviter.discriminator}`,
+							`{lang:commands.utility.lookup.id}: ${inviter.id}`,
+							`{lang:commands.utility.lookup.bot}: ${inviter.bot ? "{lang:commands.utility.lookup.yes}" : "{lang:commands.utility.lookup.no}"}`,
+							`{lang:commands.utility.lookup.system}: ${inviter.system ? "{lang:commands.utility.lookup.yes}" : "{lang:commands.utility.lookup.no}"}`
 						].join("\n"),
-						inline: false
-					});
-					embed.thumbnail = { url: inviter.avatarURL };
+						false
+					);
+					embed.setThumbnail(inviter.avatarURL);
 				}
 
-				embed.author = {
-					name: guild.name,
-					icon_url: !guild.icon ? "https://i.furcdn.net/noicon.png" : `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`
-				};
+				embed.setAuthor(guild.name, !guild.icon ? "https://i.furcdn.net/noicon.png" : `https://cdn.discordapp.com/icons/${guild.id}/${guild.icon}.png`);
 			}
 
 			return msg.channel.createMessage({
@@ -110,33 +102,32 @@ export default new Command({
 
 		case 403:
 			return msg.channel.createMessage({
-				embed: {
-					title: "Server Found",
-					description: `A server with the id "${msg.args[0]}" was found. No further info available.`,
-					color: Colors.orange,
-					timestamp: new Date().toISOString()
-				}
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setTitle("{lang:commands.utility.lookup.found}")
+					.setDescription(`{lang:commands.utility.lookup.foundDesc|${msg.args[0]}} {lang:commands.utility.lookup.noInfo}`)
+					.setColor(Colors.orange)
+					.setTimestamp(new Date().toISOString())
 			});
 			break;
 
 		case 404:
 			return msg.channel.createMessage({
-				embed: {
-					title: "Server Not Found",
-					description: `A server with the id "${msg.args[0]}" was not found.`,
-					color: Colors.red,
-					timestamp: new Date().toISOString()
-				}
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setTitle("{lang:commands.utility.lookup.notFound}")
+					.setDescription(`{lang:commands.utility.lookup.notFoundDesc|${msg.args[0]}}`)
+					.setColor(Colors.red)
+					.setTimestamp(new Date().toISOString())
 			});
 			break;
 
 		default:
-			console.log(w.body);
+			console.error(w.body);
 			return msg.channel.createMessage({
-				embed: {
-					title: "Discord Error",
-					description: `Unknown Discord error encountered: ${w.statusCode} ${w.statusMessage}`
-				}
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setTitle("{lang:commands.utility.lookup.discordError}")
+					.setDescription(`{lang:commands.utility.lookup.discordErrorDesc|${w.statusCode}|${w.statusMessage}}`)
+					.setColor(Colors.red)
+					.setTimestamp(new Date().toISOString())
 			});
 	}
 }));

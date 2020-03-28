@@ -14,30 +14,28 @@ export default new Command({
 	],
 	cooldown: 5e3,
 	donatorCooldown: 5e3,
-	description: "Get a self assignable role.",
-	usage: "<role>",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
-	const roles = msg.gConfig.selfAssignableRoles.map(a => {
+	const roles = gConfig.selfAssignableRoles.map(a => {
 		const b = msg.channel.guild.roles.get(a);
 		if (!b) return { id: null, name: null };
 		return { name: b.name.toLowerCase(), id: a };
 	});
 	if (!roles.map(r => r.name).includes(msg.args.join(" ").toLowerCase())) {
-		if (msg.channel.guild.roles.find(r => r.name.toLowerCase() === msg.args.join(" ").toLowerCase())) return msg.channel.createMessage(`<@!${msg.author.id}>, That role is not self assignable.`);
-		return msg.channel.createMessage(`<@!${msg.author.id}>, Role not found.`);
+		if (msg.channel.guild.roles.find(r => r.name.toLowerCase() === msg.args.join(" ").toLowerCase())) return msg.reply(`{lang:commands.utility.iam.notAssignable}`);
+		return msg.reply(`{lang:commands.utility.iam.notFound}`);
 	}
 	let role;
 	role = roles.filter(r => r.name === msg.args.join(" ").toLowerCase());
-	if (!role || role.length === 0) return msg.channel.createMessage("Role not found.");
+	if (!role || role.length === 0) return msg.reply("{lang:commands.utility.iam.notFund}");
 	role = role[0];
-	if (msg.member.roles.includes(role.id)) return msg.reply(`you already have this role.\n(you can remove a role using \`${msg.gConfig.settings.prefix}iamn\`)`);
-	const a = Utility.compareMemberWithRole(msg.guild.members.get(this.user.id), role);
-	if (a.higher || a.same) return msg.channel.createMessage(`<@!${msg.author.id}>, That role is higher than, or as high as my highest role.`);
+	if (msg.member.roles.includes(role.id)) return msg.reply(`{lang:commands.utility.iam.alreadyHave|${gConfig.settings.prefix}}`);
+	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), role);
+	if (a.higher || a.same) return msg.reply(`{lang:commands.utility.iam.higher}`);
 	await msg.member.addRole(role.id, "iam command");
 
 	// await msg.gConfig.modlog.add({ blame: this.client.user.id, action: "removeRole", role: role.id, reason: "iamnot command", userId: msg.author.id, timestamp: Date.now() });
-	return msg.channel.createMessage(`<@!${msg.author.id}>, You now have the **${role.name}** role.`);
+	return msg.reply(`{lang:commands.utility.iam.given|${role.name}}`);
 }));

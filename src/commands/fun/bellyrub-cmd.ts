@@ -1,7 +1,6 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import { Strings } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Internal } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -9,31 +8,22 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [
-		"embedLinks"
+		"embedLinks",
+		"attachFiles"
 	],
-	cooldown: 2e3,
-	donatorCooldown: 1e3,
-	description: "Give someone a nice belly rub -w-",
-	usage: "<@member/text>",
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
+}, (async function (msg, uConfig, gConfig, cmd) {
+	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
-	return msg
-		.channel
-		.createMessage({
-			embed: {
-				description: Strings.formatStr(Strings.fetchLangMessage(msg.gConfig.settings.lang, cmd), msg.author.mention, msg.args.join(" ")),
-				image: {
-					url: "https://assets.furry.bot/bellyrub.gif"
-				},
-				author: {
-					name: msg.author.tag,
-					icon_url: msg.author.avatarURL
-				},
-				timestamp: new Date().toISOString(),
-				color: Math.floor(Math.random() * 0xFFFFFF)
-			}
-		});
+	return msg.channel.createMessage({
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setDescription(`{lang:commands.fun.bellyrub.possible|${msg.author.id}|${Internal.extraArgParsing(msg)}}`)
+			.setImage("https://assets.furry.bot/bellyrub.gif")
+			.setTimestamp(new Date().toISOString())
+			.setColor(Math.floor(Math.random() * 0xFFFFFF))
+	});
 }));

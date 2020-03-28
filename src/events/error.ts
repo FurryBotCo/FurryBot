@@ -5,9 +5,6 @@ import FurryBot from "@FurryBot";
 // this cannot be async due to "unhandledRejection" (unhandled promise rejection)'s not
 // being able to be handled asynchronously
 export default new ClientEvent("error", (function (this: FurryBot, info, id?: number) {
-	this.increment([
-		"events.error"
-	]);
 	if (typeof info === "string") {
 		if (Logger !== undefined) return Logger.errorSync(`Shard #${id} | Client`, info);
 		else return console.error(info);

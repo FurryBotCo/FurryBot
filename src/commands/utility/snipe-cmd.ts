@@ -11,26 +11,24 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
-	description: "Get the last deleted message in a channel.",
-	usage: "[channel]",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	if (!msg.gConfig.settings.snipeCommand) return msg.reply("this command has been disabled in this servers settings.");
+}, (async function (msg, uConfig, gConfig, cmd) {
+	if (!gConfig.settings.snipeCommand) return msg.reply("{lang:other.error.commandDisabledSettings}");
 	let ch: Eris.TextChannel;
 	if (msg.args.length > 0) ch = await msg.getChannelFromArgs();
 
 	if (!ch) ch = msg.channel;
 
-	const s = msg.gConfig.snipe.delete[ch.id];
+	const s = gConfig.snipe.delete[ch.id];
 
-	if (!s) return msg.reply(`no snipes found for the channel <#${ch.id}>.`);
+	if (!s) return msg.reply(`{lang:commands.utility.snipe.noSnipes|${ch.id}}`);
 
 	const i = s.content.match(new RegExp("((https?:\/\/)?(discord(app\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
 	if (!!i) i.map(k => s.content = s.content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
 	const u = await this.getRESTUser(s.authorId);
 	const embed: Eris.EmbedOptions = {
-		title: "Message Delete Snipe",
+		title: "{lang:commands.utility.snipe.title}",
 		author: {
 			name: `${u.username}#${u.discriminator}`,
 			icon_url: `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`
@@ -39,6 +37,6 @@ export default new Command({
 		timestamp: new Date(s.time).toISOString()
 	};
 
-	await msg.gConfig.edit({ snipe: { delete: { [ch.id]: null } } }).then(d => d.reload());
+	await gConfig.edit({ snipe: { delete: { [ch.id]: null } } }).then(d => d.reload());
 	return msg.channel.createMessage({ embed });
 }));

@@ -1,29 +1,27 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Internal } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
 		"wag"
 	],
 	userPermissions: [],
-	botPermissions: [],
+	botPermissions: [
+		"embedLinks"
+	],
 	cooldown: 3e3,
-	donatorCooldown: .5e3,
-	description: "Wag your little tail!",
-	usage: "",
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+}, (async function (msg, uConfig, gConfig, cmd) {
+	const embed = new EmbedBuilder(gConfig.settings.lang)
+		.setAuthor(msg.author.tag, msg.author.avatarURL)
+		.setDescription(`{lang:commands.fun.wag.possible|${msg.author.id}|${Internal.extraArgParsing(msg)}}`)
+		.setTimestamp(new Date().toISOString())
+		.setColor(Math.floor(Math.random() * 0xFFFFFF));
+
 	return msg.channel.createMessage({
-		embed: {
-			description: `<@!${msg.author.id}> wags their little tail, aren't they cute ^-^`,
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			timestamp: new Date().toISOString(),
-			color: Math.floor(Math.random() * 0xFFFFFF)
-		}
+		embed
 	});
 }));

@@ -1,9 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
 import config from "../../config";
 import phin from "phin";
-import * as Eris from "eris";
 
 export default new Command({
 	triggers: [
@@ -14,15 +13,12 @@ export default new Command({
 	botPermissions: [
 		"embedLinks"
 	],
-	cooldown: 1e4,
-	donatorCooldown: .5e4,
-	description: "Get info about an ip address.",
-	usage: "<ip>",
+	cooldown: 5e3,
+	donatorCooldown: 2.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// await msg.channel.startTyping();
-	if (msg.unparsedArgs.length === 0) throw new Error("ERR_INVALID_USAGE");
+}, (async function (msg, uConfig, gConfig, cmd) {
+	if (msg.unparsedArgs.length < 1) throw new Error("ERR_INVALID_USAGE");
 	// if(config.apis.ipinfo.regex.ipv4.test(msg.unparsedArgs.join(" ")) || config.apis.ipinfo.regex.ipv6.test(msg.unparsedArgs.join(" "))) {
 	const req = await phin({
 		method: "GET",
@@ -34,27 +30,17 @@ export default new Command({
 	}).then(rq => JSON.parse(rq.body.toString()));
 	if (req.error || req.reserved) {
 		if (![undefined, null, ""].includes(req.reason)) return msg.channel.createMessage(`<@!${msg.author.id}>, Error processing request: ${req.reason}.`);
-		if (req.reserved) return msg.channel.createMessage(`<@!${msg.author.id}>, The supplied ip is a reserved ip, these have no specific information associated with them.`);
+		if (req.reserved) return msg.reply("{lang:commands.information.ipinfo.reserved}");
 	}
 
-	const embed: Eris.EmbedOptions = {
-		title: `IP Info for ${req.ip}`,
-		fields: [{
-			name: "Location",
-			value: `${req.city}, ${req.region} (${req.region_code}) - ${req.country_name} (lat: ${req.latitude} long: ${req.longitude})`,
-			inline: false
-		}, {
-			name: "Owner",
-			value: `${req.org} (${req.asn})`,
-			inline: false
-		}, {
-			name: "Timezone",
-			value: `${req.timezone} (UTC-${req.utc_offset})`,
-			inline: false
-		}]
-	};
 
 	return msg.channel.createMessage({
-		embed
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle(`{lang:commands.information.ipinfo.title|${req.ip}}`)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Colors.gold)
+			.addField("{lang:commands.information.ipinfo.location}", `${req.city}, ${req.region} (${req.region_code}) - ${req.country_name} ({lang:commands.information.ipinfo.lat}: ${req.latitude} {lang:commands.information.ipinfo.long}: ${req.longitude})`)
+			.addField("{lang:commands.information.ipinfo.owner}", `${req.org} (${req.asn})`)
+			.addField("{lang:commands.information.ipinfo.timezone}", `${req.timezone} (UTC-${req.utc_offset})`)
 	});
 }));

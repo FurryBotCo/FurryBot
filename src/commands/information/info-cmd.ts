@@ -1,10 +1,9 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import * as Eris from "eris";
-import { Colors } from "../../util/Constants";
+import EmbedBuilder from "../../util/EmbedBuilder";
 import { Internal, Time } from "../../util/Functions";
+import { Colors } from "../../util/Constants";
+import config from "../../config";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
@@ -14,20 +13,14 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [
-		"embedLinks"
+		"embedLinks",
+		"attachFiles"
 	],
-	cooldown: 2e3,
-	donatorCooldown: 1e3,
-	description: "Get some info about me.",
-	usage: "",
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// const st = await this.cluster.getManagerStats();
-	// if (st.clusters.length === 0) return msg.reply("hey, I haven't recieved any stats from other clusters yet, please try again later!");
-
-	// \u25FD
-
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const info = {
 		processUsage: `${Math.round(Internal.memory.process.getUsed() / 1024 / 1024)}MB / ${Math.round(Internal.memory.process.getTotal() / 1024 / 1024)}MB`,
 		systemUsage: `${Math.round(Internal.memory.system.getUsed() / 1024 / 1024 / 1024)}GB / ${Math.round(Internal.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
@@ -48,7 +41,7 @@ export default new Command({
 		gatewayVersion: Eris.Constants.GATEWAY_VERSION,
 		version: config.version,
 		nodeVersion: process.version,
-		supportServer: `[${config.bot.supportInvite}](${config.bot.supportInvite})`,
+		supportServer: `[${config.bot.supportURL}](${config.bot.supportURL})`,
 		donate: `[${config.bot.patreon}](${config.bot.patreon})`
 	};
 
@@ -56,55 +49,48 @@ export default new Command({
 		if (Object.keys(info).map(k => k.toLowerCase()).includes(msg.args[0].toLowerCase())) {
 			const inf = Object.keys(info).find(k => k.toLowerCase() === msg.args[0].toLowerCase());
 			return msg.channel.createMessage({
-				embed: {
-					title: "Bot Info!",
-					timestamp: new Date().toISOString(),
-					author: {
-						name: msg.author.tag,
-						icon_url: msg.author.avatarURL
-					},
-					color: Colors.gold,
-					description: info[inf]
-				}
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setTitle("{lang:commands.information.info.title}")
+					.setDescription(info[inf])
+					.setAuthor(msg.author.tag, msg.author.avatarURL)
+					.setTimestamp(new Date().toISOString())
+					.setColor(Colors.gold)
 			});
 		}
 	}
 
-	const embed: Eris.EmbedOptions = {
-		title: "Bot Info!",
-		description: [
-			"**Stats**:",
-			`\u25FD Process Memory Usage: ${info.processUsage}`,
-			`\u25FD System Memory Usage: ${info.systemUsage}`,
-			`\u25FD Uptime: ${info.uptime}`,
-			`\u25FD Shard: ${info.shard}`,
-			`\u25FD Server Count: ${info.guilds}`,
-			`\u25FD Large Server Count: ${info.largeGuilds}`,
-			`\u25FD User Count: ${info.users}`,
-			`\u25FD Channel Count: ${info.channels}`,
-			`\u25FD Voice Connection Count: ${info.voiceConnections}`,
-			`\u25FD Commands: ${info.commands}`,
-			"",
-			"**Creator(s)**:",
-			`\u25FD ${info.creators.split("\n").join("\n\u25FD")}`,
-			"",
-			"**Other Info**:",
-			`\u25FD Library: ${info.library}`,
-			`\u25FD Library Version: ${info.libraryVersion}`,
-			`\u25FD API Version: ${info.apiVersion}`,
-			`\u25FD Gateway Version: ${info.gatewayVersion}`,
-			`\u25FD Bot Version: ${info.version}`,
-			`\u25FD Node Version: ${info.nodeVersion}`,
-			`\u25FD Support Server: ${info.supportServer}`,
-			`\u25FD Donate: ${info.donate}`
-		].join("\n"),
-		timestamp: new Date().toISOString(),
-		author: {
-			name: msg.author.tag,
-			icon_url: msg.author.avatarURL
-		},
-		color: Colors.gold
-	};
-
-	msg.channel.createMessage({ embed });
+	msg.channel.createMessage({
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle("{lang:commands.information.info.title}")
+			.setDescription([
+				"**{lang:commands.information.info.stats}**:",
+				`\u25FD {lang:commands.information.info.processUsage}: ${info.processUsage}`,
+				`\u25FD {lang:commands.information.info.systemUsage}: ${info.systemUsage}`,
+				`\u25FD {lang:commands.information.info.uptime}: ${info.uptime}`,
+				`\u25FD {lang:commands.information.info.shard}: ${info.shard}`,
+				`\u25FD {lang:commands.information.info.guilds}: ${info.guilds}`,
+				`\u25FD {lang:commands.information.info.largeGuilds}: ${info.largeGuilds}`,
+				`\u25FD {lang:commands.information.info.users}: ${info.users}`,
+				`\u25FD {lang:commands.information.info.channels}: ${info.channels}`,
+				`\u25FD {lang:commands.information.info.voiceConnections}: ${info.voiceConnections}`,
+				`\u25FD {lang:commands.information.info.commands}: ${info.commands}`,
+				"",
+				"**{lang:commands.information.info.creators}**:",
+				`\u25FD ${info.creators.split("\n").join("\n\u25FD")}`,
+				"",
+				"**{lang:commands.information.info.other}**:",
+				`\u25FD {lang:commands.information.info.library}: ${info.library}`,
+				`\u25FD {lang:commands.information.info.libraryVersion}: ${info.libraryVersion}`,
+				`\u25FD {lang:commands.information.info.apiVersion}: ${info.apiVersion}`,
+				`\u25FD {lang:commands.information.info.gatewayVersion}: ${info.gatewayVersion}`,
+				`\u25FD {lang:commands.information.info.version}: ${info.version}`,
+				`\u25FD {lang:commands.information.info.nodeVersion}: ${info.nodeVersion}`,
+				`\u25FD {lang:commands.information.info.supportServer}: ${info.supportServer}`,
+				`\u25FD {lang:commands.information.info.donate}: ${info.donate}`
+			].join("\n"))
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Colors.gold)
+			.setThumbnail(config.images.botIcon)
+	});
 }));

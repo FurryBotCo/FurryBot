@@ -1,9 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
+import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
-import { db } from "../../modules/Database";
+import config from "../../config";
 import { Economy } from "../../util/Functions";
 
 export default new Command({
@@ -12,16 +10,13 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [
-		"embedLinks",
-		"externalEmojis"
+		"embedLinks"
 	],
-	cooldown: 6e4,
-	donatorCooldown: 3e4,
-	description: "Beg for money",
-	usage: "",
-	features: ["devOnly"],
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
+	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const { multi, multiStr } = await Economy.calculateMulti(msg.author.id, this);
 	const names = [
 		...config.eco.people,
@@ -34,21 +29,14 @@ export default new Command({
 
 	const amount = Math.floor(((Math.random() * 75) + 25) * (multi + 1));
 
-	await msg.uConfig.edit({ bal: msg.uConfig.bal + amount });
-
+	await uConfig.edit({ bal: uConfig.bal + amount });
 	return msg.channel.createMessage({
-		embed: {
-			title: "Begging For Money",
-			color: Colors.gold,
-			timestamp: new Date().toISOString(),
-			description: `**${person}** gave you ${amount}${msg.gConfig.settings.ecoEmoji}`,
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			footer: {
-				text: `Multiplier: ${multiStr}%`
-			}
-		}
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle("{lang:commands.economy.beg.title}")
+			.setColor(Colors.gold)
+			.setTimestamp(new Date().toISOString())
+			.setDescription(`{lang:commands.economy.beg.possible|${amount}|${gConfig.settings.ecoEmoji}|${person}}`)
+			.setAuthor(`${msg.author.username}#${msg.author.discriminator}`, msg.author.avatarURL)
+			.setFooter(`{lang:commands.economy.beg.multiplier|${multiStr}}`)
 	});
 }));

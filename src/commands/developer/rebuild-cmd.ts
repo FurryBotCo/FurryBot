@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { execSync } from "child_process";
@@ -16,10 +15,10 @@ export default new Command({
 	usage: "",
 	features: ["devOnly", "betaOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	const start = performance.now();
 	const rb = execSync("npm run build", {
-		cwd: config.rootDir
+		cwd: config.dir.base
 	});
 	const end = performance.now();
 	return msg.channel.createMessage(`Rebuild finished in ${(end - start).toFixed(3)}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);

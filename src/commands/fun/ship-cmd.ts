@@ -1,30 +1,22 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import * as Eris from "eris";
-import * as fs from "fs-extra";
-import { Canvas } from "canvas-constructor";
 import { Colors } from "../../util/Constants";
 import { Request } from "../../util/Functions";
+import * as fs from "fs-extra";
+import { Canvas } from "canvas-constructor";
+import Eris from "eris";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
 		"ship"
 	],
 	userPermissions: [],
-	botPermissions: [
-		"attachFiles",
-		"embedLinks"
-	],
+	botPermissions: [],
 	cooldown: 5e3,
 	donatorCooldown: 2.5e3,
-	description: "Ship some people!",
-	usage: "<@member1> [@member2]",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	// @FIXME not using second user
+}, (async function (this, msg, uConfig, gConfig) {
 	let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1;
 	if (Object.keys(msg.dashedArgs.parsed.keyValue).includes("percent")) {
 		if (!config.developers.includes(msg.author.id)) return msg.reply("this option, `percent` is developer only.");
@@ -36,8 +28,10 @@ export default new Command({
 	if (msg.args.length === 0) member2 = msg.channel.guild.members.random();
 	else if (msg.args.length === 1) member2 = await msg.getMemberFromArgs(0, false);
 	else {
-		member1 = await msg.getMemberFromArgs(0, false, false, 0);
-		member2 = await msg.getMemberFromArgs(1, false, false, 0);
+		// I know it's backwards but it's a minor thing that only shows up here
+		// and I don't want to touch the mostrosity that is get<X>FromArgs
+		member1 = await msg.getMemberFromArgs(null, null, null, 1);
+		member2 = await msg.getMemberFromArgs(null, null, null, 0);
 	}
 
 	if (!member1 || !member2) return msg.errorEmbed("INVALID_MEMBER");
@@ -56,7 +50,7 @@ export default new Command({
 		}
 	};
 
-	const sh = fs.readFileSync(`${config.rootDir}/src/assets/images/ship/${ship.image}.png`);
+	const sh = fs.readFileSync(`${config.dir.base}/src/assets/images/ship/${ship.image}.png`);
 	const av1 = await Request.getImageFromURL(member1.user.avatarURL);
 	const av2 = await Request.getImageFromURL(member2.user.avatarURL);
 

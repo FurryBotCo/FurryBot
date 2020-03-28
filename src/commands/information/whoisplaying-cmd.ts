@@ -1,14 +1,11 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import * as Eris from "eris";
+import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
 		"whoisplaying",
-		"whosplaying"
+		"whoplays"
 	],
 	userPermissions: [],
 	botPermissions: [
@@ -16,29 +13,21 @@ export default new Command({
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Get a list of users playing the specified game",
-	usage: "<game>",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// debating a reaction menu
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
-	const l = msg.channel.guild.members.filter(m => m.game && m.game.name.includes(msg.args.join(" ")));
+	const l = msg.channel.guild.members.filter(m => m.game && m.game.name.toLowerCase().includes(msg.args.join(" ").toLowerCase()));
 
 	return msg.channel.createMessage({
-		embed: {
-			title: `Who Is Playing: "${msg.args.join(" ")}"`,
-			timestamp: new Date().toISOString(),
-			color: Colors.gold,
-			description: [
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle(`{lang:commands.information.whoisplaying.title|${msg.args.join(" ")}}`)
+			.setDescription([
 				`Total: **${l.length}**`,
 				"",
 				...l.map(m => `${m.username}#${m.discriminator} (<@!${m.id}>)`)
-			].join("\n"),
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			}
-		}
+			].join("\n"))
+			.setTimestamp(new Date().toISOString())
+			.setColor(Colors.gold)
 	});
 }));

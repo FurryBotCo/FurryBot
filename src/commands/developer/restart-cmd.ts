@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import { Time } from "../../util/Functions";
 import * as fs from "fs-extra";
@@ -17,9 +16,9 @@ export default new Command({
 	usage: "",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	const time = await Time.ms((this.shards.size * 7) * 1e3, true);
-	fs.writeFileSync(`${config.rootDir}/restart.json`, JSON.stringify({
+	fs.writeFileSync(`${config.dir.base}/restart.json`, JSON.stringify({
 		time: Date.now(),
 		user: msg.author.id,
 		channel: msg.channel.id

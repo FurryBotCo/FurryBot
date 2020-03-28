@@ -1,9 +1,11 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
 import { Request } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import UserConfig from "../../modules/config/UserConfig";
+import GuildConfig from "../../modules/config/GuildConfig";
 
 export default new Command({
 	triggers: [
@@ -12,34 +14,24 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [
-		"attachFiles"
+		"attachFiles",
+		"embedLinks"
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Get a picture of a birb!",
-	usage: "",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// await msg.channel.startTyping();
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const img = await Request.imageAPIRequest(true, "birb");
 	if (img.success === false) return msg.reply(`Image API returned an error: ${img.error.description}`);
-	return msg
-		.channel
-		.createMessage({
-			embed: {
-				title: "Birb!",
-				description: `[Image URL](${img.response.image})`,
-				timestamp: new Date().toISOString(),
-				author: {
-					name: msg.author.tag,
-					icon_url: msg.author.avatarURL
-				},
-				color: Math.floor(Math.random() * 0xFFFFFF),
-				image: {
-					url: img.response.image
-				}
-			}
-		})
-		.catch(err => null);
+	return msg.channel.createMessage({
+		embed:
+			new EmbedBuilder(gConfig.settings.lang)
+				.setTitle("{lang:commands.animals.bird.title}")
+				.setDescription(`[{lang:other.imageURL}](${img.response.image})`)
+				.setTimestamp(new Date().toISOString())
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+				.setImage(img.response.image)
+	});
 }));

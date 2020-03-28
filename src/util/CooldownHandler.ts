@@ -91,14 +91,14 @@ export default class CooldownHandler<T extends string = string> extends EventEmi
 			else {
 				if (![undefined, null].includes(meta)) {
 					const m = this.meta.find(t => t.value === value && t.type === type);
-					if (!m) return {
+					if (!m || Object.keys(meta).some(k => !m.data[k] || m.data[k] !== meta[k]) || Object.keys(m.data).some(k => !meta[k] || meta[k] !== m.data[k])) return {
 						found: false,
 						time: null
 					};
 				}
 				found = true;
 				const j = this.times.find(t => t.value === value && t.type === type);
-				if (!!j) time = Date.now() - j.created;
+				if (!!j) time = (j.created + j.time) - Date.now();
 				else time = null;
 			}
 		}

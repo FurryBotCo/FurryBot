@@ -15,8 +15,6 @@ export default new Command({
 	],
 	cooldown: 2e3,
 	donatorCooldown: 1e3,
-	description: "Mock some text",
-	usage: "<text>",
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {

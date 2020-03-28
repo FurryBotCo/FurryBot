@@ -19,11 +19,9 @@ export default new Command({
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Fetch a random image from print screen (lightshot)",
-	usage: "",
 	features: ["nsfw"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const alphabet = "abcdefghijklmnopqrstuvwxyz";
 	const num = "0123456789";
 	let tries = 0;

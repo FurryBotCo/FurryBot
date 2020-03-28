@@ -1,5 +1,4 @@
 import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../../config";
 import { mdb } from "../../../../modules/Database";
@@ -22,7 +21,7 @@ export default new SubCommand({
 	usage: "<id>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const id = msg.args[0];
 	if (id.length < 17 || id.length > 18) return msg.reply(`**${id}** isn't a valid server id.`);
@@ -37,7 +36,7 @@ export default new SubCommand({
 		}
 	});
 	await msg.channel.createMessage("Please either provide one of the ids to remove it, or say `cancel` to cancel.");
-	const d = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);
+	const d = await this.col.awaitMessage(msg.channel.id, msg.author.id, 6e4);
 	if (!d) return msg.reply("please provide an id to remove.");
 	if (d.content.toLowerCase() === "cancel") return msg.reply("canceled.");
 	const ids = gbl.map(b => b.id);

@@ -1,24 +1,20 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import phin from "phin";
 
 export default new Command({
 	triggers: [
-		"dadjoke",
-		"dad"
+		"dadjoke"
 	],
 	userPermissions: [],
-	botPermissions: [],
-	cooldown: 4e3,
-	donatorCooldown: 2e3,
-	description: "Get a dadjoke!",
-	usage: "",
+	botPermissions: [
+		"embedLinks"
+	],
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	// await msg.channel.startTyping();
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const req = await phin({
 		method: "GET",
 		url: "https://icanhazdadjoke.com",

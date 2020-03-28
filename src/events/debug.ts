@@ -6,9 +6,6 @@ import chalk from "chalk";
 
 export default new ClientEvent("debug", (async function (this: FurryBot, info: string, id: number) {
 
-	this.increment([
-		"events.debug"
-	]);
 	if (typeof config !== "undefined" && config.debug === true) {
 		// too many for this
 		if (["Duplicate presence update"].some(t => info.toLowerCase().indexOf(t.toLowerCase()) !== -1)) return;

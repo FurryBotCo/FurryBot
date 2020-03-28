@@ -55,6 +55,8 @@ commands:
     bal:
       description: "Check your balance."
       usage: "[@user]"
+      yourBalance: "Your Balance"
+      otherBalance: "Balance Of"
     beg:
       description: "Beg for money."
       usage: ""
@@ -68,12 +70,23 @@ commands:
       description: "Get your current economy multiplier."
       usage: ""
       title: "Multiplier"
+      total: "Total"
+      multi:
+        supportServer: "Support Server"
+        vote: "Vote"
+        weekendVote: "Weekend Vote"
+        booster: "Booster"
+        donator: "Donator"
+        tips: "Tips"
+        developer: "Developer"
+        supportStaff: "Support Staff"
+        special: "Special Peeps"
   fun:
     8ball:
       description: "Ask the magic 8ball a question!"
       title: "{0}'s Magic 8ball Game'"
       usage: "<question>"
-      said: "The Magic 8ball said: **{0}**."
+      said: "The Magic 8ball said"
       disclaimer: "Disclaimer: Do not take any answers seriously!"
       possible:
         - "It is certain"
@@ -104,31 +117,34 @@ commands:
     bellyrub:
       description: "Give someone a nice belly rub -w-"
       usage: "<@member/text>"
+      possible:
+        - "<@!{0}> rubs the belly of {1}!"
     blep:
       description: "Do a little blep!"
       usage: ""
       possible:
-        - "{0} did a little blep!"
-        - "{0} stuck their tongue out cutely!"
+        - "<@!{0}> did a little blep!"
+        - "<@!{0}> stuck their tongue out cutely!"
     boop:
       description: "Boop someones snoot!"
       usage: "<@member/text>"
       possible:
-        - "{0} has booped {1}!\nOwO"
-        - "{0} lightly pokes the nose of {1}!\nOwO"
+        - "<@!{0}> has booped {1}!\nOwO"
+        - "<@!{0}> lightly pokes the nose of {1}!\nOwO"
     conga:
       description: "Start a conga with someone, or join in!"
       usage: "[@user]"
-      join: "<@!{0}> joined a conga with <@!{1}>!\n<@!{1}> now has {2} furs congaing with them!\nJoin in using `{3}conga`\n{4}"
+      join: "<@!{0}> joined a conga with {1} furs!\nJoin in using `{2}conga`\n{3}"
       tooLarge: "This conga is too large for emojis!"
-      start: "<@!{0}> started a conga with <@!{1}>!\nJoin in using `{2}conga`.\n{3}"
+      start: "<@!{0}> started a conga with <@!{1}>!\nJoin in using `{2}conga`.\n{3}{3}"
       alreadyPresent: "you are already in this conga!"
+      noSelf: "you cannot start a conga with yourself!"
     cuddle:
       description: "Cuddle someone!"
       usage: "<@member/text>"
       possible:
-        - "{0} has cuddled {1}\nThey're so cute"
-        - "{0} sneaks up behind {1} and cuddles them\nIsn't that sweet"
+        - "<@!{0}> has cuddled {1}\nThey're so cute"
+        - "<@!{0}> sneaks up behind {1} and cuddles them\nIsn't that sweet"
     dadjoke:
       description: "Get a dadjoke"
       usage: ""
@@ -136,9 +152,9 @@ commands:
       description: "Throw a dictionary at someone to teach them some knowledge!"
       usage: "<@member/text>"
       possible:
-        - '{0} throws a dictionary at {1} screaming "KNOWLEDGE"!'
-        - "{0} drops some knowledge on {1}, with their dictionary!"
-        - "{0} drops their entire english folder onto {1}, it seems to have flattened them!"
+        - '<@!{0}> throws a dictionary at {1} screaming "KNOWLEDGE"!'
+        - "<@!{0}> drops some knowledge on {1}, with their dictionary!"
+        - "<@!{0}> drops their entire english folder onto {1}, it seems to have flattened them!"
     divorce:
       description: "Revoke your marriage.."
       usage: "<@member>"
@@ -162,14 +178,16 @@ commands:
       description: "Flop onto someone! OwO"
       usage: "<@member/text>"
       possible:
-        - "<@!{0}> flops over onto <@!{1}>!\nOof"
-        - "<@!{0}> lays on <@!{1}>.. owo"
+        - "<@!{0}> flops over onto {1}!\nOof"
+        - "<@!{0}> lays on {1}.. owo"
     furpile:
       description: "Start a furpile on someone, or join in!"
       usage: "[@user]"
-      start: "<@!{0}> started a furpile on <@!{1}>\nJoin in using `{2}`."
-      join: "<@!{0}> joined a furpile on <@!{1}>!\n<@!{1}> now has {2} furs on them!\nJoin in using `{3}furpile`/"
+      join: "<@!{0}> joined a furpile with {1} furs!\nJoin in using `{2}furpile`"
+      tooLarge: "This furpile is too large for emojis!"
+      start: "<@!{0}> started a furpile on <@!{1}>!\nJoin in using `{2}furpile`."
       alreadyPresent: "you are already in this furpile!"
+      noSelf: "you cannot start a furpile on yourself!"
     fursuit:
       description: "Get a random fursuit image!"
       usage: ""
@@ -178,34 +196,36 @@ commands:
       usage: "<keywords>"
       noResults: 'no results were found for "{0}".'
       title: 'Results for "{0}" on giphy'
-      footer: "These results are not curated by us!"
+      disclaimer: "These results are not curated by us!"
     glomp:
       description: "Pounce onto someone lovingly~!"
       usage: "<@member/text>"
       possible:
-        - '{0} pounced onto {1}, tackling them to the floor in a giant hug! {0} whispers "I love you~" quietly into {1}''s ear.'
+        - '<@!{0}> pounced onto {1}, tackling them to the floor in a giant hug! <@!{0}> whispers "I love you~" quietly into {1}''s ear.'
     huff:
       description: "Blow someone's house down.."
       usage: "<@member/text>"
+      possible:
+        - "<@!{0}> huffed, and puffed, and blew {1}'s house down!"
     hug:
       description: "Hug someone!"
       usage: "<@member/text>"
       possible:
-        - "{0} sneaks up behind {1}, and when they aren't looking, tackles them from behind in the biggest hug ever!"
-        - "{0} gently wraps their arms around {1}!"
-        - "{0} wraps their arms around {1}, giving them a big warm hug"
+        - "<@!{0}> sneaks up behind {1}, and when they aren't looking, tackles them from behind in the biggest hug ever!"
+        - "<@!{0}> gently wraps their arms around {1}!"
+        - "<@!{0}> wraps their arms around {1}, giving them a big warm hug"
     kiss:
       description: "Kiss someone 0.0"
       usage: "<@member/text>"
       possible:
-        - "{0} kisses {1}\nThey must be in love!\n:blue_heart:"
-        - "{0} kisses {1}\nCute!"
+        - "<@!{0}> kisses {1}\nThey must be in love!\n:blue_heart:"
+        - "<@!{0}> kisses {1}\nCute!"
     lick:
       description: "Lick someone.. owo"
       usage: "<@member/text>"
       possible:
-        - "{0} licks {1}\nUwU"
-        - "{0} decides to make {1}'s fur a little slimy...'"
+        - "<@!{0}> licks {1}\nUwU"
+        - "<@!{0}> decides to make {1}'s fur a little slimy...'"
     marry:
       description: "Promose to someone!"
       usage: "<@member>"
@@ -218,32 +238,35 @@ commands:
       invalidOption: "<@!{0}>, that wasn't a valid option.."
       accepted: "Congrats <@!{0}> and <@!{1}> :ring:!"
       denied: "better luck next time!"
+      devOnly: 'only developers may use the "force" option.'
+      noSelf: "you cannot marry yourself."
+      noBot: "you cannot marry a bot."
     nap:
       description: "Flop onto someone.. then take a nap?"
       usage: "<@member/text>"
       possible:
-        - "{0} decided to take a nap on {1}.. {1} might need a forklift for this one!"
+        - "<@!{0}> decided to take a nap on {1}.. {1} might need a forklift for this one!"
     nuzzle:
       description: "Nuzzle someone!"
       usage: "<@member/text>"
       possible:
-        - "{0} nuzzles {1} gently\nIsn't that cute!"
+        - "<@!{0}> nuzzles {1} gently\nIsn't that cute!"
     pat:
       description: "Pat someone uwu"
       usage: "<@member/text>"
       possible:
-        - "{0} pats {1} on the head for being a good boi (or girl/other)"
-        - "{0} gently pets {1}"
+        - "<@!{0}> pats {1} on the head for being a good boi (or girl/other)"
+        - "<@!{0}> gently pets {1}"
     poke:
       description: "Poke someone!"
       usage: "<@member/text>"
       possible:
-        - "{0} pokes {1}\nDon't make them mad.."
+        - "<@!{0}> pokes {1}\nDon't make them mad.."
     pounce:
       description: "Pounce on someone! uwu"
       usage: "<@member/text>"
       possible:
-        - "{0} pounces onto {1} uwu"
+        - "<@!{0}> pounces onto {1} uwu"
     roll:
       description: "Roll the dice."
       usage: "[min] [max]"
@@ -263,23 +286,23 @@ commands:
     slap:
       description: "Slap someone.."
       possible:
-        - "{0} slaps {1}.. ouch"
+        - "<@!{0}> slaps {1}.. ouch"
       usage: "<@member/text>"
     sniff:
       description: "Sniff someone..?"
       usage: "<@member/text>"
       possible:
-        - "{0} siffs {1}\nMaybe they smell good..?"
+        - "<@!{0}> siffs {1}\nMaybe they smell good..?"
     snowball:
       description: "Throw a snowball at someone!"
       usage: "<@member/text>"
       possible:
-        - "{0} throws a snowball at {1}!"
+        - "<@!{0}> throws a snowball at {1}!"
     spray:
       description: "Spray someone with a bottle of water.."
       usage: "<@member/text>"
       possible:
-        - '{0} sprays {1} with a bottle of water, yelling "bad fur"!'
+        - '<@!{0}> sprays {1} with a bottle of water, yelling "bad fur"!'
     wag:
       description: "Wag your little tail!"
       usage: ""
@@ -297,14 +320,14 @@ commands:
       title: "Bot Info!"
       stats: "Stats"
       processUsage: "Process Memory Usage"
-      ststemUsage: "System Memory Usage"
+      systemUsage: "System Memory Usage"
       uptime: "Uptime"
       shard: "Shard"
-      serverCount: "Server Count"
-      largeServerCount: "Large Server Count"
-      userCount: "User Count"
-      channelCount: "Channel Count"
-      voiceConnectionCount: "Voice Connection Count"
+      guilds: "Server Count"
+      largeGuilds: "Large Server Count"
+      users: "User Count"
+      channels: "Channel Count"
+      voiceConnections: "Voice Connection Count"
       commands: "Commands"
       creators: "Creator(s)"
       other: "Other Info"
@@ -312,7 +335,7 @@ commands:
       libraryVersion: "Library Version"
       apiVersion: "API Version"
       gatewayVersion: "Gateway Version"
-      botVersion: "Bot Version"
+      version: "Bot Version"
       nodeVersion: "Node Version"
       supportServer: "Support Server"
       donate: "Donate"
@@ -359,15 +382,13 @@ commands:
       description: "Get some info about my shards."
       usage: ""
       title: "Shard Info"
-      name: "Shard #{0}"
+      shard: "Shard #{0}"
       guilds: "Guilds"
       ping: "Ping"
-      current: "Current Shard"
-      total: "Total Guilds"
-      average: "Average Ping"
+      footer: "Current Shard: #{0} | Total Guilds: {1} | Average Ping: {2}ms"
     sinfo:
       description: "Get some info about the current server."
-      usage: ""
+      usage: "[channels/members/server/banner/splash]"
       features:
         inviteSplash: "Invite Splash"
         inviteSlashDesc: "guild has access to set an invite splash background"
@@ -418,7 +439,7 @@ commands:
       region: "Region"
       creationDate: "Creation Date"
       nitroBoosts: "Nitro Boosts"
-      boostTier: "Boos Tier"
+      boostTier: "Boost Tier"
       large: "Large"
       verificationLevel: "Verification Level"
       2faRequirement: "2FA Requirement"
@@ -427,8 +448,15 @@ commands:
       featuresLabel: "Features"
       members: "Members"
       note: "note"
+      noteContent: "status counts are based on cached users, and may not include all server members"
       nonBots: "Non Bots"
       bots: "Bots"
+      server: "Server"
+      banner: "Server Banner"
+      noBanner: "this server does not have a banner."
+      splash: "Invite Splash"
+      noSplash: "this server does not have an invite splash."
+      icon: "Icon"
       channels: "Channels"
       total: "Total"
       text: "Text"
@@ -440,6 +468,9 @@ commands:
       visibleYou: "Visible (for you)"
       hiddenMe: "Hidden (for me)"
       visibleMe: "Hidden (for me)"
+      no: "No"
+      yes: "Yes"
+      invalidType: 'invalid type, valid types: "channels", "members", "server", "icon", "splash", "banner"'
     uinfo:
       description: "Get some info about a user."
       usage: "[@member/id]"
@@ -450,8 +481,748 @@ commands:
       creationDate: "Account Creation Date"
       roles: "Roles"
       tooManyRoles: "Too many roles to list, please use `{0}roles {1}` to list them."
+      joinPos: "Join Position"
+      nearbyJoins: "Nearby Joins"
     whoisplaying:
       description: "Get a list of users playing the specified game."
       usage: "<game>"
       title: "Who Is Playing: {0}"
       total: "Total: **{0}**"
+  meme:
+    abandon:
+      description: "Why your mother abandoned you."
+      usage: "<text>"
+    aborted:
+      description: "Why someone should've been aborted"
+      usage: "[image]"
+    affect:
+      description: "My baby won't be affected."
+      usage: "[image]"
+    airpods:
+      description: "Sick airpods bro"
+      usage: "[image]"
+    america:
+      description: "Ameeerica, frick yeah!"
+      usage: "[image]"
+    armor:
+      description: "Nothing can penetrate my armor."
+      usage: "<text>"
+    balloon:
+      description: "Nothing will pop this."
+      usage: "balloon"
+    batslap:
+      description: "slap someone"
+      usage: "<@user>"
+    bed:
+      description: "There's a monster under the bed!"
+      usage: "[image/@user]"
+    bongocat:
+      description: "Bongo Bongo Bongo!"
+      usage: "[image/@user]"
+    boo:
+      description: "Spooky!"
+      usage: "<text>"
+    brain:
+      description: "This is big brain time"
+      usage: "<text>"
+    brazzers:
+      description: "Slap the brazzers logo onto that!"
+      usage: "[image/@user]"
+    byemom:
+      description: "Google some weird stuff while your mom is gone"
+      usage: "<text>"
+    cancer:
+      description: "Absolute cancer."
+      usage: "[image/@user]"
+    changemymind:
+      description: "Change My Mind!"
+      usage: "<text>"
+    communism:
+      description: "You filthy communist!"
+      usage: "[image/@user]"
+    crab:
+      description: "Crab rave!"
+      usage: "<text>"
+    cry:
+      description: "We need that water"
+      usage: "<text>"
+    dab:
+      description: "Dab on 'em"
+      usage: "[image/@user]"
+    dank:
+      description: "Dank memes"
+      usage: "[image/@user]"
+    deepfry:
+      description: "Deep fry that image"
+      usage: "[image/@user]"
+    delete:
+      description: "Delete this garbage"
+      usage: "[image/@user]"
+    disability:
+      description: "Not all disabilities are the same"
+      usage: "[image/@user]"
+    door:
+      description: "Nope!"
+      usage: "[image/@user]"
+    excuseme:
+      description: "Excuse me what the frick"
+      usage: "<text>"
+    facts:
+      description: "Straight facts"
+      usage: "<text>"
+    failure:
+      description: "You're a failure, and a disappointement."
+      usage: "[image/@user]"
+    fakenews:
+      description: "You're fake news!"
+      usage: "[image/@user]"
+    fedora:
+      description: "m'lady"
+      usage: "[image/@user]"
+    floor:
+      description: "Stay off the floor"
+      usage: "[text]"
+    garfield:
+      description: "Wonder who that sign is for"
+      usage: "[image/@user]"
+    gay:
+      description: "Gay up an image."
+      usage: "[image]"
+    goggles:
+      description: "Put on your saftey goggles"
+      usage: "[image/@user]"
+    hitler:
+      description: "Worse than hitler"
+      usage: "[image/@user]"
+    humansaregood:
+      description: "Humans are good"
+      usage: "<text>"
+    inator:
+      description: "Textinator"
+      usage: "<text>"
+    invert:
+      description: "Invert an image"
+      usage: "[image/@user]"
+    jail:
+      description: "Put someone in jail"
+      usage: "[image/@user]"
+    justpretending:
+      description: "Maybe they're just pretending"
+      usage: "<text>"
+    knowyourlocation:
+      description: "Someone wants to know your location"
+      usage: "<text>"
+    laid:
+      description: "People who get laid"
+      usage: "[image/@user]"
+    madethis:
+      description: "I made this"
+      usage: "[image/@user]"
+    magik:
+      description: "screw with an image"
+      usage: "[image/@user]"
+    master:
+      description: "Master"
+      usage: "<text>"
+    mock:
+      description: "MoCk SoMe TeXt"
+      usage: "<text>"
+    note:
+      description: "Passing notes.."
+      usage: "<text>"
+    ohno:
+      description: "Oh no dog"
+      usage: "<text>"
+    plan:
+      description: "My brilliant plan"
+      usage: "<text>"
+    presentation:
+      description: "My presentation"
+      usage: "<text>"
+    quote:
+      description: "Quote someone"
+      usage: "<text>"
+    radialblur:
+      description: "Add a radial blur to an image"
+      usage: "[image/@user]"
+    rip:
+      description: "Rest in peace"
+      usage: "[image/@user]"
+    roblox:
+      description: "Oof"
+      usage: "[image/@user]"
+    salty:
+      description: "You salty bro?"
+      usage: "[image/@user]"
+    satan:
+      description: "Show someone as satan"
+      usage: "[image/@user]"
+    screams:
+      description: "WhY CaN'T YoU Be nOrMaL"
+      usage: "[image/@user]"
+    sickban:
+      description: "ban this sick filth"
+      usage: "[image/@user]"
+    slapsroof:
+      description: "Slap the roof of the car"
+      usage: "<text>"
+    spank:
+      description: "Spank someone"
+      usage: "[image/@user]"
+    stroke:
+      description: "Know the signs of a stroke"
+      usage: "<text>"
+    suprised:
+      description: "\\*surprised pikachu face\\*"
+      usage: "<text>"
+    sword:
+      description: "That's a massive sword"
+      usage: "<text>"
+    thesearch:
+      description: "No intelligent life anywhere"
+      usage: "<text>"
+    trash:
+      description: "You're trash"
+      usage: "[image/@user]"
+    trigger:
+      description: "I'm.. So.. Triggered!!"
+      usage: "[image/@user]"
+    ugly:
+      description: "So ugly"
+      usage: "[image/@user]"
+    unpopular:
+      description: "Unpopular opinion"
+      usage: "<text>"
+    violence:
+      description: "Voilence is ~~never~~ always the answer."
+      usage: "<text>"
+    vr:
+      description: "Realistic vr"
+      usage: "<text>"
+    walking:
+      description: "When you walking"
+      usage: "<text>"
+    wanted:
+      description: "Wanted for a $5000 reward"
+      usage: "[image/@user]"
+    warp:
+      description: "Warp an image"
+      usage: "[image/@user]"
+    whodidthis:
+      description: "Who did this \uD83E\uDD23"
+      usage: "[image/@user]"
+    yomomma:
+      description: "Get a yomomma joke"
+      usage: ""
+    youtube:
+      description: "Youtube comment"
+      usage: "<text>"
+  misc:
+    auto:
+      description: Toggle automated posting of content in a channel."
+      usage: ""
+    pserver:
+      description: "Manage your premium servers"
+      usage: ""
+    avatar:
+      description: "Get a users avatar."
+      usage: "[@user]"
+      title: "Avatar"
+      link: "Link"
+    bugreport:
+      description: "Report a bug with the bot. (if reporting multiple, report them all in one message.)"
+      usage: "<bug>"
+      title: "Bug Report"
+      desc: "Your bug report was posted! You can view it [here](https://discord.gg/CQMx76B)."
+      nothing: "please provide something to report."
+    help:
+      description: "Get some help with the bot."
+      usage: "[command/category]"
+      hoverInfo: "Hover for mrore info"
+      cmdTotal: "Total Commands"
+      title: "Command Help"
+      cmdList: "Command List #{0}"
+    rank:
+      description: "Get a users rank."
+      usage: "[@user]"
+    suggest:
+      description: "Suggest something for me!"
+      usage: "<suggestion>"
+      title: "Suggestion Posted!"
+      desc: "Your suggestion was posted! You can view it [here](https://discord.gg/CQMx76B)."
+    toggletips:
+      description: "Toggle getting random tips."
+      usage: ""
+      enabled: "enabled tips."
+      disabled: "disabled tips."
+  moderation:
+    ban:
+      description: "Ban members from your server."
+      usage: "<@member/id> [time] [--days=<0-14>]"
+      deleteLessThan: "delete days cannot be less than zero."
+      deleteMoreThan: "delete days cannot be more than 14."
+      timeLessThan: "time cannot be less than one (1)."
+      timeInvalid: "invalid time."
+      alredyBanned: "User already banned"
+      alreadyBannedDesc: "It looks like **{0}** is already banned here.."
+      noBanSelf: "pretty sure you don't want to do this to yourself."
+      noBanOwner: "you cannot ban the server owner."
+      noBanOther: "you cannot ban **{0}** as their highest role is higher than yours!"
+      banDm: "You were banned from **{0}**\nReason: {1}"
+      noReason: "No Reason Specified."
+      userBanned: "***User {0} was banned, {1}***"
+      couldNotBan: "I couldn't ban **{0}**, {1}"
+    delwarn:
+      description: "Remove a warning from someone."
+      usage: "<@member/id> <warning id>"
+      couldNotFind: 'I couldn''t find a warning for **{0}** with the id "{1}" for this server.'
+      noBanSelf: "pretty sure you don't want to do this to yourself."
+      deleted: 'deleted warning "{0}" for user **{1}**.'
+      couldNotHackban: "I couldn't hackban **{0}**, {1}"
+    hackban:
+      description: "Ban someone that isn't in your server."
+      usage: "<@user/id> [reason]"
+      title: "User already banned"
+      desc: "It looks like {0} is already banned here.."
+      banned: "***User {0} was banned, {1}***"
+      couldNotHackban: "I couldn't hackban **{0}**, {1}"
+    kick:
+      description: "Kick members from your server."
+      usage: "<@member/id> [reason]"
+      noSelf: "Pretty sure you don't want to do this to yourself."
+      dm: "You were kicked from **{0}**\nReason: {1}"
+      noKick: "you cannot kick **{0}** as their highest role is higher than yours!"
+      kicked: "***User {0} was kicked, {1}***"
+      couldNotKick: "I couldn't kick **{0}**, {1}"
+    lock:
+      description: "Lock a channel to prevent people talking in it."
+      usage: "[channel]"
+      alreadyDeniedThis: "the send messages permission seems to already be denied in this channel"
+      alreadyDeniedThat: "the send messages permission seems to already be denied on that channel"
+      executed: "lock executed.\nNote: This lock will not work if a user has the `administrator` permission, or if `send messages` is ticked to yes in the channels permission overrides."
+    log:
+      description: "Enable or disable logging."
+      usage: "[enable/disable] [event/all] [channel]"
+      invalidOption: "invalid option, valid options"
+      enabledAll: "enabled the logging of everything in channel <#{0}>."
+      disableAll: "disabled the logging of everything."
+      eventEnabled: "enabled the logging of **{0}** in channel <#{1}>."
+      eventDisabled: "disabled the logging of **{0}**."
+      disabled: "Disabled"
+      title: "Logging"
+      thisOnly: "you must use channels that are in this server."
+    mute:
+      description: "Stop someone from chatting."
+      usage: "<@member/id> [time] [reason]"
+      tooLittleTime: "time cannot be less than one (1)."
+      invalidTime: "invalid time."
+      noMuteOther: "you cannot mute **{0}** as their highest role is higher than yours!"
+      noReason: "No Reason Specified."
+      muted: "***User {0} was muted, {1}***"
+      couldNotMute: "I couldn't mute **{0}**, {1}"
+      noRole: "No mute role"
+      noRoleDesc: "this server does not have a mute role set, you can set this with `{0}settings mute role <role>`"
+      roleNotFound: "Mute role not found"
+      roleNotFoundDesc: "The mute role specified for this server <@&{0}> ({1}) was not found, it has been reset. You can set a new one with `{2}settings mute role <role>`"
+      invalidRole: "Invalid mute role"
+      invalidRoleDesc: "The current mute role <@&{0}> ({1}) seems to be higher than me, please move it below me. You can set a new one with `{2}settings mute role <role>`"
+      alreadyMuted: "User already muted"
+      alreadyMutedDesc: "The user **{0}** seems to already be muted.. You can unmute them with `${1}unmute <@!{2}> [reason]`"
+    softban:
+      description: "Ban someone to delete their messages, then immediately unban them."
+      usage: "<@member/id> <reason> [--days=1-14]"
+      deleteLessThan: "delete days cannot be less than one."
+      deleteMoreThan: "delete days cannot be more than 14."
+      alredyBanned: "User already banned"
+      alreadyBannedDesc: "It looks like **{0}** is already banned here.."
+      noBanSelf: "pretty sure you don't want to do this to yourself."
+      noBanOwner: "you cannot ban the server owner."
+      noBanOther: "you cannot ban **{0}** as their highest role is higher than yours!"
+      banDm: "You were banned from **{0}**\nReason: {1}"
+      noReason: "No Reason Specified."
+      userSoftbanned: "***User {0} was softbanned, {1}***"
+      couldNotSoftban: "I couldn't softban **{0}**, {1}"
+      couldNotUnban: "I couldn't unban **{0}**, {1}"
+    unban:
+      description: Remove bans for people that are already banned.
+      usage: "<id> [reason]"
+      notBanned: "User not banned"
+      notBannedDesc: "It doesn't look like {0} is banned here.."
+      noReason: "No Reason Specified."
+      unbanned: "***Unbanned {0}, {1}***"
+      couldNotUnban: "I couldn't unban **{0}**, {1}"
+    unlock:
+      description: "Unlock a channel after it has been locked."
+      usage: "[channel]"
+      thisNotLocked: "this channel doesn't seem to be locked."
+      thatNotLocked: "that channel doesn't seem to be locked."
+      removed: "lock removed."
+    unmute:
+      description: "Remove a mute from someone."
+      usage: "<@member/id> [reason]"
+      noRole: "No mute role"
+      noRoleDesc: "this server does not have a mute role set, you can set this with `{0}settings mute role <role>`"
+      roleNotFound: "Mute role not found"
+      roleNotFoundDesc: "The mute role specified for this server <@&{0}> ({1}) was not found, it has been reset. You can set a new one with `{2}settings mute role <role>`"
+      invalidRole: "Invalid mute role"
+      invalidRoleDesc: "The current mute role <@&{0}> ({1}) seems to be higher than me, please move it below me. You can set a new one with `{2}settings mute role <role>`"
+      notMuted: "User not muted"
+      notMutedDesc: "The user **{0}** seems to not be muted.. You can mute them with `${1}mute <@!{2}> [reason]`"
+      unmuted: "***User {0} was unmuted, {1}***"
+      couldNotUnmute: "I couldn't unmute **{0}**, {1}"
+    warn:
+      description: "Add a warning to someone."
+      usage: "<@member/id> [reason]"
+      noReason: "None Provided"
+      warned: "***User {0} was warned, {1}***"
+    warnings:
+      description: "Add a warning to someone."
+      usage: "<@member/id> [page]"
+      noWarnings: "couldn't find any warnings for the user **{0}**."
+      warning: "Warning #{0}"
+      blame: "Blame"
+      reason: "Reason"
+      date: "Date"
+      id: "ID"
+      invalidPage: "invalid page number."
+      title: "Warnings for"
+      page: 'Page {0}/{1} | {2}warnings "{3}" {4}'
+      pageWithoutMore: "Page {0}/{1}"
+  nsfw:
+    bulge:
+      description: "*notices bulge* OwO"
+      usage: ""
+      title: "Bulge"
+    e621:
+      description: "Get some content from E621!"
+      usage: "[tags]"
+      title: "E621"
+    fursuitbutts:
+      description: "See some fursuit booties!"
+      usage: ""
+      title: "Fursuit Butts"
+    linkroulette:
+      description: "Fetch a random short url - high chance to be nsfw!"
+      usage: ""
+      title: "Link Roulette"
+      invalid: "command produced an invalid selection."
+      link: "Link"
+      noResults: "no results were found."
+    prntscr:
+      description: "Fetch a random image from print screen (lightshot)"
+      usage: ""
+    yiff:
+      description: "Get some yiff!"
+      usage: "[gay/straight/lesbian/dickgirl]"
+      title: "{0} Yiff"
+  utility:
+    asar:
+      description: "Add a self assignable role."
+      usage: "<@role/id/name>"
+      higherUser: "you cannot add roles as high as, or higher than you."
+      higherBot: "this role is higher than, or as high as me, I cannot remove or assign it."
+      managed: "this role is managed (likely permissions for a bot), these cannot be removed or assigned."
+      alreadyListed: "this role is already listed as a self assignable role."
+      added: "added **{0}** to the list of self assignable roles."
+    bancount:
+      description: "Get the number of bans preformed per user."
+      usage: ""
+      total: "Total Bans Fetched"
+    blcheck:
+      description: "Check if a user is blacklisted."
+      usage: "<id>"
+    editsnipe:
+      description: "Get the last edited message in a channel."
+      usage: "[channel]"
+      noSnipes: "no edit snipes found for the channel <#{0}>."
+      title: "Message Edit Snipe"
+      new: "New Content"
+      old: "Old Content"
+    iam:
+      description: "Get a self assignable role."
+      usage: "<role>"
+      notAssignable: "that role is not self assignable."
+      notFound: "role not found."
+      alreadyHave: "you already have this role.\n(you can remove a role using `{0}iamn`)"
+      higher: "that role is higher than, or as high as my highest role."
+      given: "you now have the **{0}** role."
+    iamn:
+      description: "Remove a self assignable role from yourself."
+      usage: "<role>"
+      notAssignable: "that role is not self assignable."
+      notFound: "role not found."
+      notHave: "you cannot remove a role you do not have.\n(use `{0}iam` to get a role)"
+      higher: "that role is higher than, or as high as my highest role."
+      removed: "you no longer have the **{0}** role."
+    inviteinfo:
+      description: "Get info about a Discord invite."
+      usage: "<code/invite>"
+      noInv: "I couldn't find an invite code in what you provided.."
+      invalid: "that doesn't seem to be a valid invite code (or maybe I'm banned?)."
+      title: "Invite Info"
+      info: "Server/Channel Info"
+      extra: "Extra"
+      code: "Code"
+      server: "Server"
+      serverName: "Server Name"
+      serverId: "Server ID"
+      memberCount: "Member Count"
+      presenceCount: "Presence Count"
+      vanityURLCode: "Vanity URL Code"
+      channel: "Channel"
+      channelName: "Channel Name"
+      channelId: "Channel ID"
+      channelType: "Channel Type"
+      unknown: "Unknown"
+      none: "None"
+      inviter: "Inviter"
+      name: "Name"
+      id: "ID"
+      bot: "Bot"
+      system: "System"
+      yes: "Yes"
+      no: "No"
+    link:
+      description: "Look for your Patreon subscription."
+      usage: ""
+    lookup:
+      description: "Lookup a Discord server by its id."
+      usage: "<id>"
+      invalid: "that doesn't seem to be a valid server id.."
+      found: "Server Found"
+      foundDesc: 'A server with the id "{0}" was found.'
+      notFound: "Server Not Found"
+      notFoundDesc: 'A server with the id "{0}" was not found.'
+      noInfo: "No further info available."
+      info: "Info"
+      serverName: "Server Name"
+      creation: "Creation Date"
+      list: "Online.Idle/DnD Members"
+      srvChInfo: "Server/Channel Info"
+      code: "Invite Code"
+      server: "Server"
+      serverId: "Server ID"
+      memberCount: "MemberCount"
+      presenceCount: "Presence Count"
+      vanityURLCode: "Vanity URL Code"
+      channel: "Channel"
+      channelName: "Channel Name"
+      channelId: "Channel ID"
+      channelType: "Channel Type"
+      unknown: "Unknown"
+      none: "None"
+      inviter: "Inviter"
+      name: "Name"
+      id: "ID"
+      bot: "Bot"
+      system: "System"
+      yes: "Yes"
+      no: "No"
+      discordError: "DiscordError"
+      discordErrorDesc: "Unknown Discord error encountered: {0} {1}"
+    lsar:
+      description: "List this servers self assignable roles."
+      usage: "[page]"
+      noRoles: "there are no roles set as self assignable."
+      invalidPage: "invalid page."
+      notFound: "Role Not Found"
+      title: "Self Assignable Roles"
+      desc: "To gain a role, use the command `{0}iam <role name>`\nTo go to the next page, use `{0}lsar [page]`.\nPage {1}/{2}"
+      roles: "Roles"
+    makeinv:
+      description: "Generates a unique invite to a channel."
+      usage: "[channel] [--temporary=true/false/-t] [--maxAge=0] [--maxUses=0]"
+      helpTitle: "Command Help"
+      helpDesc: "As this command is a little complex in design, we have some extra help emplyed here"
+      helpUsage: "Some example usages"
+      temp: "Temporary Invite"
+      maxAge: "Max Age"
+      maxUses: "Max Uses"
+      created: "Invite Created"
+      code: "Code"
+      temporary: "Temporary"
+      channel: "Channel"
+      yes: "Yes"
+      no: "No"
+      none: "None"
+    prefix:
+      description: "List this servers prefix, or change my prefix for this server."
+      usage: "[new prefix]"
+      current: 'this servers prefix is "{0}", if you want to change this, run this again with the new prefix! (ex: `{0}prefix <new prefix>`)'
+      invalid: "you cannot use {0} as my prefix."
+      same: "that is already this servers prefix."
+      maxLen: "the maximum length for my prefix is 15 characters (not counting spaces)."
+      set: "set this servers prefix to {0}"
+    prune:
+      description: "Clear messages in a channel."
+      usage: "<2-100>"
+      amount: "please provide a valid number between two (2) and 100."
+      skipped: "Skipped {0} message(s), reason: over 2 weeks old."
+    reset:
+      description: "Reset the current servers settings."
+      usage: ""
+      confirm: "this will erase ALL guild (server) settings, are you sure you want to do this?\nType **yes** or **no**."
+      invalid: "that wasn't a valid option.."
+      canceled: "Canceled reset."
+      done: "All guild settings will be reset shortly.\n(note: prefix will be **{0}**)"
+      error: "There was an internal error while doing this"
+    rsar:
+      description: "Remove a self assignable role"
+      usage: "<@role/id/name>"
+      notListed: "this role is not listed as a self assignable role."
+      removed: "Removed **{0}** from the list of self assignable roles."
+    seen:
+      description: "Get the servers I share with a user."
+      usage: "<@member/id>"
+      amountTitle: "Seen On {0} Servers - {1} ({2})"
+      amountDesc: "I see this user in {0} other servers."
+      tooManyServers: "Not showing names/ids, user has too many in common (>30)."
+    settings:
+      description: "Edit this servers settings."
+      usage: "[page/setting [value]]"
+      invalidPage: "invalid settings page."
+      title: "Server Settings"
+      value: "Value"
+      none: "NONE"
+      noValue: "No Value"
+      footer: "Page {0}/{1} | {2}settings <page> | {2}settings <name> <value>"
+      notFound: "could not find that setting."
+      current: "**{0}** is currently set to {1}"
+      unchanged: "unchanged."
+      chNotFound: "I couldn't find that channel.."
+      chPermMissing: "I don't seem to be able to send messages in <#{0}>.."
+      roleNotFound: "I couldn't find that role.."
+      roleHigher: "that role is higher than, or as high as my top role. Therefore, I cannot touch it, please move it below me, or move me above it."
+      invalidValue: "invalid value."
+      set: "changed **{0}** from {1} to {2}."
+      invalidNumber: 'you must provide a valid number. (in most cases, 0 is "disable")'
+      enabled: "Enabled"
+      disabled: "Disabled"
+    settopic:
+      description: "Set a text channel's topic"
+      usage: "<topic>"
+      set: "Set the topic of <#{0}> to **{1}**"
+      none: "NONE"
+    snipe:
+      description: "Get the last deleted message in a channel."
+      usage: "[channel]"
+      noSnipes: "no snipes found for the channel <#{0}>."
+      title: "Message Delete Snipe"
+    tag:
+      description: "Manages tags for this server."
+      usage: "<tag/create/delete/edit/list>"
+      invalidUsage: "invalid usage. Either provide a tag name to view tags, or **create**/**delete**/**edit** to manage tags, or **list** to list tags."
+      missingPerms: "you must have the `sendMessages` permission to use the **create**/**delete**/**edit** functionalities."
+      noTags: "no tags were found."
+      pageLess: "please provide a page number that is greater than zero."
+      invalidPage: "invalid page number, max page number: **{0}**"
+      page: "Page {0}/{1}"
+      next: "Use `{0}tag list {1}` to view the next page."
+      use: "To use a tag, run {0}tag <name>"
+      createUsage: "provide a tag name and content. Usage: `{0}tag create <name> <content>`"
+      deleteUsage: "provide a tag name to delete. Usage: `{0}tag delete <name>`"
+      editUsage: "provide a tag name to edit. Usage: `{0}tag edit <name> <content>`"
+      invalid: "invalid tag."
+      needName: "please provide a tag name."
+      needContent: "please provide some content for the tag."
+      alreadyExists: 'a tag with the name "{0}" already exists.'
+      doesNotExist: 'a tag with the name does not "{0}" exist.'
+      created: "Tag Created"
+      name: "Tag Name"
+      content: "Tag Content"
+      oldContent: "Old Content"
+      newContent: "New Content"
+      edited: "Tag Edited"
+      deleted: "deleted the tag **{0}**."
+    unlink:
+      description: "Remove your donor perks."
+      usage: ""
+
+category:
+  animals:
+    displayName: ":dog: Animals"
+    description: "Cute little animals to brighten your day!"
+  dev:
+    displayName: ":tools: Developer"
+    description: "The fun developer stuffs"
+  economy:
+    displayName: ":moneybag: Economy"
+    description: "Fun money things"
+  fun:
+    displayName: ":smile: Fun"
+    description: "Some commands to spice up your chat"
+  information:
+    displayName: ":tools: Information"
+    description: "Some information that may be useful to you, may not be, I don't know."
+  meme:
+    displayName: ":joy: Memey"
+    description: "Let's get this bread."
+  misc:
+    displayName: ":thumbsup: Miscellaneous"
+    description: "Miscellaneous stuff."
+  moderation:
+    displayName: ":hammer: Moderation"
+    description: "Stomp down the server baddies with your ban hammer."
+  nsfw:
+    displayName: ":smirk: NSFW"
+    description: "That stuff your parents warned you about >~>"
+  utility:
+    displayName: ":tools: Utility"
+    description: "Helpful things for the bot, and your server."
+
+other:
+  imageURL: "Image URL"
+  error:
+    invalidUsage:
+      info: "Info"
+      title: "Invalid Usage"
+      command: "Command"
+      usage: "Usage"
+      description: "Description"
+      category: "Category"
+      providedArgs: "Provided Args"
+      noArgs: "NONE"
+    imageAPI: "internal image api error, please try again later."
+    permissionMissing: "I am missing the `{0}` permission to be able to run this properly!"
+    econnreset: "Some network issue happened on our side, please try again later. (do not report these unless they are very frequent)"
+    unknown: "There was an issue while doing something.."
+    join: "Please join our support server and report this, along with the code.\nSupport Server: {0}\nCode: `{1}`\n\nError:\n**{2}: {3}**"
+    commandDisabled: "this command has been temporarily disabled."
+    unknownAPIError: "API Error:\nCode: {0}\nDescription: `{1}`"
+    codeAPIError: "API Error:\n{0}"
+    commandDisabledSettings: "this command has been disabled in this servers settings."
+  modlog:
+    invalid: "Detected an invalid modlog setup, reverted to normal."
+    missingPermissions: "I'm missing some permissions to be able to make a modlog entry (I need `sendMessages` and `embedLinks`), it has been reverted to normal."
+    titles:
+      ban: "Member Ban"
+      mute: "Member Muted"
+      hackban: "Member Hackbanned"
+      kick: "Member Kicked"
+      softban: "Member Softbanned"
+      unban: "Member Unbanned"
+      unmute: "Member Unmuted"
+      warn: "Member Warned"
+      delwarn: "Member Warn Removed"
+      lock: "Channel Locked"
+      unlock: "Channel Unlocked"
+    fields:
+      target: "Target"
+      reason: "Reason"
+      deleteDays: "Message Delete Days"
+      time: "Time"
+      permanent: "Permanent"
+      id: "ID"
+      warningReason: "Warning Reason"
+      oldBlame: "Old Blame"
+      unknown: "Unknown"
+    noneProvided: "None Provided."
+    actionAuto: "Action performed automatically."
+    action: "Action carried out by {0}"
+  shortURL: "Short URL"
+  firstTimeViewed: "**this is the first time this has been viewed! Image #{0}**"
+  poweredBy:
+    furrybot: "powered by furry.bot"
+  mention:
+    description: "Hi, {0}! Since you've mentioned me, here's a little about me:\nMy prefix here is **{1}**, you can see my commands by using `{1}help`, you can change my prefix by using `{1}prefix <new prefix>`,\nIf you want to invite me to another server, you can use [this link]({2}), or, if that isn't working, you can visit [https://furry.bot/add](https://furry.bot/add)\nIf you need support, you can visit our server [here]({3})"
+    title: "Hello!"

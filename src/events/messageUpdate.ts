@@ -1,16 +1,13 @@
 import ClientEvent from "../util/ClientEvent";
-import PartialMessage from "../util/PartialMessage";
-import FurryBot from "@FurryBot";
+import PartialMessage from "../modules/PartialMessage";
+import FurryBot from "../main";
 import * as Eris from "eris";
 import { db } from "../modules/Database";
-import { ChannelNamesCamelCase } from "../util/Constants";
+import Logger from "../util/LoggerV8";
 
-export default new ClientEvent("messageUpdate", (async function (this: FurryBot, message: Eris.Message, oldMessage: PartialMessage) {
+export default new ClientEvent("messageUpdate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>, oldMessage: PartialMessage) {
 	if (!this || !message || !message.author || message.author.bot || !oldMessage || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any) || message.content === oldMessage.content) return;
-	this.increment([
-		"events.messageUpdate"
-	], [`channelType:${ChannelNamesCamelCase[message.channel.type]}`]);
-	const g = await db.getGuild((message.channel as Eris.GuildChannel).guild.id);
+	const g = await db.getGuild(message.channel.guild.id);
 	await g.edit({
 		snipe: {
 			edit: {
@@ -26,8 +23,18 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	this.emit("messageCreate", message);
 
 	const e = g.logEvents.messageEdit;
-	if (!e.enabled || !e.channel) return;
+	if (!e || e.enabled || !e.channel) return;
 	const ch = await this.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
+
+	if (ch.guild.id !== message.guildID) {
+		Logger.warn("Message Update", `messageUpdate log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`);
+		await g.edit({
+			logEvents: {
+				messageEdit: null
+			}
+		});
+		return;
+	}
 
 	const embed: Eris.EmbedOptions = {
 		title: "Message Edited",
@@ -51,12 +58,5 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 		]
 	};
 
-	return ch.createMessage({ embed }).catch(err => g.edit({
-		logEvents: {
-			messageEdit: {
-				enabled: false,
-				channel: null
-			}
-		}
-	}));
+	return ch.createMessage({ embed }).catch(err => null);
 }));

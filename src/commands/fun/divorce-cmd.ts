@@ -1,7 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import { Internal } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import Eris from "eris";
+import db from "../../modules/Database";
 
 export default new Command({
 	triggers: [
@@ -9,30 +9,28 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [],
-	cooldown: 3e4,
-	donatorCooldown: 1.5e4,
-	description: "Revoke your marriage..",
-	usage: "<@member>",
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	if (!msg.uConfig.marriage.married) return msg.reply("you have to marry someone before you can divorce them..");
+}, (async function (msg, uConfig, gConfig, cmd) {
+	if (!uConfig.marriage.married) return msg.reply("you have to marry someone before you can divorce them..");
 
-	const m = await Internal.getUser(msg.uConfig.marriage.partner);
+	const m = await db.getUser(uConfig.marriage.partner);
 
-	if ([undefined, null].includes(msg.uConfig.marriage)) await msg.uConfig.edit({
+	if ([undefined, null].includes(uConfig.marriage)) await uConfig.edit({
 		marriage: {
 			married: false,
 			partner: null
 		}
 	}).then(d => d.reload());
 
-	const u = await this.getRESTUser(msg.uConfig.marriage.partner).catch(err => ({ username: "Unknown", discriminator: "0000" }));
+	const u = await this.getRESTUser(uConfig.marriage.partner).catch(err => ({ username: "Unknown", discriminator: "0000" }));
 	await msg.channel.createMessage(`Are you sure you want to divorce **${u.username}#${u.discriminator}**? **yes** or **no**.`).then(async () => {
-		const d = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);
+		const d = await this.col.awaitMessage(msg.channel.id, msg.author.id, 6e4);
 		if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply("that wasn't a valid option..");
 		if (d.content.toLowerCase() === "yes") {
-			await msg.uConfig.edit({
+			await uConfig.edit({
 				marriage: {
 					married: false,
 					partner: null

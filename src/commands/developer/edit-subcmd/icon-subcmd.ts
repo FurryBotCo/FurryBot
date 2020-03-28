@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import phin from "phin";
 import { Request } from "../../../util/Functions";
@@ -16,7 +15,7 @@ export default new SubCommand({
 	usage: "<url>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	if (msg.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
 	const set = await phin({
 		url: msg.unparsedArgs.join("%20"),

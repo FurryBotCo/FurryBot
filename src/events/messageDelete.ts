@@ -1,16 +1,14 @@
 import ClientEvent from "../util/ClientEvent";
-import FurryBot from "@FurryBot";
+import FurryBot from "../main";
 import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { ChannelNamesCamelCase, Colors, MessageTypes } from "../util/Constants";
 import { Utility } from "../util/Functions";
+import Logger from "../util/LoggerV8";
 
-export default new ClientEvent("messageDelete", (async function (this: FurryBot, message: Eris.Message) {
+export default new ClientEvent("messageDelete", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	if (!this || !message || !message.author || message.author.bot || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any)) return;
-	this.increment([
-		"events.messageDelete"
-	], [`channelType: ${ChannelNamesCamelCase[message.channel.type]}`]);
-	const g = await db.getGuild((message.channel as Eris.GuildChannel).guild.id);
+	const g = await db.getGuild(message.channel.guild.id);
 	if (!g) return;
 	await g.edit({
 		snipe: {
@@ -25,9 +23,18 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 	}).then(d => d.reload());
 
 	const e = g.logEvents.messageDelete;
-	if (!e.enabled || !e.channel) return;
-	const ch = (message.channel as Eris.GuildTextableChannel).guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+	if (!e || !e.enabled || !e.channel) return;
+	const ch = message.channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
+	if (ch.guild.id !== message.guildID) {
+		Logger.warn("Message Delete", `messageDelete log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`);
+		await g.edit({
+			logEvents: {
+				messageDelete: null
+			}
+		});
+		return;
+	}
 	const d = new Date(message.createdAt);
 
 	const embed: Eris.EmbedOptions = {
@@ -45,16 +52,9 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 		timestamp: new Date().toISOString(),
 		color: Colors.red
 	};
-	const log = await Utility.fetchAuditLogEntries((message.channel as Eris.GuildTextableChannel).guild, Eris.Constants.AuditLogActions.MESSAGE_DELETE, message.id);
+	const log = await Utility.fetchAuditLogEntries(message.channel.guild, Eris.Constants.AuditLogActions.MESSAGE_DELETE, message.id);
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-	return ch.createMessage({ embed }).catch(err => g.edit({
-		logEvents: {
-			messageDelete: {
-				enabled: false,
-				channel: null
-			}
-		}
-	}));
+	return ch.createMessage({ embed }).catch(err => null);
 }));

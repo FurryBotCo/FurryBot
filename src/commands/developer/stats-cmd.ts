@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import { Colors } from "../../util/Constants";
 import Eris from "eris";
@@ -16,7 +15,7 @@ export default new Command({
 	usage: "",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	const types = ["size", "shards", "users", "channels"];
 	let embed: Eris.EmbedOptions;
 	switch (msg.args[0].toLowerCase()) {

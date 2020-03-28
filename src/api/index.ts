@@ -3,10 +3,9 @@ import logger from "morgan";
 import express from "express";
 import * as fs from "fs-extra";
 import session from "express-session";
-import cookieParser from "cookie-parser";
 import http from "http";
 import https from "https";
-import FurryBot from "@FurryBot";
+import FurryBot from "../main";
 
 export default (async (client: FurryBot) => {
 	const app: express.Application = express();
@@ -22,8 +21,7 @@ export default (async (client: FurryBot) => {
 		saveUninitialized: true
 	}))
 		.set("view engine", "ejs")
-		.set("views", `${config.rootDir}/src/api/views/templates`)
-		.use(cookieParser(config.web.cookieSecret))
+		.set("views", `${config.dir.base}/src/api/views/templates`)
 		.use(logger("dev"))
 		.use(express.json())
 		.use(express.urlencoded({

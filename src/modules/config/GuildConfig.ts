@@ -2,7 +2,7 @@ import config from "../../config";
 import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
 
-class GuildConfig {
+export default class GuildConfig {
 	id: string;
 	selfAssignableRoles: string[];
 	music: {
@@ -81,83 +81,64 @@ class GuildConfig {
 			[k: string]: string[];
 		};
 	};
+
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		this.id = id;
-		if (!data) data = config.defaults.guildConfig;
-		this._load.call(this, data);
+		if (!data) data = config.defaults.config.guild;
+		this.load.call(this, data);
 	}
 
-	private _load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
-		this.selfAssignableRoles = ![undefined, null].includes(data.selfAssignableRoles) ? data.selfAssignableRoles : config.defaults.guildConfig.selfAssignableRoles;
-		this.music = ![undefined, null].includes(data.music) ? {
-			volume: data.music.volume || 100,
-			textChannel: data.music.textChannel || null,
-			queue: data.music.queue || []
-		} : config.defaults.guildConfig.music;
-		this.settings = Object.keys(config.defaults.guildConfig.settings).map(k => ({ [k]: data.settings && ![undefined, null].includes(data.settings[k]) ? data.settings[k] : config.defaults.guildConfig.settings[k] })).reduce((a, b) => ({ ...a, ...b })) as any;
-		this.snipe = data.snipe ? {
-			delete: data.snipe.delete || config.defaults.guildConfig.snipe.delete,
-			edit: data.snipe.edit || config.defaults.guildConfig.snipe.edit
-		} : config.defaults.guildConfig.snipe;
-		this.logEvents = {} as any;
-		Object.keys(config.defaults.guildConfig.logEvents).map(k => data.logEvents && data.logEvents[k] ? this.logEvents[k] = data.logEvents[k] : this.logEvents[k] = config.defaults.guildConfig.logEvents[k]);
-		this.tags = data.tags ? data.tags : config.defaults.guildConfig.tags;
-		this.auto = ![undefined, null].includes(data.auto) ? data.auto : config.defaults.guildConfig.auto;
-		this.disable = data.disable ? {
-			server: data.disable.server || [],
-			channels: data.disable.channels || {}
-		} : config.defaults.guildConfig.disable;
-		return null;
+	async load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
+		/**
+		 * @param {A} a - the object to get keys from
+		 * @param {B} b - default
+		 * @param {C} c - set data
+		 */
+		function goKeys(a, b, c) {
+			Object.keys(b).map(k => typeof a[k] === "undefined" ? c[k] = b[k] : a[k] instanceof Array ? c[k] = a[k] : typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? (c[k] = {}, goKeys(a[k], b[k], c[k])) : c[k] = a[k]);
+		}
+		goKeys(data, config.defaults.config.guild, this);
 	}
 
 	async reload() {
 		const r = await mdb.collection("guilds").findOne({ id: this.id });
-		this._load.call(this, r);
-
+		this.load.call(this, r);
 		return this;
 	}
 
-	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles" | "autoyiff">>) {
-		const g = {
-			music: this.music,
-			settings: this.settings,
-			snipe: this.snipe,
-			logEvents: this.logEvents,
-			tags: {
-				...this.tags,
-				...(data.tags && Object.keys(data).length > 0 ? data.tags : {})
-			}
-		};
-
-		Object.keys(g.tags).map(t => g.tags[t] === null ? delete g.tags[t] : null);
-
-		function replaceArray(keys: string[], check: any, update: any) {
-			return keys.map(k => typeof check[k] !== "undefined" ? update[k] = check[k] : null);
+	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
+		const d = this;
+		function goKeys(a, b) {
+			Object.keys(a).map(k => typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? goKeys(a[k], b[k]) : typeof b === "undefined" ? b = { [k]: a[k] } : b[k] = a[k]);
 		}
+		goKeys(data, d);
 
-		if (typeof data.music !== "undefined") replaceArray(["volume", "textChannel"], data.music, g.music);
+		const e = await mdb.collection("guilds").findOne({
+			id: this.id
+		});
 
-		if (typeof data.settings !== "undefined") replaceArray(Object.keys(config.defaults.guildConfig.settings), data.settings, g.settings);
+		if (!e) await mdb.collection("guilds").insertOne({
+			id: this.id, ...d
+		});
+		else await mdb.collection("guilds").findOneAndUpdate({
+			id: this.id
+		}, {
+			$set: d
+		});
 
-		if (typeof data.snipe !== "undefined") {
-			if (typeof data.snipe.delete !== "undefined") g.snipe.delete = { ...g.snipe.delete, ...data.snipe.delete };
-			if (typeof data.snipe.edit !== "undefined") g.snipe.edit = { ...g.snipe.edit, ...data.snipe.edit };
-		}
-
-		if (typeof data.logEvents !== "undefined") replaceArray(Object.keys(config.defaults.guildConfig.logEvents), data.logEvents, g.logEvents);
-
-		try {
-			await mdb.collection("guilds").findOneAndUpdate({
-				id: this.id
-			}, {
-				$set: g
-			});
-		} catch (e) {
-			await mdb.collection("guilds").insertOne({ id: this.id, ...g });
-		}
-
-		// auto reload on edit
 		return this.reload();
+	}
+
+	async create() {
+		const e = await mdb.collection("guilds").findOne({
+			id: this.id
+		});
+		if (!e) await mdb.collection("guilds").insertOne({
+			id: this.id,
+			...config.defaults.config.guild
+		});
+
+		return this;
 	}
 
 	async delete() {
@@ -165,11 +146,9 @@ class GuildConfig {
 	}
 
 	async reset() {
-		// await this.delete();
-		// awaitz mdb.collection("guilds").insertOne(Object.assign({}, config, { id: this.id }));
-		await this.edit(config.defaults.guildConfig);
-		await this._load(config.defaults.guildConfig);
-		return this;
+		await this.delete();
+		await this.create();
+		return this.reload();
 	}
 
 	async premiumCheck(): Promise<GlobalTypes.PremiumGuildEntry> {
@@ -184,5 +163,3 @@ class GuildConfig {
 		else return r[0];
 	}
 }
-
-export default GuildConfig;

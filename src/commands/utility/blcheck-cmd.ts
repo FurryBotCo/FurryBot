@@ -14,11 +14,9 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Check if a user is blacklisted.",
-	usage: "<id>",
-	features: ["supportOnly"],
+	features: ["supportOnly"], // staff & support only so no translation
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const u = await msg.getUserFromArgs();
 	if (!u) return msg.reply(`**${msg.args[0]}** isn't a valid user.`);

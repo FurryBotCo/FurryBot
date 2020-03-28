@@ -5,6 +5,7 @@ import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import { Utility, Request } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -18,11 +19,9 @@ export default new Command({
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "See some fursuit booties!",
-	usage: "",
 	features: ["nsfw"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
 	const img = await phin({
 		method: "GET",
@@ -33,26 +32,19 @@ export default new Command({
 
 	if (img.statusCode !== 200) {
 		Logger.error(`Shard #${msg.channel.guild.shard.id}`, img);
-		return msg.channel.createMessage(`<@!${msg.author.id}>, Unknown api error.`);
+		return msg.reply(`{lang:other.error.unknownAPIError|${img.body.error.code}|${img.body.error.description}}`);
 	}
 	const short = await Utility.shortenURL(img.body.response.image);
-	const extra = short.new ? `**this is the first time this has been viewed! Image #${short.linkNumber}**\n` : "";
+	const extra = short.new ? `{lang:other.firstTimeViewed|${short.linkNumber}}\n` : "";
 
 	return msg.channel.createMessage({
-		embed: {
-			color: Colors.gold,
-			description: `${extra}Short URL: <${short.link}>`,
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			image: {
-				url: img.body.response.image
-			},
-			timestamp: new Date().toISOString(),
-			footer: {
-				text: "powered by furry.bot"
-			}
-		}
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setDescription(`${extra}{lang:other.shortURL}: <${short.link}>`)
+			.setTitle("{lang:commands.nsfw.fursuitbutts.title}")
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Colors.gold)
+			.setImage(img.body.response.image)
+			.setFooter("{lang:other.poweredBy.furrybot}")
 	});
 }));

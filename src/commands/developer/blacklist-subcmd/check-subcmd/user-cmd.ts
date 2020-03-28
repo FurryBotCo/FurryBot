@@ -1,5 +1,4 @@
 import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import { mdb } from "../../../../modules/Database";
 import { Blacklist } from "../../../../util/@types/Misc";
@@ -18,7 +17,7 @@ export default new SubCommand({
 	usage: "<id>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const u = await msg.getUserFromArgs();
 	if (!u) return msg.reply(`**${msg.args[0]}** isn't a valid user.`);

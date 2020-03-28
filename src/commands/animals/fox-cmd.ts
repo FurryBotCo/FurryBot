@@ -1,39 +1,37 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
 import { Request } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import UserConfig from "../../modules/config/UserConfig";
+import GuildConfig from "../../modules/config/GuildConfig";
 
 export default new Command({
 	triggers: [
-		"fox",
-		"foxxo",
-		"foxyboi"
+		"fox"
 	],
 	userPermissions: [],
 	botPermissions: [
-		"attachFiles"
+		"attachFiles",
+		"embedLinks"
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Get a picture of a fox!",
-	usage: "",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
+	const img = await Request.getImageFromURL("https://foxrudor.de");
 	return msg.channel.createMessage({
-		embed: {
-			title: "Foxxo!",
-			timestamp: new Date().toISOString(),
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			color: Math.floor(Math.random() * 0xFFFFFF),
-			image: {
-				url: "https://foxrudor.de"
-			}
-		}
-	}).catch(err => null);
+		embed:
+			new EmbedBuilder(gConfig.settings.lang)
+				.setTitle("{lang:commands.animals.fox.title}")
+				.setTimestamp(new Date().toISOString())
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+				.setImage("attachment://fox.png")
+	}, {
+		file: img,
+		name: "fox.png"
+	});
 }));
