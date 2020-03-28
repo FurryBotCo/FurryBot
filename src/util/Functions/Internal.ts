@@ -488,8 +488,8 @@ export default class Internal {
 			.filter(k => !k.match(new RegExp("<@!?[0-9]{17,18}>", "i")))
 			.map(k => {
 				let m: Eris.Member;
-				if (k.indexOf("#") !== -1) m = msg.channel.guild.members.filter(u => `${u.username}#${u.discriminator}` === k)[0];
-				else m = msg.channel.guild.members.filter(u => u.username === k)[0];
+				if (k.indexOf("#") !== -1) m = msg.channel.guild.members.filter(u => (`${u.username}#${u.discriminator}`).toLowerCase() === k.toLowerCase())[0];
+				else m = msg.channel.guild.members.filter(u => u.username.toLowerCase() === k.toLowerCase() || (u.nick && u.nick.toLowerCase() === k.toLowerCase()))[0];
 
 				if (!!m) str = str.replace(k, `<@!${m.id}>`);
 			});
