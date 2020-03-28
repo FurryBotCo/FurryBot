@@ -2,6 +2,7 @@ import Command from "../../util/CommandHandler/lib/Command";
 import config from "../../config";
 import truncate from "truncate";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import Logger from "../../util/LoggerV8";
 
 export default new Command({
 	triggers: [
@@ -32,10 +33,8 @@ export default new Command({
 		avatarURL: "https://i.furry.bot/furry.png",
 		wait: true
 	});
-	try {
-		await m.addReaction(config.emojis.upvote);
-		await m.addReaction(config.emojis.downvote);
-	} catch (e) { }
+	await m.addReaction(config.emojis.upvote).catch(err => Logger.error(`Shard #${msg.channel.guild.shard.id}`, err));
+	await m.addReaction(config.emojis.downvote).catch(err => Logger.error(`Shard #${msg.channel.guild.shard.id}`, err));
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.misc.suggest.title}")
