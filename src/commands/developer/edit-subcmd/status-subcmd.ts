@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import Eris from "eris";
 
@@ -15,7 +14,7 @@ export default new SubCommand({
 	usage: "<status>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	if (msg.args.length <= 0) return new Error("ERR_INVALID_USAGE");
 	const types: Eris.Status[] = ["online", "idle", "dnd", "offline"];
 	if (!types.includes(msg.args[0].toLowerCase() as Eris.Status)) return msg.reply(`invalid type. Valid types: **${types.join("**, **")}**.`);

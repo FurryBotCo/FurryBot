@@ -1,40 +1,38 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
 		"furpile"
 	],
 	userPermissions: [],
-	botPermissions: [],
-	cooldown: 5e3,
-	donatorCooldown: 2.5e3,
-	description: "Start a furpile on someone, or join in!",
-	usage: "[@user]",
+	botPermissions: [
+		"externalEmojis"
+	],
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
-	if (msg.args.length < 1) {
-		if (msg.channel.furpile !== undefined && msg.channel.furpile.active) {
-			if (msg.channel.furpile.inPile.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this furpile!`);
-			clearTimeout(msg.channel.furpile.timeout);
-			msg.channel.furpile.inPile.push(msg.author.id);
-			msg.channel.furpile.timeout = setTimeout((ch) => delete ch.furpile, 18e5, msg.channel);
-			return msg.channel.createMessage(`<@!${msg.author.id}> joined a furpile on <@!${msg.channel.furpile.member.id}>!\n<@!${msg.channel.furpile.member.id}> now has ${msg.channel.furpile.inPile.length} furs on them!\nJoin in using \`${msg.gConfig.settings.prefix}furpile\`.`);
-		}
-		else throw new Error("ERR_INVALID_USAGE");
+}, (async function (msg, uConfig, gConfig, cmd) {
+	const h = this.holder.has("furpile", msg.channel.id);
+
+	if (h && msg.args.length === 0) {
+		const c = this.holder.get<string[]>("furpile", msg.channel.id);
+		const t = this.holder.get<NodeJS.Timeout>("furpile", `${msg.channel.id}.timeout`);
+		clearTimeout(t);
+		if (c.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.reply("{lang:commands.fun.furpile.alreadyPresent}");
+		this.holder.add("furpile", msg.channel.id, msg.author.id);
+		this.holder.set("furpile", `${msg.channel.id}.timeout`, setTimeout((ch: Eris.GuildTextableChannel) => { this.holder.remove("furpile", ch.id); this.holder.remove("furpile", `${ch.id}.timeout`); }, 18e5, msg.channel));
+		return msg.channel.createMessage(`{lang:commands.fun.furpile.join|${msg.author.id}|${c.length + 1}|${gConfig.settings.prefix}}`);
 	} else {
-		const member = await msg.getMemberFromArgs();
-		if (!member) return msg.errorEmbed("INVALID_USER");
-		msg.channel.furpile = {
-			active: true,
-			member,
-			inPile: [],
-			timeout: setTimeout((ch) => delete ch.furpile, 18e5, msg.channel)
-		};
-		msg.channel.furpile.inPile.push(msg.author.id, member.id);
-		return msg.channel.createMessage(`<@!${msg.author.id}> started a furpile on <@!${member.id}>!\nJoin in using \`${msg.gConfig.settings.prefix}furpile\`.`);
+		if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+		const m = await msg.getMemberFromArgs();
+		if (!m) return msg.errorEmbed("INVALID_MEMBER");
+		if (m.id === msg.author.id) return msg.reply("{lang:commands.fun.furpile.noSelf}");
+		this.holder.set("furpile", msg.channel.id, []);
+		this.holder.add("furpile", msg.channel.id, msg.author.id);
+		this.holder.set("furpile", `${msg.channel.id}.timeout`, setTimeout((ch: Eris.GuildTextableChannel) => { this.holder.remove("furpile", ch.id); this.holder.remove("furpile", `${ch.id}.timeout`); }, 18e5, msg.channel));
+		await msg.channel.createMessage(`{lang:commands.fun.furpile.start|${msg.author.id}|${m.id}|${gConfig.settings.prefix}}`);
 	}
 }));

@@ -40,7 +40,7 @@ export default class Database {
 		let u = await this.collection("users").findOne({ id }).then(res => res ? new UserConfig(id, res) : null);
 
 		if (!u) {
-			await this.mdb.collection("users").insertOne({ ...config.defaults.userConfig, id }).catch((err: MongoError) => {
+			await this.mdb.collection("users").insertOne({ ...config.defaults.config.user, id }).catch((err: MongoError) => {
 				switch (err.code) {
 					case 11000: return Logger.warn("Database", `Duplicate key error (key: ${(err as any).keyValue.id})`);
 					default:
@@ -70,9 +70,9 @@ export default class Database {
 
 		if (!g) {
 			// this mess is to set the prefix to the config default instead of what's in the guildConfig defaults
-			const t = { ...config.defaults.guildConfig };
+			const t = { ...config.defaults.config.guild };
 			delete t.settings;
-			await this.mdb.collection("guilds").insertOne({ ...t, settings: { ...config.defaults.guildConfig.settings, prefix: config.defaultPrefix }, id }).catch((err: MongoError) => {
+			await this.mdb.collection("guilds").insertOne({ ...t, settings: { ...config.defaults.config.guild.settings, prefix: config.defaults.prefix }, id }).catch((err: MongoError) => {
 				switch (err.code) {
 					case 11000: return Logger.warn("Database", `Duplicate key error (key: ${(err as any).keyValue.id})`);
 					default:

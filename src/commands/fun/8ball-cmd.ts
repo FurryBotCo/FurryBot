@@ -1,6 +1,5 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import EmbedBuilder from "../../util/EmbedBuilder";
 import config from "../../config";
 import { Colors } from "../../util/Constants";
 
@@ -12,31 +11,20 @@ export default new Command({
 	botPermissions: [
 		"embedLinks"
 	],
-	cooldown: 2e3,
-	donatorCooldown: 1e3,
-	description: "Ask the magic 8ball a question!",
-	usage: "<question>",
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	if (msg.args.length === 0) return new Error("ERR_INVALID_USAGE");
+}, (async function (msg, uConfig, gConfig, cmd) {
+	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
-	return msg
-		.channel
-		.createMessage({
-			embed: {
-				title: `${msg.author.tag}'s Magic 8ball Game`,
-				author: {
-					name: msg.author.tag,
-					icon_url: msg.author.avatarURL
-				},
-				description: `The Magic 8ball said: "**${config.bot.cmd8ball[Math.floor(Math.random() * config.bot.cmd8ball.length)]}**."`,
-				footer: {
-					text: "Disclaimer: Do not take any answers seriously!",
-					icon_url: "https://i.furry.bot/furry.png"
-				},
-				timestamp: new Date().toISOString(),
-				color: Colors.gold
-			}
-		});
+	return msg.channel.createMessage({
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle(`{lang:commands.fun.8ball.title|${msg.author.tag}}`)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setDescription(`{lang:commands.fun.8ball.said}: **{lang:commands.fun.8ball.possible}**.`)
+			.setFooter(`{lang:commands.fun.8ball.disclaimer}`, config.images.botIcon)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Colors.gold)
+	});
 }));

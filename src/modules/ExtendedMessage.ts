@@ -1,83 +1,31 @@
-import Eris from "eris";
-import FurryBot from "@FurryBot";
-import UserConfig from "./config/UserConfig";
-import GuildConfig from "./config/GuildConfig";
-import config from "../config";
-import { Logger } from "../util/LoggerV8";
+import Eris, { ExtraMessageContent } from "eris";
+import FurryBot from "../main";
+import * as F from "../util/Functions";
 import Command from "../util/CommandHandler/lib/Command";
 import Category from "../util/CommandHandler/lib/Category";
-import { db } from "./Database";
-import * as F from "../util/Functions";
+import config from "../config";
+import db from "./Database";
+import Language from "../util/Language";
+import EmbedBuilder from "../util/EmbedBuilder";
 
-type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R ? (...args: P) => R : never;
-type OmitMultipleArgs<F> = OmitFirstArg<OmitFirstArg<F>>;
-
-export interface ExtendedTextChannel extends Eris.TextChannel {
-	furpile: {
-		active: boolean;
-		inPile: string[];
-		timeout: NodeJS.Timeout;
-		member: Eris.Member | Eris.User;
-	};
-	conga: {
-		active: boolean;
-		inConga: string[];
-		timeout: NodeJS.Timeout;
-		member: Eris.Member | Eris.User;
-	};
-	awoo: {
-		active: boolean;
-		inAwoo: string[];
-		timeout: NodeJS.Timeout;
-	};
-	startTyping: OmitMultipleArgs<typeof F.Message.startTyping>;
-	stopTyping: OmitMultipleArgs<typeof F.Message.stopTyping>;
+export interface ExtendedGuildChanel extends Eris.GuildChannel {
+	createMessage(content: ExtraMessageContent, file?: Eris.MessageFile): Promise<ExtendedMessage>;
+	startTyping(maxRounds: number): NodeJS.Timeout;
+	stopTyping(): boolean;
 	readonly isTyping: boolean;
 }
 
-class ExtendedMessage extends Eris.Message<ExtendedTextChannel> {
-	id: string;
-	timestamp: number;
-	type: number;
+export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.TextableChannel> extends Eris.Message<T> {
+	channel: ExtendedGuildChanel & T;
 	author: Eris.User & { tag: string; };
-	member: Eris.Member;
-	mentions: Eris.User[];
-	content: string;
-	cleanContent: string;
-	roleMentions: string[];
-	channelMentions: string[];
-	editedTimestamp: number;
-	tts: boolean;
-	mentionEveryone: boolean;
-	attachments: Eris.Attachment[];
-	embeds: Eris.Embed[];
-	activity?: {};
-	application?: {};
-	reactions: {
-		count: number,
-		me: boolean
-	};
-	pinned: boolean;
-	// response: AutoResponse;
-	c: string;
-	user: {
-		isDeveloper: boolean;
-		isBooster: boolean;
-	};
-	client: FurryBot;
-	private _gConfig: GuildConfig;
-	private _uConfig: UserConfig;
+	private _client: FurryBot;
 	private _cmd: {
 		cmd: Command;
 		cat: Category;
 	};
 	private _args: string[];
-	constructor(msg: Eris.Message, client: FurryBot) {
-		if (!msg.channel) return;
-		// if (!mdb) throw new TypeError("missing mdb");
-		// if (!uc) throw new TypeError("missing user config");
-		// if (!gc) throw new TypeError("missing guild config");
-
+	private _prefix: string;
+	constructor(msg: Eris.Message<T>, client: FurryBot) {
 		const data: {
 			attachments?: Eris.Attachment[];
 			author?: Eris.User;
@@ -122,68 +70,105 @@ class ExtendedMessage extends Eris.Message<ExtendedTextChannel> {
 		// else data.timestamp = Date.now();
 		if (![undefined].includes(msg.tts)) data.tts = msg.tts;
 		if (![undefined].includes(msg.type)) data.type = msg.type;
-		super(data, client instanceof Eris.Client ? client : (client as any).eris);
-		this.client = client;
+
+		super(data, client);
+
 		// this property doesn't seem to be set properly
 		this.timestamp = !isNaN(msg.timestamp) ? msg.timestamp : Date.now();
 
 		if (!this.author.tag) Object.defineProperty(this.author, "tag", {
 			get(this: Eris.User) { return `${this.username}#${this.discriminator}`; }
 		});
-	}
 
-	async _load() {
-		const client = this.client;
-		this._uConfig = await db.getUser(this.author.id);
-		if ([Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) {
-			this._gConfig = await db.getGuild(this.channel.guild.id);
-			this.user = {
-				get isDeveloper() {
-					return config.developers.includes(this.user.id);
-				},
-				isBooster: await F.Economy.checkBooster(this.author.id, client)
-			};
-		} else {
-			this._gConfig = null;
-			this.user = {
-				get isDeveloper() {
-					return config.developers.includes(this.user.id);
-				},
-				isBooster: false
-			};
-		}
 		const ch = this.channel;
 
 		if (typeof this.channel.startTyping === "undefined") Object.defineProperty(this.channel, "startTyping", {
-			value: F.Message.startTyping.bind(null, this.client, ch)
+			value: (async (maxRounds = 6) => {
+				this.channel.sendTyping();
+				let i = 1;
+				const k = setInterval(async () => {
+					if (i >= maxRounds) clearInterval(k);
+					else {
+						await this.channel.sendTyping();
+						i++;
+					}
+				}, 1e4);
+				this.client.holder.set("typing", this.channel.id, k);
+				return k;
+			})
 		});
 
 		if (typeof this.channel.stopTyping === "undefined") Object.defineProperty(this.channel, "stopTyping", {
-			value: F.Message.stopTyping.bind(null, this.client, ch)
+			value: (async () => {
+				if (this.client.holder.has("typing", ch.id)) {
+					clearInterval(this.client.holder.get<NodeJS.Timer>("typing", ch.id));
+					return this.client.holder.remove("typing", ch.id);
+				} else return false;
+			})
 		});
 
 		if (typeof this.channel.isTyping === "undefined") Object.defineProperty(this.channel, "isTyping", {
 			get() {
-				return client.channelTyping.has(ch.id);
+				return this.client.holder.has("typing", ch.id);
 			}
 		});
 
-		return this;
+		this.channel.createMessage = (async (content: Eris.ExtraMessageContent, file?: Eris.MessageFile) => {
+			// easier than type checking
+			if (!!this.channel.guild) {
+				const g = await db.getGuild(this.channel.guild.id);
+				if (typeof content === "string") content = Language.get(g.settings.lang).parseString(content);
+				if (typeof content === "object") {
+					content.content = Language.get(g.settings.lang).parseString(content.content);
+					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
+				}
+			}
+			return this.client.createMessage.call(this.client, this.channel.id, content, file).then(d => new ExtendedMessage(d, this.client));
+		});
+
+		this.channel.editMessage = (async (messageID: string, content: Eris.ExtraMessageContent) => {
+			// easier than type checking
+			if (!!this.channel.guild) {
+				const g = await db.getGuild(this.channel.guild.id);
+				if (typeof content === "string") content = Language.get(g.settings.lang).parseString(content);
+				if (typeof content === "object") {
+					content.content = Language.get(g.settings.lang).parseString(content.content);
+					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
+				}
+			}
+			return this.client.editMessage.call(this.client, this.channel.id, messageID, content).then(d => new ExtendedMessage(d, this.client));
+		});
+
+		this.edit = (async (content: Eris.ExtraMessageContent) => {
+			// easier than type checking
+			if (!!this.channel.guild) {
+				const g = await db.getGuild(this.channel.guild.id);
+				if (typeof content === "string") content = Language.get(g.settings.lang).parseString(content);
+				if (typeof content === "object") {
+					content.content = Language.get(g.settings.lang).parseString(content.content);
+					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
+				}
+			}
+			return this.client.editMessage.call(this.client, this.channel.id, this.id, content).then(d => new ExtendedMessage(d, this.client));
+		});
+
+		// no prefix if dm
+		// if ((this.channel.type as any) === Eris.Constants.ChannelTypes.DM) this.prefix = "";
 	}
 
+	get client() { return this._client; }
 	get prefix() {
-		return ![
+		return ![undefined, null].includes(this._prefix) ? this._prefix : this._prefix = [
 			Eris.Constants.ChannelTypes.GUILD_TEXT,
 			Eris.Constants.ChannelTypes.GUILD_NEWS
-		].includes(this.channel.type) ? null : this.content.startsWith(`<@${this.client.user.id}>`) ? `<@${this.client.user.id}` : this.content.startsWith(`<@!${this.client.user.id}>`) ? `<@!${this.client.user.id}>` : this.gConfig && this.gConfig.settings.prefix ? this.gConfig.settings.prefix : config.defaultPrefix;
+		].includes(this.channel.type as any) ? this.content.startsWith(`<@${this.client.user.id}>`) ? `<@${this.client.user.id}` : this.content.startsWith(`<@!${this.client.user.id}>`) ? `<@!${this.client.user.id}>` : config.defaults.prefix : null;
 	}
+	set prefix(p: string) { this._prefix = p; }
 	get args() { return this._args instanceof Array ? this._args : this._args = F.Message.parseArgs(this.content, this.prefix); }
 	set args(a: string[]) { this._args = a; }
 	get unparsedArgs() { return this.content.slice(this.prefix.length).trim().split(/\s+/).slice(1); }
 	get dashedArgs() { return F.Message.parseDashedArgs(this.args, this.unparsedArgs); }
 	get cmd() { return this._cmd ? this._cmd : this._cmd = F.Message.parseCmd(this.content, this.prefix, this.client); }
-	get uConfig() { return this._uConfig; }
-	get gConfig() { return this._gConfig; }
 	get mentionMap(): {
 		users: Eris.User[],
 		members: Eris.Member[],
@@ -204,15 +189,199 @@ class ExtendedMessage extends Eris.Message<ExtendedTextChannel> {
 		};
 	}
 
-	get guild() { return this.channel.guild; }
-	get reply(): typeof F.Message.reply { return F.Message.reply.bind(this); }
-	get getUserFromArgs(): typeof F.Message.getUserFromArgs { return F.Message.getUserFromArgs.bind(this); }
-	get getMemberFromArgs(): typeof F.Message.getMemberFromArgs { return F.Message.getMemberFromArgs.bind(this); }
-	get getChannelFromArgs(): typeof F.Message.getChannelFromArgs { return F.Message.getChannelFromArgs.bind(this); }
-	get getRoleFromArgs(): typeof F.Message.getRoleFromArgs { return F.Message.getRoleFromArgs.bind(this); }
-	get getGuildFromArgs(): typeof F.Message.getGuildFromArgs { return F.Message.getGuildFromArgs.bind(this); }
-	get getServerFromArgs() { return this.getGuildFromArgs; }
-	get errorEmbed(): typeof F.Message.errorEmbed { return F.Message.errorEmbed.bind(this); }
-}
+	async reply(msg: Eris.MessageContent, attachments?: Eris.MessageFile): Promise<Eris.Message> {
+		if (typeof msg === "string") return this.channel.createMessage(`<@!${this.author.id}>, ${msg}`, attachments);
+		else return this.channel.createMessage({
+			...msg,
+			content: msg.content ? `<@!${this.author.id}>, ${msg.content}` : ""
+		}, attachments);
+	}
 
-export default ExtendedMessage;
+	async getUserFromArgs<U extends Eris.User = Eris.User>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition = 0): Promise<U> {
+		if (!this) throw new TypeError("invalid message");
+		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args";
+		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if (join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
+
+		// member mention
+		if (this.mentionMap.users.length >= mentionPosition + 1) return this.mentionMap.users[mentionPosition] as U;
+		// user ID
+		if (![undefined, null, ""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
+			if (this.channel.guild.members.has(args[argPosition])) return this.channel.guild.members.get(args[argPosition]).user as U;
+		}
+
+		// username
+		if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
+			try {
+				return this.channel.guild.members.find(m => m.user.username.toLowerCase() === args[argPosition].toLowerCase()).user as U;
+			} catch (e) {
+				return null;
+			}
+		}
+
+		// user tag
+		if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase()).user as U;
+
+		// nothing found
+		return this.client.getRESTUser(args[argPosition]).catch(err => null);
+	}
+
+	async getMemberFromArgs<M extends Eris.Member>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition = 0): Promise<M> {
+		if (!this) throw new TypeError("invalid message");
+		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args";
+		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if (join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
+
+		// member mention
+		if (this.mentionMap.members.length >= mentionPosition + 1) return this.mentionMap.members[mentionPosition] as M;
+
+		// member ID
+		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.get(args[argPosition]);
+
+		// username
+		// apparently "user" can be null on a guild member?!?ws
+		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find((c: M) => c.user && c.user.username && c.user.username.toLowerCase() === args[argPosition].toLowerCase());
+
+		// nothing found
+		return null;
+	}
+
+	async getChannelFromArgs<C extends Eris.AnyGuildChannel>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition = 0): Promise<C> {
+		if (!this) throw new TypeError("invalid message");
+		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args";
+		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if (join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
+
+		// role mention
+		if (this.mentionMap.channels.length >= mentionPosition + 1) return this.mentionMap.channels.slice(mentionPosition)[mentionPosition] as C;
+
+		// role ID
+		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.get(args[argPosition]);
+
+		// role name
+		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.find((r: C) => r.name.toLowerCase() === args[argPosition].toLowerCase());
+
+		// nothing found
+		return null;
+	}
+
+	async getRoleFromArgs<R extends Eris.Role>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false): Promise<R> {
+		if (!this) throw new TypeError("invalid message");
+		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args";
+		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if (join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+
+		// role id
+		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.channel.guild.roles.get(args[argPosition]);
+
+		// role name
+		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.channel.guild.roles.find((r: R) => r.name.toLowerCase() === args[argPosition].toLowerCase());
+
+		// nothing found
+		return null;
+	}
+
+	async getGuildFromArgs<G extends Eris.Guild>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false): Promise<G> {
+		if (!this) throw new TypeError("invalid message");
+		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
+		let argObject, args;
+		argObject = unparsed ? "unparsedArgs" : "args";
+		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
+		if (join) {
+			args = [this[argObject].join(" ")];
+			argPosition = 0;
+		} else {
+			args = this[argObject];
+		}
+		// server id
+		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.get(args[argPosition]);
+
+		// server name
+		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.find((g: G) => g.name.toLowerCase() === args[argPosition].toLowerCase());
+
+		// nothing found
+		return null;
+	}
+
+	async errorEmbed(this: ExtendedMessage, type?: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL" | "INVALID_SERVER", custom = false, title = "", description = "", fields: any[] = [], color: number = Math.floor(Math.random() * 0xFFFFFF)): Promise<Eris.Message> {
+		if (!type) type = "" as any;
+		if (!custom) {
+			switch (type.replace(/(\s|-)/g, "_").toUpperCase()) {
+				case "INVALID_USER":
+				case "INVALID_MEMBER":
+					title = "User Not Found",
+						description = "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag",
+						fields = [];
+					break;
+
+				case "INVALID_ROLE":
+					title = "Role Not Found",
+						description = "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
+						fields = [];
+					break;
+
+				case "INVALID_CHANNEL":
+					title = "Channel Not Found",
+						description = "The specified channel was not found, please provide one of the following:\nFULL channel ID, FULL channel name, or channel mention",
+						fields = [];
+					break;
+
+				case "INVALID_SERVER":
+					title = "Server Not Found",
+						description = "The specified server was not found, please provide a valid server id the bot is in.",
+						fields = [];
+					break;
+
+				default:
+					title = "Default Title",
+						description = "Default Description",
+						fields = [];
+			}
+		}
+
+		return this.channel.createMessage({
+			embed: {
+				title,
+				description,
+				fields,
+				color,
+				timestamp: new Date().toISOString(),
+				author: {
+					name: this.author.tag,
+					icon_url: this.author.avatarURL
+				}
+			}
+		});
+	}
+}

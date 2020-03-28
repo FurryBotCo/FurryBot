@@ -13,11 +13,9 @@ export default new Command({
 	],
 	cooldown: 2.5e3,
 	donatorCooldown: 2e3,
-	description: "Spank someone",
-	usage: "",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
 	let a = "https://i.furry.bot/furry.png";
 	if (msg.args.length === 0) {
@@ -31,5 +29,5 @@ export default new Command({
 		}
 		msg.args = [msg.author.avatarURL];
 	}
-	return GenericMemeCommand.handleImage(this, msg, "spank", { avatars: [a || msg.author.avatarURL] });
+	return GenericMemeCommand.handleImage(this, msg, uConfig, gConfig, "spank", { avatars: [a || msg.author.avatarURL] });
 }));

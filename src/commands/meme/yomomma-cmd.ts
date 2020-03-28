@@ -11,11 +11,9 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 2.5e3,
 	donatorCooldown: 2e3,
-	description: "Get a yomomma joke",
-	usage: "",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
 	const txt = await Request.memeRequest("/yomomma");
 	const embed: Eris.EmbedOptions = {

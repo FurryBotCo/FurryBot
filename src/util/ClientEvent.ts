@@ -1,7 +1,7 @@
 import * as Eris from "eris";
-import PartialMessage from "./PartialMessage";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import PartialMessage from "../modules/PartialMessage";
+import FurryBot from "../main";
+import ExtendedMessage from "../modules/ExtendedMessage";
 
 class ClientEvent {
 	event: string;

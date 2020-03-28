@@ -4,6 +4,7 @@ import ExtendedMessage from "@ExtendedMessage";
 import { Utility } from "../../util/Functions";
 import Eris from "eris";
 import { Colors } from "../../util/Constants";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -13,11 +14,9 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 5e3,
 	donatorCooldown: 5e3,
-	description: "Get the number of bans preformed per user.",
-	usage: "",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const b: Eris.GuildAuditLogEntry[] = [];
 
 	async function get(a?: string) {
@@ -35,13 +34,12 @@ export default new Command({
 	b.map(e => !k[e.user.id] ? k[e.user.id] = 1 : k[e.user.id]++);
 
 	return msg.channel.createMessage({
-		embed: {
-			title: `Total Bans Fetched: ${b.length}`,
-			description: [
-				...Object.keys(k).map(j => `<@!${j}>: ${k[j]}`)
-			].join("\n"),
-			timestamp: new Date().toISOString(),
-			color: Colors.green
-		}
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle(`{lang:commands.utility.bancount.total}: ${b.length}`)
+			.setDescription(Object.keys(k).map(j => `<@!${j}>: ${k[j]}`).join("\n"))
+			.setColor(Colors.green)
+			.setTimestamp(new Date().toISOString())
 	});
+
+
 }));

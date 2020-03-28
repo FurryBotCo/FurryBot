@@ -1,6 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import { Colors } from "../../util/Constants";
 import Eris from "eris";
 import { Internal } from "../../util/Functions";
@@ -15,13 +13,12 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 15e3,
 	donatorCooldown: 15e3,
-	description: "Look for your Patreon subscription.",
-	usage: "",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	const c = await msg.uConfig.premiumCheck();
-	if (c.active) return msg.reply(`you are already marked as a donator.\nNote: if something has changed, and you want to refresh it, you can run \`${msg.gConfig.settings.prefix}unlink\` to remove your perks, then run this to gain them again.`);
+}, (async function (msg, uConfig, gConfig, cmd) {
+	return msg.reply("{lang:other.error.commandDisabled}");
+	const c = await uConfig.premiumCheck();
+	if (c.active) return msg.reply(`you are already marked as a donator.\nNote: if something has changed, and you want to refresh it, you can run \`${gConfig.settings.prefix}unlink\` to remove your perks, then run this to gain them again.`);
 
 	const p = await Internal.loopPatrons();
 
@@ -35,13 +32,12 @@ export default new Command({
 				active: true,
 				patronId: patron.id,
 				userId: msg.author.id
-			} as GlobalTypes.PremiumUserEntry);
-
+			});
 			const dm = await msg.author.getDMChannel();
 
 			const embed: Eris.EmbedOptions = {
 				title: "Successfully Linked!",
-				description: `Thanks for donating! Donator perks are still in beta, so they may be a bit buggy on being enabled.\nIf you need any help, you can ask in our support server: ${config.bot.supportInvite}.`,
+				description: `Thanks for donating! Donator perks are still in beta, so they may be a bit buggy on being enabled.\nIf you need any help, you can ask in our support server: ${config.bot.supportURL}.`,
 				color: Colors.gold,
 				timestamp: new Date().toISOString()
 			};
@@ -65,9 +61,9 @@ export default new Command({
 				avatarURL: "https://i.furry.bot/furry.png"
 			});
 
-			return msg.reply(`successfully linked your Discord account to Patreon. If you need any help, you can visit our support server here: ${config.bot.supportInvite}`);
+			return msg.reply(`successfully linked your Discord account to Patreon. If you need any help, you can visit our support server here: ${config.bot.supportURL}`);
 		}
 
-		return msg.reply(`we were unable to link your Discord account with your Patreon account. Make sure you have donated, and that the payment was successful. If you need more help, you can visit us here: ${config.bot.supportInvite}`);
+		return msg.reply(`we were unable to link your Discord account with your Patreon account. Make sure you have donated, and that the payment was successful. If you need more help, you can visit us here: ${config.bot.supportURL}`);
 	}
 }));

@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import phin from "phin";
 import { Colors } from "../../util/Constants";
@@ -16,7 +15,7 @@ export default new Command({
 	usage: "",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	const pingServers = [
 		/*{
 			host: "ap.ping-test.furry.bot",
@@ -43,7 +42,7 @@ export default new Command({
 	const pings = await Promise.all(pingServers.map(async (p) => {
 		const k = await phin({
 			method: "GET",
-			url: `https://${p.host}/ping/164.68.110.213`,
+			url: `https://${p.host}/ping/furry.bot`,
 			parse: "json",
 			timeout: 2e3
 		}).catch(err => null);

@@ -10,6 +10,7 @@ import Eris from "eris";
 import { Request, Utility, Time, Strings } from ".";
 import Logger from "../LoggerV8";
 import { Colors } from "../Constants";
+import ExtendedMessage from "../../modules/ExtendedMessage";
 
 export default class Internal {
 	private constructor() {
@@ -259,7 +260,8 @@ export default class Internal {
 							text: `Disable this using "${g.settings.prefix}auto yiff disable ${w.cat}" (without quotes)`
 						}
 					};
-					if (img.success !== true) embed.description = `API Error encountered while fetching image.\nCode: ${img.error.code} \nDescription: \`${img.error.description}\`\nReport this to my [support server](${config.bot.supportInvite})`;
+					// @FIXME language stuff
+					if (img.success !== true) embed.description = `API Error encountered while fetching image.\nCode: ${img.error.code} \nDescription: \`${img.error.description}\`\nReport this to my [support server](${config.bot.supportURL})`;
 					else {
 						const short = await Utility.shortenURL(img.response.image);
 						embed.description = `Type: ${w.cat}\nShort URL: ${short.link}`;
@@ -468,6 +470,29 @@ export default class Internal {
 		};
 
 		Object.keys(f).map(k => str = str.replace(new RegExp(`\\{${k}\\}`, "g"), f[k]));
+
+		return str;
+	}
+
+	static extraArgParsing<M extends ExtendedMessage<Eris.GuildTextableChannel>>(msg: M) {
+		let str = msg.args.join(" ");
+		try {
+			str
+				.match(new RegExp("[0-9]{17,18}", "g"))
+				.filter(k => !str.split(" ")[str.split(" ").indexOf(k)].match(new RegExp("<@!?[0-9]{17,18}>")) || msg.channel.guild.members.has(k))
+				.map(k => str = str.replace(k, `<@!${k}>`));
+
+		} catch (e) { }
+		str
+			.split(" ")
+			.filter(k => !k.match(new RegExp("<@!?[0-9]{17,18}>", "i")))
+			.map(k => {
+				let m: Eris.Member;
+				if (k.indexOf("#") !== -1) m = msg.channel.guild.members.filter(u => `${u.username}#${u.discriminator}` === k)[0];
+				else m = msg.channel.guild.members.filter(u => u.username === k)[0];
+
+				if (!!m) str = str.replace(k, `<@!${m.id}>`);
+			});
 
 		return str;
 	}

@@ -1,5 +1,4 @@
 import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import { mdb } from "../../../../modules/Database";
 import { Blacklist } from "../../../../util/@types/Misc";
@@ -20,7 +19,7 @@ export default new SubCommand({
 	usage: "<id>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const id = msg.args[0];
 	if (id.length < 17 || id.length > 18) return msg.reply(`**${id}** isn't a valid server id.`);

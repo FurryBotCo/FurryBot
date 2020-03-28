@@ -21,7 +21,7 @@ export default class Economy {
 		if (!g || !g.members.has(userId)) return false;
 		else {
 			const m = g.members.get(userId);
-			return m.roles.includes(config.nitroBoosterRole);
+			return m.roles.includes(config.eco.nitroBoosterRole);
 		}
 	}
 
@@ -85,65 +85,60 @@ export default class Economy {
 	}
 
 	static get multi() {
+		// @FIXME language stuff
 		return {
 			supportServer: {
 				p: 0.0175,
 				check: this.checkSupportServer,
-				name: `[Support Server](${config.bot.supportInvite})`,
+				name: `[{lang:commands.economy.multiplier.multi.supportServer}](${config.bot.supportURL})`,
 				hidden: false
 			},
 			vote: {
 				p: 0.01,
 				check: (async (userId: string) => this.checkVote(userId).then(v => v.voted)),
-				name: `[Vote](${config.bot.voteURL})`,
+				name: `[{lang:commands.economy.multiplier.multi.vote}](${config.bot.voteURL})`,
 				hidden: false
 			},
 			voteWeekend: {
 				p: 0.005,
 				check: (async (userId: string) => this.checkVote(userId).then(v => v.weekend)),
-				name: `[Weekend Vote](${config.bot.voteURL})`,
+				name: `[{lang:commands.economy.multiplier.multi.weekendVote}](${config.bot.voteURL})`,
 				hidden: false
 			},
 			booster: {
 				p: 0.030,
 				check: this.checkBooster,
-				name: `[Booster](${config.bot.supportInvite})`,
+				name: `[{lang:commands.economy.multiplier.multi.booster}](${config.bot.supportURL})`,
 				hidden: false
 			},
 			donator: {
 				p: 0.030,
 				check: this.checkDonator,
-				name: `[Donator](${config.bot.patreon})`,
+				name: `[{lang:commands.economy.multiplier.multi.donator}](${config.bot.patreon})`,
 				hidden: false
 			},
 			tips: {
 				p: 0.015,
 				check: this.checkTips,
-				name: "Tips",
+				name: "{lang:commands.economy.multiplier.multi.tips}",
 				hidden: false
-			},
-			firstBooster: {
-				p: 0.050,
-				check: (userId: string, client: FurryBot) => userId === "603060182288695316",
-				name: "First Booster",
-				hidden: true
 			},
 			developer: {
 				p: 0.200,
 				check: (userId: string, client: FurryBot) => config.developers.includes(userId),
-				name: "Developer",
+				name: "{lang:commands.economy.multiplier.multi.developer}",
 				hidden: true
 			},
 			supportStaff: {
 				p: 0.050,
 				check: (userId: string, client: FurryBot) => client.guilds.get(config.bot.mainGuild).members.has(userId) && client.guilds.get(config.bot.mainGuild).members.get(userId).roles.includes("427302201027854337"),
-				name: "Support Server Staff",
+				name: "{lang:commands.economy.multiplier.multi.supportStaff}",
 				hidden: true
 			},
 			specialPeeps: {
 				p: 0.050,
 				check: (userId: string, client: FurryBot) => ["192361753693126668"].includes(userId),
-				name: "Special Peeps",
+				name: "{lang:commands.economy.multiplier.multi.special}",
 				hidden: true
 			}
 		};

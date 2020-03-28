@@ -6,6 +6,8 @@ import chunk from "chunk";
 import config from "../../config";
 import { Colors } from "../../util/Constants";
 import { Utility, Internal } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import Language from "../../util/Language";
 
 export default new Command({
 	triggers: [
@@ -17,11 +19,9 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 1e3,
 	donatorCooldown: 1e3,
-	description: "Edit this servers settings.",
-	usage: "",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const str = config.settings.map(s => ({ [s.name.toLowerCase()]: s.dbName })).reduce((a, b) => ({ ...a, ...b }));
 
 	const booleanChoices = {
@@ -37,25 +37,22 @@ export default new Command({
 
 	if (msg.args.length === 0 || !isNaN(Number(msg.args[0]))) {
 		const page = msg.args.length < 1 ? 1 : Number(msg.args[0]);
-		const pages = chunk(config.settings, 5).map(s => s.map(ss => ({ ...ss, value: msg.gConfig.settings[ss.dbName] })));
-		if (page > pages.length) return msg.reply("invalid settings page.");
+		const pages = chunk(config.settings, 5).map(s => s.map(ss => ({ ...ss, value: gConfig.settings[ss.dbName] })));
+		if (page > pages.length) return msg.reply("{lang:commands.utility.settings.invalidPage}");
 
 		return msg.channel.createMessage({
-			embed: {
-				title: "Server Settings",
-				description: [
+			embed: new EmbedBuilder(gConfig.settings.lang)
+				.setTitle("{lang:commands.utility.settings.title}")
+				.setDescription([
 					...pages[page - 1].map(s => [
 						`**${s.name}**`,
-						`Value: ${s.type === "boolean" ? !!s.value ? `<:${config.emojis.greenTick}>` : `<:${config.emojis.redTick}>` : s.type === "channel" ? !s.value ? "NONE" : `<#${s.value}>` : s.type === "role" ? !s.value ? "NONE" : `<@&${s.value}>` : `**${Internal.sanitize(![undefined, null].includes(s.value) ? s.value.toString() : "No Value")}**`}`,
+						`{lang:commands.utility.settings.value}: ${s.type === "boolean" ? !!s.value ? `<:${config.emojis.greenTick}>` : `<:${config.emojis.redTick}>` : s.type === "channel" ? !s.value ? "{lang:commands.utility.settings.none}" : `<#${s.value}>` : s.type === "role" ? !s.value ? "{lang:commands.utility.settings.none}" : `<@&${s.value}>` : `**${Internal.sanitize(![undefined, null].includes(s.value) ? s.value.toString() : "{lang:commands.utility.settings.noValue}")}**`}`,
 						s.description
 					].join("\n"))
-				].join("\n\n"),
-				footer: {
-					text: `Page ${page}/${pages.length} | ${msg.gConfig.settings.prefix}settings <page> | ${msg.gConfig.settings.prefix}settings <name> <value>`
-				},
-				timestamp: new Date().toISOString(),
-				color: Colors.gold
-			}
+				].join("\n\n"))
+				.setFooter(`{lang:commands.utility.settings.footer|${page}|${pages.length}|${gConfig.settings.prefix}}`)
+				.setTimestamp(new Date().toISOString())
+				.setColor(Colors.gold)
 		});
 	}
 
@@ -72,21 +69,21 @@ export default new Command({
 		} else continue;
 	}
 
-	if (!s) return msg.reply("could not find that setting.");
-	let cur = msg.gConfig.settings[s];
+	if (!s) return msg.reply("{lang:commands.utility.settings.notFound}");
+	let cur = gConfig.settings[s];
 
 	switch (config.settings.find(st => st.dbName === s).type) {
 		case "channel": {
 			if (!v) {
 				if (cur && !msg.channel.guild.channels.has(cur)) {
-					await msg.gConfig.edit({
+					await gConfig.edit({
 						settings: {
 							[s]: null
 						}
 					});
 					cur = null;
 				}
-				return msg.reply(`**${n}** is currently set to ${cur ? `<#${cur}>` : "None"}`);
+				return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? `<#${cur}>` : "{lang:commands.utility.settings.none}"}`);
 			}
 			let ci: string;
 			const a = v.match("^([0-9]{17,19})$");
@@ -97,26 +94,26 @@ export default new Command({
 			if (b && b.length > 1) ci = b[1];
 			if (c) ci = c.id;
 
-			if (ci === msg.gConfig.settings[s]) return msg.reply("unchanged.");
+			if (ci === gConfig.settings[s]) return msg.reply("{lang:commands.utility.settings.unchanged}");
 
 			const ch = msg.channel.guild.channels.get(ci);
-			if (!ch) return msg.reply("I couldn't find that channel..");
-			if (!ch.permissionsOf(this.user.id).has("sendMessages")) return msg.reply(`I don't seem to be able to send messages in <#${ch.id}>..`);
+			if (!ch) return msg.reply("{lang:commands.utility.settings.chNotFound}");
+			if (!ch.permissionsOf(this.user.id).has("sendMessages")) return msg.reply(`{lang:commands.utility.settings.chPermMissing|${ch.id}}`);
 
-			await msg.gConfig.edit({
+			await gConfig.edit({
 				settings: {
 					[s]: ch.id
 				}
 			});
 
-			return msg.reply(`changed **${n}** from ${cur === null ? "NONE" : `<#${cur}>`} to <#${ch.id}>.`);
+			return msg.reply(`{lang:commands.utility.settings.set${n}|${cur === null ? "{lang:commands.utility.settings.none}" : `<#${cur}>`}|<#${ch.id}}`);
 			break;
 		}
 
 		case "role": {
 			if (!v) {
 				if (cur && !msg.channel.guild.roles.has(cur)) {
-					await msg.gConfig.edit({
+					await gConfig.edit({
 						settings: {
 							[s]: null
 						}
@@ -126,7 +123,7 @@ export default new Command({
 
 				let k: Eris.Role;
 				if (cur) k = msg.channel.guild.roles.get(cur);
-				return msg.reply(`**${n}** is currently set to ${cur ? k.name : "None"}`);
+				return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? k.name : "{lang:commands.utility.settings.none}"}}`);
 			}
 			let ri: string;
 			const a = v.match("^([0-9]{17,19})$");
@@ -138,70 +135,70 @@ export default new Command({
 			if (c) ri = c.id;
 
 			const r = msg.channel.guild.roles.get(ri);
-			if (!r) return msg.reply("I couldn't find that role..");
-			if (r.id === msg.gConfig.settings[s]) return msg.reply("unchanged.");
+			if (!r) return msg.reply("{lang:commands.utility.settings.roleNotFound}");
+			if (r.id === gConfig.settings[s]) return msg.reply("{lang:commands.utility.settings.unchanged}");
 			const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), r);
 
-			if (p.lower || p.same) return msg.reply("that role is higher than, or as high as my top role. Therefore, I cannot touch it, please move it below me, or move me above it.");
+			if (p.lower || p.same) return msg.reply("{lang:commands.utility.settings.roleHigher}");
 
-			await msg.gConfig.edit({
+			await gConfig.edit({
 				settings: {
 					[s]: r.id
 				}
 			});
 
-			return msg.reply(`changed **${n}** to ${r.name}.`);
+			return msg.reply(`{lang:commands.utility.settings.set|${n}|${r.name}}`);
 			break;
 		}
 
 		case "boolean": {
-			if (!v) return msg.reply(`**${n}** is currently set to ${cur ? "Enabled" : "Disabled"}.`);
+			if (!v) return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? Language.parseString(gConfig.settings.lang, "{lang:commands.utility.settings.enabled}") : Language.parseString(gConfig.settings.lang, "{lang:commands.utility.settings.disabled}")}}`);
 
-			if (!Object.keys(booleanChoices).includes(v.toLowerCase())) return msg.reply("invalid value.");
+			if (!Object.keys(booleanChoices).includes(v.toLowerCase())) return msg.reply("{lang:commands.utility.settings.invalidValue}");
 
 			const k = booleanChoices[v.toLowerCase()];
 
-			if (msg.gConfig.settings[s] === k) return msg.reply("unchanged.");
+			if (gConfig.settings[s] === k) return msg.reply("{lang:commands.utility.settings.unchanged}");
 
-			await msg.gConfig.edit({
+			await gConfig.edit({
 				settings: {
 					[s]: k
 				}
 			});
 
-			return msg.reply(`changed **${n}** from ${cur ? "Enabled" : "Disabled"} to ${k ? "Enabled" : "Disabled"}.`);
+			return msg.reply(`{lang:commands.utility.settings.set|${n}|${cur ? Language.parseString(gConfig.settings.lang, "{lang:commands.utility.settings.enabled}") : Language.parseString(gConfig.settings.lang, "{lang:commands.utility.settings.disabled}")}|${k ? Language.parseString(gConfig.settings.lang, "{lang:commands.utility.settings.enabled}") : Language.parseString(gConfig.settings.lang, "{lang:commands.utility.settings.disabled}")}}`);
 			break;
 		}
 
 		case "string": {
-			if (!v) return msg.reply(`**${n}** is currently set to ${Internal.sanitize(cur) || "No Value"}`);
+			if (!v) return msg.reply(`{lang:commands.utility.settings.current|${n}|${Internal.sanitize(cur) || "{lang:commands.utility.settings.noValue}"}}`);
 
-			if (msg.gConfig.settings[s] === v) return msg.reply("unchanged.");
+			if (gConfig.settings[s] === v) return msg.reply("{lang:commands.utility.settings.unchanged}");
 
-			await msg.gConfig.edit({
+			await gConfig.edit({
 				settings: {
 					[s]: v
 				}
 			});
 
-			return msg.reply(`changed **${n}** from ${Internal.sanitize(cur) || "No Value"} to ${Internal.sanitize(v)}.`);
+			return msg.reply(`{lang:commands.utility.settings.set|${n}|${Internal.sanitize(cur) || "{lang:commands.utility.settings.noValue}"}|${Internal.sanitize(v)}}`);
 			break;
 		}
 
 		case "number": {
-			if (!v) return msg.reply(`**${n}** is currently set to ${[undefined, null].includes(cur) ? "No Value" : cur}`);
+			if (!v) return msg.reply(`{lang:commands.utility.settings.current|${n}|${[undefined, null].includes(cur) ? "{lang:commands.utility.settings.noValue}" : cur}}`);
 			const num = Number(v);
-			if (isNaN(num)) return msg.reply("you must provide a valid number. (in most cases, 0 is \"disable\")");
+			if (isNaN(num)) return msg.reply("{lang:commands.utility.settings.invalidNumber}");
 
-			if (Number(msg.gConfig.settings[s]) === num) return msg.reply("unchanged.");
+			if (Number(gConfig.settings[s]) === num) return msg.reply("{lang:commands.utility.settings.unchanged}");
 
-			await msg.gConfig.edit({
+			await gConfig.edit({
 				settings: {
 					[s]: v
 				}
 			});
 
-			return msg.reply(`changed **${n}** from ${[undefined, null].includes(cur) ? "No Value" : cur} to ${v} .`);
+			return msg.reply(`{lang:commands.utility.settings.set|${n}|${[undefined, null].includes(cur) ? "{lang:commands.utility.settings.noValue}" : cur}|${v}}`);
 			break;
 		}
 	}

@@ -4,6 +4,7 @@ import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import { mdb } from "../../modules/Database";
 import chunk from "chunk";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -14,44 +15,33 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 5e3,
 	donatorCooldown: 5e3,
-	description: "List this servers self assignable roles.",
-	usage: "[page]",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	const roles = msg.gConfig.selfAssignableRoles;
+}, (async function (msg, uConfig, gConfig, cmd) {
+	const roles = gConfig.selfAssignableRoles;
 	const page = msg.args.length > 0 ? parseInt(msg.args[0], 10) : 1;
-	if (roles.length === 0) return msg.reply("There are no roles set as self assignable.");
+	if (roles.length === 0) return msg.reply("{lang:commands.utility.lsar.noRoles}");
 	const c = chunk(roles, 10);
-	if (c.length === 0) return msg.reply("There are no roles set as self assignable.");
-	if (!page || page > c.length) return msg.reply("Invalid page.");
+	if (c.length === 0) return msg.reply("{lang:commands.utility.lsar.noRoles}");
+	if (!page || page > c.length) return msg.reply("{lang:commands.utility.lsar.invalidPage}");
 	const remove = [];
 	const rl = roles.map(a => {
 		const b = msg.channel.guild.roles.get(a);
 		if (!b) {
 			remove.push(a);
-			return `Role Not Found - \`${a}\``;
+			return `{lang:commands.utility.lsar.notFound} - \`${a}\``;
 		}
 		return b.name;
 	}).join("\n");
 	if (remove.length > 0) await mdb.collection("guilds").findOneAndUpdate({ id: msg.channel.guild.id }, { $pull: { selfAssignableRoles: { $each: remove } } });
-	const embed: Eris.EmbedOptions = {
-		title: "Self Assignable Roles",
-		description: `To gain a role, use the command \`${msg.gConfig.settings.prefix}iam <role name>\`\nTo go to the next page, use \`${msg.gConfig.settings.prefix}lsar [page]\`.\nPage ${page}/${c.length}`,
-		fields: [
-			{
-				name: "Roles",
-				value: rl,
-				inline: false
-			}
-		],
-		author: {
-			name: msg.author.tag,
-			icon_url: msg.author.avatarURL
-		},
-		timestamp: new Date().toISOString(),
-		color: Math.floor(Math.random() * 0xFFFFFF)
-	};
 
-	return msg.channel.createMessage({ embed });
+	return msg.channel.createMessage({
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle("{lang:commands.utility.lsar.title}")
+			.setDescription(`{lang:commands.utility.lsar.desc|${gConfig.settings.prefix}|${page}|${c.length}}`)
+			.addField("{lang:commands.utility.lsar.roles}", rl, false)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Math.floor(Math.random() * 0xFFFFFF))
+	});
 }));

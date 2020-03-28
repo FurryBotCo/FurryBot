@@ -1,13 +1,14 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import { mdb } from "../../modules/Database";
+import Eris from "eris";
+import { Utility } from "../../util/Functions";
 import config from "../../config";
-import * as Eris from "eris";
+import Language from "../../util/Language";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
-		"log",
-		"logevents"
+		"log"
 	],
 	userPermissions: [
 		"manageGuild"
@@ -15,23 +16,22 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
-	description: "Enable or disable logging.",
-	usage: "[enable/disable] [event/all] [channel]",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const a = ["enable", "disable"];
-	const b = [...Object.keys(config.defaults.guildConfig.logEvents).map(e => e.toLowerCase()), "all"];
+	const b = [...Object.keys(config.defaults.config.guild.logEvents).map(e => e.toLowerCase()), "all"];
 	if (msg.args.length >= 2) {
-		if (!a.includes(msg.args[0].toLowerCase())) return msg.reply(`invalid option, valid options: **${a.join("**, **")}**.`);
-		if (!b.includes(msg.args[1].toLowerCase())) return msg.reply(`invalid option, valid options: **${b.join("**, **")}**.`);
+		if (!a.includes(msg.args[0].toLowerCase())) return msg.reply(`{lang:commands.moderation.log.invalidOption}: **${a.join("**, **")}**.`);
+		if (!b.includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.moderation.log.invalidOption}: **${b.join("**, **")}**.`);
 		const c = msg.args[0].toLowerCase() === "disable" ? false : true;
 		let ch = await msg.getChannelFromArgs(2);
 		if (!ch) ch = msg.channel;
+		if (ch.guild.id !== msg.channel.guild.id) return msg.reply("{lang:commands.moderation.log.thisServer}");
 
 		if (msg.args[1].toLowerCase() === "all") {
-			await msg.gConfig.edit({
-				logEvents: Object.keys(config.defaults.guildConfig.logEvents)
+			await gConfig.edit({
+				logEvents: Object.keys(config.defaults.config.guild.logEvents)
 					.map(e => ({
 						[e]: {
 							channel: ch.id,
@@ -40,12 +40,12 @@ export default new Command({
 					})).reduce((a, b) => ({ ...a, ...b }), {})
 			}).then(d => d.reload());
 
-			if (c) return msg.reply(`enabled the logging of everything in channel <#${ch.id}>.`);
-			else return msg.reply(`disabled the logging of everything.`);
+			if (c) return msg.reply(`{lang:commands.moderation.log.enabledAll|${ch.id}}`);
+			else return msg.reply(`{lang:commands.moderation.log.disableAll}`);
 		} else {
-			const ev = Object.keys(config.defaults.guildConfig.logEvents)[Object.keys(config.defaults.guildConfig.logEvents).map(k => k.toLowerCase()).indexOf(msg.args[1].toLowerCase())];
+			const ev = Object.keys(config.defaults.config.guild.logEvents)[Object.keys(config.defaults.config.guild.logEvents).map(k => k.toLowerCase()).indexOf(msg.args[1].toLowerCase())];
 
-			await msg.gConfig.edit({
+			await gConfig.edit({
 				logEvents: {
 					[ev]: {
 						channel: ch.id,
@@ -54,16 +54,16 @@ export default new Command({
 				}
 			}).then(d => d.reload());
 
-			if (c) return msg.reply(`enabled the logging of **${ev}** in channel <#${ch.id}>.`);
-			else return msg.reply(`disabled the logging of **${ev}**.`);
+			if (c) return msg.reply(`{lang:commands.moderation.log.eventEnabled|${ev}|${ch.id}}`);
+			else return msg.reply(`{lang:commands.moderation.log.eventDisabled|${ev}}`);
 		}
 	} else if (msg.args.length === 0) {
 		const d = [];
-		await Promise.all(Object.keys(config.defaults.guildConfig.logEvents).map(async (k) => {
-			const j = msg.gConfig.logEvents[k];
-			if (!j || !j.enabled) return d.push(`${k} - **disabled**`);
+		await Promise.all(Object.keys(config.defaults.config.guild.logEvents).map(async (k) => {
+			const j = gConfig.logEvents[k];
+			if (!j || !j.enabled) return d.push(`${k} - **{lang:commands.moderation.log.disabled}**`);
 			const ch = msg.channel.guild.channels.get(j.channel);
-			if (!ch) await msg.gConfig.edit({
+			if (!ch) await gConfig.edit({
 				logEvents: {
 					[k]: {
 						channel: null,
@@ -74,16 +74,13 @@ export default new Command({
 			return d.push(`${k} - <#${j.channel}>`);
 		}));
 
-		const embed: Eris.EmbedOptions = {
-			title: "Log Events",
-			description: d.join("\n"),
-			timestamp: new Date().toISOString(),
-			author: {
-				name: msg.channel.guild.name,
-				icon_url: msg.channel.guild.iconURL
-			}
-		};
-
-		return msg.channel.createMessage({ embed });
+		return msg.channel.createMessage({
+			embed: new EmbedBuilder(gConfig.settings.lang)
+				.setTitle("{lang:commands.moderation.log.title}")
+				.setDescription(d.join("\n"))
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setTimestamp(new Date().toISOString())
+				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+		});
 	} else return new Error("ERR_INVALID_USAGE");
 }));

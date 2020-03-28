@@ -1,7 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import * as Eris from "eris";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
+import config from "../../config";
+import phin from "phin";
 import Permissions from "../../util/Permissions";
 
 export default new Command({
@@ -13,13 +14,11 @@ export default new Command({
 	botPermissions: [
 		"embedLinks"
 	],
-	cooldown: 2e3,
-	donatorCooldown: 1e3,
-	description: "Check your permissions, and my permissions.",
-	usage: "",
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const allowUser = [],
 		denyUser = [],
 		allowBot = [],
@@ -44,27 +43,14 @@ export default new Command({
 	const ab = allowBot.length === 0 ? "NONE" : allowBot.join("**, **");
 	const db = denyBot.length === Object.keys(Permissions.constant).length ? "NONE" : denyBot.join("**, **");
 
+
 	return msg.channel.createMessage({
-		embed: {
-			title: "Permission Info",
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			fields: [
-				{
-					name: "User",
-					value: `__Allow__:\n**${au.length === 0 ? "NONE" : au
-						}**\n\n\n__Deny__:\n**${du.length === 0 ? "NONE" : du}**`,
-					inline: false
-				}, {
-					name: "Bot",
-					value: `__Allow__:\n**${ab.length === 0 ? "NONE" : ab}**\n\n\n__Deny__:\n**${db.length === 0 ? "NONE" : db}**`,
-					inline: false
-				}
-			],
-			timestamp: new Date().toISOString(),
-			color: Math.floor(Math.random() * 0xFFFFFF)
-		}
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle("{lang:commands.information.perms.title}")
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Colors.green)
+			.addField("{lang:commands.information.perms.user}", `__Allow__:\n**${au.length === 0 ? "NONE" : au}**\n\n\n__Deny__:\n**${du.length === 0 ? "NONE" : du}**`)
+			.addField("{lang:commands.information.perms.bot}", `__Allow__:\n**${ab.length === 0 ? "NONE" : ab}**\n\n\n__Deny__:\n**${db.length === 0 ? "NONE" : db}**`)
 	});
 }));

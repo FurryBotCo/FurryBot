@@ -38,21 +38,10 @@ class Snowflake {
 		return dec;
 	}
 
-	get getSnowflake() {
-		return this._generate;
-	}
-
-	get getId() {
-		return this._generate;
-	}
-
-	get get() {
-		return this._generate;
-	}
-
-	get generate() {
-		return this._generate;
-	}
+	get getSnowflake() { return this._generate; }
+	get getId() { return this._generate; }
+	get get() { return this._generate; }
+	get generate() { return this._generate; }
 }
 
 export default Snowflake;

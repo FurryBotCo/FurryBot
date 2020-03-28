@@ -1,6 +1,6 @@
 
-import ExtendedMessage from "@ExtendedMessage";
-import FurryBot from "@FurryBot";
+import ExtendedMessage from "../modules/ExtendedMessage";
+import FurryBot from "../main";
 
 class MessageCollector {
 	collectors: {

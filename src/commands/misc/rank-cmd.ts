@@ -1,10 +1,8 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import * as Eris from "eris";
-import { db } from "../../modules/Database";
 import config from "../../config";
+import Eris from "eris";
 import { Colors } from "../../util/Constants";
+import db from "../../modules/Database";
 
 export default new Command({
 	triggers: [
@@ -15,24 +13,18 @@ export default new Command({
 		"embedLinks"
 	],
 	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	description: "Get a users rank.",
-	usage: "[@user]",
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// await msg.channel.startTyping();
+}, (async function (msg, uConfig, gConfig, cmd) {
 	let user: Eris.User;
 	if (msg.args.length < 1) user = msg.author;
 	else user = await msg.getUserFromArgs();
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
+	const c = await db.getUser(user.id);
 
-	/*const users = await Promise.all(msg.channel.guild.members.map(async (m) => db.getUser(m.id))).then(m => m.sort((a, b) => b.getLevel(msg.channel.guild.id) - a.getLevel(msg.channel.guild.id)));
-
-	const u = users.map((v, i) => ({ v, i })).filter(m => m.v.id === user.id).map(k => ({ ...k, l: k.v.getLevel(msg.channel.guild.id) }))[0];*/
-
-	const lvl = config.leveling.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id)/*u.l*/);
+	const lvl = config.leveling.calcLevel(c.getLevel(msg.channel.guild.id));
 	const n = config.leveling.calcExp(lvl.level + 1);
 	return msg.channel.createMessage({
 		embed: {

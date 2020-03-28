@@ -1,26 +1,22 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
 	triggers: [
-		"ping",
-		"pong"
+		"ping"
 	],
 	userPermissions: [],
-	botPermissions: [],
-	cooldown: .5e3,
-	donatorCooldown: .25e3,
-	description: "Get my average ping.",
-	usage: "",
+	botPermissions: [
+		"embedLinks"
+	],
+	cooldown: 1e3,
+	donatorCooldown: .5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// await msg.channel.startTyping();
-	return msg.channel.createMessage("Checking Ping..")
-		.then(m => m.edit("Ping Calculated!"))
+}, (async function (msg, uConfig, gConfig, cmd) {
+	return msg.channel.createMessage("{lang:commands.information.ping.check}")
+		.then(m => m.edit("{lang:commands.information.ping.calc}"))
 		.then(async (m) => {
-			await msg.channel.createMessage(`Client Ping: ${Number(m.timestamp - msg.timestamp).toLocaleString()}ms${"\n"}Shard Ping: ${Number(msg.guild.shard.latency).toLocaleString()}ms`);
+			await msg.channel.createMessage(`{lang:commands.information.ping.client}: ${Number(m.timestamp - msg.timestamp).toLocaleString()}ms${"\n"}{lang:commands.information.ping.shard}: ${Number(msg.channel.guild.shard.latency).toLocaleString()}ms`);
 			return m.delete();
 		});
 }));

@@ -1,16 +1,12 @@
 import ClientEvent from "../util/ClientEvent";
 import { Logger } from "../util/LoggerV8";
-import FurryBot from "@FurryBot";
+import FurryBot from "../main";
 import * as Eris from "eris";
 import config from "../config";
 import { Colors } from "../util/Constants";
 import { Internal } from "../util/Functions";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
-	this.decrement([
-		"events.guildDelete"
-	]);
-
 	await Internal.incrementDailyCounter(this, false);
 
 	let author = {

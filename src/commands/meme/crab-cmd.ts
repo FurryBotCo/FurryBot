@@ -17,8 +17,6 @@ export default new Command({
 	],
 	cooldown: 12.5e3,
 	donatorCooldown: 1e4,
-	description: "Crab rave!",
-	usage: "<text>",
 	features: [],
 	file: __filename
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
@@ -34,7 +32,7 @@ export default new Command({
 	} catch (e) {
 		b = null;
 	}
-	if (b !== null) await msg.channel.createMessage(`It seems there may have been an api error..\n\`\`\`json\n${JSON.stringify(b)}\n\`\`\`\n\nIf this says something about being ratelimited, please try again in a few seconds. Else, report it to our support server: ${config.bot.supportInvite}`);
+	if (b !== null) await msg.channel.createMessage(`It seems there may have been an api error..\n\`\`\`json\n${JSON.stringify(b)}\n\`\`\`\n\nIf this says something about being ratelimited, please try again in a few seconds. Else, report it to our support server: ${config.bot.supportURL}`);
 	await m.delete();
 	return msg.channel.createMessage("", {
 		name: "crab.mp4",

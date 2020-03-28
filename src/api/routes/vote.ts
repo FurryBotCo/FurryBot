@@ -40,8 +40,8 @@ export default (async (client: FurryBot) => {
 				let bal = await mdb.collection("users").findOne({ id: req.body.user }).then(res => res.bal + config.eco.voteAmount).catch(err => null);
 
 				if (!bal) {
-					await mdb.collection("users").insertOne({ ...{ id: req.body.user, ...config.defaults.userConfig } });
-					bal = config.defaults.userConfig.bal;
+					await mdb.collection("users").insertOne({ ...{ id: req.body.user, ...config.defaults.config.user } });
+					bal = config.defaults.config.user.bal;
 				}
 
 				await mdb.collection("users").findOneAndUpdate({ id: req.body.user }, { $set: { bal } });

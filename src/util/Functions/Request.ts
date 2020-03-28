@@ -94,8 +94,8 @@ export default class Request {
 			method: "POST",
 			url: `https://dankmemer.services/api${path}`,
 			headers: {
-				"Authorization": config.apis.dankMemer.token,
-				"User-Agent": config.userAgent,
+				"Authorization": config.keys.dankMemer.token,
+				"User-Agent": config.web.userAgent,
 				"Content-Type": "application/json"
 			},
 			data,
@@ -112,7 +112,7 @@ export default class Request {
 				url: `https://api.chewey-bot.top/${cat}`,
 				headers: {
 					"User-Agent": config.web.userAgent,
-					"Authorization": config.apis.chewyBot.key
+					"Authorization": config.keys.chewyBot.key
 				},
 				timeout: 5e3
 			});

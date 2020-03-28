@@ -1,72 +1,77 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import { db } from "../../modules/Database";
-import { Request } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Request, Internal } from "../../util/Functions";
+import Logger from "../../util/LoggerV8";
+import db from "../../modules/Database";
+import Eris from "eris";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
-		"marry",
-		"propose"
+		"marry"
 	],
 	userPermissions: [],
-	botPermissions: [],
-	cooldown: 3e4,
-	donatorCooldown: 1.5e4,
-	description: "Propose to someone!",
-	usage: "<@member>",
+	botPermissions: [
+		"embedLinks"
+	],
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const member = await msg.getMemberFromArgs();
 	if (!member) return msg.errorEmbed("INVALID_USER");
 	const m = await db.getUser(member.id);
 
-	if ([undefined, null].includes(msg.uConfig.marriage)) await msg.uConfig.edit({
+	if ([undefined, null].includes(uConfig.marriage)) await uConfig.edit({
 		marriage: {
 			married: false,
 			partner: null
 		}
 	}).then(d => d.reload());
 
-	if (msg.uConfig.marriage.married) {
-		const u = await this.getRESTUser(msg.uConfig.marriage.partner).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
-		return msg.reply(`hey, hey! You're already married to **${u}**! You can get a divorce though..`);
+	if (msg.author.id === member.id) return msg.reply("{lang:commands.fun.marry.noSelf}");
+	if (member.bot) return msg.reply("{lang:commands.fun.marry.noBot}");
+	if (uConfig.marriage.married) {
+		const u = await this.getRESTUser(uConfig.marriage.partner).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
+		return msg.reply(`{lang:commands.fun.marry.selfAlreadyMarried|${u}}`);
 	}
 
 	if (m.marriage.married) {
 		const u = await this.getRESTUser(m.marriage.partner).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
-		return msg.reply(`hey, hey! They're already married to **${u}**!`);
+		return msg.reply(`{lang:commands.fun.marry.otherAlreadyMarried|${u}}`);
 	}
 
 	const img = await Request.imageAPIRequest(false, "propose", true, true);
 
-	if (["embedLinks", "attachFiles"].some(p => msg.channel.permissionsOf(this.user.id).has(p)) && img.success === true) await msg.channel.createMessage({
-		embed: {
-			title: "Marriage Proposal!",
-			description: `<@!${msg.author.id}> has proposed to <@!${member.id}>!`,
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			image: {
-				url: "attachment://marry.png"
-			},
-			color: Math.floor(Math.random() * 0xFFFFFF),
-			timestamp: new Date().toISOString()
-		},
-		content: `<@!${msg.author.id}> has proposed to <@!${member.id}>!\n<@!${member.id}> do you accept? **yes** or **no**.`
-	}, {
-		file: await Request.getImageFromURL(img.response.image),
-		name: "marry.png"
-	});
-	else await msg.channel.createMessage(`<@!${msg.author.id}> has proposed to <@!${member.id}>!\n<@!${member.id}> do you accept? **yes** or **no**.${img.success ? "\n\n(TIP: you could get images in this command if I had the `attachFiles`, and `embedLinks` permissions!)" : ""}`);
+	let d: Eris.Message<Eris.TextableChannel>;
+	let force = false;
+	if (msg.dashedArgs.parsed.value.includes("force")) {
+		if (!config.developers.includes(msg.author.id)) return msg.reply("{lang:commands.fun.marry.devOnly}");
+		else force = true;
+	}
+	if (!force) {
+		if (["embedLinks", "attachFiles"].some(p => msg.channel.permissionsOf(this.user.id).has(p)) && img.success === true) await msg.channel.createMessage({
+			embed: new EmbedBuilder(gConfig.settings.lang)
+				.setTitle("{lang:commands.fun.marry.title}")
+				.setDescription(`{lang:commands.fun.marry.text|${msg.author.id}|${member.id}}`)
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setImage("attachment://marry.png")
+				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+				.setTimestamp(new Date().toISOString()),
+			content: `{lang:commands.fun.marry.content|${msg.author.id}|${member.id}}`
+		}, {
+			file: await Request.getImageFromURL(img.response.image),
+			name: "marry.png"
+		});
+		else await msg.channel.createMessage(`{lang:commands.fun.marry.content|${msg.author.id}|${member.id}}${img.success ? "\n\n(TIP: you could get images in this command if I had the `attachFiles`, and `embedLinks` permissions!)" : ""}`);
 
-	const d = await this.messageCollector.awaitMessage(msg.channel.id, member.id, 6e4);
-	if (!d) return msg.reply("Seems like we didn't get a reply..");
-	if (!["yes", "no"].includes(d.content.toLowerCase())) return msg.channel.createMessage(`<@!${member.id}>, that wasn't a valid option..`);
+		d = await this.col.awaitMessage(msg.channel.id, member.id, 6e4);
+		if (!d) return msg.reply("{lang:commands.fun.marry.noReply}");
+		if (!["yes", "no"].includes(d.content.toLowerCase())) return msg.channel.createMessage(`{lang:commands.fun.marry.invalidOption|${member.id}}`);
+	} else d = { content: "yes" } as any;
 	if (d.content.toLowerCase() === "yes") {
-		await msg.uConfig.edit({
+		await uConfig.edit({
 			marriage: {
 				married: true,
 				partner: member.id
@@ -78,8 +83,8 @@ export default new Command({
 				partner: msg.author.id
 			}
 		}).then(d => d.reload());
-		return msg.channel.createMessage(`Congrats <@!${msg.author.id}> and <@!${member.id}> :ring:!`);
+		return msg.channel.createMessage(`{lang:commands.fun.marry.accepted|${msg.author.id}|${member.id}}`);
 	} else {
-		return msg.reply("Better luck next time!");
+		return msg.reply("{lang:commands.fun.marry.denied}");
 	}
 }));

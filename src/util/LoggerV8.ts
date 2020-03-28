@@ -69,13 +69,13 @@ class LoggerV8 {
 				}
 
 				if (typeof msg.indexOf !== "undefined") {
-					if (msg.indexOf(config.bot.token)) msg = msg.replace(config.bot.token, "[TOKEN]");
+					if (msg.indexOf(config.bot.client.token)) msg = msg.replace(config.bot.client.token, "[TOKEN]");
 					if (msg.indexOf(config.universalKey)) msg = msg.replace(config.universalKey, "[KEY]");
 				}
 
 				// .replace(/[^\[\]\w\s:\(\)#\|\.,_-]/gmi, "")
-				if (!fs.existsSync(`${config.logsDir}/client/${d}.log`)) fs.writeFileSync(`${config.logsDir}/client/${d}.log`, "");
-				fs.appendFileSync(`${config.logsDir}/client/${d}.log`, `[${dt.toTimeString().split(" ")[0]}][${type.toUpperCase()}] ${source} | ${mn}\n`);
+				if (!fs.existsSync(`${config.dir.logs}/client/${d}.log`)) fs.writeFileSync(`${config.dir.logs}/client/${d}.log`, "");
+				fs.appendFileSync(`${config.dir.logs}/client/${d}.log`, `[${dt.toTimeString().split(" ")[0]}][${type.toUpperCase()}] ${source} | ${mn}\n`);
 				process.stdout.write(`${chalk.grey(`[${dt.toTimeString().split(" ")[0]}]`)} ${source} | ${chalk[colors[type]](msg)}\n`);
 				return true;
 			} catch (e) {

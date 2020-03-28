@@ -1,9 +1,6 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import * as Eris from "eris";
-import { Time, Internal } from "../../util/Functions";
-import { Colors } from "../../util/Constants";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Time } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -15,64 +12,44 @@ export default new Command({
 	botPermissions: [
 		"embedLinks"
 	],
-	cooldown: 2e3,
-	donatorCooldown: 1e3,
-	description: "Get some info about a user.",
-	usage: "[@member/id]",
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
-	const roles = user.roles.map(role => role !== msg.channel.guild.id ? `<@&${role}>` : "@everyone");
+	const m = Array.from(msg.channel.guild.members.values()).sort((a, b) => a.joinedAt - b.joinedAt).map(m => m.id);
 
-	// @TODO member number
-	// const members = Array.from(msg.channel.guild.members.values()).sort((a, b) => a.joinedAt < b.joinedAt ? -1 : a.joinedAt > b.joinedAt ? 1 : 0).map(m => m.id);
-	// console.log(members.length);
-	// const pos = members.indexOf(user.id);
-	// const around = members.slice(pos <= 2 ? 0 : pos - 2, pos <= 2 ? 5 : pos + 2);
-	// console.log(around.length);
-	// console.log(pos);
-	const embed: Eris.EmbedOptions = {
-		title: "User info",
-		description: [
-			`\u25FD Tag: ${user.username}#${user.discriminator} (<@!${user.id}>)`,
-			`\u25FD ID: ${user.id}`,
-			`\u25FD Server Join Date: ${Time.formatDateWithPadding(user.joinedAt, true)}`,
-			`\u25FD Account Creation Date: ${Time.formatDateWithPadding(user.createdAt, true)}`,
-			`\u25FD Roles [${roles.length}]: ${roles.length > 15 ? `Too many roles to list, please use \`${msg.gConfig.settings.prefix}roles ${user.user.id}\`` : roles.length === 0 ? "NONE" : roles.toString()}`
-		].join("\n"),
-		thumbnail: {
-			url: user.avatarURL
-		},
-		timestamp: new Date().toISOString(),
-		color: Colors.gold
-	};
+	const around = [...workItOut(true), user.id, ...workItOut(false)];
 
-	// @FIXME fix this eventually
-	/*if (!user.user.bot) {
-		const u = await Internal.getUser(user.id);
-
-		if (u.marriage.married) embed.fields.push({
-			name: "Marriage Status (on this bot)",
-			value: `Married to ${await this.getRESTUser(u.marriage.partner).then(usr => `${usr.username}#${usr.discriminator}`).catch(err => "Unknown#0000")}`,
-			inline: true
-		});
-
-		else embed.fields.push({
-			name: "Marriage Status (on this bot)",
-			value: "Not Married.",
-			inline: false
-		});
-	} else embed.fields.push({
-		name: "Marriage Status (on this bot)",
-		value: "Bots cannot be married.",
-		inline: false
-	});*/
+	function workItOut(n: boolean) {
+		const k: string[] = [];
+		for (let i = 1; i < 3; i++) {
+			const d = n ? m.indexOf(user.id) - i : m.indexOf(user.id) + i;
+			console.log(d);
+			if (d < 0 || d > (m.length - 1)) continue;
+			else k.push(m[d]);
+		}
+		return k;
+	}
 
 	return msg.channel.createMessage({
-		embed
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle(`{lang:commands.information.uinfo.title}`)
+			.setImage(user.avatarURL)
+			.setDescription([
+				`\u25FD {lang:commands.information.uinfo.tag}: ${user.username}#${user.discriminator} (<@!${user.id}>)`,
+				`\u25FD {lang:commands.information.uinfo.id}: ${user.id}`,
+				`\u25FD {lang:commands.information.uinfo.joinDate}: ${Time.formatDateWithPadding(user.joinedAt, true)}`,
+				`\u25FD {lang:commands.information.uinfo.creationDate}: ${Time.formatDateWithPadding(user.createdAt, true)}`,
+				`\u25FD {lang:commands.information.uinfo.roles} [${user.roles.length}]: ${user.roles.reduce((a, b) => a + msg.channel.guild.roles.get(b).name.length, 0) > 750 ? `{lang:commands.information.uinfo.tooManyRoles|${gConfig.settings.prefix}|${user.user.id}}` : user.roles.length === 0 ? "NONE" : user.roles.map(r => `<@&${r}>`).join(" ")}`,
+				`\u25FD {lang:commands.information.uinfo.joinPos}: #${m.indexOf(user.id) + 1}`,
+				`\u25FD {lang:commands.information.uinfo.nearbyJoins} ${around.map(a => a === msg.author.id ? `**<@!${a}>**` : `<@!${a}>`).join(" > ")}`
+			].join("\n"))
+			.setTimestamp(new Date().toISOString())
+			.setColor(Math.floor(Math.random() * 0xFFFFFF))
 	});
 }));

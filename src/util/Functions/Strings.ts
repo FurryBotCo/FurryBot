@@ -65,23 +65,6 @@ export default class Strings {
 	}
 
 	/**
-	 * Fetch a language message
-	 * @static
-	 * @param {string} lang - language to fetch from
-	 * @param {Command} cmd - command to fetch for
-	 * @returns {string}
-	 * @memberof Strings
-	 */
-	static fetchLangMessage(lang: string, cmd: Command) {
-		if (!lang || !Object.keys(config.lang).includes(lang.toLowerCase())) throw new TypeError("invalid language provided");
-		if (!cmd) throw new TypeError("invalid command provided");
-
-		const l = config.lang[lang.toLowerCase()][cmd.triggers[0].toLowerCase()];
-		if (!l) return "";
-		return l[Math.floor(Math.random() * l.length)];
-	}
-
-	/**
 	 * ascii escape string
 	 * @static
 	 * @param {string} str - string to escape

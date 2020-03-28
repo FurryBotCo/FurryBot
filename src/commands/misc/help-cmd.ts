@@ -1,31 +1,22 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import Eris from "eris";
+import EmbedBuilder from "../../util/EmbedBuilder";
 import config from "../../config";
-import * as Eris from "eris";
 import { Time } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
-		"help",
-		"h",
-		"?"
+		"help"
 	],
 	userPermissions: [],
 	botPermissions: [
 		"embedLinks"
 	],
-	cooldown: 1e3,
-	donatorCooldown: .5e3,
-	description: "Get some help with the bot.",
-	usage: "[command/category]",
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// await msg.channel.startTyping();
-	// \u25FD
-	let embed: Eris.EmbedOptions;
-
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length === 0) {
 		const categories = [...this.cmd.categories];
 
@@ -33,70 +24,71 @@ export default new Command({
 			if ((c.devOnly && !config.developers.includes(msg.author.id))) categories.splice(categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()), categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()));
 		});
 
-		embed = {
-			title: "Command Help",
-			fields: categories.map(c => ({ name: `${c.displayName}`, value: `\`${msg.gConfig.settings.prefix}help ${c.name}\`\n[Hover for more info](https://furry.bot '${c.description}\n${c.commands.length} Commands Total')`, inline: true })),
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			timestamp: new Date().toISOString(),
-			color: Math.floor(Math.random() * 0xFFFFFF)
-		};
+		const embed = new EmbedBuilder(gConfig.settings.lang)
+			.setTitle("{lang:commands.misc.help.title}")
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Math.floor(Math.random() * 0xFFFFFF));
 
-		return msg.channel.createMessage({ embed });
+		categories.map(c => embed.addField(`${c.displayName}`, `\`${gConfig.settings.prefix}help ${c.name}\`\n[{lang:commands.misc.help.hoverInfo}](https://furry.bot '${c.description}\n${c.commands.length} {lang:commands.misc.help.cmdTotal}')`, true));
+
+		return msg.channel.createMessage({
+			embed
+		});
 	}
 
 	if (this.cmd.commandTriggers.includes(msg.args[0].toLowerCase())) {
-		const { cmd, cat } = this.cmd.getCommand(msg.args[0].toLowerCase());
+		const { cat, cmd } = this.cmd.getCommand(msg.args[0].toLowerCase());
 
-		if (!cmd) return msg.reply("Command not found.");
+		if (!cmd) return msg.reply("{lang:commands.misc.help.cmdNotFound}");
 
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) return msg.reply("you must be a developer to see this command.");
 
-		embed = {
-			title: cmd.triggers[0],
-			description: [
-				cmd.description,
-				"",
-				`**Restrictions**:`,
-				`\u25FD NSFW: **${cmd.features.includes("nsfw") ? "Yes" : "No"}**`,
-				`\u25FD Developer Only: **${cmd.features.includes("devOnly") ? "Yes" : "No"}**`,
-				`\u25FD Beta Only: **${cmd.features.includes("betaOnly") ? "Yes" : "No"}**`,
-				`\u25FD Guild Owner Only: **${cmd.features.includes("guildOwnerOnly") ? "Yes" : "No"}**`,
-				`\u25FD Support Server Only: **${cmd.features.includes("supportOnly") ? "Yes" : "No"}**`,
-				`\u25FD Donator Only: **${cmd.features.includes("donatorOnly") ? "Yes" : "No"}**`,
-				`\u25FD Premium Guild Only: **${cmd.features.includes("premiumGuildOnly") ? "Yes" : "No"}**`,
-				"",
-				`**Permissions**:`,
-				`\u25FD Bot: **${cmd.botPermissions.length === 0 ? "NONE" : cmd.botPermissions.join("**, **")}**`,
-				`\u25FD User: **${cmd.userPermissions.length === 0 ? "NONE" : cmd.userPermissions.join("**, **")}**`,
-				"",
-				"**Extra**:",
-				`\u25FD Usage: \`${msg.gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
-				`\u25FD Aliases: ${cmd.triggers.join(", ")}`,
-				`\u25FD Normal Cooldown: ${Time.ms(cmd.cooldown, true)}`,
-				`\u25FD Donator Cooldown: ${Time.ms(cmd.donatorCooldown, true)}`,
-				`\u25FD Category: ${cat.displayName}`
-			].join("\n"),
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			timestamp: new Date().toISOString(),
-			color: Math.floor(Math.random() * 0xFFFFFF)
-		};
-
-
-		return msg.channel.createMessage({ embed });
+		return msg.channel.createMessage({
+			embed: new EmbedBuilder(gConfig.settings.lang)
+				.setTitle(cmd.triggers[0])
+				.setDescription([
+					cmd.description,
+					"",
+					`**{lang:commands.misc.help.restrictions}**:`,
+					`\u25FD {lang:commands.misc.help.nsfw}: **${cmd.features.includes("nsfw") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
+					`\u25FD {lang:commands.misc.help.devOnly}: **${cmd.features.includes("devOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
+					`\u25FD {lang:commands.misc.help.betaOnly}: **${cmd.features.includes("betaOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
+					`\u25FD {lang:commands.misc.help.guildOwnerOnly}: **${cmd.features.includes("guildOwnerOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
+					`\u25FD {lang:commands.misc.help.supportServerOnly}: **${cmd.features.includes("supportOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
+					`\u25FD {lang:commands.misc.help.donatorOnly}: **${cmd.features.includes("donatorOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
+					`\u25FD {lang:commands.misc.help.premiumGuildOnly}: **${cmd.features.includes("premiumGuildOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
+					"",
+					`**{lang:commands.misc.help.permissions}**:`,
+					`\u25FD {lang:commands.misc.help.bot}: **${cmd.botPermissions.length === 0 ? "{lang:commands.misc.help.none}" : cmd.botPermissions.join("**, **")}**`,
+					`\u25FD {lang:commands.misc.help.}user: **${cmd.userPermissions.length === 0 ? "{lang:commands.misc.help.none}" : cmd.userPermissions.join("**, **")}**`,
+					"",
+					"**Extra**:",
+					`\u25FD {lang:commands.misc.help.usage}: \`${gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
+					`\u25FD {lang:commands.misc.help.aliases}: ${cmd.triggers.join(", ")}`,
+					`\u25FD {lang:commands.misc.help.normalCooldown}: ${Time.ms(cmd.cooldown, true)}`,
+					`\u25FD {lang:commands.misc.help.donatorCooldown}: ${Time.ms(cmd.donatorCooldown, true)}`,
+					`\u25FD {lang:commands.misc.help.category}: ${cat.displayName}`
+				].join("\n"))
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setTimestamp(new Date().toISOString())
+				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+		});
 	}
 
 	if (this.cmd.categories.map(c => c.name.toLowerCase()).includes(msg.args[0].toLowerCase())) {
 		const cat = this.cmd.getCategory(msg.args[0]);
 
-		if (!cat) return msg.reply("Category not found.");
+		if (!cat) return msg.reply("{lang:commands.misc.help.catNotFound}");
 
-		if (cat.devOnly && !config.developers.includes(msg.author.id)) return msg.reply("you must be a developer to see this category.");
+		if (cat.devOnly && !config.developers.includes(msg.author.id)) return msg.reply("{lang:commands.misc.help.devOnlyCat}");
+
+		const embed = new EmbedBuilder(gConfig.settings.lang)
+			.setTitle(cat.displayName)
+			.setDescription(cat.description)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Math.floor(Math.random() * 0xFFFFFF));
 
 		const fields: {
 			name: string;
@@ -108,7 +100,7 @@ export default new Command({
 		cat.commands.forEach((c) => {
 			if (!(c.features.includes("devOnly") && !config.developers.includes(msg.author.id))) {
 				if (!fields[i]) fields[i] = {
-					name: `Command List #${i + 1}`,
+					name: `{lang:commands.misc.help.cmdList|${i + 1}}`,
 					value: "",
 					inline: false
 				};
@@ -118,7 +110,7 @@ export default new Command({
 				if (fields[i].value.length > 1000 || fields[i].value.length + txt.length > 1000) {
 					i++;
 					return fields[i] = {
-						name: `Command List #${i + 1}`,
+						name: `{lang:commands.misc.help.cmdList|${i + 1}}`,
 						value: txt,
 						inline: false
 					};
@@ -128,20 +120,9 @@ export default new Command({
 			}
 		});
 
-		embed = {
-			title: cat.displayName,
-			description: cat.description,
-			fields,
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			timestamp: new Date().toISOString(),
-			color: Math.floor(Math.random() * 0xFFFFFF)
-		};
-
+		fields.map(f => embed.addField(f.name, f.value, f.inline));
 		return msg.channel.createMessage({ embed });
 	}
 
-	return msg.reply("Command or category not found.");
+	return msg.reply("{lang:commands.misc.help.neitherFound}");
 }));

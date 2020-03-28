@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../config";
 import * as Eris from "eris";
@@ -22,7 +21,7 @@ export default new SubCommand({
 	usage: "<event> [rebuild:yes/no]",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	const events = this.eventNames();
 	const ext = __filename.split(".").reverse()[0];
 	const d = path.resolve(`${__dirname}/../../../events`);
@@ -35,7 +34,7 @@ export default new SubCommand({
 	let rebuild: boolean, m: Eris.Message, a: string;
 	if (msg.args.length === 1) {
 		m = await msg.reply("would you like to rebuild the code? **Yes** or **No**.");
-		const b = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 15e3);
+		const b = await this.col.awaitMessage(msg.channel.id, msg.author.id, 15e3);
 		if (!b || !b.content || !["false", "true", "no", "yes"].includes(b.content.toLowerCase())) return msg.reply("invalid response.");
 		a = b.content.toLowerCase();
 
@@ -62,7 +61,7 @@ export default new SubCommand({
 			m = await m.edit("Rebuilding code, please wait..");
 			const start = performance.now();
 			const rb = execSync("npm run build", {
-				cwd: config.rootDir
+				cwd: config.dir.base
 			});
 			const end = performance.now();
 			m = await m.edit(`Rebuild finished in ${Number((end - start).toFixed(3)).toLocaleString()}ms\`\`\`fix\n${rb.toString()}\n\`\`\``);

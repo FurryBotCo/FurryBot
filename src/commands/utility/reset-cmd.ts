@@ -16,27 +16,25 @@ export default new Command({
 	botPermissions: [],
 	cooldown: 36e5,
 	donatorCooldown: 36e5,
-	description: "Reset the current servers settings.",
-	usage: "",
 	features: ["guildOwnerOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	msg.channel.createMessage("this will erase ALL guild (server) settings, are you sure you want to do this?\nType **yes** or **no**.");
-	const d = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);
-	if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply("that wasn't a valid option..");
+}, (async function (msg, uConfig, gConfig, cmd) {
+	msg.channel.createMessage("{lang:commands.utility.reset.confirm}");
+	const d = await this.col.awaitMessage(msg.channel.id, msg.author.id, 6e4);
+	if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply("{lang:commands.utility.reset.invalid}");
 	const choice = d.content.toLowerCase() === "yes";
 
 	if (!choice) {
-		return msg.channel.createMessage("Canceled reset.");
+		return msg.channel.createMessage("{lang:commands.utility.reset.canceled}");
 	} else {
 
 		// await msg.gConfig.modlog.add({ blame: this.client.user.id, action: "resetSettings", old: msg.gConfig, timestamp: Date.now() });
-		await msg.channel.createMessage(`All guild settings will be reset shortly.\n(note: prefix will be **${config.defaultPrefix}**)`);
+		await msg.channel.createMessage(`{lang:commands.utility.reset.done|${config.defaults.prefix}}`);
 		try {
-			await msg.gConfig.reset().then(d => d.reload());
+			await gConfig.reset().then(d => d.reload());
 		} catch (e) {
-			Logger.error(e, msg.guild.shard.id);
-			return msg.channel.createMessage("There was an internal error while doing this");
+			Logger.error(e, msg.channel.guild.shard.id);
+			return msg.channel.createMessage("{lang:commands.utility.reset.error}");
 		}
 	}
 }));

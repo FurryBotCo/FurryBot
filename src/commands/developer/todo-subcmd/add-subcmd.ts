@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../config";
 import { Logger } from "../../../util/LoggerV8";
@@ -19,14 +18,14 @@ export default new SubCommand({
 	usage: "<item>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
 	const p = await phin({
 		method: "POST",
 		url: "https://api.todoist.com/sync/v8/sync",
 		data: {
-			token: config.apis.todoist.token,
+			token: config.keys.todoist.token,
 			commands: [
 				{
 					type: "item_add",
@@ -34,7 +33,7 @@ export default new SubCommand({
 					uuid: uuid(),
 					args: {
 						content: msg.args.join(" "),
-						project_id: config.apis.todoist.projectId
+						project_id: config.keys.todoist.projectId
 					}
 				}
 			]

@@ -13,11 +13,9 @@ export default new Command({
 	],
 	cooldown: 2.5e3,
 	donatorCooldown: 2e3,
-	description: "You're a failure, and a disappointement.",
-	usage: "[image/@user]",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
-	return GenericMemeCommand.handleImage(this, msg, cmd.triggers[0]);
+	return GenericMemeCommand.handleImage(this, msg, uConfig, gConfig, cmd.triggers[0]);
 }));

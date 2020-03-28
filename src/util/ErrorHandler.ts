@@ -1,6 +1,6 @@
 
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import FurryBot from "../main";
+import ExtendedMessage from "../modules/ExtendedMessage";
 
 const errors = {
 	400: "We had an internal error when fetching something that this needed.",

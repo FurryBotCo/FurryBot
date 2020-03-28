@@ -17,13 +17,12 @@ export default new Command({
 	],
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
-	description: "Get some content from E621!",
-	usage: "[tags]",
 	features: ["nsfw"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
-	if (this.activeReactChannels.includes(msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active paginated command in this channel. Please either wait for that one to time out, or say **stop** to stop it.");
+	if (!msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly without the `manageMessages` permission!");
+	if (this.holder.has("react", null, msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active paginated command in this channel. Please either wait for that one to time out, or say **stop** to stop it.");
 
 	const tags = msg.args.map(a => a.replace(/,\|/g, ""));
 	if (tags.length > 40) return msg.reply("you can only specify up to fourty (40) tags.");
@@ -68,7 +67,7 @@ export default new Command({
 	const inst = await msg.channel.createMessage(`To navigate posts, you can reply with one of the following:\n**first**, **back**, **stop**, **next**, **last**.`);
 
 	const f = (async () => {
-		const d = await this.messageCollector.awaitMessage(msg.channel.id, msg.author.id, 6e4);
+		const d = await this.col.awaitMessage(msg.channel.id, msg.author.id, 6e4);
 		if (!d) return setPost.call(this, "EXIT");
 
 		switch (d.content.toLowerCase()) {
@@ -112,7 +111,7 @@ export default new Command({
 		if (p === "EXIT") {
 			clearTimeout(rl);
 			await inst.edit("Navigating not active, it either timed out or the starter exited.");
-			this.activeReactChannels.splice(this.activeReactChannels.indexOf(msg.channel.id), 1);
+			this.holder.remove("react", null, msg.channel.id);
 			return;
 		} else currentPost = p as number;
 
@@ -139,7 +138,7 @@ export default new Command({
 		await m.edit({ embed });
 	}
 
-	this.activeReactChannels.push(msg.channel.id);
+	this.holder.add("react", null, msg.channel.id);
 
 	f();
 

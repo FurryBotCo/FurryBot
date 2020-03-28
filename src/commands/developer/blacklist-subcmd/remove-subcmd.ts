@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 
 export default new SubCommand({
@@ -16,7 +15,7 @@ export default new SubCommand({
 	features: ["devOnly"],
 	subCommandDir: `${__dirname}/remove-subcmd`,
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: SubCommand) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length === 0) return cmd.sendSubCommandEmbed(msg);
-	else return cmd.handleSubCommand(msg, this);
+	else return cmd.handleSubCommand(msg, uConfig, gConfig, this);
 }));

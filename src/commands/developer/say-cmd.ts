@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
@@ -14,7 +13,7 @@ export default new Command({
 	usage: "<text>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	await msg.delete().catch(err => null);
 	return msg.channel.createMessage(msg.unparsedArgs.join(" "));
 }));

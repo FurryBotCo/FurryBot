@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
@@ -13,6 +12,7 @@ import * as os from "os";
 import { performance } from "perf_hooks";
 import Permissions from "../../util/Permissions";
 import * as F from "../../util/Functions";
+import Language from "../../util/Language";
 
 export default new Command({
 	triggers: [
@@ -28,7 +28,7 @@ export default new Command({
 	usage: "<code>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const
 		silent = msg.dashedArgs.unparsed.value.includes("s"),
 		deleteInvoke = msg.dashedArgs.unparsed.value.includes("d");
@@ -52,7 +52,11 @@ export default new Command({
 			F,
 			Functions: F,
 			...F,
-			Eris
+			Eris,
+			uConfig,
+			gConfig,
+			cmd,
+			Language
 		});
 	} catch (e) {
 		res = e;
@@ -75,7 +79,7 @@ export default new Command({
 		}
 	}
 
-	if (res.indexOf(config.bot.token) !== -1) res = res.replace(new RegExp(config.bot.token, "g"), "[BOT TOKEN]");
+	if (res.indexOf(config.bot.client.token) !== -1) res = res.replace(new RegExp(config.bot.client.token, "g"), "[BOT TOKEN]");
 	if (res.indexOf(config.universalKey) !== -1) res = res.replace(new RegExp(config.universalKey, "g"), "[UNIVERSAL KEY]");
 
 	if (deleteInvoke) await msg.delete();
@@ -86,8 +90,8 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					api_dev_key: config.apis.pastebin.devKey,
-					api_user_key: config.apis.pastebin.userKey,
+					api_dev_key: config.keys.pastebin.devKey,
+					api_user_key: config.keys.pastebin.userKey,
 					api_option: "paste",
 					api_paste_code: res,
 					api_paste_private: "2",
@@ -130,8 +134,8 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					api_dev_key: config.apis.pastebin.devKey,
-					api_user_key: config.apis.pastebin.userKey,
+					api_dev_key: config.keys.pastebin.devKey,
+					api_user_key: config.keys.pastebin.userKey,
 					api_option: "paste",
 					api_paste_code: res,
 					api_paste_private: "2",
@@ -143,6 +147,6 @@ export default new Command({
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		return Logger.log(`Silent eval return: ${res}`, msg.guild.shard.id);
+		return Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Silent eval return: ${res}`);
 	}
 }));

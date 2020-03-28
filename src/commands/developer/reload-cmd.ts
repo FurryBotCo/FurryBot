@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
@@ -15,7 +14,7 @@ export default new Command({
 	features: ["devOnly"],
 	subCommandDir: `${__dirname}/reload-subcmd`,
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage, cmd: Command) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length === 0) return cmd.sendSubCommandEmbed(msg);
-	else return cmd.handleSubCommand(msg, this);
+	else return cmd.handleSubCommand(msg, uConfig, gConfig, this);
 }));

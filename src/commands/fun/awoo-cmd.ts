@@ -1,38 +1,33 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
-		"awoo",
-		"howl"
+		"awoo"
 	],
 	userPermissions: [],
 	botPermissions: [
 		"externalEmojis"
 	],
-	cooldown: 5e3,
-	donatorCooldown: 2.5e3,
-	description: "Start a howl, or join in!",
-	usage: "",
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	if (typeof msg.channel.awoo !== "undefined" && msg.channel.awoo.active) {
-		if (msg.channel.awoo.inAwoo.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.channel.createMessage(`<@!${msg.author.id}>, you are already in this howl!`);
-		clearTimeout(msg.channel.awoo.timeout);
-		msg.channel.awoo.inAwoo.push(msg.author.id);
-		await msg.channel.createMessage(`<@!${msg.author.id}> joined a howl with ${msg.channel.awoo.inAwoo.length} furs!\nJoin in using \`${msg.gConfig.settings.prefix}awoo\`.\n${msg.channel.awoo.inAwoo.length > 30 ? "This howl is too large for emojis!" : `<:${config.emojis.awoo}>`.repeat(msg.channel.awoo.inAwoo.length)}`);
-		msg.channel.awoo.timeout = setTimeout((ch) => delete ch.awoo, 18e5, msg.channel);
-	} else {
-		await msg.channel.createMessage(`<@!${msg.author.id}> started a howl!\nJoin in using \`${msg.gConfig.settings.prefix}awoo\`.\n<:${config.emojis.awoo}>`);
-		msg.channel.awoo = {
-			active: true,
-			inAwoo: [],
-			timeout: setTimeout((ch) => delete ch.awoo, 18e5, msg.channel)
-		};
+}, (async function (msg, uConfig, gConfig, cmd) {
+	const h = this.holder.has("awoo", msg.channel.id);
 
-		return msg.channel.awoo.inAwoo.push(msg.author.id);
+	if (h) {
+		const c = this.holder.get<string[]>("awoo", msg.channel.id);
+		const t = this.holder.get<NodeJS.Timeout>("awoo", `${msg.channel.id}.timeout`);
+		clearTimeout(t);
+		if (c.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.reply("{lang:commands.fun.awoo.alreadyPresent}");
+		this.holder.add("awoo", msg.channel.id, msg.author.id);
+		this.holder.set("awoo", `${msg.channel.id}.timeout`, setTimeout((ch: Eris.GuildTextableChannel) => { this.holder.remove("awoo", ch.id); this.holder.remove("awoo", `${ch.id}.timeout`); }, 18e5, msg.channel));
+		return msg.channel.createMessage(`{lang:commands.fun.awoo.join|${msg.author.id}|${c.length + 1}|${gConfig.settings.prefix}|${c.length + 1 > 30 ? "{lang:commands.fun.awoo.tooLarge}" : `<:${config.emojis.awoo}>`.repeat(c.length + 1)}}`);
+	} else {
+		this.holder.add("awoo", msg.channel.id, msg.author.id);
+		this.holder.set("awoo", `${msg.channel.id}.timeout`, setTimeout((ch: Eris.GuildTextableChannel) => { this.holder.remove("awoo", ch.id); this.holder.remove("awoo", `${ch.id}.timeout`); }, 18e5, msg.channel));
+		await msg.channel.createMessage(`{lang:commands.fun.awoo.start|${msg.author.id}|${gConfig.settings.prefix}|<:${config.emojis.awoo}>}`);
 	}
 }));

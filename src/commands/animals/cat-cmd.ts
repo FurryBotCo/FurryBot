@@ -1,9 +1,6 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import { Request } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import phin from "phin";
 
 export default new Command({
 	triggers: [
@@ -11,27 +8,27 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [
-		"attachFiles"
+		"attachFiles",
+		"embedLinks"
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Get a picture of a cat!",
-	usage: "",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
+	const img = await phin({
+		method: "GET",
+		url: "https://aws.random.cat/meow",
+		parse: "json"
+	}).then(b => b.body);
+
 	return msg.channel.createMessage({
-		embed: {
-			title: "Kitty!",
-			timestamp: new Date().toISOString(),
-			author: {
-				name: msg.author.tag,
-				icon_url: msg.author.avatarURL
-			},
-			color: Math.floor(Math.random() * 0xFFFFFF),
-			image: {
-				url: "https://cataas.com/cat/gif"
-			}
-		}
-	}).catch(err => null);
+		embed:
+			new EmbedBuilder(gConfig.settings.lang)
+				.setTitle("{lang:commands.animals.cat.title}")
+				.setTimestamp(new Date().toISOString())
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+				.setImage(img.file)
+	});
 }));

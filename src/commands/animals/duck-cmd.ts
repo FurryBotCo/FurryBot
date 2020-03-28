@@ -1,10 +1,11 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
-import phin from "phin";
 import { Request } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import UserConfig from "../../modules/config/UserConfig";
+import GuildConfig from "../../modules/config/GuildConfig";
 
 export default new Command({
 	triggers: [
@@ -12,35 +13,25 @@ export default new Command({
 	],
 	userPermissions: [],
 	botPermissions: [
-		"attachFiles"
+		"attachFiles",
+		"embedLinks"
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Get a picture of a duck!",
-	usage: "",
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// await msg.channel.startTyping();
-	const img = await Request.chewyBotAPIRequest("duck").catch(err => null);
+}, (async function (msg, uConfig, gConfig, cmd) {
+	const img = await Request.chewyBotAPIRequest("duck");
 
 	if (!img) return msg.reply("failed to fetch image from api, please try again later.");
-
-	return msg
-		.channel
-		.createMessage({
-			embed: {
-				title: "Ducky!",
-				description: `[Image URL](${img})`,
-				timestamp: new Date().toISOString(),
-				author: {
-					name: msg.author.tag,
-					icon_url: msg.author.avatarURL
-				},
-				color: Math.floor(Math.random() * 0xFFFFFF),
-				image: {
-					url: img
-				}
-			}
-		});
+	return msg.channel.createMessage({
+		embed:
+			new EmbedBuilder(gConfig.settings.lang)
+				.setTitle("{lang:commands.animals.duck.title}")
+				.setDescription(`[{lang:other.imageURL}](${img})`)
+				.setTimestamp(new Date().toISOString())
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+				.setImage(img)
+	});
 }));

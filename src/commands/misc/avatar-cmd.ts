@@ -1,7 +1,6 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import * as Eris from "eris";
+import Eris from "eris";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -13,13 +12,10 @@ export default new Command({
 		"attachFiles"
 	],
 	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	description: "Get a users avatar.",
-	usage: "[@user]",
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	// await msg.channel.startTyping();
+}, (async function (msg, uConfig, gConfig, cmd) {
 	let user: Eris.User;
 	if (msg.args.length < 1) user = msg.author;
 	else user = await msg.getUserFromArgs();
@@ -36,22 +32,14 @@ export default new Command({
 
 	if ([undefined, null].includes(color)) color = Math.floor(Math.random() * 0xFFFFFF);
 
-	const embed: Eris.EmbedOptions = {
-		title: "Avatar",
-		image: {
-			url: `${user.avatarURL.split("?")[0]}?size=1024`
-		},
-		author: {
-			name: msg.author.tag,
-			icon_url: msg.author.avatarURL
-		},
-		footer: {
-			text: `${user.username}#${user.discriminator}`,
-			icon_url: `${msg.author.avatarURL.split("?")[0]}?size=1024`
-		},
-		description: `[Link](${user.avatarURL.split("?")[0]}?size=1024)`,
-		color
-	};
-
-	return msg.channel.createMessage({ embed });
+	return msg.channel.createMessage({
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle("{lang:commands.misc.avatar.title}")
+			.setDescription(`[{lang:commands.misc.avatar.link}](${user.avatarURL})`)
+			.setFooter(`${user.username}#${user.discriminator}`, user.avatarURL)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setImage(user.avatarURL)
+			.setColor(color)
+			.setTimestamp(new Date().toISOString())
+	});
 }));

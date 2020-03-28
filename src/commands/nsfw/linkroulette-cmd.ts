@@ -3,6 +3,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import { mongo } from "../../modules/Database";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -15,29 +16,23 @@ export default new Command({
 	],
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	description: "Fetch a random short url - high chance to be nsfw!",
-	usage: "",
 	features: ["nsfw"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
 	let s: any[] | any = await mongo.db("furrybot").collection("shorturl").find().toArray();
 
-	if (s.length === 0) return msg.reply("No results were found.");
+	if (s.length === 0) return msg.reply("{lang:commands.nsfw.linkroulette.noResults}");
 
 	s = s[Math.floor(Math.random() * s.length)];
-	if (!s) return msg.reply("Command produced an invalid selection.");
+	if (!s) return msg.reply("{lang:commands.nsfw.linkroulette.invalid}");
 
-	const embed: Eris.EmbedOptions = {
-		title: "Link Roulette",
-		description: `[${s.link}](${s.link}) - **Link #${s.linkNumber}**`,
-		color: Math.floor(Math.random() * 0xFFFFFF),
-		timestamp: new Date().toISOString(),
-		author: {
-			name: msg.author.tag,
-			icon_url: msg.author.avatarURL
-		}
-	};
-
-	return msg.channel.createMessage({ embed });
+	return msg.channel.createMessage({
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle("{lang:commands.nsfw.linkroulette.title}")
+			.setDescription(`[${s.link}](${s.link}) - **{lang:commands.nsfw.linkroulette.link} #${s.linkNumber}**`)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Math.floor(Math.random() * 0xFFFFFF))
+	});
 }));

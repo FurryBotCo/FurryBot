@@ -1,7 +1,5 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import * as Eris from "eris";
+import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 
 export default new Command({
@@ -12,28 +10,21 @@ export default new Command({
 	botPermissions: [
 		"embedLinks"
 	],
-	cooldown: 2e3,
-	donatorCooldown: 1e3,
-	description: "Get some info about my shards.",
-	usage: "",
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
-	const embed: Eris.EmbedOptions = {
-		title: "Shard Info",
-		fields: this.shards.map(s => ({
-			name: `Shard #${s.id}`,
-			value: `Guilds: ${this.guilds.filter(g => g.shard.id === s.id).length}\nPing: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`,
-			inline: true
-		})),
-		color: Colors.gold,
-		timestamp: new Date().toISOString(),
-		footer: {
-			text: `Current Shard: #${msg.channel.guild.shard.id} | Total Guilds: ${this.guilds.size} | Average Ping: ${Math.floor(this.shards.map(s => s.latency).reduce((a, b) => a + b) / this.shards.size)}ms`
-		}
-	};
+}, (async function (msg, uConfig, gConfig, cmd) {
+	const embed = new EmbedBuilder(gConfig.settings.lang)
+		.setTitle("{lang:commands.information.shards.title}")
+		.setFooter(`{lang:commands.information.shards.footer|${msg.channel.guild.shard.id}|${this.guilds.size}|${Math.floor(this.shards.map(s => s.latency).reduce((a, b) => a + b) / this.shards.size)}}`)
+		.setColor(Colors.gold)
+		.setTimestamp(new Date().toISOString());
 
-	// if (this.shards.map(s => s.id).includes(msg.channel.guild.shard.id)) embed.fields.find(f => f.name === `Shard #${msg.guild.shard.id}`).name = `Shard #${msg.guild.shard.id} (current)`;
+
+	this.shards.map(s =>
+		embed.addField(`{lang:commands.information.shards.shard|${s.id}}`, `{lang:commands.information.shards.guilds}: ${this.guilds.filter(g => g.shard.id === s.id).length}\n{lang:commands.information.shards.ping}: ${s.latency !== Infinity ? `${s.latency}ms` : "N/A"}\nStatus: ${s.status}`, true)
+	);
 
 	return msg.channel.createMessage({
 		embed

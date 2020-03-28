@@ -1,7 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import Eris from "eris";
+import FurryBot from "../../main";
 
 export default new Command({
 	triggers: [
@@ -15,7 +15,7 @@ export default new Command({
 	usage: "",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg: ExtendedMessage) {
 	const sort = {
 		good: [],
 		bad: []
@@ -66,7 +66,7 @@ export default new Command({
 		});
 	}
 
-	async function handleReaction(this: FurryBot, m: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, userId: string) {
+	async function handleReaction(m: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, userId: string) {
 		if (userId === this.user.id) return;
 		await e.removeReaction(emoji.name, userId);
 		if (userId !== msg.author.id || !["✅", "❌"].includes(emoji.name)) return;

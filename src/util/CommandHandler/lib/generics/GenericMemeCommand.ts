@@ -3,9 +3,11 @@ import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import Logger from "../../../LoggerV8";
 import { Utility, Request } from "../../../Functions";
+import UserConfig from "../../../../modules/config/UserConfig";
+import GuildConfig from "../../../../modules/config/GuildConfig";
 
 export default {
-	handleImage: (async function (client: FurryBot, msg: ExtendedMessage, path: string, extra?: { avatars?: string[]; usernames?: string[]; text?: string; fileType?: string; }) {
+	handleImage: (async function (client: FurryBot, msg: ExtendedMessage, uConfig: UserConfig, gConfig: GuildConfig, path: string, extra?: { avatars?: string[]; usernames?: string[]; text?: string; fileType?: string; }) {
 		let imgurl, j;
 		if (msg.args.length >= 1) {
 			// get member from message
@@ -33,7 +35,7 @@ export default {
 			name: `${path}.${extra && extra.fileType ? extra.fileType : "png"}`
 		}).catch(err => msg.reply(`Error sending: ${err}`));
 	}),
-	handleText: (async function (client: FurryBot, msg: ExtendedMessage, path: string, extra?: { avatars?: string[]; usernames?: string[]; }) {
+	handleText: (async function (client: FurryBot, msg: ExtendedMessage, uConfig: UserConfig, gConfig: GuildConfig, path: string, extra?: { avatars?: string[]; usernames?: string[]; }) {
 
 		let j;
 		let text = msg.args.join(" ");
