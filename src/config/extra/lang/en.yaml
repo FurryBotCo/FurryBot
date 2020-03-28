@@ -84,7 +84,7 @@ commands:
   fun:
     8ball:
       description: "Ask the magic 8ball a question!"
-      title: "{0}'s Magic 8ball Game'"
+      title: "{0}'s Magic 8ball Game"
       usage: "<question>"
       said: "The Magic 8ball said"
       disclaimer: "Disclaimer: Do not take any answers seriously!"
