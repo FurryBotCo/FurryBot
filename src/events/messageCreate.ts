@@ -40,6 +40,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const ubl: Blacklist.UserEntry[] = await mdb.collection("blacklist").find({ userId: msg.author.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now()));
 		const bl = gbl.length > 0 || ubl.length > 0;
 
+		if (msg.member.roles.includes(config.blacklistRoleId) && !bl) await msg.member.removeRole(config.blacklistRoleId, "user is not blacklisted (might have expired)").catch(err => null);
 
 		if (bl && !config.developers.includes(msg.author.id)) {
 			if (msg.channel.guild && msg.channel.guild.id === config.bot.mainGuild) {
