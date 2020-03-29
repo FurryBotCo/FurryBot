@@ -1,91 +1,54 @@
 import express from "express";
 import config from "../../config";
 import { mdb } from "../../modules/Database";
-import uuid from "uuid/v4";
-import * as eris from "eris";
 import { Logger } from "../../util/LoggerV8";
 import FurryBot from "@FurryBot";
 
 export default (async (client: FurryBot) => {
 	const app: express.Router = express.Router();
 
-	app.post("/:list", async (req, res) => {
-		if (req.headers.authorization !== config.universalKey) return res.status(401).json({
-			success: false,
-			error: "invalid authorization"
-		});
-
-		switch (req.params.list.toLowerCase()) {
-			case "dbl":
-				Logger.log("API | Vote", `${req.body.type.toLowerCase() === "test" ? "Test v" : "V"}ote from dbl for ${req.body.user} on bot ${req.body.bot}`);
-
-				if (req.body.bot !== client.user.id) {
-					Logger.warn("API | Vote", `Vote for different client recieved, current client: ${client.user.id}, recieved: ${req.body.bot}`);
-					return res.status(400).json({
-						success: false,
-						error: "invalid client"
-					});
-				}
-
-				await mdb.collection("votes").insertOne({
-					id: uuid(),
-					userId: req.body.user,
-					bot: req.body.bot,
-					weekend: req.body.isWeekend,
-					type: req.body.type,
-					query: req.body.query,
-					timestamp: Date.now()
-				});
-
-				let bal = await mdb.collection("users").findOne({ id: req.body.user }).then(res => res.bal + config.eco.voteAmount).catch(err => null);
-
-				if (!bal) {
-					await mdb.collection("users").insertOne({ ...{ id: req.body.user, ...config.defaults.config.user } });
-					bal = config.defaults.config.user.bal;
-				}
-
-				await mdb.collection("users").findOneAndUpdate({ id: req.body.user }, { $set: { bal } });
-
-				const u = await client.getRESTUser(req.body.user);
-
-				await u.getDMChannel().then(ch => ch.createMessage({
-					embed: {
-						title: "Thanks for voting for me!",
-						description: `Hey, thanks for voting for me on that bot list!\nYou've been gifted **${config.eco.voteAmount}**${config.eco.emoji}!`,
-						timestamp: new Date().toISOString(),
+	app
+		.post("/dbl", async (req, res) => {
+			if (!req.headers.authorization) return res.status(401).json({ success: false, error: "Missing authentication." });
+			if (req.headers.authorization !== config.universalKey) return res.status(401).json({ success: false, error: "Invalid authentication." });
+			if (req.body.bot !== config.bot.client.id) return res.status(403).json({ success: false, error: "Invalid client id." });
+			const time = Date.now();
+			await mdb.collection("votes").insertOne({
+				user: req.body.user,
+				weekend: req.body.isWeekend,
+				query: req.body.query,
+				type: req.body.type,
+				time
+			});
+			const u = client.users.has(req.body.user) ? client.users.get(req.body.user) : await client.getRESTUser(req.body.user);
+			await client.w.get("vote").execute({
+				embeds: [
+					{
+						title: "Vote Performed",
+						author: {
+							name: `${u.username}#${u.discriminator}`,
+							icon_url: u.avatarURL
+						},
+						footer: {
+							text: `User ID: ${u.id}`
+						},
+						description: [
+							`Voted on [dbl](https://top.gg/bot/${config.bot.client.id})`
+						].join("\n"),
 						color: Math.floor(Math.random() * 0xFFFFFF)
 					}
-				})).catch(err => null);
+				]
+			});
 
-				const embed: eris.EmbedOptions = {
-					title: `Vote for ${client.user.username}#${client.user.discriminator}`,
-					author: {
-						name: `Vote performed by ${u.username}#${u.discriminator}`,
-						icon_url: u.avatarURL
-					},
-					description: `[voted on dbl](https://discordbots.org/bot/398251412246495233/vote)`,
-					timestamp: new Date().toISOString(),
-					color: Math.floor(Math.random() * 0xFFFFFF)
-				};
-
-				await client.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
-					embeds: [embed],
-					username: `Vote Logs${config.beta ? " - Beta" : ""}`,
-					avatarURL: "https://assets.furry.bot/vote_logs.png"
-				});
-				break;
-
-			default:
-				return res.status(404).json({
-					success: false,
-					error: "invalid list"
-				});
-		}
-
-		return res.status(200).json({
-			success: true
+			Logger.log("DBL Vote", `Vote on DBL by user ${u.username}#${u.discriminator} (${u.id})`);
+			await u.getDMChannel().then(dm => dm.createMessage(`Hey, thanks for voting for me! We currently do not have any specific rewards, but some are planned! You can suggest some rewards with \`${config.defaults.prefix}suggest\`!`)).catch(err => null);
+			return res.status(200).json({
+				success: true,
+				data: {
+					time
+				}
+			});
 		});
-	});
 
 	return app;
 
