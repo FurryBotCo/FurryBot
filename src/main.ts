@@ -68,7 +68,7 @@ export default class FurryBot extends Eris.Client {
 			});
 		this.temp = null;
 		this.w = new WebhookStore(this);
-		Object.keys(config.webhooks).map(h => this.w.add(h, config.webhooks[h].id, config.webhooks[h].token));
+		Object.keys(config.webhooks).map(h => this.w.add(h, config.webhooks[h].id, config.webhooks[h].token, config.webhooks[h].username, config.webhooks[h].avatar));
 		this.m = new ModLogUtil(this);
 		this.firstReady = false;
 		this.spamCounter = {
