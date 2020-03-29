@@ -2,7 +2,7 @@ import config from "./src/config";
 import * as fs from "fs-extra";
 import path from "path";
 import { Logger } from "./src/util/LoggerV8";
-// import ListStats from "./src/util/ListStats";
+import ListStats from "./src/util/ListStats";
 import FurryBot from "./src/main";
 
 // directory existence check
@@ -14,7 +14,7 @@ if (__filename.endsWith(".js") && !fs.existsSync(`${config.dir.base}/src/assets`
 }
 
 const bot = new FurryBot(config.bot.client.token, config.bot.clientOptions);
-// if (!config.beta) setInterval(() => ListStats(bot.shards.map(s => bot.guilds.filter(g => g.shard.id === s.id).length)), 9e5);
+if (!config.beta) setInterval(() => ListStats(bot.shards.map(s => bot.guilds.filter(g => g.shard.id === s.id).length)), 9e5);
 
 fs.writeFileSync(`${__dirname}/${__filename.endsWith(".ts") ? "" : "../"}process.pid`, process.pid);
 
