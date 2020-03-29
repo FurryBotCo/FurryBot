@@ -176,13 +176,13 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		channels: Eris.AnyGuildChannel[]
 	} {
 		if (this.channel instanceof Eris.GuildChannel) return {
-			users: !this.mentions ? [] : this.mentions.reverse(),
-			members: !this.mentions ? [] : this.mentions.map(c => this.channel.guild.members.get(c.id)).reverse(),
+			users: !this.mentions ? [] : this.mentions,
+			members: !this.mentions ? [] : this.mentions.map(c => this.channel.guild.members.get(c.id)),
 			roles: !this.roleMentions ? [] : this.roleMentions.map(r => this.channel.guild.roles.get(r)),
 			channels: !this.channelMentions ? [] : this.channelMentions.map(c => this.channel.guild.channels.get(c))
 		};
 		else return {
-			users: !this.mentions ? [] : this.mentions.reverse(),
+			users: !this.mentions ? [] : this.mentions,
 			members: [],
 			roles: [],
 			channels: []
@@ -197,29 +197,31 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		}, attachments);
 	}
 
-	async getUserFromArgs<U extends Eris.User = Eris.User>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition = 0): Promise<U> {
+	async getUserFromArgs<U extends Eris.User = Eris.User>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition?: number): Promise<U> {
 		if (!this) throw new TypeError("invalid message");
 		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
-		let argObject, args;
+		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (join) {
-			args = [this[argObject].join(" ")];
-			argPosition = 0;
-		} else {
-			args = this[argObject];
-		}
+		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
+		else args = this[argObject];
+
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
+		// make mention position arg position if not explicitly set
+		if ([undefined, null].includes(mentionPosition)) mentionPosition = argPosition;
 
 		// member mention
 		if (this.mentionMap.users.length >= mentionPosition + 1) return this.mentionMap.users[mentionPosition] as U;
+
 		// user ID
-		if (![undefined, null, ""].includes(args[argPosition]) && !isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
 			if (this.channel.guild.members.has(args[argPosition])) return this.channel.guild.members.get(args[argPosition]).user as U;
+			else if (this.client.users.has(args[argPosition])) return this.client.users.get(args[argPosition]);
+			else return this.client.getRESTUser(args[argPosition]).catch(err => null) as Promise<U>;
 		}
 
 		// username
-		if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
 			try {
 				return this.channel.guild.members.find(m => m.user.username.toLowerCase() === args[argPosition].toLowerCase()).user as U;
 			} catch (e) {
@@ -228,85 +230,87 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		}
 
 		// user tag
-		if (![undefined, null, ""].includes(args[argPosition]) && isNaN(args[argPosition]) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase()).user as U;
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase()).user as U;
 
 		// nothing found
-		return this.client.getRESTUser(args[argPosition]).catch(err => null);
+		return null;
 	}
 
-	async getMemberFromArgs<M extends Eris.Member>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition = 0): Promise<M> {
+	async getMemberFromArgs<M extends Eris.Member>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition?: number): Promise<M> {
 		if (!this) throw new TypeError("invalid message");
 		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
-		let argObject, args;
+		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (join) {
-			args = [this[argObject].join(" ")];
-			argPosition = 0;
-		} else {
-			args = this[argObject];
-		}
+		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
+		else args = this[argObject];
+
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
+		// make mention position arg position if not explicitly set
+		if ([undefined, null].includes(mentionPosition)) mentionPosition = argPosition;
 
 		// member mention
 		if (this.mentionMap.members.length >= mentionPosition + 1) return this.mentionMap.members[mentionPosition] as M;
 
 		// member ID
-		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.get(args[argPosition]);
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.get(args[argPosition]);
 
 		// username
-		// apparently "user" can be null on a guild member?!?ws
-		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find((c: M) => c.user && c.user.username && c.user.username.toLowerCase() === args[argPosition].toLowerCase());
+		// apparently "user" can be null on a guild member?!?
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find((c: M) => c.user && c.user.username && c.user.username.toLowerCase() === args[argPosition].toLowerCase());
 
 		// nothing found
 		return null;
 	}
 
-	async getChannelFromArgs<C extends Eris.AnyGuildChannel>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition = 0): Promise<C> {
+	async getChannelFromArgs<C extends Eris.AnyGuildChannel>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition?: number): Promise<C> {
 		if (!this) throw new TypeError("invalid message");
 		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
-		let argObject, args;
+		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (join) {
-			args = [this[argObject].join(" ")];
-			argPosition = 0;
-		} else {
-			args = this[argObject];
-		}
-		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
+		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
+		else args = this[argObject];
 
-		// role mention
+		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
+		// make mention position arg position if not explicitly set
+		if ([undefined, null].includes(mentionPosition)) mentionPosition = argPosition;
+
+		// channel mention
 		if (this.mentionMap.channels.length >= mentionPosition + 1) return this.mentionMap.channels.slice(mentionPosition)[mentionPosition] as C;
 
-		// role ID
-		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.get(args[argPosition]);
+		// channel ID
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.get(args[argPosition]);
 
-		// role name
-		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.find((r: C) => r.name.toLowerCase() === args[argPosition].toLowerCase());
+		// channel name
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.find((r: C) => r.name.toLowerCase() === args[argPosition].toLowerCase());
 
 		// nothing found
 		return null;
 	}
 
-	async getRoleFromArgs<R extends Eris.Role>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false): Promise<R> {
+	async getRoleFromArgs<R extends Eris.Role>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false, mentionPosition?: number): Promise<R> {
 		if (!this) throw new TypeError("invalid message");
 		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
-		let argObject, args;
+		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (join) {
-			args = [this[argObject].join(" ")];
-			argPosition = 0;
-		} else {
-			args = this[argObject];
-		}
+		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
+		else args = this[argObject];
+
+		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
+		// make mention position arg position if not explicitly set
+		if ([undefined, null].includes(mentionPosition)) mentionPosition = argPosition;
+
+		// role mention
+		if (this.mentionMap.roles.length >= mentionPosition + 1) return this.mentionMap.roles.slice(mentionPosition)[mentionPosition] as R;
+
 
 		// role id
-		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.channel.guild.roles.get(args[argPosition]);
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.channel.guild.roles.get(args[argPosition]);
 
 		// role name
-		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.channel.guild.roles.find((r: R) => r.name.toLowerCase() === args[argPosition].toLowerCase());
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.channel.guild.roles.find((r: R) => r.name.toLowerCase() === args[argPosition].toLowerCase());
 
 		// nothing found
 		return null;
@@ -315,20 +319,17 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 	async getGuildFromArgs<G extends Eris.Guild>(this: ExtendedMessage, argPosition = 0, unparsed = false, join = false): Promise<G> {
 		if (!this) throw new TypeError("invalid message");
 		if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(this.channel.type)) return;
-		let argObject, args;
+		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (join) {
-			args = [this[argObject].join(" ")];
-			argPosition = 0;
-		} else {
-			args = this[argObject];
-		}
+		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
+		else args = this[argObject];
+
 		// server id
-		if (!isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.get(args[argPosition]);
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.guilds.get(args[argPosition]);
 
 		// server name
-		if (isNaN(args[argPosition]) && !(args.length === argPosition || !args)) return this.client.guilds.find((g: G) => g.name.toLowerCase() === args[argPosition].toLowerCase());
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.guilds.find((g: G) => g.name.toLowerCase() === args[argPosition].toLowerCase());
 
 		// nothing found
 		return null;
@@ -340,33 +341,33 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 			switch (type.replace(/(\s|-)/g, "_").toUpperCase()) {
 				case "INVALID_USER":
 				case "INVALID_MEMBER":
-					title = "User Not Found",
-						description = "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag",
-						fields = [];
+					title = "User Not Found";
+					description = "The specified user was not found, please provide one of the following:\nFULL user ID, FULL username, FULL user tag";
+					fields = [];
 					break;
 
 				case "INVALID_ROLE":
-					title = "Role Not Found",
-						description = "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention",
-						fields = [];
+					title = "Role Not Found";
+					description = "The specified role was not found, please provide one of the following:\nFULL role ID, FULL role name (capitals do matter), or role mention";
+					fields = [];
 					break;
 
 				case "INVALID_CHANNEL":
-					title = "Channel Not Found",
-						description = "The specified channel was not found, please provide one of the following:\nFULL channel ID, FULL channel name, or channel mention",
-						fields = [];
+					title = "Channel Not Found";
+					description = "The specified channel was not found, please provide one of the following:\nFULL channel ID, FULL channel name, or channel mention";
+					fields = [];
 					break;
 
 				case "INVALID_SERVER":
-					title = "Server Not Found",
-						description = "The specified server was not found, please provide a valid server id the bot is in.",
-						fields = [];
+					title = "Server Not Found";
+					description = "The specified server was not found, please provide a valid server id the bot is in.";
+					fields = [];
 					break;
 
 				default:
-					title = "Default Title",
-						description = "Default Description",
-						fields = [];
+					title = "Default Title";
+					description = "Default Description";
+					fields = [];
 			}
 		}
 

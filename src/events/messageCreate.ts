@@ -73,7 +73,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			return;
 		}
 		t.end("blacklist");
-
 		t.start("dm");
 		// needed due to everything else being GuildTextableChannel
 		if ((message.channel as unknown as Eris.PrivateChannel).type === Eris.Constants.ChannelTypes.DM) {
@@ -120,14 +119,12 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}
 		}
 		t.end("dm");
-
 		t.start("db");
 		uConfig = await db.getUser(msg.author.id);
 		gConfig = await db.getGuild(msg.channel.guild.id);
 		// overwrite prefix set without db
 		if (gConfig.settings.prefix !== config.defaults.prefix) msg.prefix = gConfig.settings.prefix;
 		t.end("db");
-
 		t.start("mention");
 		if ([`<@!${this.user.id}>`, `<@${this.user.id}>`].includes(msg.content)) {
 			const embed =
@@ -149,7 +146,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}).catch(err => null);
 		}
 		t.end("mention");
-
 		t.start("autoResponse");
 		if (["f", "rip"].includes(msg.content.toLowerCase()) && gConfig.settings.fResponse && msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
 			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return;
@@ -237,7 +233,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					return;
 				}
 			}
-
 			let count = await mdb.collection("stats").findOne({ id: "fCount" }).then(res => parseInt(res.count, 10)).catch(err => 1);
 			await mdb.collection("stats").findOneAndUpdate({ id: "fCount" }, { $set: { count: ++count } });
 			if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.channel.createMessage({
@@ -256,7 +251,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			}); else return msg.channel.createMessage(`<@!${msg.author.id}> has paid respects.\n\nRespects paid total: **${count}**\n\nYou can turn this auto response off by using \`${gConfig.settings.prefix}settings f response disabled\``).catch(err => null);
 		}
 		t.end("autoResponse");
-
 		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()) || msg.content.toLowerCase() === msg.prefix.toLowerCase() || !msg.cmd || !msg.cmd.cmd) return;
 		const cmd = msg.cmd.cmd;
 
@@ -343,7 +337,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}
 			}
 		}
-
 		if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage(`You attempted to run the command "${msg.cmd.cmd.triggers[0]}" in the channel <#${msg.channel.id}>, but I'm missing the **sendMessages** permission.\n\nContent:\n> ${msg.content}`)).catch(err => null);
 
 		if (cmd.features.includes("betaOnly") && !config.beta) return;
@@ -383,7 +376,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}).catch(err => null);
 			}
 		}
-
 		const donator = await uConfig.premiumCheck();
 		if (cmd.features.includes("donatorOnly") && !config.developers.includes(msg.author.id)) {
 			if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
@@ -449,7 +441,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}).catch(err => null);
 			}
 		}
-
 		if (!config.developers.includes(msg.author.id)) {
 			const cool = this.cd.check(msg.author.id, "cmd", { cmd: cmd.triggers[0] });
 			const time = cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;
@@ -478,7 +469,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cd.add(msg.author.id, "cmd", donator.active ? cmd.donatorCooldown : cmd.cooldown, { cmd: cmd.triggers[0] });
 
 		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}" ran with ${msg.unparsedArgs.length === 0 ? "no arguments" : `the arguments "${msg.unparsedArgs.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
-
 		t.start("cmd");
 		const c = await cmd.run.call(this, msg, uConfig, gConfig, cmd).catch(err => err);
 		t.end("cmd");
@@ -486,7 +476,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.triggers[0] !== "eval" && msg.channel.isTyping) await msg.channel.stopTyping();
 		if (c instanceof Error) throw c;
 		t.end("main");
-
 		// timing command processing
 		if (msg.cmd.cat.name !== "dev") await mdb.collection("timing").insertOne({ times: t.timers, cmd: cmd.triggers[0], id: uuid.v4() });
 	} catch (e) {
