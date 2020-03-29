@@ -36,8 +36,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		t.end("leveling");
 
 		t.start("blacklist");
-		const gbl: Blacklist.GuildEntry[] = [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(msg.channel.type) ? await mdb.collection("blacklist").find({ guildId: msg.channel.guild.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())) : [];
-		const ubl: Blacklist.UserEntry[] = await mdb.collection("blacklist").find({ userId: msg.author.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now()));
+		const gblB: Blacklist.GuildEntry[] = [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(msg.channel.type) ? await mdb.collection("blacklist").find({ guildId: msg.channel.guild.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())) : [];
+		const gbl: Blacklist.GuildEntry[] = gblB.filter(r => [0, null].includes(r.expire) || r.expire > Date.now());
+		const ublB: Blacklist.UserEntry[] = await mdb.collection("blacklist").find({ userId: msg.author.id }).toArray();
+		const ubl: Blacklist.UserEntry[] = ublB.filter(r => [0, null].includes(r.expire) || r.expire > Date.now());
 		const bl = gbl.length > 0 || ubl.length > 0;
 
 		if (msg.member.roles.includes(config.blacklistRoleId) && !bl) await msg.member.removeRole(config.blacklistRoleId, "user is not blacklisted (might have expired)").catch(err => null);
@@ -196,7 +198,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 					if (spC >= config.antiSpam.response.blacklist) {
 						const id = Strings.random(7);
-						const expire = Date.now() + 1.21e+9;
+						const expire = config.bl.getTime("response", ublB.length, true, true);
 						const d = new Date(expire);
 						await mdb.collection("blacklist").insertOne({
 							created: Date.now(),
@@ -214,7 +216,15 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 							embeds: [
 								{
 									title: "User Blacklisted",
-									description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Auto Responses. \nReport: ${config.beta ? `https://${config.web.api.ip}/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}\nBlame: Automatic\nExpiry: ${Time.formatDateWithPadding(d, false)} (MM/DD/YYYY)`,
+									description: [
+										`Id: ${msg.author.id}`,
+										`Tag: ${msg.author.tag}`,
+										`Reason: Spamming Auto Responses.`,
+										`Report: ${config.beta ? `https://${config.web.api.ip}/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`}`,
+										`Blame: Automatic`,
+										`Expiry: ${expire === 0 ? "Never" : `${Time.formatDateWithPadding(d, false)} (MM/DD/YYYY)`}`,
+										`Previous Blacklists: **${ublB.length}** (strike ${ublB.length + 1})`
+									].join("\n"),
 									timestamp: new Date().toISOString(),
 									color: Math.floor(Math.random() * 0xFFFFFF)
 								}
@@ -295,7 +305,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 				if (spC >= config.antiSpam.cmd.blacklist) {
 					const id = Strings.random(7);
-					const expire = Date.now() + 2.592e+9;
+					const expire = config.bl.getTime("cmd", ublB.length, true, true);
 					const d = new Date(expire);
 					await mdb.collection("blacklist").insertOne({
 						created: Date.now(),
@@ -314,7 +324,15 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						embeds: [
 							{
 								title: "User Blacklisted",
-								description: `Id: ${msg.author.id}\nTag: ${msg.author.tag}\nReason: Spamming Commands. \nReport: ${config.beta ? `https://${config.web.api.ip}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}\nBlame: Automatic\nExpiry:  ${Time.formatDateWithPadding(d, false)} (MM/DD/YYYY)`,
+								description: [
+									`Id: ${msg.author.id}`,
+									`Tag: ${msg.author.tag}`,
+									`Reason: Spamming Commands.`,
+									`Report: ${config.beta ? `https://${config.web.api.ip}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`,
+									`Blame: Automatic`,
+									`Expiry:  ${expire === 0 ? "Never" : `${Time.formatDateWithPadding(d, false)} (MM/DD/YYYY)`}`,
+									`Previous Blacklists: **${ublB.length}** (strike ${ublB.length + 1})`
+								].join("\n"),
 								timestamp: new Date().toISOString(),
 								color: Math.floor(Math.random() * 0xFFFFFF)
 							}
