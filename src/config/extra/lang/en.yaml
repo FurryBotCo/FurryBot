@@ -543,6 +543,10 @@ commands:
     crab:
       description: "Crab rave!"
       usage: "<text>"
+      time: "This command may take a while.."
+      invalid: 'This command must be used with some text separated by a comma, ex: "split with, a comma"'
+      error: "It seems there may have been an api error"
+      support: "If this says something about being ratelimited, please try again in a few seconds. Else, report it to our support server"
     cry:
       description: "We need that water"
       usage: "<text>"
