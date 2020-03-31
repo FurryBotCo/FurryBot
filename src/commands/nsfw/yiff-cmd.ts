@@ -80,5 +80,5 @@ export default new Command({
 			.setColor(Colors.gold)
 			.setImage(img.response.image)
 			.setFooter("{lang:other.poweredBy.furrybot}")
-	});
+	}).catch(err => null);
 }));
