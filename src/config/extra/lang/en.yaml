@@ -774,7 +774,7 @@ commands:
       noBanOther: "you cannot ban **{0}** as their highest role is higher than yours!"
       banDm: "You were banned from **{0}**\nReason: {1}"
       noReason: "No Reason Specified."
-      userBanned: "***User {0} was banned, {1}***"
+      userBanned: "User {0} was banned, {1}"
       couldNotBan: "I couldn't ban **{0}**, {1}"
     delwarn:
       description: "Remove a warning from someone."
@@ -788,7 +788,7 @@ commands:
       usage: "<@user/id> [reason]"
       title: "User already banned"
       desc: "It looks like {0} is already banned here.."
-      banned: "***User {0} was banned, {1}***"
+      banned: "User {0} was banned, {1}"
       couldNotHackban: "I couldn't hackban **{0}**, {1}"
     kick:
       description: "Kick members from your server."
@@ -796,7 +796,7 @@ commands:
       noSelf: "Pretty sure you don't want to do this to yourself."
       dm: "You were kicked from **{0}**\nReason: {1}"
       noKick: "you cannot kick **{0}** as their highest role is higher than yours!"
-      kicked: "***User {0} was kicked, {1}***"
+      kicked: "User {0} was kicked, {1}"
       couldNotKick: "I couldn't kick **{0}**, {1}"
     lock:
       description: "Lock a channel to prevent people talking in it."
@@ -822,7 +822,7 @@ commands:
       invalidTime: "invalid time."
       noMuteOther: "you cannot mute **{0}** as their highest role is higher than yours!"
       noReason: "No Reason Specified."
-      muted: "***User {0} was muted, {1}***"
+      muted: "User {0} was muted, {1}"
       couldNotMute: "I couldn't mute **{0}**, {1}"
       noRole: "No mute role"
       noRoleDesc: "this server does not have a mute role set, you can set this with `{0}settings mute role <role>`"
@@ -844,7 +844,7 @@ commands:
       noBanOther: "you cannot ban **{0}** as their highest role is higher than yours!"
       banDm: "You were banned from **{0}**\nReason: {1}"
       noReason: "No Reason Specified."
-      userSoftbanned: "***User {0} was softbanned, {1}***"
+      userSoftbanned: "User {0} was softbanned, {1}"
       couldNotSoftban: "I couldn't softban **{0}**, {1}"
       couldNotUnban: "I couldn't unban **{0}**, {1}"
     unban:
@@ -853,7 +853,7 @@ commands:
       notBanned: "User not banned"
       notBannedDesc: "It doesn't look like {0} is banned here.."
       noReason: "No Reason Specified."
-      unbanned: "***Unbanned {0}, {1}***"
+      unbanned: "Unbanned {0}, {1}"
       couldNotUnban: "I couldn't unban **{0}**, {1}"
     unlock:
       description: "Unlock a channel after it has been locked."
@@ -872,13 +872,13 @@ commands:
       invalidRoleDesc: "The current mute role <@&{0}> ({1}) seems to be higher than me, please move it below me. You can set a new one with `{2}settings mute role <role>`"
       notMuted: "User not muted"
       notMutedDesc: "The user **{0}** seems to not be muted.. You can mute them with `${1}mute <@!{2}> [reason]`"
-      unmuted: "***User {0} was unmuted, {1}***"
+      unmuted: "User {0} was unmuted, {1}"
       couldNotUnmute: "I couldn't unmute **{0}**, {1}"
     warn:
       description: "Add a warning to someone."
       usage: "<@member/id> [reason]"
       noReason: "None Provided"
-      warned: "***User {0} was warned, {1}***"
+      warned: "User {0} was warned, {1}"
     warnings:
       description: "Add a warning to someone."
       usage: "<@member/id> [page]"

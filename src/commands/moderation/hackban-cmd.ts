@@ -42,7 +42,7 @@ export default new Command({
 	if (user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.reply("{lang:commands.moderation.hackban.noSelf}");
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "{lang:commands.moderation.hackban.noReason}";
 	msg.channel.guild.banMember(user.id, 7, `Hackban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
-		await msg.channel.createMessage(`{lang:commands.moderation.hackban.banned|${user.username}#${user.discriminator}|${reason}}`).catch(noerr => null);
+		await msg.channel.createMessage(`******{lang:commands.moderation.hackban.banned|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "hackban",
 			reason,

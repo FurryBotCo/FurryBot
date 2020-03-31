@@ -36,7 +36,7 @@ export default new Command({
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "{lang:commands.moderation.kick.noReason}";
 	if (!member.user.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`{lang:commands.moderation.kick.dm|${msg.channel.guild.name}|${reason}}`)).catch(err => null);
 	member.kick(`Kick: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
-		await msg.channel.createMessage(`{lang:commands.moderation.kick.kicked|${member.username}#${member.discriminator}|${reason}}`).catch(noerr => null);
+		await msg.channel.createMessage(`***{lang:commands.moderation.kick.kicked|${member.username}#${member.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "kick",
 			reason,

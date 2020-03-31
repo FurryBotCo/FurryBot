@@ -39,7 +39,7 @@ export default new Command({
 	} as Warning);
 
 
-	await msg.channel.createMessage(`{lang:commands.moderation.warn.warned|${member.username}#${member.discriminator}|${reason}}`).then(async () => {
+	await msg.channel.createMessage(`***{lang:commands.moderation.warn.warned|${member.username}#${member.discriminator}|${reason}}***`).then(async () => {
 		await this.m.create(msg.channel, {
 			type: "warn",
 			target: member,

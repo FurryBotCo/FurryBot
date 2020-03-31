@@ -54,7 +54,7 @@ export default new Command({
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "{lang:commands.moderation.softban.noReason}";
 	// if (!user.user.bot) m = await user.user.getDMChannel().then(dm => dm.createMessage(`You were banned from **${msg.channel.guild.name}**\nReason: ${reason}`));
 	user.ban(7, `Softban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
-		await msg.channel.createMessage(`{lang:commands.moderation.softban.softbanned|${user.username}#${user.discriminator}|${reason}}`).catch(noerr => null);
+		await msg.channel.createMessage(`***{lang:commands.moderation.softban.softbanned|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "softban",
 			reason,
@@ -66,7 +66,7 @@ export default new Command({
 		await msg.channel.createMessage(`{lang:commands.moderation.softban.couldNotSoftban|${user.username}#${user.discriminator}|${err}}`);
 		// if (!!m) await m.delete();
 	}).then(() => user.unban(`Softban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`)).catch(err =>
-		msg.channel.createMessage(`{lang:commands.moderation.softban.couldNotUnban|${user.username}#${user.discriminator}|${err}}`)
+		msg.channel.createMessage(`{lang:commands.moderation.softban.couldNotSoftban|${user.username}#${user.discriminator}|${err}}`)
 	);
 
 	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
