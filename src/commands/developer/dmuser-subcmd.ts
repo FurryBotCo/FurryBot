@@ -14,7 +14,7 @@ export default new Command({
 	features: ["devOnly"],
 	file: __filename
 }, (async function (msg: ExtendedMessage) {
-	if (msg.args.length > 0) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 0) return new Error("ERR_INVALID_USAGE");
 
 	const user = await msg.getUserFromArgs();
 
