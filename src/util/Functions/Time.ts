@@ -115,9 +115,9 @@ export default class Time {
 	 * @returns
 	 * @memberof Time
 	 */
-	static formatDateWithPadding(d: Date | number = new Date(), seconds = true, ms = false) {
+	static formatDateWithPadding(d: Date | number = new Date(), hms = true, ms = false) {
 		if (typeof d === "number") d = new Date(d);
-		return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()} ${seconds ? `${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
+		return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()}${hms ? ` ${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
 	}
 
 	static formatAgo(time: number | Date) {
