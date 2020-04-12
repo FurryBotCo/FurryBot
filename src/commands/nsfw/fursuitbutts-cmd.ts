@@ -23,7 +23,7 @@ export default new Command({
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
-	const img = await phin({
+	const img = await phin<any>({
 		method: "GET",
 		url: "https://api.fursuitbutts.com/butts",
 		parse: "json",

@@ -10,5 +10,6 @@
 	"preferences": {
 		"mention": true
 	},
-	"levels": {}
+	"levels": {},
+	"deletion": null
 }

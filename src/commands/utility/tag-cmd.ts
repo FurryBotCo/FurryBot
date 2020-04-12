@@ -53,11 +53,11 @@ export default new Command({
 		if (msg.args[0].toLowerCase() === "create") return msg.reply(`{lang:commands.utility.tag.createUsage|${gConfig.settings.prefix}}`);
 		if (msg.args[0].toLowerCase() === "delete") return msg.reply(`{lang:commands.utility.tag.deleteusage|${gConfig.settings.prefix}}`);
 		if (msg.args[0].toLowerCase() === "edit") return msg.reply(`{lang:commands.utility.tag.editUsage|${gConfig.settings.prefix}}`);
-		if (!Object.keys(tags).includes(msg.args[0].toLowerCase())) return msg.reply(`{lang:commands.utility.tag.invalid.`);
+		if (!Object.keys(tags).includes(msg.args[0].toLowerCase())) return msg.reply(`{lang:commands.utility.tag.invalid}.`);
 
 		return msg.channel.createMessage(tags[msg.args[0].toLowerCase()]);
 	} else {
-		if (!msg.args[1]) return msg.reply("{lang:commands.utility.tag.needName");
+		if (!msg.args[1]) return msg.reply("{lang:commands.utility.tag.needName}");
 		switch (msg.args[0].toLowerCase()) {
 			case "create": {
 				if (Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.tag.alreadyExists|${msg.args[1].toLowerCase()}}`);

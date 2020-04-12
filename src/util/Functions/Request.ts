@@ -16,7 +16,7 @@ export default class Request {
 	 * @memberof Request
 	 */
 	static async getImageFromURL(url: string) {
-		return phin({ url }).then(res => res.body);
+		return phin({ url }).then(res => Buffer.from(res.body));
 	}
 
 	/**
@@ -47,7 +47,7 @@ export default class Request {
 	)> {
 		if ([undefined, null].includes(json)) json = true;
 		const url = `https://api.furry.bot/V1/${animal ? "animals" : `furry/${safe ? "sfw" : "nsfw"}`}/${category ? category.toLowerCase() : safe ? "hug" : "bulge"}${json ? "" : "/image"}`.replace(/\s/g, "");
-		const s = await phin({
+		const s = await phin<any>({
 			method: "GET",
 			url,
 			parse: "json",
@@ -79,7 +79,7 @@ export default class Request {
 	 * @returns {Promise<phin.BufferResponse>}
 	 * @memberof Request
 	 */
-	static async memeRequest(path: string, avatars: string[] | string = [], usernames: string[] | string = [], text = ""): Promise<phin.BufferResponse> {
+	static async memeRequest(path: string, avatars: string[] | string = [], usernames: string[] | string = [], text = ""): Promise<phin.IResponse> {
 		avatars = typeof avatars === "string" ? [avatars] : avatars;
 		usernames = typeof usernames === "string" ? [usernames] : usernames;
 		const data: {
@@ -105,7 +105,7 @@ export default class Request {
 	}
 
 	static async chewyBotAPIRequest(cat: string): Promise<string> {
-		let r: phin.BufferResponse;
+		let r: phin.IResponse;
 		try {
 			r = await phin({
 				method: "GET",

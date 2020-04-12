@@ -15,7 +15,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const req = await phin({
+	const req = await phin<any>({
 		method: "GET",
 		url: "https://icanhazdadjoke.com",
 		headers: {

@@ -71,16 +71,14 @@ export default class GuildConfig {
 	tags: {
 		[k: string]: string;
 	};
-	auto: (
-		GlobalTypes.Auto.Yiff<"gay" | "straight" | "lesbian" | "dickgirl"> |
-		GlobalTypes.Auto.Animals<"bird" | "bunny" | "cat" | "dog" | "duck" | "fox" | "otter" | "panda" | "snek" | "turtle" | "wolf">
-	)[];
+	auto: {}[];
 	disable: {
 		server: string[];
 		channels: {
 			[k: string]: string[];
 		};
 	};
+	deletion?: number;
 
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		this.id = id;
@@ -95,7 +93,7 @@ export default class GuildConfig {
 		 * @param {C} c - set data
 		 */
 		function goKeys(a, b, c) {
-			Object.keys(b).map(k => typeof a[k] === "undefined" ? c[k] = b[k] : a[k] instanceof Array ? c[k] = a[k] : typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? (c[k] = {}, goKeys(a[k], b[k], c[k])) : c[k] = a[k]);
+			Object.keys(b).map(k => typeof a[k] === "undefined" ? c[k] = b[k] : a[k] instanceof Array ? c[k] = a[k] : typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? ([undefined, null].includes(c) ? c = {} : null, c[k] = a[k], goKeys(a[k], b[k], c[k])) : ([undefined, null].includes(c) ? c = {} : null, c[k] = a[k])); // tslint:disable-line no-unused-expression
 		}
 		goKeys(data, config.defaults.config.guild, this);
 	}
@@ -109,8 +107,9 @@ export default class GuildConfig {
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
 		const d = this;
 		function goKeys(a, b) {
-			Object.keys(a).map(k => typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? goKeys(a[k], b[k]) : typeof b === "undefined" ? b = { [k]: a[k] } : b[k] = a[k]);
+			Object.keys(a).map(k => typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? ([undefined, null].includes(b) ? b = {} : null, typeof b[k] === "undefined" ? b[k] = a[k] : null, goKeys(a[k], b[k])) : typeof b === "undefined" ? b = { [k]: a[k] } : ([undefined, null].includes(b) ? b = {} : null, b[k] = a[k])); // tslint:disable-line no-unused-expression
 		}
+		function go(s, o) { }
 		goKeys(data, d);
 
 		const e = await mdb.collection("guilds").findOne({

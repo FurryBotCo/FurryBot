@@ -18,10 +18,11 @@ export default new Command({
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const rand = msg.channel.guild.members.filter(m => m.id !== msg.author.id);
+	const r = rand[Math.floor(Math.random() * rand.length)];
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setDescription(`{lang:commands.fun.bap.possible|${msg.author.id}|${Internal.extraArgParsing(msg)}|${rand[Math.floor(Math.random() * rand.length)].id}}`)
+			.setDescription(`{lang:commands.fun.bap.possible|${msg.author.id}|${Internal.extraArgParsing(msg)}|${r.username}#${r.discriminator}}`)
 			.setImage("https://assets.furry.bot/bap.gif")
 			.setTimestamp(new Date().toISOString())
 			.setColor(Math.floor(Math.random() * 0xFFFFFF))

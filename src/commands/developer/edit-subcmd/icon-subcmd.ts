@@ -19,9 +19,8 @@ export default new SubCommand({
 	if (msg.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
 	const set = await phin({
 		url: msg.unparsedArgs.join("%20"),
-		parse: "none",
 		timeout: 5e3
-	}).then(res => `data:${res.headers["content-type"]};base64,${res.body.toString("base64")}`);
+	}).then(res => `data:${res.headers["content-type"]};base64,${Buffer.from(res.body.toString()).toString("base64")}`);
 	this.editSelf({ avatar: set })
 		.then(async (user) => msg.channel.createMessage(`<@!${msg.author.id}>, Set Avatar to (attachment)`, {
 			file: await Request.getImageFromURL(user.avatarURL),

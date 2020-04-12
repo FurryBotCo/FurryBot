@@ -220,17 +220,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 			else return this.client.getRESTUser(args[argPosition]).catch(err => null) as Promise<U>;
 		}
 
-		// username
-		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && args[argPosition].indexOf("#") === -1 && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
-			try {
-				return this.channel.guild.members.find(m => m.user.username.toLowerCase() === args[argPosition].toLowerCase()).user as U;
-			} catch (e) {
-				return null;
-			}
-		}
-
-		// user tag
-		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && args[argPosition].indexOf("#") !== -1 && !(this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find(m => `${m.username}#${m.discriminator}`.toLowerCase() === args[argPosition].toLowerCase()).user as U;
+		// no username or tag because we're getting a user so it's not reasonable to look for those
 
 		// nothing found
 		return null;

@@ -41,7 +41,7 @@ export default class Utility {
 		length: number;
 		new: boolean;
 	}> {
-		const req = await phin({
+		const req = await phin<any>({
 			url: `https://r.furry.services/get?url=${encodeURIComponent(url)}`,
 			headers: {
 				"User-Agent": config.web.userAgent
@@ -54,7 +54,7 @@ export default class Utility {
 			...req.body
 		};
 		else if (req.statusCode === 404) {
-			const cr = await phin({
+			const cr = await phin<any>({
 				method: "POST",
 				url: `https://r.furry.services/create?url=${encodeURIComponent(url)}`,
 				headers: {

@@ -32,7 +32,7 @@ class LoggerV8 {
 	get debug() { return this._log("debug"); }
 	get debugSync() { return this._logSync("debug"); }
 
-	_log(type: string) {
+	private _log(type: string) {
 		return (async (source: string, msg?: any): Promise<boolean> => {
 			try {
 				const dt = new Date();
@@ -85,7 +85,7 @@ class LoggerV8 {
 		});
 	}
 
-	_logSync(type: string): (source: string, msg?: any) => boolean {
+	private _logSync(type: string): (source: string, msg?: any) => boolean {
 		return deasync(this._log(type)).bind(this);
 	}
 }

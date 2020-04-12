@@ -26,6 +26,7 @@ export default class UserConfig {
 	levels: {
 		[k: string]: number;
 	};
+	deletion?: number;
 
 	constructor(id: string, data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		this.id = id;
@@ -44,8 +45,8 @@ export default class UserConfig {
 		 * @param {B} b - default
 		 * @param {C} c - set data
 		 */
-		function goKeys<A extends {}, B extends {}, C extends {}>(a: A, b: B, c: C) {
-			Object.keys(b).map(k => typeof a[k] === "undefined" ? c[k] = b[k] : a[k] instanceof Array ? c[k] = a[k] : typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? (c[k] = {}, goKeys(a[k], b[k], c[k])) : c[k] = a[k]);
+		function goKeys(a, b, c) {
+			Object.keys(b).map(k => typeof a[k] === "undefined" ? c[k] = b[k] : a[k] instanceof Array ? c[k] = a[k] : typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? (c[k] = a[k], goKeys(a[k], b[k], c[k])) : ([undefined, null].includes(typeof c[k]) ? c[k] = {} : null, c[k] = a[k])); // tslint:disable-line no-unused-expression
 		}
 		goKeys(data, config.defaults.config.user, this);
 	}
@@ -59,8 +60,8 @@ export default class UserConfig {
 	async edit(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		const d = this;
 
-		function goKeys<A extends {}, B extends {}>(a: A, b: B) {
-			Object.keys(a).map(k => typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? goKeys(a[k], b[k]) : b[k] = a[k]);
+		function goKeys(a, b) {
+			Object.keys(a).map(k => typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? (typeof b[k] === "undefined" ? b[k] = a[k] : null, goKeys(a[k], b[k])) : typeof b === "undefined" ? b = { [k]: a[k] } : ([undefined, null].includes(b[k]) ? b[k] = {} : null, b[k] = a[k])); // tslint:disable-line no-unused-expression
 		}
 		goKeys(data, d);
 

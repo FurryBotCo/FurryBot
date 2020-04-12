@@ -16,7 +16,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const img = await phin({
+	const img = await phin<any>({
 		method: "GET",
 		url: "https://aws.random.cat/meow",
 		parse: "json"

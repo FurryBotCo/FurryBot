@@ -22,7 +22,7 @@ export default new Command({
 	// not 19 yet, bot soon™
 	if (msg.args[0].length < 17 || msg.args.length > 19) return msg.reply("{lang:commands.utility.lookup.invalid}");
 
-	const w = await phin({
+	const w = await phin<any>({
 		method: "GET",
 		url: `https://discordapp.com/api/guilds/${msg.args[0]}/widget.json`,
 		headers: {
