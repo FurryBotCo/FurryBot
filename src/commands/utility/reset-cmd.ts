@@ -33,7 +33,7 @@ export default new Command({
 		try {
 			await gConfig.reset().then(d => d.reload());
 		} catch (e) {
-			Logger.error(e, msg.channel.guild.shard.id);
+			this.log("error", e, `Shard #${msg.channel.guild.shard.id}`);
 			return msg.channel.createMessage("{lang:commands.utility.reset.error}");
 		}
 	}

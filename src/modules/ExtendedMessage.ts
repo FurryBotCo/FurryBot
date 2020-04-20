@@ -18,7 +18,8 @@ export interface ExtendedGuildChanel extends Eris.GuildChannel {
 export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.TextableChannel> extends Eris.Message<T> {
 	channel: ExtendedGuildChanel & T;
 	author: Eris.User & { tag: string; };
-	private _client: FurryBot;
+	client: FurryBot;
+	private _client: Eris.Client;
 	private _cmd: {
 		cmd: Command;
 		cat: Category;
@@ -72,6 +73,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		if (![undefined].includes(msg.type)) data.type = msg.type;
 
 		super(data, client);
+		this.client = client;
 
 		// this property doesn't seem to be set properly
 		this.timestamp = !isNaN(msg.timestamp) ? msg.timestamp : Date.now();
@@ -93,23 +95,23 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 						i++;
 					}
 				}, 1e4);
-				this.client.holder.set("typing", this.channel.id, k);
+				client.holder.set("typing", this.channel.id, k);
 				return k;
 			})
 		});
 
 		if (typeof this.channel.stopTyping === "undefined") Object.defineProperty(this.channel, "stopTyping", {
 			value: (async () => {
-				if (this.client.holder.has("typing", ch.id)) {
-					clearInterval(this.client.holder.get<NodeJS.Timer>("typing", ch.id));
-					return this.client.holder.remove("typing", ch.id);
+				if (client.holder.has("typing", ch.id)) {
+					clearInterval(client.holder.get<NodeJS.Timer>("typing", ch.id));
+					return client.holder.remove("typing", ch.id);
 				} else return false;
 			})
 		});
 
 		if (typeof this.channel.isTyping === "undefined") Object.defineProperty(this.channel, "isTyping", {
 			get() {
-				return this.client.holder.has("typing", ch.id);
+				return client.holder.has("typing", ch.id);
 			}
 		});
 
@@ -123,7 +125,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
 				}
 			}
-			return this.client.createMessage.call(this.client, this.channel.id, content, file).then(d => new ExtendedMessage(d, this.client));
+			return this._client.createMessage.call(this._client, this.channel.id, content, file).then(d => new ExtendedMessage(d, this.client));
 		});
 
 		this.channel.editMessage = (async (messageID: string, content: Eris.ExtraMessageContent) => {
@@ -136,7 +138,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
 				}
 			}
-			return this.client.editMessage.call(this.client, this.channel.id, messageID, content).then(d => new ExtendedMessage(d, this.client));
+			return this._client.editMessage.call(this._client, this.channel.id, messageID, content).then(d => new ExtendedMessage(d, this.client));
 		});
 
 		this.edit = (async (content: Eris.ExtraMessageContent) => {
@@ -149,14 +151,13 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
 				}
 			}
-			return this.client.editMessage.call(this.client, this.channel.id, this.id, content).then(d => new ExtendedMessage(d, this.client));
+			return this._client.editMessage.call(this._client, this.channel.id, this.id, content).then(d => new ExtendedMessage(d, this.client));
 		});
 
 		// no prefix if dm
 		// if ((this.channel.type as any) === Eris.Constants.ChannelTypes.DM) this.prefix = "";
 	}
 
-	get client() { return this._client; }
 	get prefix() {
 		return ![undefined, null].includes(this._prefix) ? this._prefix : this._prefix = [
 			Eris.Constants.ChannelTypes.GUILD_TEXT,

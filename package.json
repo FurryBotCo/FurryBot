@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "8.0.2",
+  "version": "8.1.0",
   "description": "Furry Bot for Discord!",
   "main": "index.js",
   "dependencies": {
@@ -10,7 +10,7 @@
     "chalk": "^3.0.0",
     "cheerio": "^1.0.0-rc.3",
     "chunk": "0.0.2",
-    "clustersv3": "npm:@donovan_dmc/clustersv3@^1.0.0",
+    "clustersv3": "npm:@donovan_dmc/clustersv3@^1.0.38",
     "deasync": "^0.1.19",
     "e6api": "^1.0.13",
     "e9api": "^1.0.13",

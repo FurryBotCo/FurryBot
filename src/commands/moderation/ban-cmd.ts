@@ -4,6 +4,7 @@ import Eris from "eris";
 import { Utility } from "../../util/Functions";
 import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import Language from "../../util/Language";
 
 export default new Command({
 	triggers: [
@@ -28,7 +29,7 @@ export default new Command({
 		const a = [...msg.args];
 		a.splice(a.indexOf(`--days=${msg.dashedArgs.parsed.keyValue.days}`));
 		msg.args = a;
-		if (deleteDays < 1) return msg.reply("{lang:commands.moderation.ban.deleteLessThan}");
+		if (deleteDays < 0) return msg.reply("{lang:commands.moderation.ban.deleteLessThan}");
 		if (deleteDays > 14) return msg.reply("{lang:commands.moderation.ban.deleteMoreThan}");
 	}
 
@@ -70,7 +71,7 @@ export default new Command({
 	const a = Utility.compareMembers(member, msg.member);
 	if ((a.member1.higher || a.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(`{lang:commands.moderation.ban.noBanOther|${member.username}#${member.discriminator}}`);
 	// if(!user.bannable) return msg.channel.createMessage(`<@!${msg.author.id}>, I cannot ban ${member.username}#${member.discriminator}! Do they have a higher role than me? Do I have ban permissions?`);
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "{lang:commands.moderation.ban.noReason}";
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
 	if (!member.user.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`{lang:commands.moderation.ban.banDm|${msg.channel.guild.name}|${reason}}`)).catch(err => null);
 	member.ban(deleteDays, `Ban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 		await msg.channel.createMessage(`***{lang:commands.moderation.ban.userBanned|${member.username}#${member.discriminator}|${reason}}***`).catch(err => null);
@@ -91,7 +92,8 @@ export default new Command({
 			reason
 		} as any); // apparently mongodb's types require specifying "_id" so we'll do this now
 	}).catch(async (err) => {
-		msg.channel.createMessage(`{lang:commands.moderation.ban.couldNotBan|${member.username}#${member.discriminator}|${err}}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.ban.englishOnly}`);
+		else await msg.channel.createMessage(`{lang:commands.moderation.ban.couldNotBan|${member.username}#${member.discriminator}|${err}}`);
 		if (typeof m !== "undefined") await m.delete();
 	});
 	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);

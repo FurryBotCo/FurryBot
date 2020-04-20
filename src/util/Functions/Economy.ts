@@ -131,6 +131,7 @@ export default class Economy {
 			},
 			supportStaff: {
 				p: 0.050,
+				// @TODO make function to check across clusters
 				check: (userId: string, client: FurryBot) => client.guilds.get(config.bot.mainGuild).members.has(userId) && client.guilds.get(config.bot.mainGuild).members.get(userId).roles.includes("427302201027854337"),
 				name: "{lang:commands.economy.multiplier.multi.supportStaff}",
 				hidden: true

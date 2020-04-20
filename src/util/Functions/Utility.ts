@@ -5,7 +5,7 @@ import youtubesearch from "youtube-search";
 import ytdl from "ytdl-core";
 import * as URL from "url";
 import util from "util";
-import client from "../../../";
+import FurryBot from "../../main";
 import { Utility as T } from "./TypeDefs";
 
 export default class Utility {
@@ -239,7 +239,7 @@ export default class Utility {
 	 * @returns {(Promise<T.AuditLogReturn>}
 	 * @memberof Utility
 	 */
-	static async fetchAuditLogEntries(guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<T.AuditLogReturn> {
+	static async fetchAuditLogEntries(client: FurryBot, guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<T.AuditLogReturn> {
 		if (!guild.members.get(client.user.id).permission.has("viewAuditLogs")) return {
 			success: false,
 			error: {

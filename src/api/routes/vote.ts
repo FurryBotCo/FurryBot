@@ -40,7 +40,7 @@ export default (async (client: FurryBot) => {
 				]
 			});
 
-			Logger.log("DBL Vote", `Vote on DBL by user ${u.username}#${u.discriminator} (${u.id})`);
+			client.log("debug", "DBL Vote", `Vote on DBL by user ${u.username}#${u.discriminator} (${u.id})`);
 			await u.getDMChannel().then(dm => dm.createMessage(`Hey, thanks for voting for me! We currently do not have any specific rewards, but some are planned! You can suggest some rewards with \`${config.defaults.prefix}suggest\`!`)).catch(err => null);
 			return res.status(200).json({
 				success: true,

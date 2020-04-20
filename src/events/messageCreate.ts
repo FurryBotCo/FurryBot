@@ -1,6 +1,6 @@
 import ClientEvent from "../util/ClientEvent";
 import FurryBot from "../main";
-import Eris, { GuildChannel } from "eris";
+import Eris from "eris";
 import ExtendedMessage from "../modules/ExtendedMessage";
 import Timers from "../util/Timers";
 import config from "../config";
@@ -15,6 +15,7 @@ import * as uuid from "uuid";
 import GuildConfig from "../modules/config/GuildConfig";
 import UserConfig from "../modules/config/UserConfig";
 import phin from "phin";
+import Language from "../util/Language";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	let
@@ -22,15 +23,14 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		gConfig: GuildConfig,
 		uConfig: UserConfig;
 	try {
-		const t = new Timers(config.beta);
+		const t = new Timers(this, config.beta);
 		t.start("main");
 
-		if (!message || !message.author || message.author.bot || (config.beta && !config.betaAccess.includes(message.author.id))) return;
+		if (!message || !message.author || message.author.bot || !this.firstReady || (config.beta && !config.betaAccess.includes(message.author.id))) return;
 
 		t.start("messageProcess");
 		msg = new ExtendedMessage(message, this);
 		t.end("messageProcess");
-
 		t.start("leveling");
 		// @FIXME leveling
 		t.end("leveling");
@@ -42,7 +42,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const ubl: Blacklist.UserEntry[] = ublB.filter(r => [0, null].includes(r.expire) || r.expire > Date.now());
 		const bl = gbl.length > 0 || ubl.length > 0;
 
-		if (msg.member.roles.includes(config.blacklistRoleId) && !bl) await msg.member.removeRole(config.blacklistRoleId, "user is not blacklisted (might have expired)").catch(err => null);
+		if (msg.member && msg.member.roles.includes(config.blacklistRoleId) && !bl) await msg.member.removeRole(config.blacklistRoleId, "user is not blacklisted (might have expired)").catch(err => null);
 
 		if (bl && !config.developers.includes(msg.author.id)) {
 			if (msg.channel.guild && msg.channel.guild.id === config.bot.mainGuild) {
@@ -98,7 +98,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				});
 
 				await msg.author.getDMChannel().then(dm => dm.createMessage(config.bot.directMessage.invite)).catch(err => null);
-				return Logger.log("Direct Message", `DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`);
+				return this.log("log", `DM Advertisment recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, "Direct Message");
 			} else {
 				await this.w.get("directMessage").execute({
 					embeds: [{
@@ -115,7 +115,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				});
 
 				await msg.author.getDMChannel().then(dm => dm.createMessage(config.bot.directMessage.normal));
-				return Logger.log("Direct Message", `Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`);
+				return this.log("log", `Direct message recieved from ${msg.author.username}#${msg.author.discriminator}: ${msg.content}`, "Direct Message");
 			}
 		}
 		t.end("dm");
@@ -285,7 +285,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 				fs.writeFileSync(`${config.dir.logs}/spam/${msg.author.id}-${reportId}-cmd.json`, JSON.stringify(report));
 
-				Logger.log(`Shard #${msg.channel.guild.shard.id} | Command Handler`, `Possible command spam from "${msg.author.tag}" (${msg.author.id}), VL: ${spC}, Report: ${config.beta ? `https://${config.web.api.ip}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`);
+				this.log("log", `Possible command spam from "${msg.author.tag}" (${msg.author.id}), VL: ${spC}, Report: ${config.beta ? `https://${config.web.api.ip}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`, `Shard #${msg.channel.guild.shard.id} | Command Handler`);
 				await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 					embeds: [
 						{
@@ -313,7 +313,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						expire
 					} as Blacklist.UserEntry);
 
-					Logger.log(`Shard #${msg.channel.guild.shard.id} | Command Handler`, `User "${msg.author.tag}" (${msg.author.id}) blacklisted for spamming, VL: ${spC}, Report: ${config.beta ? `https://${config.web.api.ip}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`);
+					this.log("log", `User "${msg.author.tag}" (${msg.author.id}) blacklisted for spamming, VL: ${spC}, Report: ${config.beta ? `https://${config.web.api.ip}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`, `Shard #${msg.channel.guild.shard.id} | Command Handler`);
 					await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 						embeds: [
 							{
@@ -342,7 +342,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.features.includes("betaOnly") && !config.beta) return;
 
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) {
-			Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `${msg.author.tag} (${msg.author.id}) attempted to run developer command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+			this.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 			return msg.reply(`you must be a developer to use this command.`).catch(err => null);
 		}
 
@@ -413,8 +413,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
 			if (cmd.userPermissions.some(perm => !msg.channel.guild.members.get(msg.author.id).permission.has(perm))) {
 				const p = cmd.userPermissions.filter(perm => !msg.channel.guild.members.get(msg.author.id).permission.has(perm));
-				if (!msg.channel.permissionsOf(msg.client.user.id).has("embedLinks")) return msg.reply(`you're missing some permissions to be able to run that, but I need the \`embedLinks\` permission to tell you which.`).catch(err => null);
-				Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `user ${msg.author.username}#${msg.author.discriminator} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`);
+				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`you're missing some permissions to be able to run that, but I need the \`embedLinks\` permission to tell you which.`).catch(err => null);
+				this.log("debug", `user ${msg.author.username}#${msg.author.discriminator} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`, `Shard #${msg.channel.guild.shard.id}`);
 				return msg.channel.createMessage({
 					embed: {
 						title: "You do not have the required permission(s) to use this!",
@@ -429,8 +429,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.botPermissions.length > 0) {
 			if (cmd.botPermissions.some(perm => !msg.channel.guild.members.get(this.user.id).permission.has(perm))) {
 				const p = cmd.botPermissions.filter(perm => !msg.channel.guild.members.get(this.user.id).permission.has(perm));
-				if (!msg.channel.permissionsOf(msg.client.user.id).has("embedLinks")) return msg.reply(`I am missing some permissions to be able to run that, but I need the \`embedLinks\` permission to tell you which.`).catch(err => null);
-				Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${(msg.channel as Eris.TextChannel).guild.name} (${(msg.channel as Eris.TextChannel).guild.id})`);
+				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`I am missing some permissions to be able to run that, but I need the \`embedLinks\` permission to tell you which.`).catch(err => null);
+				this.log("debug", `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${(msg.channel as Eris.TextChannel).guild.name} (${(msg.channel as Eris.TextChannel).guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 				return msg.channel.createMessage({
 					embed: {
 						title: "I do not have the required permission(s) to use this!",
@@ -468,11 +468,11 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cd.add(msg.author.id, "cmd", donator.active ? cmd.donatorCooldown : cmd.cooldown, { cmd: cmd.triggers[0] });
 
-		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}" ran with ${msg.unparsedArgs.length === 0 ? "no arguments" : `the arguments "${msg.unparsedArgs.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+		this.log("log", `Command "${cmd.triggers[0]}" ran with ${msg.unparsedArgs.length === 0 ? "no arguments" : `the arguments "${msg.unparsedArgs.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 		t.start("cmd");
 		const c = await cmd.run.call(this, msg, uConfig, gConfig, cmd).catch(err => err);
 		t.end("cmd");
-		Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `Command handler for "${cmd.triggers[0]}" took ${t.calc("cmd", "cmd")}ms`);
+		this.log("debug", `Command handler for "${cmd.triggers[0]}" took ${t.calc("cmd", "cmd")}ms`, `Shard #${msg.channel.guild.shard.id}`);
 		if (cmd.triggers[0] !== "eval" && msg.channel.isTyping) await msg.channel.stopTyping();
 		if (c instanceof Error) throw c;
 		t.end("main");
@@ -481,7 +481,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 	} catch (e) {
 		const err: Error & { code?: string; } = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
 		if (!["ERR_INVALID_USAGE", "RETURN"].includes(err.message)) {
-			Logger.error(msg && msg.channel && msg.channel.guild && msg.channel.guild.shard ? `Shard #${msg.channel.guild.shard.id}` : "Error", err);
+			this.log("error", err, msg && msg.channel && msg.channel.guild && msg.channel.guild.shard ? `Shard #${msg.channel.guild.shard.id} | Error` : `Error`);
 			if (!msg || !msg.channel || !msg.channel.guild || !msg.channel.guild.shard) return;
 		}
 		const cmd = msg.cmd !== null ? msg.cmd.cmd : null;
@@ -513,8 +513,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			default: {
 				const r = Strings.random(10);
 				const ecode = `err.${cmd !== null ? cmd.triggers[0] : "general"}.${config.beta ? "beta" : "prod"}.${r}`;
-				Logger.error(`Shard #${msg.channel.guild.shard.id}`, ecode);
-				Logger.error(`Shard #${msg.channel.guild.shard.id}`, err);
+				this.log("error", ecode, `Shard #${msg.channel.guild.shard.id}`);
+				this.log("error", err, `Shard #${msg.channel.guild.shard.id}`);
 
 				const s = await phin({
 					method: "POST",
@@ -570,7 +570,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						}
 					}
 					if (!k) k = "{lang:other.error.unknown}";
-					return msg.channel.createMessage(`${k}\n{lang:other.error.join|${config.bot.supportURL}|${ecode}|${err.name}|${err.message}}`).catch(err => null);
+					return msg.channel.createMessage(`${k}\n${Language.get(gConfig.settings.lang).get("other.error.join").format(config.bot.supportURL, ecode, err.name, err.message)}`).catch(err => null);
 				}
 			}
 		}

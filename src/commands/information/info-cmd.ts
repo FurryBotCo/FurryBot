@@ -22,6 +22,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
+
 	const info = {
 		processUsage: `${Math.round(Internal.memory.process.getUsed() / 1024 / 1024)}MB / ${Math.round(Internal.memory.process.getTotal() / 1024 / 1024)}MB`,
 		systemUsage: `${Math.round(Internal.memory.system.getUsed() / 1024 / 1024 / 1024)}GB / ${Math.round(Internal.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,

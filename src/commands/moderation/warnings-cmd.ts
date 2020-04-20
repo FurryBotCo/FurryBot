@@ -36,7 +36,7 @@ export default new Command({
 			name: `{lang:commands.moderation.warnings.warning|${i + 1}}`,
 			value: [
 				`{lang:commands.moderation.warnings.blame}: ${u.username}#${u.discriminator}`,
-				`{lang:commands.moderation.warnings.reason}: ${k.reason}`,
+				`{lang:commands.moderation.warnings.reason}: ${k.reason.length > 100 ? "[TOO LONG TO DISPLAY]" : k.reason}`,
 				`{lang:commands.moderation.warnings.date}: ${Time.formatDateWithPadding(k.date).split(" ")[0]}`,
 				`{lang:commands.moderation.warnings.id}: ${k.id}`
 			].join("\n"),

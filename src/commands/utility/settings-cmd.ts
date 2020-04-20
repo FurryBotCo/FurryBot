@@ -201,5 +201,26 @@ export default new Command({
 			return msg.reply(`{lang:commands.utility.settings.set|${n}|${[undefined, null].includes(cur) ? "{lang:commands.utility.settings.noValue}" : cur}|${v}}`);
 			break;
 		}
+
+		case "custom": {
+			switch (s) {
+				case "lang": {
+					if (!v) return msg.reply(`{lang:commands.utility.settings.current|${n}|${Internal.sanitize(cur) || "{lang:commands.utility.settings.noValue}"}}`);
+
+					if (gConfig.settings[s] === v) return msg.reply("{lang:commands.utility.settings.unchanged}");
+
+					if (!config.languages.includes(v)) return msg.reply(`{lang:commands.utility.settings.invalidLang|${v}|${config.languages.join(" ")}}`);
+					await gConfig.edit({
+						settings: {
+							[s]: v
+						}
+					});
+
+					return msg.reply(`{lang:commands.utility.settings.set|${n}|${Internal.sanitize(cur) || "{lang:commands.utility.settings.noValue}"}|${Internal.sanitize(v)}}`);
+					break;
+					break;
+				}
+			}
+		}
 	}
 }));

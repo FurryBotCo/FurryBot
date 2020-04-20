@@ -6,31 +6,25 @@ import FurryBot from "@FurryBot";
 // being able to be handled asynchronously
 export default new ClientEvent("error", (function (this: FurryBot, info, id?: number) {
 	if (typeof info === "string") {
-		if (Logger !== undefined) return Logger.errorSync(`Shard #${id} | Client`, info);
-		else return console.error(info);
+		this.log("error", info, `${!!id ? ` Shard #${id}` : ""} | Client`);
 	} else {
 		switch (info.type) {
-			// case "SIGINT":
-			// 	Logger.error("Client", `${info.type} recieved, signal: ${info.data.signal}. Killing process.`);
-			// 	this.disconnect({ reconnect: false });
-			// 	process.kill(process.pid);
-			// 	break;
 			case "uncaughtException":
-				return Logger.errorSync("Uncaught Exception", info.data.error);
+				return this.log("error", info.data.error, `${!!id ? ` Shard #${id}` : ""} | Uncaught Exception`);
 				break;
 
 			case "unhandledRejection":
 				try {
-					Logger.errorSync("Unhandled Rejection | Reason", info.data.reason);
-					Logger.errorSync("Unhandled Rejection | Promise", info.data.promise);
+					this.log("error", info.data.reason, `${!!id ? ` Shard #${id}` : ""} | Unhandled Rejection | Reason`);
+					this.log("error", info.data.promise, `${!!id ? ` Shard #${id}` : ""} | Unhandled Rejection | Promise`);
 				} catch (e) {
-					Logger.errorSync("Error Handler Error", e);
-					Logger.errorSync("Error Handler Error", info);
+					this.log("error", e, `${!!id ? ` Shard #${id}` : ""} | Error Handler Error`);
+					this.log("error", info, `${!!id ? ` Shard #${id}` : ""} | Error Handler Error`);
 				}
 				break;
 
 			default:
-				return Logger.errorSync("Unknown Error", info);
+				return this.log("error", info, `${!!id ? ` Shard #${id}` : ""} | Unknown Error`);
 		}
 	}
 }));

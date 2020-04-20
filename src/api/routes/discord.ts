@@ -23,7 +23,7 @@ export default (async (client: FurryBot) => {
 			const c = await Internal.authorizeOAuth(req.query.code);
 
 			if (c instanceof Error) {
-				Logger.error("OAuth", c);
+				this.log("error", c, "OAuth");
 				return res.status(500).render("error", { title: "Internal Error", status: 500, message: "We had an internal error while authorizing, please try again later." });
 			}
 

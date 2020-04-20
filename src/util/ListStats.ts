@@ -1,8 +1,9 @@
 import { Logger } from "../util/LoggerV8";
 import config from "../config";
 import phin from "phin";
+import FurryBot from "../main";
 
-export default (async (shards: number[]) => {
+export default (async (manager: FurryBot, shards: number[]) => {
 	if (!shards || shards.length === 0) throw new TypeError("invalid shards provided");
 	try {
 		await phin<any>({
@@ -19,7 +20,7 @@ export default (async (shards: number[]) => {
 			parse: "json"
 		});
 
-		// botblock was blocked on discordbots.org
+		// botblock was blocked on top.gg
 		const rq = await phin<any>({
 			method: "POST",
 			url: `https://top.gg/api/bots/${config.bot.client.id}/stats`,
@@ -33,10 +34,16 @@ export default (async (shards: number[]) => {
 			timeout: 1e4,
 			parse: "json"
 		})
-			.then(req => JSON.parse(req.body.toString()));
-		Logger.log("Bot List Stats", `Posted guild counts: ${shards.reduce((a, b) => a + b, 0)}`);
+			.then(req => {
+				try {
+					return JSON.parse(req.body.toString());
+				} catch (e) {
+					manager.log("error", req.body, "Bot List Stats");
+				}
+			});
+		manager.log("log", `Posted guild counts: ${shards.reduce((a, b) => a + b, 0)}`, "Bot List Stats");
 	} catch (e) {
-		Logger.error("Bot List Stats", e);
+		manager.log("error", e, "Bot List Stats");
 	}
 	return {
 		count: shards.reduce((a, b) => a + b, 0)

@@ -6,16 +6,16 @@ import config from "../config";
 import sv from "../api";
 import express from "express";
 import http from "http";
-import { mdb } from "../modules/Database";
+import { mdb, db } from "../modules/Database";
 import cmd from "../commands";
-import { Internal, Time, TimedTasks } from "../util/Functions";
+import { Time, TimedTasks } from "../util/Functions";
 import * as fs from "fs-extra";
 import Eris from "eris";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
-	if (this.firstReady) return Logger.warn("Ready", "Skipping ready event as it has already fired.");
+	if (this.firstReady) return this.log("warn", "Skipping ready event as it has already fired.", "Ready");
+	db.setClient(this);
 	this.firstReady = true;
-
 	const srv = await sv(this);
 
 	this.editStatus("online", {
@@ -23,23 +23,10 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		type: 0
 	});
 
-	this.w.get("shard").execute({
-		embeds: [
-			{
-				title: "Ready",
-				description: `Ready with ${this.shards.size} shards, and ${this.guilds.size} guilds.`,
-				timestamp: new Date().toISOString()
-			}
-		],
-		username: `Furry Bot${config.beta ? " - Beta" : ""} Status`,
-		avatarURL: "https://i.furry.bot/furry.png"
-	});
-
-
 	const svr = http.createServer(express())
-		.on("error", () => Logger.warn("APIServer", "Attempted to start api server, but the port is in use."))
-		.on("listening", () => (svr.close(), this.srv = srv.listen(config.web.api.port, config.web.api.ip, () => Logger.debug("APIServer", `Listening on ${config.web.api.ip}:${config.web.api.port}`))))
-		.on("close", () => Logger.debug("APIServer", "Port test server closed, starting bot api server."))
+		.on("error", () => this.log("warn", "Attempted to start api server, but the port is in use.", "APIServer"))
+		.on("listening", () => (svr.close(), this.srv = srv.listen(config.web.api.port, config.web.api.ip, () => this.log("debug", `Listening on ${config.web.api.ip}:${config.web.api.port}`, "APIServer"))))
+		.on("close", () => this.log("debug", "Port test server closed, starting bot api server.", "APIServer"))
 		.listen(config.web.api.port, config.web.api.ip);
 
 	this.temp = new Temp(config.dir.tmp);
@@ -51,9 +38,10 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 		this.spamCounter.response = this.spamCounter.response.filter(s => s.time + 3e4 > Date.now());
 	}, 1e3);
 
-	cmd.map(c => this.cmd.addCategory(c));
 
-	Logger.log("Ready", `Client ready with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds, with ${this.cmd.commands.length} commands.`);
+	this.log("log", `Client ready with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds, with ${this.cmd.commands.length} commands.`, `Ready`);
+
+	cmd.map(c => this.cmd.addCategory(c));
 
 	if (fs.existsSync(`${config.dir.base}/restart.json`)) {
 		const t = Date.now();

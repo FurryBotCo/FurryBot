@@ -1,7 +1,7 @@
 import config from "../../config";
 import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
-
+import _ from "lodash";
 export default class GuildConfig {
 	id: string;
 	selfAssignableRoles: string[];
@@ -87,15 +87,10 @@ export default class GuildConfig {
 	}
 
 	async load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
-		/**
-		 * @param {A} a - the object to get keys from
-		 * @param {B} b - default
-		 * @param {C} c - set data
-		 */
-		function goKeys(a, b, c) {
-			Object.keys(b).map(k => typeof a[k] === "undefined" ? c[k] = b[k] : a[k] instanceof Array ? c[k] = a[k] : typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? ([undefined, null].includes(c) ? c = {} : null, c[k] = a[k], goKeys(a[k], b[k], c[k])) : ([undefined, null].includes(c) ? c = {} : null, c[k] = a[k])); // tslint:disable-line no-unused-expression
-		}
-		goKeys(data, config.defaults.config.guild, this);
+		_.merge({ ...config.defaults.config.guild }, data);
+		_.merge(this, data);
+		// temporary fix for missing settings properties
+		Object.keys(config.defaults.config.guild.settings).map(p => typeof this.settings[p] === "undefined" ? this.settings[p] = config.defaults.config.guild.settings[p] : null);
 	}
 
 	async reload() {
@@ -106,11 +101,7 @@ export default class GuildConfig {
 
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
 		const d = this;
-		function goKeys(a, b) {
-			Object.keys(a).map(k => typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? ([undefined, null].includes(b) ? b = {} : null, typeof b[k] === "undefined" ? b[k] = a[k] : null, goKeys(a[k], b[k])) : typeof b === "undefined" ? b = { [k]: a[k] } : ([undefined, null].includes(b) ? b = {} : null, b[k] = a[k])); // tslint:disable-line no-unused-expression
-		}
-		function go(s, o) { }
-		goKeys(data, d);
+		_.merge(d, data);
 
 		const e = await mdb.collection("guilds").findOne({
 			id: this.id

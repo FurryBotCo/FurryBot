@@ -40,7 +40,7 @@ export default new ClientEvent("messageDeleteBulk", (async function (this: Furry
 		timestamp: new Date().toISOString()
 	};
 
-	const log = await Utility.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.MESSAGE_BULK_DELETE, null);
+	const log = await Utility.fetchAuditLogEntries(this, guild, Eris.Constants.AuditLogActions.MESSAGE_BULK_DELETE, null);
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 

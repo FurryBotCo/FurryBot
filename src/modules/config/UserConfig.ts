@@ -1,6 +1,7 @@
 import config from "../../config";
 import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
+import _ from "lodash";
 
 interface Warning {
 	blame: string;
@@ -35,20 +36,8 @@ export default class UserConfig {
 	}
 
 	async load(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
-		/**
-		 *
-		 *
-		 * @template A
-		 * @template B
-		 * @template C
-		 * @param {A} a - the object to get keys from
-		 * @param {B} b - default
-		 * @param {C} c - set data
-		 */
-		function goKeys(a, b, c) {
-			Object.keys(b).map(k => typeof a[k] === "undefined" ? c[k] = b[k] : a[k] instanceof Array ? c[k] = a[k] : typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? (c[k] = a[k], goKeys(a[k], b[k], c[k])) : ([undefined, null].includes(typeof c[k]) ? c[k] = {} : null, c[k] = a[k])); // tslint:disable-line no-unused-expression
-		}
-		goKeys(data, config.defaults.config.user, this);
+		_.merge({ ...config.defaults.config.guild }, data);
+		_.merge(this, data);
 	}
 
 	async reload() {
@@ -59,11 +48,7 @@ export default class UserConfig {
 
 	async edit(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		const d = this;
-
-		function goKeys(a, b) {
-			Object.keys(a).map(k => typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? (typeof b[k] === "undefined" ? b[k] = a[k] : null, goKeys(a[k], b[k])) : typeof b === "undefined" ? b = { [k]: a[k] } : ([undefined, null].includes(b[k]) ? b[k] = {} : null, b[k] = a[k])); // tslint:disable-line no-unused-expression
-		}
-		goKeys(data, d);
+		_.merge(d, data);
 
 		const e = await mdb.collection("users").findOne({
 			id: this.id

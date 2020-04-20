@@ -103,7 +103,7 @@ export default new Command({
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		if (error) Logger.error(`Shard #${msg.channel.guild.shard.id}`, ![undefined, null].includes(o) ? o : res);
+		if (error) this.log("error", ![undefined, null].includes(o) ? o : res, `Shard #${msg.channel.guild.shard.id}`);
 
 		return msg.channel.createMessage({
 			embed: {
@@ -147,6 +147,6 @@ export default new Command({
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		return Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Silent eval return: ${res}`);
+		return this.log("log", `Silent eval return: ${res}`, `Shard #${msg.channel.guild.shard.id}`);
 	}
 }));

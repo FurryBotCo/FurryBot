@@ -19,22 +19,24 @@ export default class TimedTasks {
 		const d = new Date();
 		if (d.getSeconds() === 0) {
 			if (d.getMinutes() === 0) {
-				await this.runDeleteUsers(client).then(() => Logger.debug("Timed Tasks |  Delete Users", "Finished processing."));
-				await this.runDeleteGuilds(client).then(() => Logger.debug("Timed Tasks |  Delete Guilds", "Finished processing."));
+				await this.runDeleteUsers(client).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Delete Users"));
+				await this.runDeleteGuilds(client).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Delete Guilds"));
 			}
 
-			if ([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => Logger.debug("Timed Tasks |  Run Auto Posting [5]", "Finished processing."));
-			if ([0, 10, 20, 30, 40, 50].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => Logger.debug("Timed Tasks |  Run Auto Posting [10]", "Finished processing."));
-			if ([0, 15, 30, 45].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => Logger.debug("Timed Tasks |  Run Auto Posting [15]", "Finished processing."));
-			if ([0, 30].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => Logger.debug("Timed Tasks |  Run Auto Posting [60] ", "Finished processing."));
+			if ([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [5]"));
+			if ([0, 10, 20, 30, 40, 50].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [10]"));
+			if ([0, 15, 30, 45].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [15]"));
+			if ([0, 30].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [30]"));
+			if ([0].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [60]"));
 
-			if (!config.beta && d.getHours() === 0) await this.runDailyJoins(client).then(() => Logger.debug("Timed Tasks | Daily Joins", "Finished processing."));
+			if (!config.beta && d.getHours() === 0 && d.getMinutes() === 0) await this.runDailyJoins(client).then(() => client.log("debug", "Finished processing.", "Timed Tasks | Daily Joins"));
 		}
 
-		if ((d.getSeconds() % 10) === 0) await this.runStatusChange(client, (d.getSeconds() / 10) - 1).then(() => Logger.debug("Timed Tasks | Status Change", "Finished processing."));
+		if ((d.getSeconds() % 15) === 0) await this.runStatusChange(client, (d.getSeconds() / 15) - 1).then(() => config.beta ? client.log("debug", "Finished processing.", "Timed Tasks | Status Change") : null);
 
-		await this.runAutoServerActions(client); // .then(() => Logger.debug("Timed Tasks |  Run Auto Actions", "Finished processing."));
+		await this.runAutoServerActions(client); // .then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Actions"));
 	}
+
 
 	static async runDeleteUsers(client: FurryBot) {
 		const d = await mdb.collection<UserConfig>("users").find({
@@ -45,7 +47,7 @@ export default class TimedTasks {
 		}).toArray();
 
 		if (d.length === 0) {
-			if (config.beta) Logger.warn("Timed Tasks |  Delete Users", "No processable entries found.");
+			if (config.beta) client.log("warn", "No processable entries found.", "Timed Tasks |  Delete Users");
 			return;
 		}
 
@@ -62,7 +64,7 @@ export default class TimedTasks {
 			})).catch(err => null);
 
 			await mdb.collection<UserConfig>("users").findOneAndDelete({ id: u.id });
-			Logger.debug("Timed Tasks |  Delete Users", `Deleted the user "${u.id}"`);
+			client.log("debug", `Deleted the user "${u.id}"`, "Timed Tasks |  Delete Users");
 		}));
 	}
 
@@ -75,13 +77,13 @@ export default class TimedTasks {
 		}).toArray();
 
 		if (d.length === 0) {
-			if (config.beta) Logger.warn("Timed Tasks |  Delete Guilds", "No processable entries found.");
+			if (config.beta) client.log("warn", "No processable entries found.", "Timed Tasks |  Delete Guilds");
 			return;
 		}
 
 		await Promise.all(d.map(async (u) => {
 			await mdb.collection<GuildConfig>("guilds").findOneAndDelete({ id: u.id });
-			Logger.debug("Timed Tasks |  Delete Guild", `Deleted the guild "${u.id}"`);
+			client.log("debug", `Deleted the guild "${u.id}"`, "Timed Tasks |  Delete Guild");
 		}));
 	}
 
@@ -91,7 +93,7 @@ export default class TimedTasks {
 		await Promise.all(a.map(async (entry) => {
 			switch (entry.type) {
 				case "ban": {
-					const g = client.guilds.get(entry.guildId);
+					const g = await client.getRESTGuild(entry.guildId);
 					await g.unbanMember(entry.userId, `Automatic Unban`).catch(err => null);
 					const u = client.users.has(entry.userId) ? client.users.get(entry.userId) : await client.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
@@ -103,14 +105,14 @@ export default class TimedTasks {
 					if (!ch) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
-						Logger.warn("Timed Tasks |  Auto Server Actions", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`);
+						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks |  Auto Server Actions");
 						return;
 					}
 
 					if (!["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
-						Logger.warn("Timed Tasks |  Auto Server Actions", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`);
+						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks |  Auto Server Actions");
 						return;
 					}
 
@@ -126,7 +128,7 @@ export default class TimedTasks {
 				}
 
 				case "mute": {
-					const g = client.guilds.get(entry.guildId);
+					const g = await client.getRESTGuild(entry.guildId);
 					// fetch user from api if they aren't in the server
 					const m = g.members.has(entry.userId) ? g.members.get(entry.userId) : await client.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
@@ -140,14 +142,14 @@ export default class TimedTasks {
 					if (!ch) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
-						Logger.warn("Timed Tasks | Auto Server Actions", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`);
+						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks | Auto Server Actions");
 						return;
 					}
 
 					if (!["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
-						Logger.warn("Timed Tasks | Auto Server Actions", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`);
+						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks | Auto Server Actions");
 						return;
 					}
 
@@ -206,7 +208,7 @@ export default class TimedTasks {
 
 				default: {
 					await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
-					Logger.warn("Timed Tasks | Auto Server Actions", `Unknown timed type "${entry.type}" found.`);
+					client.log("warn", `Unknown timed type "${entry.type}" found.`, "Timed Tasks | Auto Server Actions");
 				}
 			}
 		}));
@@ -219,20 +221,20 @@ export default class TimedTasks {
 		await Promise.all(entries.map(async (entry) => {
 			const g = await db.getGuild(entry.guildId);
 			if (!g) {
-				Logger.warn("Timed Tasks | Auto Posting", `Skipped posting type "${entry.type}" in guild "${g.id}" because the guild entry does not exist in the database.`);
+				client.log("warn", `Skipped posting type "${entry.type}" in guild "${g.id}" because the guild entry does not exist in the database.`, "Timed Tasks | Auto Posting");
 				await mdb.collection("auto").findOneAndDelete({ _id: entry._id });
 				return;
 			}
 
 			if (!client.guilds.has(g.id)) {
-				Logger.warn("Timed Tasks | Auto Posting", `Skipped posting type "${entry.type}" in guild "${g.id}" because the guild has been removed.`);
+				client.log("warn", `Skipped posting type "${entry.type}" in guild "${g.id}" because the guild has been removed.`, "Timed Tasks | Auto Posting");
 				await mdb.collection("auto").findOneAndDelete({ _id: entry._id });
 				return;
 			}
 
 			const p = await g.premiumCheck();
 			if (!p.active) {
-				Logger.warn("Timed Tasks | Auto Posting", `Skipped posting type "${entry.type}" in guild "${g.id}" because their premium is not active.`);
+				client.log("warn", `Skipped posting type "${entry.type}" in guild "${g.id}" because their premium is not active.`, "Timed Tasks | Auto Posting");
 				await mdb.collection("auto").findOneAndDelete({ _id: entry._id });
 				return;
 			}
@@ -351,7 +353,7 @@ export default class TimedTasks {
 		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 		let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.count).catch(err => null);
 		if (!k) k = "Unknown.";
-		Logger.log("Daily Joins", `Daily joins for ${id}: ${k}`);
+		client.log("log", `Daily joins for ${id}: ${k}`, "Daily Joins");
 		await client.executeWebhook(config.webhooks.dailyjoins.id, config.webhooks.dailyjoins.token, {
 			embeds: [
 				{
@@ -367,9 +369,7 @@ export default class TimedTasks {
 
 	static async runStatusChange(client: FurryBot, num: number) {
 		switch (num) {
-			case 0:
-			case 3:
-			default: {
+			case 0: {
 				await client.editStatus("online", { name: `${config.defaults.prefix}help with ${client.users.size} furries`, type: GameTypes.PLAYING });
 				break;
 			}
@@ -384,21 +384,10 @@ export default class TimedTasks {
 				break;
 			}
 
-			case 4: {
+			case 3: {
 				await client.editStatus("online", { name: `${config.defaults.prefix}help at https://furry.bot`, type: GameTypes.PLAYING });
 				break;
 			}
-
-			case 5: {
-				await client.editStatus("online", { name: `${config.defaults.prefix}help in ${config.bot.supportURL}`, type: GameTypes.PLAYING });
-				break;
-			}
 		}
-	}
-}
-
-class Base {
-	constructor({ options }) {
-
 	}
 }

@@ -42,11 +42,11 @@ export default new SubCommand({
 	});
 
 	if (p.statusCode !== 200) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, {
+		this.log("error", {
 			statusCode: p.statusCode,
 			statusMessage: p.statusMessage,
 			body: p.body
-		});
+		}, `Shard #${msg.channel.guild.shard.id}`);
 		return msg.reply("request failed, check console.");
 	}
 

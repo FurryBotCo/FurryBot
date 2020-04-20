@@ -4,8 +4,8 @@ import UserConfig from "../modules/config/UserConfig";
 import deasync from "deasync";
 import GuildConfig from "../modules/config/GuildConfig";
 import config from "../config";
-import { Logger } from "../util/LoggerV8";
 import Timers from "./Timers";
+import FurryBot from "../main";
 
 export default class Database {
 	conn: {
@@ -13,10 +13,13 @@ export default class Database {
 		mdb: Db
 	};
 	debug: boolean;
+	client: FurryBot;
 	constructor(host: string, port: number, database: string, opt: MongoClientOptions, debug?: boolean) {
 		this.conn = DB(host, port, database, opt);
 		this.debug = !!debug;
 	}
+
+	setClient(client: FurryBot) { this.client = client; }
 
 	collection(name: "guilds"): Collection<GuildConfig>;
 	collection(name: "users"): Collection<UserConfig>;
@@ -35,23 +38,22 @@ export default class Database {
 	async getUser(id: string): Promise<UserConfig>;
 	async getUser<F extends (err: Error, d: UserConfig) => any>(id: string, cb: F): Promise<F>;
 	async getUser<F extends (err: Error, d: UserConfig) => any>(id: string, cb?: F): Promise<UserConfig | F> {
-		const t = new Timers();
+		const t = new Timers(this.client);
 		t.start("user");
 		let u = await this.collection("users").findOne({ id }).then(res => res ? new UserConfig(id, res) : null);
 
 		if (!u) {
 			await this.mdb.collection("users").insertOne({ ...config.defaults.config.user, id }).catch((err: MongoError) => {
 				switch (err.code) {
-					case 11000: return Logger.warn("Database", `Duplicate key error (key: ${(err as any).keyValue.id})`);
-					default:
-						return Logger.error("Database", err);
+					case 11000: { this.client.log("warn", `Duplicate key error (key: ${(err as any).keyValue.id})`, `Database`); break; }
+					default: this.client.log("error", err, `Database`);
 				}
 			});
-			Logger.debug("Database", `Created user entry "${id}".`);
+			this.client.log("debug", `Created user entry "${id}".`, `Database`);
 			u = await this.collection("users").findOne({ id }).then(res => res ? new UserConfig(id, res) : null);
 		}
 		t.end("user");
-		if (this.debug) Logger.debug("Database", `Database query for the user "${id}" took ${t.calc("user", "user")}ms.`);
+		if (this.debug) this.client.log("debug", `Database query for the user "${id}" took ${t.calc("user", "user")}ms.`, `Database`);
 
 		if (!cb) return u;
 		else return cb(null, u);
@@ -64,7 +66,7 @@ export default class Database {
 	async getGuild(id: string): Promise<GuildConfig>;
 	async getGuild<F extends (err: Error, d: GuildConfig) => any>(id: string, cb: F): Promise<F>;
 	async getGuild<F extends (err: Error, d: GuildConfig) => any>(id: string, cb?: F): Promise<GuildConfig | F> {
-		const t = new Timers();
+		const t = new Timers(this.client);
 		t.start("guild");
 		let g = await this.collection("guilds").findOne({ id }).then(res => res ? new GuildConfig(id, res) : null);
 
@@ -74,17 +76,16 @@ export default class Database {
 			delete t.settings;
 			await this.mdb.collection("guilds").insertOne({ ...t, settings: { ...config.defaults.config.guild.settings, prefix: config.defaults.prefix }, id }).catch((err: MongoError) => {
 				switch (err.code) {
-					case 11000: return Logger.warn("Database", `Duplicate key error (key: ${(err as any).keyValue.id})`);
-					default:
-						return Logger.error("Database", err);
+					case 11000: { this.client.log("warn", `Duplicate key error (key: ${(err as any).keyValue.id})`, `Database`); break; }
+					default: this.client.log("error", err, `Database`);
 				}
 			});
-			Logger.debug("Database", `Created guild entry "${id}".`);
+			this.client.log("debug", `Created guild entry "${id}".`, `Database`);
 			g = await this.collection("guilds").findOne({ id }).then(res => res ? new GuildConfig(id, res) : null);
 		}
 
 		t.end("guild");
-		if (this.debug) Logger.debug("Database", `Database query for the guild "${id}" took ${t.calc("guild", "guild")}ms.`);
+		if (this.debug) this.client.log("debug", `Database query for the guild "${id}" took ${t.calc("guild", "guild")}ms.`, `Database`);
 
 		if (!cb) return g;
 		else return cb(null, g);

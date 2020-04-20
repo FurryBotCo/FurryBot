@@ -33,7 +33,7 @@ export default new Command({
 	const a = Utility.compareMembers(member, msg.member);
 	if ((a.member2.higher || a.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`<@!${msg.author.id}>, {lang:commands.moderation.kick.noKick|${member.username}#${member.discriminator}}`);
 	// if(!user.kickable) return msg.channel.createMessage(`I cannot kick ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have kick permissions?`);
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "{lang:commands.moderation.kick.noReason}";
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
 	if (!member.user.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`{lang:commands.moderation.kick.dm|${msg.channel.guild.name}|${reason}}`)).catch(err => null);
 	member.kick(`Kick: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 		await msg.channel.createMessage(`***{lang:commands.moderation.kick.kicked|${member.username}#${member.discriminator}|${reason}}***`).catch(noerr => null);
@@ -44,10 +44,9 @@ export default new Command({
 			blame: msg.author
 		});
 	}).catch(async (err) => {
-		await msg.reply(`{lang:commands.moderation.kick.couldNotKick|${member.username}#${member.discriminator}|${err}}`);
-		if (m !== undefined) {
-			await m.delete();
-		}
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.kick.englishOnly}`);
+		else await msg.reply(`{lang:commands.moderation.kick.couldNotKick|${member.username}#${member.discriminator}|${err}}`);
+		if (m !== undefined) await m.delete();
 	});
 
 	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);

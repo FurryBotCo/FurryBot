@@ -1,5 +1,6 @@
 import { performance } from "perf_hooks";
 import Logger from "./LoggerV8";
+import FurryBot from "../main";
 
 export default class Timers {
 	timers: {
@@ -9,8 +10,10 @@ export default class Timers {
 		};
 	};
 	log: boolean;
-	constructor(log?: boolean) {
+	client: FurryBot;
+	constructor(client: FurryBot, log?: boolean) {
 		this.timers = {};
+		this.client = client;
 		this.log = !!log;
 	}
 
@@ -28,7 +31,7 @@ export default class Timers {
 		if (this.timers[label].end !== null) throw new TypeError(`Timer with the label "${label}" has already ended.`);
 
 		this.timers[label].end = parseFloat(performance.now().toFixed(3));
-		if (this.log) Logger.debug("Timers", `${label} took ${this.calc(label, label)}ms`);
+		if (this.log) this.client.log("debug", `${label} took ${this.calc(label, label)}ms`, `Timers`);
 		return this.timers[label].end;
 	}
 

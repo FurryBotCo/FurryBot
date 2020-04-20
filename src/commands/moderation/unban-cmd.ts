@@ -4,6 +4,7 @@ import Eris from "eris";
 import { Utility } from "../../util/Functions";
 import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import Language from "../../util/Language";
 
 export default new Command({
 	triggers: [
@@ -38,7 +39,7 @@ export default new Command({
 		});
 	}
 
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "{lang:commands.moderation.unban.noReason}";
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
 	msg.channel.guild.unbanMember(user.id, `Unban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 		await msg.channel.createMessage(`***{lang:commands.moderation.unban.unbanned|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
@@ -48,7 +49,8 @@ export default new Command({
 			blame: msg.author
 		});
 	}).catch(async (err) => {
-		msg.channel.createMessage(`{lang:commands.moderation.unban.couldNotUnban|${user.username}#${user.discriminator}|${err}}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.unban.englishOnly}`);
+		else await msg.channel.createMessage(`{lang:commands.moderation.unban.couldNotUnban|${user.username}#${user.discriminator}|${err}}`);
 	});
 
 	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);

@@ -66,7 +66,7 @@ export default class Language {
 	private constructor() { }
 
 	static get(lang: string) {
-		if (!fs.existsSync(`${config.dir.lang}/${lang}.yaml`)) throw new TypeError("invalid language");
+		if (!fs.existsSync(`${config.dir.lang}/${lang}.yaml`)) lang = "en"; // (prefer default over error) throw new TypeError("invalid language");
 		const l = YAML.parse(fs.readFileSync(`${config.dir.lang}/${lang}.yaml`).toString());
 		return new SpecificLanguage(lang, l);
 	}

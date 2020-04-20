@@ -45,7 +45,7 @@
 		"dbName": "modlog",
 		"description": "Sets the channel to send modlog entries to (also enables the modlog)."
 	}, {
-		"type": "string",
+		"type": "custom",
 		"name": "Language",
 		"dbName": "lang",
 		"description": "Sets the language the bot will use in this server (english only currently)."

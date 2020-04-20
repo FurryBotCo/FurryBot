@@ -27,7 +27,7 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	const ch = await this.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
 
 	if (ch.guild.id !== message.guildID) {
-		Logger.warn("Message Update", `messageUpdate log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`);
+		this.log("warn", `messageUpdate log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`, "Message Update");
 		await g.edit({
 			logEvents: {
 				messageEdit: null

@@ -19,7 +19,7 @@ export default new Command({
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const img = await Request.imageAPIRequest(true, "blep");
 	if (img.success === false) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, img.error);
+		this.log("error", img.error, `Shard #${msg.channel.guild.shard.id}`);
 		return msg.reply(`{lang:other.error.imageAPI}`);
 	}
 

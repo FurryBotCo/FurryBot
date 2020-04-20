@@ -27,7 +27,7 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 	const ch = message.channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	if (ch.guild.id !== message.guildID) {
-		Logger.warn("Message Delete", `messageDelete log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`);
+		this.log("warn", `messageDelete log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`, "Message Delete");
 		await g.edit({
 			logEvents: {
 				messageDelete: null
@@ -52,7 +52,7 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 		timestamp: new Date().toISOString(),
 		color: Colors.red
 	};
-	const log = await Utility.fetchAuditLogEntries(message.channel.guild, Eris.Constants.AuditLogActions.MESSAGE_DELETE, message.id);
+	const log = await Utility.fetchAuditLogEntries(this, message.channel.guild, Eris.Constants.AuditLogActions.MESSAGE_DELETE, message.id);
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 

@@ -33,8 +33,8 @@ export default new Command({
 		avatarURL: "https://i.furry.bot/furry.png",
 		wait: true
 	});
-	await m.addReaction(config.emojis.upvote).catch(err => Logger.error(`Shard #${msg.channel.guild.shard.id}`, err));
-	await m.addReaction(config.emojis.downvote).catch(err => Logger.error(`Shard #${msg.channel.guild.shard.id}`, err));
+	await m.addReaction(config.emojis.upvote).catch(err => this.log("error", err, `Shard #${msg.channel.guild.shard.id}`));
+	await m.addReaction(config.emojis.downvote).catch(err => this.log("error", err, `Shard #${msg.channel.guild.shard.id}`));
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.misc.bugreport.title}")
