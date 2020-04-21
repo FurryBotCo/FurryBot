@@ -31,9 +31,6 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		t.start("messageProcess");
 		msg = new ExtendedMessage(message, this);
 		t.end("messageProcess");
-		t.start("leveling");
-		// @FIXME leveling
-		t.end("leveling");
 
 		t.start("blacklist");
 		const gblB: Blacklist.GuildEntry[] = [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(msg.channel.type) ? await mdb.collection("blacklist").find({ guildId: msg.channel.guild.id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())) : [];
@@ -122,6 +119,40 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		t.start("db");
 		uConfig = await db.getUser(msg.author.id);
 		gConfig = await db.getGuild(msg.channel.guild.id);
+
+		t.start("leveling");
+		if ([Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(msg.channel.type)) {
+			const c = this.cd.check(msg.author.id, "leveling", { guild: msg.channel.guild.id });
+			if (!c.found) {
+				this.cd.add(msg.author.id, "leveling", 6e4, { guild: msg.channel.guild.id });
+				const lvl = config.leveling.calcLevel(uConfig.getLevel(msg.channel.guild.id));
+				const l = Math.floor(Math.random() * 10) + 5;
+				await uConfig.edit({
+					levels: {
+						[msg.channel.guild.id]: uConfig.getLevel(msg.channel.guild.id) + l
+					}
+				});
+				const nlvl = config.leveling.calcLevel(uConfig.getLevel(msg.channel.guild.id));
+				if (nlvl.level > lvl.level && gConfig.settings.announceLevelUp) {
+					if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
+						let m: Eris.Message;
+						if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) m = await msg.channel.createMessage({
+							embed: new EmbedBuilder(gConfig.settings.lang)
+								.setTitle("{lang:other.leveling.embedTitle}")
+								.setDescription(`{lang:other.leveling.embedDescription|${nlvl.level}}`)
+								.setColor(Colors.green)
+								.setTimestamp(new Date().toISOString())
+								.setAuthor(msg.author.tag, msg.author.avatarURL)
+						});
+						else msg.channel.createMessage(`{lang:other.leveling.message|${msg.author.id}|${nlvl.level}}`);
+
+						setTimeout(() => m.delete(), 2e4);
+					} else msg.author.getDMChannel().then(dm => dm.createMessage(`{lang:other.leveling.directMessage|${nlvl.level}|${msg.channel.guild.name}}`)).catch(err => null);
+				}
+			}
+		}
+		t.end("leveling");
+
 		// overwrite prefix set without db
 		if (gConfig.settings.prefix !== config.defaults.prefix) msg.prefix = gConfig.settings.prefix;
 		t.end("db");
