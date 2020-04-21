@@ -3,6 +3,7 @@ import FurryBot from "@FurryBot";
 import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import { mdb } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
@@ -16,9 +17,10 @@ export default new Command({
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const tags: { [k: string]: string; } = {};
-	Object.keys(gConfig.tags).map(t =>
-		tags[t.toLowerCase()] = gConfig.tags[t]
-	);
+	await Promise.all(Object.keys(gConfig.tags).map(async (t) => {
+		if (!gConfig.tags[t]) await mdb.collection("guilds").findOneAndUpdate({ id: msg.channel.guild.id }, { $unset: { [`tags.${t}`]: true } });
+		else tags[t.toLowerCase()] = gConfig.tags[t];
+	}));
 	const values = Object.values(tags);
 	if (msg.args.length < 1) return msg.reply(`{lang:commands.utility.tag.invalidUsage}`);
 
@@ -97,8 +99,8 @@ export default new Command({
 
 			case "delete": {
 				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.doesNotExist|${msg.args[1].toLowerCase()}}`);
-				await gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: null } });
-				return msg.reply(`{lang:commands.utility.deleted|${msg.args[1].toLowerCase()}}`);
+				await mdb.collection("guilds").findOneAndUpdate({ id: msg.channel.guild.id }, { $unset: { [`tags.${msg.args[1].toLowerCase()}`]: "" } });
+				return msg.reply(`{lang:commands.utility.tag.deleted|${msg.args[1].toLowerCase()}}`);
 				break;
 			}
 		}
