@@ -134,7 +134,7 @@ commands:
     conga:
       description: "Start a conga with someone, or join in!"
       usage: "[@user]"
-      join: "<@!{0}> joined a conga with {1} furs!\nJoin in using `{2}conga`\n{3}"
+      join: "<@!{0}> joined a conga with {1} other furs!\nThere are now {3} furs in this conga!\nJoin in using `{2}conga`\n{4}"
       tooLarge: "This conga is too large for emojis!"
       start: "<@!{0}> started a conga with <@!{1}>!\nJoin in using `{2}conga`.\n{3}{3}"
       alreadyPresent: "you are already in this conga!"
@@ -183,7 +183,7 @@ commands:
     furpile:
       description: "Start a furpile on someone, or join in!"
       usage: "[@user]"
-      join: "<@!{0}> joined a furpile with {1} furs!\nJoin in using `{2}furpile`"
+      join: "<@!{0}> joined a furpile with {1} other furs!\nThis furpile now has {2} furs in it!\nJoin in using `{3}furpile`"
       tooLarge: "This furpile is too large for emojis!"
       start: "<@!{0}> started a furpile on <@!{1}>!\nJoin in using `{2}furpile`."
       alreadyPresent: "you are already in this furpile!"
@@ -747,7 +747,7 @@ commands:
     help:
       description: "Get some help with the bot."
       usage: "[command/category]"
-      hoverInfo: "Hover for mrore info"
+      hoverInfo: "Hover for more info"
       cmdTotal: "Total Commands"
       title: "Command Help"
       cmdList: "Command List #{0}"
@@ -1189,10 +1189,17 @@ category:
     description: "Helpful things for the bot, and your server."
 
 other:
+  leveling:
+    embedTitle: "Level Up!"
+    embedDescription: "You leveled up to level **{0}**!"
+    message: "<@!{0}> leveled up to level **{1}**!\n(This would look different if I had the permission **embedLinks**.)"
+    directMessage: "You leveled up to level **{0}** in the server **{1}**!\n(I sent this here because I cannot send messages in the channel you actually leveled up in)"
   imageURL: "Image URL"
   noReason: "No Reason"
   error:
     tooLong: "the max length of {0} is {1}."
+    invalidBalance: "your current balance is invalid. Please contact a developer to fix this."
+    otherInvalidBalance: "their current balance is invalid, so you cannot view or interact them with them."
     invalidUsage:
       info: "Info"
       title: "Invalid Usage"
@@ -1211,6 +1218,7 @@ other:
     unknownAPIError: "API Error:\nCode: {0}\nDescription: `{1}`"
     codeAPIError: "API Error:\n{0}"
     commandDisabledSettings: "this command has been disabled in this servers settings."
+    duplicatePagination: "There is already an active paginated command in this channel.\nIf you started it: Say **stop** to stop it.\nIf you did not start it: Either wait for it to time out, or tell the person who started it to say **stop*."
   modlog:
     invalid: "Detected an invalid modlog setup, reverted to normal."
     missingPermissions: "I'm missing some permissions to be able to make a modlog entry (I need `sendMessages` and `embedLinks`), it has been reverted to normal."
