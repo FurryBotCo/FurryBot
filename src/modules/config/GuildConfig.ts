@@ -87,10 +87,9 @@ export default class GuildConfig {
 	}
 
 	async load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
-		_.merge({ ...config.defaults.config.guild }, data);
-		_.merge(this, data);
+		_.merge(this, _.merge({ ...config.defaults.config.guild }, data));
 		// temporary fix for missing settings properties
-		Object.keys(config.defaults.config.guild.settings).map(p => typeof this.settings[p] === "undefined" ? this.settings[p] = config.defaults.config.guild.settings[p] : null);
+		// Object.keys(config.defaults.config.guild.settings).map(p => typeof this.settings[p] === "undefined" ? this.settings[p] = config.defaults.config.guild.settings[p] : null);
 	}
 
 	async reload() {

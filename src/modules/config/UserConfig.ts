@@ -36,8 +36,7 @@ export default class UserConfig {
 	}
 
 	async load(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
-		_.merge({ ...config.defaults.config.guild }, data);
-		_.merge(this, data);
+		_.merge(this, _.merge({ ...config.defaults.config.user }, data));
 	}
 
 	async reload() {
