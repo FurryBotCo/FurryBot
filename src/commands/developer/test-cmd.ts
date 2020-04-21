@@ -97,27 +97,27 @@ export default new Command({
 					title: "get<X>FromArgs Test",
 					fields: [{
 						name: "Users",
-						value: u.join("\n"),
+						value: u.join("\n") || "NONE",
 						inline: false
 					},
 					{
 						name: "Members",
-						value: m.join("\n"),
+						value: m.join("\n") || "NONE",
 						inline: false
 					},
 					{
 						name: "Roles",
-						value: r.join("\n"),
+						value: r.join("\n") || "NONE",
 						inline: false
 					},
 					{
 						name: "Channels",
-						value: ch.join("\n"),
+						value: ch.join("\n") || "NONE",
 						inline: false
 					},
 					{
 						name: "Guilds",
-						value: g.join("\n"),
+						value: g.join("\n") || "NONE",
 						inline: false
 					}
 					],
