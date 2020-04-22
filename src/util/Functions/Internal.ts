@@ -227,7 +227,6 @@ export default class Internal {
 	static get refreshPatreonToken() { return refreshPatreonToken; }
 
 	static sanitize(str: string) {
-		console.log(str);
 		if (typeof str !== "string") str = (str as any).toString();
 		["*", "_", "@"].map(s => str = str.replace(new RegExp(`\\${s}`, "gi"), `\\${s}`));
 		return str;
