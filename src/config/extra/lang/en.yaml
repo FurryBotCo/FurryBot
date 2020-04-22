@@ -751,9 +751,37 @@ commands:
       cmdTotal: "Total Commands"
       title: "Command Help"
       cmdList: "Command List #{0}"
+      embed:
+        restrictions: "Restrictions"
+        nsfw: "NSFW"
+        contribOnly: "Contributor Only"
+        devOnly: "Dev Only"
+        betaOnly: "Beta Only"
+        guildOwnerOnly: "Server Owner Only"
+        supportServerOnly: "Support Server Only"
+        donatorOnly: "Donator Only"
+        premiumGuildOnly: "Premium Server Only"
+        permissions: "Permissions"
+        bot: "Bot"
+        user: "User"
+        usage: "Usage"
+        aliases: "Aliases"
+        normalCooldown: "Normal Cooldown"
+        donatorCooldown: "Donator Cooldown"
+        category: "Category"
     rank:
       description: "Get a users rank."
       usage: "[@user]"
+    leaderboard:
+      description: "Get the server leveling leaderboard."
+      usage: "[page]"
+      serverTooLarge: "this server is too large to display the leveling leaderboard."
+      invalidPage: "the provided page number was invalid. Valid pages: {0}"
+      pageLessThan: "the page number cannot be less than one. Valid pages: {0}"
+      pageMoreThan: "there are not that many pages. Valid pages: {0}"
+      embed:
+        title: "Server Leaderboard"
+        footer: "Page {0}/{1} | Skipped {2} Non Cached Users"
     suggest:
       description: "Suggest something for me!"
       usage: "<suggestion>"
@@ -1189,6 +1217,9 @@ category:
     description: "Helpful things for the bot, and your server."
 
 other:
+  yes: "Yes"
+  no: "No"
+  none: "None"
   leveling:
     embedTitle: "Level Up!"
     embedDescription: "You leveled up to level **{0}**!"
