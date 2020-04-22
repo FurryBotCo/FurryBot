@@ -19,7 +19,7 @@ export default class SubCommand {
 	donatorCooldown: number;
 	description: string;
 	usage: string;
-	features: ("nsfw" | "devOnly" | "betaOnly" | "donatorOnly" | "premiumGuildOnly" | "guildOwnerOnly" | "supportOnly")[];
+	features: ("nsfw" | "contribOnly" | "devOnly" | "betaOnly" | "donatorOnly" | "premiumGuildOnly" | "guildOwnerOnly" | "supportOnly")[];
 	category: string;
 	subCommands: SubCommand[];
 	file: string;
@@ -126,6 +126,11 @@ export default class SubCommand {
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) {
 			Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `${msg.author.tag} (${msg.author.id}) attempted to run developer command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 			return msg.reply(`you must be a developer to use this command.`).catch(err => null);
+		}
+
+		if (cmd.features.includes("contribOnly") && !config.contributors.includes(msg.author.id)) {
+			Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `${msg.author.tag} (${msg.author.id}) attempted to run contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+			return msg.reply(`you must be a contributor or higher to use this command.`).catch(err => null);
 		}
 
 		if (cmd.features.includes("supportOnly") && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("this command may only be ran in my support server.").catch(err => null);
