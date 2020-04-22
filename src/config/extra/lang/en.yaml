@@ -782,6 +782,7 @@ commands:
       embed:
         title: "Server Leaderboard"
         footer: "Page {0}/{1} | Skipped {2} Non Cached Users"
+        until: "until level up"
     suggest:
       description: "Suggest something for me!"
       usage: "<suggestion>"
