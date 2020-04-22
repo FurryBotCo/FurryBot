@@ -218,7 +218,6 @@ export default new Command({
 
 					return msg.reply(`{lang:commands.utility.settings.set|${n}|${Internal.sanitize(cur) || "{lang:commands.utility.settings.noValue}"}|${Internal.sanitize(v)}}`);
 					break;
-					break;
 				}
 			}
 		}
