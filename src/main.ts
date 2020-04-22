@@ -49,6 +49,9 @@ export default class FurryBot extends Eris.Client {
 		this.holder = new Holder();
 		fs.readdirSync(`${__dirname}/events`).map((d) => {
 			const e: ClientEvent = require(`${__dirname}/events/${d}`).default;
+			if (!e) throw new TypeError(`Event file ${d} is missing an export.`);
+			if (!e.listener) throw new TypeError(`Event file ${d} is missing a listener.`);
+			if (!e.event) throw new TypeError(`Event file ${d} is missing an event.`);
 			const b = e.listener.bind(this);
 			this.on(e.event, b);
 			this.holder.set("events", e.event, b);
@@ -85,6 +88,4 @@ export default class FurryBot extends Eris.Client {
 	log(level: "log" | "info" | "warn" | "error" | "data" | "debug" | "internal" | "internal.debug", message: any, name: string) {
 		Logger[level](`${name || "General"}`, message);
 	}
-
-
 }
