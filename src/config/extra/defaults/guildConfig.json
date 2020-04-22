@@ -122,5 +122,6 @@
 	"disable": {
 		"server": [],
 		"channels": {}
-	}
+	},
+	"deletion": null
 }

@@ -35,7 +35,9 @@ export default new Command({
 		DISCOVERABLE: `[{lang:commands.information.sinfo.features.discoverable}](${fDocsUrl} '{lang:commands.information.sinfo.features.discoverableDesc}')`,
 		FEATURABLE: `[{lang:commands.information.sinfo.features.featurable}](${fDocsUrl} '{lang:commands.information.sinfo.features.featurableDesc}')`,
 		ANIMATED_ICON: `[{lang:commands.information.sinfo.features.animatedIcon}](${fDocsUrl} '{lang:commands.information.sinfo.features.animatedIconDesc}')`,
-		BANNER: `[{lang:commands.information.sinfo.features.banner}](${fDocsUrl} '{lang:commands.information.sinfo.features.bannerDesc}')`
+		BANNER: `[{lang:commands.information.sinfo.features.banner}](${fDocsUrl} '{lang:commands.information.sinfo.features.bannerDesc}')`,
+		WELCOME_SCREEN_ENABLED: `[{lang:commands.information.sinfo.features.welcomeScreen}](${fDocsUrl} '{lang:commands.information.sinfo.features.welcomeScreenDesc}')`,
+		PUBLIC_DISABLED: `[{lang:commands.information.sinfo.features.publicDisabled}](${fDocsUrl} '{lang:commands.information.sinfo.features.publicDisabledDesc}')`
 	};
 
 	let features = msg.channel.guild.features.map(f => `\u25FD ${fStr[f] || `${f}`}`).join("\n");

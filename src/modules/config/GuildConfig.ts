@@ -1,7 +1,8 @@
 import config from "../../config";
 import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
-
+import _ from "lodash";
+import Logger from "../../util/LoggerV8";
 export default class GuildConfig {
 	id: string;
 	selfAssignableRoles: string[];
@@ -71,16 +72,14 @@ export default class GuildConfig {
 	tags: {
 		[k: string]: string;
 	};
-	auto: (
-		GlobalTypes.Auto.Yiff<"gay" | "straight" | "lesbian" | "dickgirl"> |
-		GlobalTypes.Auto.Animals<"bird" | "bunny" | "cat" | "dog" | "duck" | "fox" | "otter" | "panda" | "snek" | "turtle" | "wolf">
-	)[];
+	auto: {}[];
 	disable: {
 		server: string[];
 		channels: {
 			[k: string]: string[];
 		};
 	};
+	deletion?: number;
 
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		this.id = id;
@@ -90,14 +89,24 @@ export default class GuildConfig {
 
 	async load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		/**
-		 * @param {A} a - the object to get keys from
-		 * @param {B} b - default
-		 * @param {C} c - set data
+		 * @param {*} a - the current class
+		 * @param {*} b - the provided data
+		 * @param {*} c - the default data
 		 */
-		function goKeys(a, b, c) {
-			Object.keys(b).map(k => typeof a[k] === "undefined" ? c[k] = b[k] : a[k] instanceof Array ? c[k] = a[k] : typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? (c[k] = {}, goKeys(a[k], b[k], c[k])) : c[k] = a[k]);
-		}
-		goKeys(data, config.defaults.config.guild, this);
+		const goKeys = (a, b, c) => {
+			const obj = Object.keys(c).length === 0 ? b : c;
+			return Object.keys(obj).map(k => {
+				if (typeof c[k] === "object" && c[k] !== null) {
+					if (c[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
+					else {
+						if ([undefined, null, ""].includes(a[k])) a[k] = {};
+						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k], c[k]);
+					}
+				} else return a[k] = [undefined].includes(b[k]) ? c[k] : b[k];
+			});
+		};
+
+		goKeys(this, data, config.defaults.config.guild);
 	}
 
 	async reload() {
@@ -108,10 +117,25 @@ export default class GuildConfig {
 
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
 		const d = this;
-		function goKeys(a, b) {
-			Object.keys(a).map(k => typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? goKeys(a[k], b[k]) : typeof b === "undefined" ? b = { [k]: a[k] } : b[k] = a[k]);
-		}
-		goKeys(data, d);
+
+		/**
+		 *
+		 * @param {*} a - the data to update
+		 * @param {*} b - the provided data
+		 */
+		const goKeys = (a, b) => {
+			return Object.keys(b).map(k => {
+				if (typeof b[k] === "object" && b[k] !== null) {
+					if (b[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
+					else {
+						if ([undefined, null, ""].includes(a[k])) a[k] = {};
+						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k]);
+					}
+				} else return a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
+			});
+		};
+
+		goKeys(d, data);
 
 		const e = await mdb.collection("guilds").findOne({
 			id: this.id

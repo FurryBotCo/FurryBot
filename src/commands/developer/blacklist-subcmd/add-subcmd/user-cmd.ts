@@ -17,14 +17,16 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Add a user to the blacklist.",
 	usage: "<id> <reason>",
-	features: ["devOnly"],
+	features: ["contribOnly"],
 	file: __filename
 }, (async function (msg: ExtendedMessage) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const u = await msg.getUserFromArgs();
 	if (!u) return msg.reply(`**${msg.args[0]}** isn't a valid user.`);
 	const { id } = u;
+
+	if (config.developers.includes(id) && !config.developers.includes(msg.author.id)) return msg.reply("you cannot blacklist developers.");
+	if (config.contributors.includes(id) && !config.developers.includes(msg.author.id)) return msg.reply("you cannot blacklist contributors.");
 	const ubl: Blacklist.UserEntry = await mdb.collection("blacklist").find({ userId: id }).toArray().then(res => res.filter(r => [0, null].includes(r.expire) || r.expire > Date.now())[0]);
 	if (!!ubl) {
 		const expiry = [0, null].includes(ubl.expire) ? "Never" : Time.formatDateWithPadding(new Date(ubl.expire));

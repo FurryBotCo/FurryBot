@@ -26,6 +26,9 @@ export default new Command({
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 	const m = member.id === msg.author.id ? uConfig : await db.getUser(member.id);
 
+	if (m.id === msg.author.id && isNaN(Number(uConfig.bal))) return msg.reply("{lang:other.error.invalidBalance}");
+	else if (isNaN(Number(m.bal))) return msg.reply("{lang:other.error.otherInvalidBalance}");
+
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle(member.id === msg.member.id ? "{lang:commands.economy.bal.yourBalance}" : `{lang:commands.economy.bal.otherBalance} ${member.username}#${member.discriminator}`)

@@ -12,7 +12,7 @@ export default class ModLogUtil {
 		this.client = client;
 	}
 
-	async create<B = Eris.User | string, C extends Eris.GuildTextableChannel = Eris.GuildTextableChannel>(ch: C, data: { type: "custom"; embed: Eris.EmbedOptions | EmbedBuilder; } | {
+	async create<B = Eris.User | string | "automatic", C extends Eris.GuildTextableChannel = Eris.GuildTextableChannel>(ch: C, data: { type: "custom"; embed: Eris.EmbedOptions | EmbedBuilder; } | {
 		blame: B;
 		target: Eris.GuildTextableChannel;
 		reason?: string;

@@ -5,16 +5,22 @@ class Webhook {
 	client: FurryBot;
 	id: string;
 	token: string;
-	constructor(client: FurryBot, id: string, token: string) {
+	username?: string;
+	avatar?: string;
+	constructor(client: FurryBot, id: string, token: string, username?: string, avatar?: string) {
 		if (!client) throw new TypeError("missing client");
 		if (!id) throw new TypeError("missing id");
 		if (!token) throw new TypeError("missing token");
 		this.client = client;
 		this.id = id;
 		this.token = token;
+		this.username = username;
+		this.avatar = avatar;
 	}
 
 	async execute(payload: WebhookPayload) {
+		if (!!this.username && !payload.username) payload.username = this.username;
+		if (!!this.avatar && !payload.avatarURL) payload.avatarURL = this.avatar;
 		return this.client.executeWebhook(this.id, this.token, payload);
 	}
 }
@@ -27,7 +33,7 @@ export default class WebhookStore extends Map<string, Webhook> {
 		this.client = client;
 	}
 
-	add(name: string, id: string, token: string) {
-		this.set(name, new Webhook(this.client, id, token));
+	add(name: string, id: string, token: string, username?: string, avatar?: string) {
+		this.set(name, new Webhook(this.client, id, token, username, avatar));
 	}
 }

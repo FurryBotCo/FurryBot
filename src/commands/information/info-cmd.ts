@@ -4,6 +4,7 @@ import { Internal, Time } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
 import config from "../../config";
 import Eris from "eris";
+import pkg from "../../../package.json";
 
 export default new Command({
 	triggers: [
@@ -21,6 +22,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
+
 	const info = {
 		processUsage: `${Math.round(Internal.memory.process.getUsed() / 1024 / 1024)}MB / ${Math.round(Internal.memory.process.getTotal() / 1024 / 1024)}MB`,
 		systemUsage: `${Math.round(Internal.memory.system.getUsed() / 1024 / 1024 / 1024)}GB / ${Math.round(Internal.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
@@ -80,7 +82,7 @@ export default new Command({
 				"",
 				"**{lang:commands.information.info.other}**:",
 				`\u25FD {lang:commands.information.info.library}: ${info.library}`,
-				`\u25FD {lang:commands.information.info.libraryVersion}: ${info.libraryVersion}`,
+				`\u25FD {lang:commands.information.info.libraryVersion}: ${info.libraryVersion} (\`${pkg.dependencies.eris}\`)`,
 				`\u25FD {lang:commands.information.info.apiVersion}: ${info.apiVersion}`,
 				`\u25FD {lang:commands.information.info.gatewayVersion}: ${info.gatewayVersion}`,
 				`\u25FD {lang:commands.information.info.version}: ${info.version}`,

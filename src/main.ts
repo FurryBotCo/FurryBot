@@ -1,8 +1,8 @@
 import Eris from "eris";
+import { Base, Cluster } from "clustersv3";
 import Holder from "./util/Holder";
 import MessageCollector from "./util/MessageCollector";
 import ErrorHandler from "./util/ErrorHandler";
-import DeadShardTest from "./util/DeadShardTest";
 import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
 import WebhookStore from "./util/WebhookStore";
 import config from "./config";
@@ -16,12 +16,12 @@ import E9API from "e9api";
 import ModLogUtil from "./util/ModLogUtil";
 import * as http from "http";
 import * as https from "https";
+import redis from "async-redis";
 
 export default class FurryBot extends Eris.Client {
 	holder: Holder;
 	col: MessageCollector;
 	err: ErrorHandler;
-	shardTest: DeadShardTest;
 	cmd: CommandHolder;
 	cd: CooldownHandler;
 	temp: Temp;
@@ -44,31 +44,34 @@ export default class FurryBot extends Eris.Client {
 	e6: E6API;
 	e9: E9API;
 	srv: http.Server | https.Server;
-	constructor(token: string, options: Eris.ClientOptions) {
-		super(token, options);
-		this.holder = new Holder();
+	rClient: redis.RedisClient;
+	constructor(token, clientOptions) {
+		super(token, clientOptions);
 
+		this.holder = new Holder();
 		fs.readdirSync(`${__dirname}/events`).map((d) => {
 			const e: ClientEvent = require(`${__dirname}/events/${d}`).default;
+			if (!e) throw new TypeError(`Event file ${d} is missing an export.`);
+			if (!e.listener) throw new TypeError(`Event file ${d} is missing a listener.`);
+			if (!e.event) throw new TypeError(`Event file ${d} is missing an event.`);
 			const b = e.listener.bind(this);
 			this.on(e.event, b);
 			this.holder.set("events", e.event, b);
 		});
 		this.col = new MessageCollector(this);
 		this.err = new ErrorHandler(this);
-		this.shardTest = new DeadShardTest(this);
 		this.cmd = new CommandHolder(this);
 		this.cd = new CooldownHandler();
 		this.cd
 			.on("add", (value, type, time, meta) => {
-				if (type === "cmd") Logger.debug("Cooldown Handler", `Set cooldown for "${value}" on "${meta.cmd}" for "${time}"`);
+				if (type === "cmd") this.log("debug", `Set cooldown for "${value}" on "${meta.cmd}" for "${time}"`, "Cooldown Handler");
 			})
 			.on("remove", (value, type, time, meta) => {
-				if (type === "cmd") Logger.debug("Cooldown Handler", `Removed cooldown for "${value}" on "${meta.cmd}" (time: ${time})`);
+				if (type === "cmd") this.log("debug", `Removed cooldown for "${value}" on "${meta.cmd}" (time: ${time})`, "Cooldown Handler");
 			});
 		this.temp = null;
 		this.w = new WebhookStore(this);
-		Object.keys(config.webhooks).map(h => this.w.add(h, config.webhooks[h].id, config.webhooks[h].token));
+		Object.keys(config.webhooks).map(h => this.w.add(h, config.webhooks[h].id, config.webhooks[h].token, config.webhooks[h].username, config.webhooks[h].avatar));
 		this.m = new ModLogUtil(this);
 		this.firstReady = false;
 		this.spamCounter = {
@@ -82,13 +85,12 @@ export default class FurryBot extends Eris.Client {
 		this.e9 = new E9API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
 		});
+		this.rClient = redis.createClient(config.keys.redis.port, config.keys.redis.host, {
+			password: config.keys.redis.password
+		});
+	}
 
-		process
-			.on("unhandledRejection", (reason, promise) =>
-				this.err.globalHandler.bind(this.err, "unhandledRejection")({ reason, promise })
-			)
-			.on("uncaughtException", (error) =>
-				this.err.globalHandler.bind(this.err, "uncaughtException")({ error })
-			);
+	log(level: "log" | "info" | "warn" | "error" | "data" | "debug" | "internal" | "internal.debug", message: any, name: string) {
+		Logger[level](`${name || "General"}`, message);
 	}
 }

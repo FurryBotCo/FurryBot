@@ -21,7 +21,7 @@ export default new SubCommand({
 }, (async function (msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
-	const p = await phin({
+	const p = await phin<any>({
 		method: "POST",
 		url: "https://api.todoist.com/sync/v8/sync",
 		data: {
@@ -37,16 +37,16 @@ export default new SubCommand({
 					}
 				}
 			]
-		},
+		} as any,
 		parse: "json"
 	});
 
 	if (p.statusCode !== 200) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, {
+		this.log("error", {
 			statusCode: p.statusCode,
 			statusMessage: p.statusMessage,
 			body: p.body
-		});
+		}, `Shard #${msg.channel.guild.shard.id}`);
 		return msg.reply("request failed, check console.");
 	}
 

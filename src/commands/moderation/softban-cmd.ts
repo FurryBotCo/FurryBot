@@ -4,6 +4,7 @@ import Eris from "eris";
 import { Utility } from "../../util/Functions";
 import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import Language from "../../util/Language";
 
 export default new Command({
 	triggers: [
@@ -51,10 +52,10 @@ export default new Command({
 	const a = Utility.compareMembers(user, msg.member);
 	if ((a.member1.higher || a.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(`{lang:commands.moderation.softban.noBanOther|${user.username}#${user.discriminator}}`);
 	// if(!user.bannable) return msg.channel.createMessage(`<@!${msg.author.id}>, I cannot ban ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have ban permissions?`);
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "{lang:commands.moderation.softban.noReason}";
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
 	// if (!user.user.bot) m = await user.user.getDMChannel().then(dm => dm.createMessage(`You were banned from **${msg.channel.guild.name}**\nReason: ${reason}`));
 	user.ban(7, `Softban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
-		await msg.channel.createMessage(`{lang:commands.moderation.softban.softbanned|${user.username}#${user.discriminator}|${reason}}`).catch(noerr => null);
+		await msg.channel.createMessage(`***{lang:commands.moderation.softban.softbanned|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "softban",
 			reason,
@@ -65,9 +66,10 @@ export default new Command({
 	}).catch(async (err) => {
 		await msg.channel.createMessage(`{lang:commands.moderation.softban.couldNotSoftban|${user.username}#${user.discriminator}|${err}}`);
 		// if (!!m) await m.delete();
-	}).then(() => user.unban(`Softban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`)).catch(err =>
-		msg.channel.createMessage(`{lang:commands.moderation.softban.couldNotUnban|${user.username}#${user.discriminator}|${err}}`)
-	);
+	}).then(() => user.unban(`Softban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`)).catch(async (err) => {
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.softban.englishOnly}`);
+		else await msg.channel.createMessage(`{lang:commands.moderation.softban.couldNotSoftban|${user.username}#${user.discriminator}|${err}}`);
+	});
 
 	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
 }));

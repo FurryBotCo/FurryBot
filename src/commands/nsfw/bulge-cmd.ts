@@ -24,7 +24,7 @@ export default new Command({
 	// await msg.channel.startTyping();
 	const img = await Request.imageAPIRequest(false, "bulge", true, false);
 	if (img.success === false) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, img);
+		this.log("error", img, `Shard #${msg.channel.guild.shard.id}`);
 		return msg.reply(`{lang:other.error.unknownAPIError|${img.error.code}|${img.error.description}}`);
 	}
 	const short = await Utility.shortenURL(img.response.image);

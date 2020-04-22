@@ -14,7 +14,7 @@ export default new Command({
 	features: ["devOnly"],
 	file: __filename
 }, (async function (msg: ExtendedMessage) {
-	if (msg.args.length > 0) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 0) return new Error("ERR_INVALID_USAGE");
 
 	const user = await msg.getUserFromArgs();
 
@@ -24,7 +24,16 @@ export default new Command({
 
 	if (!dm) return msg.reply(`failed to fetch dm channel for **${user.username}#${user.discriminator}** (${user.id})`);
 
-	const m = await dm.createMessage(msg.args.slice(1, msg.args.length).join(" ")).catch(err => null);
+	const m = await dm.createMessage({
+		embed: {
+			title: `Forwarded Message From ${msg.author.tag}`,
+			author: {
+				name: msg.author.tag,
+				icon_url: msg.author.avatarURL
+			},
+			description: msg.args.slice(1, msg.args.length).join(" ")
+		}
+	}).catch(err => null);
 
 	if (!m) return msg.reply(`failed to dm **${user.username}#${user.discriminator}** (${user.id}), they might have their dms closed.`);
 

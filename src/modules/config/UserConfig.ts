@@ -1,6 +1,7 @@
 import config from "../../config";
 import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
+import _ from "lodash";
 
 interface Warning {
 	blame: string;
@@ -26,6 +27,7 @@ export default class UserConfig {
 	levels: {
 		[k: string]: number;
 	};
+	deletion?: number;
 
 	constructor(id: string, data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		this.id = id;
@@ -35,19 +37,24 @@ export default class UserConfig {
 
 	async load(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		/**
-		 *
-		 *
-		 * @template A
-		 * @template B
-		 * @template C
-		 * @param {A} a - the object to get keys from
-		 * @param {B} b - default
-		 * @param {C} c - set data
+		 * @param {*} a - the current class
+		 * @param {*} b - the provided data
+		 * @param {*} c - the default data
 		 */
-		function goKeys<A extends {}, B extends {}, C extends {}>(a: A, b: B, c: C) {
-			Object.keys(b).map(k => typeof a[k] === "undefined" ? c[k] = b[k] : a[k] instanceof Array ? c[k] = a[k] : typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? (c[k] = {}, goKeys(a[k], b[k], c[k])) : c[k] = a[k]);
-		}
-		goKeys(data, config.defaults.config.user, this);
+		const goKeys = (a, b, c) => {
+			const obj = Object.keys(c).length === 0 ? b : c;
+			return Object.keys(obj).map(k => {
+				if (typeof c[k] === "object" && c[k] !== null) {
+					if (c[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
+					else {
+						if ([undefined, null, ""].includes(a[k])) a[k] = {};
+						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k], c[k]);
+					}
+				} else return a[k] = [undefined].includes(b[k]) ? c[k] : b[k];
+			});
+		};
+
+		goKeys(this, data, config.defaults.config.user);
 	}
 
 	async reload() {
@@ -58,11 +65,25 @@ export default class UserConfig {
 
 	async edit(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		const d = this;
+		/**
+		 *
+		 * @param {*} a - the data to update
+		 * @param {*} b - the provided data
+		 */
+		const goKeys = (a, b) => {
+			return Object.keys(b).map(k => {
+				if (typeof b[k] === "object" && b[k] !== null) {
+					if (b[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
+					else {
+						if ([undefined, null, ""].includes(a[k])) a[k] = {};
+						if ([undefined, null, ""].includes(b[k])) b[k] = {};
+						return goKeys(a[k], b[k]);
+					}
+				} else return a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
+			});
+		};
 
-		function goKeys<A extends {}, B extends {}>(a: A, b: B) {
-			Object.keys(a).map(k => typeof a[k] === "object" && a[k] !== null /* because typeof null is object */ ? goKeys(a[k], b[k]) : b[k] = a[k]);
-		}
-		goKeys(data, d);
+		goKeys(d, data);
 
 		const e = await mdb.collection("users").findOne({
 			id: this.id
@@ -86,7 +107,7 @@ export default class UserConfig {
 		});
 		if (!e) await mdb.collection("users").insertOne({
 			id: this.id,
-			...config.defaults.config.guild
+			...config.defaults.config.user
 		});
 
 		return this;
@@ -116,6 +137,6 @@ export default class UserConfig {
 	}
 
 	getLevel(g: string) {
-		return this.levels[g] || 0;
+		return this.levels && this.levels[g] ? this.levels[g] : 0;
 	}
 }

@@ -44,31 +44,34 @@ export default new Command({
 
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) return msg.reply("you must be a developer to see this command.");
 
+		if (cmd.features.includes("contribOnly") && !config.developers.includes(msg.author.id)) return msg.reply("you must be a contributor or above to see this command.");
+
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(gConfig.settings.lang)
 				.setTitle(cmd.triggers[0])
 				.setDescription([
 					cmd.description,
 					"",
-					`**{lang:commands.misc.help.restrictions}**:`,
-					`\u25FD {lang:commands.misc.help.nsfw}: **${cmd.features.includes("nsfw") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
-					`\u25FD {lang:commands.misc.help.devOnly}: **${cmd.features.includes("devOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
-					`\u25FD {lang:commands.misc.help.betaOnly}: **${cmd.features.includes("betaOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
-					`\u25FD {lang:commands.misc.help.guildOwnerOnly}: **${cmd.features.includes("guildOwnerOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
-					`\u25FD {lang:commands.misc.help.supportServerOnly}: **${cmd.features.includes("supportOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
-					`\u25FD {lang:commands.misc.help.donatorOnly}: **${cmd.features.includes("donatorOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
-					`\u25FD {lang:commands.misc.help.premiumGuildOnly}: **${cmd.features.includes("premiumGuildOnly") ? "{lang:commands.misc.help.yes}" : "{lang:commands.misc.help.no}"}**`,
+					`**{lang:commands.misc.help.embed.restrictions}**:`,
+					`\u25FD {lang:commands.misc.help.embed.nsfw}: **${cmd.features.includes("nsfw") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
+					`\u25FD {lang:commands.misc.help.embed.contribOnly}: **${cmd.features.includes("contribOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
+					`\u25FD {lang:commands.misc.help.embed.devOnly}: **${cmd.features.includes("devOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
+					`\u25FD {lang:commands.misc.help.embed.betaOnly}: **${cmd.features.includes("betaOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
+					`\u25FD {lang:commands.misc.help.embed.guildOwnerOnly}: **${cmd.features.includes("guildOwnerOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
+					`\u25FD {lang:commands.misc.help.embed.supportServerOnly}: **${cmd.features.includes("supportOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
+					`\u25FD {lang:commands.misc.help.embed.donatorOnly}: **${cmd.features.includes("donatorOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
+					`\u25FD {lang:commands.misc.help.embed.premiumGuildOnly}: **${cmd.features.includes("premiumGuildOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
 					"",
-					`**{lang:commands.misc.help.permissions}**:`,
-					`\u25FD {lang:commands.misc.help.bot}: **${cmd.botPermissions.length === 0 ? "{lang:commands.misc.help.none}" : cmd.botPermissions.join("**, **")}**`,
-					`\u25FD {lang:commands.misc.help.}user: **${cmd.userPermissions.length === 0 ? "{lang:commands.misc.help.none}" : cmd.userPermissions.join("**, **")}**`,
+					`**{lang:commands.misc.help.embed.permissions}**:`,
+					`\u25FD {lang:commands.misc.help.embed.bot}: **${cmd.botPermissions.length === 0 ? "{lang:other.none}" : cmd.botPermissions.join("**, **")}**`,
+					`\u25FD {lang:commands.misc.help.embed.user}: **${cmd.userPermissions.length === 0 ? "{lang:other.none}" : cmd.userPermissions.join("**, **")}**`,
 					"",
 					"**Extra**:",
-					`\u25FD {lang:commands.misc.help.usage}: \`${gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
-					`\u25FD {lang:commands.misc.help.aliases}: ${cmd.triggers.join(", ")}`,
-					`\u25FD {lang:commands.misc.help.normalCooldown}: ${Time.ms(cmd.cooldown, true)}`,
-					`\u25FD {lang:commands.misc.help.donatorCooldown}: ${Time.ms(cmd.donatorCooldown, true)}`,
-					`\u25FD {lang:commands.misc.help.category}: ${cat.displayName}`
+					`\u25FD {lang:commands.misc.help.embed.usage}: \`${gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
+					`\u25FD {lang:commands.misc.help.embed.aliases}: ${cmd.triggers.join(", ")}`,
+					`\u25FD {lang:commands.misc.help.embed.normalCooldown}: ${Time.ms(cmd.cooldown, true)}`,
+					`\u25FD {lang:commands.misc.help.embed.donatorCooldown}: ${Time.ms(cmd.donatorCooldown, true)}`,
+					`\u25FD {lang:commands.misc.help.embed.category}: ${cat.displayName}`
 				].join("\n"))
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setTimestamp(new Date().toISOString())

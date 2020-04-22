@@ -11,7 +11,7 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Check if a user/server is blacklisted.",
 	usage: "<user/server> <id>",
-	features: ["devOnly"],
+	features: ["contribOnly"],
 	subCommandDir: `${__dirname}/check-subcmd`,
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {

@@ -13,11 +13,11 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Get a shard's status.",
 	usage: "<id>",
-	features: ["devOnly"],
+	features: ["contribOnly"],
 	file: __filename
 }, (async function (msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
-
+	// @TODO clusters
 	const s = Number(msg.args[0]);
 	if (!this.shards.has(s)) return msg.reply(`invalid shard id "${s}".`);
 

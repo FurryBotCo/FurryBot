@@ -5,7 +5,14 @@ const ECHTypes = EConst.ChannelTypes;
 const EMSGTypes = EConst.MessageTypes;
 const EMSGFlags = EConst.MessageFlags;
 
-const ChannelNames = {
+export const GameTypes = {
+	PLAYING: 0 as 0,
+	STREAMING: 1 as 1,
+	LISTENING: 2 as 2,
+	WATCHING: 3 as 3
+};
+
+export const ChannelNames = {
 	[ECHTypes.DM]: "Direct Message",
 	[ECHTypes.GUILD_TEXT]: "Text",
 	[ECHTypes.GROUP_DM]: "Group Direct Message",
@@ -14,7 +21,7 @@ const ChannelNames = {
 	[ECHTypes.GUILD_STORE]: "Store"
 };
 
-const ChannelNamesCamelCase = {
+export const ChannelNamesCamelCase = {
 	[ECHTypes.DM]: "directMessage",
 	[ECHTypes.GUILD_TEXT]: "text",
 	[ECHTypes.GROUP_DM]: "groupDirectMessage",
@@ -23,7 +30,7 @@ const ChannelNamesCamelCase = {
 	[ECHTypes.GUILD_STORE]: "store"
 };
 
-const MessageTypes = {
+export const MessageTypes = {
 	[EMSGTypes.DEFAULT]: "Regular",
 	[EMSGTypes.RECIPIENT_ADD]: "Recipient Add (System)",
 	[EMSGTypes.RECIPIENT_REMOVE]: "Recipient Remove (System)",
@@ -39,7 +46,7 @@ const MessageTypes = {
 	[EMSGTypes.CHANNEL_FOLLOW_ADD]: "Channel Follow Add (System)"
 };
 
-const MessageFlags = {
+export const MessageFlags = {
 	[EMSGFlags.CROSSPOSTED]: "Crossposted",
 	[EMSGFlags.IS_CROSSPOST]: "Is Crosspost",
 	[EMSGFlags.SUPPRESS_EMBEDS]: "Suppress Embeds",
@@ -48,7 +55,7 @@ const MessageFlags = {
 };
 
 // stored as octals as to make knowing hex easier
-const Colors = {
+export const Colors = {
 	blue: 0x4169e1,
 	green: 0x2ecc71,
 	gold: 0xf1c40f,
@@ -58,9 +65,3 @@ const Colors = {
 };
 
 /* tslint:enable variable-name */
-
-export { ChannelNames };
-export { ChannelNamesCamelCase };
-export { MessageTypes };
-export { MessageFlags };
-export { Colors };

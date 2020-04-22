@@ -3,7 +3,7 @@ import phin from "phin";
 import refreshPatreonToken from "./refreshPatreonToken";
 
 const loopPatrons = (async (refresh = true, url?: string) => {
-	const res = await phin({
+	const res = await phin<any>({
 		method: "GET",
 		url: url || `https://www.patreon.com/api/oauth2/api/campaigns/${config.patreon.campaignId}/pledges?include=patron.null&page%5Bcount%5D=100`,
 		headers: {

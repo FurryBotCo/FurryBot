@@ -23,7 +23,7 @@ export default new Command({
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	// await msg.channel.startTyping();
-	const img = await phin({
+	const img = await phin<any>({
 		method: "GET",
 		url: "https://api.fursuitbutts.com/butts",
 		parse: "json",
@@ -31,7 +31,7 @@ export default new Command({
 	});
 
 	if (img.statusCode !== 200) {
-		Logger.error(`Shard #${msg.channel.guild.shard.id}`, img);
+		this.log("error", img, `Shard #${msg.channel.guild.shard.id}`);
 		return msg.reply(`{lang:other.error.unknownAPIError|${img.body.error.code}|${img.body.error.description}}`);
 	}
 	const short = await Utility.shortenURL(img.body.response.image);

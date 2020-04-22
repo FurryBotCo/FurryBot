@@ -11,6 +11,7 @@ import { Request, Utility, Time, Strings } from ".";
 import Logger from "../LoggerV8";
 import { Colors } from "../Constants";
 import ExtendedMessage from "../../modules/ExtendedMessage";
+import phin from "phin";
 
 export default class Internal {
 	private constructor() {
@@ -225,229 +226,7 @@ export default class Internal {
 	static get loopPatrons() { return loopPatrons; }
 	static get refreshPatreonToken() { return refreshPatreonToken; }
 
-	/**
-	 * Run auto content systems
-	 * @static
-	 * @param {number} time
-	 * @param {FurryBot} client
-	 * @memberof Internal
-	 */
-	static async runAuto(time: number, client: FurryBot) {
-		// @TODO clean this crap up
-		const guilds = await mdb
-			.collection("guilds")
-			.find<GuildConfig>({})
-			.toArray()
-			.then(g =>
-				g.filter(k => k.auto && k.auto.length > 0)
-			);
-
-		const counter = {
-			gay: 0,
-			straight: 0,
-			lesbian: 0,
-			dickgirl: 0
-		};
-		for (const g of guilds) for (const w of g.auto.filter(a => a.time === (time / 6e4))) {
-			switch (w.type.toLowerCase() as typeof w.type) {
-				case "yiff": {
-					const img = await Request.imageAPIRequest(false, `yiff/${w.cat}`, true, false);
-					const embed: Eris.EmbedOptions = {
-						title: "Auto Yiff",
-						color: Math.floor(Math.random() * 0xFFFFFF),
-						timestamp: new Date().toISOString(),
-						footer: {
-							text: `Disable this using "${g.settings.prefix}auto yiff disable ${w.cat}" (without quotes)`
-						}
-					};
-					// @FIXME language stuff
-					if (img.success !== true) embed.description = `API Error encountered while fetching image.\nCode: ${img.error.code} \nDescription: \`${img.error.description}\`\nReport this to my [support server](${config.bot.supportURL})`;
-					else {
-						const short = await Utility.shortenURL(img.response.image);
-						embed.description = `Type: ${w.cat}\nShort URL: ${short.link}`;
-						embed.image = {
-							url: img.response.image
-						};
-					}
-
-					await client.executeWebhook(w.webhook.id, w.webhook.token, {
-						embeds: [
-							embed
-						]
-					}).then(() => counter[w.cat]++);
-					break;
-				}
-
-				default:
-					Logger.error("Auto", `unknown type "${w.type.toLowerCase()}"`);
-			}
-		}
-
-		Logger.debug("Auto", `${time / 6e4}m Processed\nTotal Ran:\n${Object.keys(counter).map(k => `${Strings.ucwords(k)}: ${counter[k]}`).join("\n")}`);
-	}
-
-
-	static async timedCheck(client: FurryBot) {
-		const col = mdb.collection<GlobalTypes.TimedEntry>("timed");
-		const e = await col.find({}).toArray();
-
-		for (const entry of e) {
-			if (!client.guilds.has(entry.guildId)) {
-				await col.findOneAndDelete({ _id: entry._id });
-				Logger.warn("Timed Check", `skipped timed ${entry.type} for user "${entry.userId}" because the guild "${entry.guildId}" is no longer present.`);
-				continue;
-			}
-
-			if (Date.now() < entry.expiry) continue;
-
-			switch (entry.type) {
-				case "ban": {
-					const g = client.guilds.get(entry.guildId);
-					await g.unbanMember(entry.userId, `Automatic Unban`).catch(err => null);
-					const u = client.users.has(entry.userId) ? client.users.get(entry.userId) : await client.getRESTUser(entry.userId);
-					const c = await db.getGuild(entry.guildId);
-					if (!c.settings.modlog) {
-						await col.findOneAndDelete({ _id: entry._id });
-						continue;
-					}
-					const ch = g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog);
-					if (!ch) {
-						await col.findOneAndDelete({ _id: entry._id });
-						await c.edit({ settings: { modlog: null } });
-						Logger.warn("Timed Check", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`);
-						continue;
-					}
-
-					if (!["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
-						await col.findOneAndDelete({ _id: entry._id });
-						await c.edit({ settings: { modlog: null } });
-						Logger.warn("Timed Check", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`);
-						continue;
-					}
-
-					await ch.createMessage({
-						embed: {
-							title: "Member Unbanned",
-							description: [
-								`Target: ${u.username}#${u.discriminator} <@!${u.id}>`,
-								`Reason: Automatic action due to expiry.`
-							].join("\n"),
-							timestamp: new Date().toISOString(),
-							color: Colors.green,
-							author: {
-								name: `${client.user.username}#${client.user.discriminator}`,
-								icon_url: client.user.avatarURL
-							},
-							footer: {
-								text: `Action was automatically performed.`
-							}
-						}
-					});
-					await col.findOneAndDelete({ _id: entry._id });
-					break;
-				}
-
-				case "mute": {
-					const g = client.guilds.get(entry.guildId);
-					// fetch user from api if they aren't in the server
-					const m = g.members.has(entry.userId) ? g.members.get(entry.userId) : await client.getRESTUser(entry.userId);
-					const c = await db.getGuild(entry.guildId);
-					const r = g.roles.get(c.settings.muteRole);
-					if (!c.settings.modlog) {
-						await col.findOneAndDelete({ _id: entry._id });
-						continue;
-					}
-
-					const ch = g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog);
-					if (!ch) {
-						await col.findOneAndDelete({ _id: entry._id });
-						await c.edit({ settings: { modlog: null } });
-						Logger.warn("Timed Check", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`);
-						continue;
-					}
-
-					if (!["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
-						await col.findOneAndDelete({ _id: entry._id });
-						await c.edit({ settings: { modlog: null } });
-						Logger.warn("Timed Check", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`);
-						continue;
-					}
-
-					if (!g.members.has(entry.userId)) {
-						await ch.createMessage({
-							embed: {
-								title: "Automatic Unmute Failed",
-								description: `I failed to automatically unmute **${m.username}#${m.discriminator}** (<@!${m.id}>)\nReason: The user is not in the server.`,
-								timestamp: new Date().toISOString(),
-								color: Colors.red,
-								author: {
-									name: `${client.user.username}#${client.user.discriminator}`,
-									icon_url: client.user.avatarURL
-								}
-							}
-						});
-						await col.findOneAndDelete({ _id: entry._id });
-						continue;
-					}
-
-					if (m instanceof Eris.Member) {
-						if (!m.roles.includes(c.settings.muteRole)) {
-							await col.findOneAndDelete({ _id: entry._id });
-							continue;
-						}
-
-						if (!r) {
-							await ch.createMessage({
-								embed: {
-									title: "Automatic Unmute Failed",
-									description: `I failed to automatically unmute **${m.username}#${m.discriminator}** (<@!${m.id}>)\nReason: Couldn't find mute role.`,
-									timestamp: new Date().toISOString(),
-									color: Colors.red,
-									author: {
-										name: `${client.user.username}#${client.user.discriminator}`,
-										icon_url: client.user.avatarURL
-									}
-								}
-							});
-							await col.findOneAndDelete({ _id: entry._id });
-							continue;
-						}
-
-						await m.removeRole(r.id, "Automatic Unmute").catch(err => null);
-
-						await ch.createMessage({
-							embed: {
-								title: "Member Unmuted",
-								description: [
-									`Target: ${m.username}#${m.discriminator} <@!${m.id}>`,
-									`Reason: Automatic action due to expiry.`
-								].join("\n"),
-								timestamp: new Date().toISOString(),
-								color: Colors.green,
-								author: {
-									name: `${client.user.username}#${client.user.discriminator}`,
-									icon_url: client.user.avatarURL
-								},
-								footer: {
-									text: `Action was automatically performed.`
-								}
-							}
-						});
-						await col.findOneAndDelete({ _id: entry._id });
-					}
-					break;
-				}
-
-				default: {
-					await col.findOneAndDelete({ _id: entry._id });
-					Logger.warn("Timed Check", `Unknown timed type "${entry.type}" found.`);
-				}
-			}
-		}
-	}
-
 	static sanitize(str: string) {
-		console.log(str);
 		if (typeof str !== "string") str = (str as any).toString();
 		["*", "_", "@"].map(s => str = str.replace(new RegExp(`\\${s}`, "gi"), `\\${s}`));
 		return str;
@@ -485,15 +264,49 @@ export default class Internal {
 		} catch (e) { }
 		str
 			.split(" ")
-			.filter(k => !k.match(new RegExp("<@!?[0-9]{17,18}>", "i")))
+			.filter(k => !k.match(new RegExp("<@!?[0-9]{17,18}>", "i")) && k.length >= 3)
 			.map(k => {
 				let m: Eris.Member;
-				if (k.indexOf("#") !== -1) m = msg.channel.guild.members.filter(u => `${u.username}#${u.discriminator}` === k)[0];
-				else m = msg.channel.guild.members.filter(u => u.username === k)[0];
+				if (k.indexOf("#") !== -1) m = msg.channel.guild.members.filter(u => (`${u.username}#${u.discriminator}`).toLowerCase() === k.toLowerCase())[0];
+				else m = msg.channel.guild.members.filter(u => u.username.toLowerCase() === k.toLowerCase() || (u.nick && u.nick.toLowerCase() === k.toLowerCase()))[0];
 
 				if (!!m) str = str.replace(k, `<@!${m.id}>`);
 			});
 
 		return str;
+	}
+
+	static async authorizeOAuth(code: string): Promise<Discord.Oauth2Token> {
+		const c = await phin<Discord.Oauth2Token>({
+			method: "POST",
+			url: "https://discordapp.com/api/oauth2/token",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded"
+			},
+			form: {
+				client_id: config.bot.client.id,
+				client_secret: config.bot.client.secret,
+				grant_type: "authorization_code",
+				code,
+				redirect_uri: config.web.oauth2.redirectURL,
+				scope: config.web.oauth2.scopes.join(" ")
+			},
+			parse: "json"
+		});
+
+		if (c.statusCode === 200) return c.body;
+		else throw new Error(JSON.stringify(c.body));
+	}
+
+	static async getSelfUser(auth: string) {
+		const p = await phin<Discord.APISelfUser>({
+			method: "GET",
+			url: "https://discordapp.com/api/v7/users/@me",
+			headers: {
+				Authorization: `Bearer ${auth}`
+			},
+			parse: "json"
+		});
+		return p.statusCode !== 200 ? null : p.body;
 	}
 }

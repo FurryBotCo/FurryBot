@@ -33,7 +33,7 @@ export default new Command({
 	// if(user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.channel.createMessage("Pretty sure you don't want to do this to yourthis.");
 	// if(user.roles.highest.rawPosition >= msg.member.roles.highest.rawPosition && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`You cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
 	// if(user.permissions.has("administrator")) return msg.channel.createMessage("That user has `ADMINISTRATOR`, that would literally do nothing.");
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "No Reason Specified";
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
 	if (gConfig.settings.muteRole === null) return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.moderation.unmute.unmuteRole}")
@@ -76,7 +76,7 @@ export default new Command({
 	});
 
 	user.removeRole(gConfig.settings.muteRole, `Unmute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
-		await msg.channel.createMessage(`{lang:commands.moderation.unmute.unmuted|${user.username}#${user.discriminator}|${reason}}`).catch(noerr => null);
+		await msg.channel.createMessage(`***{lang:commands.moderation.unmute.unmuted|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "unmute",
 			target: user,
@@ -84,7 +84,8 @@ export default new Command({
 			reason
 		});
 	}).catch(async (err) => {
-		msg.channel.createMessage(`{lang:commands.moderation.unmute.couldNotUnmute|${user.username}#${user.discriminator}|${err}}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.unmute.englishOnly}`);
+		else await msg.channel.createMessage(`{lang:commands.moderation.unmute.couldNotUnmute|${user.username}#${user.discriminator}|${err}}`);
 		/*if (m !== undefined) {
 			await m.delete();
 		}*/

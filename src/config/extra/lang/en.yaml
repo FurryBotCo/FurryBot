@@ -84,7 +84,7 @@ commands:
   fun:
     8ball:
       description: "Ask the magic 8ball a question!"
-      title: "{0}'s Magic 8ball Game'"
+      title: "{0}'s Magic 8ball Game"
       usage: "<question>"
       said: "The Magic 8ball said"
       disclaimer: "Disclaimer: Do not take any answers seriously!"
@@ -113,7 +113,7 @@ commands:
       possible:
         - "<@!{0}> smacks {1} hard on the snoot with a rolled up news paper!"
         - "<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit themselves!"
-        - "<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit <@!{2}>!"
+        - "<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit {2}"
     bellyrub:
       description: "Give someone a nice belly rub -w-"
       usage: "<@member/text>"
@@ -134,7 +134,7 @@ commands:
     conga:
       description: "Start a conga with someone, or join in!"
       usage: "[@user]"
-      join: "<@!{0}> joined a conga with {1} furs!\nJoin in using `{2}conga`\n{3}"
+      join: "<@!{0}> joined a conga with {1} other furs!\nThere are now {3} furs in this conga!\nJoin in using `{2}conga`\n{4}"
       tooLarge: "This conga is too large for emojis!"
       start: "<@!{0}> started a conga with <@!{1}>!\nJoin in using `{2}conga`.\n{3}{3}"
       alreadyPresent: "you are already in this conga!"
@@ -164,7 +164,7 @@ commands:
       done: "you've divorced **{0}**..."
       canceled: "you've stayed with **{0}**!"
     e926:
-      description: "Get some content from E926 (SWF E621)!"
+      description: "Get some content from E926 (SFW E621)!"
       usage: "[tags]"
       maxTags: "you can only specify up to fourty (40) tags."
       blacklistedTags: "Your search contained blacklisted tags, **{0}**"
@@ -183,7 +183,7 @@ commands:
     furpile:
       description: "Start a furpile on someone, or join in!"
       usage: "[@user]"
-      join: "<@!{0}> joined a furpile with {1} furs!\nJoin in using `{2}furpile`"
+      join: "<@!{0}> joined a furpile with {1} other furs!\nThis furpile now has {2} furs in it!\nJoin in using `{3}furpile`"
       tooLarge: "This furpile is too large for emojis!"
       start: "<@!{0}> started a furpile on <@!{1}>!\nJoin in using `{2}furpile`."
       alreadyPresent: "you are already in this furpile!"
@@ -267,7 +267,7 @@ commands:
       usage: "<@member/text>"
       possible:
         - "<@!{0}> pounces onto {1} uwu"
-    roll:
+    dice:
       description: "Roll the dice."
       usage: "[min] [max]"
       minLess: "the minimum must be less than the maximum."
@@ -323,6 +323,7 @@ commands:
       systemUsage: "System Memory Usage"
       uptime: "Uptime"
       shard: "Shard"
+      cluster: "Cluster"
       guilds: "Server Count"
       largeGuilds: "Large Server Count"
       users: "User Count"
@@ -414,6 +415,10 @@ commands:
         animatedIconDesc: "guild has access to set an animated guild icon"
         banner: "Banner"
         bannerDesc: "guild has access to set a guild banner image"
+        welcomeScreen: "Welcome Screen Enabled"
+        welcomeScreenDesc: "guild has enabled the welcome screen"
+        publicDisabled: "Public Disabled"
+        publicDisabledDesc: "guild has enabled the welcome screen"
         none: "NONE"
       verification:
         none: "NONE"
@@ -543,6 +548,10 @@ commands:
     crab:
       description: "Crab rave!"
       usage: "<text>"
+      time: "This command may take a while.."
+      invalid: 'This command must be used with some text separated by a comma, ex: "split with, a comma"'
+      error: "It seems there may have been an api error"
+      support: "If this says something about being ratelimited, please try again in a few seconds. Else, report it to our support server"
     cry:
       description: "We need that water"
       usage: "<text>"
@@ -672,7 +681,7 @@ commands:
     stroke:
       description: "Know the signs of a stroke"
       usage: "<text>"
-    suprised:
+    surprised:
       description: "\\*surprised pikachu face\\*"
       usage: "<text>"
     sword:
@@ -738,13 +747,42 @@ commands:
     help:
       description: "Get some help with the bot."
       usage: "[command/category]"
-      hoverInfo: "Hover for mrore info"
+      hoverInfo: "Hover for more info"
       cmdTotal: "Total Commands"
       title: "Command Help"
       cmdList: "Command List #{0}"
+      embed:
+        restrictions: "Restrictions"
+        nsfw: "NSFW"
+        contribOnly: "Contributor Only"
+        devOnly: "Dev Only"
+        betaOnly: "Beta Only"
+        guildOwnerOnly: "Server Owner Only"
+        supportServerOnly: "Support Server Only"
+        donatorOnly: "Donator Only"
+        premiumGuildOnly: "Premium Server Only"
+        permissions: "Permissions"
+        bot: "Bot"
+        user: "User"
+        usage: "Usage"
+        aliases: "Aliases"
+        normalCooldown: "Normal Cooldown"
+        donatorCooldown: "Donator Cooldown"
+        category: "Category"
     rank:
       description: "Get a users rank."
       usage: "[@user]"
+    leaderboard:
+      description: "Get the server leveling leaderboard."
+      usage: "[page]"
+      serverTooLarge: "this server is too large to display the leveling leaderboard."
+      invalidPage: "the provided page number was invalid. Valid pages: {0}"
+      pageLessThan: "the page number cannot be less than one. Valid pages: {0}"
+      pageMoreThan: "there are not that many pages. Valid pages: {0}"
+      embed:
+        title: "Server Leaderboard"
+        footer: "Page {0}/{1} | Skipped {2} Non Cached Users"
+        until: "until level up"
     suggest:
       description: "Suggest something for me!"
       usage: "<suggestion>"
@@ -770,8 +808,9 @@ commands:
       noBanOther: "you cannot ban **{0}** as their highest role is higher than yours!"
       banDm: "You were banned from **{0}**\nReason: {1}"
       noReason: "No Reason Specified."
-      userBanned: "***User {0} was banned, {1}***"
+      userBanned: "User {0} was banned, {1}"
       couldNotBan: "I couldn't ban **{0}**, {1}"
+      englishOnly: "The provided reason must be comprised of English characters only."
     delwarn:
       description: "Remove a warning from someone."
       usage: "<@member/id> <warning id>"
@@ -784,16 +823,18 @@ commands:
       usage: "<@user/id> [reason]"
       title: "User already banned"
       desc: "It looks like {0} is already banned here.."
-      banned: "***User {0} was banned, {1}***"
+      banned: "User {0} was banned, {1}"
       couldNotHackban: "I couldn't hackban **{0}**, {1}"
+      englishOnly: "The provided reason must be comprised of English characters only."
     kick:
       description: "Kick members from your server."
       usage: "<@member/id> [reason]"
       noSelf: "Pretty sure you don't want to do this to yourself."
       dm: "You were kicked from **{0}**\nReason: {1}"
       noKick: "you cannot kick **{0}** as their highest role is higher than yours!"
-      kicked: "***User {0} was kicked, {1}***"
+      kicked: "User {0} was kicked, {1}"
       couldNotKick: "I couldn't kick **{0}**, {1}"
+      englishOnly: "The provided reason must be comprised of English characters only."
     lock:
       description: "Lock a channel to prevent people talking in it."
       usage: "[channel]"
@@ -818,7 +859,7 @@ commands:
       invalidTime: "invalid time."
       noMuteOther: "you cannot mute **{0}** as their highest role is higher than yours!"
       noReason: "No Reason Specified."
-      muted: "***User {0} was muted, {1}***"
+      muted: "User {0} was muted, {1}"
       couldNotMute: "I couldn't mute **{0}**, {1}"
       noRole: "No mute role"
       noRoleDesc: "this server does not have a mute role set, you can set this with `{0}settings mute role <role>`"
@@ -828,10 +869,11 @@ commands:
       invalidRoleDesc: "The current mute role <@&{0}> ({1}) seems to be higher than me, please move it below me. You can set a new one with `{2}settings mute role <role>`"
       alreadyMuted: "User already muted"
       alreadyMutedDesc: "The user **{0}** seems to already be muted.. You can unmute them with `${1}unmute <@!{2}> [reason]`"
+      englishOnly: "The provided reason must be comprised of English characters only."
     softban:
       description: "Ban someone to delete their messages, then immediately unban them."
-      usage: "<@member/id> <reason> [--days=1-14]"
-      deleteLessThan: "delete days cannot be less than one."
+      usage: "<@member/id> <reason> [--days=0-14]"
+      deleteLessThan: "delete days cannot be less than zero."
       deleteMoreThan: "delete days cannot be more than 14."
       alredyBanned: "User already banned"
       alreadyBannedDesc: "It looks like **{0}** is already banned here.."
@@ -840,17 +882,19 @@ commands:
       noBanOther: "you cannot ban **{0}** as their highest role is higher than yours!"
       banDm: "You were banned from **{0}**\nReason: {1}"
       noReason: "No Reason Specified."
-      userSoftbanned: "***User {0} was softbanned, {1}***"
+      userSoftbanned: "User {0} was softbanned, {1}"
       couldNotSoftban: "I couldn't softban **{0}**, {1}"
       couldNotUnban: "I couldn't unban **{0}**, {1}"
+      englishOnly: "The provided reason must be comprised of English characters only."
     unban:
       description: Remove bans for people that are already banned.
       usage: "<id> [reason]"
       notBanned: "User not banned"
       notBannedDesc: "It doesn't look like {0} is banned here.."
       noReason: "No Reason Specified."
-      unbanned: "***Unbanned {0}, {1}***"
+      unbanned: "Unbanned {0}, {1}"
       couldNotUnban: "I couldn't unban **{0}**, {1}"
+      englishOnly: "The provided reason must be comprised of English characters only."
     unlock:
       description: "Unlock a channel after it has been locked."
       usage: "[channel]"
@@ -868,13 +912,14 @@ commands:
       invalidRoleDesc: "The current mute role <@&{0}> ({1}) seems to be higher than me, please move it below me. You can set a new one with `{2}settings mute role <role>`"
       notMuted: "User not muted"
       notMutedDesc: "The user **{0}** seems to not be muted.. You can mute them with `${1}mute <@!{2}> [reason]`"
-      unmuted: "***User {0} was unmuted, {1}***"
+      unmuted: "User {0} was unmuted, {1}"
       couldNotUnmute: "I couldn't unmute **{0}**, {1}"
+      englishOnly: "The provided reason must be comprised of English characters only."
     warn:
       description: "Add a warning to someone."
       usage: "<@member/id> [reason]"
       noReason: "None Provided"
-      warned: "***User {0} was warned, {1}***"
+      warned: "User {0} was warned, {1}"
     warnings:
       description: "Add a warning to someone."
       usage: "<@member/id> [page]"
@@ -888,6 +933,7 @@ commands:
       title: "Warnings for"
       page: 'Page {0}/{1} | {2}warnings "{3}" {4}'
       pageWithoutMore: "Page {0}/{1}"
+      englishOnly: "The provided reason must be comprised of English characters only."
   nsfw:
     bulge:
       description: "*notices bulge* OwO"
@@ -1098,6 +1144,7 @@ commands:
       invalidNumber: 'you must provide a valid number. (in most cases, 0 is "disable")'
       enabled: "Enabled"
       disabled: "Disabled"
+      invalidLang: "{0} is not a valid language we support. Valid languages: {1}"
     settopic:
       description: "Set a text channel's topic"
       usage: "<topic>"
@@ -1171,8 +1218,21 @@ category:
     description: "Helpful things for the bot, and your server."
 
 other:
+  yes: "Yes"
+  no: "No"
+  none: "None"
+  leveling:
+    embedTitle: "Level Up!"
+    embedDescription: "You leveled up to level **{0}**!"
+    embedFooter: 'This can be disabled via the setting "Announce Level Increases".'
+    message: "<@!{0}> leveled up to level **{1}**!\n(This would look different if I had the permission **embedLinks**.)"
+    directMessage: "You leveled up to level **{0}** in the server **{1}**!\n(I sent this here because I cannot send messages in the channel you actually leveled up in)"
   imageURL: "Image URL"
+  noReason: "No Reason"
   error:
+    tooLong: "the max length of {0} is {1}."
+    invalidBalance: "your current balance is invalid. Please contact a developer to fix this."
+    otherInvalidBalance: "their current balance is invalid, so you cannot view or interact them with them."
     invalidUsage:
       info: "Info"
       title: "Invalid Usage"
@@ -1191,6 +1251,7 @@ other:
     unknownAPIError: "API Error:\nCode: {0}\nDescription: `{1}`"
     codeAPIError: "API Error:\n{0}"
     commandDisabledSettings: "this command has been disabled in this servers settings."
+    duplicatePagination: "There is already an active paginated command in this channel.\nIf you started it: Say **stop** to stop it.\nIf you did not start it: Either wait for it to time out, or tell the person who started it to say **stop*."
   modlog:
     invalid: "Detected an invalid modlog setup, reverted to normal."
     missingPermissions: "I'm missing some permissions to be able to make a modlog entry (I need `sendMessages` and `embedLinks`), it has been reverted to normal."

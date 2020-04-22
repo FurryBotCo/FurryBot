@@ -40,9 +40,9 @@ export default new Command({
 	});
 
 	if (user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.reply("{lang:commands.moderation.hackban.noSelf}");
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "{lang:commands.moderation.hackban.noReason}";
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
 	msg.channel.guild.banMember(user.id, 7, `Hackban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
-		await msg.channel.createMessage(`{lang:commands.moderation.hackban.banned|${user.username}#${user.discriminator}|${reason}}`).catch(noerr => null);
+		await msg.channel.createMessage(`***{lang:commands.moderation.hackban.banned|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "hackban",
 			reason,
@@ -50,7 +50,8 @@ export default new Command({
 			blame: msg.author
 		});
 	}).catch(async (err) => {
-		msg.channel.createMessage(`{lang:commands.moderation.hackban.couldNotHackban|${user.username}#${user.discriminator}|${err}}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.hackban.englishOnly}`);
+		else await msg.channel.createMessage(`{lang:commands.moderation.hackban.couldNotHackban|${user.username}#${user.discriminator}|${err}}`);
 		/*if (m !== undefined) {
 			await m.delete();
 		}*/

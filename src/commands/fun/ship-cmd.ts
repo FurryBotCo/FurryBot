@@ -17,21 +17,33 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (this, msg, uConfig, gConfig) {
-	let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1;
+	let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1, reset = false;
 	if (Object.keys(msg.dashedArgs.parsed.keyValue).includes("percent")) {
 		if (!config.developers.includes(msg.author.id)) return msg.reply("this option, `percent` is developer only.");
 		amount = Number(msg.dashedArgs.parsed.keyValue.percent);
 		msg.args = msg.args.filter(a => a !== `--percent=${amount}`);
 	}
 
+	if (msg.dashedArgs.parsed.value.includes("reset")) {
+		if (!config.developers.includes(msg.author.id)) return msg.reply("this option, `reset` is developer only.");
+		reset = true;
+
+	}
+
+	const f = `${config.dir.base}/src/config/extra/other/ship.json`;
+	if (!fs.existsSync(f)) fs.writeFileSync(f, JSON.stringify([]));
+	const a = JSON.parse(fs.readFileSync(f).toString()) as {
+		user1: string;
+		user2: string;
+		amount: number;
+		name: string;
+	}[];
 
 	if (msg.args.length === 0) member2 = msg.channel.guild.members.random();
 	else if (msg.args.length === 1) member2 = await msg.getMemberFromArgs(0, false);
 	else {
-		// I know it's backwards but it's a minor thing that only shows up here
-		// and I don't want to touch the mostrosity that is get<X>FromArgs
-		member1 = await msg.getMemberFromArgs(null, null, null, 1);
-		member2 = await msg.getMemberFromArgs(null, null, null, 0);
+		member1 = await msg.getMemberFromArgs(0);
+		member2 = await msg.getMemberFromArgs(1);
 	}
 
 	if (!member1 || !member2) return msg.errorEmbed("INVALID_MEMBER");
@@ -49,7 +61,32 @@ export default new Command({
 			else if (this.amount === 100) return "ship-100-percent";
 		}
 	};
+	const c = a.find(b => b.user1 === member1.id && b.user2 === member2.id || b.user1 === member2.id && b.user2 === member1.id);
 
+	if (!reset) {
+		if (!!c) Object.assign(ship, {
+			amount: c.amount,
+			name: c.name
+		});
+		else {
+			a.push({
+				user1: member1.id,
+				user2: member2.id,
+				amount: ship.amount,
+				name: ship.name
+			});
+			fs.writeFileSync(f, JSON.stringify(a));
+		}
+	} else {
+		if (!!c) a.splice(a.indexOf(c));
+		a.push({
+			user1: member1.id,
+			user2: member2.id,
+			amount: ship.amount,
+			name: ship.name
+		});
+		fs.writeFileSync(f, JSON.stringify(a));
+	}
 	const sh = fs.readFileSync(`${config.dir.base}/src/assets/images/ship/${ship.image}.png`);
 	const av1 = await Request.getImageFromURL(member1.user.avatarURL);
 	const av2 = await Request.getImageFromURL(member2.user.avatarURL);

@@ -23,7 +23,7 @@ export default new Command({
 
 	const m = Array.from(msg.channel.guild.members.values()).sort((a, b) => a.joinedAt - b.joinedAt).map(m => m.id);
 
-	const around = [...workItOut(true), user.id, ...workItOut(false)];
+	const around = [...workItOut(true).reverse(), user.id, ...workItOut(false)];
 
 	function workItOut(n: boolean) {
 		const k: string[] = [];

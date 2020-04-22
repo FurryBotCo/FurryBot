@@ -11,7 +11,7 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Manage the bots shards.",
 	usage: "<disconnect/connect/status/restart> <id>",
-	features: ["devOnly"],
+	features: ["contribOnly"],
 	subCommandDir: `${__dirname}/dshard-subcmd`,
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {

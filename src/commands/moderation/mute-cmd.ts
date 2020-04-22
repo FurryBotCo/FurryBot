@@ -5,6 +5,7 @@ import { Utility } from "../../util/Functions";
 import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
+import Language from "../../util/Language";
 
 export default new Command({
 	triggers: [
@@ -90,10 +91,10 @@ export default new Command({
 	const b = Utility.compareMembers(msg.member, user);
 	if ((b.member2.higher || b.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(`{lang:commands.moderation.mute.noMuteOther|${user.username}#${user.discriminator}}`);
 	// if (user.permission.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : "{lang:commands.moderation.mute.noReason}";
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
 
 	user.addRole(gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
-		await msg.channel.createMessage(`{lang:commands.moderation.mute.muted|${user.username}#${user.discriminator}|${reason}}`).catch(noerr => null);
+		await msg.channel.createMessage(`***{lang:commands.moderation.mute.muted|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "mute",
 			time,
@@ -110,7 +111,8 @@ export default new Command({
 			reason
 		} as any); // apparently mongodb's types require specifying "_id" so we'll do this now
 	}).catch(async (err) => {
-		return msg.reply(`{lang:commands.moderation.mute.couldNotMute|${user.username}#${user.discriminator}|${err}}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.mute.englishOnly}`);
+		else await msg.reply(`{lang:commands.moderation.mute.couldNotMute|${user.username}#${user.discriminator}|${err}}`);
 		/*if (m !== undefined) {
 			await m.delete();
 		}*/

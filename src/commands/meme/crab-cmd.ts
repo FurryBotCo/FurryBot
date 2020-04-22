@@ -22,7 +22,7 @@ export default new Command({
 }, (async function (this: FurryBot, msg: ExtendedMessage) {
 	if (msg.unparsedArgs.length < 1) throw new Error("ERR_INVALID_USAGE");
 
-	const m = await msg.channel.createMessage("This command may take a while..");
+	const m = await msg.channel.createMessage("{lang:commands.meme.crab.time}");
 
 	const { body: img } = await Request.memeRequest("/crab", null, null, msg.unparsedArgs.join(" "));
 
@@ -32,7 +32,10 @@ export default new Command({
 	} catch (e) {
 		b = null;
 	}
-	if (b !== null) await msg.channel.createMessage(`It seems there may have been an api error..\n\`\`\`json\n${JSON.stringify(b)}\n\`\`\`\n\nIf this says something about being ratelimited, please try again in a few seconds. Else, report it to our support server: ${config.bot.supportURL}`);
+	if (b !== null) {
+		if (b.error && b.error === "You must submit exactly two strings split by comma") return msg.reply("{lang:commands.meme.crab.invalid}");
+		return msg.channel.createMessage(`{lang:commands.meme.crab.error}..\n\`\`\`json\n${JSON.stringify(b)}\n\`\`\`\n\n{lang:commands.meme.crab.support}: ${config.bot.supportURL}`);
+	}
 	await m.delete();
 	return msg.channel.createMessage("", {
 		name: "crab.mp4",

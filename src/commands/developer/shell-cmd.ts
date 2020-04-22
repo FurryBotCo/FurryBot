@@ -117,6 +117,6 @@ export default new Command({
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		return Logger.log(`Silent shell eval return: ${res}`, msg.channel.guild.shard.id);
+		return this.log("log", `Silent shell eval return: ${res}`, `Shard #${msg.channel.guild.shard.id}`);
 	}
 }));

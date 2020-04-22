@@ -26,8 +26,8 @@ export default new Command({
 
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 
-	const reason = msg.args.length > 1 ? msg.args.slice(1).join(" ") : "{lang:commands.moderation.warn.noReason}";
-
+	const reason = msg.args.length > 1 ? msg.args.slice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
+	if (reason.length > 100) return msg.reply(Language.get(gConfig.settings.lang).get("other.error.tooLong").format("a warning", "100"));
 	const id = Strings.random(7);
 	const w = await mdb.collection("warnings").insertOne({
 		blameId: msg.author.id,
@@ -39,7 +39,7 @@ export default new Command({
 	} as Warning);
 
 
-	await msg.channel.createMessage(`{lang:commands.moderation.warn.warned|${member.username}#${member.discriminator}|${reason}}`).then(async () => {
+	await msg.channel.createMessage(`***{lang:commands.moderation.warn.warned|${member.username}#${member.discriminator}|${reason}}***`).then(async () => {
 		await this.m.create(msg.channel, {
 			type: "warn",
 			target: member,

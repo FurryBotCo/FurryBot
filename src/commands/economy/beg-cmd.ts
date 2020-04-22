@@ -17,6 +17,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
+	if (isNaN(Number(uConfig.bal))) return msg.reply("{lang:other.error.invalidBalance}");
 	const { multi, multiStr } = await Economy.calculateMulti(msg.author.id, this);
 	const names = [
 		...config.eco.people,
@@ -35,7 +36,7 @@ export default new Command({
 			.setTitle("{lang:commands.economy.beg.title}")
 			.setColor(Colors.gold)
 			.setTimestamp(new Date().toISOString())
-			.setDescription(`{lang:commands.economy.beg.possible|${amount}|${gConfig.settings.ecoEmoji}|${person}}`)
+			.setDescription(`{lang:commands.economy.beg.possible|${person}|${amount}|${gConfig.settings.ecoEmoji}}`)
 			.setAuthor(`${msg.author.username}#${msg.author.discriminator}`, msg.author.avatarURL)
 			.setFooter(`{lang:commands.economy.beg.multiplier|${multiStr}}`)
 	});

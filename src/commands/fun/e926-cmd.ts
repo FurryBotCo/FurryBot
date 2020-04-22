@@ -21,7 +21,7 @@ export default new Command({
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (!msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly without the `manageMessages` permission!");
-	if (this.holder.has("react", null, msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("There is already an active paginated command in this channel. Please either wait for that one to time out, or say **stop** to stop it.");
+	if (this.holder.has("react", null, msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("{lang:other.error.duplicatePagination}");
 
 	const tags = msg.args.map(a => a.replace(/,\|/g, ""));
 	if (tags.length > 40) return msg.reply("you can only specify up to fourty (40) tags.");

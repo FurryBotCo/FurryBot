@@ -28,7 +28,7 @@ export default new Command({
 		if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.reply("{lang:other.error.permissionMissing|attachFiles}");
 		const img = await Request.imageAPIRequest(false, "lick", true, true);
 		if (img.success === false) {
-			Logger.error(`Shard #${msg.channel.guild.shard.id}`, img.error);
+			this.log("error", img.error, `Shard #${msg.channel.guild.shard.id}`);
 			return msg.reply(`{lang:other.error.imageAPI}`);
 		}
 		embed.setImage(img.response.image);

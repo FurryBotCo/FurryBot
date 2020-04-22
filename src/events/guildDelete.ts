@@ -26,7 +26,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 	}
 
 
-	Logger.info(`Shard #${guild.shard.id} | Client`, `Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members!`);
+	this.log("info", `Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members! We now have ${this.guilds.size} guilds.`, `Shard #${guild.shard.id} | Client`);
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Left!",
 		description: [

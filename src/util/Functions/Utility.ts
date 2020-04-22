@@ -5,7 +5,7 @@ import youtubesearch from "youtube-search";
 import ytdl from "ytdl-core";
 import * as URL from "url";
 import util from "util";
-import client from "../../../";
+import FurryBot from "../../main";
 import { Utility as T } from "./TypeDefs";
 
 export default class Utility {
@@ -41,7 +41,7 @@ export default class Utility {
 		length: number;
 		new: boolean;
 	}> {
-		const req = await phin({
+		const req = await phin<any>({
 			url: `https://r.furry.services/get?url=${encodeURIComponent(url)}`,
 			headers: {
 				"User-Agent": config.web.userAgent
@@ -54,7 +54,7 @@ export default class Utility {
 			...req.body
 		};
 		else if (req.statusCode === 404) {
-			const cr = await phin({
+			const cr = await phin<any>({
 				method: "POST",
 				url: `https://r.furry.services/create?url=${encodeURIComponent(url)}`,
 				headers: {
@@ -239,7 +239,7 @@ export default class Utility {
 	 * @returns {(Promise<T.AuditLogReturn>}
 	 * @memberof Utility
 	 */
-	static async fetchAuditLogEntries(guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<T.AuditLogReturn> {
+	static async fetchAuditLogEntries(client: FurryBot, guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<T.AuditLogReturn> {
 		if (!guild.members.get(client.user.id).permission.has("viewAuditLogs")) return {
 			success: false,
 			error: {

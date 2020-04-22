@@ -20,7 +20,7 @@ export default new Command({
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
-	const rq = await phin({
+	const rq = await phin<any>({
 		method: "GET",
 		url: `https://api.giphy.com/v1/gifs/search?api_key=${config.keys.giphy.apikey}&q=${msg.args.join("%20")}&limit=50&offset=7&rating=G&lang=en`,
 		parse: "json",
