@@ -19,7 +19,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.0",
     "fs-extra": "^8.1.0",
-    "lodash": "^4.17.15",
+    "jimp": "^0.10.2",
     "mongodb": "^3.5.5",
     "morgan": "^1.10.0",
     "phin": "^3.4.1",

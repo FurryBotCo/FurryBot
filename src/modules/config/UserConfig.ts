@@ -36,7 +36,24 @@ export default class UserConfig {
 	}
 
 	async load(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
-		_.merge(this, _.merge({ ...config.defaults.config.user }, data));
+		/**
+		 * @param {*} a - the current class
+		 * @param {*} b - the provided data
+		 * @param {*} c - the default data
+		 */
+		const goKeys = (a, b, c) => {
+			return Object.keys(c).map(k => {
+				if (typeof c[k] === "object" && c[k] !== null) {
+					if (c[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
+					else {
+						if ([undefined, null, ""].includes(a[k])) a[k] = {};
+						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k], c[k]);
+					}
+				} else return a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
+			});
+		};
+
+		goKeys(this, data, config.defaults.config.guild);
 	}
 
 	async reload() {
@@ -47,7 +64,24 @@ export default class UserConfig {
 
 	async edit(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		const d = this;
-		_.merge(d, data);
+		/**
+		 *
+		 * @param {*} a - the data to update
+		 * @param {*} b - the provided data
+		 */
+		const goKeys = (a, b) => {
+			return Object.keys(b).map(k => {
+				if (typeof b[k] === "object" && b[k] !== null) {
+					if (b[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
+					else {
+						if ([undefined, null, ""].includes(a[k])) a[k] = {};
+						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k]);
+					}
+				} else return a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
+			});
+		};
+
+		goKeys(d, data);
 
 		const e = await mdb.collection("users").findOne({
 			id: this.id
@@ -71,7 +105,7 @@ export default class UserConfig {
 		});
 		if (!e) await mdb.collection("users").insertOne({
 			id: this.id,
-			...config.defaults.config.guild
+			...config.defaults.config.user
 		});
 
 		return this;

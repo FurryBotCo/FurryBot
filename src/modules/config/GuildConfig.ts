@@ -2,6 +2,7 @@ import config from "../../config";
 import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
 import _ from "lodash";
+import Logger from "../../util/LoggerV8";
 export default class GuildConfig {
 	id: string;
 	selfAssignableRoles: string[];
@@ -87,9 +88,24 @@ export default class GuildConfig {
 	}
 
 	async load(data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
-		_.merge(this, _.merge({ ...config.defaults.config.guild }, data));
-		// temporary fix for missing settings properties
-		// Object.keys(config.defaults.config.guild.settings).map(p => typeof this.settings[p] === "undefined" ? this.settings[p] = config.defaults.config.guild.settings[p] : null);
+		/**
+		 * @param {*} a - the current class
+		 * @param {*} b - the provided data
+		 * @param {*} c - the default data
+		 */
+		const goKeys = (a, b, c) => {
+			return Object.keys(c).map(k => {
+				if (typeof c[k] === "object" && c[k] !== null) {
+					if (c[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
+					else {
+						if ([undefined, null, ""].includes(a[k])) a[k] = {};
+						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k], c[k]);
+					}
+				} else return a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
+			});
+		};
+
+		goKeys(this, data, config.defaults.config.guild);
 	}
 
 	async reload() {
@@ -100,7 +116,25 @@ export default class GuildConfig {
 
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
 		const d = this;
-		_.merge(d, data);
+
+		/**
+		 *
+		 * @param {*} a - the data to update
+		 * @param {*} b - the provided data
+		 */
+		const goKeys = (a, b) => {
+			return Object.keys(b).map(k => {
+				if (typeof b[k] === "object" && b[k] !== null) {
+					if (b[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
+					else {
+						if ([undefined, null, ""].includes(a[k])) a[k] = {};
+						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k]);
+					}
+				} else return a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
+			});
+		};
+
+		goKeys(d, data);
 
 		const e = await mdb.collection("guilds").findOne({
 			id: this.id
