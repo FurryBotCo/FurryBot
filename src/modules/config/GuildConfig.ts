@@ -94,14 +94,15 @@ export default class GuildConfig {
 		 * @param {*} c - the default data
 		 */
 		const goKeys = (a, b, c) => {
-			return Object.keys(c).map(k => {
+			const obj = Object.keys(c).length === 0 ? b : c;
+			return Object.keys(obj).map(k => {
 				if (typeof c[k] === "object" && c[k] !== null) {
 					if (c[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
 					else {
 						if ([undefined, null, ""].includes(a[k])) a[k] = {};
 						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k], c[k]);
 					}
-				} else return a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
+				} else return a[k] = [undefined].includes(b[k]) ? c[k] : b[k];
 			});
 		};
 
