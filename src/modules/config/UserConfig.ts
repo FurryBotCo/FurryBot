@@ -47,13 +47,14 @@ export default class UserConfig {
 					if (c[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
 					else {
 						if ([undefined, null, ""].includes(a[k])) a[k] = {};
-						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k], c[k]);
+						if ([undefined, null, ""].includes(b[k])) b[k] = {};
+						return goKeys(a[k], b[k], c[k]);
 					}
 				} else return a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
 			});
 		};
 
-		goKeys(this, data, config.defaults.config.guild);
+		goKeys(this, data, config.defaults.config.user);
 	}
 
 	async reload() {
@@ -75,7 +76,8 @@ export default class UserConfig {
 					if (b[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
 					else {
 						if ([undefined, null, ""].includes(a[k])) a[k] = {};
-						if (![undefined, null, ""].includes(b[k])) return goKeys(a[k], b[k]);
+						if ([undefined, null, ""].includes(b[k])) b[k] = {};
+						return goKeys(a[k], b[k]);
 					}
 				} else return a[k] = [undefined, null, ""].includes(b[k]) ? a[k] : b[k];
 			});
@@ -135,6 +137,6 @@ export default class UserConfig {
 	}
 
 	getLevel(g: string) {
-		return this.levels[g] || 0;
+		return this.levels && this.levels[g] ? this.levels[g] : 0;
 	}
 }
