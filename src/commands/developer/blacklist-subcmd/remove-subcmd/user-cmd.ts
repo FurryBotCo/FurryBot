@@ -17,10 +17,9 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Remove a user from the blacklist.",
 	usage: "<id>",
-	features: ["devOnly"],
+	features: ["contribOnly"],
 	file: __filename
 }, (async function (msg: ExtendedMessage) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const u = await msg.getUserFromArgs();
 	if (!u) return msg.reply(`**${msg.args[0]}** isn't a valid user.`);

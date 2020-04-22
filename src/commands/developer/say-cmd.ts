@@ -11,7 +11,7 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Make me say something.",
 	usage: "<text>",
-	features: ["devOnly"],
+	features: ["contribOnly"],
 	file: __filename
 }, (async function (msg: ExtendedMessage) {
 	await msg.delete().catch(err => null);

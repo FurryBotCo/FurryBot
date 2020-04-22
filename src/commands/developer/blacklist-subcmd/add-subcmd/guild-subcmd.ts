@@ -19,7 +19,7 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Add a server to the blacklist.",
 	usage: "<id> <reason>",
-	features: ["devOnly"],
+	features: ["contribOnly"],
 	file: __filename
 }, (async function (msg: ExtendedMessage) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
