@@ -26,7 +26,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const t = new Timers(this, config.beta || config.developers.includes(message.author.id));
 		t.start("main");
 
-		if (!message || !message.author || message.author.bot || !this.firstReady || (config.beta && !config.betaAccess.includes(message.author.id))) return;
+		if (!message || !message.author || message.author.bot || !this.firstReady) return;
 
 		t.start("messageProcess");
 		msg = new ExtendedMessage(message, this);
@@ -138,6 +138,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						[msg.channel.guild.id]: uConfig.getLevel(msg.channel.guild.id) + l
 					}
 				});
+				await this.rClient.SET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${message.author.id}`, (uConfig.getLevel(msg.channel.guild.id) + l).toString());
 				const nlvl = config.leveling.calcLevel(uConfig.getLevel(msg.channel.guild.id));
 				if (nlvl.level > lvl.level && gConfig.settings.announceLevelUp) {
 					if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
@@ -378,6 +379,11 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) {
 			this.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 			return msg.reply(`you must be a developer to use this command.`).catch(err => null);
+		}
+
+		if (cmd.features.includes("contribOnly") && !config.contributors.includes(msg.author.id)) {
+			Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `${msg.author.tag} (${msg.author.id}) attempted to run contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+			return msg.reply(`you must be a contributor or higher to use this command.`).catch(err => null);
 		}
 
 		if (cmd.features.includes("supportOnly") && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("this command may only be ran in my support server.").catch(err => null);
