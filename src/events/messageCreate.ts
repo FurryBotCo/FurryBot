@@ -143,7 +143,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						[msg.channel.guild.id]: uConfig.getLevel(msg.channel.guild.id) + l
 					}
 				});
-				await rClient.SET(`${config.beta ? "beta" : "prod"}: leveling: ${msg.channel.guild.id}: ${message.author.id}`, (uConfig.getLevel(msg.channel.guild.id) + l).toString());
+				await rClient.SET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${message.author.id}`, (uConfig.getLevel(msg.channel.guild.id) + l).toString());
 				const nlvl = config.leveling.calcLevel(uConfig.getLevel(msg.channel.guild.id));
 				if (nlvl.level > lvl.level && gConfig.settings.announceLevelUp) {
 					rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:levelUp`);
@@ -158,9 +158,11 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 								.setTimestamp(new Date().toISOString())
 								.setAuthor(msg.author.tag, msg.author.avatarURL)
 						});
-						else msg.channel.createMessage(`{ lang: other.leveling.message | ${msg.author.id} | ${nlvl.level}}`);
-						setTimeout(() => m.delete(), 2e4);
-					} else await msg.author.getDMChannel().then(dm => dm.createMessage(`{ lang: other.leveling.directMessage | ${nlvl.level} | ${msg.channel.guild.name}}`)).catch(err => null);
+						else msg.channel.createMessage(`{lang:other.leveling.message|${msg.author.id}|${nlvl.level}}`);
+						setTimeout(() => {
+							try { m.delete(); } catch (e) { }
+						}, 2e4);
+					} else await msg.author.getDMChannel().then(dm => dm.createMessage(`{lang:other.leveling.directMessage|${nlvl.level}|${msg.channel.guild.name}}`)).catch(err => null);
 				}
 			}
 		}
