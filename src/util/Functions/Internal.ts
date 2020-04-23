@@ -321,13 +321,15 @@ export default class Internal {
 		const statNames = [
 			`${config.beta ? "beta" : "prod"}:stats:commandsTotal`,
 			`${config.beta ? "beta" : "prod"}:stats:messages`,
-			`${config.beta ? "beta" : "prod"}:stats:directMessage`
+			`${config.beta ? "beta" : "prod"}:stats:directMessage`,
+			`${config.beta ? "beta" : "prod"}:stats:uptime`
 		];
 
 		return Promise.all<{
 			commandsTotal?: number;
 			messages?: number;
 			directMessage?: number;
+			uptime?: number;
 		}>(statNames.map(async (s) => ({ [s.split(":").slice(-1)[0]]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
 	}
 }

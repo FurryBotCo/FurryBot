@@ -6,7 +6,7 @@ import FurryBot from "../../main";
 import { Colors, GameTypes } from "../Constants";
 import GuildConfig from "../../modules/config/GuildConfig";
 import Eris from "eris";
-import { Request } from ".";
+import { Request, Internal } from ".";
 import EmbedBuilder from "../EmbedBuilder";
 import phin from "phin";
 import rClient from "../Redis";
@@ -35,7 +35,7 @@ export default class TimedTasks {
 
 		if ((d.getSeconds() % 15) === 0) {
 			await this.runStatusChange(client, (d.getSeconds() / 15) - 1).then(() => config.beta ? client.log("debug", "Finished processing.", "Timed Tasks | Status Change") : null);
-			// await this.runStatsUpdate(client).then(() => client.log("debug", "Finished Processing.", "Timed Tasks | Stats Update"));
+			await this.runStatsUpdate(client).then(() => client.log("debug", "Finished Processing.", "Timed Tasks | Stats Update"));
 		}
 
 		await this.runAutoServerActions(client); // .then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Actions"));
@@ -400,5 +400,8 @@ export default class TimedTasks {
 		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:largeGuildCount`, client.guilds.filter(g => g.large).length.toString());
 		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:channelCount`, Object.keys(client.channelGuildMap).length.toString());
 		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:userCount`, client.users.size.toString());
+		const v = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:stats:uptime`).then(v => !v ? 0 : Number(v));
+		const up = Math.floor(process.uptime() * 1000);
+		if (up > v) await rClient.SET(`${config.beta ? "beta" : "prod"}:stats:uptime`, up.toString());
 	}
 }

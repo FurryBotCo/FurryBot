@@ -487,6 +487,8 @@ commands:
       userCount: "User Count"
       channelCount: "Channel Count"
       shardCount: "Shard Count"
+      currentUptime: "Current Uptime"
+      recordUptime: "Record Uptime"
     uinfo:
       description: "Get some info about a user."
       usage: "[@member/id]"

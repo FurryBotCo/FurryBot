@@ -1,7 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
 import Eris from "eris";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import { Internal } from "../../util/Functions";
+import { Internal, Time } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
 import config from "../../config";
 
@@ -34,5 +34,7 @@ export default new Command({
 			.addField("{lang:commands.information.stats.userCount}", this.users.size.toString(), true)
 			.addField("{lang:commands.information.stats.channelCount}", Object.keys(this.channelGuildMap).length.toString(), true)
 			.addField("{lang:commands.information.stats.shardCount}", this.shards.size.toString(), true)
+			.addField("{lang:commands.information.stats.currentUptime}", Time.ms(process.uptime() * 1000), true)
+			.addField("{lang:commands.information.stats.recordUptime}", Time.ms(stats.uptime || 0), true)
 	});
 }));
