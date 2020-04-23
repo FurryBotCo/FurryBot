@@ -4,8 +4,11 @@ import FurryBot from "../main";
 import * as Eris from "eris";
 import { db } from "../modules/Database";
 import Logger from "../util/LoggerV8";
+import config from "../config";
+import rClient from "../util/Redis";
 
 export default new ClientEvent("messageUpdate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>, oldMessage: PartialMessage) {
+	rClient.INCR(`${config.beta ? "beta" : "prod"}:events:messageUpdate`);
 	if (!this || !message || !message.author || message.author.bot || !oldMessage || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any) || message.content === oldMessage.content) return;
 	const g = await db.getGuild(message.channel.guild.id);
 	await g.edit({

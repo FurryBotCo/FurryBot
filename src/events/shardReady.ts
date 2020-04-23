@@ -3,8 +3,10 @@ import { Logger } from "../util/LoggerV8";
 import FurryBot from "../main";
 import config from "../config";
 import { Colors } from "../util/Constants";
+import rClient from "../util/Redis";
 
 export default new ClientEvent("shardReady", (async function (this: FurryBot, id: number) {
+	rClient.INCR(`${config.beta ? "beta" : "prod"}:events:shardReady`);
 	Logger.log("Shard Ready", `Shard #${id} is ready.`);
 	if (!this.firstReady) this.shards.get(id).editStatus("idle", { name: "Not ready yet..", type: 0 });
 	return this.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {

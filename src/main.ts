@@ -16,7 +16,6 @@ import E9API from "e9api";
 import ModLogUtil from "./util/ModLogUtil";
 import * as http from "http";
 import * as https from "https";
-import redis from "async-redis";
 
 export default class FurryBot extends Eris.Client {
 	holder: Holder;
@@ -44,7 +43,6 @@ export default class FurryBot extends Eris.Client {
 	e6: E6API;
 	e9: E9API;
 	srv: http.Server | https.Server;
-	rClient: redis.RedisClient;
 	constructor(token, clientOptions) {
 		super(token, clientOptions);
 
@@ -84,9 +82,6 @@ export default class FurryBot extends Eris.Client {
 		});
 		this.e9 = new E9API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
-		});
-		this.rClient = redis.createClient(config.keys.redis.port, config.keys.redis.host, {
-			password: config.keys.redis.password
 		});
 	}
 

@@ -6,6 +6,7 @@ import db from "../../modules/Database";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Utility } from "../../util/Functions";
 import chunk from "chunk";
+import rClient from "../../util/Redis";
 
 export default new Command({
 	triggers: [
@@ -24,7 +25,7 @@ export default new Command({
 	const members = msg.channel.guild.members.filter(m => !m.user.bot);
 	// if (members.length > 1000) return msg.reply("{lang:commands.misc.leaderboard.serverTooLarge}");
 
-	let u: { id: string; level: number; }[] = await Promise.all(members.map(async (m) => new Promise((a, b) => this.rClient.GET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
+	let u: { id: string; level: number; }[] = await Promise.all(members.map(async (m) => new Promise((a, b) => rClient.GET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
 	const f = u.filter(a => a.level === null).length;
 	u = u.filter(a => a.level !== null).sort((a, b) => b.level - a.level);
 	const c = chunk(u, 10);

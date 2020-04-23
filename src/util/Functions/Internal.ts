@@ -12,6 +12,9 @@ import Logger from "../LoggerV8";
 import { Colors } from "../Constants";
 import ExtendedMessage from "../../modules/ExtendedMessage";
 import phin from "phin";
+import { RedisClient } from "async-redis";
+import rClient from "../Redis";
+import { stat } from "fs";
 
 export default class Internal {
 	private constructor() {
@@ -308,5 +311,21 @@ export default class Internal {
 			parse: "json"
 		});
 		return p.statusCode !== 200 ? null : p.body;
+	}
+
+	static async fetchRedisKey(key: string) {
+		return new Promise<string>((a, b) => rClient.GET(key, (err, reply) => !err ? a(reply) : b(err)));
+	}
+
+	static async getStats(): Promise<{
+		commandsTotal?: number;
+		messages?: number;
+	}> {
+		const statNames = [
+			`${config.beta ? "beta" : "prod"}:stats:commandsTotal`,
+			`${config.beta ? "beta" : "prod"}:stats:messages`
+		];
+
+		return Promise.all(statNames.map(async (s) => ({ [s]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
 	}
 }

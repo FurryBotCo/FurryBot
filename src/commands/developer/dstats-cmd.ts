@@ -5,7 +5,7 @@ import Eris from "eris";
 
 export default new Command({
 	triggers: [
-		"stats"
+		"dstats"
 	],
 	userPermissions: [],
 	botPermissions: [],

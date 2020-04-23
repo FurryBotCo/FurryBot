@@ -5,8 +5,10 @@ import * as Eris from "eris";
 import config from "../config";
 import { Colors } from "../util/Constants";
 import { Internal } from "../util/Functions";
+import rClient from "../util/Redis";
 
 export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
+	rClient.INCR(`${config.beta ? "beta" : "prod"}:events:guildCreate`);
 	await Internal.incrementDailyCounter(this, true);
 
 	let author = {

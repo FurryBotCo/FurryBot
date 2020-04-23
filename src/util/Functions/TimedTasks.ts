@@ -9,6 +9,7 @@ import Eris from "eris";
 import { Request } from ".";
 import EmbedBuilder from "../EmbedBuilder";
 import phin from "phin";
+import rClient from "../Redis";
 
 export default class TimedTasks {
 	private constructor() {
@@ -32,7 +33,10 @@ export default class TimedTasks {
 			if (!config.beta && d.getHours() === 0 && d.getMinutes() === 0) await this.runDailyJoins(client).then(() => client.log("debug", "Finished processing.", "Timed Tasks | Daily Joins"));
 		}
 
-		if ((d.getSeconds() % 15) === 0) await this.runStatusChange(client, (d.getSeconds() / 15) - 1).then(() => config.beta ? client.log("debug", "Finished processing.", "Timed Tasks | Status Change") : null);
+		if ((d.getSeconds() % 15) === 0) {
+			await this.runStatusChange(client, (d.getSeconds() / 15) - 1).then(() => config.beta ? client.log("debug", "Finished processing.", "Timed Tasks | Status Change") : null);
+			// await this.runStatsUpdate(client).then(() => client.log("debug", "Finished Processing.", "Timed Tasks | Stats Update"));
+		}
 
 		await this.runAutoServerActions(client); // .then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Actions"));
 	}
@@ -389,5 +393,12 @@ export default class TimedTasks {
 				break;
 			}
 		}
+	}
+
+	static async runStatsUpdate(client: FurryBot) {
+		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:guildCount`, client.guilds.size.toString());
+		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:largeGuildCount`, client.guilds.filter(g => g.large).length.toString());
+		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:channelCount`, Object.keys(client.channelGuildMap).length.toString());
+		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:userCount`, client.users.size.toString());
 	}
 }

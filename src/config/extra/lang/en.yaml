@@ -476,6 +476,17 @@ commands:
       no: "No"
       yes: "Yes"
       invalidType: 'invalid type, valid types: "channels", "members", "server", "icon", "splash", "banner"'
+    stats:
+      description: "Statistics about me."
+      usage: ""
+      title: "Stats"
+      commandsTotal: "Commands Ran"
+      messages: "Messages Processed"
+      guildCount: "Guilds"
+      largeGuildCount: "Large Guilds"
+      userCount: "User Count"
+      channelCount: "Channel Count"
+      shardCount: "Shard Count"
     uinfo:
       description: "Get some info about a user."
       usage: "[@member/id]"
@@ -1221,6 +1232,7 @@ other:
   yes: "Yes"
   no: "No"
   none: "None"
+  noneYet: "None Yet"
   leveling:
     embedTitle: "Level Up!"
     embedDescription: "You leveled up to level **{0}**!"
