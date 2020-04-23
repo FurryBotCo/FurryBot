@@ -326,6 +326,6 @@ export default class Internal {
 			`${config.beta ? "beta" : "prod"}:stats:messages`
 		];
 
-		return Promise.all(statNames.map(async (s) => ({ [s]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
+		return Promise.all(statNames.map(async (s) => ({ [s.split(":").slice(-1)[0]]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
 	}
 }
