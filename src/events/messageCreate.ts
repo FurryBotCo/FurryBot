@@ -212,17 +212,17 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 						beta: config.beta
 					};
 
-					const d = fs.readdirSync(`${config.dir.logs} /spam`).filter(d => !fs.lstatSync(`${config.dir.logs}/spam / ${d} `).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-response.json") && fs.lstatSync(`${config.dir.logs} /spam/${d} `).birthtimeMs + 1.2e5 > Date.now());
+					const d = fs.readdirSync(`${config.dir.logs}/spam`).filter(d => !fs.lstatSync(`${config.dir.logs}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-response.json") && fs.lstatSync(`${config.dir.logs}/spam/${d}`).birthtimeMs + 1.2e5 > Date.now());
 
 					if (d.length > 0) {
-						report = Internal.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.dir.logs} /spam/${f} `).toString())), report);
+						report = Internal.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.dir.logs}/spam/${f}`).toString())), report);
 						spC = report.entries.length;
-						d.map(f => fs.unlinkSync(`${config.dir.logs} /spam/${f} `));
+						d.map(f => fs.unlinkSync(`${config.dir.logs}/spam/${f}`));
 					}
 
 					const reportId = Strings.random(10);
 
-					fs.writeFileSync(`${config.dir.logs} /spam/${msg.author.id} -${reportId} -response.json`, JSON.stringify(report));
+					fs.writeFileSync(`${config.dir.logs}/spam/${msg.author.id}-${reportId}-response.json`, JSON.stringify(report));
 
 					await this.executeWebhook(config.webhooks.logs.id, config.webhooks.logs.token, {
 						embeds: [
@@ -231,7 +231,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 								description: `Report: ${config.beta ? `https://${config.web.api.ip}:${config.web.api.port}/reports/response/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/response/${msg.author.id}/${reportId}`} `
 							}
 						],
-						username: `FurryBot Spam Logs${config.beta ? " - Beta" : ""} `,
+						username: `FurryBot Spam Logs${config.beta ? " - Beta" : ""}`,
 						avatarURL: "https://assets.furry.bot/blacklist_logs.png"
 					}).catch(err => null);
 
