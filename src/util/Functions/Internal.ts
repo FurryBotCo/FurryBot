@@ -317,15 +317,17 @@ export default class Internal {
 		return new Promise<string>((a, b) => rClient.GET(key, (err, reply) => !err ? a(reply) : b(err)));
 	}
 
-	static async getStats(): Promise<{
-		commandsTotal?: number;
-		messages?: number;
-	}> {
+	static async getStats() {
 		const statNames = [
 			`${config.beta ? "beta" : "prod"}:stats:commandsTotal`,
-			`${config.beta ? "beta" : "prod"}:stats:messages`
+			`${config.beta ? "beta" : "prod"}:stats:messages`,
+			`${config.beta ? "beta" : "prod"}:stats:directMessage`
 		];
 
-		return Promise.all(statNames.map(async (s) => ({ [s.split(":").slice(-1)[0]]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
+		return Promise.all<{
+			commandsTotal?: number;
+			messages?: number;
+			directMessage?: number;
+		}>(statNames.map(async (s) => ({ [s.split(":").slice(-1)[0]]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
 	}
 }
