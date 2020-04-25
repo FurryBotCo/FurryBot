@@ -5,16 +5,11 @@ import * as os from "os";
 import FurryBot from "../../main";
 import loopPatrons from "../patreon/loopPatrons";
 import refreshPatreonToken from "../patreon/refreshPatreonToken";
-import GuildConfig from "../../modules/config/GuildConfig";
 import Eris from "eris";
-import { Request, Utility, Time, Strings } from ".";
-import Logger from "../LoggerV8";
-import { Colors } from "../Constants";
+import { Time } from ".";
 import ExtendedMessage from "../../modules/ExtendedMessage";
 import phin from "phin";
-import { RedisClient } from "async-redis";
 import rClient from "../Redis";
-import { stat } from "fs";
 
 export default class Internal {
 	private constructor() {
