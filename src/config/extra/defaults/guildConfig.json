@@ -119,9 +119,6 @@
 	},
 	"tags": {},
 	"auto": [],
-	"disable": {
-		"server": [],
-		"channels": {}
-	},
+	"disable": [],
 	"deletion": null
 }

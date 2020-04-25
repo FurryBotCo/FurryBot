@@ -73,12 +73,16 @@ export default class GuildConfig {
 		[k: string]: string;
 	};
 	auto: {}[];
-	disable: {
-		server: string[];
-		channels: {
-			[k: string]: string[];
-		};
-	};
+	disable: (({
+		type: "channel" | "role" | "user";
+		id: string;
+	} | {
+		type: "server";
+	}) & ({
+		command: string;
+	} | {
+		category: string;
+	}))[];
 	deletion?: number;
 
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {

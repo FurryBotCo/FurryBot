@@ -788,6 +788,7 @@ commands:
     leaderboard:
       description: "Get the server leveling leaderboard."
       usage: "[page]"
+      noPages: "there don't seem to be any leaderboard pages. It may not have been populated yet, please be patient."
       serverTooLarge: "this server is too large to display the leveling leaderboard."
       invalidPage: "the provided page number was invalid. Valid pages: {0}"
       pageLessThan: "the page number cannot be less than one. Valid pages: {0}"
@@ -990,6 +991,21 @@ commands:
     blcheck:
       description: "Check if a user is blacklisted."
       usage: "<id>"
+    disable:
+      description: "Disable commands in channels or serverwide."
+      usage: "(run without any arguments for help)"
+      help:
+        title: "Disable Help"
+        add: "Add"
+        entireServer: "Entire Server"
+        specificChannel: "Specific Channel"
+        specificRole: "Specific Role"
+        specificUser: "Specific User"
+        cmdTip: "For a specific command, replace **all** with the command or category."
+        remove: "Remove"
+        withId: "With ID"
+        removeAll: "Remove All"
+        list: "List"
     editsnipe:
       description: "Get the last edited message in a channel."
       usage: "[channel]"
