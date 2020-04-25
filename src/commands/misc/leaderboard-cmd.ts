@@ -31,6 +31,7 @@ export default new Command({
 	const c = chunk(u, 10);
 
 	const page = msg.args.length > 0 ? Number(msg.args[0]) : 1;
+	if (c.length === 0) return msg.reply("{lang:commands.misc.leaderboard.noPages}");
 	if (isNaN(page)) return msg.reply(`{lang:commands.misc.leaderboard.invalidPage|${c.length}}`);
 	if (page < 1) return msg.reply(`{lang:commands.misc.leaderboard.pageLessThan|${c.length}}`);
 	if (page > c.length) return msg.reply(`{lang:commands.misc.leaderboard.pageMoreThan|${c.length}}`);
