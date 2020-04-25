@@ -13,6 +13,7 @@ import { performance } from "perf_hooks";
 import Permissions from "../../util/Permissions";
 import * as F from "../../util/Functions";
 import Language from "../../util/Language";
+import rClient from "../../util/Redis";
 
 export default new Command({
 	triggers: [
@@ -56,7 +57,8 @@ export default new Command({
 			uConfig,
 			gConfig,
 			cmd,
-			Language
+			Language,
+			rClient
 		});
 	} catch (e) {
 		res = e;
