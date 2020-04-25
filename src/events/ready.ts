@@ -1,7 +1,7 @@
 import ClientEvent from "../util/ClientEvent";
 import Temp from "../util/Temp";
 import { Logger } from "../util/LoggerV8";
-import FurryBot from "@FurryBot";
+import FurryBot from "../main";
 import config from "../config";
 import sv from "../api";
 import express from "express";

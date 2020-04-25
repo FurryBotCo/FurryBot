@@ -1,5 +1,5 @@
 import config from "../../config";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 import Internal from "./Internal";
 
 export default class Economy {

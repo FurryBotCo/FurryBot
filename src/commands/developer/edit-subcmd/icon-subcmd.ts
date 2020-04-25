@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 import phin from "phin";
 import { Request } from "../../../util/Functions";
 
@@ -15,7 +14,7 @@ export default new SubCommand({
 	usage: "<url>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
 	const set = await phin({
 		url: msg.unparsedArgs.join("%20"),

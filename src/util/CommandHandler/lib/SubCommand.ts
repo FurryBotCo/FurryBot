@@ -1,6 +1,6 @@
 import * as UT from "./utilTypes";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import FurryBot from "../../../main";
+import ExtendedMessage from "../../../modules/ExtendedMessage";
 import Eris from "eris";
 import config from "../../../config";
 import { Logger } from "../../LoggerV8";

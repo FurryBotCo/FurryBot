@@ -1,8 +1,5 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import * as Eris from "eris";
 import { Request, Utility } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
 import EmbedBuilder from "../../util/EmbedBuilder";

@@ -1,5 +1,4 @@
 import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../../config";
 import { mdb } from "../../../../modules/Database";
 import Eris from "eris";
@@ -19,7 +18,7 @@ export default new SubCommand({
 	usage: "<id> <reason>",
 	features: ["contribOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const u = await msg.getUserFromArgs();
 	if (!u) return msg.reply(`**${msg.args[0]}** isn't a valid user.`);

@@ -1,8 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
-import { Request } from "../../util/Functions";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import db from "../../modules/Database";
 import { Colors } from "../../util/Constants";
@@ -20,7 +16,7 @@ export default new Command({
 	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (msg, uConfig, gConfig, cmd) {
+}, (async function (msg, uConfig, gConfig) {
 	let member = msg.member;
 	if (msg.args.length > 0) member = await msg.getMemberFromArgs();
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");

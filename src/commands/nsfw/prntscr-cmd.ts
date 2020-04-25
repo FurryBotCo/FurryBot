@@ -1,6 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import phin from "phin";
 import cheerio from "cheerio";
@@ -49,11 +47,11 @@ export default new Command({
 				headers: {
 					"User-Agent": config.web.userAgent
 				}
-			}).catch(err => null);
+			}).catch(() => null);
 
 			const img = cheerio.load(p.body.toString())(".no-click.screenshot-image").attr("src");
 
-			const k = await phin({ method: "GET", url: img, parse: "none" }).catch(err => null);
+			const k = await phin({ method: "GET", url: img, parse: "none" }).catch(() => null);
 			if (!img || img.startsWith("//st") || !k || k.statusCode !== 200) {
 				tries++;
 				if (tries >= 5) return null;

@@ -2,7 +2,7 @@ import config from "../../config";
 import { mdb, db } from "../../modules/Database";
 import { Blacklist } from "../@types/Misc";
 import * as os from "os";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 import loopPatrons from "../patreon/loopPatrons";
 import refreshPatreonToken from "../patreon/refreshPatreonToken";
 import GuildConfig from "../../modules/config/GuildConfig";

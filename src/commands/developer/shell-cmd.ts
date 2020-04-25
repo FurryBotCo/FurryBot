@@ -1,7 +1,5 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
 import phin from "phin";
 import util from "util";
 import * as Eris from "eris";
@@ -21,7 +19,7 @@ export default new Command({
 	usage: "<code>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	let silent = false;
 	let error = false;
 	let deleteInvoke = false;

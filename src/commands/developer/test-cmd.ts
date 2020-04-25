@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 import { Strings } from "../../util/Functions";
 
 export default new Command({
@@ -14,7 +13,7 @@ export default new Command({
 	usage: "",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (!msg.args[0]) return msg.reply("tested..");
 
 	switch (msg.args[0].toLowerCase()) {

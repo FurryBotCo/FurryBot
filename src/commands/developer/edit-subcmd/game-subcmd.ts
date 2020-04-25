@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new SubCommand({
 	triggers: [
@@ -13,7 +12,7 @@ export default new SubCommand({
 	usage: "<type> <game>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length <= 1) return new Error("ERR_INVALID_USAGE");
 	let type;
 	switch (msg.args[0].toLowerCase()) {

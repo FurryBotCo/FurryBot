@@ -1,5 +1,5 @@
 import Command from "./Command";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../../main";
 import Category from "./Category";
 import Logger from "../../LoggerV8";
 export default class CommandHolder {

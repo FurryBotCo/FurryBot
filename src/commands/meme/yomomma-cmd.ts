@@ -1,8 +1,7 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import { Request } from "../../util/Functions";
+
 export default new Command({
 	triggers: [
 		"yomomma"

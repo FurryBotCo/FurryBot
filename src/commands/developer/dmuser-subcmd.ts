@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
 	triggers: [
@@ -13,7 +12,7 @@ export default new Command({
 	usage: "<id> <message>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 0) return new Error("ERR_INVALID_USAGE");
 
 	const user = await msg.getUserFromArgs();

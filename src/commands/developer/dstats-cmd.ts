@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 import { Colors } from "../../util/Constants";
 import Eris from "eris";
 
@@ -15,7 +14,7 @@ export default new Command({
 	usage: "",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const types = ["size", "shards", "users", "channels"];
 	let embed: Eris.EmbedOptions;
 	switch (msg.args[0].toLowerCase()) {

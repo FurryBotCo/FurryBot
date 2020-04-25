@@ -1,10 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import { Colors } from "../../util/Constants";
-import Eris from "eris";
-import { Internal } from "../../util/Functions";
-import config from "../../config";
 import { mdb } from "../../modules/Database";
 
 export default new Command({

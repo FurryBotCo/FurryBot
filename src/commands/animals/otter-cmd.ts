@@ -1,5 +1,5 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
+import ExtendedMessage from "../../modules/ExtendedMessage";
 import config from "../../config";
 import { Logger } from "../../util/LoggerV8";
 import { Request } from "../../util/Functions";

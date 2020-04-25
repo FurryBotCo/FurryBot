@@ -4,7 +4,7 @@ import { mdb } from "../../modules/Database";
 import uuid from "uuid/v4";
 import Eris, * as eris from "eris";
 import { Logger } from "../../util/LoggerV8";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 import { Strings } from "../../util/Functions";
 
 export default (async (client: FurryBot) => {

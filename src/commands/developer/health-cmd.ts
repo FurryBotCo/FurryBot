@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 import phin from "phin";
 import { Colors } from "../../util/Constants";
 
@@ -15,7 +14,7 @@ export default new Command({
 	usage: "",
 	features: ["contribOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const pingServers = [
 		/*{
 			host: "ap.ping-test.furry.bot",

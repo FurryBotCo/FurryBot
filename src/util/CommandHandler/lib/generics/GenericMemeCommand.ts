@@ -1,5 +1,5 @@
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import FurryBot from "../../../../main";
+import ExtendedMessage from "../../../../modules/ExtendedMessage";
 import * as Eris from "eris";
 import Logger from "../../../LoggerV8";
 import { Utility, Request } from "../../../Functions";

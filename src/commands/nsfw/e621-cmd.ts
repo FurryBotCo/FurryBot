@@ -1,6 +1,5 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
+import FurryBot from "../../main";
 import config from "../../config";
 import * as Eris from "eris";
 import { Colors } from "../../util/Constants";
@@ -97,7 +96,7 @@ export default new Command({
 				return f();
 		}
 
-		if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) await d.delete().catch(err => null);
+		if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) await d.delete().catch(() => null);
 
 		return f();
 	});
@@ -105,7 +104,7 @@ export default new Command({
 	async function setPost(this: FurryBot, p: "EXIT");
 	async function setPost(this: FurryBot, p: number);
 	async function setPost(this: FurryBot, p: string | number) {
-		if (ratelimit && !config.developers.includes(msg.author.id)) return msg.reply("you are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(err => null), 5e3)).catch(err => null);
+		if (ratelimit && !config.developers.includes(msg.author.id)) return msg.reply("you are being ratelimited! Please wait a bit more before navigating posts!").then(m => setTimeout(() => m.delete().catch(() => null), 5e3)).catch(() => null);
 		ratelimit = true;
 
 		if (p === "EXIT") {

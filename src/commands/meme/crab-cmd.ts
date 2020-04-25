@@ -1,9 +1,5 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
-import * as Eris from "eris";
-import { Strings, Request, Time } from "../../util/Functions";
-import { performance } from "perf_hooks";
+import { Request } from "../../util/Functions";
 import config from "../../config";
 
 export default new Command({
@@ -19,7 +15,7 @@ export default new Command({
 	donatorCooldown: 1e4,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.unparsedArgs.length < 1) throw new Error("ERR_INVALID_USAGE");
 
 	const m = await msg.channel.createMessage("{lang:commands.meme.crab.time}");

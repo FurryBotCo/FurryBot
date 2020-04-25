@@ -16,7 +16,7 @@ export default new Command({
 	donatorCooldown: 2.5e3,
 	features: [],
 	file: __filename
-}, (async function (this, msg, uConfig, gConfig) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1, reset = false;
 	if (Object.keys(msg.dashedArgs.parsed.keyValue).includes("percent")) {
 		if (!config.developers.includes(msg.author.id)) return msg.reply("this option, `percent` is developer only.");

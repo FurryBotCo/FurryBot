@@ -1,7 +1,5 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
 import _eval from "../../util/eval";
 import phin from "phin";
 import util from "util";

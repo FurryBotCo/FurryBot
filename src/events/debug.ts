@@ -1,6 +1,6 @@
 import ClientEvent from "../util/ClientEvent";
 import { Logger } from "../util/LoggerV8";
-import FurryBot from "@FurryBot";
+import FurryBot from "../main";
 import config from "../config";
 import chalk from "chalk";
 import rClient from "../util/Redis";

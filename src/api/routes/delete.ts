@@ -1,7 +1,7 @@
 import express from "express";
 import config from "../../config";
 import * as fs from "fs-extra";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 import { db } from "../../modules/Database";
 
 export default (async (client: FurryBot) => {

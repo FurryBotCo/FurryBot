@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../config";
 import { Logger } from "../../../util/LoggerV8";
 import phin from "phin";
@@ -18,7 +17,7 @@ export default new SubCommand({
 	usage: "<item>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
 	const p = await phin<any>({

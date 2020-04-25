@@ -1,7 +1,7 @@
 import express from "express";
 import config from "../../config";
 import * as fs from "fs-extra";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 import crypto from "crypto";
 import Logger from "../../util/LoggerV8";
 import { Internal } from "../../util/Functions";
