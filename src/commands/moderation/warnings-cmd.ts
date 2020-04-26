@@ -23,7 +23,8 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const member = await msg.getMemberFromArgs();
+	let member = await msg.getMemberFromArgs();
+	if (!member) member = msg.member;
 
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 
