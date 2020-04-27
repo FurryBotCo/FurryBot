@@ -64,6 +64,7 @@ src/config/extra/other/*
 !src/config/extra/other/leveling.json
 !src/config/extra/other/settings.json
 !src/config/extra/other/toStringFormatNames.ts
+!src/config/extra/other/commandRestrictions.ts
 
 # test directory
 test/
