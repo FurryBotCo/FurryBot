@@ -995,7 +995,7 @@ commands:
       description: "Disable commands in channels or serverwide."
       usage: "(run without any arguments for help)"
       help:
-        title: "Disable Help"
+        title: 'Help for the "disable" command.'
         add: "Add"
         entireServer: "Entire Server"
         specificChannel: "Specific Channel"
@@ -1132,7 +1132,7 @@ commands:
       description: "Clear messages in a channel."
       usage: "<2-100>"
       amount: "please provide a valid number between two (2) and 100."
-      skipped: "Skipped {0} message(s), reason: over 2 weeks old."
+      skipped: "Skipped {0} message(s), reason: they are over 2 weeks old.\nNote: this is a technical limitation from Discord, not us."
     reset:
       description: "Reset the current servers settings."
       usage: ""
@@ -1174,6 +1174,7 @@ commands:
       enabled: "Enabled"
       disabled: "Disabled"
       invalidLang: "{0} is not a valid language we support. Valid languages: {1}"
+      arrayInvalidOpt: "invalid usage. After the setting name, supply one of the following: \"add\", \"remove\", then the value to add or remove.\nEx: {0}settings {1} add <value>"
     settopic:
       description: "Set a text channel's topic"
       usage: "<topic>"
