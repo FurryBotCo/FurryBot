@@ -3,6 +3,7 @@ import Eris from "eris";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import config from "../../config";
 import { Time } from "../../util/Functions";
+import Language from "../../util/Language";
 
 export default new Command({
 	triggers: [
@@ -45,6 +46,7 @@ export default new Command({
 		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) return msg.reply("you must be a developer to see this command.");
 
 		if (cmd.features.includes("contribOnly") && !config.developers.includes(msg.author.id)) return msg.reply("you must be a contributor or above to see this command.");
+		const u = Language.get(gConfig.settings.lang).get(`commands.${cat.name}.${cmd.triggers[0]}.usage`);
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(gConfig.settings.lang)
@@ -53,21 +55,16 @@ export default new Command({
 					cmd.description,
 					"",
 					`**{lang:commands.misc.help.embed.restrictions}**:`,
-					`\u25FD {lang:commands.misc.help.embed.nsfw}: **${cmd.features.includes("nsfw") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
-					`\u25FD {lang:commands.misc.help.embed.contribOnly}: **${cmd.features.includes("contribOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
-					`\u25FD {lang:commands.misc.help.embed.devOnly}: **${cmd.features.includes("devOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
-					`\u25FD {lang:commands.misc.help.embed.betaOnly}: **${cmd.features.includes("betaOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
-					`\u25FD {lang:commands.misc.help.embed.guildOwnerOnly}: **${cmd.features.includes("guildOwnerOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
-					`\u25FD {lang:commands.misc.help.embed.supportServerOnly}: **${cmd.features.includes("supportOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
-					`\u25FD {lang:commands.misc.help.embed.donatorOnly}: **${cmd.features.includes("donatorOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
-					`\u25FD {lang:commands.misc.help.embed.premiumGuildOnly}: **${cmd.features.includes("premiumGuildOnly") ? "{lang:other.yes}" : "{lang:other.no}"}**`,
+					"```diff",
+					...this.cmd.restrictions.map(r => `${cmd.features.includes(r.name as any) ? "+" : "-"} {lang:other.commandRestrictions.${r.name}}`),
+					"```",
 					"",
 					`**{lang:commands.misc.help.embed.permissions}**:`,
 					`\u25FD {lang:commands.misc.help.embed.bot}: **${cmd.botPermissions.length === 0 ? "{lang:other.none}" : cmd.botPermissions.join("**, **")}**`,
 					`\u25FD {lang:commands.misc.help.embed.user}: **${cmd.userPermissions.length === 0 ? "{lang:other.none}" : cmd.userPermissions.join("**, **")}**`,
 					"",
 					"**Extra**:",
-					`\u25FD {lang:commands.misc.help.embed.usage}: \`${gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
+					`\u25FD {lang:commands.misc.help.embed.usage}: \`${gConfig.settings.prefix}${cmd.triggers[0]}${!u ? !cmd.usage ? "" : ` ${cmd.usage}` : ` ${u}`}\``,
 					`\u25FD {lang:commands.misc.help.embed.aliases}: ${cmd.triggers.join(", ")}`,
 					`\u25FD {lang:commands.misc.help.embed.normalCooldown}: ${Time.ms(cmd.cooldown, true)}`,
 					`\u25FD {lang:commands.misc.help.embed.donatorCooldown}: ${Time.ms(cmd.donatorCooldown, true)}`,
