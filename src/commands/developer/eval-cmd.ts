@@ -8,10 +8,10 @@ import * as fs from "fs";
 import { db, mdb, mongo } from "../../modules/Database";
 import * as os from "os";
 import { performance } from "perf_hooks";
-import Permissions from "../../util/Permissions";
 import * as F from "../../util/Functions";
 import Language from "../../util/Language";
 import rClient from "../../util/Redis";
+import { Permissions } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
