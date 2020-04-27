@@ -7,7 +7,6 @@ import config from "../config";
 import db, { mdb } from "../modules/Database";
 import { Time, Internal, Strings, Request } from "../util/Functions";
 import { Blacklist } from "../util/@types/Misc";
-import Logger from "../util/LoggerV8";
 import EmbedBuilder from "../util/EmbedBuilder";
 import * as fs from "fs-extra";
 import { Colors } from "../util/Constants";
@@ -29,7 +28,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const t = new Timers(this, config.beta || config.developers.includes(message.author.id));
 		t.start("main");
 
-		if (!message || !message.author || message.author.bot || !this.firstReady) return;
+		if (!message || !message.author || message.author.bot || (config.beta && !config.contributors.includes(message.author.id)) || !this.firstReady) return;
 
 		t.start("messageProcess");
 		msg = new ExtendedMessage(message, this);
@@ -42,9 +41,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const ubl: Blacklist.UserEntry[] = ublB.filter(r => [0, null].includes(r.expire) || r.expire > Date.now());
 		const bl = gbl.length > 0 || ubl.length > 0;
 
-		if (msg.member && msg.member.roles.includes(config.blacklistRoleId) && !bl) await msg.member.removeRole(config.blacklistRoleId, "user is not blacklisted (might have expired)").catch(err => null);
+		if (!config.beta && msg.member && msg.member.roles.includes(config.blacklistRoleId) && !bl) await msg.member.removeRole(config.blacklistRoleId, "user is not blacklisted (might have expired)").catch(err => null);
 
-		if (bl && !config.developers.includes(msg.author.id)) {
+		if (!config.beta && bl && !config.developers.includes(msg.author.id)) {
 			if (msg.channel.guild && msg.channel.guild.id === config.bot.mainGuild) {
 				if (!msg.member.roles.includes(config.blacklistRoleId)) await msg.member.addRole(config.blacklistRoleId, "user is blacklisted").catch(err => null);
 			}
@@ -384,98 +383,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 		if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage(`You attempted to run the command "${msg.cmd.cmd.triggers[0]}" in the channel <#${msg.channel.id}>, but I'm missing the **sendMessages** permission.\n\nContent:\n> ${msg.content}`)).catch(err => null);
 
-		if (cmd.features.includes("betaOnly") && !config.beta) return;
-
-		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) {
-			rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:devOnlyError`);
-			this.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
-			return msg.reply(`you must be a developer to use this command.`).catch(err => null);
-		}
-
-		if (cmd.features.includes("contribOnly") && !config.contributors.includes(msg.author.id)) {
-			rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:contribOnlyError`);
-			Logger.debug(`Shard #${msg.channel.guild.shard.id}`, `${msg.author.tag} (${msg.author.id}) attempted to run contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
-			return msg.reply(`you must be a contributor or higher to use this command.`).catch(err => null);
-		}
-
-		if (cmd.features.includes("supportOnly") && msg.channel.guild.id !== config.bot.mainGuild) return msg.reply("this command may only be ran in my support server.").catch(err => null);
-
-		if (cmd.features.includes("guildOwnerOnly") && msg.author.id !== msg.channel.guild.ownerID) return msg.reply("only this servers owner may use this command.").catch(err => null);
-
-		if (cmd.features.includes("nsfw")) {
-			if (!msg.channel.nsfw) return msg.reply(`this command can only be ran in nsfw channels.`, {
-				file: await Request.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
-				name: "nsfw.gif"
-			}).catch(err => null);
-
-			if (!gConfig.settings.nsfw) return msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${gConfig.settings.prefix}settings nsfw commands enabled\`.`).catch(err => null);
-
-			if (msg.channel.topic && config.yiff.disableStatements.some(t => msg.channel.topic.indexOf(t) !== -1)) {
-				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
-				const st = config.yiff.disableStatements.filter(t => msg.channel.topic.indexOf(t) !== -1);
-
-				return msg.channel.createMessage({
-					embed: {
-						author: {
-							name: msg.author.tag,
-							icon_url: msg.author.avatarURL
-						},
-						title: "NSFW Commands Disabled",
-						description: `NSFW commands have been explicitly disabled in this channel. To reenable them, remove **${st.join("**, **")}** from the channel topic.`,
-						color: Colors.red,
-						timestamp: new Date().toISOString()
-					}
-				}).catch(err => null);
-			}
-		}
-		const donator = await uConfig.premiumCheck();
-		if (cmd.features.includes("donatorOnly") && !config.developers.includes(msg.author.id)) {
-			if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
-			if (!donator.active) return msg.channel.createMessage({
-				embed: {
-					title: "Usage Not Allowed",
-					description: `You must be a donator to use this command.\nYou can donate [here](${config.bot.patreon}).`,
-					color: Colors.red,
-					timestamp: new Date().toISOString(),
-					author: {
-						name: msg.author.tag,
-						icon_url: msg.author.avatarURL
-					}
-				}
-			});
-		}
-
-		const premium = await gConfig.premiumCheck();
-		if (cmd.features.includes("premiumGuildOnly") && !config.developers.includes(msg.author.id)) {
-			if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
-			if (!premium.active) return msg.channel.createMessage({
-				embed: {
-					title: "Usage Not Allowed",
-					description: `This command can only be used in premium servers.\nYou can donate [here](${config.bot.patreon}), and can activate a premium server using \`${gConfig.settings.prefix}pserver add\`.`,
-					color: Colors.red,
-					timestamp: new Date().toISOString(),
-					author: {
-						name: msg.author.tag,
-						icon_url: msg.author.avatarURL
-					}
-				}
-			});
-		}
-
-		if (cmd.userPermissions.length > 0 && !config.developers.includes(msg.author.id)) {
-			if (cmd.userPermissions.some(perm => !msg.channel.guild.members.get(msg.author.id).permission.has(perm))) {
-				const p = cmd.userPermissions.filter(perm => !msg.channel.guild.members.get(msg.author.id).permission.has(perm));
-				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`you're missing some permissions to be able to run that, but I need the \`embedLinks\` permission to tell you which.`).catch(err => null);
-				this.log("debug", `user ${msg.author.username}#${msg.author.discriminator} (${msg.author.id}) is missing the permission(s) ${p.join(", ")} to run the command ${cmd.triggers[0]}`, `Shard #${msg.channel.guild.shard.id}`);
-				return msg.channel.createMessage({
-					embed: {
-						title: "You do not have the required permission(s) to use this!",
-						description: `You require the permission(s) **${p.join("**, **")}** to run this, which you do not have.`,
-						color: Colors.red,
-						timestamp: new Date().toISOString()
-					}
-				}).catch(err => null);
-			}
+		try {
+			await Promise.all(this.cmd.restrictions.filter(r => cmd.features.includes(r.name as any)).map(async (r) => r.check(msg, this, cmd, uConfig, gConfig)));
+		} catch (e) {
+			return;
 		}
 
 		if (cmd.botPermissions.length > 0) {
@@ -493,6 +404,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}).catch(err => null);
 			}
 		}
+
+		const donator = await uConfig.premiumCheck();
+
 		if (!config.developers.includes(msg.author.id)) {
 			const cool = this.cd.check(msg.author.id, "cmd", { cmd: cmd.triggers[0] });
 			const time = cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;

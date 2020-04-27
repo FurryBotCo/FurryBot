@@ -2,12 +2,16 @@ import Command from "./Command";
 import FurryBot from "../../../main";
 import Category from "./Category";
 import Logger from "../../LoggerV8";
+import commandRestrictions from "../../../config/extra/other/commandRestrictions";
+import config from "../../../config";
 export default class CommandHolder {
 	client: FurryBot;
 	categories: Category[];
+	restrictions: ReturnType<typeof commandRestrictions>;
 	constructor(client: FurryBot) {
 		this.client = client;
 		this.categories = [];
+		this.restrictions = commandRestrictions(config);
 	}
 
 	get commands() {
