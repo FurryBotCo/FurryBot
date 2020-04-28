@@ -138,8 +138,20 @@ export default class Economy {
 			},
 			specialPeeps: {
 				p: 0.050,
-				check: (userId: string, client: FurryBot) => ["192361753693126668"].includes(userId),
+				check: (userId: string, client: FurryBot) => ["192361753693126668", "201210303831080960"].includes(userId),
 				name: "{lang:commands.economy.multiplier.multi.special}",
+				hidden: true
+			},
+			cutie: {
+				p: 0.050,
+				check: (userId: string, client: FurryBot) => ["201210303831080960"].includes(userId),
+				name: "Cutest Little Cutie",
+				hidden: true
+			},
+			horny: {
+				p: 0.050,
+				check: (userId: string, client: FurryBot) => ["515317973335146512"].includes(userId),
+				name: "Horniest of Them All",
 				hidden: true
 			}
 		};
