@@ -1,5 +1,4 @@
 import Eris from "eris";
-import { Base, Cluster } from "clustersv3";
 import Holder from "./util/Holder";
 import MessageCollector from "./util/MessageCollector";
 import ErrorHandler from "./util/ErrorHandler";
