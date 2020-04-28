@@ -30,7 +30,7 @@ export default new Command({
 
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
-			.setDescription(`${extra}{lang:other.shortURL}:<${short.link}>`)
+			.setDescription(`${extra}{lang:other.shortURL}: <${short.link}>`)
 			.setTitle("{lang:commands.nsfw.bulge.title}")
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
 			.setTimestamp(new Date().toISOString())
