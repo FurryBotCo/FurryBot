@@ -37,7 +37,8 @@ export default new Command({
 		ANIMATED_ICON: `[{lang:commands.information.sinfo.features.animatedIcon}](${fDocsUrl} '{lang:commands.information.sinfo.features.animatedIconDesc}')`,
 		BANNER: `[{lang:commands.information.sinfo.features.banner}](${fDocsUrl} '{lang:commands.information.sinfo.features.bannerDesc}')`,
 		WELCOME_SCREEN_ENABLED: `[{lang:commands.information.sinfo.features.welcomeScreen}](${fDocsUrl} '{lang:commands.information.sinfo.features.welcomeScreenDesc}')`,
-		PUBLIC_DISABLED: `[{lang:commands.information.sinfo.features.publicDisabled}](${fDocsUrl} '{lang:commands.information.sinfo.features.publicDisabledDesc}')`
+		PUBLIC_DISABLED: `[{lang:commands.information.sinfo.features.publicDisabled}](${fDocsUrl} '{lang:commands.information.sinfo.features.publicDisabledDesc}')`,
+		MORE_EMOJI: `[{lang:commands.information.sinfo.features.moreEmoji}](${fDocsUrl} '{lang:commands.information.sinfo.features.moreEmojiDesc}')`
 	};
 
 	let features = msg.channel.guild.features.map(f => `\u25FD ${fStr[f] || `${f}`}`).join("\n");
