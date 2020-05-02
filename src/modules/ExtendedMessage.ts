@@ -204,8 +204,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
-		else args = this[argObject];
+		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
 		// make mention position arg position if not explicitly set
@@ -233,8 +233,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
-		else args = this[argObject];
+		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
 		// make mention position arg position if not explicitly set
@@ -260,8 +260,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
-		else args = this[argObject];
+		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
 		// make mention position arg position if not explicitly set
@@ -286,8 +286,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
-		else args = this[argObject];
+		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
 		// make mention position arg position if not explicitly set
@@ -313,8 +313,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")], argPosition = 0);
-		else args = this[argObject];
+		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		// server id
 		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.guilds.get(args[argPosition]);
