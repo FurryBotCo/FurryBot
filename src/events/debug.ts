@@ -3,10 +3,9 @@ import { Logger } from "../util/LoggerV8";
 import FurryBot from "../main";
 import config from "../config";
 import chalk from "chalk";
-import rClient from "../util/Redis";
 
 export default new ClientEvent("debug", (async function (this: FurryBot, info: string, id: number) {
-	rClient.INCR(`${config.beta ? "beta" : "prod"}:events:debug`);
+	await this.track("events", "debug");
 	if (typeof config !== "undefined" && config.debug === true) {
 		// too many for this
 		if (["duplicate presence update"].some(t => info.toLowerCase().indexOf(t.toLowerCase()) !== -1)) return;

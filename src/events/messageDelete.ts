@@ -4,12 +4,11 @@ import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors, MessageTypes } from "../util/Constants";
 import { Utility } from "../util/Functions";
-import Logger from "../util/LoggerV8";
 import config from "../config";
 import rClient from "../util/Redis";
 
 export default new ClientEvent("messageDelete", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
-	rClient.INCR(`${config.beta ? "beta" : "prod"}:events:messageDelete`);
+	this.track("events", "messageDelete");
 	if (!this || !message || !message.author || message.author.bot || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any)) return;
 	const g = await db.getGuild(message.channel.guild.id);
 	if (!g) return;

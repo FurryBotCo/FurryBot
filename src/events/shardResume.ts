@@ -3,10 +3,9 @@ import { Logger } from "../util/LoggerV8";
 import FurryBot from "../main";
 import config from "../config";
 import { Colors } from "../util/Constants";
-import rClient from "../util/Redis";
 
 export default new ClientEvent("shardResume", (async function (this: FurryBot, id: number) {
-	rClient.INCR(`${config.beta ? "beta" : "prod"}:events:shardResume`);
+	this.track("events", "shardResume");
 	Logger.log("Shard Ready", `Shard #${id} resumed.`);
 	return this.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
 		embeds: [

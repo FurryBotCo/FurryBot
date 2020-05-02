@@ -18,8 +18,8 @@ import Language from "../util/Language";
 import rClient from "../util/Redis";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
-	rClient.INCR(`${config.beta ? "beta" : "prod"}:events:messageCreate`);
-	rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:messages`);
+	await this.track("events", "messageCreate");
+	await this.track("stats", "messages");
 	let
 		msg: ExtendedMessage<Eris.GuildTextableChannel>,
 		gConfig: GuildConfig,
@@ -75,11 +75,11 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		t.start("dm");
 		// needed due to everything else being GuildTextableChannel
 		if ((message.channel as unknown as Eris.PrivateChannel).type === Eris.Constants.ChannelTypes.DM) {
-			rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:directMessage`);
+			this.track("stats", "directMessage");
 			if (bl) return;
 
 			if (/discord\.gg/gi.test(msg.content.toLowerCase())) {
-				rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:directMessageInvite`);
+				this.track("stats", "directMessageInvite");
 				// being more constructive instead of outright banning
 				// const g = await this.getRESTGuild(config.bot.mainGuild);
 				// await g.banMember(message.author.id, 0, "Advertising in bots dms.");
@@ -145,7 +145,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				await rClient.SET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${message.author.id}`, (uConfig.getLevel(msg.channel.guild.id) + l).toString());
 				const nlvl = config.leveling.calcLevel(uConfig.getLevel(msg.channel.guild.id));
 				if (nlvl.level > lvl.level && gConfig.settings.announceLevelUp) {
-					rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:levelUp`);
+					this.track("stats", "levelUp");
 					if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
 						let m: Eris.Message;
 						if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) m = await msg.channel.createMessage({
@@ -169,7 +169,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		t.start("mention");
 		if ([`<@!${this.user.id}> `, ` <@${this.user.id}> `].includes(msg.content)) {
-			rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:mention`);
+			this.track("stats", "mention");
 			const embed =
 				new EmbedBuilder(gConfig.settings.lang)
 					.setTitle("{lang:other.mention.title}")
@@ -191,7 +191,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		t.end("mention");
 		t.start("autoResponse");
 		if (["f", "rip"].includes(msg.content.toLowerCase()) && gConfig.settings.fResponse && msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
-			rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:autoResponse`);
+			this.track("stats", "autoResponse");
 			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return;
 			if (!config.developers.includes(msg.author.id) && !(ubl.length > 0)) {
 				this.spamCounter.response.push({
@@ -411,7 +411,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			const cool = this.cd.check(msg.author.id, "cmd", { cmd: cmd.triggers[0] });
 			const time = cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;
 			if (cool.found && cmd.cooldown !== 0 && cool.time !== 0) {
-				rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:cooldownCheck`);
+				this.track("stats", "cooldownCheck");
 				const t = Time.ms(time, true);
 				const n = Time.ms(cmd.cooldown, true);
 				const d = Time.ms(cmd.donatorCooldown, true);
@@ -437,9 +437,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		this.log("log", `Command "${cmd.triggers[0]}" ran with ${msg.unparsedArgs.length === 0 ? "no arguments" : `the arguments "${msg.unparsedArgs.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 		t.start("cmd");
-		rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:commandsTotal`);
-		rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:commands:${cmd.triggers[0]}`);
-		rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:commands:allTime:${cmd.triggers[0]}`);
+		this.track("stats", "commandsTotal");
+		this.track("stats", "commands", cmd.triggers[0]);
+		this.track("stats", "commands", "allTime", cmd.triggers[0]);
 		const c = await cmd.run.call(this, msg, uConfig, gConfig, cmd).catch(err => err);
 		t.end("cmd");
 		this.log("debug", `Command handler for "${cmd.triggers[0]}" took ${t.calc("cmd", "cmd")}ms`, `Shard #${msg.channel.guild.shard.id}`);
@@ -500,6 +500,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					},
 					timeout: 5e3
 				}).then(k => k.body.toString());
+
+				this.track("stats", "error");
 				const embed: Eris.EmbedOptions = {
 					title: ":x: Error",
 					description: [
@@ -535,6 +537,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					});
 					switch (err.code) {
 						case "ECONNRESET": {
+							this.track("errors", "econnreset");
 							k = "{lang:other.error.econnreset}";
 							break;
 						}

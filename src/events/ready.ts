@@ -11,10 +11,9 @@ import cmd from "../commands";
 import { Time, TimedTasks } from "../util/Functions";
 import * as fs from "fs-extra";
 import Eris from "eris";
-import rClient from "../util/Redis";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
-	rClient.INCR(`${config.beta ? "beta" : "prod"}:events:ready`);
+	this.track("events", "ready");
 	if (this.firstReady) return this.log("warn", "Skipping ready event as it has already fired.", "Ready");
 	db.setClient(this);
 	this.firstReady = true;

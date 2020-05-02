@@ -8,10 +8,9 @@ const uuid = short().generate;
 import * as fs from "fs-extra";
 import path from "path";
 import { Utility, Time } from "../util/Functions";
-import rClient from "../util/Redis";
 
 export default new ClientEvent("messageDeleteBulk", (async function (this: FurryBot, messages: Eris.PossiblyUncachedMessage[]) {
-	rClient.INCR(`${config.beta ? "beta" : "prod"}:events:messageDeleteBulk`);
+	this.track("events", "messageDeleteBulk");
 	if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(messages[0].channel.type as any)) return;
 	const guild = (messages[0].channel as Eris.GuildChannel).guild;
 	const g = await db.getGuild(guild.id);
