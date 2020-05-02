@@ -3,6 +3,7 @@ import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
 import _ from "lodash";
 import Logger from "../../util/LoggerV8";
+import rClient from "../../util/Redis";
 export default class GuildConfig {
 	id: string;
 	selfAssignableRoles: string[];
@@ -114,12 +115,14 @@ export default class GuildConfig {
 	}
 
 	async reload() {
+		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:gConfig:${this.id}`);
 		const r = await mdb.collection("guilds").findOne({ id: this.id });
 		this.load.call(this, r);
 		return this;
 	}
 
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
+		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:gConfig:${this.id}`);
 		const d = this;
 
 		/**
@@ -170,6 +173,7 @@ export default class GuildConfig {
 	}
 
 	async delete() {
+		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:gConfig:${this.id}`);
 		await mdb.collection("guilds").findOneAndDelete({ id: this.id });
 	}
 

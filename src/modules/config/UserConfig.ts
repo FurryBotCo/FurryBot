@@ -2,6 +2,7 @@ import config from "../../config";
 import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
 import _ from "lodash";
+import rClient from "../../util/Redis";
 
 interface Warning {
 	blame: string;
@@ -58,12 +59,14 @@ export default class UserConfig {
 	}
 
 	async reload() {
+		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:uConfig:${this.id}`);
 		const r = await mdb.collection("users").findOne({ id: this.id });
 		this.load.call(this, r);
 		return this;
 	}
 
 	async edit(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
+		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:uConfig:${this.id}`);
 		const d = this;
 		/**
 		 *
@@ -114,6 +117,7 @@ export default class UserConfig {
 	}
 
 	async delete() {
+		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:uConfig:${this.id}`);
 		await mdb.collection("users").findOneAndDelete({ id: this.id });
 	}
 
