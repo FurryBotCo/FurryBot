@@ -53,15 +53,15 @@ export default ((config: typeof cnf) => {
 			})
 		},
 		{
-			name: "contribOnly",
+			name: "helperOnly",
 			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command | SubCommand, uConfig?: UserConfig, gConfig?: GuildConfig) => {
 				if (!uConfig) uConfig = await db.getUser(msg.author.id);
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 
-				rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:contribOnlyError`);
-				client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
-				if (!config.contributors.includes(msg.author.id)) {
-					await msg.reply(`you must be a contributor or higher to use this command.`).catch(err => null);
+				if (!config.helpers.includes(msg.author.id)) {
+					rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:helperOnlyError`);
+					client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run helper command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
+					await msg.reply(`you must be a helper or higher to use this command.`).catch(err => null);
 					throw new Error();
 				}
 			})
@@ -72,10 +72,10 @@ export default ((config: typeof cnf) => {
 				if (!uConfig) uConfig = await db.getUser(msg.author.id);
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 
-				rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:devOnlyError`);
-				client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 				if (!config.developers.includes(msg.author.id)) {
-					await msg.reply(`you must be a developer to use this command.`).catch(err => null);
+					rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:devOnlyError`);
+					client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer/contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
+					await msg.reply(`you must be a developer or contributor to use this command.`).catch(err => null);
 					throw new Error();
 				}
 			})
