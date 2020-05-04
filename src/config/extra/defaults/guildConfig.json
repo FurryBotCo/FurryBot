@@ -8,6 +8,9 @@
 	"modlog": [],
 	"settings": {
 		"announceLevelUp": false,
+		"levelingIgnoreChannels": [],
+		"levelingIgnoreRoles": [],
+		"levelingIgnoreUsers": [],
 		"nsfw": false,
 		"defaultYiff": "gay",
 		"snipeCommand": true,
