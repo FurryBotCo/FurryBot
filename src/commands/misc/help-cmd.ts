@@ -43,9 +43,9 @@ export default new Command({
 
 		if (!cmd) return msg.reply("{lang:commands.misc.help.cmdNotFound}");
 
-		if (cmd.features.includes("devOnly") && !config.developers.includes(msg.author.id)) return msg.reply("you must be a developer to see this command.");
+		if (cmd.features.includes("devOnly") && !(config.developers.includes(msg.author.id) || config.contributors.includes(msg.author.id))) return msg.reply("you must be a developer / contributor to see this command.");
 
-		if (cmd.features.includes("contribOnly") && !config.developers.includes(msg.author.id)) return msg.reply("you must be a contributor or above to see this command.");
+		if (cmd.features.includes("helperOnly") && !config.helpers.includes(msg.author.id)) return msg.reply("you must be a helper or above to see this command.");
 		const u = Language.get(gConfig.settings.lang).get(`commands.${cat.name}.${cmd.triggers[0]}.usage`);
 
 		return msg.channel.createMessage({
