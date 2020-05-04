@@ -12,7 +12,7 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Check my server/shard health.",
 	usage: "",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const pingServers = [

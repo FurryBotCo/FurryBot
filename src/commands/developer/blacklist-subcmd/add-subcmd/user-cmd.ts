@@ -16,7 +16,7 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Add a user to the blacklist.",
 	usage: "<id> <reason>",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");

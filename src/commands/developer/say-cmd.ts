@@ -10,7 +10,7 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Make me say something.",
 	usage: "<text>",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	await msg.delete().catch(err => null);

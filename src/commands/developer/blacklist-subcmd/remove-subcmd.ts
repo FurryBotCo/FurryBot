@@ -11,7 +11,7 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Remove users/servers from the blacklist.",
 	usage: "<user/server> <id>",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	subCommandDir: `${__dirname}/remove-subcmd`,
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {

@@ -10,7 +10,7 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Disconnect a shard.",
 	usage: "<id> [reconnect]",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");

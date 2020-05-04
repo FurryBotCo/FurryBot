@@ -11,7 +11,7 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Add a user/server to the blacklist.",
 	usage: "<user/server> <id> [reason]",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	subCommandDir: `${__dirname}/add-subcmd`,
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
