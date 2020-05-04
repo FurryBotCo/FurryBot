@@ -4,6 +4,7 @@ import { DeepPartial } from "../../util/@types/Misc";
 import _ from "lodash";
 import Logger from "../../util/LoggerV8";
 import rClient from "../../util/Redis";
+import { UpdateQuery, FindOneAndUpdateOption } from "mongodb";
 export default class GuildConfig {
 	id: string;
 	selfAssignableRoles: string[];
@@ -119,6 +120,10 @@ export default class GuildConfig {
 		const r = await mdb.collection("guilds").findOne({ id: this.id });
 		this.load.call(this, r);
 		return this;
+	}
+
+	async mongoEdit<T = any>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
+		return mdb.collection<T>("guilds").findOneAndUpdate({ id: this.id } as any, d, opt);
 	}
 
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {

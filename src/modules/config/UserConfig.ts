@@ -3,6 +3,7 @@ import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
 import _ from "lodash";
 import rClient from "../../util/Redis";
+import { UpdateQuery, FindOneAndUpdateOption } from "mongodb";
 
 interface Warning {
 	blame: string;
@@ -63,6 +64,10 @@ export default class UserConfig {
 		const r = await mdb.collection("users").findOne({ id: this.id });
 		this.load.call(this, r);
 		return this;
+	}
+
+	async mongoEdit<T = any>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
+		return mdb.collection<T>("guilds").findOneAndUpdate({ id: this.id } as any, d, opt);
 	}
 
 	async edit(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
