@@ -11,7 +11,8 @@ import { Utility, Time } from "../util/Functions";
 
 export default new ClientEvent("messageDeleteBulk", (async function (this: FurryBot, messages: Eris.PossiblyUncachedMessage[]) {
 	this.track("events", "messageDeleteBulk");
-	if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(messages[0].channel.type as any)) return;
+	const c = this.getChannel(messages[0].channel.id);
+	if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type as any)) return;
 	const guild = (messages[0].channel as Eris.GuildChannel).guild;
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.messageBulkDelete;

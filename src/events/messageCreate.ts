@@ -28,7 +28,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const t = new Timers(this, config.beta || config.developers.includes(message.author.id));
 		t.start("main");
 
-		if (!message || !message.author || message.author.bot || (config.beta && !config.contributors.includes(message.author.id)) || !this.firstReady) return;
+		if (!message || !message.author || message.author.bot || (config.beta && !(config.developers.includes(message.author.id) || config.contributors.includes(message.author.id) || config.helpers.includes(message.author.id))) || !this.firstReady) return;
 
 		t.start("messageProcess");
 		msg = new ExtendedMessage(message, this);
