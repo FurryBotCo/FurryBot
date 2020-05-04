@@ -43,7 +43,7 @@ export default new Command({
 			.setDescription([
 				...c[page - 1].map((k, i) => {
 					const l = config.leveling.calcLevel(k.level);
-					return `**#${i + 1}**: <@!${k.id}> - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:commands.misc.leaderboard.embed.until})`;
+					return `**#${(i + 1) + ((page - 1) * 10)}**: <@!${k.id}> - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:commands.misc.leaderboard.embed.until})`;
 				})
 			].join("\n"))
 			.setFooter(`{lang:commands.misc.leaderboard.embed.footer|${page}|${c.length}|${f}}`)
