@@ -15,6 +15,8 @@ import E9API from "e9api";
 import ModLogUtil from "./util/ModLogUtil";
 import * as http from "http";
 import * as https from "https";
+import rClient from "./util/Redis";
+import DataDog from "./util/DataDog";
 
 export default class FurryBot extends Eris.Client {
 	holder: Holder;
@@ -86,5 +88,10 @@ export default class FurryBot extends Eris.Client {
 
 	log(level: "log" | "info" | "warn" | "error" | "data" | "debug" | "internal" | "internal.debug", message: any, name: string) {
 		Logger[level](`${name || "General"}`, message);
+	}
+
+	async track(...parts: (string | number)[]) {
+		await rClient.INCR(`${config.beta ? "beta" : "prod"}:${parts.join(":")}`);
+		await DataDog.increment(`bot.${config.beta ? "beta" : "prod"}.${parts.join(".")}`);
 	}
 }
