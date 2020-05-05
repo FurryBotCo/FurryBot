@@ -84,6 +84,14 @@ export default class FurryBot extends Eris.Client {
 		this.e9 = new E9API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
 		});
+
+		process
+			.on("unhandledRejection", (reason, promise) =>
+				this.err.globalHandler.bind(this.err, "unhandledRejection")({ reason, promise })
+			)
+			.on("uncaughtException", (error) =>
+				this.err.globalHandler.bind(this.err, "uncaughtException")({ error })
+			);
 	}
 
 	log(level: "log" | "info" | "warn" | "error" | "data" | "debug" | "internal" | "internal.debug", message: any, name: string) {
