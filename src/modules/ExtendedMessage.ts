@@ -208,8 +208,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
-		// make mention position arg position if not explicitly set
-		if ([undefined, null].includes(mentionPosition)) mentionPosition = argPosition;
+		// make mention position zero if not explicitly set
+		if ([undefined, null].includes(mentionPosition)) mentionPosition = 0;
 
 		// member mention
 		if (this.mentionMap.users.length >= mentionPosition + 1) return this.mentionMap.users[mentionPosition] as U;
@@ -237,8 +237,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
-		// make mention position arg position if not explicitly set
-		if ([undefined, null].includes(mentionPosition)) mentionPosition = argPosition;
+		// make mention position zero if not explicitly set
+		if ([undefined, null].includes(mentionPosition)) mentionPosition = 0;
 
 		// member mention
 		if (this.mentionMap.members.length >= mentionPosition + 1) return this.mentionMap.members[mentionPosition] as M;
@@ -264,8 +264,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
-		// make mention position arg position if not explicitly set
-		if ([undefined, null].includes(mentionPosition)) mentionPosition = argPosition;
+		// make mention position zero if not explicitly set
+		if ([undefined, null].includes(mentionPosition)) mentionPosition = 0;
 
 		// channel mention
 		if (this.mentionMap.channels.length >= mentionPosition + 1) return this.mentionMap.channels.slice(mentionPosition)[mentionPosition] as C;
@@ -290,8 +290,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
-		// make mention position arg position if not explicitly set
-		if ([undefined, null].includes(mentionPosition)) mentionPosition = argPosition;
+		// make mention position zero if not explicitly set
+		if ([undefined, null].includes(mentionPosition)) mentionPosition = 0;
 
 		// role mention
 		if (this.mentionMap.roles.length >= mentionPosition + 1) return this.mentionMap.roles.slice(mentionPosition)[mentionPosition] as R;
