@@ -3,6 +3,7 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import chunk from "chunk";
 import { Colors } from "../../util/Constants";
 import { Strings } from "../../util/Functions";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -55,6 +56,8 @@ export default new Command({
 				else if (cats.includes(msg.args[1].toLowerCase())) (type = "cat", d.category = msg.args[1].toLowerCase());
 				else return msg.reply(`{lang:commands.utility.disable.invalid|${msg.args[1].toLowerCase()}}`);
 			} else d.all = true;
+
+			if (!!d.command && config.cantBeDisabled.includes(d.command.toLowerCase())) return msg.reply(`{lang:commands.utility.disable.commandNotAllowed|${d.command}}`);
 
 			if (msg.args.length === 2) {
 				if (d.all) return msg.reply("{lang:commands.utility.disable.noAllServer}");

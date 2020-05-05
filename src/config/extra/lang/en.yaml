@@ -1000,6 +1000,7 @@ commands:
       noAllServer: "you cannot disable all commands server wide."
       duplicate: "there is already a disable entry with that specification!"
       noAddFound: 'nothing was found for the provided argument "{0}"'
+      commandNotAllowed: 'the command "{0}" cannot be disabled.'
       success:
         cmdServer: 'disabled the usage of the command "{0}" server wide.'
         catServer: 'disabled the usage of the category "{0}" server wide.'
