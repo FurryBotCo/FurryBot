@@ -13,7 +13,7 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 		const g = await db.getGuild(channel.guild.id);
 		if (!g) return;
 		const e = g.logEvents.channelUpdate;
-		if (!e.enabled || !e.channel) return;
+		if (!e || !e.enabled || !e.channel) return;
 		const ch = channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 		const props: { [k: string]: { type: string; name: string; } } = {

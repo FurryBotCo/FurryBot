@@ -12,7 +12,7 @@ export default new ClientEvent("channelDelete", (async function (this: FurryBot,
 		const g = await db.getGuild(channel.guild.id);
 		if (!g) return;
 		const e = g.logEvents.channelDelete;
-		if (!e.enabled || !e.channel) return;
+		if (!e || !e.enabled || !e.channel) return;
 		const ch = channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 		const embed: Eris.EmbedOptions = {

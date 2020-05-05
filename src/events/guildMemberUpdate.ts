@@ -9,7 +9,7 @@ export default new ClientEvent("guildMemberUpdate", (async function (this: Furry
 	this.track("events", "guildMemberUpdate");
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.memberJoin;
-	if (!e.enabled || !e.channel) return;
+	if (!e || !e.enabled || !e.channel) return;
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const props: { [k: string]: { type: string; name: string; } } = {

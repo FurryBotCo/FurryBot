@@ -8,7 +8,7 @@ export default new ClientEvent("voiceChannelSwitch", (async function (this: Furr
 	this.track("events", "voiceChannelSwitch");
 	const g = await db.getGuild(member.guild.id);
 	const e = g.logEvents.voiceSwitch;
-	if (!e.enabled || !e.channel) return;
+	if (!e || !e.enabled || !e.channel) return;
 	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {

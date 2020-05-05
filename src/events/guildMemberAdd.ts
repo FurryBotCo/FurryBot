@@ -10,7 +10,7 @@ export default new ClientEvent("guildMemberAdd", (async function (this: FurryBot
 
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.memberJoin;
-	if (!(!e.enabled || !e.channel)) {
+	if (!(!e || !e.enabled || !e.channel)) {
 		const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 		const embed: Eris.EmbedOptions = {

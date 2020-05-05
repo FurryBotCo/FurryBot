@@ -9,7 +9,7 @@ export default new ClientEvent("guildRoleCreate", (async function (this: FurryBo
 	this.track("events", "guildRoleCreate");
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.roleCreate;
-	if (!e.enabled || !e.channel) return;
+	if (!e || !e.enabled || !e.channel) return;
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {

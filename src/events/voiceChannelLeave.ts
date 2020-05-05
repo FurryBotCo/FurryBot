@@ -8,7 +8,7 @@ export default new ClientEvent("voiceChannelLeave", (async function (this: Furry
 	this.track("events", "voiceChannelLeave");
 	const g = await db.getGuild(member.guild.id);
 	const e = g.logEvents.voiceLeave;
-	if (!e.enabled || !e.channel) return;
+	if (!e || !e.enabled || !e.channel) return;
 	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {

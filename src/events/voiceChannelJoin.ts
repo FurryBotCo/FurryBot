@@ -8,7 +8,7 @@ export default new ClientEvent("voiceChannelJoin", (async function (this: FurryB
 	this.track("events", "voiceChannelJoin");
 	const g = await db.getGuild(member.guild.id);
 	const e = g.logEvents.voiceJoin;
-	if (!e.enabled || !e.channel) return;
+	if (!e || !e.enabled || !e.channel) return;
 	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {

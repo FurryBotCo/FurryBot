@@ -9,7 +9,7 @@ export default new ClientEvent("guildMemberRemove", (async function (this: Furry
 	this.track("events", "guildMemberRemove");
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.memberJoin;
-	if (!(!e.enabled || !e.channel)) {
+	if (!(!e || !e.enabled || !e.channel)) {
 		const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 		const embed: Eris.EmbedOptions = {

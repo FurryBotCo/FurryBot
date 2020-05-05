@@ -13,7 +13,7 @@ export default new ClientEvent("presenceUpdate", (async function (this: FurryBot
 	if (other instanceof Eris.Member) {
 		const g = await db.getGuild(other.guild.id);
 		const e = g.logEvents.presenceUpdate;
-		if (!e.enabled || !e.channel) return;
+		if (!e || !e.enabled || !e.channel) return;
 		const ch = await this.getRESTChannel(e.channel) as Eris.GuildTextableChannel;
 		if (!ch || !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(this.user.id).has(p))) return g.edit({
 			logEvents: {

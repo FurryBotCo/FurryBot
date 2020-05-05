@@ -9,7 +9,7 @@ export default new ClientEvent("guildRoleDelete", (async function (this: FurryBo
 	this.track("events", "guildRoleDelete");
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.roleDelete;
-	if (!e.enabled || !e.channel) return;
+	if (!e || !e.enabled || !e.channel) return;
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {

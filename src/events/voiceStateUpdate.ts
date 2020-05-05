@@ -9,7 +9,7 @@ export default new ClientEvent("voiceStateUpdate", (async function (this: FurryB
 	this.track("events", "voiceStateUpdate");
 	const g = await db.getGuild(member.guild.id);
 	const e = g.logEvents.voiceStateUpdate;
-	if (!e.enabled || !e.channel) return;
+	if (!e || !e.enabled || !e.channel) return;
 	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 	const vc = member.guild.channels.get<Eris.VoiceChannel>(member.voiceState.channelID);
 

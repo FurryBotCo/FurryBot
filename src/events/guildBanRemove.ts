@@ -9,7 +9,7 @@ export default new ClientEvent("guildBanRemove", (async function (this: FurryBot
 	this.track("events", "guildBanRemove");
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.memberUnban;
-	if (!e.enabled || !e.channel) return;
+	if (!e || !e.enabled || !e.channel) return;
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	const embed: Eris.EmbedOptions = {
