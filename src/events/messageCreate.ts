@@ -298,6 +298,14 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()) || msg.content.toLowerCase() === msg.prefix.toLowerCase() || !msg.cmd || !msg.cmd.cmd) return;
 		const cmd = msg.cmd.cmd;
 
+		if (gConfig.disable.length > 0 && !config.developers.includes(msg.author.id)) {
+			const a = gConfig.disable.filter((d: any) => d.type === "server" && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
+			const b = gConfig.disable.filter((d: any) => d.type === "user" && d.id === msg.author.id && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
+			const c = gConfig.disable.filter((d: any) => d.type === "role" && msg.member.roles.includes(d.id) && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
+			const d = gConfig.disable.filter((d: any) => d.type === "channel" && d.id === msg.channel.id && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
+			if (a.length > 0 || b.length > 0 || c.length > 0 || d.length > 0) return;
+		}
+
 		if (!config.developers.includes(msg.author.id)) {
 			this.spamCounter.command.push({
 				time: Date.now(),

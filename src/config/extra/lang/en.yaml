@@ -996,6 +996,43 @@ commands:
     disable:
       description: "Disable commands in channels or serverwide."
       usage: "(run without any arguments for help)"
+      invalid: "{0} is not a valid command or category."
+      noAllServer: "you cannot disable all commands server wide."
+      duplicate: "there is already a disable entry with that specification!"
+      noAddFound: 'nothing was found for the provided argument "{0}"'
+      success:
+        cmdServer: 'disabled the usage of the command "{0}" server wide.'
+        catServer: 'disabled the usage of the category "{0}" server wide.'
+        cmdChannel: 'disabled the usage of the command "{0}" in the channel <#{1}>.'
+        catChannel: 'disabled the usage of the category "{0}" in the channel <#{1}>.'
+        allChannel: "disabled the usage of all commands in the channel <#{0}>."
+        cmdRole: 'disabled the usage of the command "{0}" for the role <@&{1}>.'
+        catRole: 'disabled the usage of the category "{0}" for the role <@&{1}>.'
+        allRole: "disabled the usage of all commands for the role <@&{0}>."
+        cmdUser: 'disabled the usage of the command "{0}" for the user <@!{1}>.'
+        catUser: 'disabled the usage of the category "{0}" for the user <@!{1}>.'
+        allUser: "disabled the usage of all commands for the user <@!{0}>."
+      remove:
+        cleared: "remove all disable entries."
+        invalidId: 'I couldn''t find an entry with the id "{0}".'
+        NaNId: "ids must be a valid number."
+        missingId: "please provide a valid id (found in the `list` subcommand), or **clear** to remove all entries."
+        success: "successfully removed the disable entry **{0}**."
+      list:
+        empty: "there are no entries to list."
+        invalidPage: "invalid page number. the page number must be a valid whole number between **{0}** and **{1}**."
+        footer: "Page {0}/{1} | {2} Total Entries | Remove With {3}disable remove <id>"
+        cmdChannel: "Command **{0}** disabled in the channel <#{1}>."
+        cmdRole: "Command **{0}** disabled for the role <@&{1}>."
+        cmdUser: "Command **{0}** disabled for the user <@!{1}>."
+        cmdServer: "Command **{0}** disabled server wide."
+        catChannel: "Category **{0}** disabled in the channel <#{1}>."
+        catRole: "Category **{0}** disabled for the role <@&{1}>."
+        catUser: "Category **{0}** disabled for the user <@!{1}>."
+        catServer: "Category **{0}** disabled server wide."
+        allChannel: "All commands disabled in the channel <#{0}>."
+        allRole: "All commands disabled for the role <@&{0}>."
+        allUser: "All commands disabled for the user <@!{0}>."
       help:
         title: 'Help for the "disable" command.'
         add: "Add"
