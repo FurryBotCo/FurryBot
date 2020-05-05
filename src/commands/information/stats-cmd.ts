@@ -27,14 +27,14 @@ export default new Command({
 			.setThumbnail(config.images.botIcon)
 			.setColor(Colors.gold)
 			.setTimestamp(new Date().toISOString())
-			.addField("{lang:commands.information.stats.commandsTotal}", !stats.commandsTotal ? "{lang:other.noneYet}" : stats.commandsTotal.toString(), true)
-			.addField("{lang:commands.information.stats.messages}", !stats.messages ? "{lang:other.noneYet}" : stats.messages.toString(), true)
+			.addField("{lang:commands.information.stats.commandsTotal}", `${stats.commandsTotal || "{lang:other.noneYet}"} / ${stats.commandsAllTime || "{lang:other.noneYet}"}`, true)
+			.addField("{lang:commands.information.stats.messages}", `${stats.messages || "{lang:other.noneYet}"} / ${stats.messageCreate || "{lang:other.noneYet}"}`, true)
+			.addField("{lang:commands.information.stats.directMessage}", `${stats.directMessage || "{lang:other.noneYet}"}`, true)
 			.addField("{lang:commands.information.stats.guildCount}", this.guilds.size.toString(), true)
 			.addField("{lang:commands.information.stats.largeGuildCount}", this.guilds.filter(g => g.large).length.toString(), true)
 			.addField("{lang:commands.information.stats.userCount}", this.users.size.toString(), true)
 			.addField("{lang:commands.information.stats.channelCount}", Object.keys(this.channelGuildMap).length.toString(), true)
 			.addField("{lang:commands.information.stats.shardCount}", this.shards.size.toString(), true)
-			.addField("{lang:commands.information.stats.currentUptime}", Time.ms(process.uptime() * 1000), true)
-			.addField("{lang:commands.information.stats.recordUptime}", Time.ms(stats.uptime || 0), true)
+			.addField("{lang:commands.information.stats.uptime}", `${Time.ms(process.uptime() * 1000)} / ${Time.ms(stats.uptime || 0)}`, true)
 	});
 }));

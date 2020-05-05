@@ -315,14 +315,18 @@ export default class Internal {
 	static async getStats() {
 		const statNames = [
 			`${config.beta ? "beta" : "prod"}:stats:commandsTotal`,
+			`${config.beta ? "beta" : "prod"}:stats:commandsAllTime`,
 			`${config.beta ? "beta" : "prod"}:stats:messages`,
+			`${config.beta ? "beta" : "prod"}:events:messageCreate`,
 			`${config.beta ? "beta" : "prod"}:stats:directMessage`,
 			`${config.beta ? "beta" : "prod"}:stats:uptime`
 		];
 
 		return Promise.all<{
 			commandsTotal?: number;
+			commandsAllTime?: number;
 			messages?: number;
+			messageCreate?: number;
 			directMessage?: number;
 			uptime?: number;
 		}>(statNames.map(async (s) => ({ [s.split(":").slice(-1)[0]]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));

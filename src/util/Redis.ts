@@ -17,6 +17,7 @@ rClient
 	// set some stats to zero on first ready
 	.once("ready", () => {
 		rClient.SET(`${config.beta ? "beta" : "prod"}:stats:messages`, "0");
+		rClient.SET(`${config.beta ? "beta" : "prod"}:stats:commandsTotal`, "0");
 		rClient.KEYS(`${config.beta ? "beta" : "prod"}:stats:commands:*`, async (err, v) => {
 			if (err) throw err;
 			const keys = [];
