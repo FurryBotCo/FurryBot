@@ -20,6 +20,9 @@ export default class Database {
 	constructor(host: string, port: number, database: string, opt: MongoClientOptions, debug?: boolean) {
 		this.conn = DB(host, port, database, opt);
 		this.debug = !!debug;
+		this.client = {
+			log: () => null
+		} as any;
 	}
 
 	setClient(client: FurryBot) { this.client = client; }
