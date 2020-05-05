@@ -5,6 +5,7 @@ import config from "../config";
 import { Colors } from "../util/Constants";
 
 export default new ClientEvent("shardResume", (async function (this: FurryBot, id: number) {
+	this.track("events", "shardResume");
 	Logger.log("Shard Ready", `Shard #${id} resumed.`);
 	return this.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
 		embeds: [

@@ -1,7 +1,7 @@
 import express from "express";
 import { mdb } from "../../modules/Database";
 import config from "../../config";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 import { Internal } from "../../util/Functions";
 
 export default (async (client: FurryBot) => {
@@ -11,7 +11,8 @@ export default (async (client: FurryBot) => {
 	app.get("/", async (req, res) => {
 		const d = new Date(),
 			date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
-			dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null);
+			dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null),
+			stats = await Internal.getStats();
 
 		return res.status(200).json({
 			success: true,
@@ -35,9 +36,10 @@ export default (async (client: FurryBot) => {
 			libraryVersion: require("eris").VERSION,
 			nodeVersion: process.version,
 			dailyJoins,
-			commandCount: client.cmd.commands.length/*,
-			messageCount: client.stats.messageCount,
-			dmMessageCount: client.stats.dmMessageCount*/
+			commandCount: client.cmd.commands.length,
+			commandsRan: stats.commandsTotal,
+			messageCount: stats.messages,
+			dmMessageCount: stats.directMessage
 		});
 	});
 

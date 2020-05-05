@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new SubCommand({
 	triggers: [
@@ -11,9 +10,9 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Connect a shard.",
 	usage: "<id>",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 
 	const s = Number(msg.args[0]);

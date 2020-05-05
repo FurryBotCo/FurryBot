@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
 	triggers: [
@@ -11,9 +10,9 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Make me say something.",
 	usage: "<text>",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	await msg.delete().catch(err => null);
 	return msg.channel.createMessage(msg.unparsedArgs.join(" "));
 }));

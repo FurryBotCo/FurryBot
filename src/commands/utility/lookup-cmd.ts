@@ -41,7 +41,7 @@ export default new Command({
 				.setTimestamp(new Date().toISOString());
 
 			const code = w.body.instant_invite.match(new RegExp("^((https?\:\/\/)?(discord\.gg|discordapp\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"))[4];
-			const inv = (await this.getInvite(code, true).catch(err => null)) as Eris.Invite & { channel: { type: number; }; guild: { vanityUrlCode?: string; }; };
+			const inv = (await this.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
 			if (!inv) {
 				embed.addField(
 					"{lang:commands.utility.lookup.info}",

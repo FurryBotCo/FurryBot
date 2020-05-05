@@ -2,6 +2,8 @@ import config from "../../config";
 import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
 import _ from "lodash";
+import rClient from "../../util/Redis";
+import { UpdateQuery, FindOneAndUpdateOption } from "mongodb";
 
 interface Warning {
 	blame: string;
@@ -57,13 +59,24 @@ export default class UserConfig {
 		goKeys(this, data, config.defaults.config.user);
 	}
 
+	async deleteCache() {
+		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:uConfig:${this.id}`);
+	}
+
 	async reload() {
+		await this.deleteCache();
 		const r = await mdb.collection("users").findOne({ id: this.id });
 		this.load.call(this, r);
 		return this;
 	}
 
+	async mongoEdit<T = any>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
+		await this.deleteCache();
+		return mdb.collection<T>("guilds").findOneAndUpdate({ id: this.id } as any, d, opt);
+	}
+
 	async edit(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
+		await this.deleteCache();
 		const d = this;
 		/**
 		 *
@@ -102,6 +115,7 @@ export default class UserConfig {
 	}
 
 	async create() {
+		await this.deleteCache();
 		const e = await mdb.collection("users").findOne({
 			id: this.id
 		});
@@ -114,6 +128,7 @@ export default class UserConfig {
 	}
 
 	async delete() {
+		await this.deleteCache();
 		await mdb.collection("users").findOneAndDelete({ id: this.id });
 	}
 

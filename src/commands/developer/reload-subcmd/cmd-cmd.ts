@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../config";
 import * as Eris from "eris";
 import { Colors } from "../../../util/Constants";
@@ -21,15 +20,15 @@ export default new SubCommand({
 	usage: "<cat/all> [rebuild:yes/no]",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const start = performance.now();
-	let cmd: Command, cat: Category, cmds: number, newCat: Category[];
+	let c: Command, cat: Category, cmds: number, newCat: Category[];
 	if (!msg.args[0] || msg.args[0].toLowerCase() !== "all") {
 		const cmds = this.cmd.commandTriggers.reduce((a, b) => a.concat(b));
 		if (msg.args.length < 1 || !cmds.includes(msg.args[0])) return msg.reply("please provide a valid command to reload.");
 		// this weird bit is to keep this in one line
-		[cmd, cat] = Object.values(this.cmd.getCommand(msg.args[0])) as any;
-		if (!fs.existsSync(cmd.file)) return msg.reply(`cannot find the file "${cmd.file}" for the command **${cmd.triggers[0]}** on disk, not reloading. (if removing command, reload full category)`);
+		[c, cat] = Object.values(this.cmd.getCommand(msg.args[0])) as any;
+		if (!fs.existsSync(c.file)) return msg.reply(`cannot find the file "${c.file}" for the command **${c.triggers[0]}** on disk, not reloading. (if removing command, reload full category)`);
 	}
 	let rebuild: boolean, m: Eris.Message, a: string;
 	if (msg.args.length === 1) {
@@ -86,15 +85,15 @@ export default new SubCommand({
 			newCat = oldCat.map(c => this.cmd.addCategory(require(c.file).default));
 			cmds = newCat.reduce((a, b) => a + b.commands.length, 0);
 		} else {
-			delete require.cache[cmd.file];
+			delete require.cache[c.file];
 			function loopSub(o: SubCommand) {
 				if (o.subCommands.length > 0) o.subCommands.map(s => loopSub(s));
 
 				delete require.cache[o.file];
 			}
-			if (cmd.subCommands.length > 0) cmd.subCommands.map(s => loopSub(s));
-			this.cmd.getCategory(cat.name).removeCommand(cmd);
-			const n = require(cmd.file).default;
+			if (c.subCommands.length > 0) c.subCommands.map(s => loopSub(s));
+			this.cmd.getCategory(cat.name).removeCommand(c);
+			const n = require(c.file).default;
 			this.cmd.getCategory(cat.name).addCommand(n);
 		}
 	} catch (e) {
@@ -102,7 +101,7 @@ export default new SubCommand({
 			embed: {
 				title: "Error",
 				color: Colors.red,
-				description: `Error while reloading **${msg.args[0].toLowerCase() === "all" ? "all" : cmd.triggers[0]}**:\n${e.stack}`,
+				description: `Error while reloading **${msg.args[0].toLowerCase() === "all" ? "all" : c.triggers[0]}**:\n${e.stack}`,
 				timestamp: new Date().toISOString(),
 				author: {
 					name: msg.author.tag,
@@ -118,5 +117,5 @@ export default new SubCommand({
 	const end = performance.now();
 
 	if (msg.args[0] === "all") return m.edit(`${m.content}\n\nReloaded **${cmds}** commands from **${newCat.length}** categories in ${Number((end - start).toFixed(3)).toLocaleString()}ms`);
-	else return m.edit(`${m.content}\n\nReloaded the command **${cmd.triggers[0]}** from the category **${cat.name}** in ${Number((end - start).toFixed(3)).toLocaleString()}ms`);
+	else return m.edit(`${m.content}\n\nReloaded the command **${c.triggers[0]}** from the category **${cat.name}** in ${Number((end - start).toFixed(3)).toLocaleString()}ms`);
 }));

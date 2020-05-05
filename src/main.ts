@@ -1,5 +1,4 @@
 import Eris from "eris";
-import { Base, Cluster } from "clustersv3";
 import Holder from "./util/Holder";
 import MessageCollector from "./util/MessageCollector";
 import ErrorHandler from "./util/ErrorHandler";
@@ -16,7 +15,8 @@ import E9API from "e9api";
 import ModLogUtil from "./util/ModLogUtil";
 import * as http from "http";
 import * as https from "https";
-import redis from "async-redis";
+import rClient from "./util/Redis";
+import DataDog from "./util/DataDog";
 
 export default class FurryBot extends Eris.Client {
 	holder: Holder;
@@ -44,7 +44,6 @@ export default class FurryBot extends Eris.Client {
 	e6: E6API;
 	e9: E9API;
 	srv: http.Server | https.Server;
-	rClient: redis.RedisClient;
 	constructor(token, clientOptions) {
 		super(token, clientOptions);
 
@@ -85,12 +84,14 @@ export default class FurryBot extends Eris.Client {
 		this.e9 = new E9API({
 			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
 		});
-		this.rClient = redis.createClient(config.keys.redis.port, config.keys.redis.host, {
-			password: config.keys.redis.password
-		});
 	}
 
 	log(level: "log" | "info" | "warn" | "error" | "data" | "debug" | "internal" | "internal.debug", message: any, name: string) {
 		Logger[level](`${name || "General"}`, message);
+	}
+
+	async track(...parts: (string | number)[]) {
+		await rClient.INCR(`${config.beta ? "beta" : "prod"}:${parts.join(":")}`);
+		await DataDog.increment(`bot.${config.beta ? "beta" : "prod"}.${parts.join(".")}`);
 	}
 }

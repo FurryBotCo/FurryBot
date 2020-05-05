@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
 	triggers: [
@@ -11,7 +10,7 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Manage the bots shards.",
 	usage: "<disconnect/connect/status/restart> <id>",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	subCommandDir: `${__dirname}/dshard-subcmd`,
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {

@@ -5,6 +5,7 @@ import config from "../config";
 import { Colors } from "../util/Constants";
 
 export default new ClientEvent("shardDisconnect", (async function (this: FurryBot, err: Error, id: number) {
+	this.track("events", "shardDisconnect");
 	Logger.error("Shard Disconnect", `Shard #${id} disconnected.`);
 	Logger.error("Shard Disconnect", err);
 	return this.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {

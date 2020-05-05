@@ -1,7 +1,5 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
 import _eval from "../../util/eval";
 import phin from "phin";
 import util from "util";
@@ -10,9 +8,10 @@ import * as fs from "fs";
 import { db, mdb, mongo } from "../../modules/Database";
 import * as os from "os";
 import { performance } from "perf_hooks";
-import Permissions from "../../util/Permissions";
 import * as F from "../../util/Functions";
 import Language from "../../util/Language";
+import rClient from "../../util/Redis";
+import { Permissions } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
@@ -56,7 +55,8 @@ export default new Command({
 			uConfig,
 			gConfig,
 			cmd,
-			Language
+			Language,
+			rClient
 		});
 	} catch (e) {
 		res = e;

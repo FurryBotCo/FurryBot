@@ -2,16 +2,14 @@ import config from "../../config";
 import { mdb, db } from "../../modules/Database";
 import { Blacklist } from "../@types/Misc";
 import * as os from "os";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 import loopPatrons from "../patreon/loopPatrons";
 import refreshPatreonToken from "../patreon/refreshPatreonToken";
-import GuildConfig from "../../modules/config/GuildConfig";
 import Eris from "eris";
-import { Request, Utility, Time, Strings } from ".";
-import Logger from "../LoggerV8";
-import { Colors } from "../Constants";
+import { Time } from ".";
 import ExtendedMessage from "../../modules/ExtendedMessage";
 import phin from "phin";
+import rClient from "../Redis";
 
 export default class Internal {
 	private constructor() {
@@ -308,5 +306,29 @@ export default class Internal {
 			parse: "json"
 		});
 		return p.statusCode !== 200 ? null : p.body;
+	}
+
+	static async fetchRedisKey(key: string) {
+		return new Promise<string>((a, b) => rClient.GET(key, (err, reply) => !err ? a(reply) : b(err)));
+	}
+
+	static async getStats() {
+		const statNames = [
+			`${config.beta ? "beta" : "prod"}:stats:commandsTotal`,
+			`${config.beta ? "beta" : "prod"}:stats:commandsAllTime`,
+			`${config.beta ? "beta" : "prod"}:stats:messages`,
+			`${config.beta ? "beta" : "prod"}:events:messageCreate`,
+			`${config.beta ? "beta" : "prod"}:stats:directMessage`,
+			`${config.beta ? "beta" : "prod"}:stats:uptime`
+		];
+
+		return Promise.all<{
+			commandsTotal?: number;
+			commandsAllTime?: number;
+			messages?: number;
+			messageCreate?: number;
+			directMessage?: number;
+			uptime?: number;
+		}>(statNames.map(async (s) => ({ [s.split(":").slice(-1)[0]]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
 	}
 }

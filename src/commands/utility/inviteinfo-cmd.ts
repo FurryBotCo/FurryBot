@@ -1,6 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import { Colors, ChannelNames } from "../../util/Constants";
 import EmbedBuilder from "../../util/EmbedBuilder";
@@ -25,7 +23,7 @@ export default new Command({
 
 	if (!code) return msg.reply("{lang:commands.utility.inviteinfo.noInv}");
 
-	const inv = (await this.getInvite(code, true).catch(err => null)) as Eris.Invite & { channel: { type: number; }; guild: { vanityUrlCode?: string; }; };
+	const inv = (await this.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
 	if (!inv) return msg.reply("{lang:commands.utility.inviteinfo.invalid}");
 	const { guild, inviter, channel } = inv;
 

@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new SubCommand({
 	triggers: [
@@ -11,7 +10,7 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Check if a user/server is blacklisted.",
 	usage: "<user/server> <id>",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	subCommandDir: `${__dirname}/check-subcmd`,
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {

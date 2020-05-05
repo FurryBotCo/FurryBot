@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new SubCommand({
 	triggers: [
@@ -14,7 +13,7 @@ export default new SubCommand({
 	usage: "<username>",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.unparsedArgs.length === 0) return new Error("ERR_INVALID_USAGE");
 	const username = msg.unparsedArgs.join(" ");
 	if (username.length < 2 || username.length > 32) return msg.channel.createMessage("Username must be between **2** and **32** characters.");

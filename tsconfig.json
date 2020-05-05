@@ -10,17 +10,7 @@
         "allowSyntheticDefaultImports": true,
         "moduleResolution": "node",
         "module": "commonjs",
-        "paths": {
-            "@FurryBot": [
-                "main.ts"
-            ],
-            "@ExtendedMessage": [
-                "modules/ExtendedMessage.ts"
-            ],
-            "@Command": [
-                "util/CommandHandler/lib/Command.ts"
-            ]
-        },
+        "paths": {},
         "typeRoots": [
             "./node_modules/@types",
             "./src/util/@types"

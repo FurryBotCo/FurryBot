@@ -1,6 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import * as Eris from "eris";
 import { Strings } from "../../util/Functions";
 
@@ -17,7 +15,7 @@ export default new Command({
 	donatorCooldown: 1e3,
 	features: [],
 	file: __filename
-}, (async function (this: FurryBot, msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.unparsedArgs.length < 1) throw new Error("ERR_INVALID_USAGE");
 
 	const embed: Eris.EmbedOptions = {

@@ -11,7 +11,7 @@ export default new Command({
 	donatorCooldown: 1e3,
 	features: [],
 	file: __filename
-}, (async function (this, msg, uConfig, gConfig) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const val = Math.floor(Math.random() * 6);
 	const bullets = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 3;
 

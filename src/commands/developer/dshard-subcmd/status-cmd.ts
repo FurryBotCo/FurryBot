@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 import { Colors } from "../../../util/Constants";
 import { Time } from "../../../util/Functions";
 
@@ -13,9 +12,9 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Get a shard's status.",
 	usage: "<id>",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	// @TODO clusters
 	const s = Number(msg.args[0]);

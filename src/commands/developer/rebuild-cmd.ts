@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../config";
 import { execSync } from "child_process";
 
@@ -15,7 +14,7 @@ export default new Command({
 	usage: "",
 	features: ["devOnly", "betaOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const start = performance.now();
 	const rb = execSync("npm run build", {
 		cwd: config.dir.base

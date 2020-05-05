@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
 	triggers: [
@@ -13,6 +12,6 @@ export default new Command({
 	usage: "",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	return msg.reply("stopping..").then(() => process.exit());
 }));

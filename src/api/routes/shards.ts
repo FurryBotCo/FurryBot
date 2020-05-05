@@ -1,5 +1,5 @@
 import express from "express";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 
 export default (async (client: FurryBot) => {
 

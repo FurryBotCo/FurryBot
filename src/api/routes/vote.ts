@@ -2,7 +2,7 @@ import express from "express";
 import config from "../../config";
 import { mdb } from "../../modules/Database";
 import { Logger } from "../../util/LoggerV8";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 
 export default (async (client: FurryBot) => {
 	const app: express.Router = express.Router();

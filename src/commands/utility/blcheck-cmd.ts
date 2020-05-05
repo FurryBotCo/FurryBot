@@ -1,6 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 import { mdb } from "../../modules/Database";
 import { Blacklist } from "../../util/@types/Misc";
 import { Time } from "../../util/Functions";

@@ -68,15 +68,15 @@ export default class Time {
 		if (time > 0) r.s += time / 1000;
 
 		const str = [];
-		if (r.s > 0) str.push(`${r.s} second${r.s === 1 ? "" : "s"}`);
-		if (r.m > 0) str.push(`${r.m} minute${r.m === 1 ? "" : "s"}`);
-		if (r.h > 0) str.push(`${r.h} hour${r.h === 1 ? "" : "s"}`);
-		if (r.d > 0) str.push(`${r.d} day${r.d === 1 ? "" : "s"}`);
-		if (r.w > 0) str.push(`${r.w} week${r.w === 1 ? "" : "s"}`);
-		if (r.mn > 0) str.push(`${r.mn} month${r.mn === 1 ? "" : "s"}`);
-		if (r.y > 0) str.push(`${r.y} year${r.y === 1 ? "" : "s"}`);
+		if (r.s > 0) str.push(`${Math.floor(r.s)} second${r.s === 1 ? "" : "s"}`);
+		if (r.m > 0) str.push(`${Math.floor(r.m)} minute${r.m === 1 ? "" : "s"}`);
+		if (r.h > 0) str.push(`${Math.floor(r.h)} hour${r.h === 1 ? "" : "s"}`);
+		if (r.d > 0) str.push(`${Math.floor(r.d)} day${r.d === 1 ? "" : "s"}`);
+		if (r.w > 0) str.push(`${Math.floor(r.w)} week${r.w === 1 ? "" : "s"}`);
+		if (r.mn > 0) str.push(`${Math.floor(r.mn)} month${r.mn === 1 ? "" : "s"}`);
+		if (r.y > 0) str.push(`${Math.floor(r.y)} year${r.y === 1 ? "" : "s"}`);
 
-		return words ? str.reverse().join(", ") : Object.keys(r).filter(k => r[k] > 0).map(k => `${r[k]}${k}`).reverse().reduce((a, b) => a + b, "");
+		return words ? str.reverse().join(", ") : Object.keys(r).filter(k => r[k] > 0).map(k => `${Math.floor(r[k])}${k}`).reverse().reduce((a, b) => a + b, "");
 	}
 
 	/**

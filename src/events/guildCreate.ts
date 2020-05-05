@@ -7,6 +7,7 @@ import { Colors } from "../util/Constants";
 import { Internal } from "../util/Functions";
 
 export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
+	await this.track("events", "guildCreate");
 	await Internal.incrementDailyCounter(this, true);
 
 	let author = {

@@ -30,7 +30,8 @@ export default class Category {
 	addCommand(cmd: Command) {
 		if (this.commands.includes(cmd)) throw new TypeError("Command already present in category.");
 		this.commands.push(cmd);
-		Logger.debug("Command Handler", `Added the command "${cmd.triggers[0]}" to the category "${this.name}".`);
+		// removed due to being spammy
+		// Logger.debug("Command Handler", `Added the command "${cmd.triggers[0]}" to the category "${this.name}".`);
 		return cmd;
 	}
 

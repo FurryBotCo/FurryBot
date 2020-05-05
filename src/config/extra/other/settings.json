@@ -1,99 +1,129 @@
 [{
 		"type": "boolean",
+		"subType": null,
 		"name": "NSFW Commands",
 		"dbName": "nsfw",
 		"description": "Enables the usage of nsfw commands (in nsfw channels) in this server."
 	},
 	{
 		"type": "string",
+		"subType": null,
 		"name": "Default Yiff Type",
 		"dbName": "defaultYiff",
 		"description": "Changes the default type returned with the `yiff` command. Valid: **gay**, **straight**, **lesbian**, **dickgirl**"
 	}, {
 		"type": "boolean",
+		"subType": null,
 		"name": "Snipe Command",
 		"dbName": "snipeCommand",
 		"description": "Enables the `snipe` and `editsnipe` commands."
 	}, {
 		"type": "boolean",
+		"subType": null,
 		"name": "Announce Level Increases",
 		"dbName": "announceLevelUp",
 		"description": "Sends a message to the channel when someone levels up (f!rank)"
 	}, {
+		"type": "array",
+		"subType": "channel",
+		"name": "Leveling Ignore Channels",
+		"dbName": "levelingIgnoreChannels",
+		"description": "Channels that ignore leveling."
+	}, {
+		"type": "array",
+		"subType": "role",
+		"name": "Leveling Ignore Roles",
+		"dbName": "levelingIgnoreRoles",
+		"description": "Roles that ignore leveling."
+	}, {
+		"type": "array",
+		"subType": "user",
+		"name": "Leveling Ignore Users",
+		"dbName": "levelingIgnoreUsers",
+		"description": "Users that ignore leveling."
+	}, {
 		"type": "boolean",
+		"subType": null,
 		"name": "F Response",
 		"dbName": "fResponse",
 		"description": "Replies with \"X has paid respects\" every time \"f\" or \"rip\" is said."
 	}, {
 		"type": "boolean",
+		"subType": null,
 		"name": "Command Images",
 		"dbName": "commandImages",
 		"description": "Displays images on some commands in the fun category."
 	}, {
 		"type": "boolean",
+		"subType": null,
 		"name": "Delete Mod Commands",
 		"dbName": "deleteModCmds",
 		"description": "Toggles deleting the invocation of moderation commands after execution."
 	}, {
 		"type": "role",
+		"subType": null,
 		"name": "Mute Role",
 		"dbName": "muteRole",
 		"description": "Sets the role to give to people when they are muted."
 	}, {
 		"type": "channel",
+		"subType": null,
 		"name": "Modlog Channel",
 		"dbName": "modlog",
 		"description": "Sets the channel to send modlog entries to (also enables the modlog)."
 	}, {
 		"type": "custom",
+		"subType": null,
 		"name": "Language",
 		"dbName": "lang",
 		"description": "Sets the language the bot will use in this server (english only currently)."
 	}, {
 		"type": "string",
+		"subType": null,
 		"name": "Economy Emoji",
 		"dbName": "ecoEmoji",
 		"description": "Changes the emoji used in economy commands."
 	}, {
 		"type": "boolean",
+		"subType": null,
 		"name": "Welcomer",
 		"dbName": "joinEnabled",
 		"description": "Sends a message when people join this server."
 	}, {
 		"type": "channel",
+		"subType": null,
 		"name": "Welcome Message Channel",
 		"dbName": "joinChannel",
 		"description": "The channel to send join messages to."
 	}, {
 		"type": "string",
+		"subType": null,
 		"name": "Welcome Message Text",
 		"dbName": "joinMessage",
 		"description": "Changes the text used in join messages. [formatting](https://botapi.furry.bot/note/welcomer_formatting)"
 	}, {
 		"type": "boolean",
+		"subType": null,
 		"name": "Leaver",
 		"dbName": "leaveEnabled",
 		"description": "Sends a message when people leave this server."
 	}, {
 		"type": "channel",
+		"subType": null,
 		"name": "Leave Message Channel",
 		"dbName": "leaveChannel",
 		"description": "The channel to send leave messages to."
 	}, {
 		"type": "string",
+		"subType": null,
 		"name": "Leave Message Text",
 		"dbName": "leaveMessage",
 		"description": "Changes the text used in leave messages. [formatting](https://botapi.furry.bot/note/welcomer_formatting)"
 	}, {
 		"type": "number",
+		"subType": null,
 		"name": "Join/Leave Delete Time",
 		"dbName": "welcomeDeleteTime",
 		"description": "Changes the time (in seconds) in which join/leave messages will self destruct (0 to disable)."
-	},
-	{
-		"type": "boolean",
-		"name": "Announce Level Increases",
-		"dbName": "announceLevelUp",
-		"description": "Sends a message to the channel when someone levels up (f!rank)"
 	}
 ]

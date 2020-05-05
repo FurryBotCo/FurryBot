@@ -1,6 +1,6 @@
 import express from "express";
 import { mongo } from "../../modules/Database";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../main";
 
 export default (async (client: FurryBot) => {
 

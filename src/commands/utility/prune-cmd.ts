@@ -1,6 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import FurryBot from "@FurryBot";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
 	triggers: [
@@ -19,7 +17,7 @@ export default new Command({
 	features: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	let count = parseInt(msg.args[0], 10);
+	let count = Number(msg.args[0]);
 	if (msg.args.length === 0 || isNaN(count)) throw new Error("ERR_INVALID_USAGE");
 	if (count < 2 || count > 100) return msg.reply("{lang:commands.utility.prune.amount}");
 	if (count < 100) count++;

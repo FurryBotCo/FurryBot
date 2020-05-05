@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../config";
 import * as Eris from "eris";
 import { Colors } from "../../../util/Constants";
@@ -19,7 +18,7 @@ export default new SubCommand({
 	usage: "<cat> [rebuild:yes/no]",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const cats = this.cmd.categories.map(c => c.name);
 	if (msg.args.length < 1 || !cats.includes(msg.args[0])) return msg.channel.createMessage({
 		embed: {

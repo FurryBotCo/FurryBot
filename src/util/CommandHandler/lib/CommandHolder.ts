@@ -1,13 +1,17 @@
 import Command from "./Command";
-import FurryBot from "@FurryBot";
+import FurryBot from "../../../main";
 import Category from "./Category";
 import Logger from "../../LoggerV8";
+import commandRestrictions from "../../../config/extra/other/commandRestrictions";
+import config from "../../../config";
 export default class CommandHolder {
 	client: FurryBot;
 	categories: Category[];
+	restrictions: ReturnType<typeof commandRestrictions>;
 	constructor(client: FurryBot) {
 		this.client = client;
 		this.categories = [];
+		this.restrictions = commandRestrictions(config);
 	}
 
 	get commands() {
@@ -39,7 +43,7 @@ export default class CommandHolder {
 				description,
 				file
 			});
-			Logger.debug("Command Handler", `Added the category "${cat.name}"`);
+			Logger.debug("Command Handler", `Added the category "${cat.name}" with ${cat.commands.length} commands.`);
 			this.categories.push(cat);
 			return cat;
 		} else {
@@ -52,7 +56,7 @@ export default class CommandHolder {
 					throw new TypeError(`Duplicate command trigger "${t}" (cat: ${cat.name})`);
 				}
 			}
-			Logger.debug("Command Handler", `Added the category "${catOrName.name}"`);
+			Logger.debug("Command Handler", `Added the category "${catOrName.name}" with ${catOrName.commands.length} commands.`);
 			this.categories.push(catOrName);
 			// catOrName.commands.map(c => this.addCommand(c));
 			return catOrName;
@@ -64,12 +68,12 @@ export default class CommandHolder {
 			const cat = this.categories.find(c => c.name === catOrName);
 			if (!cat) return false;
 			this.categories.splice(this.categories.indexOf(cat), 1);
-			Logger.debug("Command Handler", `Removed the category "${cat.name}"`);
+			Logger.debug("Command Handler", `Removed the category "${cat.name}" with ${cat.commands.length} commands.`);
 			return true;
 		} else {
 			if (!this.categories.includes(catOrName)) return false;
 			this.categories.splice(this.categories.indexOf(catOrName), 1);
-			Logger.debug("Command Handler", `Removed the category "${catOrName.name}"`);
+			Logger.debug("Command Handler", `Removed the category "${catOrName.name}" with ${catOrName.commands.length} commands.`);
 			return true;
 		}
 	}

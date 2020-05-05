@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 import phin from "phin";
 import { Colors } from "../../util/Constants";
 
@@ -13,9 +12,9 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Check my server/shard health.",
 	usage: "",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const pingServers = [
 		/*{
 			host: "ap.ping-test.furry.bot",

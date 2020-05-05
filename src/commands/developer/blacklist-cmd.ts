@@ -1,5 +1,4 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
 
 export default new Command({
 	triggers: [
@@ -12,7 +11,7 @@ export default new Command({
 	donatorCooldown: 0,
 	description: "Manage the bots blacklist.",
 	usage: "<add/check/list/remove> [user(s)/server(s)] [id] [reason]",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	subCommandDir: `${__dirname}/blacklist-subcmd`,
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {

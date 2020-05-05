@@ -1,5 +1,4 @@
 import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 import config from "../../../config";
 import * as Eris from "eris";
 import { Colors } from "../../../util/Constants";
@@ -18,7 +17,7 @@ export default new SubCommand({
 	usage: "[rebuild:yes/no]",
 	features: ["devOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const start = performance.now();
 	let rebuild: boolean, m: Eris.Message, a: string, i = 0;
 	if (msg.args.length === 0) {

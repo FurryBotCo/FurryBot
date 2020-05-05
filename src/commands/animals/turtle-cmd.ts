@@ -1,11 +1,6 @@
 import Command from "../../util/CommandHandler/lib/Command";
-import ExtendedMessage from "@ExtendedMessage";
-import config from "../../config";
-import { Logger } from "../../util/LoggerV8";
 import { Request } from "../../util/Functions";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import UserConfig from "../../modules/config/UserConfig";
-import GuildConfig from "../../modules/config/GuildConfig";
 
 export default new Command({
 	triggers: [
@@ -20,7 +15,7 @@ export default new Command({
 	donatorCooldown: 1.5e3,
 	features: [],
 	file: __filename
-}, (async function (msg, uConfig, gConfig, cmd) {
+}, (async function (msg, uConfig, gConfig) {
 	const img = await Request.chewyBotAPIRequest("turtle");
 
 	if (!img) return msg.reply("failed to fetch image from api, please try again later.");

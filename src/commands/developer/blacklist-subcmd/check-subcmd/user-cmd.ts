@@ -1,5 +1,4 @@
 import SubCommand from "../../../../util/CommandHandler/lib/SubCommand";
-import ExtendedMessage from "@ExtendedMessage";
 import { mdb } from "../../../../modules/Database";
 import { Blacklist } from "../../../../util/@types/Misc";
 import { Time } from "../../../../util/Functions";
@@ -15,9 +14,9 @@ export default new SubCommand({
 	donatorCooldown: 0,
 	description: "Check if a user is blacklisted.",
 	usage: "<id>",
-	features: ["contribOnly"],
+	features: ["helperOnly"],
 	file: __filename
-}, (async function (msg: ExtendedMessage) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	const u = await msg.getUserFromArgs();
 	if (!u) return msg.reply(`**${msg.args[0]}** isn't a valid user.`);

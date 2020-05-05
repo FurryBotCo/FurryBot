@@ -3,6 +3,7 @@ import config from "../../config";
 import Eris from "eris";
 import { Colors } from "../../util/Constants";
 import db from "../../modules/Database";
+import rClient from "../../util/Redis";
 
 export default new Command({
 	triggers: [
@@ -24,7 +25,7 @@ export default new Command({
 	if (!user) return msg.errorEmbed("INVALID_USER");
 	const c = await db.getUser(user.id);
 
-	let u: { id: string; level: number; }[] = await Promise.all(msg.channel.guild.members.filter(m => !m.user.bot).map(async (m) => new Promise((a, b) => this.rClient.GET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
+	let u: { id: string; level: number; }[] = await Promise.all(msg.channel.guild.members.filter(m => !m.user.bot).map(async (m) => new Promise((a, b) => rClient.GET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
 	const f = u.filter(a => a.level === null).length;
 	u = u.filter(a => a.level !== null).sort((a, b) => b.level - a.level);
 

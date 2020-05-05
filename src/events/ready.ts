@@ -1,18 +1,18 @@
 import ClientEvent from "../util/ClientEvent";
 import Temp from "../util/Temp";
 import { Logger } from "../util/LoggerV8";
-import FurryBot from "@FurryBot";
+import FurryBot from "../main";
 import config from "../config";
 import sv from "../api";
 import express from "express";
 import http from "http";
 import { mdb, db } from "../modules/Database";
-import cmd from "../commands";
 import { Time, TimedTasks } from "../util/Functions";
 import * as fs from "fs-extra";
 import Eris from "eris";
 
 export default new ClientEvent("ready", (async function (this: FurryBot) {
+	this.track("events", "ready");
 	if (this.firstReady) return this.log("warn", "Skipping ready event as it has already fired.", "Ready");
 	db.setClient(this);
 	this.firstReady = true;
@@ -39,9 +39,12 @@ export default new ClientEvent("ready", (async function (this: FurryBot) {
 	}, 1e3);
 
 
+	// makes commands only load at ready
+	let cmd = require("../commands");
+	if (cmd.default) cmd = cmd.default;
+	cmd.map(c => this.cmd.addCategory(c));
 	this.log("log", `Client ready with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds, with ${this.cmd.commands.length} commands.`, `Ready`);
 
-	cmd.map(c => this.cmd.addCategory(c));
 
 	if (fs.existsSync(`${config.dir.base}/restart.json`)) {
 		const t = Date.now();

@@ -3,6 +3,8 @@ import { mdb } from "../Database";
 import { DeepPartial } from "../../util/@types/Misc";
 import _ from "lodash";
 import Logger from "../../util/LoggerV8";
+import rClient from "../../util/Redis";
+import { UpdateQuery, FindOneAndUpdateOption } from "mongodb";
 export default class GuildConfig {
 	id: string;
 	selfAssignableRoles: string[];
@@ -73,12 +75,18 @@ export default class GuildConfig {
 		[k: string]: string;
 	};
 	auto: {}[];
-	disable: {
-		server: string[];
-		channels: {
-			[k: string]: string[];
-		};
-	};
+	disable: (({
+		type: "channel" | "role" | "user";
+		id: string;
+	} | {
+		type: "server";
+	}) & ({
+		command: string;
+	} | {
+		category: string;
+	} | {
+		all: true;
+	}))[];
 	deletion?: number;
 
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
@@ -109,13 +117,24 @@ export default class GuildConfig {
 		goKeys(this, data, config.defaults.config.guild);
 	}
 
+	async deleteCache() {
+		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:gConfig:${this.id}`);
+	}
+
 	async reload() {
+		await this.deleteCache();
 		const r = await mdb.collection("guilds").findOne({ id: this.id });
 		this.load.call(this, r);
 		return this;
 	}
 
+	async mongoEdit<T = any>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
+		await this.deleteCache();
+		return mdb.collection<T>("guilds").findOneAndUpdate({ id: this.id } as any, d, opt);
+	}
+
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
+		await this.deleteCache();
 		const d = this;
 
 		/**
@@ -154,6 +173,7 @@ export default class GuildConfig {
 	}
 
 	async create() {
+		await this.deleteCache();
 		const e = await mdb.collection("guilds").findOne({
 			id: this.id
 		});
@@ -166,6 +186,7 @@ export default class GuildConfig {
 	}
 
 	async delete() {
+		await this.deleteCache();
 		await mdb.collection("guilds").findOneAndDelete({ id: this.id });
 	}
 
