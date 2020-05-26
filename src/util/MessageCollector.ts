@@ -36,7 +36,7 @@ export default class MessageCollector<C extends Eris.Client> {
 		return new Promise((a, b) => {
 			this.collectors.push({
 				channel: channelId,
-				filter: !filter ? filter : () => true,
+				filter: !!filter ? filter : () => true,
 				resolve: a as any,
 				limit: limit || 1,
 				messages: [],
