@@ -1190,6 +1190,15 @@ other:
     permissionMissing: "I am missing the `{0}` permission to be able to run this properly!"
     invalidTime: "invalid time argument provided. It must be in this format: <X>m<X>h<X>d<X>n<X>y (<X> being a placeholder for the amount of minutes/hours/days/months/years)\nm = minutes\nh = hours\nd = days\nn = months\ny = years"
     dankMemer: "we recieved an error when contacting an external api: **{0}: {1}**."
+    invalidUsage:
+      info: "Info"
+      title: "Invalid Usage"
+      command: "Command"
+      usage: "Usage"
+      description: "Description"
+      category: "Category"
+      providedArgs: "Provided Args"
+      noArgs: "NONE"
   blacklisted:
     guild: "This server has been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}"
     user: "You have been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}"

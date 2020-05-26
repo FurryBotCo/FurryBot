@@ -347,14 +347,14 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			case "ERR_INVALID_USAGE": {
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
-						.setTitle(`:x: {lang:other.error.invalidUsage.title}`)
+						.setTitle(`:x: {lang:other.errors.invalidUsage.title}`)
 						.setDescription([
-							"**{lang:other.error.invalidUsage.info}**:",
-							`\u25FD {lang:other.error.invalidUsage.command}: ${cmd.triggers[0]}`,
-							`\u25FD {lang:other.error.invalidUsage.usage}: \`${gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
-							`\u25FD {lang:other.error.invalidUsage.description}: ${cmd.description || "{lang:other.error.invalidUsage.noDescription}"}`,
-							`\u25FD {lang:other.error.invalidUsage.category}: ${cmd.category}`,
-							`\u25FD {lang:other.error.invalidUsage.providedArgs}: **${msg.unparsedArgs.length < 1 ? "{lang:other.error.invalidUsage.noArgs}" : msg.unparsedArgs.join(" ")}**`
+							"**{lang:other.errors.invalidUsage.info}**:",
+							`\u25FD {lang:other.errors.invalidUsage.command}: ${cmd.triggers[0]}`,
+							`\u25FD {lang:other.errors.invalidUsage.usage}: \`${gConfig.settings.prefix}${cmd.triggers[0]} ${cmd.usage}\``,
+							`\u25FD {lang:other.errors.invalidUsage.description}: ${cmd.description || "{lang:other.errors.invalidUsage.noDescription}"}`,
+							`\u25FD {lang:other.errors.invalidUsage.category}: ${cmd.category}`,
+							`\u25FD {lang:other.errors.invalidUsage.providedArgs}: **${msg.unparsedArgs.length < 1 ? "{lang:other.errors.invalidUsage.noArgs}" : msg.unparsedArgs.join(" ")}**`
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)
