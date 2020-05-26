@@ -86,6 +86,9 @@ commands:
         confirmUser: "are you sure you want to unblacklist the user **{0}**? Reply with **yes** or **no**."
         confirmGuild: "are you sure you want to unblacklist the guild **{0}**? Reply with **yes** or **no**."
         invalidPos: "invalid position provided. Maximum: **{0}**"
+    sudo:
+      description: "Make a user run a command."
+      usage: "<user> <command> [args] [--bypass]"
     dmuser:
       description: "Send a direct message to a user."
       usage: "<id> <message>"
@@ -1186,6 +1189,7 @@ other:
     imageAPI: "failed to fetch image from api, please try again later."
     permissionMissing: "I am missing the `{0}` permission to be able to run this properly!"
     invalidTime: "invalid time argument provided. It must be in this format: <X>m<X>h<X>d<X>n<X>y (<X> being a placeholder for the amount of minutes/hours/days/months/years)\nm = minutes\nh = hours\nd = days\nn = months\ny = years"
+    dankMemer: "we recieved an error when contacting an external api: **{0}: {1}**."
   blacklisted:
     guild: "This server has been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}"
     user: "You have been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}"
