@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 
@@ -7,13 +7,14 @@ export default new Command({
 		"whoisplaying",
 		"whoplays"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
-	cooldown: 3e3,
+	permissions: {
+		user: [],
+		bot: [
+		]
+	},
+	cooldown: 2e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
@@ -29,5 +30,6 @@ export default new Command({
 			].join("\n"))
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.gold)
+			.toJSON()
 	});
 }));

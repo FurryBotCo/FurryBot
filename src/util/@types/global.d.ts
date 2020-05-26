@@ -54,6 +54,58 @@ declare global {
 		}
 	}
 
+	type DeepPartial<T> = {
+		[P in keyof T]?: Partial<T[P]>;
+	}
+
+	type ArrayOneOrMore<T> = {
+		0: T;
+	} & T[];
+
+	type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
+
+	type OverloadedReturnType<T> =
+		T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R } ? R :
+		T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R } ? R :
+		T extends { (...args: any[]): infer R; (...args: any[]): infer R } ? R :
+		T extends (...args: any[]) => infer R ? R : any;
+
+	type ReturnTypeWithArgs<T extends (...args: any[]) => any, ARGS_T> =
+		Extract<
+			T extends { (...args: infer A1): infer R1; (...args: infer A2): infer R2; (...args: infer A3): infer R3; (...args: infer A4): infer R4; } ? [A1, R1] | [A2, R2] | [A3, R3] | [A4, R4] :
+			T extends { (...args: infer A1): infer R1; (...args: infer A2): infer R2; (...args: infer A3): infer R3; } ? [A1, R1] | [A2, R2] | [A3, R3] :
+			T extends { (...args: infer A1): infer R1; (...args: infer A2): infer R2; } ? [A1, R1] | [A2, R2] :
+			T extends { (...args: infer A1): infer R1; } ? [A1, R1] :
+			never,
+			[ARGS_T, any]
+		>[1];
+
+	namespace Blacklist {
+		interface GenericEntry {
+			created: number;
+			type: "user" | "guild";
+			blame: string;
+			blameId: string;
+			reason: string;
+			id: string;
+			noticeShown: boolean;
+			expire?: number;
+			userId?: string;
+			guildId?: string;
+			report?: string;
+		}
+
+		interface GuildEntry extends GenericEntry {
+			type: "guild";
+			guildId: string;
+		}
+
+		interface UserEntry extends GenericEntry {
+			type: "user";
+			userId: string;
+		}
+	}
+
 	namespace Express {
 		interface Session {
 			discord: {

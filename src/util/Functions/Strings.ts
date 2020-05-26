@@ -1,5 +1,3 @@
-import config from "../../config";
-import Command from "../CommandHandler/lib/Command";
 
 export default class Strings {
 	private constructor() {

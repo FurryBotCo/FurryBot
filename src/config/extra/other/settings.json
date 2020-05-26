@@ -14,39 +14,9 @@
 	}, {
 		"type": "boolean",
 		"subType": null,
-		"name": "Snipe Command",
-		"dbName": "snipeCommand",
-		"description": "Enables the `snipe` and `editsnipe` commands."
-	}, {
-		"type": "boolean",
-		"subType": null,
 		"name": "Announce Level Increases",
 		"dbName": "announceLevelUp",
 		"description": "Sends a message to the channel when someone levels up (f!rank)"
-	}, {
-		"type": "array",
-		"subType": "channel",
-		"name": "Leveling Ignore Channels",
-		"dbName": "levelingIgnoreChannels",
-		"description": "Channels that ignore leveling."
-	}, {
-		"type": "array",
-		"subType": "role",
-		"name": "Leveling Ignore Roles",
-		"dbName": "levelingIgnoreRoles",
-		"description": "Roles that ignore leveling."
-	}, {
-		"type": "array",
-		"subType": "user",
-		"name": "Leveling Ignore Users",
-		"dbName": "levelingIgnoreUsers",
-		"description": "Users that ignore leveling."
-	}, {
-		"type": "boolean",
-		"subType": null,
-		"name": "F Response",
-		"dbName": "fResponse",
-		"description": "Replies with \"X has paid respects\" every time \"f\" or \"rip\" is said."
 	}, {
 		"type": "boolean",
 		"subType": null,
@@ -65,6 +35,12 @@
 		"name": "Mute Role",
 		"dbName": "muteRole",
 		"description": "Sets the role to give to people when they are muted."
+	}, {
+		"type": "role",
+		"subType": null,
+		"name": "DJ Role",
+		"dbName": "djRole",
+		"description": "Set a role that bypasses a few musical (permission) restrictions."
 	}, {
 		"type": "channel",
 		"subType": null,

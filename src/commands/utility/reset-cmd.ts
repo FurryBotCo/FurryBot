@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import config from "../../config";
 
 export default new Command({
@@ -7,17 +7,19 @@ export default new Command({
 		"resetguild",
 		"resetguildsettings"
 	],
-	userPermissions: [
-		"manageGuild"
-	],
-	botPermissions: [],
+	permissions: {
+		user: [
+			"administrator"
+		],
+		bot: []
+	},
 	cooldown: 36e5,
 	donatorCooldown: 36e5,
-	features: ["guildOwnerOnly"],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	msg.channel.createMessage("{lang:commands.utility.reset.confirm}");
-	const d = await this.col.awaitMessage(msg.channel.id, msg.author.id, 6e4);
+	await msg.channel.createMessage("{lang:commands.utility.reset.confirm}");
+	const d = await this.c.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id);
 	if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply("{lang:commands.utility.reset.invalid}");
 	const choice = d.content.toLowerCase() === "yes";
 

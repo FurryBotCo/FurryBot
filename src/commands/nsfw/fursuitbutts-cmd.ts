@@ -1,47 +1,37 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import phin from "phin";
-import { Utility } from "../../util/Functions";
-import { Colors } from "../../util/Constants";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
+import { FurryBotAPI } from "../../modules/External";
 
 export default new Command({
 	triggers: [
-		"fursuitbutts",
-		"fursuitbutt"
+		"fursuitbutts"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"attachFiles",
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"attachFiles",
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: ["nsfw"],
+	restrictions: [
+		"nsfw"
+	],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	// await msg.channel.startTyping();
-	const img = await phin<any>({
-		method: "GET",
-		url: "https://api.fursuitbutts.com/butts",
-		parse: "json",
-		timeout: 5e3
-	});
-
-	if (img.statusCode !== 200) {
-		this.log("error", img, `Shard #${msg.channel.guild.shard.id}`);
-		return msg.reply(`{lang:other.error.unknownAPIError|${img.body.error.code}|${img.body.error.description}}`);
-	}
-	const short = await Utility.shortenURL(img.body.response.image);
-	const extra = short.new ? `{lang:other.firstTimeViewed|${short.linkNumber}}\n` : "";
+	const img = await FurryBotAPI.furry.butts("json", 1);
 
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
-			.setDescription(`${extra}{lang:other.shortURL}: <${short.link}>`)
+			.setDescription(`{lang:other.words.shortURL}: <${img.shorturl}>`)
 			.setTitle("{lang:commands.nsfw.fursuitbutts.title}")
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.gold)
-			.setImage(img.body.response.image)
+			.setImage(img.url)
 			.setFooter("{lang:other.poweredBy.furrybot}")
+			.toJSON()
 	});
 }));

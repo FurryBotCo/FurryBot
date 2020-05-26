@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import phin from "phin";
 import { Colors } from "../../util/Constants";
 
@@ -6,13 +6,13 @@ export default new Command({
 	triggers: [
 		"health"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Check my server/shard health.",
-	usage: "",
-	features: ["helperOnly"],
+	restrictions: ["helper"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const pingServers = [

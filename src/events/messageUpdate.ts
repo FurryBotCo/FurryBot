@@ -1,10 +1,9 @@
 import ClientEvent from "../util/ClientEvent";
-import PartialMessage from "../modules/PartialMessage";
 import FurryBot from "../main";
-import * as Eris from "eris";
-import { db } from "../modules/Database";
+import Eris from "eris";
+import db from "../modules/Database";
 
-export default new ClientEvent("messageUpdate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>, oldMessage: PartialMessage) {
+export default new ClientEvent("messageUpdate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>, oldMessage: Eris.OldMessage) {
 	this.track("events", "messageUpdate");
 	if (!this || !message || !message.author || message.author.bot || !oldMessage || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any) || message.content === oldMessage.content) return;
 	const g = await db.getGuild(message.channel.guild.id);
@@ -22,7 +21,7 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	}).then(d => d.reload());
 	this.emit("messageCreate", message);
 
-	const e = g.logEvents.messageEdit;
+	/*const e = g.logEvents.messageEdit;
 	if (!e || e.enabled || !e.channel) return;
 	const ch = await this.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
 
@@ -58,5 +57,5 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 		]
 	};
 
-	return ch.createMessage({ embed }).catch(err => null);
+	return ch.createMessage({ embed }).catch(err => null);*/
 }));

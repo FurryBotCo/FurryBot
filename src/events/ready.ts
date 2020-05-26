@@ -1,43 +1,91 @@
 import ClientEvent from "../util/ClientEvent";
-import Temp from "../util/Temp";
-import { Logger } from "../util/LoggerV8";
-import FurryBot from "../main";
 import config from "../config";
-import sv from "../api";
-import express from "express";
-import http from "http";
-import { mdb, db } from "../modules/Database";
-import { Time, TimedTasks } from "../util/Functions";
-import * as fs from "fs-extra";
+import { TimedTasks, Time } from "../util/Functions";
 import Eris from "eris";
+import * as fs from "fs";
+import db from "../modules/Database";
+import { Cluster } from "lavalink";
+import Logger from "../util/LoggerV9";
 
-export default new ClientEvent("ready", (async function (this: FurryBot) {
+export default new ClientEvent("ready", (async function () {
 	this.track("events", "ready");
 	if (this.firstReady) return this.log("warn", "Skipping ready event as it has already fired.", "Ready");
-	db.setClient(this);
 	this.firstReady = true;
-	const srv = await sv(this);
+	db.setClient(this);
+	this.api.launch();
+	const v = this.v = new Cluster({
+		nodes: config.apiKeys.lavalink.map(l => ({
+			password: l.password,
+			userID: this.user.id,
+			shardCount: this.shards.size,
+			hosts: {
+				rest: l.httpHost,
+				ws: l.wsHost
+			}
+		})),
+		send: (guildID, packet) => this.shards.get(Number((BigInt(guildID) >> 22n) % BigInt(this.shards.size))).sendWS(packet.op, packet.d, true),
+		filter: (node, guildID) => {
+			if (!this.guilds.has(guildID)) return true;
+			const c = config.apiKeys.lavalink.find(n => n.wsHost === node.connection.url);
+			if (!c) return true;
+			return c.regions.includes(this.guilds.get(guildID).region);
+		}
+	});
+
+	this
+		.on("rawWS", (packet, id) => {
+			switch (packet.op) {
+				case 0: {
+					switch (packet.t) {
+						case "VOICE_STATE_UPDATE": {
+							v.voiceStateUpdate(packet.d);
+							break;
+						}
+
+						case "VOICE_SERVER_UPDATE": {
+							v.voiceServerUpdate(packet.d);
+							break;
+						}
+
+						case "GUILD_CREATE": {
+							if (!!packet.d && !!packet.d.voice_states) for (const state of packet.d.voice_states) v.voiceStateUpdate(state);
+							break;
+						}
+					}
+					break;
+				}
+			}
+		});
+
+	v.on("event", async (d) => {
+		if (!["TrackStartEvent", "TrackEndEvent", "WebSocketClosedEvent"].includes(d.type)) Logger.log("Lavalink", d);
+		switch (d.type) {
+			case "TrackEndEvent": {
+				if (d.reason !== "FINISHED") Logger.warn("Lavalink", `Non "FINISHED" end reason "${d.reason}"`);
+				const q = this.q.get(d.guildId);
+				if (!q) return Logger.warn("Lavalink", `TrackEndEvent without valid queue entry`);
+				const j = await q.processNext(d.track);
+				if (!j) this.q.delete(q.guild.id);
+				break;
+			}
+
+			case "WebSocketClosedEvent": {
+				if (d.reason !== "Disconnected.") Logger.warn("Lavalink", `Non "Disconnected." close reason "${d.reason}" (code: ${d.code})`);
+				break;
+			}
+
+			case "TrackExceptionEvent": {
+				const q = this.q.get(d.guildId);
+				if (!q) return Logger.warn("Lavalink", `TrackExceptionEvent without valid queue entry`);
+				q.handleException(d.error);
+			}
+		}
+	});
 
 	this.editStatus("online", {
 		name: `${config.defaults.prefix}help with some furries`,
 		type: 0
 	});
-
-	const svr = http.createServer(express())
-		.on("error", () => this.log("warn", "Attempted to start api server, but the port is in use.", "APIServer"))
-		.on("listening", () => (svr.close(), this.srv = srv.listen(config.web.api.port, config.web.api.ip, () => this.log("debug", `Listening on ${config.web.api.ip}:${config.web.api.port}`, "APIServer"))))
-		.on("close", () => this.log("debug", "Port test server closed, starting bot api server.", "APIServer"))
-		.listen(config.web.api.port, config.web.api.ip);
-
-	this.temp = new Temp(config.dir.tmp);
-
-	process.on("beforeExit", this.temp.clean.bind(this.temp));
-
-	this.spamCounter.interval = setInterval(() => {
-		this.spamCounter.command = this.spamCounter.command.filter(s => s.time + 3e4 > Date.now());
-		this.spamCounter.response = this.spamCounter.response.filter(s => s.time + 3e4 > Date.now());
-	}, 1e3);
-
 
 	// makes commands only load at ready
 	let cmd = require("../commands");

@@ -2,26 +2,25 @@ import ExtendedMessage from "../../../modules/ExtendedMessage";
 import Eris from "eris";
 import db from "../../../modules/Database";
 import FurryBot from "../../../main";
-import SubCommand from "../../../util/CommandHandler/lib/SubCommand";
 import { Colors } from "../../../util/Constants";
 import UserConfig from "../../../modules/config/UserConfig";
 import GuildConfig from "../../../modules/config/GuildConfig";
 import { Request } from "../../../util/Functions";
 import cnf from "../../";
-import rClient from "../../../util/Redis";
-import Command from "../../../util/CommandHandler/lib/Command";
+import { Redis } from "../../../modules/External";
+import Command from "../../../modules/CommandHandler/Command";
 
 export default ((config: typeof cnf) => {
 	return [
 		{
 			name: "nsfw",
-			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command | SubCommand, uConfig?: UserConfig, gConfig?: GuildConfig) => {
+			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command, uConfig?: UserConfig, gConfig?: GuildConfig) => {
 				if (!uConfig) uConfig = await db.getUser(msg.author.id);
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 
 				if (!msg.channel.nsfw) {
 					await msg.reply(`this command can only be ran in nsfw channels.`, {
-						file: await Request.getImageFromURL("https://assets.furry.bot/nsfw.gif"),
+						file: await Request.getImageFromURL(config.images.nsfw),
 						name: "nsfw.gif"
 					}).catch(err => null);
 					throw new Error();
@@ -31,35 +30,44 @@ export default ((config: typeof cnf) => {
 					await msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${gConfig.settings.prefix}settings nsfw commands enabled\`.`).catch(err => null);
 					throw new Error();
 				}
+			})
+		},
+		{
+			name: "developer",
+			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command, uConfig?: UserConfig, gConfig?: GuildConfig) => {
+				if (!uConfig) uConfig = await db.getUser(msg.author.id);
+				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 
-				if (msg.channel.topic && config.yiff.disableStatements.some(t => msg.channel.topic.indexOf(t) !== -1)) {
-					if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
-					const st = config.yiff.disableStatements.filter(t => msg.channel.topic.indexOf(t) !== -1);
-
-					await msg.channel.createMessage({
-						embed: {
-							author: {
-								name: msg.author.tag,
-								icon_url: msg.author.avatarURL
-							},
-							title: "NSFW Commands Disabled",
-							description: `NSFW commands have been explicitly disabled in this channel. To reenable them, remove **${st.join("**, **")}** from the channel topic.`,
-							color: Colors.red,
-							timestamp: new Date().toISOString()
-						}
-					}).catch(err => null);
+				if (!config.developers.includes(msg.author.id)) {
+					Redis.INCR(`${config.beta ? "beta" : "prod"}:stats:restrictions:developer`);
+					client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer/contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
+					await msg.reply(`you must be a developer to use this command.`).catch(err => null);
 					throw new Error();
 				}
 			})
 		},
 		{
-			name: "helperOnly",
-			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command | SubCommand, uConfig?: UserConfig, gConfig?: GuildConfig) => {
+			name: "contributor",
+			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command, uConfig?: UserConfig, gConfig?: GuildConfig) => {
+				if (!uConfig) uConfig = await db.getUser(msg.author.id);
+				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
+
+				if (!config.contributors.includes(msg.author.id)) {
+					Redis.INCR(`${config.beta ? "beta" : "prod"}:stats:restrictions:contributor`);
+					client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer/contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
+					await msg.reply(`you must be at least a contributor to use this command.`).catch(err => null);
+					throw new Error();
+				}
+			})
+		},
+		{
+			name: "helper",
+			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command, uConfig?: UserConfig, gConfig?: GuildConfig) => {
 				if (!uConfig) uConfig = await db.getUser(msg.author.id);
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 
 				if (!config.helpers.includes(msg.author.id)) {
-					rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:helperOnlyError`);
+					Redis.INCR(`${config.beta ? "beta" : "prod"}:restrictions:helper`);
 					client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run helper command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 					await msg.reply(`you must be a helper or higher to use this command.`).catch(err => null);
 					throw new Error();
@@ -67,22 +75,8 @@ export default ((config: typeof cnf) => {
 			})
 		},
 		{
-			name: "devOnly",
-			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command | SubCommand, uConfig?: UserConfig, gConfig?: GuildConfig) => {
-				if (!uConfig) uConfig = await db.getUser(msg.author.id);
-				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
-
-				if (!config.developers.includes(msg.author.id)) {
-					rClient.INCR(`${config.beta ? "beta" : "prod"}:stats:devOnlyError`);
-					client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer/contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
-					await msg.reply(`you must be a developer or contributor to use this command.`).catch(err => null);
-					throw new Error();
-				}
-			})
-		},
-		{
-			name: "betaOnly",
-			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command | SubCommand, uConfig?: UserConfig, gConfig?: GuildConfig) => {
+			name: "beta",
+			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command, uConfig?: UserConfig, gConfig?: GuildConfig) => {
 				if (!uConfig) uConfig = await db.getUser(msg.author.id);
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 
@@ -90,8 +84,8 @@ export default ((config: typeof cnf) => {
 			})
 		},
 		{
-			name: "donatorOnly",
-			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command | SubCommand, uConfig?: UserConfig, gConfig?: GuildConfig) => {
+			name: "donator",
+			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command, uConfig?: UserConfig, gConfig?: GuildConfig) => {
 				if (!uConfig) uConfig = await db.getUser(msg.author.id);
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 				if (config.developers.includes(msg.author.id)) return;
@@ -106,7 +100,7 @@ export default ((config: typeof cnf) => {
 					await msg.channel.createMessage({
 						embed: {
 							title: "Usage Not Allowed",
-							description: `You must be a donator to use this command.\nYou can donate [here](${config.bot.patreon}).`,
+							description: `You must be a donator to use this command.\nYou can donate [here](${config.client.socials.patreon}).`,
 							color: Colors.red,
 							timestamp: new Date().toISOString(),
 							author: {
@@ -120,8 +114,8 @@ export default ((config: typeof cnf) => {
 			})
 		},
 		{
-			name: "premiumGuildOnly",
-			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command | SubCommand, uConfig?: UserConfig, gConfig?: GuildConfig) => {
+			name: "premiumServer",
+			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command, uConfig?: UserConfig, gConfig?: GuildConfig) => {
 				if (!uConfig) uConfig = await db.getUser(msg.author.id);
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 				if (config.developers.includes(msg.author.id)) return;
@@ -136,7 +130,7 @@ export default ((config: typeof cnf) => {
 					await msg.channel.createMessage({
 						embed: {
 							title: "Usage Not Allowed",
-							description: `This command can only be used in premium servers.\nYou can donate [here](${config.bot.patreon}), and can activate a premium server using \`${gConfig.settings.prefix}pserver add\`.`,
+							description: `This command can only be used in premium servers.\nYou can donate [here](${config.client.socials.patreon}), and can activate a premium server using \`${gConfig.settings.prefix}pserver add\`.`,
 							color: Colors.red,
 							timestamp: new Date().toISOString(),
 							author: {
@@ -150,8 +144,8 @@ export default ((config: typeof cnf) => {
 			})
 		},
 		{
-			name: "guildOwnerOnly",
-			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command | SubCommand, uConfig?: UserConfig, gConfig?: GuildConfig) => {
+			name: "guildOwner",
+			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command, uConfig?: UserConfig, gConfig?: GuildConfig) => {
 				if (!uConfig) uConfig = await db.getUser(msg.author.id);
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 				if (msg.author.id !== msg.channel.guild.ownerID) return;
@@ -161,8 +155,8 @@ export default ((config: typeof cnf) => {
 			})
 		},
 		{
-			name: "supportOnly",
-			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command | SubCommand, uConfig?: UserConfig, gConfig?: GuildConfig) => {
+			name: "supportServer",
+			check: (async (msg: ExtendedMessage<Eris.GuildTextableChannel>, client: FurryBot, cmd: Command, uConfig?: UserConfig, gConfig?: GuildConfig) => {
 				if (!uConfig) uConfig = await db.getUser(msg.author.id);
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 				if (msg.channel.guild.id !== msg.channel.guild.ownerID) {

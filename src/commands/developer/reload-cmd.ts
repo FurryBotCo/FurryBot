@@ -1,19 +1,21 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
+import config from "../../config";
+import { execSync } from "child_process";
+import Eris from "eris";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
 		"reload"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Reload something.",
-	usage: "<cmd/cat/event> [rebuild:yes/no]",
-	features: ["devOnly"],
-	subCommandDir: `${__dirname}/reload-subcmd`,
+	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length === 0) return cmd.sendSubCommandEmbed(msg);
-	else return cmd.handleSubCommand(msg, uConfig, gConfig, this);
+	return msg.reply("not implemented yet.");
 }));

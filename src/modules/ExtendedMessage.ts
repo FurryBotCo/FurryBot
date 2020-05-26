@@ -1,21 +1,25 @@
-import Eris, { ExtraMessageContent } from "eris";
+import Eris, { MessageContent } from "eris";
 import FurryBot from "../main";
 import * as F from "../util/Functions";
-import Command from "../util/CommandHandler/lib/Command";
-import Category from "../util/CommandHandler/lib/Category";
-import config from "../config";
-import db from "./Database";
 import Language from "../util/Language";
 import EmbedBuilder from "../util/EmbedBuilder";
+import Command from "./CommandHandler/Command";
+import Category from "./CommandHandler/Category";
+import config from "../config";
+import db from "./Database";
+import ModLogUtil from "../util/ModLogUtil";
 
 export interface ExtendedGuildChanel extends Eris.GuildChannel {
-	createMessage(content: ExtraMessageContent, file?: Eris.MessageFile): Promise<ExtendedMessage>;
+	createMessage(content: MessageContent, file?: Eris.MessageFile): Promise<ExtendedMessage>;
 	startTyping(maxRounds: number): NodeJS.Timeout;
 	stopTyping(): boolean;
 	readonly isTyping: boolean;
+	guild: Eris.Guild & {
+		readonly me: Eris.Member;
+	};
 }
 
-export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.TextableChannel> extends Eris.Message<T> {
+export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.TextableChannel, A extends { [k: string]: string; } = { [k: string]: string; }> extends Eris.Message<T> {
 	channel: ExtendedGuildChanel & T;
 	author: Eris.User & { tag: string; };
 	client: FurryBot;
@@ -110,12 +114,18 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		});
 
 		if (typeof this.channel.isTyping === "undefined") Object.defineProperty(this.channel, "isTyping", {
-			get() {
+			get(this: T) {
 				return client.holder.has("typing", ch.id);
 			}
 		});
 
-		this.channel.createMessage = (async (content: Eris.ExtraMessageContent, file?: Eris.MessageFile) => {
+		if (typeof this.channel.guild.me === "undefined") Object.defineProperty(this.channel.guild, "me", {
+			get(this: Eris.Guild) {
+				return this.members.get(client.user.id);
+			}
+		});
+
+		this.channel.createMessage = (async (content: Eris.MessageContent, file?: Eris.MessageFile) => {
 			// easier than type checking
 			if (!!this.channel.guild) {
 				const g = await db.getGuild(this.channel.guild.id);
@@ -128,7 +138,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 			return this._client.createMessage.call(this._client, this.channel.id, content, file).then(d => new ExtendedMessage(d, this.client));
 		});
 
-		this.channel.editMessage = (async (messageID: string, content: Eris.ExtraMessageContent) => {
+		this.channel.editMessage = (async (messageID: string, content: Eris.MessageContent) => {
 			// easier than type checking
 			if (!!this.channel.guild) {
 				const g = await db.getGuild(this.channel.guild.id);
@@ -141,7 +151,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 			return this._client.editMessage.call(this._client, this.channel.id, messageID, content).then(d => new ExtendedMessage(d, this.client));
 		});
 
-		this.edit = (async (content: Eris.ExtraMessageContent) => {
+		this.edit = (async (content: Eris.MessageContent) => {
 			// easier than type checking
 			if (!!this.channel.guild) {
 				const g = await db.getGuild(this.channel.guild.id);
@@ -168,7 +178,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 	get args() { return this._args instanceof Array ? this._args : this._args = F.Message.parseArgs(this.content, this.prefix); }
 	set args(a: string[]) { this._args = a; }
 	get unparsedArgs() { return this.content.slice(this.prefix.length).trim().split(/\s+/).slice(1); }
-	get dashedArgs() { return F.Message.parseDashedArgs(this.args, this.unparsedArgs); }
+	get dashedArgs() { return F.Message.parseDashedArgs<A>(this.args, this.unparsedArgs); }
 	get cmd() { return this._cmd ? this._cmd : this._cmd = F.Message.parseCmd(this.content, this.prefix, this.client); }
 	get mentionMap(): {
 		users: Eris.User[],
@@ -244,7 +254,17 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		if (this.mentionMap.members.length >= mentionPosition + 1) return this.mentionMap.members[mentionPosition] as M;
 
 		// member ID
-		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.get(args[argPosition]);
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
+			let m = this.channel.guild.members.get(args[argPosition]);
+			if (!!m) return m as M;
+			else {
+				m = await this.channel.guild.getRESTMember(args[argPosition]).catch(err => null);
+				if (!!m) {
+					this.channel.guild.members.add(m);
+					return m as M;
+				}
+			}
+		}
 
 		// username
 		// apparently "user" can be null on a guild member?!?

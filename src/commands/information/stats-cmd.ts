@@ -1,21 +1,22 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import Eris from "eris";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import { Internal, Time } from "../../util/Functions";
 import { Colors } from "../../util/Constants";
 import config from "../../config";
+import { Time, Internal } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
 		"stats"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"attachFiles"
-	],
-	cooldown: 3e3,
+	permissions: {
+		user: [],
+		bot: [
+			"attachFiles"
+		]
+	},
+	cooldown: 2e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const stats = await Internal.getStats();
@@ -36,5 +37,6 @@ export default new Command({
 			.addField("{lang:commands.information.stats.channelCount}", Object.keys(this.channelGuildMap).length.toString(), true)
 			.addField("{lang:commands.information.stats.shardCount}", this.shards.size.toString(), true)
 			.addField("{lang:commands.information.stats.uptime}", `${Time.ms(process.uptime() * 1000)} / ${Time.ms(stats.uptime || 0)}`, true)
+			.toJSON()
 	});
 }));

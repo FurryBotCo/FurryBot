@@ -1,7 +1,7 @@
-import db, { mdb } from "../../modules/Database";
+import { mdb, db } from "../../modules/Database";
 import UserConfig from "../../modules/config/UserConfig";
 import config from "../../config";
-import Logger from "../LoggerV8";
+import Logger from "../LoggerV9";
 import FurryBot from "../../main";
 import { Colors, GameTypes } from "../Constants";
 import GuildConfig from "../../modules/config/GuildConfig";
@@ -9,7 +9,8 @@ import Eris from "eris";
 import { Request, Internal } from ".";
 import EmbedBuilder from "../EmbedBuilder";
 import phin from "phin";
-import rClient from "../Redis";
+import { FurryBotAPI, Redis } from "../../modules/External";
+import WebhookStore from "../../modules/Holders/WebhookStore";
 
 export default class TimedTasks {
 	private constructor() {
@@ -95,31 +96,31 @@ export default class TimedTasks {
 		const a = await mdb.collection<GlobalTypes.TimedEntry>("timed").find({}).toArray();
 
 		await Promise.all(a.map(async (entry) => {
+			if (entry.expiry > Date.now()) return;
 			switch (entry.type) {
 				case "ban": {
-					const g = await client.getRESTGuild(entry.guildId);
+					const g = await client.guilds.get(entry.guildId);
 					await g.unbanMember(entry.userId, `Automatic Unban`).catch(err => null);
 					const u = client.users.has(entry.userId) ? client.users.get(entry.userId) : await client.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
 					if (!c.settings.modlog) {
 						mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
-						return;
 					}
-					const ch = g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog);
+
+					const ch = g.channels.has(c.settings.modlog) ? g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog) : await client.getRESTChannel<Eris.GuildTextableChannel>(c.settings.modlog);
 					if (!ch) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks |  Auto Server Actions");
-						return;
 					}
 
-					if (!["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
+					if (!!ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks |  Auto Server Actions");
-						return;
 					}
 
+					await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					await client.m.create(ch, {
 						type: "unban",
 						blame: "automatic",
@@ -127,38 +128,34 @@ export default class TimedTasks {
 						reason: "Automatic action due to expiry"
 					});
 
-					await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					break;
 				}
 
 				case "mute": {
-					const g = await client.getRESTGuild(entry.guildId);
+					const g = await client.guilds.get(entry.guildId);
 					// fetch user from api if they aren't in the server
 					const m = g.members.has(entry.userId) ? g.members.get(entry.userId) : await client.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
 					const r = g.roles.get(c.settings.muteRole);
 					if (!c.settings.modlog) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
-						return;
 					}
 
-					const ch = g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog);
+					const ch = g.channels.has(c.settings.modlog) ? g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog) : await client.getRESTChannel<Eris.GuildTextableChannel>(c.settings.modlog);
 					if (!ch) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks | Auto Server Actions");
-						return;
 					}
 
-					if (!["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
+					if (!!ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks | Auto Server Actions");
-						return;
 					}
 
 					if (!g.members.has(entry.userId)) {
-						await ch.createMessage({
+						if (!!ch) await ch.createMessage({
 							embed: {
 								title: "Automatic Unmute Failed",
 								description: `I failed to automatically unmute **${m.username}#${m.discriminator}** (<@!${m.id}>)\nReason: The user is not in the server.`,
@@ -169,9 +166,8 @@ export default class TimedTasks {
 									icon_url: client.user.avatarURL
 								}
 							}
-						});
+						}).catch(err => null);
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
-						return;
 					}
 
 					if (m instanceof Eris.Member) {
@@ -192,20 +188,20 @@ export default class TimedTasks {
 										icon_url: client.user.avatarURL
 									}
 								}
-							});
+							}).catch(err => null);
 							await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 							return;
 						}
 
 						await m.removeRole(r.id, "Automatic Unmute").catch(err => null);
 
-						await client.m.create(ch, {
+						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+						if (!!ch) await client.m.create(ch, {
 							type: "unmute",
 							blame: "automatic",
 							target: m,
 							reason: "Automatic action due to expiry."
 						});
-						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 					break;
 				}
@@ -253,9 +249,7 @@ export default class TimedTasks {
 
 			switch (entry.type) {
 				case "animals.bird": {
-					await Request.imageAPIRequest(true, "bird").then(async (r) => {
-						if (r.success === true) file = await Request.getImageFromURL(r.response.image);
-					});
+					file = await FurryBotAPI.animals.birb("json").then(async (r) => Request.getImageFromURL(r[0].url));
 					break;
 				}
 
@@ -312,30 +306,22 @@ export default class TimedTasks {
 				}
 
 				case "yiff.dickgirl": {
-					await Request.imageAPIRequest(false, "yiff/dickgirl", true, false).then(async (r) => {
-						if (r.success === true) file = await Request.getImageFromURL(r.response.image);
-					});
+					await FurryBotAPI.furry.yiff.dickgirl("json", 1).then(async (r) => Request.getImageFromURL(r[0].url));
 					break;
 				}
 
 				case "yiff.gay": {
-					await Request.imageAPIRequest(false, "yiff/gay", true, false).then(async (r) => {
-						if (r.success === true) file = await Request.getImageFromURL(r.response.image);
-					});
+					await FurryBotAPI.furry.yiff.gay("json", 1).then(async (r) => Request.getImageFromURL(r[0].url));
 					break;
 				}
 
 				case "yiff.lesbian": {
-					await Request.imageAPIRequest(false, "yiff/lesbian", true, false).then(async (r) => {
-						if (r.success === true) file = await Request.getImageFromURL(r.response.image);
-					});
+					await FurryBotAPI.furry.yiff.lesbian("json", 1).then(async (r) => Request.getImageFromURL(r[0].url));
 					break;
 				}
 
 				case "yiff.straight": {
-					await Request.imageAPIRequest(false, "yiff/straight", true, false).then(async (r) => {
-						if (r.success === true) file = await Request.getImageFromURL(r.response.image);
-					});
+					await FurryBotAPI.furry.yiff.straight("json", 1).then(async (r) => Request.getImageFromURL(r[0].url));
 					break;
 				}
 			}
@@ -353,12 +339,13 @@ export default class TimedTasks {
 	}
 
 	static async runDailyJoins(client: FurryBot) {
-		const d = new Date(Date.now() - 432e5);
+		const d = new Date((Date.now() - 432e5) - 8.64e+7);
 		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 		let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.count).catch(err => null);
 		if (!k) k = "Unknown.";
+		else k = (client.guilds.size - k).toString();
 		client.log("log", `Daily joins for ${id}: ${k}`, "Daily Joins");
-		await client.executeWebhook(config.webhooks.dailyjoins.id, config.webhooks.dailyjoins.token, {
+		await client.w.get("directMessage").execute({
 			embeds: [
 				{
 					title: `Daily Joins for ${id}`,
@@ -367,7 +354,7 @@ export default class TimedTasks {
 				}
 			],
 			username: `Daily Joins${config.beta ? " - Beta" : ""}`,
-			avatarURL: "https://i.furry.bot/furry.png"
+			avatarURL: config.images.botIcon
 		});
 	}
 
@@ -402,6 +389,6 @@ export default class TimedTasks {
 		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:userCount`, client.users.size.toString());
 		const v = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:stats:uptime`).then(v => !v ? 0 : Number(v));
 		const up = Math.floor(process.uptime() * 1000);
-		if (up > v) await rClient.SET(`${config.beta ? "beta" : "prod"}:stats:uptime`, up.toString());
+		if (up > v) await Redis.SET(`${config.beta ? "beta" : "prod"}:stats:uptime`, up.toString());
 	}
 }

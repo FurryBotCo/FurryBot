@@ -1,15 +1,16 @@
-import config from "../../config";
-import { mdb, db } from "../../modules/Database";
-import { Blacklist } from "../@types/Misc";
+/// <reference path="../@types/global.d.ts" />
 import * as os from "os";
-import FurryBot from "../../main";
-import loopPatrons from "../patreon/loopPatrons";
-import refreshPatreonToken from "../patreon/refreshPatreonToken";
+import { mdb } from "../../modules/Database";
+import config from "../../config";
 import Eris from "eris";
-import { Time } from ".";
 import ExtendedMessage from "../../modules/ExtendedMessage";
 import phin from "phin";
-import rClient from "../Redis";
+import loopPatrons from "../patreon/loopPatrons";
+import refreshPatreonToken from "../patreon/refreshPatreonToken";
+import { Time } from ".";
+import { Redis } from "../../modules/External";
+import { Worker } from "worker_threads";
+import FurryBot from "../../main";
 
 export default class Internal {
 	private constructor() {
@@ -173,54 +174,6 @@ export default class Internal {
 		};
 	}
 
-	/**
-	 * Increment or decrement the daily guild join counter
-	 * @static
-	 * @param {boolean} [increment=true]
-	 * @returns {Promise<number>}
-	 * @memberof Internal
-	 */
-	static async incrementDailyCounter(client: FurryBot, increment = true): Promise<number> {
-		const d = new Date();
-		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-
-		const j = await mdb.collection("dailyjoins").findOne({ id });
-		const count = j ? increment ? j.count + 1 : j.count - 1 : increment ? 1 : -1;
-		await mdb.collection("dailyjoins").findOneAndDelete({ id });
-		await mdb.collection("dailyjoins").insertOne({ count, id, guildCount: client.guilds.size });
-
-		return count;
-	}
-
-	/**
-	 * get a user from the database
-	 * @readonly
-	 * @static
-	 * @memberof Internal
-	 */
-	static get getUser(): typeof db["getUser"] { return db.getUser.bind(db); }
-	/**
-	 * get a user from the database (synchronous)
-	 * @readonly
-	 * @static
-	 * @memberof Internal
-	 */
-	static get getUserSync(): typeof db["getUserSync"] { return db.getUserSync.bind(db); }
-	/**
-	 * get a guild from the database
-	 * @readonly
-	 * @static
-	 * @memberof Internal
-	 */
-	static get getGuild(): typeof db["getGuild"] { return db.getGuild.bind(db); }
-	/**
-	 * get a guild from the database (synchronous)
-	 * @readonly
-	 * @static
-	 * @memberof Internal
-	 */
-	static get getGuildSync(): typeof db["getGuildSync"] { return db.getGuildSync.bind(db); }
-
 	static get loopPatrons() { return loopPatrons; }
 	static get refreshPatreonToken() { return refreshPatreonToken; }
 
@@ -251,7 +204,7 @@ export default class Internal {
 		return str;
 	}
 
-	static extraArgParsing<M extends ExtendedMessage<Eris.GuildTextableChannel>>(msg: M) {
+	static extraArgParsing<M extends ExtendedMessage<Eris.TextableChannel> = ExtendedMessage<Eris.GuildTextableChannel>>(msg: M) {
 		let str = msg.args.join(" ");
 		try {
 			str
@@ -282,8 +235,8 @@ export default class Internal {
 				"Content-Type": "application/x-www-form-urlencoded"
 			},
 			form: {
-				client_id: config.bot.client.id,
-				client_secret: config.bot.client.secret,
+				client_id: config.client.id,
+				client_secret: config.client.secret,
 				grant_type: "authorization_code",
 				code,
 				redirect_uri: config.web.oauth2.redirectURL,
@@ -309,7 +262,7 @@ export default class Internal {
 	}
 
 	static async fetchRedisKey(key: string) {
-		return new Promise<string>((a, b) => rClient.GET(key, (err, reply) => !err ? a(reply) : b(err)));
+		return new Promise<string>((a, b) => Redis.GET(key, (err, reply) => !err ? a(reply) : b(err)));
 	}
 
 	static async getStats() {
@@ -330,5 +283,19 @@ export default class Internal {
 			directMessage?: number;
 			uptime?: number;
 		}>(statNames.map(async (s) => ({ [s.split(":").slice(-1)[0]]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
+	}
+
+	static async incrementDailyCounter(client: FurryBot, incr: boolean) {
+		const d = new Date();
+		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
+		const j = await mdb.collection("dailyjoins").findOne({ id });
+		if (!j) await mdb.collection("dailyjoins").insertOne({ id, count: 0 });
+		const count = (j.count || 0) + (incr ? 1 : -1);
+		await mdb.collection("dailyjoins").findOneAndUpdate({ id }, { count, guildCount: client.guilds.size });
+		return count;
+	}
+
+	static emojiStringToId(e: string) {
+		return e.match("<:([a-zA-Z]{2,}:[0-9]{15,21})>")[1];
 	}
 }

@@ -34,16 +34,4 @@ declare module "Eris" {
 	export interface Client {
 		getRESTChannel<T = AnyChannel>(channelID: string): Promise<T>;
 	}
-
-	type ExtraMessageContent = string | Eris.AdvancedMessageContent | Eris.AdvancedMessageContent & { embed: EmbedBuilder; };
-
-	export interface TextChannel extends Eris.GuildChannel {
-		createMessage(content: ExtraMessageContent, file?: Eris.MessageFile): Promise<Eris.Message<TextChannel>>;
-		editMessage(messageID: string, content: Eris.ExtraMessageContent): Promise<Eris.Message<TextChannel>>;
-	}
-
-	export interface Textable {
-		createMessage(content: ExtraMessageContent, file?: Eris.MessageFile): Promise<Eris.Message<Eris.TextableChannel>>;
-		editMessage(messageID: string, content: Eris.ExtraMessageContent): Promise<Eris.Message<Eris.TextableChannel>>;
-	}
 }

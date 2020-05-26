@@ -1,53 +1,37 @@
+
 import Eris from "eris";
-import Holder from "./util/Holder";
-import MessageCollector from "./util/MessageCollector";
-import ErrorHandler from "./util/ErrorHandler";
-import CommandHolder from "./util/CommandHandler/lib/CommandHolder";
-import WebhookStore from "./util/WebhookStore";
 import config from "./config";
-import CooldownHandler from "./util/CooldownHandler";
-import Logger from "./util/LoggerV8";
-import Temp from "./util/Temp";
+import Logger from "./util/LoggerV9";
+import { DataDog, Redis } from "./modules/External";
+import WebhookStore from "./modules/Holders/WebhookStore";
+import Holder from "./modules/Holders/Holder";
+import MessageCollector from "./util/MessageCollector";
+import CommandHandler from "./modules/CommandHandler/CommandHandler";
+import ExtendedMessage from "./modules/ExtendedMessage";
+import ModLogUtil from "./util/ModLogUtil";
+import API from "./api";
 import ClientEvent from "./util/ClientEvent";
 import * as fs from "fs-extra";
-import E6API from "e6api";
-import E9API from "e9api";
-import ModLogUtil from "./util/ModLogUtil";
-import * as http from "http";
-import * as https from "https";
-import rClient from "./util/Redis";
-import DataDog from "./util/DataDog";
+import HolderV2 from "./modules/Holders/HolderV2";
+import { Cluster } from "lavalink";
+import { Collection } from "@augu/immutable";
+import MusicQueue from "./util/MusicQueue";
 
 export default class FurryBot extends Eris.Client {
 	holder: Holder;
-	col: MessageCollector;
-	err: ErrorHandler;
-	cmd: CommandHolder;
-	cd: CooldownHandler;
-	temp: Temp;
-	w: WebhookStore;
+	lvl: HolderV2;
+	c: MessageCollector<this>;
+	w: WebhookStore<this>;
 	m: ModLogUtil;
+	cmd: CommandHandler;
+	api: API;
 	firstReady: boolean;
-	spamCounter: {
-		command: {
-			time: number;
-			user: string;
-			cmd: string;
-		}[];
-		interval: NodeJS.Timeout;
-		response: {
-			time: number;
-			user: string;
-			response: string;
-		}[];
-	};
-	e6: E6API;
-	e9: E9API;
-	srv: http.Server | https.Server;
-	constructor(token, clientOptions) {
+	v: Cluster;
+	q: Collection<MusicQueue>;
+	constructor(token: string, clientOptions: Eris.ClientOptions) {
 		super(token, clientOptions);
-
 		this.holder = new Holder();
+		this.lvl = new HolderV2();
 		fs.readdirSync(`${__dirname}/events`).map((d) => {
 			const e: ClientEvent = require(`${__dirname}/events/${d}`).default;
 			if (!e) throw new TypeError(`Event file ${d} is missing an export.`);
@@ -57,49 +41,47 @@ export default class FurryBot extends Eris.Client {
 			this.on(e.event, b);
 			this.holder.set("events", e.event, b);
 		});
-		this.col = new MessageCollector(this);
-		this.err = new ErrorHandler(this);
-		this.cmd = new CommandHolder(this);
-		this.cd = new CooldownHandler();
-		this.cd
-			.on("add", (value, type, time, meta) => {
-				if (type === "cmd") this.log("debug", `Set cooldown for "${value}" on "${meta.cmd}" for "${time}"`, "Cooldown Handler");
-			})
-			.on("remove", (value, type, time, meta) => {
-				if (type === "cmd") this.log("debug", `Removed cooldown for "${value}" on "${meta.cmd}" (time: ${time})`, "Cooldown Handler");
-			});
-		this.temp = null;
-		this.w = new WebhookStore(this);
-		Object.keys(config.webhooks).map(h => this.w.add(h, config.webhooks[h].id, config.webhooks[h].token, config.webhooks[h].username, config.webhooks[h].avatar));
-		this.m = new ModLogUtil(this);
-		this.firstReady = false;
-		this.spamCounter = {
-			command: [],
-			interval: null,
-			response: []
-		};
-		this.e6 = new E6API({
-			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
-		});
-		this.e9 = new E9API({
-			userAgent: config.web.userAgentExt("Donovan_DMC, https://github.com/FurryBotCo/FurryBot")
-		});
 
 		process
-			.on("unhandledRejection", (reason, promise) =>
-				this.err.globalHandler.bind(this.err, "unhandledRejection")({ reason, promise })
-			)
-			.on("uncaughtException", (error) =>
-				this.err.globalHandler.bind(this.err, "uncaughtException")({ error })
-			);
+			.on("uncaughtException", (err) => {
+				this.log("error", err, "Uncaught Exception");
+			})
+			.on("unhandledRejection", (reason, promise) => {
+				this.log("error", reason, "Unhandled Rejection");
+				this.log("error", promise, "Unhandled Rejection");
+				if (reason instanceof Error && reason.name === "TriggerDuplicationError") {
+					this.log("error", "Exiting after a TriggerDuplicationError.", "Unhandled Rejection");
+					process.exit(1);
+				}
+			})
+			.on("rejectionHandled", (p) => {
+				console.log(p);
+			});
+
+		this.c = new MessageCollector(this);
+		this.w = new WebhookStore(this);
+		this.m = new ModLogUtil(this);
+		this.cmd = new CommandHandler(this);
+		this.api = new API(this);
+		this.firstReady = false;
+		this.q = new Collection();
 	}
 
-	log(level: "log" | "info" | "warn" | "error" | "data" | "debug" | "internal" | "internal.debug", message: any, name: string) {
+	log(level: "log" | "info" | "warn" | "error" | "data" | "debug" | "internal", message: any, name: string) {
 		Logger[level](`${name || "General"}`, message);
 	}
 
 	async track(...parts: (string | number)[]) {
-		await rClient.INCR(`${config.beta ? "beta" : "prod"}:${parts.join(":")}`);
+		await Redis.INCR(`${config.beta ? "beta" : "prod"}:${parts.join(":")}`);
 		await DataDog.increment(`bot.${config.beta ? "beta" : "prod"}.${parts.join(".")}`);
 	}
+
+	getQueue(guild: Eris.Guild | string, txt: Eris.TextChannel | string, vc: Eris.VoiceChannel | string) {
+		if (guild instanceof Eris.Guild) guild = guild.id;
+		let q = this.q.get(guild);
+		if (!q) q = this.q.set(guild, new MusicQueue(guild, txt, vc, this)).get(guild);
+		return q;
+	}
+
+	getRecommendedNode() { return this.v.sort()[0]; }
 }

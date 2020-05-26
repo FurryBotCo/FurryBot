@@ -1,18 +1,19 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import { Utility } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
-		"iam",
-		"roleme"
+		"iam"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"manageRoles"
-	],
-	cooldown: 5e3,
-	donatorCooldown: 5e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: [
+			"manageRoles"
+		]
+	},
+	cooldown: 3e3,
+	donatorCooldown: 3e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");

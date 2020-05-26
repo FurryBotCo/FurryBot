@@ -1,21 +1,24 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import config from "../../config";
+import Command from "../../modules/CommandHandler/Command";
+import EmbedBuilder from "../../util/EmbedBuilder";
 import Eris from "eris";
+import config from "../../config";
 import { Colors } from "../../util/Constants";
 import db from "../../modules/Database";
-import rClient from "../../util/Redis";
+import { Redis } from "../../modules/External";
 
 export default new Command({
 	triggers: [
 		"rank"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	let user: Eris.Member;
@@ -25,7 +28,7 @@ export default new Command({
 	if (!user) return msg.errorEmbed("INVALID_USER");
 	const c = await db.getUser(user.id);
 
-	let u: { id: string; level: number; }[] = await Promise.all(msg.channel.guild.members.filter(m => !m.user.bot).map(async (m) => new Promise((a, b) => rClient.GET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
+	let u: { id: string; level: number; }[] = await Promise.all(msg.channel.guild.members.filter(m => !m.user.bot).map(async (m) => new Promise((a, b) => Redis.GET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
 	const f = u.filter(a => a.level === null).length;
 	u = u.filter(a => a.level !== null).sort((a, b) => b.level - a.level);
 
@@ -33,19 +36,16 @@ export default new Command({
 	const n = config.leveling.calcExp(lvl.level + 1);
 	const pos = u.indexOf(u.find(a => a.id === msg.author.id));
 	return msg.channel.createMessage({
-		embed: {
-			title: `${user.username}#${user.discriminator}'s Rank`,
-			author: {
-				name: `${user.username}#${user.discriminator}`,
-				icon_url: user.avatarURL
-			},
-			description: [
-				`Level: ${lvl.level}`,
-				`XP: ${lvl.leftover}/${n.lvl} (${lvl.total} total)`,
-				...[[undefined, null].includes(pos) ? "" : `Position: ${pos + 1}/${u.length} (cached)`]
-			].join("\n"),
-			timestamp: new Date().toISOString(),
-			color: Colors.gold
-		}
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle(`${user.username}#${user.discriminator}'s Rank`)
+			.setAuthor(`${user.username}#${user.discriminator}`, user.avatarURL)
+			.setDescription([
+				`{lang:other.words.level}: ${lvl.level}`,
+				`{lang:other.words.xp}: ${lvl.leftover}/${n.lvl} (${lvl.total} {lang:other.words.total})`,
+				...[[undefined, null].includes(pos) ? "" : `{lang:other.words.position}: ${pos + 1}/${u.length} ({lang:other.words.cached})`]
+			].join("\n"))
+			.setDescription(new Date().toISOString())
+			.setColor(Colors.gold)
+			.toJSON()
 	});
 }));

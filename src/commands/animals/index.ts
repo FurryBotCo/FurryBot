@@ -1,5 +1,5 @@
-import Category from "../../util/CommandHandler/lib/Category";
-import Command from "../../util/CommandHandler/lib/Command";
+import Category from "../../modules/CommandHandler/Category";
+import Command from "../../modules/CommandHandler/Command";
 import * as fs from "fs-extra";
 const ext = __filename.split(".").reverse()[0];
 
@@ -7,7 +7,7 @@ const cmd: Command[] = fs.readdirSync(`${__dirname}`).filter(f => f.endsWith(ext
 
 const cat = new Category({
 	name: "animals",
-	devOnly: false,
+	restrictions: [],
 	file: __filename
 });
 

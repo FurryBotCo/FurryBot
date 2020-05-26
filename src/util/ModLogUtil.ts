@@ -25,6 +25,12 @@ export default class ModLogUtil {
 		type: "warn";
 	} | {
 		blame: B;
+		target: Eris.User | Eris.Member;
+		reason?: string;
+		totalWarnings: number;
+		type: "clearwarnings";
+	} | {
+		blame: B;
 		oldBlame: string;
 		target: Eris.User | Eris.Member;
 		reason?: string;
@@ -34,7 +40,7 @@ export default class ModLogUtil {
 		blame: B;
 		target: Eris.User | Eris.Member;
 		reason?: string;
-		type: "hackban" | "kick" | "unban" | "unmute";
+		type: "kick" | "unban" | "unmute";
 	} | {
 		blame: B;
 		target: Eris.User | Eris.Member;
@@ -106,17 +112,6 @@ export default class ModLogUtil {
 						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
 						`{lang:other.modlog.fields.reason}: ${reason}`,
 						`{lang:other.modlog.fields.time}: ${!data.time ? "{lang:other.modlog.fields.permanent}" : Time.ms(data.time, true)}`
-					].join("\n"));
-				break;
-			}
-
-			case "hackban": {
-				embed
-					.setTitle("{lang:other.modlog.titles.hackban}")
-					.setColor(Colors.red)
-					.setDescription([
-						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
-						`{lang:other.modlog.fields.reason}: ${reason}`
 					].join("\n"));
 				break;
 			}
@@ -206,6 +201,17 @@ export default class ModLogUtil {
 				break;
 			}
 
+			case "clearwarnings": {
+				embed
+					.setTitle("{lang:other.modlog.titles.clearwarnings}")
+					.setColor(Colors.gold)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
+						`{lang:other.modlog.fields.totalWarnings}: ${data.totalWarnings}`
+					].join("\n"));
+				break;
+			}
+
 			case "lock": {
 				embed
 					.setTitle("{lang:other.modlog.titles.lock}")
@@ -238,7 +244,7 @@ export default class ModLogUtil {
 
 		const mdl = ch.guild.channels.get<Eris.GuildTextableChannel>(g.settings.modlog);
 		return mdl.createMessage({
-			embed
+			embed: embed.toJSON()
 		}).catch(err => null);
 	}
 }

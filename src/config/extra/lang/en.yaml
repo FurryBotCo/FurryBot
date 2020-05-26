@@ -12,17 +12,6 @@ commands:
       description: "Get a picture of a cat!"
       usage: ""
       title: "Kitty!"
-    dog:
-      description: "Get a picture of a doggo!"
-      usage: ""
-      refresh: "Refreshing dog breeds."
-      validBreeds: "Valid Dog Breeds"
-      invalidBreeds: "**{0}** is not a valid breed. You can use {1} to list breeds, or provide none to get a random breed."
-      bredFor: "Bred For"
-      breedGroup: "Breed Group"
-      lifeSpam: "Life Span"
-      temperament: "Temperament"
-      origin: "Origin"
     duck:
       description: "Get a picture of a duck!"
       usage: ""
@@ -51,36 +40,97 @@ commands:
       description: "Get a picture of a wolf!"
       usage: ""
       title: "Wolfie!"
-  economy:
-    bal:
-      description: "Check your balance."
-      usage: "[@user]"
-      yourBalance: "Your Balance"
-      otherBalance: "Balance Of"
-    beg:
-      description: "Beg for money."
+  dev:
+    blacklist:
+      description: "Manage the bots blacklist."
+      usage: "<add/check/list/remove> [user(s)/server(s)] [id] [reason]"
+      invalidType: "{0} is not a valid type. Valid types: **{1}**"
+      invalidSubType: "{0} is not a valid sub type. Valid sub types: **{1}**"
+      invalidId: "invalid or no id provided."
+      invalidUser: "invalid user id ({0}) provided."
+      invalidGuild: "invalid guild id ({0}) provided."
+      cannotBlacklist:
+        developer: "you cannot blacklist **{0}** as they are a developer."
+        contributor: "you cannot blacklist **{0}** as they are a contributor."
+        helper: "you cannot blacklist **{0}** as they are a helper."
+        supportServer: "you cannot blacklist {0} as that is my support server."
+      added:
+        user: "added the user **{0}** to the blacklist.\nReason: {1}\nExpiry: {2}\nStrike: {3}\nEntry ID: {4}"
+        guild: "added the guild **{0}** to the blacklist.\nReason: {1}\nExpiry: {2}\nStrike: {3}\nEntry ID: {4}"
+      check:
+        invalidPage: 'You provided an invalid page number "{0}". Valid pages: **{1}**'
+        noHistoryUser: "the user **{0}** has no blacklist history."
+        notBlacklistedUser: "the user **{0}** is not currently blacklisted."
+        isBlacklistedUser: "the user **{0}** is currently blacklisted."
+        previouslyBlacklistedUser: "But they have been blacklisted before."
+        noHistoryGuild: "the guild **{0}** has no blacklist history."
+        notBlacklistedGuild: "the guild **{0}** is not currently blacklisted."
+        isBlacklistedGuild: "the guild **{0}** is currently blacklisted."
+        previouslyBlacklistedGuild: "But it has been blacklisted before."
+        entries: "Here's those entries"
+        noEntries: "There are no entries for this section"
+        onThisPage: "on this page"
+        page: "Page {0} / {1}"
+      get:
+        noId: "please provide an id to lookup."
+        user: "The entry `{0}` belongs to the user **{1}**."
+        guild: "The entry `{0}` belongs to the guild **{1}**."
+      remove:
+        notBlacklistedUser: "the user **{0}** is not currently blacklisted."
+        notBlacklistedGuild: "the guild **{0}** is not currently blacklisted."
+        chose: 'please provide an id or the position to remove it. Use the subcommand "get" to see the blame, reason, time, and expiry.'
+        noReply: "you took to long to reply, please try again."
+        invalid: "I couldn't find an entry with that id."
+        user: "removed the blacklist `{0}` for the user **{1}**."
+        guild: "removed the blacklist `{0}` for the guild **{1}**."
+        confirmUser: "are you sure you want to unblacklist the user **{0}**? Reply with **yes** or **no**."
+        confirmGuild: "are you sure you want to unblacklist the guild **{0}**? Reply with **yes** or **no**."
+        invalidPos: "invalid position provided. Maximum: **{0}**"
+    dmuser:
+      description: "Send a direct message to a user."
+      usage: "<id> <message>"
+    dshard:
+      description: "Manage the bots shards."
+      usage: "<disconnect/connect/status/restart> <id>"
+    dstats:
+      description: "Get my stats."
       usage: ""
-      title: "Begging For Money"
-      gave: "**{0}** gave you {1}{2}"
-      possible:
-        - "**{0}** gave you {1}{2}"
-        - "you found {1}{2} that **{0}** left behind a dumpster.."
-      multiplier: "Multiplier: {0}%"
-    multiplier:
-      description: "Get your current economy multiplier."
+    edit:
+      description: "Edit stuff about the bot."
+      usage: "<icon/name/game/status>"
+    eval:
+      description: "Evaluate some stuffs."
+      usage: "<code>"
+    health:
+      description: "Check my server/shard health."
       usage: ""
-      title: "Multiplier"
-      total: "Total"
-      multi:
-        supportServer: "Support Server"
-        vote: "Vote"
-        weekendVote: "Weekend Vote"
-        booster: "Booster"
-        donator: "Donator"
-        tips: "Tips"
-        developer: "Developer"
-        supportStaff: "Support Staff"
-        special: "Special Peeps"
+    leaveserver:
+      description: "Make me leave a server."
+      usage: "<id>"
+    rebuild:
+      description: "Rebuild my code."
+      usage: ""
+    reload:
+      description: "Reload something."
+      usage: "<cmd/cat/event> [rebuild:yes/no]"
+    restart:
+      description: "Make me restart."
+      usage: ""
+    say:
+      description: "Make me say something."
+      usage: "<text>"
+    shell:
+      description: "Execute some shell code."
+      usage: "<code>"
+    stop:
+      description: "Make me shut down."
+      usage: ""
+    test:
+      description: "Some stuff for some testing."
+      usage: ""
+    todo:
+      description: "Manage the todo list."
+      usage: ""
   fun:
     8ball:
       description: "Ask the magic 8ball a question!"
@@ -318,28 +368,20 @@ commands:
       description: "Get some info about me."
       usage: ""
       title: "Bot Info!"
-      stats: "Stats"
       processUsage: "Process Memory Usage"
       systemUsage: "System Memory Usage"
-      uptime: "Uptime"
-      shard: "Shard"
-      cluster: "Cluster"
       guilds: "Server Count"
       largeGuilds: "Large Server Count"
       users: "User Count"
       channels: "Channel Count"
       voiceConnections: "Voice Connection Count"
-      commands: "Commands"
-      creators: "Creator(s)"
       other: "Other Info"
-      library: "Library"
       libraryVersion: "Library Version"
       apiVersion: "API Version"
       gatewayVersion: "Gateway Version"
       version: "Bot Version"
       nodeVersion: "Node Version"
       supportServer: "Support Server"
-      donate: "Donate"
     invite:
       description: "Get some invite links for me!"
       usage: ""
@@ -508,246 +550,7 @@ commands:
       usage: "<game>"
       title: "Who Is Playing: {0}"
       total: "Total: **{0}**"
-  meme:
-    abandon:
-      description: "Why your mother abandoned you."
-      usage: "<text>"
-    aborted:
-      description: "Why someone should've been aborted"
-      usage: "[image]"
-    affect:
-      description: "My baby won't be affected."
-      usage: "[image]"
-    airpods:
-      description: "Sick airpods bro"
-      usage: "[image]"
-    america:
-      description: "Ameeerica, frick yeah!"
-      usage: "[image]"
-    armor:
-      description: "Nothing can penetrate my armor."
-      usage: "<text>"
-    balloon:
-      description: "Nothing will pop this."
-      usage: "balloon"
-    batslap:
-      description: "slap someone"
-      usage: "<@user>"
-    bed:
-      description: "There's a monster under the bed!"
-      usage: "[image/@user]"
-    bongocat:
-      description: "Bongo Bongo Bongo!"
-      usage: "[image/@user]"
-    boo:
-      description: "Spooky!"
-      usage: "<text>"
-    brain:
-      description: "This is big brain time"
-      usage: "<text>"
-    brazzers:
-      description: "Slap the brazzers logo onto that!"
-      usage: "[image/@user]"
-    byemom:
-      description: "Google some weird stuff while your mom is gone"
-      usage: "<text>"
-    cancer:
-      description: "Absolute cancer."
-      usage: "[image/@user]"
-    changemymind:
-      description: "Change My Mind!"
-      usage: "<text>"
-    communism:
-      description: "You filthy communist!"
-      usage: "[image/@user]"
-    crab:
-      description: "Crab rave!"
-      usage: "<text>"
-      time: "This command may take a while.."
-      invalid: 'This command must be used with some text separated by a comma, ex: "split with, a comma"'
-      error: "It seems there may have been an api error"
-      support: "If this says something about being ratelimited, please try again in a few seconds. Else, report it to our support server"
-    cry:
-      description: "We need that water"
-      usage: "<text>"
-    dab:
-      description: "Dab on 'em"
-      usage: "[image/@user]"
-    dank:
-      description: "Dank memes"
-      usage: "[image/@user]"
-    deepfry:
-      description: "Deep fry that image"
-      usage: "[image/@user]"
-    delete:
-      description: "Delete this garbage"
-      usage: "[image/@user]"
-    disability:
-      description: "Not all disabilities are the same"
-      usage: "[image/@user]"
-    door:
-      description: "Nope!"
-      usage: "[image/@user]"
-    excuseme:
-      description: "Excuse me what the frick"
-      usage: "<text>"
-    facts:
-      description: "Straight facts"
-      usage: "<text>"
-    failure:
-      description: "You're a failure, and a disappointement."
-      usage: "[image/@user]"
-    fakenews:
-      description: "You're fake news!"
-      usage: "[image/@user]"
-    fedora:
-      description: "m'lady"
-      usage: "[image/@user]"
-    floor:
-      description: "Stay off the floor"
-      usage: "[text]"
-    garfield:
-      description: "Wonder who that sign is for"
-      usage: "[image/@user]"
-    gay:
-      description: "Gay up an image."
-      usage: "[image]"
-    goggles:
-      description: "Put on your saftey goggles"
-      usage: "[image/@user]"
-    hitler:
-      description: "Worse than hitler"
-      usage: "[image/@user]"
-    humansaregood:
-      description: "Humans are good"
-      usage: "<text>"
-    inator:
-      description: "Textinator"
-      usage: "<text>"
-    invert:
-      description: "Invert an image"
-      usage: "[image/@user]"
-    jail:
-      description: "Put someone in jail"
-      usage: "[image/@user]"
-    justpretending:
-      description: "Maybe they're just pretending"
-      usage: "<text>"
-    knowyourlocation:
-      description: "Someone wants to know your location"
-      usage: "<text>"
-    laid:
-      description: "People who get laid"
-      usage: "[image/@user]"
-    madethis:
-      description: "I made this"
-      usage: "[image/@user]"
-    magik:
-      description: "screw with an image"
-      usage: "[image/@user]"
-    master:
-      description: "Master"
-      usage: "<text>"
-    mock:
-      description: "MoCk SoMe TeXt"
-      usage: "<text>"
-    note:
-      description: "Passing notes.."
-      usage: "<text>"
-    ohno:
-      description: "Oh no dog"
-      usage: "<text>"
-    plan:
-      description: "My brilliant plan"
-      usage: "<text>"
-    presentation:
-      description: "My presentation"
-      usage: "<text>"
-    quote:
-      description: "Quote someone"
-      usage: "<text>"
-    radialblur:
-      description: "Add a radial blur to an image"
-      usage: "[image/@user]"
-    rip:
-      description: "Rest in peace"
-      usage: "[image/@user]"
-    roblox:
-      description: "Oof"
-      usage: "[image/@user]"
-    salty:
-      description: "You salty bro?"
-      usage: "[image/@user]"
-    satan:
-      description: "Show someone as satan"
-      usage: "[image/@user]"
-    screams:
-      description: "WhY CaN'T YoU Be nOrMaL"
-      usage: "[image/@user]"
-    sickban:
-      description: "ban this sick filth"
-      usage: "[image/@user]"
-    slapsroof:
-      description: "Slap the roof of the car"
-      usage: "<text>"
-    spank:
-      description: "Spank someone"
-      usage: "[image/@user]"
-    stroke:
-      description: "Know the signs of a stroke"
-      usage: "<text>"
-    surprised:
-      description: "\\*surprised pikachu face\\*"
-      usage: "<text>"
-    sword:
-      description: "That's a massive sword"
-      usage: "<text>"
-    thesearch:
-      description: "No intelligent life anywhere"
-      usage: "<text>"
-    trash:
-      description: "You're trash"
-      usage: "[image/@user]"
-    trigger:
-      description: "I'm.. So.. Triggered!!"
-      usage: "[image/@user]"
-    ugly:
-      description: "So ugly"
-      usage: "[image/@user]"
-    unpopular:
-      description: "Unpopular opinion"
-      usage: "<text>"
-    violence:
-      description: "Voilence is ~~never~~ always the answer."
-      usage: "<text>"
-    vr:
-      description: "Realistic vr"
-      usage: "<text>"
-    walking:
-      description: "When you walking"
-      usage: "<text>"
-    wanted:
-      description: "Wanted for a $5000 reward"
-      usage: "[image/@user]"
-    warp:
-      description: "Warp an image"
-      usage: "[image/@user]"
-    whodidthis:
-      description: "Who did this \uD83E\uDD23"
-      usage: "[image/@user]"
-    yomomma:
-      description: "Get a yomomma joke"
-      usage: ""
-    youtube:
-      description: "Youtube comment"
-      usage: "<text>"
   misc:
-    auto:
-      description: Toggle automated posting of content in a channel."
-      usage: ""
-    pserver:
-      description: "Manage your premium servers"
-      usage: ""
     avatar:
       description: "Get a users avatar."
       usage: "[@user]"
@@ -766,7 +569,9 @@ commands:
       cmdTotal: "Total Commands"
       title: "Command Help"
       cmdList: "Command List #{0}"
+      neitherFound: "neither a command nor category was found with that name."
       embed:
+        restrictionsTip: "Red (minus) = **not required**\nGreen (plus) = **required**"
         restrictions: "Restrictions"
         nsfw: "NSFW"
         helperOnly: "Helper Only"
@@ -776,17 +581,8 @@ commands:
         supportServerOnly: "Support Server Only"
         donatorOnly: "Donator Only"
         premiumGuildOnly: "Premium Server Only"
-        permissions: "Permissions"
-        bot: "Bot"
-        user: "User"
-        usage: "Usage"
-        aliases: "Aliases"
         normalCooldown: "Normal Cooldown"
         donatorCooldown: "Donator Cooldown"
-        category: "Category"
-    rank:
-      description: "Get a users rank."
-      usage: "[@user]"
     leaderboard:
       description: "Get the server leveling leaderboard."
       usage: "[page]"
@@ -799,11 +595,16 @@ commands:
         title: "Server Leaderboard"
         footer: "Page {0}/{1} | Skipped {2} Non Cached Users"
         until: "until level up"
+    rank:
+      description: "Get a users rank."
+      usage: "[@user]"
+      rank: "{0}'s Rank"
     suggest:
       description: "Suggest something for me!"
       usage: "<suggestion>"
       title: "Suggestion Posted!"
       desc: "Your suggestion was posted! You can view it [here](https://discord.gg/CQMx76B)."
+      nothing: "please provide something to suggest."
     toggletips:
       description: "Toggle getting random tips."
       usage: ""
@@ -822,35 +623,30 @@ commands:
       noBanSelf: "pretty sure you don't want to do this to yourself."
       noBanOwner: "you cannot ban the server owner."
       noBanOther: "you cannot ban **{0}** as their highest role is higher than yours!"
-      banDm: "You were banned from **{0}**\nReason: {1}"
+      dm: "You were banned from **{0}**.\nReason: {1}"
       noReason: "No Reason Specified."
       userBanned: "User {0} was banned, {1}"
       couldNotBan: "I couldn't ban **{0}**, {1}"
       englishOnly: "The provided reason must be comprised of English characters only."
+    clearwarnings:
+      description: "Remove a warning from someone."
+      usage: "<@member/id> <warning id>"
+      cleared: "cleared all warnings for the user **{1}**."
     delwarn:
       description: "Remove a warning from someone."
       usage: "<@member/id> <warning id>"
       couldNotFind: 'I couldn''t find a warning for **{0}** with the id "{1}" for this server.'
-      noBanSelf: "pretty sure you don't want to do this to yourself."
       deleted: 'deleted warning "{0}" for user **{1}**.'
-      couldNotHackban: "I couldn't hackban **{0}**, {1}"
-    hackban:
-      description: "Ban someone that isn't in your server."
-      usage: "<@user/id> [reason]"
-      title: "User already banned"
-      desc: "It looks like {0} is already banned here.."
-      banned: "User {0} was banned, {1}"
-      couldNotHackban: "I couldn't hackban **{0}**, {1}"
-      englishOnly: "The provided reason must be comprised of English characters only."
     kick:
       description: "Kick members from your server."
       usage: "<@member/id> [reason]"
       noSelf: "Pretty sure you don't want to do this to yourself."
-      dm: "You were kicked from **{0}**\nReason: {1}"
+      dm: "You were kicked from **{0}**.\nReason: {1}"
       noKick: "you cannot kick **{0}** as their highest role is higher than yours!"
       kicked: "User {0} was kicked, {1}"
       couldNotKick: "I couldn't kick **{0}**, {1}"
       englishOnly: "The provided reason must be comprised of English characters only."
+      noKickOwner: "you cannot kick the server owner."
     lock:
       description: "Lock a channel to prevent people talking in it."
       usage: "[channel]"
@@ -866,6 +662,7 @@ commands:
       eventEnabled: "enabled the logging of **{0}** in channel <#{1}>."
       eventDisabled: "disabled the logging of **{0}**."
       disabled: "Disabled"
+      removed: "Removed (channel not found)"
       title: "Logging"
       thisOnly: "you must use channels that are in this server."
     mute:
@@ -884,7 +681,7 @@ commands:
       invalidRole: "Invalid mute role"
       invalidRoleDesc: "The current mute role <@&{0}> ({1}) seems to be higher than me, please move it below me. You can set a new one with `{2}settings mute role <role>`"
       alreadyMuted: "User already muted"
-      alreadyMutedDesc: "The user **{0}** seems to already be muted.. You can unmute them with `${1}unmute <@!{2}> [reason]`"
+      alreadyMutedDesc: "The user **{0}** seems to already be muted.. You can unmute them with `{1}unmute <@!{2}> [reason]`"
       englishOnly: "The provided reason must be comprised of English characters only."
     softban:
       description: "Ban someone to delete their messages, then immediately unban them."
@@ -950,6 +747,38 @@ commands:
       page: 'Page {0}/{1} | {2}warnings "{3}" {4}'
       pageWithoutMore: "Page {0}/{1}"
       englishOnly: "The provided reason must be comprised of English characters only."
+  music:
+    play:
+      usage: "<query>"
+      description: "Play some music inside your server."
+      noResults: 'no results were found for the query "{0}".'
+      select:
+        content: "Please provide one of the track numbers below, or **cancel** to cancel."
+        title: "Select A Track"
+        canceled: "canceled selection."
+        invalidPage: "invalid page number **{0}**. Max page number: **{1}**"
+      addedEmbed:
+        title: "Added To Queue"
+        description: "Added the song **{0}** to the queue.\nTotal time: {1}\nTime until playing: {2}"
+    queue:
+      usage: "[page]"
+      description: "View the music queue for this server."
+      nothing: "the queue is empty and nothing is currently playing."
+      invalidPage: ""
+      embed:
+        title: "Music Queue"
+        nowPlaying: "Now Playing:\n{0} - Added By <@!{1}>\nTotal Time: {2}"
+        queue: "Queue"
+        noEntries: "No queue entires to list."
+        entry: "#{0} - **[{1}]({2})** - Added By <@!{3}>"
+        footer: "Page {0} / {1}"
+    volume:
+      usage: "[1-1000]"
+      description: "Set the volume of the player."
+      missingPerms: "you must have either the dj role (<@&{0}>), or one of these permissions: **Manage Server**, **Manage Channels**, **Manage Messages**"
+      missingPermsNoRole: "you must have either the dj role (set by using `{0}settings dj role <role>`), or one of these permissions: **Manage Server**, **Manage Channels**, **Manage Messages**"
+      invalidVolume: "the volume must be a positive number between 1 and 1000."
+      set: "set the players volume to **{0}**."
   nsfw:
     bulge:
       description: "*notices bulge* OwO"
@@ -976,7 +805,11 @@ commands:
     yiff:
       description: "Get some yiff!"
       usage: "[gay/straight/lesbian/dickgirl]"
-      title: "{0} Yiff"
+      title:
+        gay: "Gay Yiff"
+        straight: "Straight Yiff"
+        lesbian: "Lesbian Yiff"
+        dickgirl: "Dickgirl Yiff"
   utility:
     asar:
       description: "Add a self assignable role."
@@ -997,6 +830,7 @@ commands:
       description: "Disable commands in channels or serverwide."
       usage: "(run without any arguments for help)"
       invalid: "{0} is not a valid command or category."
+      invalidFirst: "{0} is not a valid selection. Valid: **add**, **remove**, **list**."
       noAllServer: "you cannot disable all commands server wide."
       duplicate: "there is already a disable entry with that specification!"
       noAddFound: 'nothing was found for the provided argument "{0}"'
@@ -1046,6 +880,7 @@ commands:
         withId: "With ID"
         removeAll: "Remove All"
         list: "List"
+        neitherFound: "neither a command or category was found."
     editsnipe:
       description: "Get the last edited message in a channel."
       usage: "[channel]"
@@ -1262,7 +1097,7 @@ commands:
       description: "Remove your donor perks."
       usage: ""
 
-category:
+categories:
   animals:
     displayName: ":dog: Animals"
     description: "Cute little animals to brighten your day!"
@@ -1287,6 +1122,9 @@ category:
   moderation:
     displayName: ":hammer: Moderation"
     description: "Stomp down the server baddies with your ban hammer."
+  music:
+    displayName: ":musical_note: Music"
+    description: "Play some music inside your server!"
   nsfw:
     displayName: ":smirk: NSFW"
     description: "That stuff your parents warned you about >~>"
@@ -1295,20 +1133,87 @@ category:
     description: "Helpful things for the bot, and your server."
 
 other:
-  yes: "Yes"
-  no: "No"
-  none: "None"
-  noneYet: "None Yet"
+  poweredBy:
+    furrybot: "powered by furry.bot"
+  mention:
+    dm: "I couldn't send messages in the channel where I was mentioned, so I sent this directly to you!"
+  words:
+    yes: "Yes"
+    no: "No"
+    never: "Never"
+    imageURL: "Image URL"
+    date: "Date"
+    blame: "Blame"
+    reason: "Reason"
+    expiry: "Expiry"
+    id: "ID"
+    current: "Current"
+    expired: "Expired"
+    entry: "Entry"
+    canceled: "Canceled"
+    stats: "Stats"
+    uptime: "Uptime"
+    shard: "Shard"
+    guilds: "Guilds"
+    users: "Users"
+    channels: "Channels"
+    cluster: "Cluster"
+    commands: "Commands"
+    other: "Other"
+    creators: "Creator(s)"
+    version: "Version"
+    library: "Library"
+    donate: "Donate"
+    categories: "Categories"
+    level: "Level"
+    xp: "XP"
+    position: "Position"
+    cached: "Cached"
+    total: "Total"
+    none: "None"
+    restrictions: "Restrictions"
+    permissions: "Permissions"
+    bot: "Bot"
+    user: "User"
+    extra: "Extra"
+    usage: "Usage"
+    aliases: "Aliases"
+    category: "Category"
+    now: "Now"
+    noReason: "No Reason"
+    shortURL: "Short URL"
+  errors:
+    imageAPI: "failed to fetch image from api, please try again later."
+    permissionMissing: "I am missing the `{0}` permission to be able to run this properly!"
+    invalidTime: "invalid time argument provided. It must be in this format: <X>m<X>h<X>d<X>n<X>y (<X> being a placeholder for the amount of minutes/hours/days/months/years)\nm = minutes\nh = hours\nd = days\nn = months\ny = years"
+  blacklisted:
+    guild: "This server has been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}"
+    user: "You have been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}"
+  permissions:
+    bot:
+      noEmbed: "I am missing some permissions to be able to run that, but I need the `embedLinks` permission to tell you which."
+      embedTitle: "I do not have the required permission(s) to use this!"
+      embedDesc: "I need the permission(s) {0} for this command to function properly, please add these to me and try again."
+    user:
+      noEmbed: "You are missing some permissions to be able to run that, but I need the `embedLinks` permission to tell you which."
+      embedTitle: "You do not have the required permission(s) to use this!"
+      embedDesc: "You need the permission(s) **{0}** to be able to use this command."
+  cooldown:
+    title: "Command On Cooldown"
+    desc: "Please wait **{0}** before trying to use this command again!"
+    donatorActive: "You are a [donator]({0}), so you get shorter cooldowns!"
+    donatorInactive: "Normal users have to wait **{0}**, meanwhile [donators]({1}) only have to wait **{2}**."
   commandRestrictions:
     nsfw: "NSFW"
-    contribOnly: "Contributor Only"
-    devOnly: "Developer Only"
-    betaOnly: "Beta Only"
-    donatorOnly: "Donator Only"
-    premiumGuildOnly: "Premium Guild Only"
-    guildOwnerOnly: "Guild Owner Only"
-    supportOnly: "Support Server Only"
-  permissions:
+    developer: "Developer"
+    contributor: "Contributor"
+    helper: "Helper"
+    beta: "Beta"
+    donator: "Donator"
+    premiumServer: "Premium Server"
+    guildOwner: "Guild Owner Only"
+    supportServer: "Support Server Only"
+  permissionNames:
     createInstantInvite: "Create Instant Invite"
     kickMembers: "Kick Members"
     banMembers: "Ban Members"
@@ -1346,8 +1251,6 @@ other:
     embedFooter: 'This can be disabled via the setting "Announce Level Increases".'
     message: "<@!{0}> leveled up to level **{1}**!\n(This would look different if I had the permission **embedLinks**.)"
     directMessage: "You leveled up to level **{0}** in the server **{1}**!\n(I sent this here because I cannot send messages in the channel you actually leveled up in)"
-  imageURL: "Image URL"
-  noReason: "No Reason"
   userFlags:
     0: "<:DiscordStaff:706259176405336135> Discord Employee"
     1: "<:DiscordPartner:706259226745634866> Discord Partner"
@@ -1376,42 +1279,35 @@ other:
     104: "<:NitroBooster:706261703712571425> Support Server Nitro Booster"
     105: "<:downvote:649732306520768522> Blacklisted"
     106: ":moneybag: Donator"
-  error:
-    tooLong: "the max length of {0} is {1}."
-    invalidBalance: "your current balance is invalid. Please contact a developer to fix this."
-    otherInvalidBalance: "their current balance is invalid, so you cannot view or interact them with them."
-    invalidUsage:
-      info: "Info"
-      title: "Invalid Usage"
-      command: "Command"
-      usage: "Usage"
-      description: "Description"
-      category: "Category"
-      providedArgs: "Provided Args"
-      noArgs: "NONE"
-    imageAPI: "internal image api error, please try again later."
-    permissionMissing: "I am missing the `{0}` permission to be able to run this properly!"
-    econnreset: "Some network issue happened on our side, please try again later. (do not report these unless they are very frequent)"
-    unknown: "There was an issue while doing something.."
-    join: "Please join our support server and report this, along with the code.\nSupport Server: {0}\nCode: `{1}`\n\nError:\n**{2}: {3}**"
-    commandDisabled: "this command has been temporarily disabled."
-    unknownAPIError: "API Error:\nCode: {0}\nDescription: `{1}`"
-    codeAPIError: "API Error:\n{0}"
-    commandDisabledSettings: "this command has been disabled in this servers settings."
-    duplicatePagination: "There is already an active paginated command in this channel.\nIf you started it: Say **stop** to stop it.\nIf you did not start it: Either wait for it to time out, or tell the person who started it to say **stop*."
+  music:
+    joinVC: "please join a voice channel before using this."
+    wrongVC: "you must be in the same voice channel as me to use this."
+    notInVC: "I must be in a voice channel and playing music for this to be usable."
+    noQueue: "I couldn't find a queue for this server, so I'm assuming nothing is playing, and music is inactive."
+    footer: "Voice Channel: {0}"
+    queueEnd:
+      title: "Queue Empty"
+      description: "I've stopped playback and left the voice channel due to the queue being empty."
+    nowPlaying:
+      title: "Now Playing"
+      description: "**{0}** is now playing in {1}.\nTotal Time: {2}"
+    error:
+      title: "Error While Playing"
+      description: "We encountered an internal error while playing \"{0}\" by **{1}**.\nLavaLink Error: `{2}`"
+      descriptionNoEntry: "We encountered an internal error during processing.\nLavaLink Error: `{0}`"
   modlog:
     invalid: "Detected an invalid modlog setup, reverted to normal."
     missingPermissions: "I'm missing some permissions to be able to make a modlog entry (I need `sendMessages` and `embedLinks`), it has been reverted to normal."
     titles:
       ban: "Member Ban"
       mute: "Member Muted"
-      hackban: "Member Hackbanned"
       kick: "Member Kicked"
       softban: "Member Softbanned"
       unban: "Member Unbanned"
       unmute: "Member Unmuted"
       warn: "Member Warned"
       delwarn: "Member Warn Removed"
+      clearwarnings: "Clear Warnings"
       lock: "Channel Locked"
       unlock: "Channel Unlocked"
     fields:
@@ -1424,13 +1320,7 @@ other:
       warningReason: "Warning Reason"
       oldBlame: "Old Blame"
       unknown: "Unknown"
+      totalWarnings: "Total Warnings"
     noneProvided: "None Provided."
     actionAuto: "Action performed automatically."
     action: "Action carried out by {0}"
-  shortURL: "Short URL"
-  firstTimeViewed: "**this is the first time this has been viewed! Image #{0}**"
-  poweredBy:
-    furrybot: "powered by furry.bot"
-  mention:
-    description: "Hi, {0}! Since you've mentioned me, here's a little about me:\nMy prefix here is **{1}**, you can see my commands by using `{1}help`, you can change my prefix by using `{1}prefix <new prefix>`,\nIf you want to invite me to another server, you can use [this link]({2}), or, if that isn't working, you can visit [https://furry.bot/add](https://furry.bot/add)\nIf you need support, you can visit our server [here]({3})"
-    title: "Hello!"

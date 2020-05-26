@@ -1,18 +1,13 @@
-import config from "../../config";
-import Eris from "eris";
 import FurryBot from "../../main";
-import Logger from "../LoggerV8";
 
 export default class Message {
 	private constructor() {
 		throw new TypeError("This class may not be instantiated, use static methods.");
 	}
-	static parseDashedArgs(originalArgs: string[], originalUnparsedArgs?: string[]): {
+	static parseDashedArgs<V extends { [k: string]: string; } = { [k: string]: string; }>(originalArgs: string[], originalUnparsedArgs?: string[]): {
 		[k in "parsed" | "unparsed"]: {
-			keyValue: {
-				[k: string]: string;
-			};
-			value: string[];
+			keyValue: V;
+			value: (V extends { [k: string]: string; } ? keyof V : string[])[];
 			args: string[];
 		}
 	} {
@@ -40,7 +35,7 @@ export default class Message {
 		return {
 			parsed: d([...originalArgs]),
 			unparsed: d(originalUnparsedArgs && originalUnparsedArgs.length > 0 ? [...originalUnparsedArgs] : [...originalArgs])
-		};
+		} as any;
 	}
 
 	static parseArgs(content: string, prefix: string) {

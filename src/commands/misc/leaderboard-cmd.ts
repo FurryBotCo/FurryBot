@@ -1,31 +1,30 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import config from "../../config";
-import Eris from "eris";
-import { Colors } from "../../util/Constants";
-import db from "../../modules/Database";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import { Utility } from "../../util/Functions";
+import { Colors } from "../../util/Constants";
+import config from "../../config";
 import chunk from "chunk";
-import rClient from "../../util/Redis";
+import { Redis } from "../../modules/External";
 
 export default new Command({
 	triggers: [
 		"leaderboard",
 		"lb"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const members = msg.channel.guild.members.filter(m => !m.user.bot);
 	// if (members.length > 1000) return msg.reply("{lang:commands.misc.leaderboard.serverTooLarge}");
 
-	let u: { id: string; level: number; }[] = await Promise.all(members.map(async (m) => new Promise((a, b) => rClient.GET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
+	let u: { id: string; level: number; }[] = await Promise.all(members.map(async (m) => new Promise((a, b) => Redis.GET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
 	const f = u.filter(a => a.level === null).length;
 	u = u.filter(a => a.level !== null).sort((a, b) => b.level - a.level);
 	const c = chunk(u, 10);
@@ -49,5 +48,6 @@ export default new Command({
 			.setFooter(`{lang:commands.misc.leaderboard.embed.footer|${page}|${c.length}|${f}}`)
 			.setColor(Colors.gold)
 			.setTimestamp(new Date().toISOString())
+			.toJSON()
 	});
 }));

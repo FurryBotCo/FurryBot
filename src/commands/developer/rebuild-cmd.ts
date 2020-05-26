@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import config from "../../config";
 import { execSync } from "child_process";
 
@@ -6,13 +6,13 @@ export default new Command({
 	triggers: [
 		"rebuild"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Rebuild the bot's code",
-	usage: "",
-	features: ["devOnly", "betaOnly"],
+	restrictions: ["developer", "beta"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const start = performance.now();

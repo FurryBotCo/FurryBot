@@ -1,22 +1,25 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import chunk from "chunk";
-import { Colors } from "../../util/Constants";
+import Command from "../../modules/CommandHandler/Command";
 import { Strings } from "../../util/Functions";
-import config from "../../config";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
+import chunk from "chunk";
 
 export default new Command({
 	triggers: [
 		"disable"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [
+			"manageGuild"
+		],
+		bot: []
+	},
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-
+	const c = ["disable"];
 	if (msg.args.length === 0) return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.utility.disable.help.title}")
@@ -35,6 +38,7 @@ export default new Command({
 				"**{lang:commands.utility.disable.help.list}**:",
 				`\u25FD {lang:commands.utility.disable.help.list} \`${msg.prefix}disable list\``
 			].join("\n"))
+			.toJSON()
 	});
 
 	// due to the structure changing
@@ -50,14 +54,14 @@ export default new Command({
 			const d: any = {};
 			let type: "cmd" | "cat";
 			if (!all) {
-				const cmds = this.cmd.commandTriggers.map(t => t.toLowerCase());
+				const cmds = this.cmd.triggers.map(t => t.toLowerCase());
 				const cats = this.cmd.categories.map(c => c.name.toLowerCase());
 				if (cmds.includes(msg.args[1].toLowerCase())) (type = "cmd", d.command = msg.args[1].toLowerCase());
 				else if (cats.includes(msg.args[1].toLowerCase())) (type = "cat", d.category = msg.args[1].toLowerCase());
 				else return msg.reply(`{lang:commands.utility.disable.invalid|${msg.args[1].toLowerCase()}}`);
 			} else d.all = true;
 
-			if (!!d.command && config.cantBeDisabled.includes(d.command.toLowerCase())) return msg.reply(`{lang:commands.utility.disable.commandNotAllowed|${d.command}}`);
+			if (!!d.command && c.includes(d.command.toLowerCase())) return msg.reply(`{lang:commands.utility.disable.commandNotAllowed|${d.command}}`);
 
 			if (msg.args.length === 2) {
 				if (d.all) return msg.reply("{lang:commands.utility.disable.noAllServer}");
@@ -67,7 +71,7 @@ export default new Command({
 				};
 				for (const dis of gConfig.disable) if (JSON.stringify(dis) === JSON.stringify(c)) return msg.reply("{lang:commands.utility.disable.duplicate}");
 
-				await gConfig.mongoEdit<typeof gConfig>({
+				await gConfig.mongoEdit({
 					$push: {
 						disable: c
 					}
@@ -95,7 +99,7 @@ export default new Command({
 
 					for (const dis of gConfig.disable) if (JSON.stringify(dis) === JSON.stringify(c)) return msg.reply("{lang:commands.utility.disable.duplicate}");
 
-					await gConfig.mongoEdit<typeof gConfig>({
+					await gConfig.mongoEdit({
 						$push: {
 							disable: c
 						}
@@ -117,7 +121,7 @@ export default new Command({
 
 					for (const dis of gConfig.disable) if (JSON.stringify(dis) === JSON.stringify(c)) return msg.reply("{lang:commands.utility.disable.duplicate}");
 
-					await gConfig.mongoEdit<typeof gConfig>({
+					await gConfig.mongoEdit({
 						$push: {
 							disable: c
 						}
@@ -139,7 +143,7 @@ export default new Command({
 
 					for (const dis of gConfig.disable) if (JSON.stringify(dis) === JSON.stringify(c)) return msg.reply("{lang:commands.utility.disable.duplicate}");
 
-					await gConfig.mongoEdit<typeof gConfig>({
+					await gConfig.mongoEdit({
 						$push: {
 							disable: c
 						}
@@ -164,7 +168,7 @@ export default new Command({
 			if (msg.args.length === 1) return msg.reply("{lang:commands.utility.disable.remove.missingId}");
 
 			if (msg.args[1].toLowerCase() === "all") {
-				await gConfig.mongoEdit<typeof gConfig>({
+				await gConfig.mongoEdit({
 					$set: {
 						disable: []
 					}
@@ -175,7 +179,7 @@ export default new Command({
 				if (isNaN(id)) return msg.reply("{lang:commands.utility.disable.remove.NaNId}");
 				if (id < 1 || id > gConfig.disable.length) return msg.reply(`{lang:commands.utility.disable.remove.invlidId|${id}}`);
 				const e = gConfig.disable[id - 1];
-				await gConfig.mongoEdit<typeof gConfig>({
+				await gConfig.mongoEdit({
 					$pull: {
 						disable: e
 					}
@@ -201,13 +205,13 @@ export default new Command({
 					.setTimestamp(new Date().toISOString())
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
 					.setFooter(`{lang:commands.utility.disable.list.footer|${page}|${pages.length}|${gConfig.disable.length}|${gConfig.settings.prefix}}`)
+					.toJSON()
 			});
 			break;
 		}
 
 		default: {
-			return msg.reply("{lang:commands.utility.disable.invalid}");
+			return msg.reply(`{lang:commands.utility.disable.invalidFirst|${msg.args[0]}}`);
 		}
 	}
-
 }));

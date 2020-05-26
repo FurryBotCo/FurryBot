@@ -1,31 +1,27 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import GenericMemeCommand from "../../util/CommandHandler/lib/generics/GenericMemeCommand";
+import Command from "../../modules/CommandHandler/Command";
+import { DankMemerAPI } from "../../modules/External";
 
 export default new Command({
 	triggers: [
 		"spank"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"attachFiles"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"attachFiles"
+		]
+	},
 	cooldown: 2.5e3,
 	donatorCooldown: 2e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	// await msg.channel.startTyping();
-	let a = "https://i.furry.bot/furry.png";
-	if (msg.args.length === 0) {
-		a = msg.author.avatarURL;
-		msg.args = ["https://i.furry.bot/furry.png"];
-	} else {
-		if (msg.mentions.length > 0 && msg.args[0].match(new RegExp(`<@!?${msg.mentions[0].id}>`))) {
-			const u = msg.mentions.shift();
-			msg.args = msg.args.slice(1);
-			a = u.avatarURL;
-		}
-		msg.args = [msg.author.avatarURL];
-	}
-	return GenericMemeCommand.handleImage(this, msg, uConfig, gConfig, "spank", { avatars: [a || msg.author.avatarURL] });
+	const member = msg.args.length === 0 ? msg.channel.guild.members.get(this.user.id) : await msg.getMemberFromArgs();
+	if (!member) return msg.errorEmbed("INVALID_MEMBER");
+	const img = await DankMemerAPI.spank(member.id === this.user.id ? [member.avatarURL, msg.author.avatarURL] : [msg.author.avatarURL, member.avatarURL]);
+
+	return msg.channel.createMessage("", {
+		file: img.file,
+		name: `${cmd.triggers[0]}.${img.ext}`
+	});
 }));

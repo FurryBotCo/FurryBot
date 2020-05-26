@@ -1,11 +1,7 @@
 import ClientEvent from "../util/ClientEvent";
 import FurryBot from "../main";
-import * as Eris from "eris";
-import { db } from "../modules/Database";
-import { Colors, MessageTypes } from "../util/Constants";
-import { Utility } from "../util/Functions";
-import config from "../config";
-import rClient from "../util/Redis";
+import Eris from "eris";
+import db from "../modules/Database";
 
 export default new ClientEvent("messageDelete", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	this.track("events", "messageDelete");
@@ -24,7 +20,7 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 		}
 	}).then(d => d.reload());
 
-	const e = g.logEvents.messageDelete;
+	/*const e = g.logEvents.messageDelete;
 	if (!e || !e.enabled || !e.channel) return;
 	const ch = message.channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
@@ -58,5 +54,5 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-	return ch.createMessage({ embed }).catch(err => null);
+	return ch.createMessage({ embed }).catch(err => null);*/
 }));

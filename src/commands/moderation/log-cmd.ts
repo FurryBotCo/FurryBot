@@ -1,26 +1,24 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { mdb } from "../../modules/Database";
-import Eris from "eris";
-import { Utility } from "../../util/Functions";
-import config from "../../config";
-import Language from "../../util/Language";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
 		"log"
 	],
-	userPermissions: [
-		"manageGuild"
-	],
-	botPermissions: [],
-	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	features: [],
+	permissions: {
+		user: [
+			"manageGuild"
+		],
+		bot: []
+	},
+	cooldown: 2e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const a = ["enable", "disable"];
-	const b = [...Object.keys(config.defaults.config.guild.logEvents).map(e => e.toLowerCase()), "all"];
+	const b = [...config.logEvents.map(e => e.toLowerCase()), "all"];
 	if (msg.args.length >= 2) {
 		if (!a.includes(msg.args[0].toLowerCase())) return msg.reply(`{lang:commands.moderation.log.invalidOption}: **${a.join("**, **")}**.`);
 		if (!b.includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.moderation.log.invalidOption}: **${b.join("**, **")}**.`);
@@ -31,46 +29,50 @@ export default new Command({
 
 		if (msg.args[1].toLowerCase() === "all") {
 			await gConfig.edit({
-				logEvents: Object.keys(config.defaults.config.guild.logEvents)
-					.map(e => ({
-						[e]: {
-							channel: ch.id,
-							enabled: c
-						}
-					})).reduce((a, b) => ({ ...a, ...b }), {})
+				logEvents: []
 			}).then(d => d.reload());
+
+			if (c) await gConfig.edit({
+				logEvents: config.logEvents.map(l => ({ channel: ch.id, type: l as any }))
+			});
 
 			if (c) return msg.reply(`{lang:commands.moderation.log.enabledAll|${ch.id}}`);
 			else return msg.reply(`{lang:commands.moderation.log.disableAll}`);
 		} else {
-			const ev = Object.keys(config.defaults.config.guild.logEvents)[Object.keys(config.defaults.config.guild.logEvents).map(k => k.toLowerCase()).indexOf(msg.args[1].toLowerCase())];
+			const ev = config.logEvents[config.logEvents.map(k => k.toLowerCase()).indexOf(msg.args[1].toLowerCase())];
+			const f = gConfig.logEvents.find(e => e.type === ev);
+			if (!!f) await gConfig.mongoEdit({
+				$pull: {
+					logEvents: f
+				} as any
+			}).then(d => gConfig.reload());
 
-			await gConfig.edit({
-				logEvents: {
-					[ev]: {
+			await gConfig.mongoEdit({
+				$push: {
+					logEvents: {
 						channel: ch.id,
-						enabled: c
+						type: ev as any
 					}
 				}
-			}).then(d => d.reload());
+			}).then(d => gConfig.reload());
 
 			if (c) return msg.reply(`{lang:commands.moderation.log.eventEnabled|${ev}|${ch.id}}`);
 			else return msg.reply(`{lang:commands.moderation.log.eventDisabled|${ev}}`);
 		}
 	} else if (msg.args.length === 0) {
 		const d = [];
-		await Promise.all(Object.keys(config.defaults.config.guild.logEvents).map(async (k) => {
-			const j = gConfig.logEvents[k];
-			if (!j || !j.enabled) return d.push(`${k} - **{lang:commands.moderation.log.disabled}**`);
+		await Promise.all(config.logEvents.map(async (k) => {
+			const j = gConfig.logEvents.find(e => e.type === k);
+			if (!j) return d.push(`${k} - **{lang:commands.moderation.log.disabled}**`);
 			const ch = msg.channel.guild.channels.get(j.channel);
-			if (!ch) await gConfig.edit({
-				logEvents: {
-					[k]: {
-						channel: null,
-						enabled: false
+			if (!ch) {
+				await gConfig.mongoEdit({
+					$pull: {
+						logEvents: j
 					}
-				}
-			}).then(d => d.reload());
+				}).then(d => gConfig.reload());
+				return d.push(`${k} - **{lang:commands.moderation.log.removed}**`);
+			}
 			return d.push(`${k} - <#${j.channel}>`);
 		}));
 
@@ -81,6 +83,7 @@ export default new Command({
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setTimestamp(new Date().toISOString())
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+				.toJSON()
 		});
 	} else return new Error("ERR_INVALID_USAGE");
 }));

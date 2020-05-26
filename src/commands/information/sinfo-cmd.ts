@@ -1,8 +1,8 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import Eris from "eris";
-import { Time } from "../../util/Functions";
 import config from "../../config";
+import { Time } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -10,13 +10,15 @@ export default new Command({
 		"serverinfo",
 		"si"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
-	cooldown: 3e3,
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
+	cooldown: 2e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const o: Eris.User = await this.getRESTUser(msg.channel.guild.ownerID).catch(err => null);
@@ -178,6 +180,6 @@ export default new Command({
 		}
 	}
 	return msg.channel.createMessage({
-		embed
+		embed: embed.toJSON()
 	});
 }));

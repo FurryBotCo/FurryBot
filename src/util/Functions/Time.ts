@@ -1,4 +1,5 @@
-import { Time as T } from "./TypeDefs";
+import { Time as T } from "../@types/Functions";
+import { type } from "os";
 
 export default class Time {
 	private constructor() {
@@ -6,13 +7,13 @@ export default class Time {
 	}
 
 	/**
-	 * convert seconds to hours
+	 * convert seconds to HH:MM:SS
 	 * @static
 	 * @param {number} sec - seconds
 	 * @returns
 	 * @memberof Time
 	 */
-	static secondsToHours(sec: number) {
+	static secondsToHMS(sec: number) {
 		let hours: string | number = Math.floor(sec / 3600);
 		let minutes: string | number = Math.floor((sec - (hours * 3600)) / 60);
 		let seconds: string | number = Math.floor(sec - (hours * 3600) - (minutes * 60));
@@ -63,9 +64,29 @@ export default class Time {
 		while (r.m >= 60) { r.h++; r.m -= 60; }
 		while (r.h >= 24) { r.d++; r.h -= 24; }
 		while (r.d >= 7) { r.w++; r.d -= 7; }
+		while (r.w >= 4 && r.d >= 2) { r.mn++; r.w -= 4; r.d -= 2; }
+		while (r.mn >= 12) { r.y++; r.mn -= 12; }
+		if (time > 0) r.s += time / 1000;
+
+		/*
+		while (time >= 1e3) { r.s++; time -= 1e3; }
+		while (r.s >= 60) { r.m++; r.s -= 60; }
+		while (r.m >= 60) { r.h++; r.m -= 60; }
+		while (r.h >= 24) { r.d++; r.h -= 24; }
+		while (r.d >= 30) { r.mn++; r.d -= 30; }
+		while (r.d >= 7) { r.w++; r.d -= 7; }
+		while (r.mn >= 12) { r.y++; r.mn -= 12; }
+		if (time > 0) r.s += time / 1000;
+
+		while (time >= 1e3) { r.s++; time -= 1e3; }
+		while (r.s >= 60) { r.m++; r.s -= 60; }
+		while (r.m >= 60) { r.h++; r.m -= 60; }
+		while (r.h >= 24) { r.d++; r.h -= 24; }
+		while (r.d >= 7) { r.w++; r.d -= 7; }
 		while (r.w >= 4) { r.mn++; r.w -= 4; }
 		while (r.mn >= 12) { r.y++; r.mn -= 12; }
 		if (time > 0) r.s += time / 1000;
+		*/
 
 		const str = [];
 		if (r.s > 0) str.push(`${Math.floor(r.s)} second${r.s === 1 ? "" : "s"}`);
@@ -124,5 +145,27 @@ export default class Time {
 		if (time instanceof Date) time = time.getTime();
 
 		return Time.ms(Date.now() - time, true).split(",")[0];
+	}
+
+	static modParsing(t: string) {
+		let time = 0;
+		const labels = {
+			m: 6e4,
+			h: 3.6e+6,
+			d: 8.64e+7,
+			n: 2.592e+9,
+			y: 3.154e+10
+		};
+		const r = new RegExp("[0-9]{1,4}[yndhm]", "ig");
+		const j = t.match(r);
+		if (!j) return 0;
+		j.map(v => {
+			const a = Number(v.slice(0, v.length - 1));
+			const b = v.slice(-1).toLowerCase();
+			if (!Object.keys(labels).includes(b)) throw new TypeError("ERR_INVALID_FORMAT");
+			time += labels[b] * a;
+		});
+
+		return time;
 	}
 }

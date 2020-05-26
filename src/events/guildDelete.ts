@@ -1,11 +1,10 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "../util/LoggerV8";
+import Logger from "../util/LoggerV9";
 import FurryBot from "../main";
-import * as Eris from "eris";
 import config from "../config";
 import { Colors } from "../util/Constants";
+import Eris from "eris";
 import { Internal } from "../util/Functions";
-import rClient from "../util/Redis";
 
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 	await this.track("events", "guildDelete");
@@ -13,7 +12,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 
 	let author = {
 		name: "Unknown#0000",
-		icon_url: "https://i.furcdn.net/noicon.png"
+		icon_url: config.images.noIcon
 	};
 	let owner = "Unknown#0000 (000000000000000000)";
 	if (guild.ownerID) {
@@ -21,7 +20,7 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		if (u !== null) {
 			author = {
 				name: `${u.username}#${u.discriminator}`,
-				icon_url: u.avatarURL ? u.avatarURL : "https://i.furcdn.net/noicon.png"
+				icon_url: u.avatarURL ? u.avatarURL : config.images.noIcon
 			};
 			owner = `${u.username}#${u.discriminator} (${u.id})`;
 		}
@@ -50,16 +49,16 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 		].join("\n"),
 		author,
 		image: {
-			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : "https://i.furcdn.net/noicon.png"
+			url: ![undefined, null, ""].includes(guild.iconURL) ? guild.iconURL : config.images.noIcon
 		},
 		thumbnail: {
-			url: "https://i.furcdn.net/noicon.png"
+			url: config.images.noIcon
 		},
 		timestamp: new Date().toISOString(),
 		color: Colors.red,
 		footer: {
 			text: `Shard ${guild.shard.id + 1}/${this.shards.size}`,
-			icon_url: "https://i.furry.bot/furry.png"
+			icon_url: config.images.botIcon
 		}
 	};
 
@@ -70,6 +69,6 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 			embed
 		],
 		username: `Furry Bot Guild Stats${config.beta ? " - Beta" : ""}`,
-		avatarURL: "https://i.furry.bot/furry.png"
+		avatarURL: config.images.botIcon
 	}).catch(err => null);
 }));

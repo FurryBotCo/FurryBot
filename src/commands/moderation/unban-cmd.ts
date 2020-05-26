@@ -1,25 +1,22 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { mdb } from "../../modules/Database";
-import Eris from "eris";
-import { Utility } from "../../util/Functions";
-import config from "../../config";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import Language from "../../util/Language";
 
 export default new Command({
 	triggers: [
-		"unban",
-		"ub"
+		"unban"
 	],
-	userPermissions: [
-		"banMembers"
-	],
-	botPermissions: [
-		"banMembers"
-	],
-	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	features: [],
+	permissions: {
+		user: [
+			"banMembers"
+		],
+		bot: [
+			"banMembers"
+		]
+	},
+	cooldown: 2e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
@@ -36,11 +33,12 @@ export default new Command({
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setTimestamp(new Date().toISOString())
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))
+				.toJSON()
 		});
 	}
 
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
-	msg.channel.guild.unbanMember(user.id, `Unban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang, "other.noReason", false);
+	await msg.channel.guild.unbanMember(user.id, `Unban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 		await msg.channel.createMessage(`***{lang:commands.moderation.unban.unbanned|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "unban",
@@ -53,5 +51,5 @@ export default new Command({
 		else await msg.channel.createMessage(`{lang:commands.moderation.unban.couldNotUnban|${user.username}#${user.discriminator}|${err}}`);
 	});
 
-	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.delete().catch(error => null);
 }));

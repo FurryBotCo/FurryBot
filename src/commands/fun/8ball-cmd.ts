@@ -1,19 +1,21 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
+import Command from "../../modules/CommandHandler/Command";
 import config from "../../config";
+import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
 		"8ball"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
@@ -26,5 +28,6 @@ export default new Command({
 			.setFooter(`{lang:commands.fun.8ball.disclaimer}`, config.images.botIcon)
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.gold)
+			.toJSON()
 	});
 }));

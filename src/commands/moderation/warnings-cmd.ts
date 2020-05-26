@@ -1,26 +1,23 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import { mdb } from "../../modules/Database";
-import Eris from "eris";
-import { Utility, Strings, Time } from "../../util/Functions";
-import config from "../../config";
-import Language from "../../util/Language";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import { Colors } from "../../util/Constants";
 import Warning from "../../util/@types/Warning";
 import chunk from "chunk";
+import Eris from "eris";
+import { Time } from "../../util/Functions";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
 		"warnings",
 		"warnlog"
 	],
-	userPermissions: [
-		"kickMembers"
-	],
-	botPermissions: [],
-	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
+	cooldown: 2e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	let member = await msg.getMemberFromArgs();
@@ -52,16 +49,14 @@ export default new Command({
 		p = pg;
 	} else p = 1;
 
-	const embed = new EmbedBuilder(gConfig.settings.lang)
-		.setTitle(`{lang:commands.moderation.warnings.title} ${member.username}#${member.discriminator}`)
-		.setTimestamp(new Date().toISOString())
-		.setColor(Math.floor(Math.random() * 0xFFFFFF))
-		.setAuthor(`${member.username}#${member.discriminator}`, member.avatarURL)
-		.setFooter(fields.length === 1 ? `{lang:commands.moderation.warnings.pageWithoutMore|${p}|${fields.length}}` : `{lang:commands.moderation.warnings.page|${p}|${fields.length}|${gConfig.settings.prefix}|${member.username}#${member.discriminator}|${p === fields.length ? p - 1 : p + 1}}`);
-
-	fields[p - 1].map(w => embed.addField(w.name, w.value, w.inline));
-
 	return msg.channel.createMessage({
-		embed
+		embed: new EmbedBuilder(gConfig.settings.lang)
+			.setTitle(`{lang:commands.moderation.warnings.title} ${member.username}#${member.discriminator}`)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Math.floor(Math.random() * 0xFFFFFF))
+			.setAuthor(`${member.username}#${member.discriminator}`, member.avatarURL)
+			.setFooter(fields.length === 1 ? `{lang:commands.moderation.warnings.pageWithoutMore|${p}|${fields.length}}` : `{lang:commands.moderation.warnings.page|${p}|${fields.length}|${gConfig.settings.prefix}|${member.username}#${member.discriminator}|${p === fields.length ? p - 1 : p + 1}}`)
+			.addFields(...fields[p - 1].map(w => ({ name: w.name, value: w.value, inline: w.inline })))
+			.toJSON()
 	});
 }));

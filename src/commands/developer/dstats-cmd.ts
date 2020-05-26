@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import { Colors } from "../../util/Constants";
 import Eris from "eris";
 
@@ -6,13 +6,13 @@ export default new Command({
 	triggers: [
 		"dstats"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Get my stats.",
-	usage: "",
-	features: ["devOnly"],
+	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const types = ["size", "shards", "users", "channels"];

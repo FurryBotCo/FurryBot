@@ -1,24 +1,20 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { mdb } from "../../modules/Database";
-import Eris from "eris";
-import { Utility } from "../../util/Functions";
-import config from "../../config";
-import Language from "../../util/Language";
-import EmbedBuilder from "../../util/EmbedBuilder";
+import Command from "../../modules/CommandHandler/Command";
 
 export default new Command({
 	triggers: [
 		"lock"
 	],
-	userPermissions: [
-		"kickMembers"
-	],
-	botPermissions: [
-		"manageChannels"
-	],
-	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	features: [],
+	permissions: {
+		user: [
+			"kickMembers"
+		],
+		bot: [
+			"manageChannels"
+		]
+	},
+	cooldown: 2e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	let ch = msg.channel;

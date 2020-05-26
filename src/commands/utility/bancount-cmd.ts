@@ -1,17 +1,25 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import Eris from "eris";
-import { Colors } from "../../util/Constants";
+import Command from "../../modules/CommandHandler/Command";
+import { Utility } from "../../util/Functions";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
 		"bancount"
 	],
-	userPermissions: [],
-	botPermissions: [],
-	cooldown: 5e3,
-	donatorCooldown: 5e3,
-	features: [],
+	permissions: {
+		user: [
+			"viewAuditLogs"
+		],
+		bot: [
+			"viewAuditLogs",
+			"banMembers"
+		]
+	},
+	cooldown: 3e3,
+	donatorCooldown: 3e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const b: Eris.GuildAuditLogEntry[] = [];
@@ -36,7 +44,6 @@ export default new Command({
 			.setDescription(Object.keys(k).map(j => `<@!${j}>: ${k[j]}`).join("\n"))
 			.setColor(Colors.green)
 			.setTimestamp(new Date().toISOString())
+			.toJSON()
 	});
-
-
 }));

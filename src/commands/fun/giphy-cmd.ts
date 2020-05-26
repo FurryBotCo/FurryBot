@@ -1,28 +1,29 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
+import Command from "../../modules/CommandHandler/Command";
 import config from "../../config";
-import phin from "phin";
+import EmbedBuilder from "../../util/EmbedBuilder";
 import { Request } from "../../util/Functions";
+import phin from "phin";
 
 export default new Command({
 	triggers: [
 		"giphy"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks",
-		"attachFiles"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks",
+			"attachFiles"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
 	const rq = await phin<any>({
 		method: "GET",
-		url: `https://api.giphy.com/v1/gifs/search?api_key=${config.keys.giphy.apikey}&q=${msg.args.join("%20")}&limit=50&offset=7&rating=G&lang=en`,
+		url: `https://api.giphy.com/v1/gifs/search?api_key=${config.apiKeys.giphy.apikey}&q=${msg.args.join("%20")}&limit=50&offset=7&rating=G&lang=en`,
 		parse: "json",
 		timeout: 5e3
 	});
@@ -39,8 +40,9 @@ export default new Command({
 			.setColor(Math.floor(Math.random() * 0xFFFFFF))
 			.setThumbnail("attachment://PoweredByGiphy.png")
 			.setFooter("{lang:commands.fun.giphy.disclaimer}")
+			.toJSON()
 	}, {
-		file: await Request.getImageFromURL("https://assets.furry.bot/PoweredByGiphy.png"),
+		file: await Request.getImageFromURL(config.images.giphyPoweredBy),
 		name: "PoweredByGiphy.png"
 	});
 }));

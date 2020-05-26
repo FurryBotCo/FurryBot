@@ -1,19 +1,21 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import * as Eris from "eris";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import chunk from "chunk";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
-		"seen",
-		"seenon"
+		"seen"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
-	cooldown: 2e3,
-	donatorCooldown: 1e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
+	cooldown: 3e3,
+	donatorCooldown: 3e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
@@ -55,5 +57,7 @@ export default new Command({
 		embed.setDescription(`${embed.getDescription()}\n{lang:commands.utility.seen.tooManyServers}`);
 	} else fields.map(f => embed.addField(f.name, f.value, f.inline));
 
-	msg.channel.createMessage({ embed });
+	msg.channel.createMessage({
+		embed: embed.toJSON()
+	});
 }));

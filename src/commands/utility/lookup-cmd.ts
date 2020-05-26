@@ -1,20 +1,22 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
+import { Time } from "../../util/Functions";
+import { ChannelNames, Colors } from "../../util/Constants";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import Eris from "eris";
 import config from "../../config";
 import phin from "phin";
-import * as Eris from "eris";
-import { Colors, ChannelNames } from "../../util/Constants";
-import { Time } from "../../util/Functions";
-import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
 		"lookup"
 	],
-	userPermissions: [],
-	botPermissions: [],
-	cooldown: 5e3,
-	donatorCooldown: 5e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
+	cooldown: 3e3,
+	donatorCooldown: 3e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
@@ -26,7 +28,7 @@ export default new Command({
 		method: "GET",
 		url: `https://discordapp.com/api/guilds/${msg.args[0]}/widget.json`,
 		headers: {
-			"Authorization": `Bot ${config.bot.client.token}`,
+			"Authorization": `Bot ${config.client.token}`,
 			"User-Agent": config.web.userAgent
 		},
 		parse: "json"
@@ -96,7 +98,7 @@ export default new Command({
 			}
 
 			return msg.channel.createMessage({
-				embed
+				embed: embed.toJSON()
 			});
 			break;
 
@@ -107,6 +109,7 @@ export default new Command({
 					.setDescription(`{lang:commands.utility.lookup.foundDesc|${msg.args[0]}} {lang:commands.utility.lookup.noInfo}`)
 					.setColor(Colors.orange)
 					.setTimestamp(new Date().toISOString())
+					.toJSON()
 			});
 			break;
 
@@ -117,6 +120,7 @@ export default new Command({
 					.setDescription(`{lang:commands.utility.lookup.notFoundDesc|${msg.args[0]}}`)
 					.setColor(Colors.red)
 					.setTimestamp(new Date().toISOString())
+					.toJSON()
 			});
 			break;
 
@@ -128,6 +132,7 @@ export default new Command({
 					.setDescription(`{lang:commands.utility.lookup.discordErrorDesc|${w.statusCode}|${w.statusMessage}}`)
 					.setColor(Colors.red)
 					.setTimestamp(new Date().toISOString())
+					.toJSON()
 			});
 	}
 }));

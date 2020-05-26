@@ -1,7 +1,6 @@
 import YAML from "yaml";
 import * as fs from "fs-extra";
 import config from "../config";
-import _ from "lodash";
 interface LangString extends String {
 	format<T extends any = string>(...args: T[]): string;
 }
@@ -65,10 +64,18 @@ class SpecificLanguage {
 export default class Language {
 	private constructor() { }
 
-	static get(lang: string) {
+	static get(lang: string): SpecificLanguage;
+	static get(lang: string, path: string, parseable?: true): LangString;
+	static get(lang: string, path: string, parseable: false): string;
+	static get(lang: string, path?: string, parseable?: boolean) {
 		if (!fs.existsSync(`${config.dir.lang}/${lang}.yaml`)) lang = "en"; // (prefer default over error) throw new TypeError("invalid language");
 		const l = YAML.parse(fs.readFileSync(`${config.dir.lang}/${lang}.yaml`).toString());
-		return new SpecificLanguage(lang, l);
+		const ln = new SpecificLanguage(lang, l);
+		if (!path) return ln;
+		else {
+			const s = ln.get(path);
+			return !parseable ? s.toString() : s;
+		}
 	}
 
 	static has(lang: string) { return fs.existsSync(`${config.dir.lang}/${lang}.yaml`); }

@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import config from "../../config";
 import phin from "phin";
 import util from "util";
@@ -11,13 +11,13 @@ export default new Command({
 		"shell",
 		"sh"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Execute shell code.",
-	usage: "<code>",
-	features: ["devOnly"],
+	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	let silent = false;
@@ -60,8 +60,8 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					api_dev_key: config.keys.pastebin.devKey,
-					api_user_key: config.keys.pastebin.userKey,
+					api_dev_key: config.apiKeys.pastebin.devKey,
+					api_user_key: config.apiKeys.pastebin.userKey,
 					api_option: "paste",
 					api_paste_code: res,
 					api_paste_private: "2",
@@ -102,8 +102,8 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					api_dev_key: config.keys.pastebin.devKey,
-					api_user_key: config.keys.pastebin.userKey,
+					api_dev_key: config.apiKeys.pastebin.devKey,
+					api_user_key: config.apiKeys.pastebin.userKey,
 					api_option: "paste",
 					api_paste_code: res,
 					api_paste_private: "2",

@@ -1,20 +1,22 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { Colors } from "../../util/Constants";
+import Command from "../../modules/CommandHandler/Command";
 import { Request } from "../../util/Functions";
+import config from "../../config";
+import { Colors } from "../../util/Constants";
+import Eris from "eris";
 import * as fs from "fs-extra";
 import { Canvas } from "canvas-constructor";
-import Eris from "eris";
-import config from "../../config";
 
 export default new Command({
 	triggers: [
 		"ship"
 	],
-	userPermissions: [],
-	botPermissions: [],
-	cooldown: 5e3,
-	donatorCooldown: 2.5e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1, reset = false;

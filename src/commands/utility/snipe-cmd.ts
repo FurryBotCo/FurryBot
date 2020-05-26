@@ -1,20 +1,21 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import * as Eris from "eris";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
 		"snipe"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (!gConfig.settings.snipeCommand) return msg.reply("{lang:other.error.commandDisabledSettings}");
 	let ch: Eris.TextChannel;
 	if (msg.args.length > 0) ch = await msg.getChannelFromArgs();
 
@@ -36,5 +37,6 @@ export default new Command({
 			.setDescription(s.content)
 			.setTimestamp(new Date(s.time).toISOString())
 			.setColor(Colors.red)
+			.toJSON()
 	});
 }));

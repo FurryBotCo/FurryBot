@@ -1,7 +1,7 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
+import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
-import config from "../../config";
 import phin from "phin";
 
 export default new Command({
@@ -9,13 +9,15 @@ export default new Command({
 		"ipinfo",
 		"ip"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
 	cooldown: 5e3,
 	donatorCooldown: 2.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.unparsedArgs.length < 1) throw new Error("ERR_INVALID_USAGE");
@@ -42,5 +44,6 @@ export default new Command({
 			.addField("{lang:commands.information.ipinfo.location}", `${req.city}, ${req.region} (${req.region_code}) - ${req.country_name} ({lang:commands.information.ipinfo.lat}: ${req.latitude} {lang:commands.information.ipinfo.long}: ${req.longitude})`)
 			.addField("{lang:commands.information.ipinfo.owner}", `${req.org} (${req.asn})`)
 			.addField("{lang:commands.information.ipinfo.timezone}", `${req.timezone} (UTC-${req.utc_offset})`)
+			.toJSON()
 	});
 }));

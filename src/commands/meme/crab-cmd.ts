@@ -1,40 +1,25 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { Request } from "../../util/Functions";
-import config from "../../config";
+import Command from "../../modules/CommandHandler/Command";
+import { DankMemerAPI } from "../../modules/External";
 
 export default new Command({
 	triggers: [
 		"crab"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"attachFiles",
-		"embedLinks"
-	],
-	cooldown: 12.5e3,
-	donatorCooldown: 1e4,
-	features: [],
+	permissions: {
+		user: [],
+		bot: [
+			"attachFiles"
+		]
+	},
+	cooldown: 2.5e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.unparsedArgs.length < 1) throw new Error("ERR_INVALID_USAGE");
+	const img = await DankMemerAPI.crab(msg.unparsedArgs.join(" ") || "Provide Some Text.");
 
-	const m = await msg.channel.createMessage("{lang:commands.meme.crab.time}");
-
-	const { body: img } = await Request.memeRequest("/crab", null, null, msg.unparsedArgs.join(" "));
-
-	let b;
-	try {
-		b = JSON.parse(img.toString());
-	} catch (e) {
-		b = null;
-	}
-	if (b !== null) {
-		if (b.error && b.error === "You must submit exactly two strings split by comma") return msg.reply("{lang:commands.meme.crab.invalid}");
-		return msg.channel.createMessage(`{lang:commands.meme.crab.error}..\n\`\`\`json\n${JSON.stringify(b)}\n\`\`\`\n\n{lang:commands.meme.crab.support}: ${config.bot.supportURL}`);
-	}
-	await m.delete();
 	return msg.channel.createMessage("", {
-		name: "crab.mp4",
-		file: img
+		file: img.file,
+		name: `${cmd.triggers[0]}.${img.ext}`
 	});
 }));

@@ -1,5 +1,5 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "../util/LoggerV8";
+import Logger from "../util/LoggerV9";
 import FurryBot from "../main";
 import config from "../config";
 import { Colors } from "../util/Constants";
@@ -8,7 +8,7 @@ export default new ClientEvent("shardReady", (async function (this: FurryBot, id
 	this.track("events", "shardReady");
 	Logger.log("Shard Ready", `Shard #${id} is ready.`);
 	if (!this.firstReady) this.shards.get(id).editStatus("idle", { name: "Not ready yet..", type: 0 });
-	return this.executeWebhook(config.webhooks.shard.id, config.webhooks.shard.token, {
+	return this.w.get("shard").execute({
 		embeds: [
 			{
 				title: "Shard Ready",
@@ -18,6 +18,6 @@ export default new ClientEvent("shardReady", (async function (this: FurryBot, id
 			}
 		],
 		username: `Furry Bot${config.beta ? " - Beta" : ""} Status`,
-		avatarURL: "https://i.furry.bot/furry.png"
+		avatarURL: config.images.botIcon
 	}).catch(err => null);
 }));

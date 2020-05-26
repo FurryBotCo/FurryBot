@@ -1,5 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { mdb } from "../../modules/Database";
+import Command from "../../modules/CommandHandler/Command";
 import { Utility } from "../../util/Functions";
 
 export default new Command({
@@ -7,15 +6,17 @@ export default new Command({
 		"asar",
 		"addselfassignablerole"
 	],
-	userPermissions: [
-		"manageRoles"
-	],
-	botPermissions: [
-		"manageRoles"
-	],
+	permissions: {
+		user: [
+			"manageRoles"
+		],
+		bot: [
+			"manageRoles"
+		]
+	},
 	cooldown: 3e3,
-	donatorCooldown: 2e3,
-	features: [],
+	donatorCooldown: 3e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const role = await msg.getRoleFromArgs(0, true, true);
@@ -27,7 +28,6 @@ export default new Command({
 	if (role.managed) return msg.reply(`{lang:commands.utility.asar.managed}`);
 	const roles = gConfig.selfAssignableRoles;
 	if (roles.includes(role.id)) return msg.reply(`{lang:commands.utility.asar.alreadyListed}`);
-	await mdb.collection("guilds").findOneAndUpdate({ id: msg.channel.guild.id }, { $push: { selfAssignableRoles: role.id } });
-	// await msg.gConfig.modlog.add({ blame: msg.author.id, action: "addSelfAssignableRole", role: role.id, timestamp: Date.now() });
+	await gConfig.mongoEdit({ $push: { selfAssignableRoles: role.id } });
 	return msg.reply(`{lang:commands.utility.asar.added|${role.name}}`);
 }));

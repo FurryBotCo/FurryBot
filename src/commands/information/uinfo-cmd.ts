@@ -1,29 +1,31 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import { Time } from "../../util/Functions";
+import { Colors } from "../../util/Constants";
+import Eris from "eris";
 import config from "../../config";
-import db, { mdb } from "../../modules/Database";
-import { Blacklist } from "../../util/@types/Misc";
-import { unlink } from "fs";
+import { Time, Internal } from "../../util/Functions";
+import db from "../../modules/Database";
 
 export default new Command({
 	triggers: [
 		"uinfo",
-		"userinfo",
 		"ui"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
-	cooldown: 3e3,
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
+	cooldown: 2e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
+	if (msg.channel.guild.memberCount <= 1000) await msg.channel.guild.fetchAllMembers(); // make numbers accurate in guilds under 1000 members
 	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
-	if (!user) return msg.errorEmbed("INVALID_USER");
+	if (!user) return msg.errorEmbed("INVALID_MEMBER");
 	let flags: number = user.user.publicFlags;
 	if (typeof flags !== "number") {
 		const u = await this.getRESTUser(user.id);
@@ -31,9 +33,6 @@ export default new Command({
 	}
 
 	const m = Array.from(msg.channel.guild.members.values()).sort((a, b) => a.joinedAt - b.joinedAt).map(m => m.id);
-
-	const around = [...workItOut(true).reverse(), user.id, ...workItOut(false)];
-
 	function workItOut(n: boolean) {
 		const k: string[] = [];
 		for (let i = 1; i < 3; i++) {
@@ -43,6 +42,7 @@ export default new Command({
 		}
 		return k;
 	}
+	const around = [...workItOut(true).reverse(), user.id, ...workItOut(false)];
 	const f: number[] = [];
 
 	// assuming Discord flags are max 20
@@ -50,13 +50,12 @@ export default new Command({
 	if (config.developers.includes(user.id)) f.push(config.flags.dev);
 	if (config.contributors.includes(user.id)) f.push(config.flags.contrib);
 	if (config.helpers.includes(user.id)) f.push(config.flags.helper);
-	try { if (this.guilds.get(config.bot.mainGuild).members.get(user.id).roles.includes(config.roles.staff) || user.id === this.guilds.get(config.bot.mainGuild).ownerID) f.push(config.flags.staff); } catch (e) { }
-	try { if (this.guilds.get(config.bot.mainGuild).members.get(user.id).roles.includes(config.roles.booster)) f.push(config.flags.booster); } catch (e) { }
+	try { if (this.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.staff) || user.id === this.guilds.get(config.client.mainGuild).ownerID) f.push(config.flags.staff); } catch (e) { }
+	try { if (this.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.booster)) f.push(config.flags.booster); } catch (e) { }
 	const c = await db.getUser(user.id);
 	const p = await c.premiumCheck();
-	const ublB: Blacklist.UserEntry[] = await mdb.collection("blacklist").find({ userId: user.id }).toArray();
-	const ubl: Blacklist.UserEntry[] = ublB.filter(r => [0, null].includes(r.expire) || r.expire > Date.now());
-	if (ubl.length > 0) f.push(config.flags.blacklisted);
+	const ubl = await uConfig.checkBlacklist();
+	if (ubl.current.length > 0) f.push(config.flags.blacklisted);
 	if (p.active) f.push(config.flags.donator);
 
 	return msg.channel.createMessage({
@@ -79,5 +78,6 @@ export default new Command({
 			].join("\n"))
 			.setTimestamp(new Date().toISOString())
 			.setColor(Math.floor(Math.random() * 0xFFFFFF))
+			.toJSON()
 	});
 }));

@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors, Permissions } from "../../util/Constants";
 
@@ -7,13 +7,15 @@ export default new Command({
 		"perms",
 		"listperms"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const member = msg.args.filter(a => !a.startsWith("--")).length === 0 ? msg.member : await msg.getMemberFromArgs();
@@ -37,5 +39,6 @@ export default new Command({
 					`{lang:commands.information.perms.compact|${gConfig.settings.prefix}|${member.username}#${member.discriminator}}`
 				] : [])
 			].join("\n"))
+			.toJSON()
 	});
 }));

@@ -1,10 +1,9 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { mdb } from "../../modules/Database";
+import Command from "../../modules/CommandHandler/Command";
 import Eris from "eris";
-import { Utility } from "../../util/Functions";
-import config from "../../config";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Time, Utility } from "../../util/Functions";
 import Language from "../../util/Language";
-import { Colors } from "../../util/Constants";
+import { mdb } from "../../modules/Database";
 import Warning from "../../util/@types/Warning";
 
 export default new Command({
@@ -12,13 +11,15 @@ export default new Command({
 		"delwarn",
 		"rmwarn"
 	],
-	userPermissions: [
-		"kickMembers"
-	],
-	botPermissions: [],
-	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	features: [],
+	permissions: {
+		user: [
+			"kickMembers"
+		],
+		bot: []
+	},
+	cooldown: 2e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 2) return new Error("ERR_INVALID_USAGE");

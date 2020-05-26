@@ -1,25 +1,22 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { mdb } from "../../modules/Database";
-import Eris from "eris";
-import { Utility, Strings } from "../../util/Functions";
-import config from "../../config";
+import Command from "../../modules/CommandHandler/Command";
+import { Strings } from "../../util/Functions";
 import Language from "../../util/Language";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import { Colors } from "../../util/Constants";
+import { mdb } from "../../modules/Database";
 import Warning from "../../util/@types/Warning";
 
 export default new Command({
 	triggers: [
-		"warn",
-		"w"
+		"warn"
 	],
-	userPermissions: [
-		"kickMembers"
-	],
-	botPermissions: [],
-	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	features: [],
+	permissions: {
+		user: [
+			"manageMessages"
+		],
+		bot: []
+	},
+	cooldown: 2e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const member = await msg.getMemberFromArgs();
@@ -49,5 +46,5 @@ export default new Command({
 		});
 	});
 
-	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.delete().catch(error => null);
 }));

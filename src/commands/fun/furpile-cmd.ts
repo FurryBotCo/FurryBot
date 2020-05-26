@@ -1,18 +1,18 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import config from "../../config";
+import Command from "../../modules/CommandHandler/Command";
 import Eris from "eris";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
 		"furpile"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"externalEmojis"
-	],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const h = this.holder.has("furpile", msg.channel.id);

@@ -1,17 +1,17 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import { Strings } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
 		"test"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Some stuff for testing",
-	usage: "",
-	features: ["devOnly"],
+	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (!msg.args[0]) return msg.reply("tested..");
@@ -126,6 +126,23 @@ export default new Command({
 					}
 				}
 			});
+		}
+
+		case "music": {
+			console.log("a");
+			const p = this.v.get(msg.channel.guild.id);
+			console.log("b");
+			if (!msg.member.voiceState || !msg.member.voiceState.channelID) return msg.reply("join a voice channel.");
+			console.log("c");
+			// const t = await this.v.load("ytsearch:paws to the walls fursona version");
+			const q = this.getQueue(msg.channel.guild.id, msg.channel.id, msg.member.voiceState.channelID);
+			console.log("d");
+			const t = await q.search("youtube", msg.args.slice(1).join(" ") || "https://www.youtube.com/watch?v=zGDzdps75ns");
+			console.log("e");
+			q.add(t[0], msg.author.id, true);
+			console.log("f");
+			return msg.reply("playing.");
+			break;
 		}
 
 		default: {

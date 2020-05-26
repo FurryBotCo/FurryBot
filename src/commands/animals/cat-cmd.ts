@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import phin from "phin";
 
@@ -6,14 +6,16 @@ export default new Command({
 	triggers: [
 		"cat"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"attachFiles",
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"attachFiles",
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const img = await phin<any>({
@@ -30,5 +32,6 @@ export default new Command({
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))
 				.setImage(img.file)
+				.toJSON()
 	});
 }));

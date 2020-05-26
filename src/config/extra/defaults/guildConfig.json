@@ -1,11 +1,5 @@
 {
 	"selfAssignableRoles": [],
-	"music": {
-		"volume": 100,
-		"textChannel": null,
-		"queue": []
-	},
-	"modlog": [],
 	"settings": {
 		"announceLevelUp": false,
 		"levelingIgnoreChannels": [],
@@ -34,93 +28,8 @@
 		"delete": {},
 		"edit": {}
 	},
-	"logEvents": {
-		"channelCreate": {
-			"channel": null,
-			"enabled": false
-		},
-		"channelDelete": {
-			"channel": null,
-			"enabled": false
-		},
-		"channelUpdate": {
-			"channel": null,
-			"enabled": false
-		},
-		"memberBan": {
-			"channel": null,
-			"enabled": false
-		},
-		"memberUnban": {
-			"channel": null,
-			"enabled": false
-		},
-		"memberJoin": {
-			"channel": null,
-			"enabled": false
-		},
-		"memberLeave": {
-			"channel": null,
-			"enabled": false
-		},
-		"memberUpdate": {
-			"channel": null,
-			"enabled": false
-		},
-		"roleCreate": {
-			"channel": null,
-			"enabled": false
-		},
-		"roleDelete": {
-			"channel": null,
-			"enabled": false
-		},
-		"roleUpdate": {
-			"channel": null,
-			"enabled": false
-		},
-		"messageDelete": {
-			"channel": null,
-			"enabled": false
-		},
-		"messageBulkDelete": {
-			"channel": null,
-			"enabled": false
-		},
-		"messageEdit": {
-			"channel": null,
-			"enabled": false
-		},
-		"presenceUpdate": {
-			"channel": null,
-			"enabled": false
-		},
-		"userUpdate": {
-			"channel": null,
-			"enabled": false
-		},
-		"voiceJoin": {
-			"channel": null,
-			"enabled": false
-		},
-		"voiceLeave": {
-			"channel": null,
-			"enabled": false
-		},
-		"voiceSwitch": {
-			"channel": null,
-			"enabled": false
-		},
-		"voiceStateUpdate": {
-			"channel": null,
-			"enabled": false
-		},
-		"guildUpdate": {
-			"channel": null,
-			"enabled": false
-		}
-	},
-	"tags": {},
+	"logEvents": [],
+	"tags": [],
 	"auto": [],
 	"disable": [],
 	"deletion": null

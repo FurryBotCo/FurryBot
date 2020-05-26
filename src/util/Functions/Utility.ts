@@ -1,12 +1,9 @@
 import config from "../../config";
-import phin from "phin";
-import Eris from "eris";
-import youtubesearch from "youtube-search";
-import ytdl from "ytdl-core";
-import * as URL from "url";
-import util from "util";
+import Eris, { Guild } from "eris";
+import { Utility as T } from "../@types/Functions";
 import FurryBot from "../../main";
-import { Utility as T } from "./TypeDefs";
+import * as URL from "url";
+import phin from "phin";
 
 export default class Utility {
 	private constructor() {
@@ -22,56 +19,6 @@ export default class Utility {
 	 * @memberof Utility
 	 */
 	static removeDuplicates<T>(array: T[]) { return Array.from(new Set(array)); }
-
-	/**
-	 *
-	 * @static
-	 * @param {string} url
-	 * @returns {Promise<T.ShortURL>}
-	 * @memberof Utility
-	 */
-	static async shortenURL(url: string): Promise<{
-		success: boolean;
-		code: string;
-		url: string;
-		link: string;
-		linkNumber: number;
-		createdTimestamp: number;
-		created: string;
-		length: number;
-		new: boolean;
-	}> {
-		const req = await phin<any>({
-			url: `https://r.furry.services/get?url=${encodeURIComponent(url)}`,
-			headers: {
-				"User-Agent": config.web.userAgent
-			},
-			parse: "json"
-		});
-
-		if (req.statusCode === 200) return {
-			new: false,
-			...req.body
-		};
-		else if (req.statusCode === 404) {
-			const cr = await phin<any>({
-				method: "POST",
-				url: `https://r.furry.services/create?url=${encodeURIComponent(url)}`,
-				headers: {
-					"User-Agent": config.web.userAgent
-				},
-				parse: "json",
-				timeout: 5e3
-			});
-
-			if (cr.statusCode !== 200) return null;
-			else return {
-				new: true,
-				...cr.body
-			};
-		}
-		else throw new Error(`furry.services api returned non 200/404 response: ${req.statusCode}, body: ${req.body}`);
-	}
 
 	/**
 	 * compare 2 members with eachother
@@ -189,7 +136,8 @@ export default class Utility {
 	 * @memberof Utility
 	 */
 	static compareMemberWithRole(member: Eris.Member, role: Eris.Role): T.CompareMemberWithRoleResult {
-		const a = member.roles.map(r => member.guild.roles.get(r)).map(r => r.position).sort().reverse()[0];
+		if (member.id === member.guild.ownerID) return { higher: false, lower: true, same: false };
+		const a = member.roles.map(r => member.guild.roles.get(r)).map(r => r.position).sort((a, b) => b - a)[0];
 
 		return {
 			higher: a > role.position,
@@ -197,23 +145,6 @@ export default class Utility {
 			same: a === role.position
 		};
 	}
-
-	/**
-	 * search videos on youtube
-	 * @static
-	 * @param {string} [q=""]
-	 * @returns {Promise<youtubesearch.YouTubeSearchResults[]>}
-	 * @memberof Utility
-	 */
-	static ytsearch(q = "") { return util.promisify(youtubesearch)(q, config.ytSearchOptions ? config.ytSearchOptions : {}).then(res => res.filter(y => y.kind === "youtube#video").slice(0, 10)); }
-
-	/**
-	 * Get info on a youtube video
-	 * @param {string} url
-	 * @returns {Promise<ytdl.videoInfo>}
-	 * @memberof Utility
-	 */
-	static ytinfo(url: string): Promise<ytdl.videoInfo> { return ytdl.getInfo(url); }
 
 	/**
 	 * validate a url

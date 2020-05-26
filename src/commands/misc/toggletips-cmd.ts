@@ -1,14 +1,16 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 
 export default new Command({
 	triggers: [
 		"toggletips"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (uConfig.tips) return uConfig.edit({ tips: false }).then(d => d.reload()).then(() => msg.reply("{lang:commands.misc.toggletips.disabled}"));

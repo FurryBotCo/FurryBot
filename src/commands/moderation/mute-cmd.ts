@@ -1,33 +1,33 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { mdb } from "../../modules/Database";
-import Eris from "eris";
-import { Utility } from "../../util/Functions";
-import config from "../../config";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import { Colors } from "../../util/Constants";
+import { mdb } from "../../modules/Database";
+import { Utility, Time } from "../../util/Functions";
 import Language from "../../util/Language";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
-		"mute",
-		"m"
+		"mute"
 	],
-	userPermissions: [
-		"kickMembers"
-	],
-	botPermissions: [
-		"manageRoles"
-	],
-	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	features: [],
+	permissions: {
+		user: [
+			"manageMessages"
+		],
+		bot: [
+			"manageRoles"
+		]
+	},
+	cooldown: 2e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
+	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
 	let time = 0;
 	// get member from message
-	const user = await msg.getMemberFromArgs();
+	const member = await msg.getMemberFromArgs();
 
-	if (!user) return msg.errorEmbed("INVALID_USER");
+	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 
 	if (gConfig.settings.muteRole === null) return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
@@ -36,6 +36,7 @@ export default new Command({
 			.setColor(Colors.red)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
 			.setTimestamp(new Date().toISOString())
+			.toJSON()
 	});
 
 	if (!msg.channel.guild.roles.has(gConfig.settings.muteRole)) {
@@ -47,6 +48,7 @@ export default new Command({
 				.setColor(Colors.red)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setTimestamp(new Date().toISOString())
+				.toJSON()
 		});
 	}
 
@@ -59,60 +61,62 @@ export default new Command({
 			.setColor(Colors.red)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
 			.setTimestamp(new Date().toISOString())
+			.toJSON()
 	});
 
-	if (user.roles.includes(gConfig.settings.muteRole)) return msg.channel.createMessage({
+	if (member.roles.includes(gConfig.settings.muteRole)) return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.moderation.mute.alreadyMuted}")
-			.setDescription(`{lang:commands.moderation.mute.alreadyMutedDesc|${user.username}#${user.discriminator}|${msg.prefix}|${user.id}}`)
+			.setDescription(`{lang:commands.moderation.mute.alreadyMutedDesc|${member.username}#${member.discriminator}|${msg.prefix}|${member.id}}`)
 			.setColor(Colors.red)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setTimestamp(new Date().toISOString())
+			.setTimestamp(new Date().toISOString()).toJSON()
 	});
 
-	if (msg.args.length > 1 && msg.args[1].match(/[0-9]{1,4}[ymdh]/i)) {
-		const labels = {
-			h: 3.6e+6,
-			d: 8.64e+7,
-			m: 2.628e+9,
-			y: 3.154e+10
-		};
-		const t = Number(msg.args[1].slice(0, msg.args[1].length - 1).toLowerCase());
-		const i = msg.args[1].slice(msg.args[1].length - 1).toLowerCase();
-		if (t < 1) return msg.reply("{lang:commands.moderation.mute.tooLittleTime}");
-		if (!Object.keys(labels).includes(i)) return msg.reply("{lang:commands.moderation.invalidTime}");
-		const a = [...msg.args];
-		a.splice(1, 1);
-		msg.args = a;
-		time = labels[i] * t;
+	if (msg.args.length >= 2) {
+		try {
+			time = Time.modParsing(msg.args[1]);
+			if (!!time) {
+				const a = [...msg.args];
+				a.splice(1, 1);
+				msg.args = a;
+			}
+		}
+		catch (e) {
+			if (e instanceof Error) {// for typings, catch clause cannot be annotated (TS1196)
+				if (e.name !== "ERR_INVALID_FORMAT") throw e; // rethrow the error if it's not what we expect
+
+				return msg.reply("{lang:other.errors.invalidTime}");
+			}
+		}
 	}
 
-	if (user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.reply("{lang:commands.moderation.noSelf}");
-	const b = Utility.compareMembers(msg.member, user);
-	if ((b.member2.higher || b.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(`{lang:commands.moderation.mute.noMuteOther|${user.username}#${user.discriminator}}`);
+	if (member.id === msg.member.id) return msg.reply("{lang:commands.moderation.noSelf}");
+	const b = Utility.compareMembers(member, msg.member);
+	if ((b.member1.higher || b.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(`{lang:commands.moderation.mute.noMuteOther|${member.username}#${member.discriminator}}`);
 	// if (user.permission.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang, "other.noReason", false);
 
-	user.addRole(gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
-		await msg.channel.createMessage(`***{lang:commands.moderation.mute.muted|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
+	member.addRole(gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+		await msg.channel.createMessage(`***{lang:commands.moderation.mute.muted|${member.username}#${member.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "mute",
 			time,
 			reason,
-			target: user.user,
+			target: member.user,
 			blame: msg.author
 		});
 		if (time !== 0) await mdb.collection<GlobalTypes.TimedEntry>("timed").insertOne({
 			time,
 			expiry: Date.now() + time,
-			userId: user.id,
+			userId: member.id,
 			guildId: msg.channel.guild.id,
 			type: "mute",
 			reason
 		} as any); // apparently mongodb's types require specifying "_id" so we'll do this now
 	}).catch(async (err) => {
 		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.mute.englishOnly}`);
-		else await msg.reply(`{lang:commands.moderation.mute.couldNotMute|${user.username}#${user.discriminator}|${err}}`);
+		else await msg.reply(`{lang:commands.moderation.mute.couldNotMute|${member.username}#${member.discriminator}|${err}}`);
 		/*if (m !== undefined) {
 			await m.delete();
 		}*/

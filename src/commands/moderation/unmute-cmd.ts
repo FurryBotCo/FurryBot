@@ -1,38 +1,33 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { mdb } from "../../modules/Database";
-import Eris from "eris";
-import { Utility } from "../../util/Functions";
-import config from "../../config";
-import Language from "../../util/Language";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import { Utility } from "../../util/Functions";
+import Language from "../../util/Language";
 import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
-		"unmute",
-		"um"
+		"unmute"
 	],
-	userPermissions: [
-		"kickMembers"
-	],
-	botPermissions: [
-		"manageRoles"
-	],
-	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	features: [],
+	permissions: {
+		user: [
+			"manageMessages"
+		],
+		bot: [
+			"manageRoles"
+		]
+	},
+	cooldown: 2e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
 
 	// get member from message
-	const user = await msg.getMemberFromArgs();
+	const member = await msg.getMemberFromArgs();
 
-	if (!user) return msg.errorEmbed("INVALID_USER");
+	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 
-	// if(user.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.channel.createMessage("Pretty sure you don't want to do this to yourthis.");
-	// if(user.roles.highest.rawPosition >= msg.member.roles.highest.rawPosition && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`You cannot mute ${user.username}#${user.discriminator} as their highest role is higher than yours!`);
-	// if(user.permissions.has("administrator")) return msg.channel.createMessage("That user has `ADMINISTRATOR`, that would literally do nothing.");
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
 	if (gConfig.settings.muteRole === null) return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
@@ -41,6 +36,7 @@ export default new Command({
 			.setColor(Colors.red)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
 			.setTimestamp(new Date().toISOString())
+			.toJSON()
 	});
 
 	if (!msg.channel.guild.roles.has(gConfig.settings.muteRole)) {
@@ -52,6 +48,7 @@ export default new Command({
 				.setColor(Colors.red)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setTimestamp(new Date().toISOString())
+				.toJSON()
 		});
 	}
 
@@ -64,28 +61,30 @@ export default new Command({
 			.setColor(Colors.red)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
 			.setTimestamp(new Date().toISOString())
+			.toJSON()
 	});
 
-	if (!user.roles.includes(gConfig.settings.muteRole)) return msg.channel.createMessage({
+	if (!member.roles.includes(gConfig.settings.muteRole)) return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.moderation.unmute.notMuted}")
-			.setDescription(`{lang:commands.moderation.unmute.notMutedDesc|${user.username}#${user.discriminator}|${msg.prefix}|${user.id}}`)
+			.setDescription(`{lang:commands.moderation.unmute.notMutedDesc|${member.username}#${member.discriminator}|${msg.prefix}|${member.id}}`)
 			.setColor(Colors.red)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
 			.setTimestamp(new Date().toISOString())
+			.toJSON()
 	});
 
-	user.removeRole(gConfig.settings.muteRole, `Unmute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
-		await msg.channel.createMessage(`***{lang:commands.moderation.unmute.unmuted|${user.username}#${user.discriminator}|${reason}}***`).catch(noerr => null);
+	await member.removeRole(gConfig.settings.muteRole, `Unmute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+		await msg.channel.createMessage(`***{lang:commands.moderation.unmute.unmuted|${member.username}#${member.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
 			type: "unmute",
-			target: user,
+			target: member,
 			blame: msg.author,
 			reason
 		});
 	}).catch(async (err) => {
 		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.unmute.englishOnly}`);
-		else await msg.channel.createMessage(`{lang:commands.moderation.unmute.couldNotUnmute|${user.username}#${user.discriminator}|${err}}`);
+		else await msg.channel.createMessage(`{lang:commands.moderation.unmute.couldNotUnmute|${member.username}#${member.discriminator}|${err}}`);
 		/*if (m !== undefined) {
 			await m.delete();
 		}*/
