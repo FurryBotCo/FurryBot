@@ -10,6 +10,7 @@ import FurryBot from "../main";
 import Logger from "../util/LoggerV9";
 import Eris, { Guild } from "eris";
 import deasync from "deasync";
+import { Colors } from "../util/Constants";
 
 class Database {
 	conn: {
@@ -179,7 +180,9 @@ class Database {
 							`Expiry: ${[0, null, undefined].includes(expire) ? "Never" : Time.formatDateWithPadding(expire, false)}`,
 							`Previous Blacklists: ${prev} (Strike #${prev + 1})`,
 							...(!!report ? [`Report: ${report}`] : [])
-						].join("\n")
+						].join("\n"),
+						color: Colors.red,
+						timestamp: new Date().toISOString()
 					}
 				]
 			});

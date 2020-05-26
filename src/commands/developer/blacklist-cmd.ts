@@ -254,7 +254,9 @@ export default new Command({
 								`Previous Reason: ${reason}`,
 								`Previous Blame: ${e.blame} (${e.blameId})`,
 								`Previous Expiry: ${[0, null, undefined].includes(e.expire) ? "Never" : Time.formatDateWithPadding(e.expire, false)}`
-							].join("\n")
+							].join("\n"),
+							color: Colors.green,
+							timestamp: new Date().toISOString()
 						}
 					]
 				});
@@ -310,7 +312,9 @@ export default new Command({
 								`Previous Reason: ${reason}`,
 								`Previous Blame: ${e.blame} (${e.blameId})`,
 								`Previous Expiry: ${[0, null, undefined].includes(e.expire) ? "Never" : Time.formatDateWithPadding(e.expire, false)}`
-							].join("\n")
+							].join("\n"),
+							color: Colors.green,
+							timestamp: new Date().toISOString()
 						}
 					]
 				});
