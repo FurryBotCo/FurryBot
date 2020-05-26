@@ -291,7 +291,14 @@ export default class Internal {
 		const j = await mdb.collection("dailyjoins").findOne({ id });
 		if (!j) await mdb.collection("dailyjoins").insertOne({ id, count: 0 });
 		const count = (j.count || 0) + (incr ? 1 : -1);
-		await mdb.collection("dailyjoins").findOneAndUpdate({ id }, { count, guildCount: client.guilds.size });
+		await mdb.collection("dailyjoins").findOneAndUpdate({
+			id
+		}, {
+			$set: {
+				count,
+				guildCount: client.guilds.size
+			}
+		});
 		return count;
 	}
 

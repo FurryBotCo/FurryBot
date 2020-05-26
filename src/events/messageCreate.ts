@@ -14,6 +14,8 @@ import { Colors } from "../util/Constants";
 import { Redis } from "../modules/External";
 import * as fs from "fs-extra";
 import phin from "phin";
+import APIError from "dankmemerapi/build/APIError";
+import { RestrictionError } from "../config/extra/other/commandRestrictions";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	await this.track("events", "messageCreate");
@@ -57,7 +59,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 
 		if (uBl.current.length > 0) {
-			if (typeof msg.channel.guild !== "undefined") {
+			if (typeof msg.channel.guild !== "undefined" && msg.channel.guild.id === config.client.mainGuild) {
 				if (!msg.member.roles.includes(config.roles.blacklist)) msg.member.addRole(config.roles.blacklist, "User is blacklisted.");
 			}
 
@@ -76,7 +78,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 			return;
 		} else {
-			if (typeof msg.channel.guild !== "undefined") {
+			if (typeof msg.channel.guild !== "undefined" && msg.channel.guild.id === config.client.mainGuild) {
 				if (msg.member.roles.includes(config.roles.blacklist)) msg.member.removeRole(config.roles.blacklist, "User is not blacklisted.");
 			}
 		}
@@ -256,7 +258,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		try {
 			await Promise.all(this.cmd.restrictions.filter(r => cmd.restrictions.includes(r.name as any)).map(async (r) => r.check(msg, this, cmd, uConfig, gConfig)));
-		} catch (e) { if (e.message === "") return; else throw e; }
+		} catch (e) { if (e instanceof RestrictionError) return; else throw e; }
 		if (cmd.permissions.user.length > 0) {
 			if (cmd.permissions.user.some(perm => !msg.channel.guild.members.get(this.user.id).permission.has(perm))) {
 				const p = cmd.permissions.user.filter(perm => !msg.channel.guild.members.get(this.user.id).permission.has(perm));
@@ -338,10 +340,11 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 		const cmd = msg.cmd !== null ? msg.cmd.cmd : null;
 		if (!cmd) return;
+
+		if (cmd.category === "meme" && err instanceof APIError && typeof err.body !== "undefined") return msg.reply(`{lang:other.errors.dankMemer|${err.body.serverError.status}|${err.body.serverError.error}}`);
+
 		switch (err.message) {
 			case "ERR_INVALID_USAGE": {
-
-
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
 						.setTitle(`:x: {lang:other.error.invalidUsage.title}`)
