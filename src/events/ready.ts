@@ -25,10 +25,16 @@ export default new ClientEvent("ready", (async function () {
 		})),
 		send: (guildID, packet) => this.shards.get(Number((BigInt(guildID) >> 22n) % BigInt(this.shards.size))).sendWS(packet.op, packet.d, true),
 		filter: (node, guildID) => {
-			if (!this.guilds.has(guildID)) return true;
+			const g = this.guilds.get(guildID);
+			if (!g) return true;
+			const regions = config.apiKeys.lavalink.map(l => l.regions).reduce((a, b) => a.concat(b));
+			if (!regions.includes(g.region)) {
+				Logger.error("Lavalink", `filter with unknown region "${g.region}"`);
+				return true;
+			}
 			const c = config.apiKeys.lavalink.find(n => n.wsHost === node.connection.url);
 			if (!c) return true;
-			return c.regions.includes(this.guilds.get(guildID).region);
+			return c.regions.includes(g.region);
 		}
 	});
 
