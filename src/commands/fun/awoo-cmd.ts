@@ -2,6 +2,7 @@ import Command from "../../modules/CommandHandler/Command";
 import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
@@ -18,16 +19,19 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	const h = this.holder.has("awoo", msg.channel.id);
 
-	return msg.channel.createMessage({
-		embed: new EmbedBuilder(gConfig.settings.lang)
-			.setTitle(`{lang:commands.fun.8ball.title|${msg.author.tag}}`)
-			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setDescription(`{lang:commands.fun.8ball.said}: **{lang:commands.fun.8ball.possible}**.`)
-			.setFooter(`{lang:commands.fun.8ball.disclaimer}`, config.images.botIcon)
-			.setTimestamp(new Date().toISOString())
-			.setColor(Colors.gold)
-			.toJSON()
-	});
+	if (h) {
+		const c = this.holder.get<string[]>("awoo", msg.channel.id);
+		const t = this.holder.get<NodeJS.Timeout>("awoo", `${msg.channel.id}.timeout`);
+		clearTimeout(t);
+		if (c.includes(msg.author.id) && !config.developers.includes(msg.author.id)) return msg.reply("{lang:commands.fun.awoo.alreadyPresent}");
+		this.holder.add("awoo", msg.channel.id, msg.author.id);
+		this.holder.set("awoo", `${msg.channel.id}.timeout`, setTimeout((ch: Eris.GuildTextableChannel) => { this.holder.remove("awoo", ch.id); this.holder.remove("awoo", `${ch.id}.timeout`); }, 18e5, msg.channel));
+		return msg.channel.createMessage(`{lang:commands.fun.awoo.join|${msg.author.id}|${c.length + 1}|${gConfig.settings.prefix}|${c.length + 1 > 30 ? "{lang:commands.fun.awoo.tooLarge}" : config.emojis.awoo.repeat(c.length + 1)}}`);
+	} else {
+		this.holder.add("awoo", msg.channel.id, msg.author.id);
+		this.holder.set("awoo", `${msg.channel.id}.timeout`, setTimeout((ch: Eris.GuildTextableChannel) => { this.holder.remove("awoo", ch.id); this.holder.remove("awoo", `${ch.id}.timeout`); }, 18e5, msg.channel));
+		await msg.channel.createMessage(`{lang:commands.fun.awoo.start|${msg.author.id}|${gConfig.settings.prefix}|${config.emojis.awoo}}`);
+	}
 }));
