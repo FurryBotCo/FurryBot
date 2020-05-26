@@ -70,7 +70,7 @@ export default new Command({
 		else await msg.channel.createMessage(`{lang:commands.fun.marry.content|${msg.author.id}|${member.id}}\n\n{lang:commands.fun.marry.imageTip}"`);
 
 		d = await this.c.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === member.id, 1);
-		if (!d) return msg.reply("{lang:commands.fun.marry.noReply}");
+		if (!d || !d.content) return msg.reply("{lang:commands.fun.marry.noReply}");
 		if (!["yes", "no"].includes(d.content.toLowerCase())) return msg.channel.createMessage(`{lang:commands.fun.marry.invalidOption|${member.id}}`);
 	} else d = { content: "yes" } as any;
 	if (d.content.toLowerCase() === "yes") {
