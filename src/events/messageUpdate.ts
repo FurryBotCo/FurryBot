@@ -21,19 +21,12 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	}).then(d => d.reload());
 	this.emit("messageCreate", message);
 
-	/*const e = g.logEvents.messageEdit;
-	if (!e || e.enabled || !e.channel) return;
+	const e = g.logEvents.find(l => l.type === "messageEdit");
+	if (!e || !e.channel) return;
 	const ch = await this.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
+	if (!ch) return g.mongoEdit({ $pull: e });
 
-	if (ch.guild.id !== message.guildID) {
-		this.log("warn", `messageUpdate log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`, "Message Update");
-		await g.edit({
-			logEvents: {
-				messageEdit: null
-			}
-		});
-		return;
-	}
+	if (!ch || ch.guild.id !== message.guildID) return;
 
 	const embed: Eris.EmbedOptions = {
 		title: "Message Edited",
@@ -57,5 +50,5 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 		]
 	};
 
-	return ch.createMessage({ embed }).catch(err => null);*/
+	return ch.createMessage({ embed }).catch(err => null);
 }));

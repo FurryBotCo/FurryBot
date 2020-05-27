@@ -2,6 +2,8 @@ import ClientEvent from "../util/ClientEvent";
 import FurryBot from "../main";
 import Eris from "eris";
 import db from "../modules/Database";
+import { MessageTypes, Colors } from "../util/Constants";
+import { Utility } from "../util/Functions";
 
 export default new ClientEvent("messageDelete", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	this.track("events", "messageDelete");
@@ -20,19 +22,11 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 		}
 	}).then(d => d.reload());
 
-	/*const e = g.logEvents.messageDelete;
-	if (!e || !e.enabled || !e.channel) return;
+	const e = g.logEvents.find(l => l.type === "messageDelete");
+	if (!e || !e.channel) return;
 	const ch = message.channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
-	if (ch.guild.id !== message.guildID) {
-		this.log("warn", `messageDelete log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`, "Message Delete");
-		await g.edit({
-			logEvents: {
-				messageDelete: null
-			}
-		});
-		return;
-	}
+	if (!ch || ch.guild.id !== message.guildID) return;
 	const d = new Date(message.createdAt);
 
 	const embed: Eris.EmbedOptions = {
@@ -54,5 +48,5 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 	if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
 	else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-	return ch.createMessage({ embed }).catch(err => null);*/
+	return ch.createMessage({ embed }).catch(err => null);
 }));
