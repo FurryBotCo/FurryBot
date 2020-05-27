@@ -28,7 +28,7 @@ export default new Command({
 
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang, "other.words.noReason", false);
 	if (gConfig.settings.muteRole === null) return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.moderation.unmute.unmuteRole}")
