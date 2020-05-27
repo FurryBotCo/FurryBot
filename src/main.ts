@@ -7,7 +7,6 @@ import WebhookStore from "./modules/Holders/WebhookStore";
 import Holder from "./modules/Holders/Holder";
 import MessageCollector from "./util/MessageCollector";
 import CommandHandler from "./modules/CommandHandler/CommandHandler";
-import ExtendedMessage from "./modules/ExtendedMessage";
 import ModLogUtil from "./util/ModLogUtil";
 import API from "./api";
 import ClientEvent from "./util/ClientEvent";
