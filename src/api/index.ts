@@ -72,12 +72,13 @@ export default class API {
 			}));
 
 		fs
-			.readdirSync(`${__dirname}/routers`)
-			.map(r => require(`${__dirname}/routes/${r}`).default as Route)
+			.readdirSync(`${__dirname}/routes`)
+			.map(r => new (require(`${__dirname}/routes/${r}`).default)() as Route)
 			.map(r => this.addRoute(r));
 	}
 
 	launch() {
+		if (!this.setupRan) this.setup();
 		const client = this.client;
 		let srv: http.Server | https.Server;
 		if (config.web.security.useHttps) srv = https.createServer({
