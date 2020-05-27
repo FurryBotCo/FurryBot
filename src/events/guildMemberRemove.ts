@@ -8,6 +8,7 @@ import { Utility, Time, Internal } from "../util/Functions";
 export default new ClientEvent("guildMemberRemove", (async function (this: FurryBot, guild: Eris.Guild, member: Eris.Member) {
 	this.track("events", "guildMemberRemove");
 	const g = await db.getGuild(guild.id);
+	if (!g || !g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "memberLeave");
 	if (!(!e || !e.channel)) {
 		const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);

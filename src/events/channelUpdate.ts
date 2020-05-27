@@ -11,7 +11,7 @@ export default new ClientEvent("channelUpdate", (async function (this: FurryBot,
 
 	if (channel instanceof Eris.GuildChannel) {
 		const g = await db.getGuild(channel.guild.id);
-		if (!g) return;
+		if (!g || !g.logEvents) return;
 		const e = g.logEvents.find(l => l.type === "channelUpdate");
 		if (!e || !e.channel) return;
 		const ch = channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);

@@ -21,6 +21,7 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	}).then(d => d.reload());
 	this.emit("messageCreate", message);
 
+	if (!g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "messageEdit");
 	if (!e || !e.channel) return;
 	const ch = await this.getRESTChannel<Eris.GuildTextableChannel>(e.channel);

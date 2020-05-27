@@ -7,6 +7,7 @@ import { Colors } from "../util/Constants";
 export default new ClientEvent("voiceChannelSwitch", (async function (this: FurryBot, member: Eris.Member, newChannel: Eris.VoiceChannel, oldChannel: Eris.VoiceChannel) {
 	this.track("events", "voiceChannelSwitch");
 	const g = await db.getGuild(member.guild.id);
+	if (!g || !g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "voiceSwitch");
 	if (!e || !e.channel) return;
 	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);

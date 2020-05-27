@@ -8,6 +8,7 @@ import { Utility } from "../util/Functions";
 export default new ClientEvent("guildRoleCreate", (async function (this: FurryBot, guild: Eris.Guild, role: Eris.Role) {
 	this.track("events", "guildRoleCreate");
 	const g = await db.getGuild(guild.id);
+	if (!g || !g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "roleCreate");
 	if (!e || !e.channel) return;
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);

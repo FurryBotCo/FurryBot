@@ -8,6 +8,7 @@ import { Utility } from "../util/Functions";
 export default new ClientEvent("guildBanAdd", (async function (this: FurryBot, guild: Eris.Guild, user: Eris.User) {
 	this.track("events", "guildBanAdd");
 	const g = await db.getGuild(guild.id);
+	if (!g || !g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "memberBan");
 	if (!e || !e.channel) return;
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);

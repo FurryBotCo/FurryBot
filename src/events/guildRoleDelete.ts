@@ -8,6 +8,7 @@ import { Utility } from "../util/Functions";
 export default new ClientEvent("guildRoleDelete", (async function (this: FurryBot, guild: Eris.Guild, role: Eris.Role) {
 	this.track("events", "guildRoleDelete");
 	const g = await db.getGuild(guild.id);
+	if (!g || !g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "roleDelete");
 	if (!e || !e.channel) return;
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);

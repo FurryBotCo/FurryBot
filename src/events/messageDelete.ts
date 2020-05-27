@@ -22,6 +22,7 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 		}
 	}).then(d => d.reload());
 
+	if (!g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "messageDelete");
 	if (!e || !e.channel) return;
 	const ch = message.channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);

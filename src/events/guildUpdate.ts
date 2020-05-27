@@ -9,6 +9,7 @@ export default new ClientEvent("guildUpdate", (async function (this: FurryBot, g
 	this.track("events", "guildUpdate");
 
 	const g = await db.getGuild(guild.id);
+	if (!g || !g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "guildUpdate");
 	if (!e || !e.channel) return;
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);

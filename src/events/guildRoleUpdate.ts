@@ -9,6 +9,7 @@ export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBo
 	this.track("events", "guildRoleUpdate");
 
 	const g = await db.getGuild(guild.id);
+	if (!g || !g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "roleUpdate");
 	if (!e || !e.channel) return;
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);

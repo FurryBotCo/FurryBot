@@ -8,6 +8,7 @@ import { Utility } from "../util/Functions";
 export default new ClientEvent("voiceStateUpdate", (async function (this: FurryBot, member: Eris.Member, oldState: Eris.OldVoiceState) {
 	this.track("events", "voiceStateUpdate");
 	const g = await db.getGuild(member.guild.id);
+	if (!g || !g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "voiceStateUpdate");
 	if (!e || !e.channel) return;
 	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
