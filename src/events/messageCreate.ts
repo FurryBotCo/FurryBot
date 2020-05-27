@@ -259,9 +259,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		try {
 			await Promise.all(this.cmd.restrictions.filter(r => cmd.restrictions.includes(r.name as any)).map(async (r) => r.check(msg, this, cmd, uConfig, gConfig)));
 		} catch (e) { if (e instanceof RestrictionError) return; else throw e; }
+
 		if (cmd.permissions.user.length > 0) {
-			if (cmd.permissions.user.some(perm => !msg.channel.guild.members.get(this.user.id).permission.has(perm))) {
-				const p = cmd.permissions.user.filter(perm => !msg.channel.guild.members.get(this.user.id).permission.has(perm));
+			if (cmd.permissions.user.some(perm => !msg.member.permission.has(perm))) {
+				const p = cmd.permissions.user.filter(perm => !msg.member.permission.has(perm));
 				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(Language.get(gConfig.settings.lang, "other.permissions.user.noEmbed", false)).catch(err => null);
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
@@ -275,8 +276,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		}
 
 		if (cmd.permissions.bot.length > 0) {
-			if (cmd.permissions.bot.some(perm => !msg.channel.guild.members.get(this.user.id).permission.has(perm))) {
-				const p = cmd.permissions.bot.filter(perm => !msg.channel.guild.members.get(this.user.id).permission.has(perm));
+			if (cmd.permissions.bot.some(perm => !msg.channel.guild.me.permission.has(perm))) {
+				const p = cmd.permissions.bot.filter(perm => !msg.channel.guild.me.permission.has(perm));
 				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(Language.get(gConfig.settings.lang, "other.permissions.bot.noEmbed", false)).catch(err => null);
 				this.log("debug", `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${(msg.channel as Eris.TextChannel).guild.name} (${(msg.channel as Eris.TextChannel).guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 				return msg.channel.createMessage({
