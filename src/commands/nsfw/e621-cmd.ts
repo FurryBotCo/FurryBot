@@ -72,7 +72,7 @@ export default new Command({
 
 	const f = (async () => {
 		const d = await this.c.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id || m.member.permission.has("administrator"), 1);
-		if (!d) return setPost.call(this, "EXIT");
+		if (!d || !d.content) return setPost.call(this, "EXIT");
 		if (d.author.id !== msg.author.id && (d.content.toLowerCase() !== "stop" || !d.member.permission.has("administrator"))) d.content = "continue";
 
 		switch (d.content.toLowerCase()) {
