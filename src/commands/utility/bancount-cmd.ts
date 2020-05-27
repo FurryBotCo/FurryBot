@@ -13,8 +13,7 @@ export default new Command({
 			"viewAuditLogs"
 		],
 		bot: [
-			"viewAuditLogs",
-			"banMembers"
+			"viewAuditLogs"
 		]
 	},
 	cooldown: 3e3,
