@@ -7,9 +7,10 @@ import { Colors } from "../util/Constants";
 export default new ClientEvent("voiceChannelLeave", (async function (this: FurryBot, member: Eris.Member, oldChannel: Eris.VoiceChannel) {
 	this.track("events", "voiceChannelLeave");
 	const g = await db.getGuild(member.guild.id);
-	if (!g || !g.logEvents) return;
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "voiceLeave");
 	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
 	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 	if (!ch) return g.mongoEdit({ $pull: e });
 

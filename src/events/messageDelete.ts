@@ -22,9 +22,10 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 		}
 	}).then(d => d.reload());
 
-	if (!g.logEvents) return;
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "messageDelete");
 	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
 	const ch = message.channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 
 	if (!ch || ch.guild.id !== message.guildID) return;

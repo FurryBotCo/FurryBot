@@ -9,35 +9,38 @@ export default new ClientEvent("guildMemberAdd", (async function (this: FurryBot
 	this.track("events", "guildMemberAdd");
 
 	const g = await db.getGuild(guild.id);
-	if (!g || !g.logEvents) return;
-	const e = g.logEvents.find(l => l.type === "memberJoin");
-	if (!(!e || !e.channel)) {
-		const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
-		if (!ch) return g.mongoEdit({ $pull: e });
+	let e: typeof g["logEvents"][0];
+	if (!(!g || !g.logEvents || !(g.logEvents instanceof Array))) e = g.logEvents.find(l => l.type === "memberJoin");
+	(async () => {
+		if (!(!e || !e.channel)) {
+			if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+			const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+			if (!ch) return g.mongoEdit({ $pull: e });
 
-		const embed: Eris.EmbedOptions = {
-			title: "Member Joined",
-			author: {
-				name: guild.name,
-				icon_url: guild.iconURL
-			},
-			description: [
-				`Member ${member.username}#${member.discriminator} (<@!${member.id}>) Joined.`,
-				`Account Creation Date: ${Time.toReadableDate(member.createdAt).split(" ").slice(0, 2).join(" ").replace(/-/g, "/")}`
-			].join("\n"),
-			timestamp: new Date().toISOString(),
-			color: Colors.green,
-			thumbnail: {
-				url: member.avatarURL
-			}
-		};
+			const embed: Eris.EmbedOptions = {
+				title: "Member Joined",
+				author: {
+					name: guild.name,
+					icon_url: guild.iconURL
+				},
+				description: [
+					`Member ${member.username}#${member.discriminator} (<@!${member.id}>) Joined.`,
+					`Account Creation Date: ${Time.toReadableDate(member.createdAt).split(" ").slice(0, 2).join(" ").replace(/-/g, "/")}`
+				].join("\n"),
+				timestamp: new Date().toISOString(),
+				color: Colors.green,
+				thumbnail: {
+					url: member.avatarURL
+				}
+			};
 
-		// const log = await Utility.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.MEMBER_BAN_REMOVE, user.id);
-		// if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
-		// else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
+			// const log = await Utility.fetchAuditLogEntries(guild, Eris.Constants.AuditLogActions.MEMBER_BAN_REMOVE, user.id);
+			// if (log.success === false) embed.description += `\n${log.error.text} (${log.error.code})`;
+			// else if (log.success) embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
 
-		await ch.createMessage({ embed }).catch(err => null);
-	}
+			await ch.createMessage({ embed }).catch(err => null);
+		}
+	})();
 
 	if (g.settings.joinEnabled) {
 		if (!g.settings.joinChannel || !guild.channels.has(g.settings.joinChannel)) await g.edit({

@@ -8,38 +8,41 @@ import { Utility, Time, Internal } from "../util/Functions";
 export default new ClientEvent("guildMemberRemove", (async function (this: FurryBot, guild: Eris.Guild, member: Eris.Member) {
 	this.track("events", "guildMemberRemove");
 	const g = await db.getGuild(guild.id);
-	if (!g || !g.logEvents) return;
-	const e = g.logEvents.find(l => l.type === "memberLeave");
-	if (!(!e || !e.channel)) {
-		const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
-		if (!ch) return g.mongoEdit({ $pull: e });
+	let e: typeof g["logEvents"][0];
+	if (!(!g || !g.logEvents || !(g.logEvents instanceof Array))) e = g.logEvents.find(l => l.type === "memberLeave");
+	(async () => {
+		if (!(!e || !e.channel)) {
+			if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+			const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+			if (!ch) return g.mongoEdit({ $pull: e });
 
-		const embed: Eris.EmbedOptions = {
-			title: "Member Left",
-			author: {
-				name: guild.name,
-				icon_url: guild.iconURL
-			},
-			description: [
-				`Member ${member.username}#${member.discriminator} (<@!${member.id}>) {REPLACE}.`,
-				`Account Creation Date: ${Time.toReadableDate(member.createdAt).split(" ").slice(0, 2).join(" ").replace(/-/g, "/")}`
-			].join("\n"),
-			timestamp: new Date().toISOString(),
-			color: Colors.red,
-			thumbnail: {
-				url: member.avatarURL
-			}
-		};
+			const embed: Eris.EmbedOptions = {
+				title: "Member Left",
+				author: {
+					name: guild.name,
+					icon_url: guild.iconURL
+				},
+				description: [
+					`Member ${member.username}#${member.discriminator} (<@!${member.id}>) {REPLACE}.`,
+					`Account Creation Date: ${Time.toReadableDate(member.createdAt).split(" ").slice(0, 2).join(" ").replace(/-/g, "/")}`
+				].join("\n"),
+				timestamp: new Date().toISOString(),
+				color: Colors.red,
+				thumbnail: {
+					url: member.avatarURL
+				}
+			};
 
-		const log = await Utility.fetchAuditLogEntries(this, guild, Eris.Constants.AuditLogActions.MEMBER_KICK, member.id);
-		if (log.success) {
-			embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
-			embed.title = "Member Kicked";
-			embed.description = embed.description.replace("{REPLACE}", "was Kicked");
-		} embed.description = embed.description.replace("{REPLACE}", "Left");
+			const log = await Utility.fetchAuditLogEntries(this, guild, Eris.Constants.AuditLogActions.MEMBER_KICK, member.id);
+			if (log.success) {
+				embed.description += `\nBlame: ${log.blame.username}#${log.blame.discriminator}\nReason: ${log.reason}`;
+				embed.title = "Member Kicked";
+				embed.description = embed.description.replace("{REPLACE}", "was Kicked");
+			} embed.description = embed.description.replace("{REPLACE}", "Left");
 
-		await ch.createMessage({ embed }).catch(err => null);
-	}
+			await ch.createMessage({ embed }).catch(err => null);
+		}
+	})();
 
 
 	if (g.settings.leaveEnabled) {

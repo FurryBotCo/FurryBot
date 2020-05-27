@@ -8,9 +8,10 @@ import { Utility } from "../util/Functions";
 export default new ClientEvent("voiceStateUpdate", (async function (this: FurryBot, member: Eris.Member, oldState: Eris.OldVoiceState) {
 	this.track("events", "voiceStateUpdate");
 	const g = await db.getGuild(member.guild.id);
-	if (!g || !g.logEvents) return;
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "voiceStateUpdate");
 	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
 	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 	const vc = member.guild.channels.get<Eris.VoiceChannel>(member.voiceState.channelID);
 	if (!ch) return g.mongoEdit({ $pull: e });

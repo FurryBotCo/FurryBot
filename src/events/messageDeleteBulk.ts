@@ -13,9 +13,10 @@ export default new ClientEvent("messageDeleteBulk", (async function (this: Furry
 	if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type as any)) return;
 	const guild = (messages[0].channel as Eris.GuildChannel).guild;
 	const g = await db.getGuild(guild.id);
-	if (!g || !g.logEvents) return;
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "messageBulkDelete");
 	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
 	const ch = await this.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
 	if (!ch) return g.mongoEdit({ $pull: e });
 

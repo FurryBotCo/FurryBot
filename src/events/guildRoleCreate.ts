@@ -8,9 +8,10 @@ import { Utility } from "../util/Functions";
 export default new ClientEvent("guildRoleCreate", (async function (this: FurryBot, guild: Eris.Guild, role: Eris.Role) {
 	this.track("events", "guildRoleCreate");
 	const g = await db.getGuild(guild.id);
-	if (!g || !g.logEvents) return;
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "roleCreate");
 	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
 	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
 	if (!ch) return g.mongoEdit({ $pull: e });
 
