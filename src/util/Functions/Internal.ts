@@ -204,12 +204,24 @@ export default class Internal {
 		return str;
 	}
 
+	static memeParsing<M extends ExtendedMessage<Eris.TextableChannel> = ExtendedMessage<Eris.GuildTextableChannel>>(msg: M, def: string) {
+		let str = msg.unparsedArgs.join(" ") || def;
+		let m;
+		while (m = /(?:<@!?)([0-9]{16,21})(?:>)/.exec(str)) {
+			const u = msg.channel.guild.members.get(m[1]);
+			if (!u) continue;
+			else str = str.replace(m[0], u.username);
+		}
+
+		return str;
+	}
+
 	static extraArgParsing<M extends ExtendedMessage<Eris.TextableChannel> = ExtendedMessage<Eris.GuildTextableChannel>>(msg: M) {
 		let str = msg.args.join(" ");
 		try {
 			str
-				.match(new RegExp("[0-9]{17,18}", "g"))
-				.filter(k => !str.split(" ")[str.split(" ").indexOf(k)].match(new RegExp("<@!?[0-9]{17,18}>")) || msg.channel.guild.members.has(k))
+				.match(new RegExp("[0-9]{16,21}", "g"))
+				.filter(k => !str.split(" ")[str.split(" ").indexOf(k)].match(new RegExp("<@!?[0-9]{16,21}>")) || msg.channel.guild.members.has(k))
 				.map(k => str = str.replace(k, `<@!${k}>`));
 
 		} catch (e) { }

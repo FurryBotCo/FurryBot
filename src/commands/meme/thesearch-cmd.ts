@@ -1,5 +1,6 @@
 import Command from "../../modules/CommandHandler/Command";
 import { DankMemerAPI } from "../../modules/External";
+import { Internal } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -16,7 +17,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const img = await DankMemerAPI.thesearch(msg.args.join("") || "Provide Some Text.");
+	const img = await DankMemerAPI.thesearch(Internal.memeParsing(msg, "Provide Some Text."));
 
 	return msg.channel.createMessage("", {
 		file: img.file,
