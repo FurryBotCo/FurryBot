@@ -345,7 +345,7 @@ export default class TimedTasks {
 		if (!k) k = "Unknown.";
 		else k = (client.guilds.size - k).toString();
 		client.log("log", `Daily joins for ${id}: ${k}`, "Daily Joins");
-		await client.w.get("directMessage").execute({
+		await client.w.get("dailyjoins").execute({
 			embeds: [
 				{
 					title: `Daily Joins for ${id}`,
