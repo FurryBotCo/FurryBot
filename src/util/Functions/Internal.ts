@@ -290,7 +290,7 @@ export default class Internal {
 		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 		const j = await mdb.collection("dailyjoins").findOne({ id });
 		if (!j) await mdb.collection("dailyjoins").insertOne({ id, count: 0 });
-		const count = (j.count || 0) + (incr ? 1 : -1);
+		const count = (!j || !j.count ? j.count : 0) + (incr ? 1 : -1);
 		await mdb.collection("dailyjoins").findOneAndUpdate({
 			id
 		}, {
