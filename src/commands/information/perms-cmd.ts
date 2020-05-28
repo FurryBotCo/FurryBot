@@ -32,7 +32,7 @@ export default new Command({
 			.setDescription([
 				`{lang:commands.information.perms.${member.id === msg.member.id ? "self" : "other"}}`,
 				"```diff",
-				...Object.keys(Permissions.constant).filter(p => !remove.includes(p)).map(p => `${member.permission.has(p) ? "+" : "-"} ${msg.dashedArgs.parsed.value.includes("compact") ? p : `{lang:other.permissions.${p}}`}`),
+				...Object.keys(Permissions.constant).filter(p => !remove.includes(p)).map(p => `${member.permission.has(p) ? "+" : "-"} ${msg.dashedArgs.parsed.value.includes("compact") ? p : `{lang:other.permissions.names.${p}}`}`),
 				"```",
 				...(!msg.dashedArgs.parsed.value.includes("compact") ? [
 					"",
