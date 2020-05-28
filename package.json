@@ -12,7 +12,7 @@
     "chalk": "^4.0.0",
     "cheerio": "^1.0.0-rc.3",
     "chunk": "0.0.2",
-    "dankmemerapi": "^1.0.9",
+    "dankmemerapi": "^1.0.10",
     "deasync": "^0.1.20",
     "e6api": "^1.0.13",
     "e9api": "^1.0.13",
