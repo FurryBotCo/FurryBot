@@ -119,7 +119,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 			}
 		});
 
-		if (typeof this.channel.guild.me === "undefined") Object.defineProperty(this.channel.guild, "me", {
+		if (typeof this.channel.guild !== "undefined" && typeof this.channel.guild.me === "undefined") Object.defineProperty(this.channel.guild, "me", {
 			get(this: Eris.Guild) {
 				return this.members.get(client.user.id);
 			}
