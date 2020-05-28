@@ -19,7 +19,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const img = await FurryBotAPI.animals.blep("json", 1).then(i => i[0]);
+	const img = await FurryBotAPI.animals.blep("json", 1);
 
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
