@@ -341,7 +341,7 @@ export default class TimedTasks {
 	static async runDailyJoins(client: FurryBot) {
 		const d = new Date((Date.now() - 432e5) - 8.64e+7);
 		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-		let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.count).catch(err => null);
+		let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.guildCount).catch(err => null);
 		if (!k) k = "Unknown.";
 		else k = (client.guilds.size - k).toString();
 		client.log("log", `Daily joins for ${id}: ${k}`, "Daily Joins");
