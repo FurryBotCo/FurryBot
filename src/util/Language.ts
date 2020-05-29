@@ -74,6 +74,7 @@ export default class Language {
 		if (!path) return ln;
 		else {
 			const s = ln.get(path);
+			if (!s) return `{lang:${path}}`;
 			return !parseable ? s.toString() : s;
 		}
 	}
