@@ -865,8 +865,8 @@ commands:
       couldNotBan: "I couldn't ban **{0}**, {1}"
       englishOnly: "The provided reason must be comprised of English characters only."
     clearwarnings:
-      description: "Remove a warning from someone."
-      usage: "<@member/id> <warning id>"
+      description: "Remove all of a users warnings."
+      usage: "<@member/id>"
       cleared: "cleared all warnings for the user **{1}**."
     delwarn:
       description: "Remove a warning from someone."
