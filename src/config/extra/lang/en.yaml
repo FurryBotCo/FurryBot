@@ -872,7 +872,8 @@ commands:
       description: "Remove a warning from someone."
       usage: "<@member/id> <warning id>"
       couldNotFind: 'I couldn''t find a warning for **{0}** with the id "{1}" for this server.'
-      deleted: 'deleted warning "{0}" for user **{1}**.'
+      deleted: "deleted warning #{0} for user **{1}**."
+      deletedLegacy: 'deleted warning "{0}" for user **{1}**.'
     kick:
       description: "Kick members from your server."
       usage: "<@member/id> [reason]"
@@ -1577,6 +1578,7 @@ other:
     invalid: "Detected an invalid modlog setup, reverted to normal."
     missingPermissions: "I'm missing some permissions to be able to make a modlog entry (I need `sendMessages` and `embedLinks`), it has been reverted to normal."
     titles:
+      general: "Case #{0}"
       ban: "Member Ban"
       mute: "Member Muted"
       kick: "Member Kicked"

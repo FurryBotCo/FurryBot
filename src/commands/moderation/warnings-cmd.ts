@@ -1,6 +1,5 @@
 import Command from "../../modules/CommandHandler/Command";
 import { mdb } from "../../modules/Database";
-import Warning from "../../util/@types/Warning";
 import chunk from "chunk";
 import Eris from "eris";
 import { Time } from "../../util/Functions";
@@ -25,9 +24,15 @@ export default new Command({
 
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 
-	const w: Warning[] = await mdb.collection("warnings").find({ userId: member.id, guildId: msg.channel.guild.id } as Warning).toArray().then((res: Warning[]) => res.sort((a, b) => a.date - b.date));
+	const w = await mdb.collection<Warning>("warnings").find({ userId: member.id, guildId: msg.channel.guild.id }).toArray().then((res) => res.sort((a, b) => a.date - b.date));
 	if (w.length === 0) return msg.reply(`{lang:commands.moderation.warnings.noWarnings|${member.username}#${member.discriminator}}`);
 
+	await Promise.all(w.filter(async (warning, i) => {
+		if (isNaN(Number(warning.id))) {
+			await mdb.collection<Warning>("warnings").findOneAndUpdate({ id: warning.id }, { $set: { id: i + 1 } });
+			w.find(wk => wk.id === warning.id).id = i + 1;
+		}
+	}));
 	const fields: Eris.EmbedField[][] = chunk(await Promise.all(w.map(async (k: Warning, i: number) => {
 		const u = this.users.has(k.blameId) ? this.users.get(k.blameId) : await this.getRESTUser(k.blameId);
 		return {
@@ -35,8 +40,7 @@ export default new Command({
 			value: [
 				`{lang:commands.moderation.warnings.blame}: ${u.username}#${u.discriminator}`,
 				`{lang:commands.moderation.warnings.reason}: ${k.reason.length > 100 ? "[TOO LONG TO DISPLAY]" : k.reason}`,
-				`{lang:commands.moderation.warnings.date}: ${Time.formatDateWithPadding(k.date).split(" ")[0]}`,
-				`{lang:commands.moderation.warnings.id}: ${k.id}`
+				`{lang:commands.moderation.warnings.date}: ${Time.formatDateWithPadding(k.date).split(" ")[0]}`
 			].join("\n"),
 			inline: false
 		};

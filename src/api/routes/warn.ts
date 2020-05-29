@@ -1,5 +1,5 @@
 import { Route } from "..";
-import { mdb } from "../../modules/Database";
+import db, { mdb } from "../../modules/Database";
 import config from "../../config";
 import Eris from "eris";
 import { Strings } from "../../util/Functions";
@@ -17,7 +17,6 @@ export default class WarnRoute extends Route {
 		app
 			.put("/:guild/create/:user", async (req, res) => {
 				if (!req.headers.authorization || req.headers.authorization !== config.universalKey) return res.status(401).json({ success: false, error: "invalid authorization" });
-				const id = Strings.random(7);
 				if (!req.body.blame) return res.status(400).json({ success: false, error: "missing blame" });
 				if (!client.guilds.has(req.params.guild)) return res.status(404).json({ success: false, error: "invalid guild" });
 				const g = client.guilds.get(req.params.guild);
@@ -26,6 +25,7 @@ export default class WarnRoute extends Route {
 				let ch: Eris.GuildTextableChannel, msg: Eris.Message<typeof ch>;
 				if (!u) return res.status(404).json({ success: false, error: "invalid user" });
 				if (!b) return res.status(400).json({ success: false, error: "invalid blame" });
+				const id = await db.getWarningEntryId(g.icon, u.id);
 				if (!!req.body.channel) {
 					const c: Eris.GuildTextableChannel = await client.getRESTChannel<Eris.GuildTextableChannel>(req.body.channel).catch(err => null);
 					if (!c || ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type)) return res.status(400).json({ success: false, error: "invalid channel" });

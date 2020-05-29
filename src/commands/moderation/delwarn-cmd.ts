@@ -4,7 +4,6 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import { Time, Utility } from "../../util/Functions";
 import Language from "../../util/Language";
 import { mdb } from "../../modules/Database";
-import Warning from "../../util/@types/Warning";
 
 export default new Command({
 	triggers: [
@@ -27,9 +26,9 @@ export default new Command({
 
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 
-	const id = msg.args[1];
+	const id = isNaN(Number(msg.args[1])) ? msg.args[1] /* assume legacy */ : Number(msg.args[1]);
 
-	const w = await mdb.collection("warnings").findOne<Warning>({
+	const w = await mdb.collection<Warning>("warnings").findOne({
 		guildId: msg.channel.guild.id,
 		userId: member.id,
 		id
@@ -43,7 +42,7 @@ export default new Command({
 		id
 	});
 
-	return msg.reply(`{lang:commands.moderation.delwarn.deleted|${id}|${member.username}#${member.discriminator}}`).then(async () => {
+	return msg.reply(`{lang:commands.moderation.delwarn.deleted${isNaN(Number(id)) ? "Legacy" : ""}|${id}|${member.username}#${member.discriminator}}`).then(async () => {
 		await this.m.create(msg.channel, {
 			type: "delwarn",
 			reason: w.reason,

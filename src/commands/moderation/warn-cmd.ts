@@ -1,8 +1,7 @@
 import Command from "../../modules/CommandHandler/Command";
 import { Strings } from "../../util/Functions";
 import Language from "../../util/Language";
-import { mdb } from "../../modules/Database";
-import Warning from "../../util/@types/Warning";
+import db, { mdb } from "../../modules/Database";
 
 export default new Command({
 	triggers: [
@@ -25,15 +24,15 @@ export default new Command({
 
 	const reason = msg.args.length > 1 ? msg.args.slice(1).join(" ") : Language.get(gConfig.settings.lang, "other.words.noReason", false);
 	if (reason.length > 100) return msg.reply(Language.get(gConfig.settings.lang).get("other.error.tooLong").format("a warning", "100"));
-	const id = Strings.random(7);
-	const w = await mdb.collection("warnings").insertOne({
+	const id = await db.getWarningEntryId(msg.channel.guild.id, member.id);
+	const w = await mdb.collection<Warning>("warnings").insertOne({
 		blameId: msg.author.id,
 		guildId: msg.channel.guild.id,
 		userId: member.id,
 		id,
 		reason,
 		date: Date.now()
-	} as Warning);
+	});
 
 
 	await msg.channel.createMessage(`***{lang:commands.moderation.warn.warned|${member.username}#${member.discriminator}|${reason}}***`).then(async () => {

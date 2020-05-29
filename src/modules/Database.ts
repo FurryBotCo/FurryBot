@@ -200,6 +200,14 @@ class Database {
 			...(type === "guild" ? { guildId: id } : { userId: id })
 		}).then(res => res.ops[0]);
 	}
+
+	async getModlogEntryId(guildId: string) {
+		return (await mdb.collection<ModLogEntry.GenericEntry>("modlog").find({ guildId }).count()) + 1;
+	}
+
+	async getWarningEntryId(guildId: string, userId: string) {
+		return (await mdb.collection<Warning>("warnings").find({ guildId, userId }).count()) + 1;
+	}
 }
 
 const db = new Database(config.db.host, config.db.port, config.db.database, config.db.opt, config.beta);

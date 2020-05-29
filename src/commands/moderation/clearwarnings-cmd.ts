@@ -4,7 +4,6 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import { Time, Utility } from "../../util/Functions";
 import Language from "../../util/Language";
 import { mdb } from "../../modules/Database";
-import Warning from "../../util/@types/Warning";
 
 export default new Command({
 	triggers: [
