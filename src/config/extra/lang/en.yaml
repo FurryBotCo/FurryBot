@@ -419,7 +419,7 @@ commands:
     shard:
       description: "Get some info about your servers current shard."
       usage: ""
-      title: "Shard Info"
+      title: "Shard Info - #{0}"
       guilds: "Guilds"
       ping: "Ping"
     shards:
