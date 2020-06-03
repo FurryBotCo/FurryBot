@@ -45,7 +45,7 @@ export default new Command({
 	const id = msg.args.length > 2 ? msg.args[2] : null;
 	let d: Eris.Guild | Eris.User;
 	let dbEntry: GuildConfig | UserConfig;
-	const reason = msg.args[3] || "No Reason";
+	const reason = msg.args.slice(3).join(" ") || "No Reason";
 	if (!types.includes(type)) return msg.reply(`{lang:commands.dev.blacklist.invalidType|${type === null ? "none" : type}|${types.join("**, **")}}`);
 	if (type === "get") {
 		const entry = await mdb.collection<Blacklist.GenericEntry>("blacklist").findOne({ id: msg.args[1] });
@@ -57,10 +57,10 @@ export default new Command({
 		const field = formatEntry(pos, entry.created, entry.blame, entry.reason, entry.expire, entry.id);
 		let text: string;
 		if (typeof entry.guildId !== "undefined") {
-			const d = await this.getRESTGuild(entry.guildId);
+			const d = await this.bot.getRESTGuild(entry.guildId);
 			text = `{lang:commands.dev.blacklist.get.guild|${msg.args[1]}|${!!d ? d.name : "Unknown"}}`;
 		} else if (typeof entry.userId !== "undefined") {
-			const d = await this.getRESTUser(entry.userId);
+			const d = await this.bot.getRESTUser(entry.userId);
 			text = `{lang:commands.dev.blacklist.get.user|${msg.args[1]}|${d.username}#${d.discriminator}}`;
 		} else throw new TypeError("Invalid blacklist entry.");
 
@@ -84,7 +84,7 @@ export default new Command({
 	switch (subType) {
 		case "guild": {
 			try {
-				d = await this.getRESTGuild(id).catch(err => null);
+				d = await this.bot.getRESTGuild(id).catch(err => null);
 				dbEntry = await db.getGuild(id);
 			} catch (e) {
 				return msg.reply(`{lang:commands.dev.blacklist.invalidGuild|${id}}`);
@@ -94,7 +94,7 @@ export default new Command({
 
 		case "user": {
 			try {
-				d = await this.getRESTUser(id);
+				d = await this.bot.getRESTUser(id);
 				dbEntry = await db.getUser(id);
 			} catch (e) {
 				return msg.reply(`{lang:commands.dev.blacklist.invalidUser|${id}}`);
@@ -103,6 +103,7 @@ export default new Command({
 		}
 	}
 
+	const date = Date.now();
 	switch (type) {
 		case "add": {
 			let expire = Number(msg.dashedArgs.unparsed.keyValue.time);
@@ -117,16 +118,16 @@ export default new Command({
 				if (!!t) return msg.reply(`{lang:commands.dev.blacklist.cannotBlacklist.${t}|${d.username}#${d.discriminator}}`);
 
 				const strike = await dbEntry.checkBlacklist().then(b => b.all.length);
-				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, expire);
+				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, date + (expire * 8.64e+7));
 
-				return msg.reply(`{lang:commands.dev.blacklist.added.user|${d.username}#${d.discriminator}|${reason}|${[null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(expire)}|${strike}|${e.id}}`);
+				return msg.reply(`{lang:commands.dev.blacklist.added.user|${d.username}#${d.discriminator}|${reason}|${[null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(date + (expire * 8.64e+7))}|${strike}|${e.id}}`);
 			} else if (subType === "guild" && d instanceof Eris.Guild && dbEntry instanceof GuildConfig) {
 				if (id === config.client.mainGuild) return msg.reply(`{lang:commands.dev.blacklist.cannotBlacklist.supportServer|${!!d ? d.name : "Unknown"}}`);
 
 				const strike = await dbEntry.checkBlacklist().then(b => b.all.length);
-				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, expire);
+				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, date + (expire * 8.64e+7));
 
-				return msg.reply(`{lang:commands.dev.blacklist.added.guild|${!!d ? d.name : "Unknown"}|${reason}|${[null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(expire)}|${strike}|${e.id}}`);
+				return msg.reply(`{lang:commands.dev.blacklist.added.guild|${!!d ? d.name : "Unknown"}|${reason}|${[null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(date + (expire * 8.64e+7))}|${strike}|${e.id}}`);
 			} else throw new TypeError("We shouldn't be here.");
 			break;
 		}
