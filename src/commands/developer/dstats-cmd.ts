@@ -16,22 +16,23 @@ export default new Command({
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const types = ["size", "shards", "users", "channels"];
+	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
 	let embed: Eris.EmbedOptions;
 	switch (msg.args[0].toLowerCase()) {
 		case "size": {
 			embed = {
 				title: "Guild Size Stats",
 				description: [
-					`\u25FD 100+ member guilds: ${this.guilds.filter(g => g.memberCount >= 100).length}`,
-					`\u25FD 250+ member guilds: ${this.guilds.filter(g => g.memberCount >= 250).length}`,
-					`\u25FD 500+ member guilds: ${this.guilds.filter(g => g.memberCount >= 500).length}`,
-					`\u25FD 1000+ member guilds: ${this.guilds.filter(g => g.memberCount >= 1000).length}`,
-					`\u25FD 2500+ member guilds: ${this.guilds.filter(g => g.memberCount >= 2500).length}`,
-					`\u25FD 5000+ member guilds: ${this.guilds.filter(g => g.memberCount >= 5000).length}`,
-					`\u25FD 10000+ member guilds: ${this.guilds.filter(g => g.memberCount >= 10000).length}`,
-					`\u25FD 25000+ member guilds: ${this.guilds.filter(g => g.memberCount >= 25000).length}`,
-					`\u25FD 50000+ member guilds: ${this.guilds.filter(g => g.memberCount >= 50000).length}`,
-					`\u25FD 100000+ member guilds: ${this.guilds.filter(g => g.memberCount >= 100000).length}`
+					`\u25FD 100+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 100).length}`,
+					`\u25FD 250+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 250).length}`,
+					`\u25FD 500+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 500).length}`,
+					`\u25FD 1000+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 1000).length}`,
+					`\u25FD 2500+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 2500).length}`,
+					`\u25FD 5000+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 5000).length}`,
+					`\u25FD 10000+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 10000).length}`,
+					`\u25FD 25000+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 25000).length}`,
+					`\u25FD 50000+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 50000).length}`,
+					`\u25FD 100000+ member guilds: ${this.bot.guilds.filter(g => g.memberCount >= 100000).length}`
 				].join("\n"),
 				timestamp: new Date().toISOString(),
 				color: Colors.green,
@@ -47,7 +48,7 @@ export default new Command({
 			embed = {
 				title: "Shard Stats",
 				description: [
-					...this.shards.map(s => `\u25FD **#${s.id}**: ${s.latency}ms | ${this.guilds.filter(g => g.shard.id === s.id).length}`)
+					...this.bot.shards.map(s => `\u25FD **#${s.id}**: ${s.latency}ms | ${this.bot.guilds.filter(g => g.shard.id === s.id).length}`)
 				].join("\n"),
 				timestamp: new Date().toISOString(),
 				color: Colors.green,
