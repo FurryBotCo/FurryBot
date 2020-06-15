@@ -297,21 +297,12 @@ export default class Internal {
 		}>(statNames.map(async (s) => ({ [s.split(":").slice(-1)[0]]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
 	}
 
-	static async incrementDailyCounter(client: FurryBot, incr: boolean) {
+	static async incrementDailyCounter(incr: boolean) {
 		const d = new Date();
 		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-		const j = await mdb.collection("dailyjoins").findOne({ id });
-		if (!j) await mdb.collection("dailyjoins").insertOne({ id, count: 0 });
-		const count = (!j || !j.count ? j.count : 0) + (incr ? 1 : -1);
-		await mdb.collection("dailyjoins").findOneAndUpdate({
-			id
-		}, {
-			$set: {
-				count,
-				guildCount: client.guilds.size
-			}
-		});
-		return count;
+		await Redis[incr ? "INCR" : "DECR"](`prod:stats:dailyJoins:${id}`);
+		const st = await this.fetchRedisKey(`prod:stats:dailyJoins:${id}`);
+		return st;
 	}
 
 	static emojiStringToId(e: string) {

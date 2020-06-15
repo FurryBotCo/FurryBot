@@ -13,7 +13,7 @@ export default class StatusRoute extends Route {
 		app
 			.get("/", async (req, res) => res.status(200).json({
 				success: true,
-				clientStatus: !client.shards.has(0) || client.shards.get(0).status !== "ready" ? null : client.shards.get(0).presence.status
+				clientStatus: !client.bot.shards.has(0) || client.bot.shards.get(0).status !== "ready" ? null : client.bot.shards.get(0).presence.status
 			}));
 	}
 }

@@ -1,4 +1,4 @@
-
+import { Worker } from "worker_threads";
 import Eris from "eris";
 import config from "./config";
 import Logger from "./util/LoggerV9";
@@ -13,32 +13,47 @@ import ClientEvent from "./util/ClientEvent";
 import * as fs from "fs-extra";
 import HolderV2 from "./modules/Holders/HolderV2";
 import { Cluster } from "lavalink";
-import { Collection } from "@augu/immutable";
+import Collection from "./util/Collection";
 import MusicQueue from "./util/MusicQueue";
+import { BaseClusterWorker } from "eris-fleet";
 
-export default class FurryBot extends Eris.Client {
+const ew = process.emitWarning;
+process.emitWarning = ((w, name, code) => {
+	if (w.toString().indexOf("NODE_TLS_REJECT_UNAUTHORIZED") !== -1) return;
+	else return ew(w, name, code);
+});
+
+export default class FurryBot extends BaseClusterWorker {
 	holder: Holder;
 	lvl: HolderV2;
-	c: MessageCollector<this>;
-	w: WebhookStore<this>;
+	c: MessageCollector;
+	w: WebhookStore;
 	m: ModLogUtil;
 	cmd: CommandHandler;
 	api: API;
 	firstReady: boolean;
 	v: Cluster;
 	q: Collection<MusicQueue>;
-	constructor(token: string, clientOptions: Eris.ClientOptions) {
-		super(token, clientOptions);
+	threads: Map<number, Worker>;
+	bot: Eris.Client;
+	constructor(setup) {
+		super(setup);
 		this.holder = new Holder();
 		this.lvl = new HolderV2();
-		fs.readdirSync(`${__dirname}/events`).map((d) => {
-			const e: ClientEvent = require(`${__dirname}/events/${d}`).default;
-			if (!e) throw new TypeError(`Event file ${d} is missing an export.`);
-			if (!e.listener) throw new TypeError(`Event file ${d} is missing a listener.`);
-			if (!e.event) throw new TypeError(`Event file ${d} is missing an event.`);
-			const b = e.listener.bind(this);
-			this.on(e.event, b);
-			this.holder.set("events", e.event, b);
+		process.nextTick(async () => {
+			// because they don't construct this until the cluster is ready??
+			const r = await import(`${__dirname}/events/ready`);
+			r.default.listener.call(this);
+
+			await Promise.all(fs.readdirSync(`${__dirname}/events`).map(async (d) => {
+				const e: ClientEvent = await import(`${__dirname}/events/${d}`).then(i => i.default);
+				if (!e) throw new TypeError(`Event file ${d} is missing an export.`);
+				if (!e.listener) throw new TypeError(`Event file ${d} is missing a listener.`);
+				if (!e.event) throw new TypeError(`Event file ${d} is missing an event.`);
+				const b = e.listener.bind(this);
+				this.bot.on(e.event, b);
+				// this.log("debug", `Loaded the event ${e.event}`, "Event Listener");
+			}));
 		});
 
 		process
@@ -64,6 +79,7 @@ export default class FurryBot extends Eris.Client {
 		this.api = new API(this);
 		this.firstReady = false;
 		this.q = new Collection();
+		this.threads = new Map();
 	}
 
 	log(level: "log" | "info" | "warn" | "error" | "data" | "debug" | "internal", message: any, name: string) {
@@ -83,4 +99,11 @@ export default class FurryBot extends Eris.Client {
 	}
 
 	getRecommendedNode() { return this.v.sort()[0]; }
+
+	// because their typings are broken
+	get shutdown() {
+		return ((done) => {
+			done();
+		});
+	}
 }

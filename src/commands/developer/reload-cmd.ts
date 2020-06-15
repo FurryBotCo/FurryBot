@@ -1,8 +1,5 @@
 import Command from "../../modules/CommandHandler/Command";
-import config from "../../config";
-import { execSync } from "child_process";
-import Eris from "eris";
-import { Colors } from "../../util/Constants";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -17,5 +14,9 @@ export default new Command({
 	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	return msg.reply("not implemented yet.");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
+
+	switch (msg.args[0].toLowerCase()) {
+		case "cmd": { }
+	}
 }));

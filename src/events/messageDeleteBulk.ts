@@ -9,15 +9,18 @@ import { Utility, Time, Strings } from "../util/Functions";
 
 export default new ClientEvent("messageDeleteBulk", (async function (this: FurryBot, messages: Eris.PossiblyUncachedMessage[]) {
 	this.track("events", "messageDeleteBulk");
-	const c = this.getChannel(messages[0].channel.id);
-	if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type as any)) return;
+	const c = this.bot.getChannel(messages[0].channel.id) as Eris.GuildTextableChannel;
+	if (![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type)) return;
+
+	if (config.beta && !config.client.betaEventGuilds.includes(c.guild.id)) return;
+
 	const guild = (messages[0].channel as Eris.GuildChannel).guild;
 	const g = await db.getGuild(guild.id);
 	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "messageBulkDelete");
 	if (!e || !e.channel) return;
 	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-	const ch = await this.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
+	const ch = await this.bot.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
 	if (!ch) return g.mongoEdit({ $pull: e });
 
 	const d = path.resolve(`${config.dir.base}/src/assets/bulkDelete`);

@@ -25,6 +25,10 @@ export default new Command({
 	if (msg.args.length < 1) user = msg.member;
 	else user = await msg.getMemberFromArgs();
 
+	/*await Promise.all(Object.keys(uConfig.levels).map(async (k) => {
+		if (!this.guilds.has(k)) console.log(`del ${k}`);
+	}));*/
+
 	if (!user) return msg.errorEmbed("INVALID_USER");
 	const c = await db.getUser(user.id);
 

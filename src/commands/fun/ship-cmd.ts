@@ -44,8 +44,8 @@ export default new Command({
 	if (msg.args.length === 0) member2 = msg.channel.guild.members.random();
 	else if (msg.args.length === 1) member2 = await msg.getMemberFromArgs(0, false);
 	else {
-		member1 = await msg.getMemberFromArgs(0);
-		member2 = await msg.getMemberFromArgs(1);
+		member1 = await msg.getMemberFromArgs(0, null, null, 0);
+		member2 = await msg.getMemberFromArgs(1, null, null, 1);
 	}
 
 	if (!member1 || !member2) return msg.errorEmbed("INVALID_MEMBER");

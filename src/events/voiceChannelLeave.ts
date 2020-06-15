@@ -3,9 +3,13 @@ import FurryBot from "../main";
 import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
+import config from "../config";
 
 export default new ClientEvent("voiceChannelLeave", (async function (this: FurryBot, member: Eris.Member, oldChannel: Eris.VoiceChannel) {
 	this.track("events", "voiceChannelLeave");
+
+	if (config.beta && !config.client.betaEventGuilds.includes(member.guild.id)) return;
+
 	const g = await db.getGuild(member.guild.id);
 	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "voiceLeave");

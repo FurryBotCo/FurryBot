@@ -45,5 +45,5 @@ export default new Command({
 		});
 	});
 
-	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.delete().catch(error => null);
+	if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) await msg.delete().catch(error => null);
 }));

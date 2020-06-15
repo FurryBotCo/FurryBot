@@ -16,6 +16,7 @@ import * as fs from "fs-extra";
 import phin from "phin";
 import APIError from "dankmemerapi/build/APIError";
 import { RestrictionError } from "../config/extra/other/commandRestrictions";
+import CommandError from "../modules/CommandHandler/CommandError";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	await this.track("events", "messageCreate");
@@ -155,9 +156,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		const nlvl = config.leveling.calcLevel(uConfig.getLevel(msg.channel.guild.id));
 		if (nlvl.level > lvl.level && gConfig.settings.announceLevelUp) {
 			this.track("stats", "levelUp");
-			if (msg.channel.permissionsOf(this.user.id).has("sendMessages")) {
+			if (msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) {
 				let m: Eris.Message;
-				if (msg.channel.permissionsOf(this.user.id).has("embedLinks")) m = await msg.channel.createMessage({
+				if (msg.channel.permissionsOf(this.bot.user.id).has("embedLinks")) m = await msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
 						.setTitle("{lang:other.leveling.embedTitle}")
 						.setDescription(`{lang:other.leveling.embedDescription|${nlvl.level}}`)
@@ -176,7 +177,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		t.end("leveling");
 
 		t.start("mention");
-		if ([`<@!${this.user.id}>`, `<@${this.user.id}>`].includes(msg.content)) {
+		if ([`<@!${this.bot.user.id}>`, `<@${this.bot.user.id}>`].includes(msg.content)) {
 			this.track("stats", "mention");
 			const embed = new EmbedBuilder(gConfig.settings.lang)
 				.setTitle("{lang:other.mention.title}")
@@ -186,11 +187,11 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				.setDescription(`{lang:other.mention.description|${msg.author.tag}|${gConfig.settings.prefix}|${config.client.invite.url}|${config.client.socials.discord}}`)
 				.toJSON();
 
-			if (!msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage({
+			if (!msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) return msg.author.getDMChannel().then(dm => dm.createMessage({
 				content: Language.get(gConfig.settings.lang).get("other.mention.dm").toString(),
 				embed
 			})).catch(err => null);
-			else if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.channel.createMessage(`${embed.title} \n${embed.description} \n(If you give me permission to embed links this would look a lot nicer)`).catch(err => null);
+			else if (!msg.channel.permissionsOf(this.bot.user.id).has("embedLinks")) return msg.channel.createMessage(`${embed.title} \n${embed.description} \n(If you give me permission to embed links this would look a lot nicer)`).catch(err => null);
 			else return msg.channel.createMessage({
 				embed
 			}).catch(err => null);
@@ -249,7 +250,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 				if (spC >= config.antiSpam.cmd.blacklist) {
 					const expire = config.bl.getTime("cmd", uBl.current.length, true, true);
-					await uConfig.addBlacklist("automatic", this.user.id, "Spamming Commands.", expire, `https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`);
+					await uConfig.addBlacklist("automatic", this.bot.user.id, "Spamming Commands.", expire, `https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`);
 
 					this.log("log", `User "${msg.author.tag}" (${msg.author.id}) blacklisted for spamming, VL: ${spC}, Report: https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`, `Shard #${msg.channel.guild.shard.id} | Command Handler`);
 				}
@@ -263,7 +264,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.permissions.user.length > 0) {
 			if (cmd.permissions.user.some(perm => !msg.member.permission.has(perm))) {
 				const p = cmd.permissions.user.filter(perm => !msg.member.permission.has(perm));
-				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(Language.get(gConfig.settings.lang, "other.permissions.user.noEmbed", false)).catch(err => null);
+				if (!msg.channel.permissionsOf(this.bot.user.id).has("embedLinks")) return msg.reply(Language.get(gConfig.settings.lang, "other.permissions.user.noEmbed", false)).catch(err => null);
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
 						.setTitle("{lang:other.permissions.user.embedTitle}")
@@ -278,7 +279,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.permissions.bot.length > 0) {
 			if (cmd.permissions.bot.some(perm => !msg.channel.guild.me.permission.has(perm))) {
 				const p = cmd.permissions.bot.filter(perm => !msg.channel.guild.me.permission.has(perm));
-				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) return msg.reply(Language.get(gConfig.settings.lang, "other.permissions.bot.noEmbed", false)).catch(err => null);
+				if (!msg.channel.permissionsOf(this.bot.user.id).has("embedLinks")) return msg.reply(Language.get(gConfig.settings.lang, "other.permissions.bot.noEmbed", false)).catch(err => null);
 				this.log("debug", `I am missing the permission(s) ${p.join(", ")} for the command ${cmd.triggers[0]}, server: ${(msg.channel as Eris.TextChannel).guild.name} (${(msg.channel as Eris.TextChannel).guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
@@ -321,8 +322,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		this.log("log", `Command "${cmd.triggers[0]}"${a !== cmd.triggers[0] ? ` (alias used: ${a})` : ""} ran with ${msg.unparsedArgs.length === 0 ? "no arguments" : `the arguments "${msg.unparsedArgs.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
 		t.start("cmd");
-		this.track("stats", "commandsTotal");
-		this.track("stats", "commandsAllTime");
+		this.track("stats", "commands", "total");
+		this.track("stats", "commands", "AllTime", "total");
 		this.track("stats", "commands", cmd.triggers[0]);
 		this.track("stats", "commands", "allTime", cmd.triggers[0]);
 		const c = await cmd.run.call(this, msg, uConfig, gConfig, cmd).catch(err => err);
@@ -344,7 +345,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		if (cmd.category === "meme" && err instanceof APIError && typeof err.body !== "undefined") return msg.reply(`{lang:other.errors.dankMemer|${err.body.serverError.status}|${err.body.serverError.error}}`);
 
-		switch (err.message) {
+		if (err instanceof CommandError) switch (err.message) {
 			case "ERR_INVALID_USAGE": {
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
@@ -364,7 +365,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}).catch(err => null);
 				break;
 			}
-
+		} else switch (err.message) {
 			case "RETURN": { return; break; }
 
 			default: {

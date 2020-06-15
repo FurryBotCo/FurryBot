@@ -1,4 +1,5 @@
 import Command from "../../modules/CommandHandler/Command";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -13,8 +14,8 @@ export default new Command({
 	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
-	const guild = await this.getRESTGuild(msg.args[0]).catch(err => null);
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
+	const guild = await this.bot.getRESTGuild(msg.args[0]).catch(err => null);
 
 	if (!guild) return msg.reply("failed to fetch guild.");
 

@@ -25,7 +25,7 @@ export default new Command({
 		}
 	}).then(d => d.reload());
 
-	const u = await this.getRESTUser(uConfig.marriage.partner).catch(err => ({ username: "Unknown", discriminator: "0000" }));
+	const u = await this.bot.getRESTUser(uConfig.marriage.partner).catch(err => ({ username: "Unknown", discriminator: "0000" }));
 	await msg.channel.createMessage(`Are you sure you want to divorce **${u.username}#${u.discriminator}**? **yes** or **no**.`).then(async () => {
 		const d = await this.c.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id, 1);
 		if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply("that wasn't a valid option..");

@@ -3,6 +3,7 @@ import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Request } from "../../util/Functions";
 import phin from "phin";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -20,7 +21,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) throw new CommandError("ERR_INVALID_USAGE", cmd);
 	const rq = await phin<any>({
 		method: "GET",
 		url: `https://api.giphy.com/v1/gifs/search?api_key=${config.apiKeys.giphy.apikey}&q=${msg.args.join("%20")}&limit=50&offset=7&rating=G&lang=en`,

@@ -4,6 +4,7 @@ import { Utility as T } from "../@types/Functions";
 import FurryBot from "../../main";
 import * as URL from "url";
 import phin from "phin";
+import { BaseClusterWorker } from "eris-fleet";
 
 export default class Utility {
 	private constructor() {
@@ -170,8 +171,8 @@ export default class Utility {
 	 * @returns {(Promise<T.AuditLogReturn>}
 	 * @memberof Utility
 	 */
-	static async fetchAuditLogEntries(client: FurryBot, guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<T.AuditLogReturn> {
-		if (!guild.members.get(client.user.id).permission.has("viewAuditLogs")) return {
+	static async fetchAuditLogEntries(client: BaseClusterWorker, guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<T.AuditLogReturn> {
+		if (!guild.members.get(client.bot.user.id).permission.has("viewAuditLogs")) return {
 			success: false,
 			error: {
 				text: "Missing `auditLog` permissions.",

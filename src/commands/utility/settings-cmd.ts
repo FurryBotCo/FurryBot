@@ -148,7 +148,7 @@ export default new Command({
 
 			const ch = msg.channel.guild.channels.get(ci);
 			if (!ch) return msg.reply("{lang:commands.utility.settings.chNotFound}");
-			if (!ch.permissionsOf(this.user.id).has("sendMessages")) return msg.reply(`{lang:commands.utility.settings.chPermMissing|${ch.id}}`);
+			if (!ch.permissionsOf(this.bot.user.id).has("sendMessages")) return msg.reply(`{lang:commands.utility.settings.chPermMissing|${ch.id}}`);
 
 			await gConfig.edit({
 				settings: {
@@ -192,7 +192,7 @@ export default new Command({
 			const r = msg.channel.guild.roles.get(ri);
 			if (!r) return msg.reply("{lang:commands.utility.settings.roleNotFound}");
 			if (r.id === gConfig.settings[s]) return msg.reply("{lang:commands.utility.settings.unchanged}");
-			const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), r);
+			const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), r);
 
 			if (p.lower || p.same) return msg.reply("{lang:commands.utility.settings.roleHigher}");
 
@@ -314,7 +314,7 @@ export default new Command({
 
 					const ch = msg.channel.guild.channels.get(ci);
 					if (!ch) return msg.reply("{lang:commands.utility.settings.chNotFound}");
-					if (!ch.permissionsOf(this.user.id).has("sendMessages")) return msg.reply(`{lang:commands.utility.settings.chPermMissing|${ch.id}}`);
+					if (!ch.permissionsOf(this.bot.user.id).has("sendMessages")) return msg.reply(`{lang:commands.utility.settings.chPermMissing|${ch.id}}`);
 
 					await gConfig.edit({
 						settings: {
@@ -353,7 +353,7 @@ export default new Command({
 					const r = msg.channel.guild.roles.get(ri);
 					if (!r) return msg.reply("{lang:commands.utility.settings.roleNotFound}");
 					if (r.id === gConfig.settings[s]) return msg.reply("{lang:commands.utility.settings.unchanged}");
-					const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), r);
+					const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), r);
 
 					if (p.lower || p.same) return msg.reply("{lang:commands.utility.settings.roleHigher}");
 
@@ -394,7 +394,7 @@ export default new Command({
 					const r = msg.channel.guild.roles.get(ri);
 					if (!r) return msg.reply("{lang:commands.utility.settings.roleNotFound}");
 					if (r.id === gConfig.settings[s]) return msg.reply("{lang:commands.utility.settings.unchanged}");
-					const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), r);
+					const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), r);
 
 					if (p.lower || p.same) return msg.reply("{lang:commands.utility.settings.roleHigher}");
 

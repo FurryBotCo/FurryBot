@@ -1,3 +1,4 @@
+/// <reference path="../@types/Eris.d.ts" />
 import { mdb, db } from "../../modules/Database";
 import UserConfig from "../../modules/config/UserConfig";
 import config from "../../config";
@@ -57,7 +58,7 @@ export default class TimedTasks {
 		}
 
 		await Promise.all(d.map(async (u) => {
-			const s = await client.getRESTUser(u.id);
+			const s = await client.bot.getRESTUser(u.id);
 
 			await s.getDMChannel().then(dm => dm.createMessage({
 				embed: {
@@ -99,22 +100,25 @@ export default class TimedTasks {
 			if (entry.expiry > Date.now()) return;
 			switch (entry.type) {
 				case "ban": {
-					const g = await client.guilds.get(entry.guildId);
+					const g = client.bot.guilds.has(entry.guildId) ? client.bot.guilds.get(entry.guildId) : await client.bot.getRESTGuild(entry.guildId);
+					if (!g) {
+						return mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+					}
 					await g.unbanMember(entry.userId, `Automatic Unban`).catch(err => null);
-					const u = client.users.has(entry.userId) ? client.users.get(entry.userId) : await client.getRESTUser(entry.userId);
+					const u = client.bot.users.has(entry.userId) ? client.bot.users.get(entry.userId) : await client.bot.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
 					if (!c.settings.modlog) {
 						mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 
-					const ch = g.channels.has(c.settings.modlog) ? g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog) : await client.getRESTChannel<Eris.GuildTextableChannel>(c.settings.modlog);
+					const ch = g.channels.has(c.settings.modlog) ? g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog) : await client.bot.getRESTChannel<Eris.GuildTextableChannel>(c.settings.modlog);
 					if (!ch) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks |  Auto Server Actions");
 					}
 
-					if (!!ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
+					if (!!ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.bot.user.id).has(p))) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks |  Auto Server Actions");
@@ -132,23 +136,26 @@ export default class TimedTasks {
 				}
 
 				case "mute": {
-					const g = await client.guilds.get(entry.guildId);
+					const g = client.bot.guilds.has(entry.guildId) ? client.bot.guilds.get(entry.guildId) : await client.bot.getRESTGuild(entry.guildId);
+					if (!g) {
+						return mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+					}
 					// fetch user from api if they aren't in the server
-					const m = g.members.has(entry.userId) ? g.members.get(entry.userId) : await client.getRESTUser(entry.userId);
+					const m = g.members.has(entry.userId) ? g.members.get(entry.userId) : await client.bot.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
 					const r = g.roles.get(c.settings.muteRole);
 					if (!c.settings.modlog) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 
-					const ch = g.channels.has(c.settings.modlog) ? g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog) : await client.getRESTChannel<Eris.GuildTextableChannel>(c.settings.modlog);
+					const ch = g.channels.has(c.settings.modlog) ? g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog) : await client.bot.getRESTChannel<Eris.GuildTextableChannel>(c.settings.modlog);
 					if (!ch) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks | Auto Server Actions");
 					}
 
-					if (!!ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
+					if (!!ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.bot.user.id).has(p))) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks | Auto Server Actions");
@@ -162,8 +169,8 @@ export default class TimedTasks {
 								timestamp: new Date().toISOString(),
 								color: Colors.red,
 								author: {
-									name: `${client.user.username}#${client.user.discriminator}`,
-									icon_url: client.user.avatarURL
+									name: `${client.bot.user.username}#${client.bot.user.discriminator}`,
+									icon_url: client.bot.user.avatarURL
 								}
 							}
 						}).catch(err => null);
@@ -184,8 +191,8 @@ export default class TimedTasks {
 									timestamp: new Date().toISOString(),
 									color: Colors.red,
 									author: {
-										name: `${client.user.username}#${client.user.discriminator}`,
-										icon_url: client.user.avatarURL
+										name: `${client.bot.user.username}#${client.bot.user.discriminator}`,
+										icon_url: client.bot.user.avatarURL
 									}
 								}
 							}).catch(err => null);
@@ -226,7 +233,8 @@ export default class TimedTasks {
 				return;
 			}
 
-			if (!client.guilds.has(g.id)) {
+			const r = client.bot.guilds.has(g.id) ? client.bot.guilds.get(g.id) : await client.bot.getRESTGuild(g.id);
+			if (!r) {
 				client.log("warn", `Skipped posting type "${entry.type}" in guild "${g.id}" because the guild has been removed.`, "Timed Tasks | Auto Posting");
 				await mdb.collection("auto").findOneAndDelete({ _id: entry._id });
 				return;
@@ -326,7 +334,7 @@ export default class TimedTasks {
 				}
 			}
 
-			await client.executeWebhook(entry.webhook.id, entry.webhook.token, {
+			await client.bot.executeWebhook(entry.webhook.id, entry.webhook.token, {
 				embeds: [
 					embed.toJSON()
 				],
@@ -339,7 +347,9 @@ export default class TimedTasks {
 	}
 
 	static async runDailyJoins(client: FurryBot) {
-		const d = new Date((Date.now() - 432e5) - 8.64e+7);
+		if (client.clusterID !== 0) return;
+		// @TODO fix daily joins
+		/*const d = new Date((Date.now() - 432e5) - 8.64e+7);
 		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 		let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.guildCount).catch(err => null);
 		if (!k) k = "Unknown.";
@@ -355,31 +365,31 @@ export default class TimedTasks {
 			],
 			username: `Daily Joins${config.beta ? " - Beta" : ""}`,
 			avatarURL: config.images.botIcon
-		});
+		});*/
 	}
 
 	static async runStatusChange(client: FurryBot, num: number) {
-		switch (num) {
+		/*switch (num) {
 			case 0: {
-				await client.editStatus("online", { name: `${config.defaults.prefix}help with ${client.users.size} furries`, type: GameTypes.PLAYING });
+				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help with ${client.bot.users.size} furries`, type: GameTypes.PLAYING });
 				break;
 			}
 
 			case 1: {
-				await client.editStatus("online", { name: `${config.defaults.prefix}help in ${client.guilds.size} servers`, type: GameTypes.WATCHING });
+				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help in ${client.bot.guilds.size} servers`, type: GameTypes.WATCHING });
 				break;
 			}
 
 			case 2: {
-				await client.editStatus("online", { name: `${config.defaults.prefix}help in ${Object.keys(client.channelGuildMap).length} channels`, type: GameTypes.LISTENING });
+				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help in ${Object.keys(client.bot.channelGuildMap).length} channels`, type: GameTypes.LISTENING });
 				break;
 			}
 
 			case 3: {
-				await client.editStatus("online", { name: `${config.defaults.prefix}help at https://furry.bot`, type: GameTypes.PLAYING });
+				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help at https://furry.bot`, type: GameTypes.PLAYING });
 				break;
 			}
-		}
+		}*/
 	}
 
 	static async runStatsUpdate(client: FurryBot) {

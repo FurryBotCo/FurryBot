@@ -1,6 +1,7 @@
 import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import config from "../../config";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -85,5 +86,5 @@ export default new Command({
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))
 				.toJSON()
 		});
-	} else return new Error("ERR_INVALID_USAGE");
+	} else return new CommandError("ERR_INVALID_USAGE", cmd);
 }));

@@ -361,6 +361,12 @@ commands:
       usage: ""
       possible:
         - "<@!{0}> wags their little tail, aren't they cute ^-^"
+    weirdedit:
+      description: "Make a message with a weird little edit thing."
+      usage: "some, text"
+      missing0: "First text missing. You must provide some text separated by commas."
+      missing1: "Second text missing. You must provide some text separated by commas."
+      edited: "This message will be edited soon."
     whosagoodboy:
       description: "Who's a good boy?!"
       usage: "[@user]"
@@ -793,11 +799,9 @@ commands:
       title: "Avatar"
       link: "Link"
     bugreport:
-      description: "Report a bug with the bot. (if reporting multiple, report them all in one message.)"
-      usage: "<bug>"
-      title: "Bug Report"
-      desc: "Your bug report was posted! You can view it [here](https://discord.gg/CQMx76B)."
-      nothing: "please provide something to report."
+      description: "Report a bug with the bot."
+      usage: ""
+      moved: "this has been moved into our support server due to our new system."
     help:
       description: "Get some help with the bot."
       usage: "[command/category]"
@@ -937,7 +941,7 @@ commands:
       couldNotUnban: "I couldn't unban **{0}**, {1}"
       englishOnly: "The provided reason must be comprised of English characters only."
     unban:
-      description: Remove bans for people that are already banned.
+      description: "Remove bans for people that are already banned."
       usage: "<id> [reason]"
       notBanned: "User not banned"
       notBannedDesc: "It doesn't look like {0} is banned here.."
@@ -1240,11 +1244,20 @@ commands:
       same: "that is already this servers prefix."
       maxLen: "the maximum length for my prefix is 15 characters (not counting spaces)."
       set: "set this servers prefix to {0}"
-    prune:
+    purge:
       description: "Clear messages in a channel."
       usage: "<2-100>"
       amount: "please provide a valid number between two (2) and 100."
       skipped: "Skipped {0} message(s), reason: they are over 2 weeks old.\nNote: this is a technical limitation from Discord, not us."
+    reembed:
+      description: "Reenable embeds on a message where they have been disabled."
+      usage: "<message id>"
+      noId: 'you must provide a link to the message. Right click, then click "copy message link"'
+      invalidMessage: "invalid message link provided."
+      invalidGuild: "the message must be in this server."
+      invalidChannel: "I couldn't find the channel that message is in (must be a text channel)."
+      notSuppressed: "embeds are not suppressed on that message."
+      unsuppressed: "embeds have been unsuppressed on that message."
     reset:
       description: "Reset the current servers settings."
       usage: ""
@@ -1374,6 +1387,8 @@ other:
     furrybot: "powered by furry.bot"
   mention:
     dm: "I couldn't send messages in the channel where I was mentioned, so I sent this directly to you!"
+    description: "Hi, {0}! Since you've mentioned me, here's a little about me:\nMy prefix here is **{1}**, you can see my commands by using `{1}help`, you can change my prefix by using `{1}prefix <new prefix>`,\nIf you want to invite me to another server, you can use [this link]({2}), or, if that isn't working, you can visit [https://furry.bot/add](https://furry.bot/add)\nIf you need support, you can visit our server [here]({3})"
+    title: "Hello!"
   words:
     yes: "Yes"
     no: "No"

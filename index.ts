@@ -4,28 +4,37 @@ import * as fs from "fs-extra";
 import config from "./src/config";
 import path from "path";
 import Logger from "./src/util/LoggerV9";
+import "./src/main";
 [config.dir.logs, `${config.dir.logs}/spam`, `${config.dir.logs}/client`, config.dir.tmp].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), Logger.log("Setup | Logs", `Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
 
 import ListStats from "./src/util/ListStats";
-import FurryBot from "./src/main";
+import Cluster from "cluster";
+import { Fleet } from "eris-fleet";
 
-const bot = new FurryBot(config.client.token, config.client.options);
-if (!config.beta) setInterval(() => ListStats(bot, bot.shards.map(s => bot.guilds.filter(g => g.shard.id === s.id).length)), 9e5);
+const Admiral = new Fleet({
+	...config.client.options,
+	token: config.client.token,
+	path: `${__dirname}/src/main.ts`
+});
 
-if (__filename.endsWith(".js") && !fs.existsSync(`${config.dir.base}/src/assets`)) {
-	fs.copySync(`${config.dir.base}/src/assets`, `${config.dir.base}/build/src/assets`);
-	bot.log("log", `Copied assets directory ${`${config.dir.base}/src/assets`} to ${config.dir.base}/build/src/assets`, "Setup | Assets");
+if (Cluster.isMaster) {
+	Admiral
+		.on("log", (m) => Logger.log("Admiral | Log", m))
+		.on("debug", (m) => Logger.debug("Admiral | Debug", m))
+		.on("warn", (m) => Logger.warn("Admiral | Warn", m))
+		.on("error", (m) => Logger.error("Admiral | Error", m));
+
+	if (!config.beta) setInterval(() => ListStats(Admiral), 9e5);
+
+	if (__filename.endsWith(".js") && !fs.existsSync(`${config.dir.base}/src/assets`)) {
+		fs.copySync(`${config.dir.base}/src/assets`, `${config.dir.base}/build/src/assets`);
+		Logger.log("Setup | Assets", `Copied assets directory ${`${config.dir.base}/src/assets`} to ${config.dir.base}/build/src/assets`);
+	}
+
+	fs.writeFileSync(`${__dirname}/${__filename.endsWith(".ts") ? "" : "../"}process.pid`, process.pid);
+
 }
 
-fs.writeFileSync(`${__dirname}/${__filename.endsWith(".ts") ? "" : "../"}process.pid`, process.pid);
-
-bot.connect();
-
-export default bot;
-
 process.on("SIGINT", () => {
-	bot
-		.removeAllListeners()
-		.disconnect({ reconnect: false });
 	process.kill(process.pid);
 });

@@ -1,5 +1,6 @@
 import Command from "../../modules/CommandHandler/Command";
 import { Colors } from "../../util/Constants";
+import CommandError from "../../modules/CommandHandler/CommandError";
 import Eris from "eris";
 
 export default new Command({
@@ -16,7 +17,7 @@ export default new Command({
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const types = ["size", "shards", "users", "channels"];
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 	let embed: Eris.EmbedOptions;
 	switch (msg.args[0].toLowerCase()) {
 		case "size": {

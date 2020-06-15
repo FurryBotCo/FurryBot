@@ -58,11 +58,11 @@ export default new Command({
 				...pings,
 				"",
 				"Shard Statuses:",
-				`Connecting: ${this.shards.filter(s => s.status === "connecting").length}`,
-				`Disconnected: ${this.shards.filter(s => s.status === "disconnected").length}`,
-				`Handshaking: ${this.shards.filter(s => s.status === "handshaking").length}`,
-				`Resuming: ${this.shards.filter(s => s.status === "resuming").length}`,
-				`Ready: ${this.shards.filter(s => s.status === "ready").length}`
+				`Connecting: ${this.bot.shards.filter(s => s.status === "connecting").length}`,
+				`Disconnected: ${this.bot.shards.filter(s => s.status === "disconnected").length}`,
+				`Handshaking: ${this.bot.shards.filter(s => s.status === "handshaking").length}`,
+				`Resuming: ${this.bot.shards.filter(s => s.status === "resuming").length}`,
+				`Ready: ${this.bot.shards.filter(s => s.status === "ready").length}`
 			].join("\n")
 		}
 	});

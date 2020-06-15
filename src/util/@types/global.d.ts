@@ -1,4 +1,5 @@
 import Eris from "eris";
+import FurryBot from "../../main";
 
 declare global {
 	interface String {
@@ -172,6 +173,29 @@ declare global {
 		}
 
 		type ModLogEntry = ChannelLockEntry | ChannelUnlockEntry | WarnEntry | ClearWarningsEntry | DeleteWarnEntry | KickEntry | UnbanEntry | UnmuteEntry | SoftBanEntry | BanEntry | MuteEntry;
+	}
+
+	interface MessageToMain {
+		type: string;
+		data: any;
+		threadId: number;
+	}
+	interface MessageToWorker {
+		type: string;
+		data: any;
+	}
+
+	type FilterFlags<Base, Condition> = {
+		[Key in keyof Base]: Base[Key] extends Condition ? Key : never;
+	};
+	type AllowedNames<Base, Condition> = FilterFlags<Base, Condition>[keyof Base];
+	type BetterFilter<Base, Condition> = Pick<Base, keyof Omit<Base, AllowedNames<Base, Condition>>>;
+	type WithoutFunctions<T> = BetterFilter<T, Function>;
+
+	namespace NodeJS {
+		interface Global {
+			bot: FurryBot;
+		}
 	}
 
 	namespace Blacklist {

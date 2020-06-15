@@ -1,5 +1,6 @@
 import Command from "../../modules/CommandHandler/Command";
 import { Request } from "../../util/Functions";
+import CommandError from "../../modules/CommandHandler/CommandError";
 import phin from "phin";
 import Eris from "eris";
 
@@ -16,7 +17,7 @@ export default new Command({
 	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.unparsedArgs.length > 2) return new Error("ERR_INVALID_USAGE");
+	if (msg.unparsedArgs.length > 2) return new CommandError("ERR_INVALID_USAGE", cmd);
 
 	switch (msg.args[0].toLowerCase()) {
 		case "game": {
@@ -42,18 +43,18 @@ export default new Command({
 					return msg.channel.createMessage(`<@!${msg.author.id}>, invalid type. Possible types: **playing**, **listening**, **watching**, **streaming**.`);
 			}
 
-			if (type === 1) return this.editStatus(msg.channel.guild.shard.presence.status, { url: msg.args[2], name: msg.args.slice(3).join(" "), type });
-			else return this.editStatus(msg.channel.guild.shard.presence.status, { name: msg.args.slice(2).join(" "), type });
+			if (type === 1) return this.bot.editStatus(msg.channel.guild.shard.presence.status, { url: msg.args[2], name: msg.args.slice(3).join(" "), type });
+			else return this.bot.editStatus(msg.channel.guild.shard.presence.status, { name: msg.args.slice(2).join(" "), type });
 			break;
 		}
 
 		case "icon": {
-			if (msg.unparsedArgs.length > 2) return new Error("ERR_INVALID_USAGE");
+			if (msg.unparsedArgs.length > 2) return new CommandError("ERR_INVALID_USAGE", cmd);
 			const set = await phin({
 				url: msg.unparsedArgs.slice(1).join("%20"),
 				timeout: 5e3
 			}).then(res => `data:${res.headers["content-type"]};base64,${Buffer.from(res.body.toString()).toString("base64")}`);
-			this.editSelf({ avatar: set })
+			this.bot.editSelf({ avatar: set })
 				.then(async (user) => msg.channel.createMessage(`<@!${msg.author.id}>, Set Avatar to (attachment)`, {
 					file: await Request.getImageFromURL(user.avatarURL),
 					name: "avatar.png"
@@ -63,22 +64,22 @@ export default new Command({
 		}
 
 		case "name": {
-			if (msg.unparsedArgs.length > 2) return new Error("ERR_INVALID_USAGE");
+			if (msg.unparsedArgs.length > 2) return new CommandError("ERR_INVALID_USAGE", cmd);
 			const username = msg.unparsedArgs.slice(1).join(" ");
 			if (username.length < 2 || username.length > 32) return msg.channel.createMessage("Username must be between **2** and **32** characters.");
-			return this.editSelf({ username })
+			return this.bot.editSelf({ username })
 				.then((user) => msg.reply(`set username to "${user.username}"`))
 				.catch((err) => msg.reply(`there was an error while doing this: ${err}`));
 			break;
 		}
 
 		case "status": {
-			if (msg.args.length > 2) return new Error("ERR_INVALID_USAGE");
+			if (msg.args.length > 2) return new CommandError("ERR_INVALID_USAGE", cmd);
 			const types: Eris.Status[] = ["online", "idle", "dnd", "offline"];
 			if (!types.includes(msg.args[1].toLowerCase() as Eris.Status)) return msg.reply(`invalid type. Valid types: **${types.join("**, **")}**.`);
 
 			try {
-				this.editStatus(msg.args[1].toLowerCase() as Eris.Status, msg.channel.guild.shard.presence.game);
+				this.bot.editStatus(msg.args[1].toLowerCase() as Eris.Status, msg.channel.guild.shard.presence.game);
 				return msg.reply(`set bots status to ${msg.args[1].toLowerCase()}`);
 			} catch (e) {
 				return msg.reply(`There was an error while doing this: ${e}`);

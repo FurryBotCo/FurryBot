@@ -2,6 +2,7 @@ import { Route } from "..";
 import config from "../../config";
 import { Internal } from "../../util/Functions";
 import { mdb } from "../../modules/Database";
+import { Stats } from "eris-fleet/dist/sharding/Admiral";
 
 export default class StatsRoute extends Route {
 	constructor() {
@@ -15,21 +16,22 @@ export default class StatsRoute extends Route {
 
 		app
 			.get("/", async (req, res) => {
+				const st = await client.ipc.getStats() as Stats;
 
 				const d = new Date((Date.now() - 432e5) - 8.64e+7);
 				const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 				let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.count).catch(err => null);
 				if (!k) k = "Unknown.";
-				else k = (client.guilds.size - k).toString();
+				else k = (client.bot.guilds.size - k).toString();
 
 				const stats = await Internal.getStats();
 
 				return res.status(200).json({
 					success: true,
 					clientStatus: "online",
-					guildCount: client.guilds.size,
-					userCount: client.users.size,
-					shardCount: client.shards.size,
+					guildCount: st.guilds,
+					userCount: st.users,
+					shardCount: st.shardCount,
 					memoryUsage: {
 						process: {
 							used: Internal.memory.process.getUsed(),
@@ -40,7 +42,7 @@ export default class StatsRoute extends Route {
 							total: Internal.memory.system.getTotal()
 						}
 					},
-					largeGuildCount: client.guilds.filter(g => g.large).length,
+					largeGuildCount: client.bot.guilds.filter(g => g.large).length,
 					botVersion: config.version,
 					library: "eris",
 					libraryVersion: require("eris").VERSION,

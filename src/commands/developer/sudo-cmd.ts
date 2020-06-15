@@ -6,6 +6,7 @@ import db from "../../modules/Database";
 import ExtendedMessage from "../../modules/ExtendedMessage";
 import { RestrictionError } from "../../config/extra/other/commandRestrictions";
 import config from "../../config";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -24,7 +25,7 @@ export default new Command({
 	],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 2) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 2) return new CommandError("ERR_INVALID_USAGE", cmd);
 	const bypass = msg.dashedArgs.unparsed.value.includes("bypass");
 	const user = await msg.getUserFromArgs();
 	if (!user) return msg.errorEmbed("INVALID_USER");
@@ -46,7 +47,7 @@ export default new Command({
 			mentions: [],
 			role_mentions: [],
 			content: `${gConfig.settings.prefix}${t} ${a.join(" ")}`
-		}, this),
+		}, this.bot),
 		this);
 
 	if (!bypass && !config.developers.includes(msg.author.id)) {

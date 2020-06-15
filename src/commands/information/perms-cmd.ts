@@ -30,7 +30,7 @@ export default new Command({
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.green)
 			.setDescription([
-				`{lang:commands.information.perms.${member.id === msg.member.id ? "self" : "other"}}`,
+				`{lang:commands.information.perms.${member.id === msg.member.id ? "self" : `other|${msg.author.tag}`}}`,
 				"```diff",
 				...Object.keys(Permissions.constant).filter(p => !remove.includes(p)).map(p => `${member.permission.has(p) ? "+" : "-"} ${msg.dashedArgs.parsed.value.includes("compact") ? p : `{lang:other.permissions.names.${p}}`}`),
 				"```",

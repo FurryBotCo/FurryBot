@@ -1,5 +1,6 @@
 import Command from "../../modules/CommandHandler/Command";
 import Eris from "eris";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -16,7 +17,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 	const s = Number(msg.args[0]);
 	if (isNaN(s) || s < 0 || s > 21600) return msg.reply("{lang:commands.utility.slowmode.invalid}");
 	const ch = msg.args.length > 1 ? await msg.getChannelFromArgs<Eris.TextChannel>(1) : msg.channel;

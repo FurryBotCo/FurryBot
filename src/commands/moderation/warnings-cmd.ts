@@ -34,7 +34,7 @@ export default new Command({
 		}
 	}));
 	const fields: Eris.EmbedField[][] = chunk(await Promise.all(w.map(async (k: Warning, i: number) => {
-		const u = this.users.has(k.blameId) ? this.users.get(k.blameId) : await this.getRESTUser(k.blameId);
+		const u = this.bot.users.has(k.blameId) ? this.bot.users.get(k.blameId) : await this.bot.getRESTUser(k.blameId);
 		return {
 			name: `{lang:commands.moderation.warnings.warning|${i + 1}}`,
 			value: [

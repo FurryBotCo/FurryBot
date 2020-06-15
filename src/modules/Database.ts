@@ -163,9 +163,9 @@ class Database {
 	async addBl(type: "guild" | "user", id: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
 		const e = Strings.random(7);
 		if (!reason) reason = "None Provided.";
-		if (!this.client || typeof this.client.getRESTUser === "undefined" || typeof this.client.getRESTGuild === "undefined") Logger.warn("Database", "Missing client on blacklist addition, webhook not executed.");
+		if (!this.client || typeof this.client.bot.getRESTUser === "undefined" || typeof this.client.bot.getRESTGuild === "undefined") Logger.warn("Database", "Missing client on blacklist addition, webhook not executed.");
 		else {
-			const d = type === "guild" ? await this.client.getRESTGuild(id) : await this.client.getRESTUser(id);
+			const d = type === "guild" ? await this.client.bot.getRESTGuild(id) : await this.client.bot.getRESTUser(id);
 			const prev = type === "guild" ? await this.getGuild(id).then(g => g.checkBlacklist().then(b => b.all.length)) : await this.getUser(id).then(u => u.checkBlacklist().then(b => b.all.length));
 			await this.client.w.get("logs").execute({
 				embeds: [

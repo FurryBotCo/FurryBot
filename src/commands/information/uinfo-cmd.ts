@@ -28,7 +28,7 @@ export default new Command({
 	if (!user) return msg.errorEmbed("INVALID_MEMBER");
 	let flags: number = user.user.publicFlags;
 	if (typeof flags !== "number") {
-		const u = await this.getRESTUser(user.id);
+		const u = await this.bot.getRESTUser(user.id);
 		flags = u.publicFlags;
 	}
 
@@ -50,8 +50,8 @@ export default new Command({
 	if (config.developers.includes(user.id)) f.push(config.flags.dev);
 	if (config.contributors.includes(user.id)) f.push(config.flags.contrib);
 	if (config.helpers.includes(user.id)) f.push(config.flags.helper);
-	try { if (this.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.staff) || user.id === this.guilds.get(config.client.mainGuild).ownerID) f.push(config.flags.staff); } catch (e) { }
-	try { if (this.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.booster)) f.push(config.flags.booster); } catch (e) { }
+	try { if (this.bot.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.staff) || user.id === this.bot.guilds.get(config.client.mainGuild).ownerID) f.push(config.flags.staff); } catch (e) { }
+	try { if (this.bot.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.booster)) f.push(config.flags.booster); } catch (e) { }
 	const c = await db.getUser(user.id);
 	const p = await c.premiumCheck();
 	const ubl = await uConfig.checkBlacklist();
@@ -74,7 +74,7 @@ export default new Command({
 				...around.map(a => a === msg.author.id ? `- [#${m.indexOf(a) + 1}] **<@!${a}>**` : `- [#${m.indexOf(a) + 1}] <@!${a}>`),
 				"",
 				"**{lang:commands.information.uinfo.badges}:**",
-				...(f.length === 0 ? ["\u25FD {lang:other.none}"] : f.map(k => `{lang:other.userFlags.${k}}`))
+				...(f.length === 0 ? ["\u25FD {lang:other.words.none}"] : f.map(k => `{lang:other.userFlags.${k}}`))
 			].join("\n"))
 			.setTimestamp(new Date().toISOString())
 			.setColor(Math.floor(Math.random() * 0xFFFFFF))

@@ -1,5 +1,6 @@
 import Command from "../../modules/CommandHandler/Command";
 import { Utility } from "../../util/Functions";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -16,7 +17,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length === 0) throw new Error("ERR_INVALID_USAGE");
+	if (msg.args.length === 0) throw new CommandError("ERR_INVALID_USAGE", cmd);
 	const roles = gConfig.selfAssignableRoles.map(a => {
 		const b = msg.channel.guild.roles.get(a);
 		if (!b) return { id: null, name: null };
@@ -31,7 +32,7 @@ export default new Command({
 	if (!role || role.length === 0) return msg.reply("{lang:commands.utility.iam.notFund}");
 	role = role[0];
 	if (msg.member.roles.includes(role.id)) return msg.reply(`{lang:commands.utility.iam.alreadyHave|${gConfig.settings.prefix}}`);
-	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), role);
+	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), role);
 	if (a.higher || a.same) return msg.reply(`{lang:commands.utility.iam.higher}`);
 	await msg.member.addRole(role.id, "iam command");
 

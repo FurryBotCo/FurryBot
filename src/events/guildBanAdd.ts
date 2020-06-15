@@ -4,9 +4,13 @@ import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
 import { Utility } from "../util/Functions";
+import config from "../config";
 
 export default new ClientEvent("guildBanAdd", (async function (this: FurryBot, guild: Eris.Guild, user: Eris.User) {
 	this.track("events", "guildBanAdd");
+
+	if (config.beta && !config.client.betaEventGuilds.includes(guild.id)) return;
+
 	const g = await db.getGuild(guild.id);
 	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "memberBan");

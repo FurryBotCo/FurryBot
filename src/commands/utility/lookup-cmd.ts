@@ -5,6 +5,7 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import Eris from "eris";
 import config from "../../config";
 import phin from "phin";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -19,10 +20,10 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 
-	// not 19 yet, bot soon™
-	if (msg.args[0].length < 17 || msg.args.length > 19) return msg.reply("{lang:commands.utility.lookup.invalid}");
+	// According to Discord's developers, ids can *techincally* be between 15 and 21 numbers.
+	if (msg.args[0].length < 15 || msg.args.length > 21) return msg.reply("{lang:commands.utility.lookup.invalid}");
 
 	const w = await phin<any>({
 		method: "GET",
@@ -43,7 +44,7 @@ export default new Command({
 				.setTimestamp(new Date().toISOString());
 
 			const code = w.body.instant_invite.match(new RegExp("^((https?\:\/\/)?(discord\.gg|discordapp\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"))[4];
-			const inv = (await this.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
+			const inv = (await this.bot.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
 			if (!inv) {
 				embed.addField(
 					"{lang:commands.utility.lookup.info}",

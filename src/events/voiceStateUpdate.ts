@@ -4,9 +4,13 @@ import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
 import { Utility } from "../util/Functions";
+import config from "../config";
 
 export default new ClientEvent("voiceStateUpdate", (async function (this: FurryBot, member: Eris.Member, oldState: Eris.OldVoiceState) {
 	this.track("events", "voiceStateUpdate");
+
+	if (config.beta && !config.client.betaEventGuilds.includes(member.guild.id)) return;
+
 	const g = await db.getGuild(member.guild.id);
 	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "voiceStateUpdate");

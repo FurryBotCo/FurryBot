@@ -30,7 +30,7 @@ export default new Command({
 	if (!!i) i.map(k => s.content = s.content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
 	if (!!iN) iN.map(k => s.oldContent = s.oldContent.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
 
-	const u = await this.getRESTUser(s.authorId);
+	const u = await this.bot.getRESTUser(s.authorId);
 
 
 

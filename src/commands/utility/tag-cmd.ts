@@ -26,7 +26,7 @@ export default new Command({
 	const values = Object.values(tags);
 	if (msg.args.length < 1) return msg.reply(`{lang:commands.utility.tag.invalidUsage}`);
 
-	if (["create", "delete", "edit"].includes(msg.args[0].toLowerCase()) && !msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.reply("{lang:commands.utility.tag.missingPerms}");
+	if (["create", "delete", "edit"].includes(msg.args[0].toLowerCase()) && !msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) return msg.reply("{lang:commands.utility.tag.missingPerms}");
 
 	if (msg.args[0].toLowerCase() === "list") {
 		const pages: string[][] = [];

@@ -21,7 +21,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const o: Eris.User = await this.getRESTUser(msg.channel.guild.ownerID).catch(err => null);
+	const o: Eris.User = await this.bot.getRESTUser(msg.channel.guild.ownerID).catch(err => null);
 	const owner = !o ? `Unknown ${msg.channel.guild.ownerID}` : `${o.username}#${o.discriminator} (${o.id})`;
 
 	const fDocsUrl = "https://discordapp.com/developers/docs/resources/guild#guild-object-guild-features";
@@ -134,8 +134,8 @@ export default new Command({
 						`\u25FD {lang:commands.information.sinfo.hiddenYou}: ${msg.channel.guild.channels.filter(c => !c.permissionsOf(msg.author.id).has("readMessages")).length}`,
 						`\u25FD {lang:commands.information.sinfo.visibleYou}: ${msg.channel.guild.channels.filter(c => c.permissionsOf(msg.author.id).has("readMessages")).length}`,
 						"",
-						`\u25FD {lang:commands.information.sinfo.hiddenMe}: ${msg.channel.guild.channels.filter(c => !c.permissionsOf(this.user.id).has("readMessages")).length}`,
-						`\u25FD {lang:commands.information.sinfo.visibleMe}: ${msg.channel.guild.channels.filter(c => c.permissionsOf(this.user.id).has("readMessages")).length}`
+						`\u25FD {lang:commands.information.sinfo.hiddenMe}: ${msg.channel.guild.channels.filter(c => !c.permissionsOf(this.bot.user.id).has("readMessages")).length}`,
+						`\u25FD {lang:commands.information.sinfo.visibleMe}: ${msg.channel.guild.channels.filter(c => c.permissionsOf(this.bot.user.id).has("readMessages")).length}`
 					].join("\n"))
 					.setThumbnail(msg.channel.guild.iconURL);
 				break;

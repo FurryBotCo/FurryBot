@@ -22,7 +22,7 @@ export default new Command({
 
 	if (!user) return msg.errorEmbed("INVALID_USER");
 
-	const a = this.guilds.filter(g => g.members.has(user.id)),
+	const a = this.bot.guilds.filter(g => g.members.has(user.id)),
 		b = a.map(g => `${g.name} (${g.id})`),
 		guilds = [],
 		fields: Eris.EmbedField[] = [];

@@ -36,7 +36,7 @@ export default class MusicQueue {
 	constructor(guild: Eris.Guild | string, txt: Eris.TextChannel | string, vc: Eris.VoiceChannel | string, client: FurryBot) {
 		if (!client) throw new TypeError("ERR_INVALID_CLIENT");
 		this.client = client;
-		this.guild = typeof guild === "string" ? client.guilds.get(guild) : guild;
+		this.guild = typeof guild === "string" ? client.bot.guilds.get(guild) : guild;
 		if (!this.guild) throw new TypeError("ERR_INVALID_GUILD");
 		this.txt = typeof txt === "string" ? this.guild.channels.get(txt) : txt;
 		if (!this.txt) throw new TypeError("ERR_INVALID_TXT");
@@ -52,7 +52,7 @@ export default class MusicQueue {
 
 	async setup() {
 		this.gConfig = await db.getGuild(this.guild.id, true);
-		if (!this.vc.voiceMembers.has(this.client.user.id)) await this.player.join(this.vc.id);
+		if (!this.vc.voiceMembers.has(this.client.bot.user.id)) await this.player.join(this.vc.id);
 		this.setupFinished = true;
 	}
 

@@ -49,9 +49,10 @@ export default class DeleteRoute extends Route {
 				const g = await db.getGuild(req.params.id);
 				if (!g) return res.status(404).render("error", { title: "No Data Found", status: 400, message: `We couldn't find any stored server data for that id.` });
 				if (!config.developers.includes(req.session.user.id)) {
-					if (!client.guilds.has(req.params.id)) return res.status(404).render("error", { title: "Forbidden", status: 403, message: `Due to me being removed from that server, I cannot verify your ability to perform this action. Please contact a staff member to further this process.` });
-					const j = client.guilds.get(req.params.id);
-					if (!j.members.has(req.session.user.id)) return res.status(404).render("error", { title: "Unauthorized", status: 401, message: `You are not in this server, so you cannot perform this action.` });
+					const j = await client.bot.getRESTGuild(req.params.id);
+					if (!j) return res.status(404).render("error", { title: "Forbidden", status: 403, message: `Due to me being removed from that server, I cannot verify your ability to perform this action. Please contact a staff member to further this process.` });
+					const m = await j.getRESTMember(req.session.user.id);
+					if (!m) return res.status(404).render("error", { title: "Unauthorized", status: 401, message: `You are not in this server, so you cannot perform this action.` });
 					const o = j.members.get(j.ownerID);
 					if (j.ownerID !== req.session.user.id) return res.status(404).render("error", { title: "Unauthorized", status: 401, message: `Only the server owner (${o.username}#${o.discriminator}) can perform this action.` });
 				}
@@ -64,9 +65,10 @@ export default class DeleteRoute extends Route {
 				const g = await db.getGuild(req.params.id);
 				if (!g) return res.status(404).render("error", { title: "No Data Found", status: 400, message: `We couldn't find any stored server data for that id.` });
 				if (!config.developers.includes(req.session.user.id)) {
-					if (!client.guilds.has(req.params.id)) return res.status(404).render("error", { title: "Forbidden", status: 403, message: `Due to me being removed from that server, I cannot verify your ability to perform this action. Please contact a staff member to further this process.` });
-					const j = client.guilds.get(req.params.id);
-					if (!j.members.has(req.session.user.id)) return res.status(404).render("error", { title: "Unauthorized", status: 401, message: `You are not in this server, so you cannot perform this action.` });
+					const j = await client.bot.getRESTGuild(req.params.id).catch(err => null);
+					if (!j) return res.status(404).render("error", { title: "Forbidden", status: 403, message: `Due to me being removed from that server, I cannot verify your ability to perform this action. Please contact a staff member to further this process.` });
+					const m = j.getRESTMember(req.session.user.id).catch(err => null);
+					if (!m) return res.status(404).render("error", { title: "Unauthorized", status: 401, message: `You are not in this server, so you cannot perform this action.` });
 					const o = j.members.get(j.ownerID);
 					if (j.ownerID !== req.session.user.id) return res.status(404).render("error", { title: "Unauthorized", status: 401, message: `Only the server owner (${o.username}#${o.discriminator}) can perform this action.` });
 				}

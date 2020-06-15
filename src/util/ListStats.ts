@@ -2,18 +2,19 @@ import Logger from "./LoggerV9";
 import config from "../config";
 import phin from "phin";
 import FurryBot from "../main";
+import { Fleet } from "eris-fleet";
 
-export default (async (manager: FurryBot, shards: number[]) => {
-	if (!shards || shards.length === 0) throw new TypeError("invalid shards provided");
+export default (async (manager: Fleet) => {
+	if (!manager.stats) throw new TypeError("List stats attempted when stats are not present.");
+
 	try {
 		await phin<any>({
 			method: "POST",
 			url: "https://botblock.org/api/count",
 			data: {
-				server_count: shards.reduce((a, b) => a + b, 0),
+				server_count: manager.stats.guilds,
 				bot_id: config.client.id,
-				shard_count: shards.length,
-				shards,
+				shard_count: manager.stats.shardCount,
 				...config.client.lists.map(l => ({ [l.site]: l.token })).reduce((a, b) => ({ ...a, ...b }))
 			} as any,
 			timeout: 1e4,
@@ -21,15 +22,16 @@ export default (async (manager: FurryBot, shards: number[]) => {
 		});
 
 		// botblock was blocked on top.gg
-		/*const rq = await phin<any>({
+		const rq = await phin<any>({
 			method: "POST",
 			url: `https://top.gg/api/bots/${config.client.id}/stats`,
 			data: {
-				shards
+				server_count: manager.stats.guilds,
+				shard_count: manager.stats.shardCount
 			} as any,
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": config.apiKeys.botLists["top.gg"]
+				"Authorization": config.client.lists.find(l => l.site === "top.gg").token
 			},
 			timeout: 1e4,
 			parse: "json"
@@ -38,15 +40,14 @@ export default (async (manager: FurryBot, shards: number[]) => {
 				try {
 					return JSON.parse(req.body.toString());
 				} catch (e) {
-					manager.log("error", req.body, "Bot List Stats");
-					manager.log("error", `${req.statusCode} ${req.statusMessage}`, "Bot List Stats");
+					Logger.error("Bot List Stats", req.body);
+					Logger.error("Bot List Stats", `${req.statusCode} ${req.statusMessage}`);
 				}
-			});*/
-		manager.log("log", `Posted guild counts: ${shards.reduce((a, b) => a + b, 0)}`, "Bot List Stats");
+			});
+		Logger.log("Bot List Stats", `Posted guild counts: ${manager.stats.guilds}`);
 	} catch (e) {
-		manager.log("error", e, "Bot List Stats");
+		Logger.error("Bot List Stats", e);
 	}
-	return {
-		count: shards.reduce((a, b) => a + b, 0)
-	};
+
+	return;
 });

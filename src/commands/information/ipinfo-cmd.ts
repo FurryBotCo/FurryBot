@@ -3,6 +3,7 @@ import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 import phin from "phin";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -20,7 +21,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.unparsedArgs.length < 1) throw new Error("ERR_INVALID_USAGE");
+	if (msg.unparsedArgs.length < 1) throw new CommandError("ERR_INVALID_USAGE", cmd);
 	// if(config.apis.ipinfo.regex.ipv4.test(msg.unparsedArgs.join(" ")) || config.apis.ipinfo.regex.ipv6.test(msg.unparsedArgs.join(" "))) {
 	const req = await phin({
 		method: "GET",

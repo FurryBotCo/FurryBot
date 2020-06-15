@@ -35,12 +35,12 @@ export default new Command({
 	if (msg.author.id === member.id) return msg.reply("{lang:commands.fun.marry.noSelf}");
 	if (member.bot) return msg.reply("{lang:commands.fun.marry.noBot}");
 	if (uConfig.marriage.married) {
-		const u = await this.getRESTUser(uConfig.marriage.partner).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
+		const u = await this.bot.getRESTUser(uConfig.marriage.partner).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
 		return msg.reply(`{lang:commands.fun.marry.selfAlreadyMarried|${u}}`);
 	}
 
 	if (m.marriage.married) {
-		const u = await this.getRESTUser(m.marriage.partner).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
+		const u = await this.bot.getRESTUser(m.marriage.partner).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
 		return msg.reply(`{lang:commands.fun.marry.otherAlreadyMarried|${u}}`);
 	}
 
@@ -53,7 +53,7 @@ export default new Command({
 		else force = true;
 	}
 	if (!force) {
-		if (["embedLinks", "attachFiles"].some(p => msg.channel.permissionsOf(this.user.id).has(p))) await msg.channel.createMessage({
+		if (["embedLinks", "attachFiles"].some(p => msg.channel.permissionsOf(this.bot.user.id).has(p))) await msg.channel.createMessage({
 			embed: new EmbedBuilder(gConfig.settings.lang)
 				.setTitle("{lang:commands.fun.marry.title}")
 				.setDescription(`{lang:commands.fun.marry.text|${msg.author.id}|${member.id}}`)

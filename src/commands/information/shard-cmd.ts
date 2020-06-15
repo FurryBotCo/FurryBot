@@ -20,7 +20,7 @@ export default new Command({
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle(`{lang:commands.information.shard.title|${msg.channel.guild.shard.id}}`)
-			.setDescription(`{lang:commands.information.shard.guilds}: ${this.guilds.filter(g => g.shard.id === msg.channel.guild.shard.id).length}\n{lang:commands.information.shard.ping}: ${msg.channel.guild.shard.latency}ms`)
+			.setDescription(`{lang:commands.information.shard.guilds}: ${this.bot.guilds.filter(g => g.shard.id === msg.channel.guild.shard.id).length}\n{lang:commands.information.shard.ping}: ${msg.channel.guild.shard.latency}ms`)
 			.setColor(Colors.gold)
 			.setTimestamp(new Date().toISOString())
 			.toJSON()

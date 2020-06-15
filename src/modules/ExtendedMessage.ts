@@ -76,7 +76,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		if (![undefined].includes(msg.tts)) data.tts = msg.tts;
 		if (![undefined].includes(msg.type)) data.type = msg.type;
 
-		super(data, client);
+		super(data, client.bot);
 		this.client = client;
 
 		// this property doesn't seem to be set properly
@@ -121,7 +121,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 
 		if (typeof this.channel.guild !== "undefined" && typeof this.channel.guild.me === "undefined") Object.defineProperty(this.channel.guild, "me", {
 			get(this: Eris.Guild) {
-				return this.members.get(client.user.id);
+				return this.members.get(client.bot.user.id);
 			}
 		});
 
@@ -172,7 +172,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		return ![undefined, null].includes(this._prefix) ? this._prefix : this._prefix = [
 			Eris.Constants.ChannelTypes.GUILD_TEXT,
 			Eris.Constants.ChannelTypes.GUILD_NEWS
-		].includes(this.channel.type as any) ? this.content.startsWith(`<@${this.client.user.id}>`) ? `<@${this.client.user.id}` : this.content.startsWith(`<@!${this.client.user.id}>`) ? `<@!${this.client.user.id}>` : config.defaults.prefix : null;
+		].includes(this.channel.type as any) ? this.content.startsWith(`<@${this.client.bot.user.id}>`) ? `<@${this.client.bot.user.id}` : this.content.startsWith(`<@!${this.client.bot.user.id}>`) ? `<@!${this.client.bot.user.id}>` : config.defaults.prefix : null;
 	}
 	set prefix(p: string) { this._prefix = p; }
 	get args() { return this._args instanceof Array ? this._args : this._args = F.Message.parseArgs(this.content, this.prefix); }
@@ -227,8 +227,8 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		// user ID
 		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
 			if (this.channel.guild.members.has(args[argPosition])) return this.channel.guild.members.get(args[argPosition]).user as U;
-			else if (this.client.users.has(args[argPosition])) return this.client.users.get(args[argPosition]);
-			else return this.client.getRESTUser(args[argPosition]).catch(err => null) as Promise<U>;
+			else if (this.client.bot.users.has(args[argPosition])) return this.client.bot.users.get(args[argPosition]);
+			else return this.client.bot.getRESTUser(args[argPosition]).catch(err => null) as Promise<U>;
 		}
 
 		// no username or tag because we're getting a user so it's not reasonable to look for those
@@ -337,10 +337,10 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		// server id
-		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.guilds.get(args[argPosition]);
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.bot.guilds.get(args[argPosition]);
 
 		// server name
-		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.guilds.find((g: G) => g.name.toLowerCase() === args[argPosition].toLowerCase());
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.bot.guilds.find((g: G) => g.name.toLowerCase() === args[argPosition].toLowerCase());
 
 		// nothing found
 		return null;

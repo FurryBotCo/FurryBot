@@ -1,4 +1,5 @@
 import Command from "../../modules/CommandHandler/Command";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -20,7 +21,7 @@ export default new Command({
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	let count = Number(msg.args[0]);
-	if (msg.args.length === 0 || isNaN(count)) throw new Error("ERR_INVALID_USAGE");
+	if (msg.args.length === 0 || isNaN(count)) throw new CommandError("ERR_INVALID_USAGE", cmd);
 	if (count < 2 || count > 100) return msg.reply("{lang:commands.utility.prune.amount}");
 	if (count < 100) count++;
 

@@ -4,10 +4,15 @@ import Eris from "eris";
 import db from "../modules/Database";
 import { MessageTypes, Colors } from "../util/Constants";
 import { Utility } from "../util/Functions";
+import config from "../config";
 
 export default new ClientEvent("messageDelete", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	this.track("events", "messageDelete");
+
 	if (!this || !message || !message.author || message.author.bot || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any)) return;
+
+	if (config.beta && !config.client.betaEventGuilds.includes(message.channel.guild.id)) return;
+
 	const g = await db.getGuild(message.channel.guild.id);
 	if (!g) return;
 	await g.edit({

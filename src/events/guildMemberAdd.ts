@@ -4,9 +4,12 @@ import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
 import { Time, Internal } from "../util/Functions";
+import config from "../config";
 
 export default new ClientEvent("guildMemberAdd", (async function (this: FurryBot, guild: Eris.Guild, member: Eris.Member) {
 	this.track("events", "guildMemberAdd");
+
+	if (config.beta && !config.client.betaEventGuilds.includes(guild.id)) return;
 
 	const g = await db.getGuild(guild.id);
 	let e: typeof g["logEvents"][0];

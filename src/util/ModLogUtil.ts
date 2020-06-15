@@ -71,7 +71,7 @@ export default class ModLogUtil {
 				}
 			});
 		}
-		if (!["sendMessages", "embedLinks"].some(p => ch.guild.channels.get(g.settings.modlog).permissionsOf(this.client.user.id).has(p))) {
+		if (!["sendMessages", "embedLinks"].some(p => ch.guild.channels.get(g.settings.modlog).permissionsOf(this.client.bot.user.id).has(p))) {
 			await ch.createMessage("{lang:other.modlog.missingPermissions}").catch(err => null);
 			await g.edit({
 				settings: {
@@ -250,11 +250,11 @@ export default class ModLogUtil {
 				else if (ch.guild.members.has(data.oldBlame)) {
 					const m = ch.guild.members.get(data.oldBlame);
 					b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
-				} else if (this.client.users.has(data.oldBlame)) {
-					const m = this.client.users.get(data.oldBlame);
+				} else if (this.client.bot.users.has(data.oldBlame)) {
+					const m = this.client.bot.users.get(data.oldBlame);
 					b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
 				} else {
-					const m = await this.client.getRESTUser(data.oldBlame);
+					const m = await this.client.bot.getRESTUser(data.oldBlame);
 					b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
 				}
 				await mdb.collection<ModLogEntry.DeleteWarnEntry>("modlog").insertOne({

@@ -16,16 +16,16 @@ export default new ClientEvent("ready", (async function () {
 	const v = this.v = new Cluster({
 		nodes: config.apiKeys.lavalink.map(l => ({
 			password: l.password,
-			userID: this.user.id,
-			shardCount: this.shards.size,
+			userID: this.bot.user.id,
+			shardCount: this.bot.shards.size,
 			hosts: {
 				rest: l.httpHost,
 				ws: l.wsHost
 			}
 		})),
-		send: (guildID, packet) => this.shards.get(Number((BigInt(guildID) >> 22n) % BigInt(this.shards.size))).sendWS(packet.op, packet.d, true),
+		send: (guildID, packet) => this.bot.shards.get(Number((BigInt(guildID) >> 22n) % BigInt(this.bot.shards.size))).sendWS(packet.op, packet.d, true),
 		filter: (node, guildID) => {
-			const g = this.guilds.get(guildID);
+			const g = this.bot.guilds.get(guildID);
 			if (!g) return true;
 			const regions = config.apiKeys.lavalink.map(l => l.regions).reduce((a, b) => a.concat(b));
 			if (!regions.includes(g.region)) {
@@ -38,7 +38,7 @@ export default new ClientEvent("ready", (async function () {
 		}
 	});
 
-	this
+	this.bot
 		.on("rawWS", (packet, id) => {
 			switch (packet.op) {
 				case 0: {
@@ -88,16 +88,15 @@ export default new ClientEvent("ready", (async function () {
 		}
 	});
 
-	this.editStatus("online", {
+	this.bot.editStatus("online", {
 		name: `${config.defaults.prefix}help with some furries`,
 		type: 0
 	});
 
 	// makes commands only load at ready
-	let cmd = require("../commands");
-	if (cmd.default) cmd = cmd.default;
+	const cmd = await import("../commands").then(async (d) => d.default);
 	cmd.map(c => this.cmd.addCategory(c));
-	this.log("log", `Client ready with ${this.users.size} users, in ${Object.keys(this.channelGuildMap).length} channels, of ${this.guilds.size} guilds, with ${this.cmd.commands.length} commands.`, `Ready`);
+	this.log("log", `Cluster ready with ${this.bot.users.size} users, in ${Object.keys(this.bot.channelGuildMap).length} channels, of ${this.bot.guilds.size} guilds, with ${this.cmd.commands.length} commands.`, `Ready`);
 
 
 	if (fs.existsSync(`${config.dir.base}/restart.json`)) {
@@ -105,7 +104,7 @@ export default new ClientEvent("ready", (async function () {
 		const r = JSON.parse(fs.readFileSync(`${config.dir.base}/restart.json`).toString());
 		fs.unlinkSync(`${config.dir.base}/restart.json`);
 
-		await this.getRESTChannel(r.channel).then((ch: Eris.GuildTextableChannel) => ch.createMessage(`<@!${r.user}>, restart took **${Time.ms(t - r.time, true)}**.`));
+		await this.bot.getRESTChannel(r.channel).then((ch: Eris.GuildTextableChannel) => ch.createMessage(`<@!${r.user}>, restart took **${Time.ms(t - r.time, true)}**.`));
 	}
 
 	setInterval(TimedTasks.runAll.bind(TimedTasks, this), 1e3);

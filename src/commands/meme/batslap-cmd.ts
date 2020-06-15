@@ -16,9 +16,9 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const member = msg.args.length === 0 ? msg.channel.guild.members.get(this.user.id) : await msg.getMemberFromArgs();
+	const member = msg.args.length === 0 ? msg.channel.guild.members.get(this.bot.user.id) : await msg.getMemberFromArgs();
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
-	const img = await DankMemerAPI.slap(member.id === this.user.id ? [member.avatarURL, msg.author.avatarURL] : [msg.author.avatarURL, member.avatarURL]);
+	const img = await DankMemerAPI.slap(member.id === this.bot.user.id ? [member.avatarURL, msg.author.avatarURL] : [msg.author.avatarURL, member.avatarURL]);
 
 	return msg.channel.createMessage("", {
 		file: img.file,

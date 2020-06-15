@@ -3,6 +3,7 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import { Utility } from "../../util/Functions";
 import Language from "../../util/Language";
 import { Colors } from "../../util/Constants";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -21,7 +22,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) throw new CommandError("ERR_INVALID_USAGE", cmd);
 
 	// get member from message
 	const member = await msg.getMemberFromArgs();
@@ -53,7 +54,7 @@ export default new Command({
 	}
 
 
-	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), msg.channel.guild.roles.get(gConfig.settings.muteRole));
+	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), msg.channel.guild.roles.get(gConfig.settings.muteRole));
 	if (a.same || a.lower) return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.moderation.unmute.invalidRole}")
@@ -89,5 +90,5 @@ export default new Command({
 			await m.delete();
 		}*/
 	});
-	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+	if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
 }));

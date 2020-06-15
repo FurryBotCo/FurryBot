@@ -7,7 +7,7 @@ import { Colors } from "../util/Constants";
 export default new ClientEvent("shardReady", (async function (this: FurryBot, id: number) {
 	this.track("events", "shardReady");
 	Logger.log("Shard Ready", `Shard #${id} is ready.`);
-	if (!this.firstReady) this.shards.get(id).editStatus("idle", { name: "Not ready yet..", type: 0 });
+	if (!this.firstReady) this.bot.shards.get(id).editStatus("idle", { name: "Not ready yet..", type: 0 });
 	return this.w.get("shard").execute({
 		embeds: [
 			{

@@ -4,6 +4,7 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import { Time, Utility } from "../../util/Functions";
 import Language from "../../util/Language";
 import { mdb } from "../../modules/Database";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -23,7 +24,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) throw new CommandError("ERR_INVALID_USAGE", cmd);
 	let deleteDays = 0, time = 0;
 	if (Object.keys(msg.dashedArgs.parsed.keyValue).includes("days")) {
 		deleteDays = Number(msg.dashedArgs.parsed.keyValue.days);
@@ -57,7 +58,7 @@ export default new Command({
 	if (!user) return msg.errorEmbed("INVALID_USER");
 	if (user instanceof Eris.Member) user = user.user;
 
-	if (msg.channel.permissionsOf(this.user.id).has("viewAuditLogs")) {
+	if (msg.channel.permissionsOf(this.bot.user.id).has("viewAuditLogs")) {
 		if (await msg.channel.guild.getBans().then(res => res.map(u => u.user.id).includes(user.id))) return msg.channel.createMessage({
 			embed: new EmbedBuilder(gConfig.settings.lang)
 				.setTitle("{lang:commands.moderation.ban.alreadyBanned}")
@@ -103,5 +104,5 @@ export default new Command({
 		else await msg.channel.createMessage(`{lang:commands.moderation.ban.couldNotBan|${user.username}#${user.discriminator}|${err}}`);
 		if (typeof m !== "undefined") await m.delete();
 	});
-	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.delete().catch(error => null);
+	if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) await msg.delete().catch(error => null);
 }));

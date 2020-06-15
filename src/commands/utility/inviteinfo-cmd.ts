@@ -1,8 +1,8 @@
 import Command from "../../modules/CommandHandler/Command";
-import { Utility } from "../../util/Functions";
 import { ChannelNames, Colors } from "../../util/Constants";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import Eris from "eris";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -18,7 +18,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 	const k = msg.unparsedArgs.join("").match(new RegExp("^((https?\:\/\/)?(discord\.gg|discord(app)?\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"));
 
 	if (!k || k.length === 0) return msg.reply("{lang:commands.utility.inviteinfo.noInv}");
@@ -26,7 +26,7 @@ export default new Command({
 
 	if (!code) return msg.reply("{lang:commands.utility.inviteinfo.noInv}");
 
-	const inv = (await this.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
+	const inv = (await this.bot.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
 	if (!inv) return msg.reply("{lang:commands.utility.inviteinfo.invalid}");
 	const { guild, inviter, channel } = inv;
 

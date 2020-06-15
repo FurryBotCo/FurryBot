@@ -2,6 +2,7 @@ import Command from "../../modules/CommandHandler/Command";
 import config from "../../config";
 import phin from "phin";
 import uuid from "uuid";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -18,7 +19,7 @@ export default new Command({
 	restrictions: ["helper"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 2) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 2) return new CommandError("ERR_INVALID_USAGE", cmd);
 
 	switch (msg.args[0].toLowerCase()) {
 		case "add": {
@@ -33,7 +34,7 @@ export default new Command({
 							temp_id: `item.add.${msg.author.id}`,
 							uuid: uuid.v4(),
 							args: {
-								content: msg.args.join(" "),
+								content: msg.args.slice(1).join(" "),
 								project_id: config.apiKeys.todoist.projectId
 							}
 						}
@@ -54,7 +55,7 @@ export default new Command({
 			return msg.reply({
 				embed: {
 					title: "Item Added To To-Do List",
-					description: `Item: ${msg.args.join(" ")}\n[Link To Item](https://todoist.com/showTask?id=${p.body.temp_id_mapping[`item.add.${msg.author.id}`]})`,
+					description: `Item: ${msg.args.slice(1).join(" ")}\n[Link To Item](https://todoist.com/showTask?id=${p.body.temp_id_mapping[`item.add.${msg.author.id}`]})`,
 					timestamp: new Date().toISOString(),
 					color: Math.floor(Math.random() * 0xFFFFFF)
 				}

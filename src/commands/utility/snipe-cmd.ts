@@ -27,7 +27,7 @@ export default new Command({
 
 	const i = s.content.match(new RegExp("((https?:\/\/)?(discord(app\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
 	if (!!i) i.map(k => s.content = s.content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
-	const u = await this.getRESTUser(s.authorId);
+	const u = await this.bot.getRESTUser(s.authorId);
 
 	await gConfig.edit({ snipe: { delete: { [ch.id]: null } } }).then(d => d.reload());
 	return msg.channel.createMessage({

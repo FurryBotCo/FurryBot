@@ -1,4 +1,5 @@
 import Command from "../../modules/CommandHandler/Command";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -13,7 +14,7 @@ export default new Command({
 	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 0) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 0) return new CommandError("ERR_INVALID_USAGE", cmd);
 
 	const user = await msg.getUserFromArgs();
 

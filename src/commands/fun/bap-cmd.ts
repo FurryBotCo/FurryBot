@@ -2,6 +2,7 @@ import Command from "../../modules/CommandHandler/Command";
 import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Internal } from "../../util/Functions";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -19,7 +20,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 	const rand = msg.channel.guild.members.filter(m => m.id !== msg.author.id);
 	const r = rand[Math.floor(Math.random() * rand.length)];
 	return msg.channel.createMessage({

@@ -41,7 +41,7 @@ export default class DiscordRoute extends Route {
 
 				if (!user) return res.status(500).render("error", { title: "Internal Error", status: 500, message: "We had an internal error while authorizing, please try again later." });
 
-				req.session.user = client.users.has(user.id) ? client.users.get(user.id) : await client.getRESTUser(user.id);
+				req.session.user = client.bot.users.has(user.id) ? client.bot.users.get(user.id) : await client.bot.getRESTUser(user.id);
 
 				return res.redirect(req.session.return || "/");
 			})

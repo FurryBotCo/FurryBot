@@ -1,8 +1,10 @@
 import Eris from "eris";
+import { Base } from "eris-sharder";
+import FurryBot from "../main";
 
 
-export default class MessageCollector<C extends Eris.Client> {
-	client: C;
+export default class MessageCollector {
+	client: FurryBot;
 	collectors: {
 		channel: string;
 		filter: (msg: Eris.Message) => boolean;
@@ -12,10 +14,10 @@ export default class MessageCollector<C extends Eris.Client> {
 		timeout: number;
 		i: NodeJS.Timeout;
 	}[];
-	constructor(client: C) {
+	constructor(client: FurryBot) {
 		this.client = client;
 		this.collectors = [];
-		this.client.on("messageCreate", this.processMessage.bind(this));
+		this.client.bot.on("messageCreate", this.processMessage.bind(this));
 	}
 
 	async processMessage(msg: Eris.Message) {

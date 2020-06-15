@@ -4,9 +4,13 @@ import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
 import { Utility, Time, Internal } from "../util/Functions";
+import config from "../config";
 
 export default new ClientEvent("guildMemberRemove", (async function (this: FurryBot, guild: Eris.Guild, member: Eris.Member) {
 	this.track("events", "guildMemberRemove");
+
+	if (config.beta && !config.client.betaEventGuilds.includes(guild.id)) return;
+
 	const g = await db.getGuild(guild.id);
 	let e: typeof g["logEvents"][0];
 	if (!(!g || !g.logEvents || !(g.logEvents instanceof Array))) e = g.logEvents.find(l => l.type === "memberLeave");

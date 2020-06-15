@@ -3,6 +3,7 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 import { Time } from "../../util/Functions";
 import Language from "../../util/Language";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
@@ -22,7 +23,7 @@ export default new Command({
 	],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 	if (!msg.member.voiceState || !msg.member.voiceState.channelID) return msg.reply("{lang:other.music.joinVC}");
 	if (!!(msg.channel.guild.me.voiceState && msg.channel.guild.me.voiceState.channelID) && msg.channel.guild.me.voiceState.channelID !== msg.member.voiceState.channelID) return msg.reply("{lang:other.music.wrongVC}");
 	const q = this.getQueue(msg.channel.guild.id, msg.channel.id, msg.member.voiceState.channelID);

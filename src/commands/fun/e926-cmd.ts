@@ -21,7 +21,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (!msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly without the `manageMessages` permission!");
+	if (!msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly without the `manageMessages` permission!");
 	if (this.holder.has("react", null, msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("{lang:other.error.duplicatePagination}");
 
 	const tags = msg.args.map(a => a.replace(/,\|/g, ""));
@@ -99,7 +99,7 @@ export default new Command({
 				return f();
 		}
 
-		if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) await d.delete().catch(err => null);
+		if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) await d.delete().catch(err => null);
 
 		return f();
 	});
