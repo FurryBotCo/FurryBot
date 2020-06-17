@@ -29,6 +29,14 @@ class Logger {
 
 	static _log(type: string) {
 		return (async (source: string, msg?: any): Promise<boolean> => {
+			if (typeof process.send !== "undefined") {
+				if (!["log", "warn", "error", "debug"].includes(type)) type = "log";
+				process.send({
+					op: type,
+					msg: `${source} | ${msg}`
+				});
+				return true;
+			}
 			try {
 				const dt = new Date();
 				const d = ((d = new Date(), seconds = true, ms = false) => `${(d.getMonth() + 1).toString().padStart(2, "0")}-${(d.getDate()).toString().padStart(2, "0")}-${d.getFullYear()}${seconds ? `${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`)(dt, false);
@@ -71,11 +79,11 @@ class Logger {
 				// .replace(/[^\[\]\w\s:\(\)#\|\.,_-]/gmi, "")
 				if (!fs.existsSync(`${config.dir.logs}/client/${d}.log`)) fs.writeFileSync(`${config.dir.logs}/client/${d}.log`, "");
 				fs.appendFileSync(`${config.dir.logs}/client/${d}.log`, `[${dt.toTimeString().split(" ")[0]}][${type.toUpperCase()}] ${source} | ${mn}\n`);
-				if (typeof process.send === "undefined") process.stdout.write(`${chalk.grey(`[${dt.toTimeString().split(" ")[0]}]`)} ${source} | ${chalk[colors[type]](msg)}\n`);
-				else process.send({
+				/*if (typeof process.send === "undefined") */process.stdout.write(`${chalk.grey(`[${dt.toTimeString().split(" ")[0]}]`)} ${source} | ${chalk[colors[type]](msg)}\n`);
+				/*else process.send({
 					op: type,
 					msg: `${source} | ${msg}`
-				});
+				});*/
 				return true;
 			} catch (e) {
 				console.error(e);

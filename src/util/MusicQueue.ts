@@ -7,7 +7,7 @@ import deasync from "deasync";
 import EmbedBuilder from "./EmbedBuilder";
 import { Colors } from "./Constants";
 import { Time } from "./Functions";
-import Logger from "./LoggerV9";
+import Logger from "./LoggerV10";
 
 interface ExtendedTrack extends Track {
 	addedBy?: string;

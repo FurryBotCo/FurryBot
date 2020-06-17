@@ -1,10 +1,17 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 import * as fs from "fs-extra";
+import MakeFile from "./src/config/extra/lang/MakeFile";
+
+// regen lang before launch
+fs.readdirSync(`${__dirname}/src/config/extra/lang`).filter(d => fs.lstatSync(`${__dirname}/src/config/extra/lang/${d}`).isDirectory()).map(d => {
+	MakeFile(d);
+});
 import config from "./src/config";
 import path from "path";
-import Logger from "./src/util/LoggerV9";
+import Logger from "./src/util/LoggerV10";
+// for faster loading after launch (and error checking)
 import "./src/main";
+import "./src/commands";
 [config.dir.logs, `${config.dir.logs}/spam`, `${config.dir.logs}/client`, config.dir.tmp].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), Logger.log("Setup | Logs", `Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
 
 import ListStats from "./src/util/ListStats";

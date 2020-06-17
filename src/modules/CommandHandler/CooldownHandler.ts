@@ -1,6 +1,6 @@
 import Eris from "eris";
 import FurryBot from "../../main";
-import Logger from "../../util/LoggerV9";
+import Logger from "../../util/LoggerV10";
 
 
 export default class CooldownHandler {

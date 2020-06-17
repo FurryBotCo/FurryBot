@@ -1,7 +1,7 @@
 import config from "../../config";
 import phin from "phin";
 import * as fs from "fs-extra";
-import Logger from "../LoggerV9";
+import Logger from "../LoggerV10";
 
 export default class Request {
 	private constructor() {

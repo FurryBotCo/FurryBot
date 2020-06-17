@@ -7,16 +7,14 @@ import ExtendedMessage from "../ExtendedMessage";
 class TriggerDuplicationError extends TypeError {
 	command: string;
 	category: string;
-	jsFile: string;
-	tsFile: string;
+	file: string;
 	constructor(command: string, category: string, file: string) {
 		super(`Duplicate command trigger "${command}" (category: ${category}, file: ${file})`);
 
 		this.name = "TriggerDuplicationError";
 		this.command = command;
 		this.category = category;
-		this.jsFile = file;
-		this.tsFile = file.replace(/build(\\+|\/)/gi, "").replace(".js", ".ts");
+		this.file = file;
 	}
 }
 
@@ -46,9 +44,7 @@ export default class Category {
 	get triggers() { return this.cmds.reduce((a, b) => a.concat(b.triggers), []); }
 
 	reloadCommands() {
-		return;
-		const c = [...this.cmds];
-		this.cmds.map(cmd => delete require.cache[cmd.file]);
+		return Promise.all(this.commands.map(async (cmd) => this.reloadCommand(cmd.triggers[0])));
 	}
 
 	addCommand(cmd: Command) {
@@ -59,5 +55,24 @@ export default class Category {
 
 		this.cmds.push(cmd);
 		return this;
+	}
+
+	removeCommand(cmd: string | Command) {
+		if (cmd instanceof Command) cmd = cmd.triggers[0];
+		const c = this.commands.find(c => c.triggers.includes(cmd as string));
+		if (!c) return false;
+		this.cmds.splice(this.cmds.indexOf(c));
+		return true;
+	}
+
+	async reloadCommand(cmd: string | Command) {
+		if (cmd instanceof Command) cmd = cmd.triggers[0];
+		const c = this.commands.find(c => c.triggers.includes(cmd as string));
+		if (!c) return null;
+		delete require.cache[require.resolve(c.file)];
+		const f = await import(c.file).then(d => d.default) as Command;
+		this.removeCommand(cmd);
+		this.addCommand(f);
+		return true;
 	}
 }

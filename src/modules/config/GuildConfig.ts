@@ -1,7 +1,7 @@
 /// <reference path="../../util/@types/global.d.ts" />
 import config from "../../config";
 import db, { mdb } from "../Database";
-import Logger from "../../util/LoggerV9";
+import Logger from "../../util/LoggerV10";
 import { UpdateQuery, FindOneAndUpdateOption } from "mongodb";
 import { Redis } from "../External";
 

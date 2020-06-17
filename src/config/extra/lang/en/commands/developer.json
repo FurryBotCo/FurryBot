@@ -1,0 +1,121 @@
+{
+	"blacklist": {
+		"description": "Manage the bots blacklist.",
+		"usage": "<add/check/list/remove> [user(s)/server(s)] [id] [reason]",
+		"invalidType": "{0} is not a valid type. Valid types: **{1}**",
+		"invalidSubType": "{0} is not a valid sub type. Valid sub types: **{1}**",
+		"invalidId": "invalid or no id provided.",
+		"invalidUser": "invalid user id ({0}) provided.",
+		"invalidGuild": "invalid guild id ({0}) provided.",
+		"cannotBlacklist": {
+			"developer": "you cannot blacklist **{0}** as they are a developer.",
+			"contributor": "you cannot blacklist **{0}** as they are a contributor.",
+			"helper": "you cannot blacklist **{0}** as they are a helper.",
+			"supportServer": "you cannot blacklist {0} as that is my support server."
+		},
+		"added": {
+			"user": "added the user **{0}** to the blacklist.\nReason: {1}\nExpiry: {2}\nStrike: {3}\nEntry ID: {4}",
+			"guild": "added the guild **{0}** to the blacklist.\nReason: {1}\nExpiry: {2}\nStrike: {3}\nEntry ID: {4}"
+		},
+		"check": {
+			"invalidPage": "You provided an invalid page number \"{0}\". Valid pages: **{1}**",
+			"noHistoryUser": "the user **{0}** has no blacklist history.",
+			"notBlacklistedUser": "the user **{0}** is not currently blacklisted.",
+			"isBlacklistedUser": "the user **{0}** is currently blacklisted.",
+			"previouslyBlacklistedUser": "But they have been blacklisted before.",
+			"noHistoryGuild": "the guild **{0}** has no blacklist history.",
+			"notBlacklistedGuild": "the guild **{0}** is not currently blacklisted.",
+			"isBlacklistedGuild": "the guild **{0}** is currently blacklisted.",
+			"previouslyBlacklistedGuild": "But it has been blacklisted before.",
+			"entries": "Here's those entries",
+			"noEntries": "There are no entries for this section",
+			"onThisPage": "on this page",
+			"page": "Page {0} / {1}"
+		},
+		"get": {
+			"noId": "please provide an id to lookup.",
+			"user": "The entry `{0}` belongs to the user **{1}**.",
+			"guild": "The entry `{0}` belongs to the guild **{1}**."
+		},
+		"remove": {
+			"notBlacklistedUser": "the user **{0}** is not currently blacklisted.",
+			"notBlacklistedGuild": "the guild **{0}** is not currently blacklisted.",
+			"chose": "please provide an id or the position to remove it. Use the subcommand \"get\" to see the blame, reason, time, and expiry.",
+			"noReply": "you took to long to reply, please try again.",
+			"invalid": "I couldn't find an entry with that id.",
+			"user": "removed the blacklist `{0}` for the user **{1}**.",
+			"guild": "removed the blacklist `{0}` for the guild **{1}**.",
+			"confirmUser": "are you sure you want to unblacklist the user **{0}**? Reply with **yes** or **no**.",
+			"confirmGuild": "are you sure you want to unblacklist the guild **{0}**? Reply with **yes** or **no**.",
+			"invalidPos": "invalid position provided. Maximum: **{0}**"
+		}
+	},
+	"sudo": {
+		"description": "Make a user run a command.",
+		"usage": "<user> <command> [args] [--bypass]"
+	},
+	"dmuser": {
+		"description": "Send a direct message to a user.",
+		"usage": "<id> <message>"
+	},
+	"dshard": {
+		"description": "Manage the bots shards.",
+		"usage": "<disconnect/connect/status/restart> <id>"
+	},
+	"dstats": {
+		"description": "Get my stats.",
+		"usage": ""
+	},
+	"edit": {
+		"description": "Edit stuff about the bot.",
+		"usage": "<icon/name/game/status>"
+	},
+	"eval": {
+		"description": "Evaluate some stuffs.",
+		"usage": "<code>"
+	},
+	"health": {
+		"description": "Check my server/shard health.",
+		"usage": ""
+	},
+	"leaveserver": {
+		"description": "Make me leave a server.",
+		"usage": "<id>"
+	},
+	"rebuild": {
+		"description": "Rebuild my code.",
+		"usage": ""
+	},
+	"reload": {
+		"description": "Reload something.",
+		"usage": "<cmd/cat/event> [rebuild:yes/no]",
+		"cmdMissing": "please provide a command to reload.",
+		"cmdInvalid": "invalid command provided.",
+		"cmdErrored": "we recieved an error while reloading the command **{0}**.\n\n```js\n{1}```",
+		"cmdDone": "reloaded the command **{0}**."
+	},
+	"restart": {
+		"description": "Make me restart.",
+		"usage": ""
+	},
+	"say": {
+		"description": "Make me say something.",
+		"usage": "<text>"
+	},
+	"shell": {
+		"description": "Execute some shell code.",
+		"usage": "<code>"
+	},
+	"stop": {
+		"description": "Make me shut down.",
+		"usage": ""
+	},
+	"test": {
+		"description": "Some stuff for some testing.",
+		"usage": ""
+	},
+	"todo": {
+		"description": "Manage the todo list.",
+		"usage": ""
+	}
+}

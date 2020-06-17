@@ -1,7 +1,7 @@
 /// <reference path="../../util/@types/async-redis.d.ts" />
 /* tslint:disable variable-name */
 import config from "../../config";
-import Logger from "../../util/LoggerV9";
+import Logger from "../../util/LoggerV10";
 import RedisClient from "async-redis";
 
 const Redis = RedisClient.createClient(config.apiKeys.redis.port, config.apiKeys.redis.host, {

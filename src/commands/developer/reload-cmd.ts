@@ -1,5 +1,6 @@
 import Command from "../../modules/CommandHandler/Command";
 import CommandError from "../../modules/CommandHandler/CommandError";
+import Category from "../../modules/CommandHandler/Category";
 
 export default new Command({
 	triggers: [
@@ -17,6 +18,14 @@ export default new Command({
 	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 
 	switch (msg.args[0].toLowerCase()) {
-		case "cmd": { }
+		case "cmd": {
+			if (!msg.args[1]) return msg.reply("{lang:commands.dev.reload.cmdMissing}");
+			const c = this.cmd.getCommand(msg.args[1].toLowerCase()) as { cmd: Command; cat: Category; };
+			if (!c) return msg.reply("{lang:commands.dev.reload.cmdMissing}");
+
+			c.cat.reloadCommand(c.cmd);
+
+			return msg.reply(`{lang:commands.dev.reload.cmdDone|${msg.args[0].toLowerCase()}}`);
+		}
 	}
 }));

@@ -4,15 +4,13 @@ import * as fs from "fs-extra";
 const ext = __filename.split(".").reverse()[0];
 
 const cat = new Category({
-	name: "dev",
+	name: "developer",
 	file: __filename,
 	restrictions: [
 		"developer"
 	]
 });
 
-export default (async () => {
-	const cmd = await Promise.all<Command>(fs.readdirSync(`${__dirname}`).filter(f => f.endsWith(ext) && f !== `index.${ext}` && !fs.lstatSync(`${__dirname}/${f}`).isDirectory()).map(async (f) => import(`${__dirname}/${f}`).then(d => d.default)));
-	cmd.map(c => cat.addCommand(c.setCategory(cat.name)));
-	return cat;
-});
+const cmd = fs.readdirSync(`${__dirname}`).filter(f => f.endsWith(ext) && f !== `index.${ext}` && !fs.lstatSync(`${__dirname}/${f}`).isDirectory()).map(f => require(`${__dirname}/${f}`).default);
+cmd.map(c => cat.addCommand(c.setCategory(cat.name)));
+export default cat;

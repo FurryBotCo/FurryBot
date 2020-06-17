@@ -5,7 +5,7 @@ import Eris from "eris";
 import * as fs from "fs";
 import db from "../modules/Database";
 import { Cluster } from "lavalink";
-import Logger from "../util/LoggerV9";
+import Logger from "../util/LoggerV10";
 
 export default new ClientEvent("ready", (async function () {
 	this.track("events", "ready");

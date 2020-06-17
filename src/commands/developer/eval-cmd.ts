@@ -12,6 +12,7 @@ import * as F from "../../util/Functions";
 import Language from "../../util/Language";
 import { Permissions } from "../../util/Constants";
 import { Redis } from "../../modules/External";
+import Logger from "../../util/LoggerV10";
 
 export default new Command({
 	triggers: [
@@ -56,7 +57,8 @@ export default new Command({
 			gConfig,
 			cmd,
 			Language,
-			Redis
+			Redis,
+			Logger
 		});
 	} catch (e) {
 		res = e;

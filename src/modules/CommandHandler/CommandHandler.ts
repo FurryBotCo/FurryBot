@@ -3,7 +3,7 @@ import Category from "./Category";
 import FurryBot from "../../main";
 import ExtendedMessage from "../ExtendedMessage";
 import CooldownHandler from "./CooldownHandler";
-import Logger from "../../util/LoggerV9";
+import Logger from "../../util/LoggerV10";
 import AntiSpam from "./AntiSpam";
 import config from "../../config";
 import commandRestrictions from "../../config/extra/other/commandRestrictions";

@@ -1,4 +1,4 @@
-import Logger from "./LoggerV9";
+import Logger from "./LoggerV10";
 import config from "../config";
 import phin from "phin";
 import FurryBot from "../main";

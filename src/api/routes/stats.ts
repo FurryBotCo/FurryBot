@@ -2,7 +2,6 @@ import { Route } from "..";
 import config from "../../config";
 import { Internal } from "../../util/Functions";
 import { mdb } from "../../modules/Database";
-import { Stats } from "eris-fleet/dist/sharding/Admiral";
 
 export default class StatsRoute extends Route {
 	constructor() {
@@ -16,7 +15,7 @@ export default class StatsRoute extends Route {
 
 		app
 			.get("/", async (req, res) => {
-				const st = await client.ipc.getStats() as Stats;
+				const st = await client.ipc.getStats();
 
 				const d = new Date((Date.now() - 432e5) - 8.64e+7);
 				const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;

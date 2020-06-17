@@ -17,6 +17,7 @@ import phin from "phin";
 import APIError from "dankmemerapi/build/APIError";
 import { RestrictionError } from "../config/extra/other/commandRestrictions";
 import CommandError from "../modules/CommandHandler/CommandError";
+import Logger from "../util/LoggerV10";
 
 export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	await this.track("events", "messageCreate");
@@ -320,7 +321,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cmd.cooldownHandler.add(msg.author.id, cmd.triggers[0], donator.active ? cmd.donatorCooldown : cmd.cooldown);
 		const a = msg.content.slice(msg.prefix.length).trim().split(" ")[0];
 
-		this.log("log", `Command "${cmd.triggers[0]}"${a !== cmd.triggers[0] ? ` (alias used: ${a})` : ""} ran with ${msg.unparsedArgs.length === 0 ? "no arguments" : `the arguments "${msg.unparsedArgs.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
+		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}"${a !== cmd.triggers[0] ? ` (alias used: ${a})` : ""} ran with ${msg.unparsedArgs.length === 0 ? "no arguments" : `the arguments "${msg.unparsedArgs.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 		t.start("cmd");
 		this.track("stats", "commands", "total");
 		this.track("stats", "commands", "AllTime", "total");

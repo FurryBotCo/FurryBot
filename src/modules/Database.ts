@@ -7,7 +7,7 @@ import UserConfig from "./config/UserConfig";
 import GuildConfig from "./config/GuildConfig";
 import { Redis } from "./External";
 import FurryBot from "../main";
-import Logger from "../util/LoggerV9";
+import Logger from "../util/LoggerV10";
 import Eris, { Guild } from "eris";
 import deasync from "deasync";
 import { Colors } from "../util/Constants";

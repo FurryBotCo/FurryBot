@@ -1,5 +1,5 @@
 import ClientEvent from "../util/ClientEvent";
-import Logger from "../util/LoggerV9";
+import Logger from "../util/LoggerV10";
 import FurryBot from "../main";
 
 // this cannot be async due to "unhandledRejection" (unhandled promise rejection)'s not

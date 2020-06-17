@@ -1,0 +1,12 @@
+{
+	"bot": {
+		"noEmbed": "I am missing some permissions to be able to run that, but I need the `embedLinks` permission to tell you which.",
+		"embedTitle": "I do not have the required permission(s) to use this!",
+		"embedDescription": "I need the permission(s) {0} for this command to function properly, please add these to me and try again."
+	},
+	"user": {
+		"noEmbed": "You are missing some permissions to be able to run that, but I need the `embedLinks` permission to tell you which.",
+		"embedTitle": "You do not have the required permission(s) to use this!",
+		"embedDescription": "You need the permission(s) **{0}** to be able to use this command."
+	}
+}

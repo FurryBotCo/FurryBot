@@ -109,10 +109,10 @@ export default new Command({
 					.setDescription([
 						"**{lang:commands.information.sinfo.members}**:",
 						`\u25FD {lang:commands.information.sinfo.total}: ${msg.channel.guild.memberCount} ([{lang:commands.information.sinfo.note}](https://botapi.furry.bot/note/sinfo '{lang:commands.information.sinfo.noteContent}'))`,
-						`\u25FD <:${config.emojis.online}>: ${msg.channel.guild.members.filter(m => m.status === "online").length}`,
-						`\u25FD <:${config.emojis.idle}>: ${msg.channel.guild.members.filter(m => m.status === "idle").length}`,
-						`\u25FD <:${config.emojis.dnd}>: ${msg.channel.guild.members.filter(m => m.status === "dnd").length}`,
-						`\u25FD <:${config.emojis.offline}>: ${msg.channel.guild.members.filter(m => m.status === "offline").length}`,
+						`\u25FD ${config.emojis.online}: ${msg.channel.guild.members.filter(m => m.status === "online").length}`,
+						`\u25FD ${config.emojis.idle}: ${msg.channel.guild.members.filter(m => m.status === "idle").length}`,
+						`\u25FD ${config.emojis.dnd}: ${msg.channel.guild.members.filter(m => m.status === "dnd").length}`,
+						`\u25FD ${config.emojis.offline}: ${msg.channel.guild.members.filter(m => m.status === "offline").length}`,
 						`\u25FD {lang:commands.information.sinfo.nonBots}: ${msg.channel.guild.members.filter(m => !m.bot).length}`,
 						`\u25FD {lang:commands.information.sinfo.bots}: ${msg.channel.guild.members.filter(m => m.bot).length}`
 					].join("\n"))

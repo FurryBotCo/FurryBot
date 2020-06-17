@@ -1,0 +1,52 @@
+{
+	"bird": {
+		"description": "Get a picture of a birb!",
+		"usage": "",
+		"title": "Birb!"
+	},
+	"bunny": {
+		"description": "Get a picture of a bunny!",
+		"usage": "",
+		"title": "Bunny!"
+	},
+	"cat": {
+		"description": "Get a picture of a cat!",
+		"usage": "",
+		"title": "Kitty!"
+	},
+	"duck": {
+		"description": "Get a picture of a duck!",
+		"usage": "",
+		"title": "Ducky!"
+	},
+	"fox": {
+		"description": "Get a picture of a fox!",
+		"usage": "",
+		"title": "Foxxo!"
+	},
+	"otter": {
+		"description": "Get a picture of an otter!",
+		"usage": "",
+		"title": "Otter!"
+	},
+	"panda": {
+		"description": "Get a picture of a panda!",
+		"usage": "",
+		"title": "Panda!"
+	},
+	"snek": {
+		"description": "Get a picture of a snek!",
+		"usage": "",
+		"title": "Snek!"
+	},
+	"turtle": {
+		"description": "Get a picture of a turtle!",
+		"usage": "",
+		"title": "Turtle"
+	},
+	"wolf": {
+		"description": "Get a picture of a wolf!",
+		"usage": "",
+		"title": "Wolfie!"
+	}
+}
