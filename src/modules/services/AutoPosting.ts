@@ -14,7 +14,11 @@ export default class AutoPostingWorker extends BaseServiceWorker {
 	client: Eris.Client;
 	constructor(setup) {
 		super(setup);
-		this.client = new Client(config.client.token, { restMode: true });
+		this.client = new Client(`Bot ${config.client.token}`, { restMode: true });
+		this.client
+			.on("debug", (d) => Logger.debug("Auto Posting", d))
+			.on("error", (d) => Logger.error("Auto Posting", d))
+			.on("warn", (d) => Logger.warn("Auto Posting", d));
 		this.serviceReady();
 	}
 
@@ -49,13 +53,13 @@ export default class AutoPostingWorker extends BaseServiceWorker {
 			.setAuthor("Auto Posting", config.images.botIcon)
 			.setColor(Colors.green)
 			.setTimestamp(new Date().toISOString())
-			.setImage("attachment://image.png");
+			.setImage(`attachment://auto-${entry.type}.png`);
 
 		let file: Buffer;
 
 		switch (entry.type) {
 			case "animals.bird": {
-				file = await FurryBotAPI.animals.birb("json").then(async (r) => Request.getImageFromURL(r[0].url));
+				file = await FurryBotAPI.animals.birb("json", 1).then(async (r) => Request.getImageFromURL(r.url));
 				break;
 			}
 
@@ -112,22 +116,22 @@ export default class AutoPostingWorker extends BaseServiceWorker {
 			}
 
 			case "yiff.dickgirl": {
-				await FurryBotAPI.furry.yiff.dickgirl("json", 1).then(async (r) => Request.getImageFromURL(r[0].url));
+				file = await FurryBotAPI.furry.yiff.dickgirl("json", 1).then(async (r) => Request.getImageFromURL(r.url));
 				break;
 			}
 
 			case "yiff.gay": {
-				await FurryBotAPI.furry.yiff.gay("json", 1).then(async (r) => Request.getImageFromURL(r[0].url));
+				file = await FurryBotAPI.furry.yiff.gay("json", 1).then(async (r) => Request.getImageFromURL(r.url));
 				break;
 			}
 
 			case "yiff.lesbian": {
-				await FurryBotAPI.furry.yiff.lesbian("json", 1).then(async (r) => Request.getImageFromURL(r[0].url));
+				file = await FurryBotAPI.furry.yiff.lesbian("json", 1).then(async (r) => Request.getImageFromURL(r.url));
 				break;
 			}
 
 			case "yiff.straight": {
-				await FurryBotAPI.furry.yiff.straight("json", 1).then(async (r) => Request.getImageFromURL(r[0].url));
+				file = await FurryBotAPI.furry.yiff.straight("json", 1).then(async (r) => Request.getImageFromURL(r.url));
 				break;
 			}
 		}
@@ -137,7 +141,7 @@ export default class AutoPostingWorker extends BaseServiceWorker {
 				embed.toJSON()
 			],
 			file: {
-				name: "image.png",
+				name: `auto-${entry.type}.png`,
 				file
 			}
 		});

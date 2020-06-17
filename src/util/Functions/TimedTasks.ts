@@ -26,11 +26,14 @@ export default class TimedTasks {
 				await this.runDeleteGuilds(client).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Delete Guilds"));
 			}
 
-			if ([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [5]"));
-			if ([0, 10, 20, 30, 40, 50].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [10]"));
-			if ([0, 15, 30, 45].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [15]"));
-			if ([0, 30].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [30]"));
-			if ([0].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [60]"));
+			for (const n of [5, 10, 15, 30]) {
+				if ((d.getMinutes() % n) === 0) await this.runAutoPosting(client, n).then(() => client.log("debug", "Finished processing.", `Timed Tasks |  Run Auto Posting [${n}]`));
+			}
+			// if ([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [5]"));
+			// if ([0, 10, 20, 30, 40, 50].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [10]"));
+			// if ([0, 15, 30, 45].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [15]"));
+			// if ([0, 30].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [30]"));
+			// if ([0].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [60]"));
 
 			if (!config.beta && d.getHours() === 0 && d.getMinutes() === 0) await this.runDailyJoins(client).then(() => client.log("debug", "Finished processing.", "Timed Tasks | Daily Joins"));
 		}
@@ -225,6 +228,8 @@ export default class TimedTasks {
 		if (time === 0) time = 60;
 		const entries = await mdb.collection<GlobalTypes.AutoEntry>("auto").find({ time: time as any }).toArray();
 
+		console.log(time);
+		console.log(entries.length);
 		await Promise.all(entries.map(async (entry) => client.ipc.command("AutoPosting", entry, false)));
 	}
 
