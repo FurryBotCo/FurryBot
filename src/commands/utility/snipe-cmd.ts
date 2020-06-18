@@ -44,7 +44,7 @@ export default new Command({
 			.setTitle("{lang:commands.utility.snipe.title}")
 			.setAuthor(`${u.username}#${u.discriminator}`, `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`)
 			.setDescription(content)
-			.setTimestamp(new Date(time).toISOString())
+			.setTimestamp(new Date(Number(time)).toISOString())
 			.setColor(Colors.red)
 			.toJSON()
 	});

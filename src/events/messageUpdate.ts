@@ -21,9 +21,10 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	});
 
 	// auto delete after 30 minutes
-	await Redis.SETEX(`prod:snipe:edit:${message.channel.guild.id}:oldContent`, 1800, oldMessage.content);
-	await Redis.SETEX(`prod:snipe:edit:${message.channel.guild.id}:newContent`, 1800, message.content);
-	await Redis.SETEX(`prod:snipe:edit:${message.channel.guild.id}:author`, 1800, message.author.id);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:oldContent`, 1800, oldMessage.content);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:newContent`, 1800, message.content);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:author`, 1800, message.author.id);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:time`, 1800, Date.now().toString());
 
 	await messageCreate.listener.call(this, message, true);
 

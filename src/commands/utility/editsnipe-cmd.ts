@@ -48,7 +48,7 @@ export default new Command({
 			.setTitle("{lang:commands.utility.editsnipe.title}")
 			.setDescription(`{lang:commands.utility.editsnipe.old}: ${oldContent}\n{lang:commands.utility.editsnipe.new}: ${newContent}`)
 			.setAuthor(`${u.username}#${u.discriminator}`, u.avatarURL)
-			.setTimestamp(new Date(time).toISOString())
+			.setTimestamp(new Date(Number(time)).toISOString())
 			.setColor(Colors.gold)
 			.toJSON()
 	});
