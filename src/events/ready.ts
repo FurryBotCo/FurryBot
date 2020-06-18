@@ -12,7 +12,7 @@ export default new ClientEvent("ready", (async function () {
 	if (this.firstReady) return this.log("warn", "Skipping ready event as it has already fired.", "Ready");
 	this.firstReady = true;
 	db.setClient(this);
-	this.api.launch();
+	if (Number(this.clusterID) === 0) this.api.launch();
 	const v = this.v = new Cluster({
 		nodes: config.apiKeys.lavalink.map(l => ({
 			password: l.password,
