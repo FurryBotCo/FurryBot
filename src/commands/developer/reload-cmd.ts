@@ -19,13 +19,17 @@ export default new Command({
 
 	switch (msg.args[0].toLowerCase()) {
 		case "cmd": {
-			if (!msg.args[1]) return msg.reply("{lang:commands.dev.reload.cmdMissing}");
+			if (!msg.args[1]) return msg.reply("{lang:commands.developer.reload.cmdMissing}");
 			const c = this.cmd.getCommand(msg.args[1].toLowerCase()) as { cmd: Command; cat: Category; };
-			if (!c) return msg.reply("{lang:commands.dev.reload.cmdMissing}");
+			if (!c) return msg.reply("{lang:commands.developer.reload.cmdMissing}");
 
 			c.cat.reloadCommand(c.cmd);
 
-			return msg.reply(`{lang:commands.dev.reload.cmdDone|${msg.args[0].toLowerCase()}}`);
+			return msg.reply(`{lang:commands.developer.reload.cmdDone|${msg.args[1].toLowerCase()}}`);
+		}
+
+		default: {
+			return msg.reply(`{lang:commands.developer.reload.invalid|${msg.args[0].toLowerCase()}}`);
 		}
 	}
 }));

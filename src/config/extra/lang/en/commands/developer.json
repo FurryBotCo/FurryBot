@@ -92,7 +92,8 @@
 		"cmdMissing": "please provide a command to reload.",
 		"cmdInvalid": "invalid command provided.",
 		"cmdErrored": "we recieved an error while reloading the command **{0}**.\n\n```js\n{1}```",
-		"cmdDone": "reloaded the command **{0}**."
+		"cmdDone": "reloaded the command **{0}**.",
+		"invalid": "invalid selection \"{0}\" provided."
 	},
 	"restart": {
 		"description": "Make me restart.",
