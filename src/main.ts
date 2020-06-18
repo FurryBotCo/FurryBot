@@ -70,8 +70,8 @@ export default class FurryBot extends BaseClusterWorker {
 		this.setup();
 	}
 
+	// because they don't construct this until the cluster is ready??
 	async setup() {
-		// because they don't construct this until the cluster is ready??
 		require(`${__dirname}/events/ready`).default.listener.call(this);
 
 		fs.readdirSync(`${__dirname}/events`).map(d => {
