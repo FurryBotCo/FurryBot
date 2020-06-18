@@ -141,6 +141,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		// overwrite prefix set without db
 		if (gConfig.settings.prefix !== config.defaults.prefix) msg.prefix = gConfig.settings.prefix;
+		if ([`<@!${this.bot.user.id}>`, `<@${this.bot.user.id}>`].includes(msg.prefix) && msg.mentions[0] && msg.mentions[0].id === this.bot.user.id) msg.mentions.shift();
 		t.end("db");
 
 		t.start("leveling");
