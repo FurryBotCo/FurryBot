@@ -2,12 +2,15 @@ import ClientEvent from "../util/ClientEvent";
 import FurryBot from "../main";
 import * as Eris from "eris";
 import { db } from "../modules/Database";
+import config from "../config";
 
 export default new ClientEvent("userUpdate", (async function (this: FurryBot, user: Eris.User, oldUser: { username: string; discriminator: string; avatar?: string; }) {
 	this.track("events", "userUpdate");
 
 	await Promise.all(this.bot.guilds.filter(g => g.members.has(user.id)).map(async (guild) => {
 		try {
+			if (config.beta && !config.client.betaEventGuilds.includes(guild.id)) return;
+
 			const g = await db.getGuild(guild.id);
 			if (!g.logEvents) return;
 			const e = g.logEvents.find(l => l.type === "userUpdate");
