@@ -9,6 +9,7 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 import phin from "phin";
 import Logger from "../../util/LoggerV10";
+import { JSONResponse } from "furrybotapi/src/typings";
 
 export default class AutoPostingWorker extends BaseServiceWorker {
 	client: Eris.Client;
@@ -49,17 +50,15 @@ export default class AutoPostingWorker extends BaseServiceWorker {
 			return;
 		}
 
-		const embed = new EmbedBuilder("en")
-			.setAuthor("Auto Posting", config.images.botIcon)
-			.setColor(Colors.green)
-			.setTimestamp(new Date().toISOString())
-			.setImage(`attachment://auto-${entry.type}.png`);
+		const d = new Date().toISOString();
+		let data: JSONResponse;
 
 		let file: Buffer;
 
 		switch (entry.type) {
 			case "animals.bird": {
-				file = await FurryBotAPI.animals.birb("json", 1).then(async (r) => Request.getImageFromURL(r.url));
+				data = await FurryBotAPI.animals.birb("json", 1);
+				file = await Request.getImageFromURL(data.url);
 				break;
 			}
 
@@ -116,25 +115,43 @@ export default class AutoPostingWorker extends BaseServiceWorker {
 			}
 
 			case "yiff.dickgirl": {
-				file = await FurryBotAPI.furry.yiff.dickgirl("json", 1).then(async (r) => Request.getImageFromURL(r.url));
+				data = await FurryBotAPI.furry.yiff.dickgirl("json", 1);
+				file = await Request.getImageFromURL(data.url);
 				break;
 			}
 
 			case "yiff.gay": {
-				file = await FurryBotAPI.furry.yiff.gay("json", 1).then(async (r) => Request.getImageFromURL(r.url));
+				data = await FurryBotAPI.furry.yiff.gay("json", 1);
+				file = await Request.getImageFromURL(data.url);
 				break;
 			}
 
 			case "yiff.lesbian": {
-				file = await FurryBotAPI.furry.yiff.lesbian("json", 1).then(async (r) => Request.getImageFromURL(r.url));
+				data = await FurryBotAPI.furry.yiff.lesbian("json", 1);
+				file = await Request.getImageFromURL(data.url);
 				break;
 			}
 
 			case "yiff.straight": {
-				file = await FurryBotAPI.furry.yiff.straight("json", 1).then(async (r) => Request.getImageFromURL(r.url));
+				data = await FurryBotAPI.furry.yiff.straight("json", 1);
+				file = await Request.getImageFromURL(data.url);
 				break;
 			}
+
+			default: {
+				Logger.error("Auto Posting", `Invalid auto posting type "${entry.type}"`);
+				return;
+			}
 		}
+
+
+		const embed = new EmbedBuilder("en")
+			.setAuthor("Auto Posting", config.images.botIcon)
+			.setColor(Colors.green)
+			.setTimestamp(new Date().toISOString())
+			.setImage(`attachment://auto-${entry.type}.png`);
+
+		if (!!data) embed.setDescription(`${data.sources.length > 0 ? `[[source]](${data.sources[0]}) ` : ""}[[Short URL]](${data.shorturl}) [[Direct Image URL]](${data.url})`);
 
 		await this.client.executeWebhook(entry.webhook.id, entry.webhook.token, {
 			embeds: [
@@ -144,6 +161,8 @@ export default class AutoPostingWorker extends BaseServiceWorker {
 				name: `auto-${entry.type}.png`,
 				file
 			}
+		}).catch(err => {
+			Logger.error(`Auto Posting | ${entry.type}`, `Failed auto posting for guild ${entry.guildId}, reason: ${err.stack}`);
 		});
 	}
 }

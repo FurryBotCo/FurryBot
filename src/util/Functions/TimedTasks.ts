@@ -228,8 +228,6 @@ export default class TimedTasks {
 		if (time === 0) time = 60;
 		const entries = await mdb.collection<GlobalTypes.AutoEntry>("auto").find({ time: time as any }).toArray();
 
-		console.log(time);
-		console.log(entries.length);
 		await Promise.all(entries.map(async (entry) => client.ipc.command("AutoPosting", entry, false)));
 	}
 
