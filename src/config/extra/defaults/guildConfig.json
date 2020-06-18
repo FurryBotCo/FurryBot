@@ -24,10 +24,6 @@
 		"leaveChannel": null,
 		"welcomeDeleteTime": 0
 	},
-	"snipe": {
-		"delete": {},
-		"edit": {}
-	},
 	"logEvents": [],
 	"tags": [],
 	"auto": [],

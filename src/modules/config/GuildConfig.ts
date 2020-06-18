@@ -31,23 +31,6 @@ export default class GuildConfig {
 		leaveChannel?: string;
 		welcomeDeleteTime: number;
 	};
-	snipe: {
-		edit: {
-			[k: string]: {
-				authorId: string;
-				content: string;
-				oldContent: string;
-				time: number;
-			};
-		};
-		delete: {
-			[k: string]: {
-				authorId: string;
-				content: string;
-				time: number;
-			};
-		};
-	};
 	logEvents: {
 		channel: string;
 		type:

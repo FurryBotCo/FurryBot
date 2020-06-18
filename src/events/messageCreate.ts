@@ -19,9 +19,9 @@ import { RestrictionError } from "../config/extra/other/commandRestrictions";
 import CommandError from "../modules/CommandHandler/CommandError";
 import Logger from "../util/LoggerV10";
 
-export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
-	await this.track("events", "messageCreate");
-	await this.track("stats", "messages");
+export default new ClientEvent("messageCreate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>, update?: boolean) {
+	if (!update) await this.track("events", "messageCreate");
+	if (!update) await this.track("stats", "messages");
 	let
 		msg: ExtendedMessage<Eris.GuildTextableChannel>,
 		gConfig: GuildConfig,

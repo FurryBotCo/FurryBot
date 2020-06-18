@@ -3,6 +3,8 @@ import FurryBot from "../main";
 import Eris from "eris";
 import db from "../modules/Database";
 import config from "../config";
+import messageCreate from "./messageCreate";
+import Redis from "../modules/External/Redis";
 
 export default new ClientEvent("messageUpdate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>, oldMessage: Eris.OldMessage) {
 	this.track("events", "messageUpdate");
@@ -11,19 +13,19 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	if (config.beta && !config.client.betaEventGuilds.includes(message.channel.guild.id)) return;
 
 	const g = await db.getGuild(message.channel.guild.id);
-	await g.edit({
-		snipe: {
-			edit: {
-				[message.channel.id]: {
-					content: message.content,
-					oldContent: oldMessage.content,
-					authorId: message.author.id,
-					time: Date.now()
-				}
-			}
+	// tslint:disable-next-line: no-string-literal
+	if (typeof g["snipe"] !== "undefined") await g.mongoEdit({
+		$unset: {
+			snipe: 1
 		}
-	}).then(d => d.reload());
-	this.bot.emit("messageCreate", message);
+	});
+
+	// auto delete after 30 minutes
+	await Redis.SETEX(`prod:snipe:edit:${message.channel.guild.id}:oldContent`, 1800, oldMessage.content);
+	await Redis.SETEX(`prod:snipe:edit:${message.channel.guild.id}:newContent`, 1800, message.content);
+	await Redis.SETEX(`prod:snipe:edit:${message.channel.guild.id}:author`, 1800, message.author.id);
+
+	await messageCreate.listener.call(this, message, true);
 
 	if (!g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "messageEdit");

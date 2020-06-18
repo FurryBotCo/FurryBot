@@ -2,6 +2,9 @@ import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 import Eris from "eris";
+import { Internal } from "../../util/Functions";
+import { Redis } from "../../modules/External";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -21,21 +24,27 @@ export default new Command({
 
 	if (!ch) ch = msg.channel;
 
-	const s = gConfig.snipe.delete[ch.id];
+	let content = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:content`);
+	const author = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:author`);
+	const time = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:time`);
 
-	if (!s) return msg.reply(`{lang:commands.utility.snipe.noSnipes|${ch.id}}`);
+	if (!content || !author || !time) return msg.reply(`{lang:commands.utility.snipe.noSnipes|${ch.id}}`);
 
-	const i = s.content.match(new RegExp("((https?:\/\/)?(discord(app\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
-	if (!!i) i.map(k => s.content = s.content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
-	const u = await this.bot.getRESTUser(s.authorId);
+	const i = content.match(new RegExp("((https?:\/\/)?(discord(app\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
+	if (!!i) i.map(k => content = content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
+	const u = await this.bot.getRESTUser(author);
 
-	await gConfig.edit({ snipe: { delete: { [ch.id]: null } } }).then(d => d.reload());
+
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:content`);
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:author`);
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:time`);
+
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.utility.snipe.title}")
 			.setAuthor(`${u.username}#${u.discriminator}`, `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`)
-			.setDescription(s.content)
-			.setTimestamp(new Date(s.time).toISOString())
+			.setDescription(content)
+			.setTimestamp(new Date(time).toISOString())
 			.setColor(Colors.red)
 			.toJSON()
 	});

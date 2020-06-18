@@ -5,6 +5,7 @@ import db from "../modules/Database";
 import { MessageTypes, Colors } from "../util/Constants";
 import { Utility } from "../util/Functions";
 import config from "../config";
+import { Redis } from "../modules/External";
 
 export default new ClientEvent("messageDelete", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	this.track("events", "messageDelete");
@@ -14,18 +15,16 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 	if (config.beta && !config.client.betaEventGuilds.includes(message.channel.guild.id)) return;
 
 	const g = await db.getGuild(message.channel.guild.id);
-	if (!g) return;
-	await g.edit({
-		snipe: {
-			delete: {
-				[message.channel.id]: {
-					content: message.content,
-					authorId: message.author.id,
-					time: Date.now()
-				}
-			}
+	// tslint:disable-next-line: no-string-literal
+	if (typeof g["snipe"] !== "undefined") await g.mongoEdit({
+		$unset: {
+			snipe: 1
 		}
-	}).then(d => d.reload());
+	});
+
+	// auto delete after 30 minutes
+	await Redis.SETEX(`prod:snipe:delete:${message.channel.guild.id}:content`, 1800, message.content);
+	await Redis.SETEX(`prod:snipe:delete:${message.channel.guild.id}:author`, 1800, message.author.id);
 
 	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "messageDelete");
