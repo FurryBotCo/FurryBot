@@ -428,12 +428,12 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 					switch (err.code) {
 						case "ECONNRESET": {
 							this.track("errors", "econnreset");
-							k = "{lang:other.error.econnreset}";
+							k = "{lang:other.errors.econnreset}";
 							break;
 						}
 					}
-					if (!k) k = "{lang:other.error.unknown}";
-					return msg.channel.createMessage(`${k}\n${Language.get(gConfig.settings.lang).get("other.error.join").format(config.client.socials.discord, ecode, err.name, err.message)}`).catch(err => null);
+					if (!k) k = "{lang:other.errors.unknown}";
+					return msg.channel.createMessage(`${k}\n${Language.get(gConfig.settings.lang, "other.errors.join").format(config.client.socials.discord, ecode, err.name, err.message)}`).catch(err => null);
 				}
 			}
 		}
