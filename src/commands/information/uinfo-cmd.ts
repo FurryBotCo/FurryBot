@@ -22,7 +22,6 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.channel.guild.memberCount <= 1000) await msg.channel.guild.fetchAllMembers(); // make numbers accurate in guilds under 1000 members
 	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 
 	if (!user) return msg.errorEmbed("INVALID_MEMBER");
