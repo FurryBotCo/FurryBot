@@ -22,7 +22,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
+	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs(0, false, true, 0);
 
 	if (!user) return msg.errorEmbed("INVALID_MEMBER");
 	let flags: number = user.user.publicFlags;
