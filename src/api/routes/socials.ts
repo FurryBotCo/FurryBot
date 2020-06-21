@@ -16,6 +16,7 @@ export default class SocialsRoute extends Route {
 		const client = this.client;
 
 		app
+			.get("/", async (req, res) => res.status(200).render("socials"))
 			.get("/twitter", async (req, res) => {
 				if (!req.session.user) {
 					req.session.return = req.originalUrl;

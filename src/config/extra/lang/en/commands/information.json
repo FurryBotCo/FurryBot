@@ -197,8 +197,7 @@
 		"joinPos": "Join Position",
 		"nearbyJoins": "Nearby Joins",
 		"badges": "User Badges",
-		"socialProfiles": "Social Profiles",
-		"addMore": "Add More Here"
+		"socialProfiles": "Social Profiles"
 	},
 	"whoisplaying": {
 		"description": "Get a list of users playing the specified game.",

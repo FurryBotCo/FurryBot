@@ -52,5 +52,7 @@
 	"gatewayVersion": "Gateway Version",
 	"nodeVersion": "Node Version",
 	"supportServer": "Support Server",
-	"noneYet": "None Yet"
+	"noneYet": "None Yet",
+	"add": "Add",
+	"remove": "Remove"
 }

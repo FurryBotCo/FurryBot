@@ -2,12 +2,12 @@
 <html lang="en">
 
 <head>
-	<title>Unlink Twitter</title>
+	<title>Furry Bot - Unlink Twitter</title>
 </head>
 
 <body>
 	Chose one to unlink:<br>
-	<%- locals.accounts.map(s => `<a href="/unlink/confirm?type=twitter&id=${s.id}">${s.username}</a>`) %>
+	<%- locals.accounts.map(s => `<a href="/unlink/confirm?type=twitter&id=${s.id}">${s.username}</a>`).join("<br>") %>
 </body>
 
 </html>
