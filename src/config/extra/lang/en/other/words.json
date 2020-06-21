@@ -54,5 +54,7 @@
 	"supportServer": "Support Server",
 	"noneYet": "None Yet",
 	"add": "Add",
-	"remove": "Remove"
+	"remove": "Remove",
+	"status": "Status",
+	"game": "Game"
 }

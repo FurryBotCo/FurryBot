@@ -68,6 +68,8 @@ export default new Command({
 				`\u25FD {lang:commands.information.uinfo.joinDate}: ${Time.formatDateWithPadding(user.joinedAt, true)}`,
 				`\u25FD {lang:commands.information.uinfo.creationDate}: ${Time.formatDateWithPadding(user.createdAt, true)}`,
 				`\u25FD {lang:commands.information.uinfo.roles} [${user.roles.length}]: ${user.roles.reduce((a, b) => a + msg.channel.guild.roles.get(b).name.length, 0) > 250 ? `{lang:commands.information.uinfo.tooManyRoles|${gConfig.settings.prefix}|${user.user.id}}` : user.roles.length === 0 ? "NONE" : user.roles.map(r => `<@&${r}>`).join(" ")}`,
+				`\u25FD {lang:other.words.status}: ${config.emojis[user.status || "offline"]} ${user.status || "offline"}`, /* if we get no status, assume offline */
+				`\u25FD {lang:other.words.game}: ${!user.game ? "{lang:other.words.none}" : `${user.game.name}`}`,
 				`\u25FD {lang:commands.information.uinfo.joinPos}: #${m.indexOf(user.id) + 1}`,
 				"\u25FD {lang:commands.information.uinfo.nearbyJoins}:",
 				...around.map(a => a === msg.author.id ? `- [#${m.indexOf(a) + 1}] **<@!${a}>**` : `- [#${m.indexOf(a) + 1}] <@!${a}>`),
