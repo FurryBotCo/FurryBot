@@ -1,10 +1,15 @@
 import { Route } from "..";
 import config from "../../config";
-import { Internal, Strings } from "../../util/Functions";
+import * as fs from "fs-extra";
+import Twitter from "../../modules/External/Twitter";
+import Logger from "../../util/LoggerV10";
+import db, { mdb } from "../../modules/Database";
+import { Internal } from "../../util/Functions";
+import sickbanCmd from "../../commands/meme/sickban-cmd";
 
-export default class DiscordRoute extends Route {
+export default class CallbackRoute extends Route {
 	constructor() {
-		super("/discord");
+		super("/cb");
 	}
 
 	setup() {
@@ -13,11 +18,43 @@ export default class DiscordRoute extends Route {
 		const client = this.client;
 
 		app
-			.get("/login", async (req, res) => {
-				req.session.state = Strings.random(32);
-				return res.redirect(`https://discordapp.com/oauth2/authorize?client_id=${config.client.id}&scope=${config.web.oauth2.scopes.join("%20")}&response_type=code&redirect_uri=${encodeURIComponent(config.web.oauth2.redirectURL)}&state=${req.session.state}`);
+			.get("/twitter", async (req, res) => {
+				if (!req.session.user) {
+					req.session.return = req.originalUrl;
+					return res.redirect("/socials/discord");
+				}
+
+				return Twitter.callback({
+					oauth_token: req.query.oauth_token,
+					oauth_verifier: req.query.oauth_verifier
+				}, req.session.tokenSecret, async (err, user) => {
+					if (err) {
+						Logger.error("Callback Router", err);
+						return res.status(500).end("Internal Server Error.");
+					}
+
+					delete req.session.tokenSecret;
+
+					const u = await db.getUser(req.session.user.id);
+
+					if (!!u.socials.find(s => s.type === "twitter" && s.id === user.userId)) return res.status(400).end("Duplicate account detected. To refresh your username, remove the account and log back in.");
+
+					await u.mongoEdit({
+						$push: {
+							socials: {
+								type: "twitter",
+								id: user.userId,
+								username: user.userName,
+								token: user.userToken,
+								secret: user.userTokenSecret
+							}
+						}
+					});
+
+					return res.status(200).end("Finished, check your profile (f!uinfo).");
+				});
 			})
-			.get("/cb", async (req, res) => {
+			.get("/discord", async (req, res) => {
 				if (!req.query.code) return res.status(400).render("error", { title: "Bad Request", status: 400, message: "Missing 'code' in query, please try again later." });
 				if (!req.query.state) return res.status(400).render("error", { title: "Bad Request", status: 400, message: "Missing 'state' in query, please try again later." });
 				if (req.query.state !== req.session.state) return res.status(400).render("error", { title: "Bad Request", status: 400, message: "Invalid 'state' in query, please try again later." });
@@ -44,7 +81,6 @@ export default class DiscordRoute extends Route {
 				req.session.user = client.bot.users.has(user.id) ? client.bot.users.get(user.id) : await client.bot.getRESTUser(user.id);
 
 				return res.redirect(req.session.return || "/");
-			})
-			.get("/logout", async (req, res) => req.session.destroy(() => res.status(200).render("logout")));
+			});
 	}
 }

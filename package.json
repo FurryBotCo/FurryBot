@@ -26,6 +26,7 @@
     "furry.services": "^1.0.1",
     "furrybotapi": "^2.0.2",
     "lavalink": "github:DonovanDMC/lavalink.js",
+    "login-with-twitter": "^1.2.2",
     "module-alias": "^2.2.2",
     "mongodb": "^3.5.7",
     "morgan": "^1.10.0",
@@ -35,6 +36,7 @@
     "redis": "^3.0.2",
     "truncate": "^2.1.0",
     "tsee": "^1.3.0",
+    "twit": "^2.2.11",
     "yaml": "^1.9.2"
   },
   "devDependencies": {
@@ -49,6 +51,7 @@
     "@types/morgan": "^1.9.0",
     "@types/node": "^13.13.5",
     "@types/redis": "^2.8.20",
+    "@types/twit": "^2.2.24",
     "@types/uuid": "^7.0.3",
     "ts-node": "^8.10.1",
     "tslint": "^6.1.2",

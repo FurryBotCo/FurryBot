@@ -179,6 +179,10 @@
 		"uptime": "Uptime",
 		"directMessage": "Direct Messages"
 	},
+	"status": {
+		"description": "Get some status about certain websites.",
+		"usage": "[service] [group]"
+	},
 	"uinfo": {
 		"description": "Get some info about a user.",
 		"usage": "[@member/id]",
@@ -192,7 +196,9 @@
 		"tooManyRoles": "Too many roles to list, please use `{0}roles {1}` to list them.",
 		"joinPos": "Join Position",
 		"nearbyJoins": "Nearby Joins",
-		"badges": "User Badges"
+		"badges": "User Badges",
+		"socialProfiles": "Social Profiles",
+		"addMore": "Add More Here"
 	},
 	"whoisplaying": {
 		"description": "Get a list of users playing the specified game.",

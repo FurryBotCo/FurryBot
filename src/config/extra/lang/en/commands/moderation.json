@@ -60,6 +60,10 @@
 		"title": "Logging",
 		"thisOnly": "you must use channels that are in this server."
 	},
+	"massBan": {
+		"description": "Ban multiple members at the same time.",
+		"usage": "<@members/ids> <reason> [--days=0-14]"
+	},
 	"mute": {
 		"description": "Stop someone from chatting.",
 		"usage": "<@member/id> [time] [reason]",

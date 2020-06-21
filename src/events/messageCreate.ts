@@ -335,7 +335,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (c instanceof Error) throw c;
 		t.end("main");
 
-		if (msg.cmd.cat.name !== "dev") await mdb.collection("timing").insertOne({ times: t.timers, cmd: cmd.triggers[0], id: Strings.random(32) });
+		if (msg.cmd.cat.name !== "developer") await mdb.collection("timing").insertOne({ times: t.timers, cmd: cmd.triggers[0], id: Strings.random(32) });
 	} catch (e) {
 		const err: Error & { code?: string; } = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
 		if (!["ERR_INVALID_USAGE", "RETURN"].includes(err.message)) {

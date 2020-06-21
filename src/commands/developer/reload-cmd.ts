@@ -1,6 +1,8 @@
 import Command from "../../modules/CommandHandler/Command";
 import CommandError from "../../modules/CommandHandler/CommandError";
 import Category from "../../modules/CommandHandler/Category";
+import * as fs from "fs-extra";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -28,6 +30,12 @@ export default new Command({
 			return msg.reply(`{lang:commands.developer.reload.cmdDone|${msg.args[1].toLowerCase()}}`);
 		}
 
+		case "lang": {
+			let i = 0;
+			fs.readdirSync(`${config.dir.lang}`).filter(f => !fs.lstatSync(`${config.dir.lang}/${f}`).isDirectory() && f.endsWith(".json")).map(f => (i++, fs.unlinkSync(`${config.dir.lang}/${f}`)));
+			return msg.reply(`{lang:commands.developer.reload.lang|${i}}`);
+			break;
+		}
 		default: {
 			return msg.reply(`{lang:commands.developer.reload.invalid|${msg.args[0].toLowerCase()}}`);
 		}

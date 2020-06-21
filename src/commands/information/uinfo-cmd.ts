@@ -73,6 +73,16 @@ export default new Command({
 				"\u25FD {lang:commands.information.uinfo.nearbyJoins}:",
 				...around.map(a => a === msg.author.id ? `- [#${m.indexOf(a) + 1}] **<@!${a}>**` : `- [#${m.indexOf(a) + 1}] <@!${a}>`),
 				"",
+				"**{lang:commands.information.uinfo.socialProfiles}:**",
+				...(c.id !== msg.author.id ? [] : [`[{lang:commands.information.uinfo.addMore}](https://${config.web.api.host}/socials)`]),
+				...(c.socials.length === 0 ? [`{lang:other.words.none}`] : c.socials.map(s => {
+					switch (s.type) {
+						case "twitter": {
+							return `${config.emojis.twitter} [${s.username}](https://twitter.com/intent/user?user_id=${s.id})`;
+						}
+					}
+				})),
+				"",
 				"**{lang:commands.information.uinfo.badges}:**",
 				...(f.length === 0 ? ["\u25FD {lang:other.words.none}"] : f.map(k => `{lang:other.userFlags.${k}}`))
 			].join("\n"))

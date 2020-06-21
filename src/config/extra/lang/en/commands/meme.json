@@ -63,9 +63,25 @@
 		"description": "Change My Mind!",
 		"usage": "<text>"
 	},
+	"cheating": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"citation": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"confusedcat": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
 	"communism": {
 		"description": "You filthy communist!",
 		"usage": "[image/@user]"
+	},
+	"corporate": {
+		"description": "No Description Yet.",
+		"usage": ""
 	},
 	"crab": {
 		"description": "Crab rave!",
@@ -99,13 +115,25 @@
 		"description": "Not all disabilities are the same",
 		"usage": "[image/@user]"
 	},
+	"doglemon": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
 	"door": {
 		"description": "Nope!",
 		"usage": "[image/@user]"
 	},
+	"egg": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
 	"excuseme": {
 		"description": "Excuse me what the frick",
 		"usage": "<text>"
+	},
+	"expanddong": {
+		"description": "No Description Yet.",
+		"usage": ""
 	},
 	"facts": {
 		"description": "Straight facts",
@@ -154,6 +182,14 @@
 	"invert": {
 		"description": "Invert an image",
 		"usage": "[image/@user]"
+	},
+	"ipad": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"humansgood": {
+		"description": "No Description Yet.",
+		"usage": ""
 	},
 	"jail": {
 		"description": "Put someone in jail",
@@ -306,5 +342,45 @@
 	"youtube": {
 		"description": "Youtube comment",
 		"usage": "<text>"
+	},
+	"kimborder": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"kowalski": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"letmein": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"lick": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"nothing": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"piccolo": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"savehumanity": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"sneakyfox": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"violentsparks": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"whothisis": {
+		"description": "No Description Yet.",
+		"usage": ""
 	}
 }

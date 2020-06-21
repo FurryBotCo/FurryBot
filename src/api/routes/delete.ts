@@ -16,7 +16,7 @@ export default class DeleteRoute extends Route {
 			.use(async (req, res, next) => {
 				if (!req.session.user) {
 					req.session.return = req.originalUrl;
-					return res.redirect("/discord/login");
+					return res.redirect("/socials/discord");
 				} else return next();
 			})
 			.get("/user", async (req, res) => res.redirect(`/delete/user/${req.session.user.id}`))

@@ -29,7 +29,13 @@ export default class UserConfig {
 		[k: string]: number;
 	};
 	deletion?: number;
-
+	socials: ({
+		username: string;
+		id: string;
+		token: string;
+		secret: string;
+		type: "twitter";
+	})[];
 	constructor(id: string, data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		this.id = id;
 		if (!data) data = config.defaults.config.user;
