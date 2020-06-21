@@ -110,6 +110,18 @@
 		"couldNotUnban": "I couldn't unban **{0}**, {1}",
 		"englishOnly": "The provided reason must be comprised of English characters only."
 	},
+	"reason": {
+		"description": "Change the reason for a modlog entry",
+		"usage": "<id> [reason]",
+		"invalidId": "invalid id \"{0}\" provided.",
+		"noModlog": "I couldn't find the mod log for this server, so previous entries cannot be edited.",
+		"noMessage": "the specified entry ({0}) does not have a message id associated with it, so it cannot be edited.",
+		"messageNotFound": "the message for that entry could not be found. If the mod log channel has changed, the entry cannot be edited.",
+		"badlyFormed": "the embed for the mod log entry seems to be badly formed, it cannot be edited.",
+		"englishOnly": "The provided reason must be comprised of English characters only.",
+		"tooLong": "that reason is too long, it must be at most 200 characters.",
+		"edited": "the reason for case **#{0}** has been updated to \"{1}\"."
+	},
 	"unlock": {
 		"description": "Unlock a channel after it has been locked.",
 		"usage": "[channel]",

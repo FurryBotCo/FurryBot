@@ -5,6 +5,7 @@ import db, { mdb } from "../modules/Database";
 import { Time, Strings } from "./Functions";
 import { Colors } from "./Constants";
 import config from "../config";
+import { InsertOneWriteOpResult, WithId } from "mongodb";
 
 export default class ModLogUtil {
 	client: FurryBot;
@@ -91,10 +92,11 @@ export default class ModLogUtil {
 			reason = !!data.reason ? data.reason : "None Provided";
 		}
 
+		let e: InsertOneWriteOpResult<WithId<ModLogEntry.GenericEntry>>;
 
 		switch (data.type) {
 			case "ban": {
-				await mdb.collection<ModLogEntry.BanEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.BanEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
@@ -102,7 +104,8 @@ export default class ModLogUtil {
 					time: data.time,
 					deleteDays: data.deleteDays,
 					pos,
-					guildId: g.id
+					guildId: g.id,
+					messageId: null
 				});
 
 				embed
@@ -118,14 +121,15 @@ export default class ModLogUtil {
 			}
 
 			case "mute": {
-				await mdb.collection<ModLogEntry.MuteEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.MuteEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
 					type: "mute",
 					time: data.time,
 					pos,
-					guildId: g.id
+					guildId: g.id,
+					messageId: null
 				});
 
 				embed
@@ -140,13 +144,14 @@ export default class ModLogUtil {
 			}
 
 			case "kick": {
-				await mdb.collection<ModLogEntry.KickEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.KickEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
 					type: "kick",
 					pos,
-					guildId: g.id
+					guildId: g.id,
+					messageId: null
 				});
 
 				embed
@@ -160,14 +165,15 @@ export default class ModLogUtil {
 			}
 
 			case "softban": {
-				await mdb.collection<ModLogEntry.SoftBanEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.SoftBanEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
 					type: "softban",
 					deleteDays: data.deleteDays,
 					pos,
-					guildId: g.id
+					guildId: g.id,
+					messageId: null
 				});
 
 				embed
@@ -182,13 +188,14 @@ export default class ModLogUtil {
 			}
 
 			case "unban": {
-				await mdb.collection<ModLogEntry.UnbanEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.UnbanEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
 					type: "unban",
 					pos,
-					guildId: g.id
+					guildId: g.id,
+					messageId: null
 				});
 
 				embed
@@ -202,13 +209,14 @@ export default class ModLogUtil {
 			}
 
 			case "unmute": {
-				await mdb.collection<ModLogEntry.UnmuteEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.UnmuteEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
 					type: "unmute",
 					pos,
-					guildId: g.id
+					guildId: g.id,
+					messageId: null
 				});
 
 				embed
@@ -222,14 +230,15 @@ export default class ModLogUtil {
 			}
 
 			case "warn": {
-				await mdb.collection<ModLogEntry.WarnEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.WarnEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
 					type: "warn",
 					pos,
 					guildId: g.id,
-					id: data.id as any
+					id: data.id as any,
+					messageId: null
 				});
 
 				embed
@@ -257,7 +266,8 @@ export default class ModLogUtil {
 					const m = await this.client.bot.getRESTUser(data.oldBlame);
 					b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
 				}
-				await mdb.collection<ModLogEntry.DeleteWarnEntry>("modlog").insertOne({
+
+				e = await mdb.collection<ModLogEntry.DeleteWarnEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
@@ -265,7 +275,8 @@ export default class ModLogUtil {
 					pos,
 					guildId: g.id,
 					oldBlame: b,
-					id: data.id as any
+					id: data.id as any,
+					messageId: null
 				});
 
 				embed
@@ -281,14 +292,15 @@ export default class ModLogUtil {
 			}
 
 			case "clearwarnings": {
-				await mdb.collection<ModLogEntry.ClearWarningsEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.ClearWarningsEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
 					type: "clearwarnings",
 					pos,
 					guildId: g.id,
-					totalWarnings: data.totalWarnings
+					totalWarnings: data.totalWarnings,
+					messageId: null
 				});
 				embed
 					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.clearwarnings}`)
@@ -301,13 +313,14 @@ export default class ModLogUtil {
 			}
 
 			case "lock": {
-				await mdb.collection<ModLogEntry.ChannelLockEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.ChannelLockEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
 					type: "lock",
 					pos,
-					guildId: g.id
+					guildId: g.id,
+					messageId: null
 				});
 
 				embed
@@ -321,13 +334,14 @@ export default class ModLogUtil {
 			}
 
 			case "unlock": {
-				await mdb.collection<ModLogEntry.ChannelUnlockEntry>("modlog").insertOne({
+				e = await mdb.collection<ModLogEntry.ChannelUnlockEntry>("modlog").insertOne({
 					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
 					target: data.target.id,
 					reason,
 					type: "unlock",
 					pos,
-					guildId: g.id
+					guildId: g.id,
+					messageId: null
 				});
 
 				embed
@@ -349,8 +363,10 @@ export default class ModLogUtil {
 		embed.setTimestamp(new Date().toISOString());
 
 		const mdl = ch.guild.channels.get<Eris.GuildTextableChannel>(g.settings.modlog);
-		return mdl.createMessage({
+		const msg = await mdl.createMessage({
 			embed: embed.toJSON()
 		}).catch(err => null);
+
+		if (!!msg && !!e && e.ops.length !== 0) await mdb.collection<ModLogEntry.GenericEntry>("modlog").findOneAndUpdate({ _id: e.ops[0]._id }, { $set: { messageId: msg.id } });
 	}
 }

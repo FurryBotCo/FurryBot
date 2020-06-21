@@ -96,6 +96,7 @@ declare global {
 			reason: string;
 			type: string;
 			guildId: string;
+			messageId?: string; // due to the way ModLogUtil works, this may be missing
 		}
 
 		interface ChannelLockEntry extends GenericEntry {
