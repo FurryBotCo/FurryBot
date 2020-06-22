@@ -56,7 +56,7 @@ export default class TimedTasks {
 		}).toArray();
 
 		if (d.length === 0) {
-			if (config.beta) client.log("warn", "No processable entries found.", "Timed Tasks |  Delete Users");
+			if (config.beta) client.log("debug", "No processable entries found.", "Timed Tasks |  Delete Users");
 			return;
 		}
 
