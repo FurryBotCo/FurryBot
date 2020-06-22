@@ -16,7 +16,7 @@ export default new ClientEvent("guildRoleUpdate", (async function (this: FurryBo
 	const e = g.logEvents.find(l => l.type === "roleUpdate");
 	if (!e || !e.channel) return;
 	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+	const ch = guild.channels.get(e.channel) as Eris.GuildTextableChannel;
 	if (!ch) return g.mongoEdit({ $pull: e });
 
 	const props: { [k: string]: { type: string; name: string; } } = {

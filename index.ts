@@ -8,11 +8,13 @@ fs.readdirSync(`${__dirname}/src/config/extra/lang`).filter(d => fs.lstatSync(`$
 });
 import config from "./src/config";
 import path from "path";
+
 import Logger from "./src/util/LoggerV10";
+[config.dir.logs, `${config.dir.logs}/spam`, `${config.dir.logs}/client`, config.dir.tmp].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), Logger.log("Setup | Logs", `Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
+
 // for faster loading after launch (and error checking)
 import "./src/main";
 import "./src/commands";
-[config.dir.logs, `${config.dir.logs}/spam`, `${config.dir.logs}/client`, config.dir.tmp].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), Logger.log("Setup | Logs", `Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
 
 import ListStats from "./src/util/ListStats";
 import Cluster from "cluster";

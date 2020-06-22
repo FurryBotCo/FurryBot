@@ -1,17 +1,12 @@
-/// <reference path="../@types/Eris.d.ts" />
 import { mdb, db } from "../../modules/Database";
 import UserConfig from "../../modules/config/UserConfig";
 import config from "../../config";
-import Logger from "../LoggerV10";
 import FurryBot from "../../main";
-import { Colors, GameTypes } from "../Constants";
+import { Colors } from "../Constants";
 import GuildConfig from "../../modules/config/GuildConfig";
 import Eris from "eris";
-import { Request, Internal } from ".";
-import EmbedBuilder from "../EmbedBuilder";
-import phin from "phin";
-import { FurryBotAPI, Redis } from "../../modules/External";
-import WebhookStore from "../../modules/Holders/WebhookStore";
+import { Internal } from ".";
+import { Redis } from "../../modules/External";
 
 export default class TimedTasks {
 	private constructor() {
@@ -114,7 +109,7 @@ export default class TimedTasks {
 						mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 
-					const ch = g.channels.has(c.settings.modlog) ? g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog) : await client.bot.getRESTChannel<Eris.GuildTextableChannel>(c.settings.modlog);
+					const ch = (g.channels.has(c.settings.modlog) ? g.channels.get(c.settings.modlog) : await client.bot.getRESTChannel(c.settings.modlog)) as Eris.GuildTextableChannel;
 					if (!ch) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
@@ -151,7 +146,7 @@ export default class TimedTasks {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 
-					const ch = g.channels.has(c.settings.modlog) ? g.channels.get<Eris.GuildTextableChannel>(c.settings.modlog) : await client.bot.getRESTChannel<Eris.GuildTextableChannel>(c.settings.modlog);
+					const ch = (g.channels.has(c.settings.modlog) ? g.channels.get(c.settings.modlog) : await client.bot.getRESTChannel(c.settings.modlog)) as Eris.GuildTextableChannel;
 					if (!ch) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });

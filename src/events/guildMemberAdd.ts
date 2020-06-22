@@ -17,7 +17,7 @@ export default new ClientEvent("guildMemberAdd", (async function (this: FurryBot
 	(async () => {
 		if (!(!e || !e.channel)) {
 			if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-			const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+			const ch = guild.channels.get(e.channel) as Eris.GuildTextableChannel;
 			if (!ch) return g.mongoEdit({ $pull: e });
 
 			const embed: Eris.EmbedOptions = {
@@ -52,7 +52,7 @@ export default new ClientEvent("guildMemberAdd", (async function (this: FurryBot
 				joinChannel: null
 			}
 		}); else {
-			const m = await guild.channels.get<Eris.GuildTextableChannel>(g.settings.joinChannel).createMessage({
+			const m = await (guild.channels.get(g.settings.joinChannel) as Eris.GuildTextableChannel).createMessage({
 				embed: {
 					author: {
 						name: `${member.username}#${member.discriminator}`,

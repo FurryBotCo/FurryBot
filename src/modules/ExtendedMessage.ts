@@ -227,7 +227,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		// user ID
 		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
 			if (this.channel.guild.members.has(args[argPosition])) return this.channel.guild.members.get(args[argPosition]).user as U;
-			else if (this.client.bot.users.has(args[argPosition])) return this.client.bot.users.get(args[argPosition]);
+			else if (this.client.bot.users.has(args[argPosition])) return this.client.bot.users.get(args[argPosition]) as U;
 			else return this.client.bot.getRESTUser(args[argPosition]).catch(err => null) as Promise<U>;
 		}
 
@@ -268,7 +268,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 
 		// username
 		// apparently "user" can be null on a guild member?!?
-		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find((c: M) => c.user && c.user.username && c.user.username.toLowerCase() === args[argPosition].toLowerCase());
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) return this.channel.guild.members.find((c: M) => c.user && c.user.username && c.user.username.toLowerCase() === args[argPosition].toLowerCase()) as M;
 
 		// nothing found
 		return null;
@@ -291,10 +291,10 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		if (this.mentionMap.channels.length >= mentionPosition + 1) return this.mentionMap.channels.slice(mentionPosition)[mentionPosition] as C;
 
 		// channel ID
-		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.get(args[argPosition]);
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.get(args[argPosition]) as C;
 
 		// channel name
-		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.find((r: C) => r.name.toLowerCase() === args[argPosition].toLowerCase());
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.channels.length >= mentionPosition + 1)) return this.channel.guild.channels.find((r: C) => r.name.toLowerCase() === args[argPosition].toLowerCase()) as C;
 
 		// nothing found
 		return null;
@@ -318,10 +318,10 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 
 
 		// role id
-		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.channel.guild.roles.get(args[argPosition]);
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.channel.guild.roles.get(args[argPosition]) as R;
 
 		// role name
-		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.channel.guild.roles.find((r: R) => r.name.toLowerCase() === args[argPosition].toLowerCase());
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.channel.guild.roles.find((r: R) => r.name.toLowerCase() === args[argPosition].toLowerCase()) as R;
 
 		// nothing found
 		return null;
@@ -337,10 +337,10 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		// server id
-		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.bot.guilds.get(args[argPosition]);
+		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.bot.guilds.get(args[argPosition]) as G;
 
 		// server name
-		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.bot.guilds.find((g: G) => g.name.toLowerCase() === args[argPosition].toLowerCase());
+		if (![undefined, null, ""].includes(args[argPosition]) && !args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args)) return this.client.bot.guilds.find((g: G) => g.name.toLowerCase() === args[argPosition].toLowerCase()) as G;
 
 		// nothing found
 		return null;

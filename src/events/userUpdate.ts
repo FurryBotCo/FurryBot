@@ -17,7 +17,7 @@ export default new ClientEvent("userUpdate", (async function (this: FurryBot, us
 			if (!e || !e.channel) return;
 			if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 			if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-			const ch = await this.bot.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
+			const ch = await this.bot.getRESTChannel(e.channel) as Eris.GuildTextableChannel;
 			if (!ch) return g.mongoEdit({ $pull: e });
 
 			if (user.username !== oldUser.username) {

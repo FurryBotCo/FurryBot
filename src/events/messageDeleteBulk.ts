@@ -20,7 +20,7 @@ export default new ClientEvent("messageDeleteBulk", (async function (this: Furry
 	const e = g.logEvents.find(l => l.type === "messageBulkDelete");
 	if (!e || !e.channel) return;
 	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-	const ch = await this.bot.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
+	const ch = await this.bot.getRESTChannel(e.channel) as Eris.GuildTextableChannel;
 	if (!ch) return g.mongoEdit({ $pull: e });
 
 	const d = path.resolve(`${config.dir.base}/src/assets/bulkDelete`);

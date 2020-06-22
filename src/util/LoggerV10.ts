@@ -77,6 +77,10 @@ class Logger {
 				}
 
 				// .replace(/[^\[\]\w\s:\(\)#\|\.,_-]/gmi, "")
+				if (!fs.existsSync(`${config.dir.logs}/client`)) {
+					fs.mkdirpSync(`${config.dir.logs}/client`);
+					this.log("Setup | Logs", `Creating non existent directory "${config.dir.logs}/client" in ${config.dir.logs}`);
+				}
 				if (!fs.existsSync(`${config.dir.logs}/client/${d}.log`)) fs.writeFileSync(`${config.dir.logs}/client/${d}.log`, "");
 				fs.appendFileSync(`${config.dir.logs}/client/${d}.log`, `[${dt.toTimeString().split(" ")[0]}][${type.toUpperCase()}] ${source} | ${mn}\n`);
 				/*if (typeof process.send === "undefined") */process.stdout.write(`${chalk.grey(`[${dt.toTimeString().split(" ")[0]}]`)} ${source} | ${chalk[colors[type]](msg)}\n`);

@@ -362,7 +362,7 @@ export default class ModLogUtil {
 
 		embed.setTimestamp(new Date().toISOString());
 
-		const mdl = ch.guild.channels.get<Eris.GuildTextableChannel>(g.settings.modlog);
+		const mdl = ch.guild.channels.get(g.settings.modlog) as Eris.GuildTextableChannel;
 		const msg = await mdl.createMessage({
 			embed: embed.toJSON()
 		}).catch(err => null);

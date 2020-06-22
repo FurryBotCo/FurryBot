@@ -17,7 +17,7 @@ export default new ClientEvent("guildMemberRemove", (async function (this: Furry
 	(async () => {
 		if (!(!e || !e.channel)) {
 			if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-			const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+			const ch = guild.channels.get(e.channel) as Eris.GuildTextableChannel;
 			if (!ch) return g.mongoEdit({ $pull: e });
 
 			const embed: Eris.EmbedOptions = {
@@ -56,7 +56,7 @@ export default new ClientEvent("guildMemberRemove", (async function (this: Furry
 				leaveChannel: null
 			}
 		}); else {
-			const m = await guild.channels.get<Eris.GuildTextableChannel>(g.settings.leaveChannel).createMessage({
+			const m = await (guild.channels.get(g.settings.leaveChannel) as Eris.GuildTextableChannel).createMessage({
 				embed: {
 					author: {
 						name: `${member.username}#${member.discriminator}`,

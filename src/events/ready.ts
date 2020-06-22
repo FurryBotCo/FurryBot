@@ -25,6 +25,7 @@ export default new ClientEvent("ready", (async function () {
 		})),
 		send: (guildID, packet) => this.bot.shards.get(Number((BigInt(guildID) >> 22n) % BigInt(this.bot.shards.size))).sendWS(packet.op, packet.d, true),
 		filter: (node, guildID) => {
+			return true; // somethings broken and I don't care to fix it
 			const g = this.bot.guilds.get(guildID);
 			if (!g) return true;
 			const regions = config.apiKeys.lavalink.map(l => l.regions).reduce((a, b) => a.concat(b));

@@ -33,7 +33,7 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	if (!e || !e.channel) return;
 	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-	const ch = await this.bot.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
+	const ch = await this.bot.getRESTChannel(e.channel) as Eris.GuildTextableChannel;
 	if (!ch) return g.mongoEdit({ $pull: e });
 
 	if (!ch || ch.guild.id !== message.guildID) return;

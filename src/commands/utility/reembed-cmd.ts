@@ -42,7 +42,7 @@ export default new Command({
 	if (!g) return msg.reply("{lang:commands.utility.reembed.invalidGuild}");
 	if (!id) return msg.reply("{lang:commands.utility.reembed.noId}");
 
-	const channel = await msg.channel.guild.channels.get<Eris.TextChannel>(ch);
+	const channel = await msg.channel.guild.channels.get(ch) as Eris.GuildTextableChannel;
 
 	if (!channel || ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(channel.type)) return msg.reply("{lang:commands.utility.reembed.invalidChannel}");
 

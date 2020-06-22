@@ -16,8 +16,8 @@ export default new ClientEvent("voiceStateUpdate", (async function (this: FurryB
 	const e = g.logEvents.find(l => l.type === "voiceStateUpdate");
 	if (!e || !e.channel) return;
 	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
-	const vc = member.guild.channels.get<Eris.VoiceChannel>(member.voiceState.channelID);
+	const ch = member.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+	const vc = member.guild.channels.get(member.voiceState.channelID) as Eris.VoiceChannel;
 	if (!ch) return g.mongoEdit({ $pull: e });
 
 	if (!vc) return;

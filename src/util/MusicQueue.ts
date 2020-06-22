@@ -38,9 +38,9 @@ export default class MusicQueue {
 		this.client = client;
 		this.guild = typeof guild === "string" ? client.bot.guilds.get(guild) : guild;
 		if (!this.guild) throw new TypeError("ERR_INVALID_GUILD");
-		this.txt = typeof txt === "string" ? this.guild.channels.get(txt) : txt;
+		this.txt = (typeof txt === "string" ? this.guild.channels.get(txt) : txt) as Eris.TextChannel;
 		if (!this.txt) throw new TypeError("ERR_INVALID_TXT");
-		this.vc = typeof vc === "string" ? this.guild.channels.get(vc) : vc;
+		this.vc = (typeof vc === "string" ? this.guild.channels.get(vc) : vc) as Eris.VoiceChannel;
 		if (!this.vc) throw new TypeError("ERR_INVALID_VC");
 		this._entires = [];
 		this.setupFinished = false;

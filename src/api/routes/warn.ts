@@ -27,7 +27,7 @@ export default class WarnRoute extends Route {
 				if (!b) return res.status(400).json({ success: false, error: "invalid blame" });
 				const id = await db.getWarningEntryId(g.icon, u.id);
 				if (!!req.body.channel) {
-					const c: Eris.GuildTextableChannel = await client.bot.getRESTChannel<Eris.GuildTextableChannel>(req.body.channel).catch(err => null);
+					const c: Eris.GuildTextableChannel = await client.bot.getRESTChannel(req.body.channel).catch(err => null) as Eris.GuildTextableChannel;
 					if (!c || ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type)) return res.status(400).json({ success: false, error: "invalid channel" });
 					ch = c;
 				}

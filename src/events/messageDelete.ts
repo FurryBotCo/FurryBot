@@ -31,7 +31,7 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 	const e = g.logEvents.find(l => l.type === "messageDelete");
 	if (!e || !e.channel) return;
 	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-	const ch = message.channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+	const ch = message.channel.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
 
 	if (!ch || ch.guild.id !== message.guildID) return;
 	const d = new Date(message.createdAt);

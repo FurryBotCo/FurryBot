@@ -15,7 +15,7 @@ export default new ClientEvent("voiceChannelLeave", (async function (this: Furry
 	const e = g.logEvents.find(l => l.type === "voiceLeave");
 	if (!e || !e.channel) return;
 	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
-	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+	const ch = member.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
 	if (!ch) return g.mongoEdit({ $pull: e });
 
 	const embed: Eris.EmbedOptions = {

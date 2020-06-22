@@ -30,7 +30,7 @@ export default new Command({
 	const entry = entries.find(e => e.pos === id);
 	if (isNaN(id) || !entry) return msg.reply(`{lang:commands.moderation.reason.invalidId|${msg.args[0]}}`);
 	if (!entry.messageId) return msg.reply(`{lang:commands.moderation.reason.noMessage|${msg.args[0]}}`);
-	const m = await msg.channel.guild.channels.get<Eris.GuildTextableChannel>(gConfig.settings.modlog).getMessage(entry.messageId);
+	const m = await (msg.channel.guild.channels.get(gConfig.settings.modlog) as Eris.GuildTextableChannel).getMessage(entry.messageId);
 	if (!m) return msg.reply("{lang:commands.moderation.reason.messageNotFound}");
 	const r = Language.get(gConfig.settings.lang, "other.modlog.fields.reason", false);
 	let e: Eris.EmbedOptions, d: string[], f: string;
