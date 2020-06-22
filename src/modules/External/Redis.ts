@@ -19,12 +19,12 @@ Redis
 	// set some stats to zero on first ready
 	.once("ready", () => {
 		Redis.SET(`${config.beta ? "beta" : "prod"}:stats:messages`, "0");
-		Redis.SET(`${config.beta ? "beta" : "prod"}:stats:commandsTotal`, "0");
+		Redis.SET(`${config.beta ? "beta" : "prod"}:stats:commands:total`, "0");
 		Redis.KEYS(`${config.beta ? "beta" : "prod"}:stats:commands:*`, async (err, v) => {
 			if (err) throw err;
 			const keys = [];
 			for (const k of v) {
-				if (k.indexOf("allTime") !== -1 || k.split(":").length !== 3) continue;
+				if (k.toLowerCase().indexOf("alltime") !== -1 || k.split(":").length !== 3) continue;
 				else keys.push(k);
 			}
 

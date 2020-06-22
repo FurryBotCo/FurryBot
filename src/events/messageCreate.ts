@@ -326,7 +326,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		t.start("cmd");
 		this.track("stats", "commands", "total");
 		this.track("stats", "commands", cmd.triggers[0]);
-		this.track("stats", "commands", "AllTime", "total");
+		this.track("stats", "commands", "allTime", "total");
 		this.track("stats", "commands", "allTime", cmd.triggers[0]);
 		const c = await cmd.run.call(this, msg, uConfig, gConfig, cmd).catch(err => err);
 		t.end("cmd");

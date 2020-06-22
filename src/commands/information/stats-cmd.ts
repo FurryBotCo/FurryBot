@@ -29,7 +29,7 @@ export default new Command({
 			.setColor(Colors.gold)
 			.setTimestamp(new Date().toISOString())
 			.addField("{lang:commands.information.stats.commandsTotal}", `${stats.commandsTotal || "{lang:other.words.noneYet}"} / ${stats.commandsAllTime || "{lang:other.words.noneYet}"}`, true)
-			.addField("{lang:commands.information.stats.messages}", `${stats.messages || "{lang:other.words.noneYet}"} / ${stats.messageCreate || "{lang:other.words.noneYet}"}`, true)
+			.addField("{lang:commands.information.stats.messages}", `${stats.messages || "{lang:other.words.noneYet}"} / ${stats.messagesAllTime || "{lang:other.words.noneYet}"}`, true)
 			.addField("{lang:commands.information.stats.directMessage}", `${stats.directMessage || "{lang:other.words.noneYet}"}`, true)
 			.addField("{lang:commands.information.stats.guildCount}", this.bot.guilds.size.toString(), true)
 			.addField("{lang:commands.information.stats.largeGuildCount}", this.bot.guilds.filter(g => g.large).length.toString(), true)

@@ -48,7 +48,7 @@ export default class StatsRoute extends Route {
 					nodeVersion: process.version,
 					dailyJoins: k,
 					commandCount: client.cmd.commands.length,
-					commandsRan: stats.commandsTotal,
+					commandsRan: stats.commandsAllTime,
 					messageCount: stats.messages,
 					dmMessageCount: stats.directMessage
 				});
