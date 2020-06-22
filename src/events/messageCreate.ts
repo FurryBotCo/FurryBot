@@ -325,8 +325,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		Logger.log(`Shard #${msg.channel.guild.shard.id}`, `Command "${cmd.triggers[0]}"${a !== cmd.triggers[0] ? ` (alias used: ${a})` : ""} ran with ${msg.unparsedArgs.length === 0 ? "no arguments" : `the arguments "${msg.unparsedArgs.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 		t.start("cmd");
 		this.track("stats", "commands", "total");
-		this.track("stats", "commands", "AllTime", "total");
 		this.track("stats", "commands", cmd.triggers[0]);
+		this.track("stats", "commands", "AllTime", "total");
 		this.track("stats", "commands", "allTime", cmd.triggers[0]);
 		const c = await cmd.run.call(this, msg, uConfig, gConfig, cmd).catch(err => err);
 		t.end("cmd");
