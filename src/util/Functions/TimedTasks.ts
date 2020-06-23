@@ -2,7 +2,7 @@ import { mdb, db } from "../../modules/Database";
 import UserConfig from "../../modules/config/UserConfig";
 import config from "../../config";
 import FurryBot from "../../main";
-import { Colors } from "../Constants";
+import { Colors, GameTypes } from "../Constants";
 import GuildConfig from "../../modules/config/GuildConfig";
 import Eris from "eris";
 import { Internal } from ".";
@@ -250,19 +250,20 @@ export default class TimedTasks {
 	}
 
 	static async runStatusChange(client: FurryBot, num: number) {
-		/*switch (num) {
+		const st = await client.ipc.getStats();
+		switch (num) {
 			case 0: {
-				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help with ${client.bot.users.size} furries`, type: GameTypes.PLAYING });
+				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help with ${st.clusters.reduce((a, b) => b.users + a, 0)} furries`, type: GameTypes.PLAYING });
 				break;
 			}
 
 			case 1: {
-				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help in ${client.bot.guilds.size} servers`, type: GameTypes.WATCHING });
+				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help in ${st.clusters.reduce((a, b) => b.guilds + a, 0)} servers`, type: GameTypes.WATCHING });
 				break;
 			}
 
 			case 2: {
-				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help in ${Object.keys(client.bot.channelGuildMap).length} channels`, type: GameTypes.LISTENING });
+				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help with ${client.cmd.commands.length} commands`, type: GameTypes.PLAYING });
 				break;
 			}
 
@@ -270,7 +271,7 @@ export default class TimedTasks {
 				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help at https://furry.bot`, type: GameTypes.PLAYING });
 				break;
 			}
-		}*/
+		}
 	}
 
 	static async runStatsUpdate(client: FurryBot) {
