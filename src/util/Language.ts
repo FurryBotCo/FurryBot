@@ -83,7 +83,7 @@ export default class Language {
 		}
 	}
 
-	static has(lang: string) { return fs.existsSync(`${config.dir.lang}/${lang}.yaml`); }
+	static has(lang: string) { return fs.existsSync(`${config.dir.lang}/${lang}.json`); }
 
 	static parseString(lang: string, str: string) {
 		if (!this.has(lang)) throw new TypeError("Invalid language.");
