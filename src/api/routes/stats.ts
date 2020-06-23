@@ -2,6 +2,7 @@ import { Route } from "..";
 import config from "../../config";
 import { Internal } from "../../util/Functions";
 import { mdb } from "../../modules/Database";
+import Eris from "eris";
 
 export default class StatsRoute extends Route {
 	constructor() {
@@ -21,27 +22,27 @@ export default class StatsRoute extends Route {
 				const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 				let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.count).catch(err => null);
 				if (!k) k = "Unknown.";
-				else k = (client.bot.guilds.size - k).toString();
+				else k = (st.clusters.reduce((a, b) => b.guilds + a, 0) - k).toString();
 
 				const stats = await Internal.getStats();
 
 				return res.status(200).json({
 					success: true,
 					clientStatus: "online",
-					guildCount: st.guilds,
-					userCount: st.users,
-					shardCount: st.shardCount,
+					guildCount: st.clusters.reduce((a, b) => b.guilds + a, 0),
+					userCount: st.clusters.reduce((a, b) => b.users + a, 0),
+					shardCount: st.clusters.reduce((a, b) => b.shardStats.length + a, 0),
+					largeGuildCount: st.clusters.reduce((a, b) => b.largeGuilds + a, 0),
 					memoryUsage: {
-						process: {
-							used: Internal.memory.process.getUsed(),
-							total: Internal.memory.process.getTotal()
+						all: {
+							used: st.totalRam * 1000 * 1000,
+							total: null
 						},
 						system: {
 							used: Internal.memory.system.getUsed(),
 							total: Internal.memory.system.getTotal()
 						}
 					},
-					largeGuildCount: client.bot.guilds.filter(g => g.large).length,
 					botVersion: config.version,
 					library: "eris",
 					libraryVersion: require("eris").VERSION,
