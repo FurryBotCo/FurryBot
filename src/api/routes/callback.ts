@@ -5,6 +5,8 @@ import Logger from "../../util/LoggerV10";
 import db from "../../modules/Database";
 import { Internal } from "../../util/Functions";
 import phin from "phin";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
 
 export default class CallbackRoute extends Route {
 	constructor() {
@@ -37,6 +39,21 @@ export default class CallbackRoute extends Route {
 				const u = await db.getUser(req.session.user.id);
 
 				if (!!u.socials.find(s => s.type === "discord.bio" && s.id === req.session.user.id)) {
+					await this.client.w.get("logs").execute({
+						username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
+						avatarURL: "https://i.furry.bot/furry.png",
+						embeds: [
+							new EmbedBuilder("en")
+								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+								.setTitle("Duplicate Social Link: Discord.Bio")
+								.setTimestamp(new Date().toISOString())
+								.setDescription([
+									`URL: [https://dsc.bio/${b.payload.user.details.slug}](https://dsc.bio/${b.payload.user.details.slug})`
+								].join("\n"))
+								.setColor(Colors.red)
+								.toJSON()
+						]
+					});
 					Logger.debug("Discord.Bio Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) tried to link a duplicate Discord.Bio account, ${b.payload.user.details.slug} (${req.session.user.id}).`);
 					return res.status(400).end("Duplicate account detected. To refresh your handle, remove the account and log back in.");
 				}
@@ -52,7 +69,21 @@ export default class CallbackRoute extends Route {
 				});
 
 				Logger.debug("Discord.Bio Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) linked their Discord.Bio account, ${b.payload.user.details.slug} (${req.session.user.id}).`);
-
+				await this.client.w.get("logs").execute({
+					username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
+					avatarURL: "https://i.furry.bot/furry.png",
+					embeds: [
+						new EmbedBuilder("en")
+							.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+							.setTitle("Successful Social Link: Discord.Bio")
+							.setTimestamp(new Date().toISOString())
+							.setDescription([
+								`URL: [https://dsc.bio/${b.payload.user.details.slug}](https://dsc.bio/${b.payload.user.details.slug})`
+							].join("\n"))
+							.setColor(Colors.green)
+							.toJSON()
+					]
+				});
 				return res.status(200).end("Finished, check your profile (f!uinfo).");
 			})
 			.get("/reddit", async (req, res) => {
@@ -142,6 +173,23 @@ export default class CallbackRoute extends Route {
 
 				if (!!u.socials.find(s => s.type === "reddit" && s.id === user.id)) {
 					Logger.debug("Reddit Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with a duplicate Reddit account, @${user.name} (${user.id}).`);
+					await this.client.w.get("logs").execute({
+						username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
+						avatarURL: "https://i.furry.bot/furry.png",
+						embeds: [
+							new EmbedBuilder("en")
+								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+								.setTitle("Duplicate Social Link: Reddit")
+								.setTimestamp(new Date().toISOString())
+								.setDescription([
+									`URL: [https://www.reddit.com/user/${user.name}](https://www.reddit.com/user/${user.name})`,
+									`Username: **${user.name}**`,
+									`ID: **${user.id}**`
+								].join("\n"))
+								.setColor(Colors.red)
+								.toJSON()
+						]
+					});
 					return res.status(400).end("Duplicate account detected. To refresh your username, remove the account and log back in.");
 				}
 
@@ -171,6 +219,24 @@ export default class CallbackRoute extends Route {
 
 				Logger.debug("Reddit Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with Reddit, @${user.name} (${user.id}).`);
 
+				await this.client.w.get("logs").execute({
+					username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
+					avatarURL: "https://i.furry.bot/furry.png",
+					embeds: [
+						new EmbedBuilder("en")
+							.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+							.setTitle("Successful Social Link: Reddit")
+							.setTimestamp(new Date().toISOString())
+							.setDescription([
+								`URL: [https://www.reddit.com/user/${user.name}](https://www.reddit.com/user/${user.name})`,
+								`Username: **${user.name}**`,
+								`ID: **${user.id}**`
+							].join("\n"))
+							.setColor(Colors.green)
+							.toJSON()
+					]
+				});
+
 				return res.status(200).end("Finished, check your profile (f!uinfo).");
 			})
 			.get("/twitter", async (req, res) => {
@@ -194,6 +260,23 @@ export default class CallbackRoute extends Route {
 
 					if (!!u.socials.find(s => s.type === "twitter" && s.id === user.userId)) {
 						Logger.debug("Twitter Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with a duplicate Twitter account, @${user.userName} (${user.userId}).`);
+						await this.client.w.get("logs").execute({
+							username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
+							avatarURL: "https://i.furry.bot/furry.png",
+							embeds: [
+								new EmbedBuilder("en")
+									.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+									.setTitle("Duplicate Social Link: Twitter")
+									.setTimestamp(new Date().toISOString())
+									.setDescription([
+										`URL: [https://twitter.com/${user.userName}](https://twitter.com/intent/user?user_id=${user.userId})`,
+										`Username: **${user.userName}**`,
+										`ID: **${user.userId}**`
+									].join("\n"))
+									.setColor(Colors.red)
+									.toJSON()
+							]
+						});
 						return res.status(400).end("Duplicate account detected. To refresh your username, remove the account and log back in.");
 					}
 
@@ -208,6 +291,24 @@ export default class CallbackRoute extends Route {
 					});
 
 					Logger.debug("Twitter Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with Twitter, @${user.userName} (${user.userId}).`);
+
+					await this.client.w.get("logs").execute({
+						username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
+						avatarURL: "https://i.furry.bot/furry.png",
+						embeds: [
+							new EmbedBuilder("en")
+								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+								.setTitle("Successful Social Link: Twitter")
+								.setTimestamp(new Date().toISOString())
+								.setDescription([
+									`URL: [https://twitter.com/${user.userName}](https://twitter.com/intent/user?user_id=${user.userId})`,
+									`Username: **${user.userName}**`,
+									`ID: **${user.userId}**`
+								].join("\n"))
+								.setColor(Colors.green)
+								.toJSON()
+						]
+					});
 
 					return res.status(200).end("Finished, check your profile (f!uinfo).");
 				});
