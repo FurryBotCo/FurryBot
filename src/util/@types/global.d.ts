@@ -6,6 +6,15 @@ declare global {
 		format<T extends string = string>(...args: T[]): string;
 	}
 
+	namespace Vote {
+		interface DBLVote {
+			user: string;
+			type: "upvote" | "test";
+			weekend: boolean;
+			query: string;
+			time: number;
+		}
+	}
 	namespace GlobalTypes {
 		interface DBEntry {
 			_id?: string;
@@ -174,16 +183,6 @@ declare global {
 		}
 
 		type ModLogEntry = ChannelLockEntry | ChannelUnlockEntry | WarnEntry | ClearWarningsEntry | DeleteWarnEntry | KickEntry | UnbanEntry | UnmuteEntry | SoftBanEntry | BanEntry | MuteEntry;
-	}
-
-	interface MessageToMain {
-		type: string;
-		data: any;
-		threadId: number;
-	}
-	interface MessageToWorker {
-		type: string;
-		data: any;
 	}
 
 	type FilterFlags<Base, Condition> = {

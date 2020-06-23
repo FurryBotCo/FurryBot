@@ -18,7 +18,7 @@ export default class VoteRoute extends Route {
 				if (req.headers.authorization !== config.universalKey) return res.status(401).json({ success: false, error: "Invalid authentication." });
 				if (req.body.bot !== config.client.id) return res.status(403).json({ success: false, error: "Invalid client id." });
 				const time = Date.now();
-				await mdb.collection("votes").insertOne({
+				await mdb.collection<Vote.DBLVote>("votes").insertOne({
 					user: req.body.user,
 					weekend: req.body.isWeekend,
 					query: req.body.query,
@@ -46,7 +46,7 @@ export default class VoteRoute extends Route {
 				});
 
 				client.log("debug", "DBL Vote", `Vote on DBL by user ${u.username}#${u.discriminator} (${u.id})`);
-				await u.getDMChannel().then(dm => dm.createMessage(`Hey, thanks for voting for me! We currently do not have any specific rewards, but some are planned! You can suggest some rewards with \`${config.defaults.prefix}suggest\`!`)).catch(err => null);
+				await u.getDMChannel().then(dm => dm.createMessage(`Hey, thanks for voting for me! The only current reward is Double EXP for leveling, and less cooldown between voting on weekends! You can suggest some more rewards with \`${config.defaults.prefix}suggest\`!`)).catch(err => null);
 				return res.status(200).json({
 					success: true,
 					data: {

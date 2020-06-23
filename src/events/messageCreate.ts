@@ -146,9 +146,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		t.start("leveling");
 		if (this.lvl.check(`leveling-${msg.author.id}-${msg.channel.guild.id}`)) return;
-		this.lvl.add(`leveling-${msg.author.id}-${msg.channel.guild.id}`, 6e4);
+		const v = await uConfig.checkVote();
+		this.lvl.add(`leveling-${msg.author.id}-${msg.channel.guild.id}`, v.weekend ? 3e4 : 6e4);
 		const lvl = config.leveling.calcLevel(uConfig.getLevel(msg.channel.guild.id));
-		const l = Math.floor(Math.random() * 10) + 5;
+		const l = (Math.floor(Math.random() * 10) + 5) * (v.voted ? 2 : 1);
 		await uConfig.edit({
 			levels: {
 				[msg.channel.guild.id]: uConfig.getLevel(msg.channel.guild.id) + l

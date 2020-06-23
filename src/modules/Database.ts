@@ -208,6 +208,17 @@ class Database {
 	async getWarningEntryId(guildId: string, userId: string) {
 		return (await mdb.collection<Warning>("warnings").find({ guildId, userId }).count()) + 1;
 	}
+
+	async checkVote(user: string) {
+		const v = await mdb.collection<Vote.DBLVote>("vote").find({ user }).toArray();
+
+		const e = v.find(e => e.time < Date.now() + 4.32e+7);
+
+		return {
+			voted: !!e,
+			weekend: !!e && !!e.weekend
+		};
+	}
 }
 
 const db = new Database(config.db.host, config.db.port, config.db.database, config.db.opt, config.beta);
