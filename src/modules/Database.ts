@@ -210,7 +210,7 @@ class Database {
 	}
 
 	async checkVote(user: string) {
-		const v = await mdb.collection<Vote.DBLVote>("vote").find({ user }).toArray();
+		const v = await mdb.collection<Vote.DBLVote>("votes").find({ user }).toArray();
 
 		const e = v.find(e => e.time < Date.now() + 4.32e+7);
 
