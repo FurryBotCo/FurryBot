@@ -112,7 +112,7 @@ export default new Command({
 
 		if (p === "EXIT") {
 			clearTimeout(rl);
-			await inst.edit("Navigating not active, it either timed out or the starter exited.");
+			await inst.edit("Navigating not active, it either timed out or the starter exited.").catch(err => null);
 			this.holder.remove("react", null, msg.channel.id);
 			return;
 		} else currentPost = p as number;
