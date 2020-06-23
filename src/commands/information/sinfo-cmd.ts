@@ -1,8 +1,8 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import Eris from "eris";
-import { Time } from "../../util/Functions";
 import config from "../../config";
+import { Time } from "../../util/Functions";
 
 export default new Command({
 	triggers: [
@@ -10,16 +10,18 @@ export default new Command({
 		"serverinfo",
 		"si"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
-	cooldown: 3e3,
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
+	cooldown: 2e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const o: Eris.User = await this.getRESTUser(msg.channel.guild.ownerID).catch(err => null);
+	const o: Eris.User = await this.bot.getRESTUser(msg.channel.guild.ownerID).catch(err => null);
 	const owner = !o ? `Unknown ${msg.channel.guild.ownerID}` : `${o.username}#${o.discriminator} (${o.id})`;
 
 	const fDocsUrl = "https://discordapp.com/developers/docs/resources/guild#guild-object-guild-features";
@@ -107,10 +109,10 @@ export default new Command({
 					.setDescription([
 						"**{lang:commands.information.sinfo.members}**:",
 						`\u25FD {lang:commands.information.sinfo.total}: ${msg.channel.guild.memberCount} ([{lang:commands.information.sinfo.note}](https://botapi.furry.bot/note/sinfo '{lang:commands.information.sinfo.noteContent}'))`,
-						`\u25FD <:${config.emojis.online}>: ${msg.channel.guild.members.filter(m => m.status === "online").length}`,
-						`\u25FD <:${config.emojis.idle}>: ${msg.channel.guild.members.filter(m => m.status === "idle").length}`,
-						`\u25FD <:${config.emojis.dnd}>: ${msg.channel.guild.members.filter(m => m.status === "dnd").length}`,
-						`\u25FD <:${config.emojis.offline}>: ${msg.channel.guild.members.filter(m => m.status === "offline").length}`,
+						`\u25FD ${config.emojis.online}: ${msg.channel.guild.members.filter(m => m.status === "online").length}`,
+						`\u25FD ${config.emojis.idle}: ${msg.channel.guild.members.filter(m => m.status === "idle").length}`,
+						`\u25FD ${config.emojis.dnd}: ${msg.channel.guild.members.filter(m => m.status === "dnd").length}`,
+						`\u25FD ${config.emojis.offline}: ${msg.channel.guild.members.filter(m => m.status === "offline").length}`,
 						`\u25FD {lang:commands.information.sinfo.nonBots}: ${msg.channel.guild.members.filter(m => !m.bot).length}`,
 						`\u25FD {lang:commands.information.sinfo.bots}: ${msg.channel.guild.members.filter(m => m.bot).length}`
 					].join("\n"))
@@ -132,8 +134,8 @@ export default new Command({
 						`\u25FD {lang:commands.information.sinfo.hiddenYou}: ${msg.channel.guild.channels.filter(c => !c.permissionsOf(msg.author.id).has("readMessages")).length}`,
 						`\u25FD {lang:commands.information.sinfo.visibleYou}: ${msg.channel.guild.channels.filter(c => c.permissionsOf(msg.author.id).has("readMessages")).length}`,
 						"",
-						`\u25FD {lang:commands.information.sinfo.hiddenMe}: ${msg.channel.guild.channels.filter(c => !c.permissionsOf(this.user.id).has("readMessages")).length}`,
-						`\u25FD {lang:commands.information.sinfo.visibleMe}: ${msg.channel.guild.channels.filter(c => c.permissionsOf(this.user.id).has("readMessages")).length}`
+						`\u25FD {lang:commands.information.sinfo.hiddenMe}: ${msg.channel.guild.channels.filter(c => !c.permissionsOf(this.bot.user.id).has("readMessages")).length}`,
+						`\u25FD {lang:commands.information.sinfo.visibleMe}: ${msg.channel.guild.channels.filter(c => c.permissionsOf(this.bot.user.id).has("readMessages")).length}`
 					].join("\n"))
 					.setThumbnail(msg.channel.guild.iconURL);
 				break;
@@ -178,6 +180,6 @@ export default new Command({
 		}
 	}
 	return msg.channel.createMessage({
-		embed
+		embed: embed.toJSON()
 	});
 }));

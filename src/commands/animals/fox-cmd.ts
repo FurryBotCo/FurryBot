@@ -1,21 +1,24 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import { Request } from "../../util/Functions";
 import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
-		"fox"
+		"fox",
+		"foxxo"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"attachFiles",
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"attachFiles",
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
-}, (async function (msg, uConfig, gConfig) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const img = await Request.getImageFromURL("https://foxrudor.de");
 	return msg.channel.createMessage({
 		embed:
@@ -25,6 +28,7 @@ export default new Command({
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))
 				.setImage("attachment://fox.png")
+				.toJSON()
 	}, {
 		file: img,
 		name: "fox.png"

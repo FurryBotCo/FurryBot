@@ -1,27 +1,28 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import EmbedBuilder from "../../util/EmbedBuilder";
-import Eris from "eris";
-import db from "../../modules/Database";
-import config from "../../config";
+import Command from "../../modules/CommandHandler/Command";
 import { Colors } from "../../util/Constants";
+import Eris from "eris";
+import config from "../../config";
+import E9 from "../../modules/External/E9API";
 
 export default new Command({
 	triggers: [
 		"e926",
 		"e9"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks",
-		"attachFiles"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks",
+			"attachFiles"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (!msg.channel.permissionsOf(this.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly without the `manageMessages` permission!");
-	if (this.holder.has("react", null, msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("{lang:other.error.duplicatePagination}");
+	if (!msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) await msg.channel.createMessage("Warning: this command may not function properly without the `manageMessages` permission!");
+	if (this.holder.has("react", null, msg.channel.id) && !config.developers.includes(msg.author.id)) return msg.reply("{lang:other.errors.duplicatePagination}");
 
 	const tags = msg.args.map(a => a.replace(/,\|/g, ""));
 	if (tags.length > 40) return msg.reply("you can only specify up to fourty (40) tags.");
@@ -30,7 +31,7 @@ export default new Command({
 	if (bl !== null && bl.length > 0) return msg.channel.createMessage(`Your search contained blacklisted tags, **${bl.join("**, **")}**`);
 
 	if (!tags.some(t => t.match(new RegExp("order:(((score|tagcount|desclength|comments|mpixels|filesize|set)(_asc|_desc)?)|(id|landscape|portrait))", "gi")))) tags.push("order:score");
-	const e = await this.e9.listPosts([...tags, "rating:s"], 50, 1, null, config.tagBlacklist).then(res => res.filter(p => p.rating === "s"));
+	const e = await E9.listPosts([...tags, "rating:s"], 50, 1, null, config.tagBlacklist).then(res => res.filter(p => p.rating === "s"));
 
 	if (e.length === 0) return msg.reply("your search returned no results.");
 
@@ -66,8 +67,9 @@ export default new Command({
 	const inst = await msg.channel.createMessage(`To navigate posts, you can reply with one of the following:\n**first**, **back**, **stop**, **next**, **last**.`);
 
 	const f = (async () => {
-		const d = await this.col.awaitMessage(msg.channel.id, msg.author.id, 6e4);
-		if (!d) return setPost.call(this, "EXIT");
+		const d = await this.c.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id || m.member.permission.has("administrator"), 1);
+		if (!d || !d.content) return setPost.call(this, "EXIT");
+		if (d.author.id !== msg.author.id && (d.content.toLowerCase() !== "stop" || !d.member.permission.has("administrator"))) d.content = "continue";
 
 		switch (d.content.toLowerCase()) {
 			case "first":
@@ -92,11 +94,12 @@ export default new Command({
 				setPost.call(this, e.length);
 				break;
 
+			case "continue":
 			default:
 				return f();
 		}
 
-		if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) await d.delete().catch(err => null);
+		if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) await d.delete().catch(err => null);
 
 		return f();
 	});

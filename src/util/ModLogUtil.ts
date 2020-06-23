@@ -1,10 +1,11 @@
 import FurryBot from "../main";
 import Eris from "eris";
 import EmbedBuilder from "./EmbedBuilder";
-import db from "../modules/Database";
-import { Time } from "./Functions";
+import db, { mdb } from "../modules/Database";
+import { Time, Strings } from "./Functions";
 import { Colors } from "./Constants";
 import config from "../config";
+import { InsertOneWriteOpResult, WithId } from "mongodb";
 
 export default class ModLogUtil {
 	client: FurryBot;
@@ -21,20 +22,26 @@ export default class ModLogUtil {
 		blame: B;
 		target: Eris.User | Eris.Member;
 		reason?: string;
-		id: string;
+		id: number;
 		type: "warn";
+	} | {
+		blame: B;
+		target: Eris.User | Eris.Member;
+		reason?: string;
+		totalWarnings: number;
+		type: "clearwarnings";
 	} | {
 		blame: B;
 		oldBlame: string;
 		target: Eris.User | Eris.Member;
 		reason?: string;
-		id: string;
+		id: string | number; // string is legacy
 		type: "rmwarn" | "delwarn";
 	} | {
 		blame: B;
 		target: Eris.User | Eris.Member;
 		reason?: string;
-		type: "hackban" | "kick" | "unban" | "unmute";
+		type: "kick" | "unban" | "unmute";
 	} | {
 		blame: B;
 		target: Eris.User | Eris.Member;
@@ -65,7 +72,7 @@ export default class ModLogUtil {
 				}
 			});
 		}
-		if (!["sendMessages", "embedLinks"].some(p => ch.guild.channels.get(g.settings.modlog).permissionsOf(this.client.user.id).has(p))) {
+		if (!["sendMessages", "embedLinks"].some(p => ch.guild.channels.get(g.settings.modlog).permissionsOf(this.client.bot.user.id).has(p))) {
 			await ch.createMessage("{lang:other.modlog.missingPermissions}").catch(err => null);
 			await g.edit({
 				settings: {
@@ -74,6 +81,7 @@ export default class ModLogUtil {
 			});
 		}
 		let reason: string;
+		const pos = await db.getModlogEntryId(g.id);
 		const embed =
 			new EmbedBuilder(g.settings.lang)
 				.setAuthor(ch.guild.name, ch.guild.iconURL);
@@ -84,10 +92,24 @@ export default class ModLogUtil {
 			reason = !!data.reason ? data.reason : "None Provided";
 		}
 
+		let e: InsertOneWriteOpResult<WithId<ModLogEntry.GenericEntry>>;
+
 		switch (data.type) {
 			case "ban": {
+				e = await mdb.collection<ModLogEntry.BanEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "ban",
+					time: data.time,
+					deleteDays: data.deleteDays,
+					pos,
+					guildId: g.id,
+					messageId: null
+				});
+
 				embed
-					.setTitle("{lang:other.modlog.titles.ban}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.ban}`)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
@@ -99,8 +121,19 @@ export default class ModLogUtil {
 			}
 
 			case "mute": {
+				e = await mdb.collection<ModLogEntry.MuteEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "mute",
+					time: data.time,
+					pos,
+					guildId: g.id,
+					messageId: null
+				});
+
 				embed
-					.setTitle("{lang:other.modlog.titles.mute}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.mute}`)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
@@ -110,20 +143,19 @@ export default class ModLogUtil {
 				break;
 			}
 
-			case "hackban": {
-				embed
-					.setTitle("{lang:other.modlog.titles.hackban}")
-					.setColor(Colors.red)
-					.setDescription([
-						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
-						`{lang:other.modlog.fields.reason}: ${reason}`
-					].join("\n"));
-				break;
-			}
-
 			case "kick": {
+				e = await mdb.collection<ModLogEntry.KickEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "kick",
+					pos,
+					guildId: g.id,
+					messageId: null
+				});
+
 				embed
-					.setTitle("{lang:other.modlog.titles.kick}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.kick}`)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
@@ -133,8 +165,19 @@ export default class ModLogUtil {
 			}
 
 			case "softban": {
+				e = await mdb.collection<ModLogEntry.SoftBanEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "softban",
+					deleteDays: data.deleteDays,
+					pos,
+					guildId: g.id,
+					messageId: null
+				});
+
 				embed
-					.setTitle("{lang:other.modlog.titles.softban}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.softban}`)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
@@ -145,8 +188,18 @@ export default class ModLogUtil {
 			}
 
 			case "unban": {
+				e = await mdb.collection<ModLogEntry.UnbanEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "unban",
+					pos,
+					guildId: g.id,
+					messageId: null
+				});
+
 				embed
-					.setTitle("{lang:other.modlog.titles.unban}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.unban}`)
 					.setColor(Colors.green)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
@@ -156,8 +209,18 @@ export default class ModLogUtil {
 			}
 
 			case "unmute": {
+				e = await mdb.collection<ModLogEntry.UnmuteEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "unmute",
+					pos,
+					guildId: g.id,
+					messageId: null
+				});
+
 				embed
-					.setTitle("{lang:other.modlog.titles.unmute}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.unmute}`)
 					.setColor(Colors.green)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
@@ -167,8 +230,19 @@ export default class ModLogUtil {
 			}
 
 			case "warn": {
+				e = await mdb.collection<ModLogEntry.WarnEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "warn",
+					pos,
+					guildId: g.id,
+					id: data.id as any,
+					messageId: null
+				});
+
 				embed
-					.setTitle("{lang:other.modlog.titles.warn}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.warn}`)
 					.setColor(Colors.gold)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
@@ -178,7 +252,6 @@ export default class ModLogUtil {
 				break;
 			}
 
-			case "rmwarn":
 			case "delwarn": {
 				let b: string;
 				if (!data.oldBlame) b = "{lang:other.modlog.fields.unknown}";
@@ -186,16 +259,28 @@ export default class ModLogUtil {
 				else if (ch.guild.members.has(data.oldBlame)) {
 					const m = ch.guild.members.get(data.oldBlame);
 					b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
-				} else if (this.client.users.has(data.oldBlame)) {
-					const m = this.client.users.get(data.oldBlame);
+				} else if (this.client.bot.users.has(data.oldBlame)) {
+					const m = this.client.bot.users.get(data.oldBlame);
 					b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
 				} else {
-					const m = await this.client.getRESTUser(data.oldBlame);
+					const m = await this.client.bot.getRESTUser(data.oldBlame);
 					b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
 				}
 
+				e = await mdb.collection<ModLogEntry.DeleteWarnEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "delwarn",
+					pos,
+					guildId: g.id,
+					oldBlame: b,
+					id: data.id as any,
+					messageId: null
+				});
+
 				embed
-					.setTitle("{lang:other.modlog.titles.delwarn}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.delwarn}`)
 					.setColor(Colors.gold)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
@@ -206,9 +291,40 @@ export default class ModLogUtil {
 				break;
 			}
 
-			case "lock": {
+			case "clearwarnings": {
+				e = await mdb.collection<ModLogEntry.ClearWarningsEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "clearwarnings",
+					pos,
+					guildId: g.id,
+					totalWarnings: data.totalWarnings,
+					messageId: null
+				});
 				embed
-					.setTitle("{lang:other.modlog.titles.lock}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.clearwarnings}`)
+					.setColor(Colors.gold)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${data.target.username}#${data.target.discriminator} <@!${data.target.id}>`,
+						`{lang:other.modlog.fields.totalWarnings}: ${data.totalWarnings}`
+					].join("\n"));
+				break;
+			}
+
+			case "lock": {
+				e = await mdb.collection<ModLogEntry.ChannelLockEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "lock",
+					pos,
+					guildId: g.id,
+					messageId: null
+				});
+
+				embed
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.lock}`)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.name} <#${data.target.id}>`,
@@ -218,8 +334,18 @@ export default class ModLogUtil {
 			}
 
 			case "unlock": {
+				e = await mdb.collection<ModLogEntry.ChannelUnlockEntry>("modlog").insertOne({
+					blame: data.blame instanceof Eris.User ? data.blame.id : data.blame as unknown as string,
+					target: data.target.id,
+					reason,
+					type: "unlock",
+					pos,
+					guildId: g.id,
+					messageId: null
+				});
+
 				embed
-					.setTitle("{lang:other.modlog.titles.unlock}")
+					.setTitle(`{lang:other.modlog.titles.general|${pos}} | {lang:other.modlog.titles.unlock}`)
 					.setColor(Colors.green)
 					.setDescription([
 						`{lang:other.modlog.fields.target}: ${data.target.name} <#${data.target.id}>`,
@@ -236,9 +362,11 @@ export default class ModLogUtil {
 
 		embed.setTimestamp(new Date().toISOString());
 
-		const mdl = ch.guild.channels.get<Eris.GuildTextableChannel>(g.settings.modlog);
-		return mdl.createMessage({
-			embed
+		const mdl = ch.guild.channels.get(g.settings.modlog) as Eris.GuildTextableChannel;
+		const msg = await mdl.createMessage({
+			embed: embed.toJSON()
 		}).catch(err => null);
+
+		if (!!msg && !!e && e.ops.length !== 0) await mdb.collection<ModLogEntry.GenericEntry>("modlog").findOneAndUpdate({ _id: e.ops[0]._id }, { $set: { messageId: msg.id } });
 	}
 }

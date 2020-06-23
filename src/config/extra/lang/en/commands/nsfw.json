@@ -1,0 +1,39 @@
+{
+	"bulge": {
+		"description": "*notices bulge* OwO",
+		"usage": "",
+		"title": "Bulge"
+	},
+	"e621": {
+		"description": "Get some content from E621!",
+		"usage": "[tags]",
+		"title": "E621"
+	},
+	"fursuitbutts": {
+		"description": "See some fursuit booties!",
+		"usage": "",
+		"title": "Fursuit Butts"
+	},
+	"linkroulette": {
+		"description": "Fetch a random short url - high chance to be nsfw!",
+		"usage": "",
+		"title": "Link Roulette",
+		"invalid": "command produced an invalid selection.",
+		"link": "Link",
+		"noResults": "no results were found."
+	},
+	"prntscr": {
+		"description": "Fetch a random image from print screen (lightshot)",
+		"usage": ""
+	},
+	"yiff": {
+		"description": "Get some yiff!",
+		"usage": "[gay/straight/lesbian/dickgirl]",
+		"title": {
+			"gay": "Gay Yiff",
+			"straight": "Straight Yiff",
+			"lesbian": "Lesbian Yiff",
+			"dickgirl": "Dickgirl Yiff"
+		}
+	}
+}

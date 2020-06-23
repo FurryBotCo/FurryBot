@@ -1,23 +1,28 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import Eris from "eris";
-import chunk from "chunk";
-import config from "../../config";
-import { Colors } from "../../util/Constants";
-import { Utility, Internal } from "../../util/Functions";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import chunk from "chunk";
+import Eris from "eris";
+import config from "../../config";
+import { Utility, Internal } from "../../util/Functions";
 import Language from "../../util/Language";
+import { Colors } from "../../util/Constants";
 
 export default new Command({
 	triggers: [
 		"settings"
 	],
-	userPermissions: [
-		"manageGuild"
-	],
-	botPermissions: [],
-	cooldown: 1e3,
-	donatorCooldown: 1e3,
-	features: [],
+	permissions: {
+		user: [
+			"manageGuild"
+		],
+		bot: [
+			"embedLinks",
+			"externalEmojis"
+		]
+	},
+	cooldown: 3e3,
+	donatorCooldown: 3e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const str = config.settings.map(s => ({ [s.name.toLowerCase()]: s.dbName })).reduce((a, b) => ({ ...a, ...b }));
@@ -47,34 +52,34 @@ export default new Command({
 
 						switch (s.type) {
 							case "boolean": {
-								v = !!s.value ? `<:${config.emojis.greenTick}>` : `<:${config.emojis.redTick}>`;
+								v = !!s.value ? config.emojis.greenTick : config.emojis.redTick;
 								break;
 							}
 
 							case "channel": {
-								v = !s.value ? "{lang:commands.utility.settings.none}" : `<#${s.value}>`;
+								v = !s.value ? "{lang:other.words.none}" : `<#${s.value}>`;
 								break;
 							}
 
 							case "role": {
-								v = !s.value ? "{lang:commands.utility.settings.none}" : `<@&${s.value}>`;
+								v = !s.value ? "{lang:other.words.none}" : `<@&${s.value}>`;
 								break;
 							}
 
 							case "array": {
 								switch (s.subType) {
 									case "channel": {
-										v = !s.value || s.value.length === 0 ? "{lang:commands.utility.settings.none}" : s.value.map(v => `<#${v}>`).join(", ");
+										v = !s.value || s.value.length === 0 ? "{lang:other.words.none}" : s.value.map(v => `<#${v}>`).join(", ");
 										break;
 									}
 
 									case "role": {
-										v = !s.value || s.value.length === 0 ? "{lang:commands.utility.settings.none}" : s.value.map(v => `<@&${v}>`).join(", ");
+										v = !s.value || s.value.length === 0 ? "{lang:other.words.none}" : s.value.map(v => `<@&${v}>`).join(", ");
 										break;
 									}
 
 									case "user": {
-										v = !s.value || s.value.length === 0 ? "{lang:commands.utility.settings.none}" : s.value.map(v => `<@!${v}>`).join(", ");
+										v = !s.value || s.value.length === 0 ? "{lang:other.words.none}" : s.value.map(v => `<@!${v}>`).join(", ");
 										break;
 									}
 								}
@@ -96,6 +101,7 @@ export default new Command({
 				.setFooter(`{lang:commands.utility.settings.footer|${page}|${pages.length}|${gConfig.settings.prefix}}`)
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.gold)
+				.toJSON()
 		});
 	}
 
@@ -127,7 +133,7 @@ export default new Command({
 					});
 					cur = null;
 				}
-				return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? `<#${cur}>` : Language.get(gConfig.settings.lang).get("other.none").toUpperCase()}}`);
+				return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? `<#${cur}>` : Language.get(gConfig.settings.lang, "other.words.none", false).toUpperCase()}}`);
 			}
 			let ci: string;
 			const a = v.match("^([0-9]{17,19})$");
@@ -142,7 +148,7 @@ export default new Command({
 
 			const ch = msg.channel.guild.channels.get(ci);
 			if (!ch) return msg.reply("{lang:commands.utility.settings.chNotFound}");
-			if (!ch.permissionsOf(this.user.id).has("sendMessages")) return msg.reply(`{lang:commands.utility.settings.chPermMissing|${ch.id}}`);
+			if (!ch.permissionsOf(this.bot.user.id).has("sendMessages")) return msg.reply(`{lang:commands.utility.settings.chPermMissing|${ch.id}}`);
 
 			await gConfig.edit({
 				settings: {
@@ -150,7 +156,7 @@ export default new Command({
 				}
 			});
 
-			return msg.reply(`{lang:commands.utility.settings.set${n}|${cur === null ? Language.get(gConfig.settings.lang).get("other.none").toUpperCase() : `<#${cur}>`}|<#${ch.id}}`);
+			return msg.reply(`{lang:commands.utility.settings.set|${n}|${cur === null ? Language.get(gConfig.settings.lang, "other.words.none", false).toUpperCase() : `<#${cur}>`}|<#${ch.id}>}`);
 			break;
 		}
 
@@ -167,7 +173,12 @@ export default new Command({
 
 				let k: Eris.Role;
 				if (cur) k = msg.channel.guild.roles.get(cur);
-				return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? k.name : Language.get(gConfig.settings.lang).get("other.none").toUpperCase()}}`);
+				return msg.reply({
+					content: `{lang:commands.utility.settings.current|${n}|${cur ? `<@&${k.id}>` : Language.get(gConfig.settings.lang, "other.words.none", false).toUpperCase()}}`,
+					allowedMentions: {
+						roles: []
+					}
+				});
 			}
 			let ri: string;
 			const a = v.match("^([0-9]{17,19})$");
@@ -181,7 +192,7 @@ export default new Command({
 			const r = msg.channel.guild.roles.get(ri);
 			if (!r) return msg.reply("{lang:commands.utility.settings.roleNotFound}");
 			if (r.id === gConfig.settings[s]) return msg.reply("{lang:commands.utility.settings.unchanged}");
-			const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), r);
+			const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), r);
 
 			if (p.lower || p.same) return msg.reply("{lang:commands.utility.settings.roleHigher}");
 
@@ -191,7 +202,12 @@ export default new Command({
 				}
 			});
 
-			return msg.reply(`{lang:commands.utility.settings.set|${n}|${r.name}}`);
+			return msg.reply({
+				content: `{lang:commands.utility.settings.set|${n}|${cur === null ? Language.get(gConfig.settings.lang, "other.words.none", false).toUpperCase() : `<@&${cur}>`}|<@&${r.id}>}`,
+				allowedMentions: {
+					roles: []
+				}
+			});
 			break;
 		}
 
@@ -283,7 +299,7 @@ export default new Command({
 							});
 							cur = null;
 						}
-						return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? `<#${cur}>` : Language.get(gConfig.settings.lang).get("other.none").toUpperCase()}}`);
+						return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? `<#${cur}>` : Language.get(gConfig.settings.lang, "other.words.none", false).toUpperCase()}}`);
 					}
 					let ci: string;
 					const a = v.match("^([0-9]{17,19})$");
@@ -298,7 +314,7 @@ export default new Command({
 
 					const ch = msg.channel.guild.channels.get(ci);
 					if (!ch) return msg.reply("{lang:commands.utility.settings.chNotFound}");
-					if (!ch.permissionsOf(this.user.id).has("sendMessages")) return msg.reply(`{lang:commands.utility.settings.chPermMissing|${ch.id}}`);
+					if (!ch.permissionsOf(this.bot.user.id).has("sendMessages")) return msg.reply(`{lang:commands.utility.settings.chPermMissing|${ch.id}}`);
 
 					await gConfig.edit({
 						settings: {
@@ -306,7 +322,7 @@ export default new Command({
 						}
 					});
 
-					return msg.reply(`{lang:commands.utility.settings.set${n}|${cur === null ? Language.get(gConfig.settings.lang).get("other.none").toUpperCase() : `<#${cur}>`}|<#${ch.id}}`);
+					return msg.reply(`{lang:commands.utility.settings.set${n}|${cur === null ? Language.get(gConfig.settings.lang, "other.words.none", false).toUpperCase() : `<#${cur}>`}|<#${ch.id}}`);
 					break;
 				}
 
@@ -323,7 +339,7 @@ export default new Command({
 
 						let k: Eris.Role;
 						if (cur) k = msg.channel.guild.roles.get(cur);
-						return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? k.name : Language.get(gConfig.settings.lang).get("other.none").toUpperCase()}}`);
+						return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? k.name : Language.get(gConfig.settings.lang, "other.words.none", false).toUpperCase()}}`);
 					}
 					let ri: string;
 					const a = v.match("^([0-9]{17,19})$");
@@ -337,7 +353,7 @@ export default new Command({
 					const r = msg.channel.guild.roles.get(ri);
 					if (!r) return msg.reply("{lang:commands.utility.settings.roleNotFound}");
 					if (r.id === gConfig.settings[s]) return msg.reply("{lang:commands.utility.settings.unchanged}");
-					const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), r);
+					const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), r);
 
 					if (p.lower || p.same) return msg.reply("{lang:commands.utility.settings.roleHigher}");
 
@@ -364,7 +380,7 @@ export default new Command({
 
 						let k: Eris.Role;
 						if (cur) k = msg.channel.guild.roles.get(cur);
-						return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? k.name : Language.get(gConfig.settings.lang).get("other.none").toUpperCase()}}`);
+						return msg.reply(`{lang:commands.utility.settings.current|${n}|${cur ? k.name : Language.get(gConfig.settings.lang, "other.words.none", false).toUpperCase()}}`);
 					}
 					let ri: string;
 					const a = v.match("^([0-9]{17,19})$");
@@ -378,7 +394,7 @@ export default new Command({
 					const r = msg.channel.guild.roles.get(ri);
 					if (!r) return msg.reply("{lang:commands.utility.settings.roleNotFound}");
 					if (r.id === gConfig.settings[s]) return msg.reply("{lang:commands.utility.settings.unchanged}");
-					const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.user.id), r);
+					const p = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), r);
 
 					if (p.lower || p.same) return msg.reply("{lang:commands.utility.settings.roleHigher}");
 

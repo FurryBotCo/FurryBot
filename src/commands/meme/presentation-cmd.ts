@@ -1,19 +1,28 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import GenericMemeCommand from "../../util/CommandHandler/lib/generics/GenericMemeCommand";
+import Command from "../../modules/CommandHandler/Command";
+import { DankMemerAPI } from "../../modules/External";
 
 export default new Command({
 	triggers: [
 		"presentation"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"attachFiles"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"attachFiles"
+		]
+	},
 	cooldown: 2.5e3,
 	donatorCooldown: 2e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	// await msg.channel.startTyping();
-	return GenericMemeCommand.handleText(this, msg, uConfig, gConfig, cmd.triggers[0]);
+	let member = await msg.getMemberFromArgs();
+	if (!member) member = msg.member;
+	// @TODO not sure how to really internalize this one yet
+	const img = await DankMemerAPI.quote(member.avatarURL, member.username, member.id === msg.author.id ? msg.args.join(" ") || "Provide Some Text." : msg.args.slice(1).join(" ") || "Provide Some Text.");
+
+	return msg.channel.createMessage("", {
+		file: img.file,
+		name: `${cmd.triggers[0]}.${img.ext}`
+	});
 }));

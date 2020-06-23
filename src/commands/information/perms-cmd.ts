@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors, Permissions } from "../../util/Constants";
 
@@ -7,13 +7,15 @@ export default new Command({
 		"perms",
 		"listperms"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const member = msg.args.filter(a => !a.startsWith("--")).length === 0 ? msg.member : await msg.getMemberFromArgs();
@@ -28,14 +30,15 @@ export default new Command({
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.green)
 			.setDescription([
-				`{lang:commands.information.perms.${member.id === msg.member.id ? "self" : "other"}}`,
+				`{lang:commands.information.perms.${member.id === msg.member.id ? "self" : `other|${msg.author.tag}`}}`,
 				"```diff",
-				...Object.keys(Permissions.constant).filter(p => !remove.includes(p)).map(p => `${member.permission.has(p) ? "+" : "-"} ${msg.dashedArgs.parsed.value.includes("compact") ? p : `{lang:other.permissions.${p}}`}`),
+				...Object.keys(Permissions.constant).filter(p => !remove.includes(p)).map(p => `${member.permission.has(p) ? "+" : "-"} ${msg.dashedArgs.parsed.value.includes("compact") ? p : `{lang:other.permissions.names.${p}}`}`),
 				"```",
 				...(!msg.dashedArgs.parsed.value.includes("compact") ? [
 					"",
 					`{lang:commands.information.perms.compact|${gConfig.settings.prefix}|${member.username}#${member.discriminator}}`
 				] : [])
 			].join("\n"))
+			.toJSON()
 	});
 }));

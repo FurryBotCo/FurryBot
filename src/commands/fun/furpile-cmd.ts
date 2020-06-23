@@ -1,18 +1,19 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import config from "../../config";
+import Command from "../../modules/CommandHandler/Command";
 import Eris from "eris";
+import config from "../../config";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
 		"furpile"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"externalEmojis"
-	],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const h = this.holder.has("furpile", msg.channel.id);
@@ -26,7 +27,7 @@ export default new Command({
 		this.holder.set("furpile", `${msg.channel.id}.timeout`, setTimeout((ch: Eris.GuildTextableChannel) => { this.holder.remove("furpile", ch.id); this.holder.remove("furpile", `${ch.id}.timeout`); }, 18e5, msg.channel));
 		return msg.channel.createMessage(`{lang:commands.fun.furpile.join|${msg.author.id}|${c.length}|${c.length + 1}|${gConfig.settings.prefix}}`);
 	} else {
-		if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 		const m = await msg.getMemberFromArgs();
 		if (!m) return msg.errorEmbed("INVALID_MEMBER");
 		if (m.id === msg.author.id) return msg.reply("{lang:commands.fun.furpile.noSelf}");

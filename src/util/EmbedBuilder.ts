@@ -1,4 +1,4 @@
-import Eris from "eris";
+import Eris, { Embed } from "eris";
 import Language from "./Language";
 import GuildConfig from "../modules/config/GuildConfig";
 
@@ -27,7 +27,8 @@ export default class EmbedBuilder {
 	}
 
 	getDescription() { return String(this.data.description); }
-	setDescription(desc: string) {
+	setDescription(desc: string | string[]) {
+		if (desc instanceof Array) desc = desc.join("\n");
 		this.data.description = Language.get(this.lang).parseString(desc);
 		return this;
 	}
@@ -96,6 +97,11 @@ export default class EmbedBuilder {
 			value: Language.get(this.lang).parseString(value),
 			inline
 		});
+		return this;
+	}
+
+	addFields(...fields: { name: string; value: string; inline?: boolean; }[]) {
+		fields.filter(f => !!f).map(f => this.addField(f.name, f.value, f.inline));
 		return this;
 	}
 

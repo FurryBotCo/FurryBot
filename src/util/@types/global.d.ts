@@ -1,4 +1,5 @@
 import Eris from "eris";
+import FurryBot from "../../main";
 
 declare global {
 	interface String {
@@ -51,6 +52,176 @@ declare global {
 			};
 			addedBy: string;
 			time: 5 | 10 | 15 | 30 | 60;
+		}
+	}
+
+	type DeepPartial<T> = {
+		[P in keyof T]?: Partial<T[P]>;
+	}
+
+	type ArrayOneOrMore<T> = {
+		0: T;
+	} & T[];
+
+	type ThenArg<T> = T extends PromiseLike<infer U> ? U : T;
+
+	type OverloadedReturnType<T> =
+		T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R } ? R :
+		T extends { (...args: any[]): infer R; (...args: any[]): infer R; (...args: any[]): infer R } ? R :
+		T extends { (...args: any[]): infer R; (...args: any[]): infer R } ? R :
+		T extends (...args: any[]) => infer R ? R : any;
+
+	type ReturnTypeWithArgs<T extends (...args: any[]) => any, ARGS_T> =
+		Extract<
+			T extends { (...args: infer A1): infer R1; (...args: infer A2): infer R2; (...args: infer A3): infer R3; (...args: infer A4): infer R4; } ? [A1, R1] | [A2, R2] | [A3, R3] | [A4, R4] :
+			T extends { (...args: infer A1): infer R1; (...args: infer A2): infer R2; (...args: infer A3): infer R3; } ? [A1, R1] | [A2, R2] | [A3, R3] :
+			T extends { (...args: infer A1): infer R1; (...args: infer A2): infer R2; } ? [A1, R1] | [A2, R2] :
+			T extends { (...args: infer A1): infer R1; } ? [A1, R1] :
+			never,
+			[ARGS_T, any]
+		>[1];
+
+	interface Warning {
+		blameId: string;
+		guildId: string;
+		userId: string;
+		id: string | number; // string is legacy
+		reason: string;
+		date: number;
+	}
+
+	namespace ModLogEntry {
+		interface GenericEntry {
+			pos: number;
+			reason: string;
+			type: string;
+			guildId: string;
+			messageId?: string; // due to the way ModLogUtil works, this may be missing
+		}
+
+		interface ChannelLockEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			type: "lock";
+		}
+
+		interface ChannelUnlockEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			type: "unlock";
+		}
+
+		interface WarnEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			id: number;
+			type: "warn";
+		}
+
+		interface ClearWarningsEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			totalWarnings: number;
+			type: "clearwarnings";
+		}
+
+		interface DeleteWarnEntry extends GenericEntry {
+			blame: string;
+			oldBlame: string;
+			target: string;
+			id: string | number; // string is legacy
+			type: "delwarn";
+		}
+
+		interface KickEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			type: "kick";
+		}
+
+		interface UnbanEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			type: "unban";
+		}
+
+		interface UnmuteEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			type: "unmute";
+		}
+
+		interface SoftBanEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			deleteDays?: number;
+			type: "softban";
+		}
+
+		interface BanEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			time?: number;
+			deleteDays?: number;
+			type: "ban";
+		}
+
+		interface MuteEntry extends GenericEntry {
+			blame: string;
+			target: string;
+			time?: number;
+			type: "mute";
+		}
+
+		type ModLogEntry = ChannelLockEntry | ChannelUnlockEntry | WarnEntry | ClearWarningsEntry | DeleteWarnEntry | KickEntry | UnbanEntry | UnmuteEntry | SoftBanEntry | BanEntry | MuteEntry;
+	}
+
+	interface MessageToMain {
+		type: string;
+		data: any;
+		threadId: number;
+	}
+	interface MessageToWorker {
+		type: string;
+		data: any;
+	}
+
+	type FilterFlags<Base, Condition> = {
+		[Key in keyof Base]: Base[Key] extends Condition ? Key : never;
+	};
+	type AllowedNames<Base, Condition> = FilterFlags<Base, Condition>[keyof Base];
+	type BetterFilter<Base, Condition> = Pick<Base, keyof Omit<Base, AllowedNames<Base, Condition>>>;
+	type WithoutFunctions<T> = BetterFilter<T, Function>;
+
+	namespace NodeJS {
+		interface Global {
+			bot: FurryBot;
+		}
+	}
+
+	namespace Blacklist {
+		interface GenericEntry {
+			created: number;
+			type: "user" | "guild";
+			blame: string;
+			blameId: string;
+			reason: string;
+			id: string;
+			noticeShown: boolean;
+			expire?: number;
+			userId?: string;
+			guildId?: string;
+			report?: string;
+		}
+
+		interface GuildEntry extends GenericEntry {
+			type: "guild";
+			guildId: string;
+		}
+
+		interface UserEntry extends GenericEntry {
+			type: "user";
+			userId: string;
 		}
 	}
 

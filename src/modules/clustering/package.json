@@ -1,0 +1,24 @@
+{
+  "name": "clustering",
+  "version": "1.0.0",
+  "description": "Clustering for furry bot.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FurryBotCo/FurryBot.git"
+  },
+  "author": "Donovan_DMC <dwddaniels262@gmail.com> (https://furry.cool)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FurryBotCo/FurryBot/issues"
+  },
+  "homepage": "https://github.com/FurryBotCo/FurryBot#readme",
+  "dependencies": {
+    "chalk": "^4.0.0",
+    "eris": "github:abalabahaha/eris#dev",
+    "tsee": "^1.3.0"
+  }
+}

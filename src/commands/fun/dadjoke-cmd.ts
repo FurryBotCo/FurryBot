@@ -1,18 +1,19 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import config from "../../config";
+import Command from "../../modules/CommandHandler/Command";
 import phin from "phin";
-
+import config from "../../config";
 export default new Command({
 	triggers: [
 		"dadjoke"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const req = await phin<any>({

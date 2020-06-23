@@ -4,14 +4,20 @@ import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
 import { Utility, Time } from "../util/Functions";
+import config from "../config";
 
 export default new ClientEvent("guildUpdate", (async function (this: FurryBot, guild: Eris.Guild, oldGuild) {
 	this.track("events", "guildUpdate");
 
+	if (config.beta && !config.client.betaEventGuilds.includes(guild.id)) return;
+
 	const g = await db.getGuild(guild.id);
-	const e = g.logEvents.guildUpdate;
-	if (!e.enabled || !e.channel) return;
-	const ch = guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
+	const e = g.logEvents.find(l => l.type === "guildUpdate");
+	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+	const ch = guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+	if (!ch) return g.mongoEdit({ $pull: e });
 
 	const props: { [k: string]: { type: string; name: string; } } = {
 		name: {

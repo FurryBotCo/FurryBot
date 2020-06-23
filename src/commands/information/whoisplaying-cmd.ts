@@ -1,22 +1,24 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
 		"whoisplaying",
 		"whoplays"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
-	cooldown: 3e3,
+	permissions: {
+		user: [],
+		bot: [
+		]
+	},
+	cooldown: 2e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 	const l = msg.channel.guild.members.filter(m => m.game && m.game.name.toLowerCase().includes(msg.args.join(" ").toLowerCase()));
 
 	return msg.channel.createMessage({
@@ -29,5 +31,6 @@ export default new Command({
 			].join("\n"))
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.gold)
+			.toJSON()
 	});
 }));

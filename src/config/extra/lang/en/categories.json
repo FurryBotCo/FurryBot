@@ -1,0 +1,46 @@
+{
+	"animals": {
+		"displayName": ":dog: Animals",
+		"description": "Cute little animals to brighten your day!"
+	},
+	"developer": {
+		"displayName": ":tools: Developer",
+		"description": "The fun developer stuffs"
+	},
+	"economy": {
+		"displayName": ":moneybag: Economy",
+		"description": "Fun money things"
+	},
+	"fun": {
+		"displayName": ":smile: Fun",
+		"description": "Some commands to spice up your chat"
+	},
+	"information": {
+		"displayName": ":tools: Information",
+		"description": "Some information that may be useful to you, may not be, I don't know."
+	},
+	"meme": {
+		"displayName": ":joy: Memey",
+		"description": "Let's get this bread."
+	},
+	"misc": {
+		"displayName": ":thumbsup: Miscellaneous",
+		"description": "Miscellaneous stuff."
+	},
+	"moderation": {
+		"displayName": ":hammer: Moderation",
+		"description": "Stomp down the server baddies with your ban hammer."
+	},
+	"music": {
+		"displayName": ":musical_note: Music",
+		"description": "Play some music inside your server!"
+	},
+	"nsfw": {
+		"displayName": ":smirk: NSFW",
+		"description": "That stuff your parents warned you about >~>"
+	},
+	"utility": {
+		"displayName": ":tools: Utility",
+		"description": "Helpful things for the bot, and your server."
+	}
+}

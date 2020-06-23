@@ -1,16 +1,18 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 
 export default new Command({
 	triggers: [
 		"dice"
 	],
-	userPermissions: [],
-	botPermissions: [],
-	cooldown: 2e3,
-	donatorCooldown: 1e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
+	restrictions: [],
 	file: __filename
-}, (async function (this, msg, uConfig, gConfig) {
+}, (async function (msg, uConfig, gConfig, cmd) {
 	const min = typeof msg.args[0] !== "undefined" ? Number(msg.args[0]) : 1;
 	const max = typeof msg.args[1] !== "undefined" ? Number(msg.args[1]) : 20;
 

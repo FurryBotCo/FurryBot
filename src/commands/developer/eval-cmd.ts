@@ -1,4 +1,4 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import config from "../../config";
 import _eval from "../../util/eval";
 import phin from "phin";
@@ -10,8 +10,9 @@ import * as os from "os";
 import { performance } from "perf_hooks";
 import * as F from "../../util/Functions";
 import Language from "../../util/Language";
-import rClient from "../../util/Redis";
 import { Permissions } from "../../util/Constants";
+import { Redis } from "../../modules/External";
+import Logger from "../../util/LoggerV10";
 
 export default new Command({
 	triggers: [
@@ -19,13 +20,13 @@ export default new Command({
 		"ev",
 		"exec"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Evaluate some stuffs.",
-	usage: "<code>",
-	features: ["devOnly"],
+	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const
@@ -56,7 +57,8 @@ export default new Command({
 			gConfig,
 			cmd,
 			Language,
-			rClient
+			Redis,
+			Logger
 		});
 	} catch (e) {
 		res = e;
@@ -79,7 +81,7 @@ export default new Command({
 		}
 	}
 
-	if (res.indexOf(config.bot.client.token) !== -1) res = res.replace(new RegExp(config.bot.client.token, "g"), "[BOT TOKEN]");
+	if (res.indexOf(config.client.token) !== -1) res = res.replace(new RegExp(config.client.token, "g"), "[BOT TOKEN]");
 	if (res.indexOf(config.universalKey) !== -1) res = res.replace(new RegExp(config.universalKey, "g"), "[UNIVERSAL KEY]");
 
 	if (deleteInvoke) await msg.delete();
@@ -90,8 +92,8 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					api_dev_key: config.keys.pastebin.devKey,
-					api_user_key: config.keys.pastebin.userKey,
+					api_dev_key: config.apiKeys.pastebin.devKey,
+					api_user_key: config.apiKeys.pastebin.userKey,
 					api_option: "paste",
 					api_paste_code: res,
 					api_paste_private: "2",
@@ -134,8 +136,8 @@ export default new Command({
 				method: "POST",
 				url: "https://pastebin.com/api/api_post.php",
 				form: {
-					api_dev_key: config.keys.pastebin.devKey,
-					api_user_key: config.keys.pastebin.userKey,
+					api_dev_key: config.apiKeys.pastebin.devKey,
+					api_user_key: config.apiKeys.pastebin.userKey,
 					api_option: "paste",
 					api_paste_code: res,
 					api_paste_private: "2",

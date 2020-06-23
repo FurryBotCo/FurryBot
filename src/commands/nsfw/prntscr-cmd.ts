@@ -1,9 +1,9 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import config from "../../config";
-import phin from "phin";
-import cheerio from "cheerio";
+import Command from "../../modules/CommandHandler/Command";
 import { Colors } from "../../util/Constants";
+import config from "../../config";
 import { Strings } from "../../util/Functions";
+import cheerio from "cheerio";
+import phin from "phin";
 
 export default new Command({
 	triggers: [
@@ -11,13 +11,18 @@ export default new Command({
 		"printscreen",
 		"pr"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"attachFiles"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"attachFiles",
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: ["nsfw"],
+	restrictions: [
+		"nsfw"
+	],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const alphabet = "abcdefghijklmnopqrstuvwxyz";

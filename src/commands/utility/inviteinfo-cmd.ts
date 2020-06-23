@@ -1,29 +1,32 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import * as Eris from "eris";
-import { Colors, ChannelNames } from "../../util/Constants";
+import Command from "../../modules/CommandHandler/Command";
+import { ChannelNames, Colors } from "../../util/Constants";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import Eris from "eris";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
 		"inviteinfo",
 		"invinfo"
 	],
-	userPermissions: [],
-	botPermissions: [],
-	cooldown: 5e3,
-	donatorCooldown: 5e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
+	cooldown: 3e3,
+	donatorCooldown: 3e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
-	const k = msg.unparsedArgs.join("").match(new RegExp("^((https?\:\/\/)?(discord\.gg|discordapp\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"));
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
+	const k = msg.unparsedArgs.join("").match(new RegExp("^((https?\:\/\/)?(discord\.gg|discord(app)?\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"));
 
 	if (!k || k.length === 0) return msg.reply("{lang:commands.utility.inviteinfo.noInv}");
-	const code = k[4];
+	const code = k[5];
 
 	if (!code) return msg.reply("{lang:commands.utility.inviteinfo.noInv}");
 
-	const inv = (await this.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
+	const inv = (await this.bot.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
 	if (!inv) return msg.reply("{lang:commands.utility.inviteinfo.invalid}");
 	const { guild, inviter, channel } = inv;
 
@@ -61,6 +64,6 @@ export default new Command({
 		embed.setThumbnail(inviter.avatarURL);
 	}
 	return msg.channel.createMessage({
-		embed
+		embed: embed.toJSON()
 	});
 }));

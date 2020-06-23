@@ -1,0 +1,386 @@
+{
+	"abandon": {
+		"description": "Why your mother abandoned you.",
+		"usage": "<text>"
+	},
+	"aborted": {
+		"description": "Why someone should've been aborted",
+		"usage": "[image]"
+	},
+	"affect": {
+		"description": "My baby won't be affected.",
+		"usage": "[image]"
+	},
+	"airpods": {
+		"description": "Sick airpods bro",
+		"usage": "[image]"
+	},
+	"america": {
+		"description": "Ameeerica, frick yeah!",
+		"usage": "[image]"
+	},
+	"armor": {
+		"description": "Nothing can penetrate my armor.",
+		"usage": "<text>"
+	},
+	"balloon": {
+		"description": "Nothing will pop this.",
+		"usage": "balloon"
+	},
+	"batslap": {
+		"description": "slap someone",
+		"usage": "<@user>"
+	},
+	"bed": {
+		"description": "There's a monster under the bed!",
+		"usage": "[image/@user]"
+	},
+	"bongocat": {
+		"description": "Bongo Bongo Bongo!",
+		"usage": "[image/@user]"
+	},
+	"boo": {
+		"description": "Spooky!",
+		"usage": "<text>"
+	},
+	"brain": {
+		"description": "This is big brain time",
+		"usage": "<text>"
+	},
+	"brazzers": {
+		"description": "Slap the brazzers logo onto that!",
+		"usage": "[image/@user]"
+	},
+	"byemom": {
+		"description": "Google some weird stuff while your mom is gone",
+		"usage": "<text>"
+	},
+	"cancer": {
+		"description": "Absolute cancer.",
+		"usage": "[image/@user]"
+	},
+	"changemymind": {
+		"description": "Change My Mind!",
+		"usage": "<text>"
+	},
+	"cheating": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"citation": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"confusedcat": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"communism": {
+		"description": "You filthy communist!",
+		"usage": "[image/@user]"
+	},
+	"corporate": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"crab": {
+		"description": "Crab rave!",
+		"usage": "<text>",
+		"time": "This command may take a while..",
+		"invalid": "This command must be used with some text separated by a comma, ex: \"split with, a comma\"",
+		"error": "It seems there may have been an api error",
+		"support": "If this says something about being ratelimited, please try again in a few seconds. Else, report it to our support server"
+	},
+	"cry": {
+		"description": "We need that water",
+		"usage": "<text>"
+	},
+	"dab": {
+		"description": "Dab on 'em",
+		"usage": "[image/@user]"
+	},
+	"dank": {
+		"description": "Dank memes",
+		"usage": "[image/@user]"
+	},
+	"deepfry": {
+		"description": "Deep fry that image",
+		"usage": "[image/@user]"
+	},
+	"delete": {
+		"description": "Delete this garbage",
+		"usage": "[image/@user]"
+	},
+	"disability": {
+		"description": "Not all disabilities are the same",
+		"usage": "[image/@user]"
+	},
+	"doglemon": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"door": {
+		"description": "Nope!",
+		"usage": "[image/@user]"
+	},
+	"egg": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"excuseme": {
+		"description": "Excuse me what the frick",
+		"usage": "<text>"
+	},
+	"expanddong": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"facts": {
+		"description": "Straight facts",
+		"usage": "<text>"
+	},
+	"failure": {
+		"description": "You're a failure, and a disappointement.",
+		"usage": "[image/@user]"
+	},
+	"fakenews": {
+		"description": "You're fake news!",
+		"usage": "[image/@user]"
+	},
+	"fedora": {
+		"description": "m'lady",
+		"usage": "[image/@user]"
+	},
+	"floor": {
+		"description": "Stay off the floor",
+		"usage": "[text]"
+	},
+	"garfield": {
+		"description": "Wonder who that sign is for",
+		"usage": "[image/@user]"
+	},
+	"gay": {
+		"description": "Gay up an image.",
+		"usage": "[image]"
+	},
+	"goggles": {
+		"description": "Put on your saftey goggles",
+		"usage": "[image/@user]"
+	},
+	"hitler": {
+		"description": "Worse than hitler",
+		"usage": "[image/@user]"
+	},
+	"humansaregood": {
+		"description": "Humans are good",
+		"usage": "<text>"
+	},
+	"inator": {
+		"description": "Textinator",
+		"usage": "<text>"
+	},
+	"invert": {
+		"description": "Invert an image",
+		"usage": "[image/@user]"
+	},
+	"ipad": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"humansgood": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"jail": {
+		"description": "Put someone in jail",
+		"usage": "[image/@user]"
+	},
+	"justpretending": {
+		"description": "Maybe they're just pretending",
+		"usage": "<text>"
+	},
+	"knowyourlocation": {
+		"description": "Someone wants to know your location",
+		"usage": "<text>"
+	},
+	"laid": {
+		"description": "People who get laid",
+		"usage": "[image/@user]"
+	},
+	"madethis": {
+		"description": "I made this",
+		"usage": "[image/@user]"
+	},
+	"magik": {
+		"description": "screw with an image",
+		"usage": "[image/@user]"
+	},
+	"master": {
+		"description": "Master",
+		"usage": "<text>"
+	},
+	"mock": {
+		"description": "MoCk SoMe TeXt",
+		"usage": "<text>"
+	},
+	"note": {
+		"description": "Passing notes..",
+		"usage": "<text>"
+	},
+	"ohno": {
+		"description": "Oh no dog",
+		"usage": "<text>"
+	},
+	"plan": {
+		"description": "My brilliant plan",
+		"usage": "<text>"
+	},
+	"presentation": {
+		"description": "My presentation",
+		"usage": "<text>"
+	},
+	"quote": {
+		"description": "Quote someone",
+		"usage": "<text>"
+	},
+	"radialblur": {
+		"description": "Add a radial blur to an image",
+		"usage": "[image/@user]"
+	},
+	"rip": {
+		"description": "Rest in peace",
+		"usage": "[image/@user]"
+	},
+	"roblox": {
+		"description": "Oof",
+		"usage": "[image/@user]"
+	},
+	"salty": {
+		"description": "You salty bro?",
+		"usage": "[image/@user]"
+	},
+	"satan": {
+		"description": "Show someone as satan",
+		"usage": "[image/@user]"
+	},
+	"screams": {
+		"description": "WhY CaN'T YoU Be nOrMaL",
+		"usage": "[image/@user]"
+	},
+	"sickban": {
+		"description": "ban this sick filth",
+		"usage": "[image/@user]"
+	},
+	"slapsroof": {
+		"description": "Slap the roof of the car",
+		"usage": "<text>"
+	},
+	"spank": {
+		"description": "Spank someone",
+		"usage": "[image/@user]"
+	},
+	"stroke": {
+		"description": "Know the signs of a stroke",
+		"usage": "<text>"
+	},
+	"surprised": {
+		"description": "\\*surprised pikachu face\\*",
+		"usage": "<text>"
+	},
+	"sword": {
+		"description": "That's a massive sword",
+		"usage": "<text>"
+	},
+	"thesearch": {
+		"description": "No intelligent life anywhere",
+		"usage": "<text>"
+	},
+	"trash": {
+		"description": "You're trash",
+		"usage": "[image/@user]"
+	},
+	"trigger": {
+		"description": "I'm.. So.. Triggered!!",
+		"usage": "[image/@user]"
+	},
+	"ugly": {
+		"description": "So ugly",
+		"usage": "[image/@user]"
+	},
+	"unpopular": {
+		"description": "Unpopular opinion",
+		"usage": "<text>"
+	},
+	"violence": {
+		"description": "Voilence is ~~never~~ always the answer.",
+		"usage": "<text>"
+	},
+	"vr": {
+		"description": "Realistic vr",
+		"usage": "<text>"
+	},
+	"walking": {
+		"description": "When you walking",
+		"usage": "<text>"
+	},
+	"wanted": {
+		"description": "Wanted for a $5000 reward",
+		"usage": "[image/@user]"
+	},
+	"warp": {
+		"description": "Warp an image",
+		"usage": "[image/@user]"
+	},
+	"whodidthis": {
+		"description": "Who did this 🤣",
+		"usage": "[image/@user]"
+	},
+	"yomomma": {
+		"description": "Get a yomomma joke",
+		"usage": ""
+	},
+	"youtube": {
+		"description": "Youtube comment",
+		"usage": "<text>"
+	},
+	"kimborder": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"kowalski": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"letmein": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"lick": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"nothing": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"piccolo": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"savehumanity": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"sneakyfox": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"violentsparks": {
+		"description": "No Description Yet.",
+		"usage": ""
+	},
+	"whothisis": {
+		"description": "No Description Yet.",
+		"usage": ""
+	}
+}

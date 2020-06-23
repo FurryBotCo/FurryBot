@@ -1,10 +1,10 @@
 import ClientEvent from "../util/ClientEvent";
-import { Logger } from "../util/LoggerV8";
+import Logger from "../util/LoggerV10";
 import FurryBot from "../main";
 
 // this cannot be async due to "unhandledRejection" (unhandled promise rejection)'s not
 // being able to be handled asynchronously
-export default new ClientEvent("error", (function (this: FurryBot, info, id?: number) {
+export default new ClientEvent("error", (function (this: FurryBot, info: Error & { [k: string]: any; }, id?: number) {
 	this.track("events", "error");
 	if (typeof info === "string") {
 		this.log("error", info, `${!!id ? ` Shard #${id}` : ""} | Client`);

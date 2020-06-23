@@ -1,41 +1,37 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { Request, Utility } from "../../util/Functions";
-import { Colors } from "../../util/Constants";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
+import { FurryBotAPI } from "../../modules/External";
 
 export default new Command({
 	triggers: [
-		"bulge",
-		"bulgie"
+		"bulge"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"attachFiles",
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"attachFiles",
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: ["nsfw"],
+	restrictions: [
+		"nsfw"
+	],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	// await msg.channel.startTyping();
-	const img = await Request.imageAPIRequest(false, "bulge", true, false);
-	if (img.success === false) {
-		this.log("error", img, `Shard #${msg.channel.guild.shard.id}`);
-		return msg.reply(`{lang:other.error.unknownAPIError|${img.error.code}|${img.error.description}}`);
-	}
-	const short = await Utility.shortenURL(img.response.image);
-	const extra = short.new ? `{lang:other.firstTimeViewed|${short.linkNumber}}\n` : "";
-
+	const img = await FurryBotAPI.furry.bulge("json", 1);
 
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
-			.setDescription(`${extra}{lang:other.shortURL}: <${short.link}>`)
+			.setDescription(`{lang:other.words.shortURL}: <${img.shorturl}>`)
 			.setTitle("{lang:commands.nsfw.bulge.title}")
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.gold)
-			.setImage(img.response.image)
+			.setImage(img.url)
 			.setFooter("{lang:other.poweredBy.furrybot}")
+			.toJSON()
 	});
 }));

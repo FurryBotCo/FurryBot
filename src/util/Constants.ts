@@ -9,7 +9,8 @@ export const GameTypes = {
 	PLAYING: 0 as 0,
 	STREAMING: 1 as 1,
 	LISTENING: 2 as 2,
-	WATCHING: 3 as 3
+	WATCHING: 3 as 3, // not officially supported? (https://github.com/discord/discord-api-docs/issues/978#issuecomment-504155456)
+	CUSTOM: 4 as 4 // bots can't use this
 };
 
 export const ChannelNames = {

@@ -3,13 +3,20 @@ import FurryBot from "../main";
 import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
+import config from "../config";
 
 export default new ClientEvent("voiceChannelJoin", (async function (this: FurryBot, member: Eris.Member, newChannel: Eris.VoiceChannel) {
 	this.track("events", "voiceChannelJoin");
+
+	if (config.beta && !config.client.betaEventGuilds.includes(member.guild.id)) return;
+
 	const g = await db.getGuild(member.guild.id);
-	const e = g.logEvents.voiceJoin;
-	if (!e.enabled || !e.channel) return;
-	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
+	const e = g.logEvents.find(l => l.type === "voiceJoin");
+	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+	const ch = member.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+	if (!ch) return g.mongoEdit({ $pull: e });
 
 	const embed: Eris.EmbedOptions = {
 		title: "Member Joined Voice Channel",

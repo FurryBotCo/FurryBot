@@ -1,0 +1,33 @@
+{
+	"invalid": "Detected an invalid modlog setup, reverted to normal.",
+	"missingPermissions": "I'm missing some permissions to be able to make a modlog entry (I need `sendMessages` and `embedLinks`), it has been reverted to normal.",
+	"titles": {
+		"general": "Case #{0}",
+		"ban": "Member Ban",
+		"mute": "Member Muted",
+		"kick": "Member Kicked",
+		"softban": "Member Softbanned",
+		"unban": "Member Unbanned",
+		"unmute": "Member Unmuted",
+		"warn": "Member Warned",
+		"delwarn": "Member Warn Removed",
+		"clearwarnings": "Clear Warnings",
+		"lock": "Channel Locked",
+		"unlock": "Channel Unlocked"
+	},
+	"fields": {
+		"target": "Target",
+		"reason": "Reason",
+		"deleteDays": "Message Delete Days",
+		"time": "Time",
+		"permanent": "Permanent",
+		"id": "ID",
+		"warningReason": "Warning Reason",
+		"oldBlame": "Old Blame",
+		"unknown": "Unknown",
+		"totalWarnings": "Total Warnings"
+	},
+	"noneProvided": "None Provided.",
+	"actionAuto": "Action performed automatically.",
+	"action": "Action carried out by {0}"
+}

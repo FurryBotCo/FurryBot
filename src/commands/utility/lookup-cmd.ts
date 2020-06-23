@@ -1,32 +1,35 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
+import { Time } from "../../util/Functions";
+import { ChannelNames, Colors } from "../../util/Constants";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import Eris from "eris";
 import config from "../../config";
 import phin from "phin";
-import * as Eris from "eris";
-import { Colors, ChannelNames } from "../../util/Constants";
-import { Time } from "../../util/Functions";
-import EmbedBuilder from "../../util/EmbedBuilder";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
 		"lookup"
 	],
-	userPermissions: [],
-	botPermissions: [],
-	cooldown: 5e3,
-	donatorCooldown: 5e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
+	cooldown: 3e3,
+	donatorCooldown: 3e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 
-	// not 19 yet, bot soon™
-	if (msg.args[0].length < 17 || msg.args.length > 19) return msg.reply("{lang:commands.utility.lookup.invalid}");
+	// According to Discord's developers, ids can *techincally* be between 15 and 21 numbers.
+	if (msg.args[0].length < 15 || msg.args.length > 21) return msg.reply("{lang:commands.utility.lookup.invalid}");
 
 	const w = await phin<any>({
 		method: "GET",
 		url: `https://discordapp.com/api/guilds/${msg.args[0]}/widget.json`,
 		headers: {
-			"Authorization": `Bot ${config.bot.client.token}`,
+			"Authorization": `Bot ${config.client.token}`,
 			"User-Agent": config.web.userAgent
 		},
 		parse: "json"
@@ -41,7 +44,7 @@ export default new Command({
 				.setTimestamp(new Date().toISOString());
 
 			const code = w.body.instant_invite.match(new RegExp("^((https?\:\/\/)?(discord\.gg|discordapp\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"))[4];
-			const inv = (await this.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
+			const inv = (await this.bot.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
 			if (!inv) {
 				embed.addField(
 					"{lang:commands.utility.lookup.info}",
@@ -96,7 +99,7 @@ export default new Command({
 			}
 
 			return msg.channel.createMessage({
-				embed
+				embed: embed.toJSON()
 			});
 			break;
 
@@ -107,6 +110,7 @@ export default new Command({
 					.setDescription(`{lang:commands.utility.lookup.foundDesc|${msg.args[0]}} {lang:commands.utility.lookup.noInfo}`)
 					.setColor(Colors.orange)
 					.setTimestamp(new Date().toISOString())
+					.toJSON()
 			});
 			break;
 
@@ -117,6 +121,7 @@ export default new Command({
 					.setDescription(`{lang:commands.utility.lookup.notFoundDesc|${msg.args[0]}}`)
 					.setColor(Colors.red)
 					.setTimestamp(new Date().toISOString())
+					.toJSON()
 			});
 			break;
 
@@ -128,6 +133,7 @@ export default new Command({
 					.setDescription(`{lang:commands.utility.lookup.discordErrorDesc|${w.statusCode}|${w.statusMessage}}`)
 					.setColor(Colors.red)
 					.setTimestamp(new Date().toISOString())
+					.toJSON()
 			});
 	}
 }));

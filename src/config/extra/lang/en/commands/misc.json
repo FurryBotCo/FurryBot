@@ -1,0 +1,68 @@
+{
+	"avatar": {
+		"description": "Get a users avatar.",
+		"usage": "[@user]",
+		"title": "Avatar",
+		"link": "Link"
+	},
+	"bugreport": {
+		"description": "Report a bug with the bot.",
+		"usage": "",
+		"moved": "this has been moved into our support server due to our new system."
+	},
+	"help": {
+		"description": "Get some help with the bot.",
+		"usage": "[command/category]",
+		"hoverInfo": "Hover for more info",
+		"cmdTotal": "Total Commands",
+		"title": "Command Help",
+		"cmdList": "Command List #{0}",
+		"neitherFound": "neither a command nor category was found with that name.",
+		"embed": {
+			"restrictionsTip": "Red (minus) = **not required**\nGreen (plus) = **required**",
+			"restrictions": "Restrictions",
+			"nsfw": "NSFW",
+			"helperOnly": "Helper Only",
+			"devOnly": "Dev Only",
+			"betaOnly": "Beta Only",
+			"guildOwnerOnly": "Server Owner Only",
+			"supportServerOnly": "Support Server Only",
+			"donatorOnly": "Donator Only",
+			"premiumGuildOnly": "Premium Server Only",
+			"normalCooldown": "Normal Cooldown",
+			"donatorCooldown": "Donator Cooldown"
+		}
+	},
+	"leaderboard": {
+		"description": "Get the server leveling leaderboard.",
+		"usage": "[page]",
+		"noPages": "there don't seem to be any leaderboard pages. It may not have been populated yet, please be patient.",
+		"serverTooLarge": "this server is too large to display the leveling leaderboard.",
+		"invalidPage": "the provided page number was invalid. Valid pages: {0}",
+		"pageLessThan": "the page number cannot be less than one. Valid pages: {0}",
+		"pageMoreThan": "there are not that many pages. Valid pages: {0}",
+		"embed": {
+			"title": "Server Leaderboard",
+			"footer": "Page {0}/{1} | Skipped {2} Non Cached Users",
+			"until": "until level up"
+		}
+	},
+	"rank": {
+		"description": "Get a users rank.",
+		"usage": "[@user]",
+		"rank": "{0}'s Rank"
+	},
+	"suggest": {
+		"description": "Suggest something for me!",
+		"usage": "<suggestion>",
+		"title": "Suggestion Posted!",
+		"desc": "Your suggestion was posted! You can view it [here](https://discord.gg/CQMx76B).",
+		"nothing": "please provide something to suggest."
+	},
+	"toggletips": {
+		"description": "Toggle getting random tips.",
+		"usage": "",
+		"enabled": "enabled tips.",
+		"disabled": "disabled tips."
+	}
+}

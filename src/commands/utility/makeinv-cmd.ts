@@ -1,21 +1,23 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import * as Eris from "eris";
-import { Colors } from "../../util/Constants";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
 		"makeinv"
 	],
-	userPermissions: [
-		"manageGuild"
-	],
-	botPermissions: [
-		"createInstantInvite"
-	],
+	permissions: {
+		user: [
+			"createInstantInvite"
+		],
+		bot: [
+			"createInstantInvite"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 3e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length === 0) return msg.channel.createMessage({
@@ -23,13 +25,14 @@ export default new Command({
 			.setTitle("{lang:commands.utility.makeinv.helpTitle}")
 			.setDescription([
 				`{lang:commands.utility.makeinv.helpDesc}`,
-				`{lang:commands.utility.makeinv.helpUsage:`,
-				`{lang:commands.utility.makeinv.temp: \`${gConfig.settings.prefix}makeinv -t\``,
+				`{lang:commands.utility.makeinv.helpUsage}:`,
+				`{lang:commands.utility.makeinv.temp}: \`${gConfig.settings.prefix}makeinv -t\``,
 				`{lang:commands.utility.makeinv.maxAge}: \`${gConfig.settings.prefix}makeinv --maxAge=<seconds>\``,
 				`{lang:commands.utility.makeinv.maxUses}: \`${gConfig.settings.prefix}makeinv --maxUses=<number>\``
 			].join("\n"))
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.red)
+			.toJSON()
 	});
 
 	const a = msg.dashedArgs.parsed;
@@ -59,5 +62,6 @@ export default new Command({
 			].join("\n"))
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.green)
+			.toJSON()
 	});
 }));

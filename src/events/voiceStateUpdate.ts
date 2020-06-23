@@ -4,14 +4,21 @@ import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
 import { Utility } from "../util/Functions";
+import config from "../config";
 
 export default new ClientEvent("voiceStateUpdate", (async function (this: FurryBot, member: Eris.Member, oldState: Eris.OldVoiceState) {
 	this.track("events", "voiceStateUpdate");
+
+	if (config.beta && !config.client.betaEventGuilds.includes(member.guild.id)) return;
+
 	const g = await db.getGuild(member.guild.id);
-	const e = g.logEvents.voiceStateUpdate;
-	if (!e.enabled || !e.channel) return;
-	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
-	const vc = member.guild.channels.get<Eris.VoiceChannel>(member.voiceState.channelID);
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
+	const e = g.logEvents.find(l => l.type === "voiceStateUpdate");
+	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+	const ch = member.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+	const vc = member.guild.channels.get(member.voiceState.channelID) as Eris.VoiceChannel;
+	if (!ch) return g.mongoEdit({ $pull: e });
 
 	if (!vc) return;
 

@@ -1,15 +1,16 @@
-import config from "../../config";
-import { mdb, db } from "../../modules/Database";
-import { Blacklist } from "../@types/Misc";
+/// <reference path="../@types/global.d.ts" />
 import * as os from "os";
-import FurryBot from "../../main";
-import loopPatrons from "../patreon/loopPatrons";
-import refreshPatreonToken from "../patreon/refreshPatreonToken";
+import { mdb } from "../../modules/Database";
+import config from "../../config";
 import Eris from "eris";
-import { Time } from ".";
 import ExtendedMessage from "../../modules/ExtendedMessage";
 import phin from "phin";
-import rClient from "../Redis";
+import loopPatrons from "../patreon/loopPatrons";
+import refreshPatreonToken from "../patreon/refreshPatreonToken";
+import { Time } from ".";
+import { Redis } from "../../modules/External";
+import { Worker } from "worker_threads";
+import FurryBot from "../../main";
 
 export default class Internal {
 	private constructor() {
@@ -173,54 +174,6 @@ export default class Internal {
 		};
 	}
 
-	/**
-	 * Increment or decrement the daily guild join counter
-	 * @static
-	 * @param {boolean} [increment=true]
-	 * @returns {Promise<number>}
-	 * @memberof Internal
-	 */
-	static async incrementDailyCounter(client: FurryBot, increment = true): Promise<number> {
-		const d = new Date();
-		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-
-		const j = await mdb.collection("dailyjoins").findOne({ id });
-		const count = j ? increment ? j.count + 1 : j.count - 1 : increment ? 1 : -1;
-		await mdb.collection("dailyjoins").findOneAndDelete({ id });
-		await mdb.collection("dailyjoins").insertOne({ count, id, guildCount: client.guilds.size });
-
-		return count;
-	}
-
-	/**
-	 * get a user from the database
-	 * @readonly
-	 * @static
-	 * @memberof Internal
-	 */
-	static get getUser(): typeof db["getUser"] { return db.getUser.bind(db); }
-	/**
-	 * get a user from the database (synchronous)
-	 * @readonly
-	 * @static
-	 * @memberof Internal
-	 */
-	static get getUserSync(): typeof db["getUserSync"] { return db.getUserSync.bind(db); }
-	/**
-	 * get a guild from the database
-	 * @readonly
-	 * @static
-	 * @memberof Internal
-	 */
-	static get getGuild(): typeof db["getGuild"] { return db.getGuild.bind(db); }
-	/**
-	 * get a guild from the database (synchronous)
-	 * @readonly
-	 * @static
-	 * @memberof Internal
-	 */
-	static get getGuildSync(): typeof db["getGuildSync"] { return db.getGuildSync.bind(db); }
-
 	static get loopPatrons() { return loopPatrons; }
 	static get refreshPatreonToken() { return refreshPatreonToken; }
 
@@ -251,12 +204,24 @@ export default class Internal {
 		return str;
 	}
 
-	static extraArgParsing<M extends ExtendedMessage<Eris.GuildTextableChannel>>(msg: M) {
+	static memeParsing<M extends ExtendedMessage<Eris.TextableChannel> = ExtendedMessage<Eris.GuildTextableChannel>>(msg: M, def: string) {
+		let str = msg.unparsedArgs.join(" ") || def;
+		let m;
+		while (m = /(?:<@!?)([0-9]{16,21})(?:>)/.exec(str)) {
+			const u = msg.channel.guild.members.get(m[1]);
+			if (!u) continue;
+			else str = str.replace(m[0], u.username);
+		}
+
+		return str;
+	}
+
+	static extraArgParsing<M extends ExtendedMessage<Eris.TextableChannel> = ExtendedMessage<Eris.GuildTextableChannel>>(msg: M) {
 		let str = msg.args.join(" ");
 		try {
 			str
-				.match(new RegExp("[0-9]{17,18}", "g"))
-				.filter(k => !str.split(" ")[str.split(" ").indexOf(k)].match(new RegExp("<@!?[0-9]{17,18}>")) || msg.channel.guild.members.has(k))
+				.match(new RegExp("[0-9]{16,21}", "g"))
+				.filter(k => !str.split(" ")[str.split(" ").indexOf(k)].match(new RegExp("<@!?[0-9]{16,21}>")) || msg.channel.guild.members.has(k))
 				.map(k => str = str.replace(k, `<@!${k}>`));
 
 		} catch (e) { }
@@ -282,8 +247,8 @@ export default class Internal {
 				"Content-Type": "application/x-www-form-urlencoded"
 			},
 			form: {
-				client_id: config.bot.client.id,
-				client_secret: config.bot.client.secret,
+				client_id: config.client.id,
+				client_secret: config.client.secret,
 				grant_type: "authorization_code",
 				code,
 				redirect_uri: config.web.oauth2.redirectURL,
@@ -309,26 +274,46 @@ export default class Internal {
 	}
 
 	static async fetchRedisKey(key: string) {
-		return new Promise<string>((a, b) => rClient.GET(key, (err, reply) => !err ? a(reply) : b(err)));
+		return new Promise<string>((a, b) => Redis.GET(key, (err, reply) => !err ? a(reply) : b(err)));
 	}
 
 	static async getStats() {
 		const statNames = [
-			`${config.beta ? "beta" : "prod"}:stats:commandsTotal`,
-			`${config.beta ? "beta" : "prod"}:stats:commandsAllTime`,
+			`${config.beta ? "beta" : "prod"}:stats:commands:total`,
+			`${config.beta ? "beta" : "prod"}:stats:commands:allTime:total`,
 			`${config.beta ? "beta" : "prod"}:stats:messages`,
 			`${config.beta ? "beta" : "prod"}:events:messageCreate`,
 			`${config.beta ? "beta" : "prod"}:stats:directMessage`,
 			`${config.beta ? "beta" : "prod"}:stats:uptime`
 		];
 
-		return Promise.all<{
-			commandsTotal?: number;
-			commandsAllTime?: number;
-			messages?: number;
-			messageCreate?: number;
-			directMessage?: number;
-			uptime?: number;
-		}>(statNames.map(async (s) => ({ [s.split(":").slice(-1)[0]]: await this.fetchRedisKey(s).then(k => k !== null ? Number(k) : null) }))).then(s => s.reduce((a, b) => ({ ...a, ...b }), {}));
+		const n = {
+			commandsTotal: `${config.beta ? "beta" : "prod"}:stats:commands:total`,
+			commandsAllTime: `${config.beta ? "beta" : "prod"}:stats:commands:allTime:total`,
+			messages: `${config.beta ? "beta" : "prod"}:stats:messages`,
+			messagesAllTime: `${config.beta ? "beta" : "prod"}:events:messageCreate`,
+			directMessage: `${config.beta ? "beta" : "prod"}:stats:directMessage`,
+			uptime: `${config.beta ? "beta" : "prod"}:stats:uptime`
+		};
+
+		const stats: { [k in keyof typeof n]: number; } = {} as any;
+
+		for (const k of Object.keys(n)) {
+			stats[k] = await this.fetchRedisKey(n[k]).then(s => !s ? null : Number(s));
+		}
+
+		return stats;
+	}
+
+	static async incrementDailyCounter(incr: boolean) {
+		const d = new Date();
+		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
+		await Redis[incr ? "INCR" : "DECR"](`${config.beta ? "beta" : "prod"}:stats:dailyJoins:${id}`);
+		const st = await this.fetchRedisKey(`${config.beta ? "beta" : "prod"}:stats:dailyJoins:${id}`);
+		return st;
+	}
+
+	static emojiStringToId(e: string) {
+		return e.match("<:([a-zA-Z]{2,}:[0-9]{15,21})>")[1];
 	}
 }

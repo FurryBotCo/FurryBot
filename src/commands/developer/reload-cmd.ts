@@ -1,19 +1,43 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
+import CommandError from "../../modules/CommandHandler/CommandError";
+import Category from "../../modules/CommandHandler/Category";
+import * as fs from "fs-extra";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
 		"reload"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Reload something.",
-	usage: "<cmd/cat/event> [rebuild:yes/no]",
-	features: ["devOnly"],
-	subCommandDir: `${__dirname}/reload-subcmd`,
+	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length === 0) return cmd.sendSubCommandEmbed(msg);
-	else return cmd.handleSubCommand(msg, uConfig, gConfig, this);
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
+
+	switch (msg.args[0].toLowerCase()) {
+		case "cmd": {
+			if (!msg.args[1]) return msg.reply("{lang:commands.developer.reload.cmdMissing}");
+			const c = this.cmd.getCommand(msg.args[1].toLowerCase()) as { cmd: Command; cat: Category; };
+			if (!c) return msg.reply("{lang:commands.developer.reload.cmdMissing}");
+
+			c.cat.reloadCommand(c.cmd);
+
+			return msg.reply(`{lang:commands.developer.reload.cmdDone|${msg.args[1].toLowerCase()}}`);
+		}
+
+		case "lang": {
+			let i = 0;
+			fs.readdirSync(`${config.dir.lang}`).filter(f => !fs.lstatSync(`${config.dir.lang}/${f}`).isDirectory() && f.endsWith(".json")).map(f => (i++, fs.unlinkSync(`${config.dir.lang}/${f}`)));
+			return msg.reply(`{lang:commands.developer.reload.lang|${i}}`);
+			break;
+		}
+		default: {
+			return msg.reply(`{lang:commands.developer.reload.invalid|${msg.args[0].toLowerCase()}}`);
+		}
+	}
 }));

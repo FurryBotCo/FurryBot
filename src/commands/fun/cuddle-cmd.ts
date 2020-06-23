@@ -1,23 +1,25 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import { Request, Internal } from "../../util/Functions";
-import Logger from "../../util/LoggerV8";
-import Eris from "eris";
+import { Internal } from "../../util/Functions";
+import { FurryBotAPI } from "../../modules/External";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
 		"cuddle"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 
 	const embed = new EmbedBuilder(gConfig.settings.lang)
 		.setAuthor(msg.author.tag, msg.author.avatarURL)
@@ -26,15 +28,11 @@ export default new Command({
 		.setColor(Math.floor(Math.random() * 0xFFFFFF));
 
 	if (gConfig.settings.commandImages) {
-		if (!msg.channel.permissionsOf(this.user.id).has("attachFiles")) return msg.reply("{lang:other.error.permissionMissing|attachFiles}");
-		const img = await Request.imageAPIRequest(false, "cuddle", true, true);
-		if (img.success === false) {
-			this.log("error", img.error, `Shard #${msg.channel.guild.shard.id}`);
-			return msg.reply(`{lang:other.error.imageAPI}`);
-		}
-		embed.setImage(img.response.image);
+		if (!msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) return msg.reply("{lang:other.errors.permissionMissing|attachFiles}");
+		const img = await FurryBotAPI.furry.cuddle("json", 1);
+		embed.setImage(img.url);
 	}
 	return msg.channel.createMessage({
-		embed
+		embed: embed.toJSON()
 	});
 }));

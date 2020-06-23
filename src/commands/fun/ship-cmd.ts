@@ -1,20 +1,22 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { Colors } from "../../util/Constants";
+import Command from "../../modules/CommandHandler/Command";
 import { Request } from "../../util/Functions";
+import config from "../../config";
+import { Colors } from "../../util/Constants";
+import Eris from "eris";
 import * as fs from "fs-extra";
 import { Canvas } from "canvas-constructor";
-import Eris from "eris";
-import config from "../../config";
 
 export default new Command({
 	triggers: [
 		"ship"
 	],
-	userPermissions: [],
-	botPermissions: [],
-	cooldown: 5e3,
-	donatorCooldown: 2.5e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
+	cooldown: 3e3,
+	donatorCooldown: 1.5e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1, reset = false;
@@ -42,8 +44,8 @@ export default new Command({
 	if (msg.args.length === 0) member2 = msg.channel.guild.members.random();
 	else if (msg.args.length === 1) member2 = await msg.getMemberFromArgs(0, false);
 	else {
-		member1 = await msg.getMemberFromArgs(0);
-		member2 = await msg.getMemberFromArgs(1);
+		member1 = await msg.getMemberFromArgs(0, null, null, 0);
+		member2 = await msg.getMemberFromArgs(1, null, null, 1);
 	}
 
 	if (!member1 || !member2) return msg.errorEmbed("INVALID_MEMBER");

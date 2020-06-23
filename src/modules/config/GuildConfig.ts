@@ -1,28 +1,19 @@
+/// <reference path="../../util/@types/global.d.ts" />
 import config from "../../config";
-import { mdb } from "../Database";
-import { DeepPartial } from "../../util/@types/Misc";
-import _ from "lodash";
-import Logger from "../../util/LoggerV8";
-import rClient from "../../util/Redis";
+import db, { mdb } from "../Database";
+import Logger from "../../util/LoggerV10";
 import { UpdateQuery, FindOneAndUpdateOption } from "mongodb";
+import { Redis } from "../External";
+
+// @TODO fix props on old entries
 export default class GuildConfig {
 	id: string;
 	selfAssignableRoles: string[];
-	music: {
-		volume: number;
-		textChannel: string;
-		queue: {
-			link: string;
-			channel: string;
-			length: number;
-			title: string;
-			blame: string;
-		}[];
-	};
 	settings: {
 		announceLevelUp: boolean;
 		nsfw: boolean;
 		defaultYiff: string;
+		djRole: string;
 		snipeCommand: boolean;
 		muteRole?: string;
 		fResponse: boolean;
@@ -40,40 +31,23 @@ export default class GuildConfig {
 		leaveChannel?: string;
 		welcomeDeleteTime: number;
 	};
-	snipe: {
-		edit: {
-			[k: string]: {
-				authorId: string;
-				content: string;
-				oldContent: string;
-				time: number;
-			};
-		};
-		delete: {
-			[k: string]: {
-				authorId: string;
-				content: string;
-				time: number;
-			};
-		};
-	};
 	logEvents: {
-		[k in
+		channel: string;
+		type:
 		"channelCreate" | "channelDelete" | "channelUpdate" |                         // channel
 		"memberBan" | "memberUnban" | "memberJoin" | "memberLeave" | "memberUpdate" | // member
 		"roleCreate" | "roleDelete" | "roleUpdate" |                                  // role
 		"messageDelete" | "messageBulkDelete" | "messageEdit" |                       // message
 		"presenceUpdate" | "userUpdate" |                                             // user
 		"voiceJoin" | "voiceLeave" | "voiceSwitch" | "voiceStateUpdate" |             // voice
-		"guildUpdate"
-		]: {
-			enabled: boolean;
-			channel?: string;
-		}
-	};
+		"guildUpdate";
+	}[];
 	tags: {
-		[k: string]: string;
-	};
+		creationDate: number;
+		creationBlame: string;
+		name: string;
+		content: string;
+	}[];
 	auto: {}[];
 	disable: (({
 		type: "channel" | "role" | "user";
@@ -115,10 +89,29 @@ export default class GuildConfig {
 		};
 
 		goKeys(this, data, config.defaults.config.guild);
+		// breaking changes
+		if (!(this.logEvents instanceof Array)) await this.mongoEdit({
+			$set: {
+				logEvents: Object.keys(this.logEvents).map(l => ({
+					type: l,
+					channel: this.logEvents[l]
+				}))
+			}
+		});
+		if (!(this.tags instanceof Array)) await this.mongoEdit({
+			$set: {
+				tags: Object.keys(this.tags).map(t => ({
+					creationDate: 0,
+					creationBlame: null,
+					name: t,
+					content: this.tags[t]
+				}))
+			}
+		});
 	}
 
 	async deleteCache() {
-		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:gConfig:${this.id}`);
+		await Redis.DEL(`${config.beta ? "beta" : "prod"}:db:gConfig:${this.id}`);
 	}
 
 	async reload() {
@@ -128,9 +121,11 @@ export default class GuildConfig {
 		return this;
 	}
 
-	async mongoEdit<T = any>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
+	async mongoEdit<T = GuildConfig>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
 		await this.deleteCache();
-		return mdb.collection<T>("guilds").findOneAndUpdate({ id: this.id } as any, d, opt);
+		const j = await mdb.collection<T>("guilds").findOneAndUpdate({ id: this.id } as any, d, opt);
+		await this.reload();
+		return j;
 	}
 
 	async edit(data: DeepPartial<Omit<{ [K in keyof GuildConfig]: GuildConfig[K]; }, "selfAssignableRoles">>) {
@@ -207,4 +202,7 @@ export default class GuildConfig {
 		};
 		else return r[0];
 	}
+
+	async checkBlacklist() { return db.checkBl("guild", this.id); }
+	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) { return db.addBl("guild", this.id, blame, blameId, reason, expire, report); }
 }

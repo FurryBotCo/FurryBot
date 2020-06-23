@@ -1,48 +1,97 @@
-import config from "../config";
-import logger from "morgan";
 import express from "express";
-import * as fs from "fs-extra";
+import morgan from "morgan";
 import session from "express-session";
+import FurryBot from "../main";
+import config from "../config";
 import http from "http";
 import https from "https";
-import FurryBot from "../main";
+import * as fs from "fs-extra";
 
-export default (async (client: FurryBot) => {
-	const app: express.Application = express();
+export class Route {
+	client: FurryBot;
+	app: express.Router;
+	path: string;
+	setupRan: boolean;
+	constructor(path: string, client?: FurryBot) {
+		this.path = path;
+		this.client = client || null;
+		this.app = express.Router();
+		this.setupRan = false;
+	}
 
-	app.use(session({
-		name: "owo",
-		secret: config.web.cookieSecret,
-		cookie: {
-			maxAge: 8.64e7,
-			secure: true
-		},
-		resave: false,
-		saveUninitialized: true
-	}))
-		.set("view engine", "ejs")
-		.set("views", `${config.dir.base}/src/api/views/templates`)
-		.use(logger("dev"))
-		.use(express.json())
-		.use(express.urlencoded({
-			extended: true
-		}));
+	// override
+	setup() {
+		this.setupRan = true;
+	}
 
-	await Promise.all(fs.readdirSync(`${__dirname}/routes`).filter(f => !fs.lstatSync(`${__dirname}/routes/${f}`).isDirectory()).map(async (f) => app.use(`/${f.split(".")[0]}`, await require(`${__dirname}/routes/${f}`).default(client))));
+	setClient(client: FurryBot) {
+		this.client = client;
+		return this;
+	}
+}
 
-	app.use(async (req, res) => res.status(404).json({
-		success: false,
-		error: "page not found"
-	}));
+export default class API {
+	client: FurryBot;
+	app: express.Application;
+	setupRan: boolean;
+	srv: http.Server | https.Server;
+	constructor(client: FurryBot) {
+		this.client = client;
+		this.app = express();
+		this.setupRan = false;
+	}
 
-	let e;
+	addRoute<R extends Route = any>(route: R) {
+		if (!route.client) route.setClient(this.client);
+		route.setup();
+		this.app.use(route.path, route.app);
+		return this;
+	}
 
-	if (config.web.security.useHttps) e = https.createServer({
-		ca: config.web.security.ca,
-		cert: config.web.security.cert,
-		key: config.web.security.key
-	}, app);
-	else e = http.createServer(app);
+	setup() {
+		this.setupRan = true;
+		const app = this.app;
 
-	return e;
-});
+		app
+			.use(session({
+				name: "fbapi",
+				secret: config.web.cookieSecret,
+				cookie: {
+					maxAge: 8.64e7,
+					secure: true
+				},
+				resave: false,
+				saveUninitialized: true
+			}))
+			.set("view engine", "ejs")
+			.set("views", `${config.dir.base}/src/api/views/templates`)
+			.use(morgan("dev"))
+			.use(express.json())
+			.use(express.urlencoded({
+				extended: true
+			}));
+
+		fs
+			.readdirSync(`${__dirname}/routes`)
+			.map(r => new (require(`${__dirname}/routes/${r}`).default)() as Route)
+			.map(r => this.addRoute(r));
+	}
+
+	launch() {
+		if (!this.setupRan) this.setup();
+		const client = this.client;
+		let srv: http.Server | https.Server;
+		if (config.web.security.useHttps) srv = https.createServer({
+			ca: config.web.security.ca,
+			cert: config.web.security.cert,
+			key: config.web.security.key
+		}, this.app);
+		else srv = http.createServer(this.app);
+
+		const svr = http.createServer(express())
+			.on("error", () => client.log("warn", "Attempted to start api server, but the port is in use.", "APIServer"))
+			.on("listening", () => (svr.close(), this.srv = srv.listen(config.web.api.port, config.web.api.ip, () => client.log("debug", `Listening on ${config.web.api.ip}:${config.web.api.port}`, "APIServer"))))
+			.on("close", () => client.log("debug", "Port test server closed, starting bot api server.", "APIServer"))
+			.listen(config.web.api.port, config.web.api.ip);
+	}
+}

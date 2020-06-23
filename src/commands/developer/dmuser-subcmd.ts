@@ -1,19 +1,20 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
 		"dmuser"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	description: "Send a direct message to a user.",
-	usage: "<id> <message>",
-	features: ["devOnly"],
+	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 0) return new Error("ERR_INVALID_USAGE");
+	if (msg.args.length < 0) return new CommandError("ERR_INVALID_USAGE", cmd);
 
 	const user = await msg.getUserFromArgs();
 

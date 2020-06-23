@@ -2,19 +2,27 @@ import ClientEvent from "../util/ClientEvent";
 import FurryBot from "../main";
 import * as Eris from "eris";
 import { db } from "../modules/Database";
-import { ChannelNames, ChannelNamesCamelCase, Colors } from "../util/Constants";
+import { ChannelNames, Colors } from "../util/Constants";
 import { Utility, Time } from "../util/Functions";
+import config from "../config";
 
 export default new ClientEvent("channelUpdate", (async function (this: FurryBot, channel: Eris.AnyGuildChannel, oldChannel: Eris.OldGuildChannel) {
 	if (!this || !db || !channel || !oldChannel || [Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(channel.type as any)) return;
 	this.track("events", "channelUpdate");
 
+	if (config.beta) {
+		if (channel instanceof Eris.GuildChannel && !config.client.betaEventGuilds.includes(channel.guild.id)) return;
+		else return;
+	}
+
 	if (channel instanceof Eris.GuildChannel) {
 		const g = await db.getGuild(channel.guild.id);
-		if (!g) return;
-		const e = g.logEvents.channelUpdate;
-		if (!e.enabled || !e.channel) return;
-		const ch = channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+		if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
+		const e = g.logEvents.find(l => l.type === "channelUpdate");
+		if (!e || !e.channel) return;
+		if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+		const ch = channel.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+		if (!ch) return g.mongoEdit({ $pull: e });
 
 		const props: { [k: string]: { type: string; name: string; } } = {
 			nsfw: {

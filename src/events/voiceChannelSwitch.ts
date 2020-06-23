@@ -3,13 +3,20 @@ import FurryBot from "../main";
 import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { Colors } from "../util/Constants";
+import config from "../config";
 
 export default new ClientEvent("voiceChannelSwitch", (async function (this: FurryBot, member: Eris.Member, newChannel: Eris.VoiceChannel, oldChannel: Eris.VoiceChannel) {
 	this.track("events", "voiceChannelSwitch");
+
+	if (config.beta && !config.client.betaEventGuilds.includes(member.guild.id)) return;
+
 	const g = await db.getGuild(member.guild.id);
-	const e = g.logEvents.voiceSwitch;
-	if (!e.enabled || !e.channel) return;
-	const ch = member.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
+	const e = g.logEvents.find(l => l.type === "voiceSwitch");
+	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+	const ch = member.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+	if (!ch) return g.mongoEdit({ $pull: e });
 
 	const embed: Eris.EmbedOptions = {
 		title: "Member Switched Voice Channels",

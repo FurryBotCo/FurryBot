@@ -1,30 +1,49 @@
-import config from "./src/config";
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import * as fs from "fs-extra";
+import MakeFile from "./src/config/extra/lang/MakeFile";
+
+// regen lang before launch
+fs.readdirSync(`${__dirname}/src/config/extra/lang`).filter(d => fs.lstatSync(`${__dirname}/src/config/extra/lang/${d}`).isDirectory()).map(d => {
+	MakeFile(d);
+});
+import config from "./src/config";
 import path from "path";
-import { Logger } from "./src/util/LoggerV8";
+
+import Logger from "./src/util/LoggerV10";
+[config.dir.logs, `${config.dir.logs}/spam`, `${config.dir.logs}/client`, config.dir.tmp].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), Logger.log("Setup | Logs", `Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`)) : null);
+
+// for faster loading after launch (and error checking)
+import "./src/main";
+import "./src/commands";
+
 import ListStats from "./src/util/ListStats";
-import FurryBot from "./src/main";
+import Cluster from "cluster";
+import { Fleet } from "eris-fleet";
 
+const Admiral = new Fleet({
+	...config.client.options,
+	token: config.client.token,
+	path: `${__dirname}/src/main.ts`
+});
 
-[config.dir.logs, `${config.dir.logs}/spam`, `${config.dir.logs}/client`, config.dir.tmp].map(l => !fs.existsSync(path.resolve(l)) ? (fs.mkdirSync(path.resolve(l)), bot.log("log", `Creating non existent directory "${l}" in ${path.resolve(`${l}/../`)}`, "Setup | Logs")) : null);
+if (Cluster.isMaster) {
+	Admiral
+		.on("log", (m) => Logger.log("Log", m))
+		.on("debug", (m) => Logger.debug("Debug", m))
+		.on("warn", (m) => Logger.warn("Warn", m))
+		.on("error", (m) => Logger.error("Error", m));
 
-const bot = new FurryBot(config.bot.client.token, config.bot.options);
-if (!config.beta) setInterval(() => ListStats(bot, bot.shards.map(s => bot.guilds.filter(g => g.shard.id === s.id).length)), 9e5);
+	if (!config.beta) setInterval(() => ListStats(Admiral), 9e5);
 
-if (__filename.endsWith(".js") && !fs.existsSync(`${config.dir.base}/src/assets`)) {
-	fs.copySync(`${config.dir.base}/src/assets`, `${config.dir.base}/build/src/assets`);
-	bot.log("log", `Copied assets directory ${`${config.dir.base}/src/assets`} to ${config.dir.base}/build/src/assets`, "Setup | Assets");
+	if (__filename.endsWith(".js") && !fs.existsSync(`${config.dir.base}/src/assets`)) {
+		fs.copySync(`${config.dir.base}/src/assets`, `${config.dir.base}/build/src/assets`);
+		Logger.log("Setup | Assets", `Copied assets directory ${`${config.dir.base}/src/assets`} to ${config.dir.base}/build/src/assets`);
+	}
+
+	fs.writeFileSync(`${__dirname}/${__filename.endsWith(".ts") ? "" : "../"}process.pid`, process.pid);
+
 }
 
-fs.writeFileSync(`${__dirname}/${__filename.endsWith(".ts") ? "" : "../"}process.pid`, process.pid);
-
-bot.connect();
-
-export default bot;
-
 process.on("SIGINT", () => {
-	bot
-		.removeAllListeners()
-		.disconnect({ reconnect: false });
 	process.kill(process.pid);
 });

@@ -1,39 +1,39 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import { mdb } from "../../modules/Database";
-import Eris from "eris";
+import Command from "../../modules/CommandHandler/Command";
 import { Utility } from "../../util/Functions";
-import config from "../../config";
 import Language from "../../util/Language";
-import EmbedBuilder from "../../util/EmbedBuilder";
+import Eris from "eris";
+import CommandError from "../../modules/CommandHandler/CommandError";
 
 export default new Command({
 	triggers: [
-		"kick",
-		"k"
+		"kick"
 	],
-	userPermissions: [
-		"kickMembers"
-	],
-	botPermissions: [
-		"kickMembers"
-	],
-	cooldown: 3e3,
-	donatorCooldown: 3e3,
-	features: [],
+	permissions: {
+		user: [
+			"kickMembers"
+		],
+		bot: [
+			"kickMembers"
+		]
+	},
+	cooldown: 2e3,
+	donatorCooldown: 2e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.args.length < 1) throw new Error("ERR_INVALID_USAGE");
-	let m;
+	if (msg.args.length < 1) throw new CommandError("ERR_INVALID_USAGE", cmd);
+	let m: Eris.Message;
 	// get member from message
 	const member = await msg.getMemberFromArgs();
 
-	if (!member) return msg.errorEmbed("INVALID_USER");
+	if (!member) return msg.errorEmbed("INVALID_MEMBER");
 
-	if (member.id === msg.member.id && !config.developers.includes(msg.author.id)) return msg.reply("{lang:commands.moderation.kick.noSelf}");
+	if (member.id === msg.member.id) return msg.reply("{lang:commands.moderation.kick.noSelf}");
+	if (member.id === msg.channel.guild.ownerID) return msg.reply("{lang:commands.moderation.kick.noKickOwner}");
 	const a = Utility.compareMembers(member, msg.member);
-	if ((a.member2.higher || a.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`<@!${msg.author.id}>, {lang:commands.moderation.kick.noKick|${member.username}#${member.discriminator}}`);
+	if ((a.member1.higher || a.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.channel.createMessage(`<@!${msg.author.id}>, {lang:commands.moderation.kick.noKick|${member.username}#${member.discriminator}}`);
 	// if(!user.kickable) return msg.channel.createMessage(`I cannot kick ${user.username}#${user.discriminator}! Do they have a higher role than me? Do I have kick permissions?`);
-	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang).get("other.noReason").toString();
+	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang, "other.words.noReason", false);
 	if (!member.user.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`{lang:commands.moderation.kick.dm|${msg.channel.guild.name}|${reason}}`)).catch(err => null);
 	member.kick(`Kick: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 		await msg.channel.createMessage(`***{lang:commands.moderation.kick.kicked|${member.username}#${member.discriminator}|${reason}}***`).catch(noerr => null);
@@ -49,5 +49,5 @@ export default new Command({
 		if (m !== undefined) await m.delete();
 	});
 
-	if (msg.channel.permissionsOf(this.user.id).has("manageMessages")) msg.delete().catch(error => null);
+	if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
 }));

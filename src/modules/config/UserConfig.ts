@@ -1,9 +1,8 @@
+/// <reference path="../../util/@types/global.d.ts" />
 import config from "../../config";
-import { mdb } from "../Database";
-import { DeepPartial } from "../../util/@types/Misc";
-import _ from "lodash";
-import rClient from "../../util/Redis";
+import db, { mdb } from "../Database";
 import { UpdateQuery, FindOneAndUpdateOption } from "mongodb";
+import { Redis } from "../External";
 
 interface Warning {
 	blame: string;
@@ -30,7 +29,15 @@ export default class UserConfig {
 		[k: string]: number;
 	};
 	deletion?: number;
-
+	socials: ({
+		username: string;
+		id: string;
+		type: "twitter";
+	} | {
+		username: string;
+		id: string;
+		type: "reddit";
+	})[];
 	constructor(id: string, data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		this.id = id;
 		if (!data) data = config.defaults.config.user;
@@ -60,7 +67,7 @@ export default class UserConfig {
 	}
 
 	async deleteCache() {
-		await rClient.DEL(`${config.beta ? "beta" : "prod"}:db:uConfig:${this.id}`);
+		await Redis.DEL(`${config.beta ? "beta" : "prod"}:db:uConfig:${this.id}`);
 	}
 
 	async reload() {
@@ -70,9 +77,11 @@ export default class UserConfig {
 		return this;
 	}
 
-	async mongoEdit<T = any>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
+	async mongoEdit<T = UserConfig>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
 		await this.deleteCache();
-		return mdb.collection<T>("guilds").findOneAndUpdate({ id: this.id } as any, d, opt);
+		const j = await mdb.collection<T>("users").findOneAndUpdate({ id: this.id } as any, d, opt);
+		await this.reload();
+		return j;
 	}
 
 	async edit(data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
@@ -154,4 +163,7 @@ export default class UserConfig {
 	getLevel(g: string) {
 		return this.levels && this.levels[g] ? this.levels[g] : 0;
 	}
+
+	async checkBlacklist() { return db.checkBl("user", this.id); }
+	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) { return db.addBl("user", this.id, blame, blameId, reason, expire, report); }
 }

@@ -1,27 +1,32 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import { mdb } from "../../modules/Database";
+import { Colors } from "../../util/Constants";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
 		"tag"
 	],
-	userPermissions: [],
-	botPermissions: [],
+	permissions: {
+		user: [],
+		bot: []
+	},
 	cooldown: 3e3,
-	donatorCooldown: 2e3,
-	features: [],
+	donatorCooldown: 3e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const tags: { [k: string]: string; } = {};
-	await Promise.all(Object.keys(gConfig.tags).map(async (t) => {
-		if (!gConfig.tags[t]) await mdb.collection("guilds").findOneAndUpdate({ id: msg.channel.guild.id }, { $unset: { [`tags.${t}`]: true } });
-		else tags[t.toLowerCase()] = gConfig.tags[t];
+	const tags: {
+		[k: string]: string
+	} = {};
+	await Promise.all(gConfig.tags.map(async (t, i) => {
+		if (!gConfig.tags[i] || !gConfig.tags[i].content) await gConfig.mongoEdit({ $pull: { tags: t } });
+		else tags[t.name.toLowerCase()] = t.content;
 	}));
 	const values = Object.values(tags);
 	if (msg.args.length < 1) return msg.reply(`{lang:commands.utility.tag.invalidUsage}`);
 
-	if (["create", "delete", "edit"].includes(msg.args[0].toLowerCase()) && !msg.channel.permissionsOf(this.user.id).has("sendMessages")) return msg.reply("{lang:commands.utility.tag.missingPerms}");
+	if (["create", "delete", "edit"].includes(msg.args[0].toLowerCase()) && !msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) return msg.reply("{lang:commands.utility.tag.missingPerms}");
 
 	if (msg.args[0].toLowerCase() === "list") {
 		const pages: string[][] = [];
@@ -45,6 +50,7 @@ export default new Command({
 				.setFooter(`{lang:commands.utility.tag.use|${gConfig.settings.prefix}}`)
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))
 				.setTimestamp(new Date().toISOString())
+				.toJSON()
 
 		});
 	}
@@ -62,7 +68,16 @@ export default new Command({
 				if (Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.tag.alreadyExists|${msg.args[1].toLowerCase()}}`);
 				const content = msg.args.slice(2).join(" ");
 				if (!content || content.length === 0) return msg.reply("{lang:commands.utility.tag.needContent}");
-				await gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
+				await gConfig.mongoEdit({
+					$push: {
+						tags: {
+							creationBlame: msg.author.id,
+							creationDate: Date.now(),
+							name: msg.args[1].toLowerCase(),
+							content
+						}
+					}
+				});
 
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
@@ -71,32 +86,48 @@ export default new Command({
 						.addField("{lang:commands.utility.tag.content}", content, false)
 						.setColor(Math.floor(Math.random() * 0xFFFFFF))
 						.setTimestamp(new Date().toISOString())
+						.toJSON()
 				});
 				break;
 			}
 
 			case "edit": {
-				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.tag.doesNotExist|${msg.args[1].toLowerCase()}}`);
-				const c = tags[msg.args[1].toLowerCase()];
+				if (!gConfig.tags.map(t => t.name.toLowerCase()).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.tag.doesNotExist|${msg.args[1].toLowerCase()}}`);
+				const c = gConfig.tags.find(t => t.name.toLowerCase() === msg.args[1].toLowerCase());
 				const content = msg.args.slice(2).join(" ");
 				if (!content || content.length === 0) return msg.reply("{lang:commands.utility.needContent}");
-				await gConfig.edit({ tags: { [msg.args[1].toLowerCase()]: content } });
+				await gConfig.mongoEdit({
+					$pull: c,
+					$push: {
+						tags: {
+							creationBlame: msg.author.id,
+							creationDate: Date.now(),
+							name: msg.args[1].toLowerCase(),
+							content
+						}
+					}
+				});
 
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
 						.setTitle("{lang:commands.utility.tag.edited}")
 						.addField("{lang:commands.utility.tag.name}", msg.args[1].toLowerCase(), false)
-						.addField("{lang:commands.utility.tag.oldContent}", c, false)
+						.addField("{lang:commands.utility.tag.oldContent}", c.content, false)
 						.addField("{lang:commands.utility.tag.newContent}", content, false)
 						.setColor(Math.floor(Math.random() * 0xFFFFFF))
 						.setTimestamp(new Date().toISOString())
+						.toJSON()
 				});
 				break;
 			}
 
 			case "delete": {
-				if (!Object.keys(tags).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.doesNotExist|${msg.args[1].toLowerCase()}}`);
-				await mdb.collection("guilds").findOneAndUpdate({ id: msg.channel.guild.id }, { $unset: { [`tags.${msg.args[1].toLowerCase()}`]: "" } });
+				if (gConfig.tags.map(t => t.name.toLowerCase()).includes(msg.args[1].toLowerCase())) return msg.reply(`{lang:commands.utility.doesNotExist|${msg.args[1].toLowerCase()}}`);
+				await gConfig.mongoEdit({
+					$pull: {
+						tags: gConfig.tags.find(t => t.name.toLowerCase() === msg.args[1].toLowerCase())
+					}
+				});
 				return msg.reply(`{lang:commands.utility.tag.deleted|${msg.args[1].toLowerCase()}}`);
 				break;
 			}

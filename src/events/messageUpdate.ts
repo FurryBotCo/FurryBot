@@ -1,40 +1,42 @@
 import ClientEvent from "../util/ClientEvent";
-import PartialMessage from "../modules/PartialMessage";
 import FurryBot from "../main";
-import * as Eris from "eris";
-import { db } from "../modules/Database";
+import Eris from "eris";
+import db from "../modules/Database";
+import config from "../config";
+import messageCreate from "./messageCreate";
+import Redis from "../modules/External/Redis";
 
-export default new ClientEvent("messageUpdate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>, oldMessage: PartialMessage) {
+export default new ClientEvent("messageUpdate", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>, oldMessage: Eris.OldMessage) {
 	this.track("events", "messageUpdate");
 	if (!this || !message || !message.author || message.author.bot || !oldMessage || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any) || message.content === oldMessage.content) return;
+
+	if (config.beta && !config.client.betaEventGuilds.includes(message.channel.guild.id)) return;
+
 	const g = await db.getGuild(message.channel.guild.id);
-	await g.edit({
-		snipe: {
-			edit: {
-				[message.channel.id]: {
-					content: message.content,
-					oldContent: oldMessage.content,
-					authorId: message.author.id,
-					time: Date.now()
-				}
-			}
+	// tslint:disable-next-line: no-string-literal
+	if (typeof g["snipe"] !== "undefined") await g.mongoEdit({
+		$unset: {
+			snipe: 1
 		}
-	}).then(d => d.reload());
-	this.emit("messageCreate", message);
+	});
 
-	const e = g.logEvents.messageEdit;
-	if (!e || e.enabled || !e.channel) return;
-	const ch = await this.getRESTChannel<Eris.GuildTextableChannel>(e.channel);
+	// auto delete after 30 minutes
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:oldContent`, 1800, oldMessage.content);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:newContent`, 1800, message.content);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:author`, 1800, message.author.id);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:time`, 1800, Date.now().toString());
 
-	if (ch.guild.id !== message.guildID) {
-		this.log("warn", `messageUpdate log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`, "Message Update");
-		await g.edit({
-			logEvents: {
-				messageEdit: null
-			}
-		});
-		return;
-	}
+	await messageCreate.listener.call(this, message, true);
+
+	if (!g.logEvents) return;
+	const e = g.logEvents.find(l => l.type === "messageEdit");
+	if (!e || !e.channel) return;
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+	const ch = await this.bot.getRESTChannel(e.channel) as Eris.GuildTextableChannel;
+	if (!ch) return g.mongoEdit({ $pull: e });
+
+	if (!ch || ch.guild.id !== message.guildID) return;
 
 	const embed: Eris.EmbedOptions = {
 		title: "Message Edited",

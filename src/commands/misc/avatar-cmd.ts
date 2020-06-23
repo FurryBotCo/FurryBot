@@ -1,19 +1,21 @@
-import Command from "../../util/CommandHandler/lib/Command";
-import Eris from "eris";
+import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
 		"avatar"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks",
-		"attachFiles"
-	],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks",
+			"attachFiles"
+		]
+	},
 	cooldown: 3e3,
 	donatorCooldown: 1.5e3,
-	features: [],
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	let user: Eris.User;
@@ -41,5 +43,6 @@ export default new Command({
 			.setImage(user.avatarURL)
 			.setColor(color)
 			.setTimestamp(new Date().toISOString())
+			.toJSON()
 	});
 }));

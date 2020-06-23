@@ -1,54 +1,58 @@
-import express from "express";
-import { mdb } from "../../modules/Database";
+import { Route } from "..";
 import config from "../../config";
-import FurryBot from "../../main";
 import { Internal } from "../../util/Functions";
+import { mdb } from "../../modules/Database";
+import Eris from "eris";
 
-export default (async (client: FurryBot) => {
+export default class StatsRoute extends Route {
+	constructor() {
+		super("/stats");
+	}
 
-	const app: express.Router = express.Router();
+	setup() {
+		super.setup();
+		const app = this.app;
+		const client = this.client;
 
-	app.get("/", async (req, res) => {
-		const d = new Date(),
-			date = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`,
-			dailyJoins = await mdb.collection("dailyjoins").findOne({ date }).then(res => res.count).catch(err => null),
-			stats = await Internal.getStats();
+		app
+			.get("/", async (req, res) => {
+				const st = await client.ipc.getStats();
 
-		return res.status(200).json({
-			success: true,
-			clientStatus: "online",
-			guildCount: client.guilds.size,
-			userCount: client.users.size,
-			shardCount: client.shards.size,
-			memoryUsage: {
-				process: {
-					used: Internal.memory.process.getUsed(),
-					total: Internal.memory.process.getTotal()
-				},
-				system: {
-					used: Internal.memory.system.getUsed(),
-					total: Internal.memory.system.getTotal()
-				}
-			},
-			largeGuildCount: client.guilds.filter(g => g.large).length,
-			botVersion: config.version,
-			library: "eris",
-			libraryVersion: require("eris").VERSION,
-			nodeVersion: process.version,
-			dailyJoins,
-			commandCount: client.cmd.commands.length,
-			commandsRan: stats.commandsTotal,
-			messageCount: stats.messages,
-			dmMessageCount: stats.directMessage
-		});
-	});
+				const d = new Date((Date.now() - 432e5) - 8.64e+7);
+				const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
+				let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.count).catch(err => null);
+				if (!k) k = "Unknown.";
+				else k = (st.clusters.reduce((a, b) => b.guilds + a, 0) - k).toString();
 
-	// fix ping sometime
-	/*
-		.get("/ping", async (req, res) => res.status(200).json({
-			success: true,
-			ping: Math.floor(client.shards.map(s => s.latency).reduce((a, b) => a + b) / client.shards.size)
-		}))*/
+				const stats = await Internal.getStats();
 
-	return app;
-});
+				return res.status(200).json({
+					success: true,
+					clientStatus: "online",
+					guildCount: st.clusters.reduce((a, b) => b.guilds + a, 0),
+					userCount: st.clusters.reduce((a, b) => b.users + a, 0),
+					shardCount: st.clusters.reduce((a, b) => b.shardStats.length + a, 0),
+					largeGuildCount: st.clusters.reduce((a, b) => b.largeGuilds + a, 0),
+					memoryUsage: {
+						all: {
+							used: st.totalRam * 1000 * 1000,
+							total: null
+						},
+						system: {
+							used: Internal.memory.system.getUsed(),
+							total: Internal.memory.system.getTotal()
+						}
+					},
+					botVersion: config.version,
+					library: "eris",
+					libraryVersion: require("eris").VERSION,
+					nodeVersion: process.version,
+					dailyJoins: k,
+					commandCount: client.cmd.commands.length,
+					commandsRan: stats.commandsAllTime,
+					messageCount: stats.messages,
+					dmMessageCount: stats.directMessage
+				});
+			});
+	}
+}

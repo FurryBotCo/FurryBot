@@ -1,5 +1,4 @@
 import { performance } from "perf_hooks";
-import Logger from "./LoggerV8";
 import FurryBot from "../main";
 
 export default class Timers {

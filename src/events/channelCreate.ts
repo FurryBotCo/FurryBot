@@ -4,16 +4,23 @@ import * as Eris from "eris";
 import { db } from "../modules/Database";
 import { ChannelNames, Colors } from "../util/Constants";
 import { Utility } from "../util/Functions";
+import config from "../config";
 
 export default new ClientEvent("channelCreate", (async function (this: FurryBot, channel: Eris.AnyChannel) {
 	this.track("events", "channelCreate");
+	if (config.beta) {
+		if (channel instanceof Eris.GuildChannel && !config.client.betaEventGuilds.includes(channel.guild.id)) return;
+		else return;
+	}
 
 	if (channel instanceof Eris.GuildChannel) {
 		const g = await db.getGuild(channel.guild.id);
-		if (!g) return;
-		const e = g.logEvents.channelCreate;
-		if (!e.enabled || !e.channel) return;
-		const ch = channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+		if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
+		const e = g.logEvents.find(l => l.type === "channelCreate");
+		if (!e || !e.channel) return;
+		if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+		const ch = channel.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+		if (!ch) return g.mongoEdit({ $pull: e });
 
 		const embed: Eris.EmbedOptions = {
 			title: "Channel Created",

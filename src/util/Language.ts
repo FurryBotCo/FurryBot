@@ -1,7 +1,7 @@
-import YAML from "yaml";
 import * as fs from "fs-extra";
 import config from "../config";
-import _ from "lodash";
+import dot from "dot-object";
+import MakeFile from "../config/extra/lang/MakeFile";
 interface LangString extends String {
 	format<T extends any = string>(...args: T[]): string;
 }
@@ -17,6 +17,16 @@ interface LangString extends String {
 	return res;
 });
 
+/*Object.defineProperty(String.prototype, "format", function (...args: string[]) {
+	let res = this.toString();
+	if (!res) return null;
+	const a = res.match(/({\d})/g);
+	if (!a) return null;
+	const e = ((s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"));
+	a.map((b, i) => args[i] !== undefined ? res = res.replace(new RegExp(e(b), "g"), args[i]) : null);
+	return res;
+});*/
+
 class SpecificLanguage {
 	lang: string;
 	private entries: { [k: string]: object; };
@@ -26,20 +36,7 @@ class SpecificLanguage {
 	}
 
 	get(str: string) {
-
-		/**
-		 * Gets nested properties from objects
-		 * @param {*} obj - the object to get stuff from
-		 * @param {string} prop - the property to look for (dot notation for nested)
-		 * @returns {string}
-		 */
-		function get(obj: any, prop: string): string {
-			if (!obj) return null;
-			const p = prop.split(".");
-			if (typeof obj[p[0]] !== "undefined") return p.length > 1 ? get(obj[p[0]], p.slice(1).join(".")) : obj[p[0]];
-			else return null;
-		}
-		let s = get(this.entries, str) as unknown as LangString;
+		let s = dot.pick(str, this.entries) as unknown as LangString;
 		if ([undefined, null].includes(s)) return null;
 		if (s instanceof Array) s = s[Math.floor(Math.random() * s.length)];
 
@@ -65,13 +62,28 @@ class SpecificLanguage {
 export default class Language {
 	private constructor() { }
 
-	static get(lang: string) {
-		if (!fs.existsSync(`${config.dir.lang}/${lang}.yaml`)) lang = "en"; // (prefer default over error) throw new TypeError("invalid language");
-		const l = YAML.parse(fs.readFileSync(`${config.dir.lang}/${lang}.yaml`).toString());
-		return new SpecificLanguage(lang, l);
+	static genJSON(lang: string) {
+		if (!fs.existsSync(`${config.dir.lang}/${lang}`)) throw new TypeError(`Invalid language "${lang}".`);
+		MakeFile(lang);
 	}
 
-	static has(lang: string) { return fs.existsSync(`${config.dir.lang}/${lang}.yaml`); }
+	static get(lang: string): SpecificLanguage;
+	static get(lang: string, path: string, parseable?: true): LangString;
+	static get(lang: string, path: string, parseable: false): string;
+	static get(lang: string, path?: string, parseable?: boolean) {
+		if (!fs.existsSync(`${config.dir.lang}/${lang}`)) lang = "en"; // (prefer default over error) throw new TypeError("invalid language");
+		if (!fs.existsSync(`${config.dir.lang}/${lang}.json`)) this.genJSON(lang);
+		const l = JSON.parse(fs.readFileSync(`${config.dir.lang}/${lang}.json`).toString());
+		const ln = new SpecificLanguage(lang, l);
+		if (!path) return ln;
+		else {
+			const s = ln.get(path);
+			if (!s) return `{lang:${path}}`;
+			return !parseable ? s.toString() : s;
+		}
+	}
+
+	static has(lang: string) { return fs.existsSync(`${config.dir.lang}/${lang}.json`); }
 
 	static parseString(lang: string, str: string) {
 		if (!this.has(lang)) throw new TypeError("Invalid language.");

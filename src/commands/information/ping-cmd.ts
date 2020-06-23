@@ -1,16 +1,18 @@
-import Command from "../../util/CommandHandler/lib/Command";
+import Command from "../../modules/CommandHandler/Command";
 
 export default new Command({
 	triggers: [
 		"ping"
 	],
-	userPermissions: [],
-	botPermissions: [
-		"embedLinks"
-	],
-	cooldown: 1e3,
-	donatorCooldown: .5e3,
-	features: [],
+	permissions: {
+		user: [],
+		bot: [
+			"embedLinks"
+		]
+	},
+	cooldown: 2e3,
+	donatorCooldown: 1.5e3,
+	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	return msg.channel.createMessage("{lang:commands.information.ping.check}")

@@ -2,9 +2,11 @@
 // this is also the reason this file is plain javascript, and not typescript
 
 module.exports = (async function (txt, v) {
-	const keys = Object.keys(v);
-	for (let k of keys) {
+	/*for (let k of keys) {
 		global[k] = v[k];
+	}*/
+	for (const k in v) {
+		new Function("value", k + " = value ")(v[k]) // attempt to set the value
 	}
 	return eval(txt);
 });

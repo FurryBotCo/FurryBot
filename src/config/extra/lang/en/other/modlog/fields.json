@@ -1,0 +1,12 @@
+{
+	"target": "Target",
+	"reason": "Reason",
+	"deleteDays": "Message Delete Days",
+	"time": "Time",
+	"permanent": "Permanent",
+	"id": "ID",
+	"warningReason": "Warning Reason",
+	"oldBlame": "Old Blame",
+	"unknown": "Unknown",
+	"totalWarnings": "Total Warnings"
+}

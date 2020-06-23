@@ -1,42 +1,39 @@
 import ClientEvent from "../util/ClientEvent";
 import FurryBot from "../main";
-import * as Eris from "eris";
-import { db } from "../modules/Database";
-import { Colors, MessageTypes } from "../util/Constants";
+import Eris from "eris";
+import db from "../modules/Database";
+import { MessageTypes, Colors } from "../util/Constants";
 import { Utility } from "../util/Functions";
 import config from "../config";
-import rClient from "../util/Redis";
+import { Redis } from "../modules/External";
 
 export default new ClientEvent("messageDelete", (async function (this: FurryBot, message: Eris.Message<Eris.GuildTextableChannel>) {
 	this.track("events", "messageDelete");
+
 	if (!this || !message || !message.author || message.author.bot || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any)) return;
+
+	if (config.beta && !config.client.betaEventGuilds.includes(message.channel.guild.id)) return;
+
 	const g = await db.getGuild(message.channel.guild.id);
-	if (!g) return;
-	await g.edit({
-		snipe: {
-			delete: {
-				[message.channel.id]: {
-					content: message.content,
-					authorId: message.author.id,
-					time: Date.now()
-				}
-			}
+	// tslint:disable-next-line: no-string-literal
+	if (typeof g["snipe"] !== "undefined") await g.mongoEdit({
+		$unset: {
+			snipe: 1
 		}
-	}).then(d => d.reload());
+	});
 
-	const e = g.logEvents.messageDelete;
-	if (!e || !e.enabled || !e.channel) return;
-	const ch = message.channel.guild.channels.get<Eris.GuildTextableChannel>(e.channel);
+	// auto delete after 30 minutes
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:delete:${message.channel.guild.id}:content`, 1800, message.content);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:delete:${message.channel.guild.id}:author`, 1800, message.author.id);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:delete:${message.channel.guild.id}:time`, 1800, Date.now().toString());
 
-	if (ch.guild.id !== message.guildID) {
-		this.log("warn", `messageDelete log attempted in a guild that was not the same as the one the event came from. (${ch.guild.id}/${message.guildID})`, "Message Delete");
-		await g.edit({
-			logEvents: {
-				messageDelete: null
-			}
-		});
-		return;
-	}
+	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
+	const e = g.logEvents.find(l => l.type === "messageDelete");
+	if (!e || !e.channel) return;
+	if (!/^[0-9]{15,21}$/.test(e.channel)) return g.mongoEdit({ $pull: e });
+	const ch = message.channel.guild.channels.get(e.channel) as Eris.GuildTextableChannel;
+
+	if (!ch || ch.guild.id !== message.guildID) return;
 	const d = new Date(message.createdAt);
 
 	const embed: Eris.EmbedOptions = {
