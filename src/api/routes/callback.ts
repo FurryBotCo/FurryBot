@@ -44,7 +44,7 @@ export default class CallbackRoute extends Route {
 						avatarURL: "https://i.furry.bot/furry.png",
 						embeds: [
 							new EmbedBuilder("en")
-								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
 								.setTitle("Duplicate Social Link: Discord.Bio")
 								.setTimestamp(new Date().toISOString())
 								.setDescription([
@@ -74,7 +74,7 @@ export default class CallbackRoute extends Route {
 					avatarURL: "https://i.furry.bot/furry.png",
 					embeds: [
 						new EmbedBuilder("en")
-							.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+							.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
 							.setTitle("Successful Social Link: Discord.Bio")
 							.setTimestamp(new Date().toISOString())
 							.setDescription([
@@ -178,7 +178,7 @@ export default class CallbackRoute extends Route {
 						avatarURL: "https://i.furry.bot/furry.png",
 						embeds: [
 							new EmbedBuilder("en")
-								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
 								.setTitle("Duplicate Social Link: Reddit")
 								.setTimestamp(new Date().toISOString())
 								.setDescription([
@@ -224,7 +224,7 @@ export default class CallbackRoute extends Route {
 					avatarURL: "https://i.furry.bot/furry.png",
 					embeds: [
 						new EmbedBuilder("en")
-							.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+							.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
 							.setTitle("Successful Social Link: Reddit")
 							.setTimestamp(new Date().toISOString())
 							.setDescription([
@@ -265,7 +265,7 @@ export default class CallbackRoute extends Route {
 							avatarURL: "https://i.furry.bot/furry.png",
 							embeds: [
 								new EmbedBuilder("en")
-									.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+									.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
 									.setTitle("Duplicate Social Link: Twitter")
 									.setTimestamp(new Date().toISOString())
 									.setDescription([
@@ -297,7 +297,7 @@ export default class CallbackRoute extends Route {
 						avatarURL: "https://i.furry.bot/furry.png",
 						embeds: [
 							new EmbedBuilder("en")
-								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.staticAvatarURL)
+								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
 								.setTitle("Successful Social Link: Twitter")
 								.setTimestamp(new Date().toISOString())
 								.setDescription([
