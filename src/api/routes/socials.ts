@@ -16,6 +16,14 @@ export default class SocialsRoute extends Route {
 
 		app
 			.get("/", async (req, res) => res.status(200).render("socials"))
+			.get("/discord.bio", async (req, res) => {
+				if (!req.session.user) {
+					req.session.return = req.originalUrl;
+					return res.redirect("/socials/discord");
+				}
+
+				return res.redirect("/cb/discord.bio");
+			})
 			.get("/reddit", async (req, res) => {
 				if (!req.session.user) {
 					req.session.return = req.originalUrl;

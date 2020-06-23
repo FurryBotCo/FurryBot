@@ -37,6 +37,10 @@ export default class UserConfig {
 		username: string;
 		id: string;
 		type: "reddit";
+	} | {
+		id: string; // used id but we need a common format here
+		slug: string; // can change very easily but who cares
+		type: "discord.bio";
 	})[];
 	constructor(id: string, data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		this.id = id;

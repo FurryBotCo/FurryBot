@@ -17,6 +17,44 @@ export default class CallbackRoute extends Route {
 		const client = this.client;
 
 		app
+			.get("/discord.bio", async (req, res) => {
+				if (!req.session.user) {
+					req.session.return = req.originalUrl;
+					return res.redirect("/socials/discord");
+				}
+
+				const d = await phin({
+					method: "GET",
+					url: `https://api.discord.bio/v1/user/details/${req.session.user.id}`,
+					headers: {
+						"User-Agent": config.web.userAgent
+					}
+				});
+
+				if (d.statusCode !== 200) return res.status(400).end("It seems like you don't have a profile on discord.bio. Make sure you're signed in to the right account.");
+				const b = JSON.parse(d.body.toString());
+
+				const u = await db.getUser(req.session.user.id);
+
+				if (!!u.socials.find(s => s.type === "discord.bio" && s.id === req.session.user.id)) {
+					Logger.debug("Discord.Bio Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) tried to link a duplicate Discord.Bio account, ${b.payload.user.details.slug} (${req.session.user.id}).`);
+					return res.status(400).end("Duplicate account detected. To refresh your handle, remove the account and log back in.");
+				}
+
+				await u.mongoEdit({
+					$push: {
+						socials: {
+							type: "discord.bio",
+							id: req.session.user.id,
+							slug: b.payload.user.details.slug
+						}
+					}
+				});
+
+				Logger.debug("Discord.Bio Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) linked their Discord.Bio account, ${b.payload.user.details.slug} (${req.session.user.id}).`);
+
+				return res.status(200).end("Finished, check your profile (f!uinfo).");
+			})
 			.get("/reddit", async (req, res) => {
 				if (!req.session.user) {
 					req.session.return = req.originalUrl;
