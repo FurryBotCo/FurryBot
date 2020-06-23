@@ -92,6 +92,7 @@ export default class TimedTasks {
 	}
 
 	static async runAutoServerActions(client: FurryBot) {
+		if (client.clusterID !== 0) return;
 		const a = await mdb.collection<GlobalTypes.TimedEntry>("timed").find({}).toArray();
 
 		await Promise.all(a.map(async (entry) => {

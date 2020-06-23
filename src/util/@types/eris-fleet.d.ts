@@ -1,10 +1,12 @@
 /// <reference types="node" />
 
+
 declare module "eris-fleet" {
 	import { EventEmitter } from "events";
 	import Eris from "eris";
+	import { Worker } from "cluster";
 
-	export class Collection extends Map {
+	export class Collection<K = any, V = any> extends Map<K, V> {
 		constructor();
 		find(func: Function): any;
 	}

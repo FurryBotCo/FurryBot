@@ -1,6 +1,7 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import * as fs from "fs-extra";
 import MakeFile from "./src/config/extra/lang/MakeFile";
+import find from "find-process";
 
 // regen lang before launch
 fs.readdirSync(`${__dirname}/src/config/extra/lang`).filter(d => fs.lstatSync(`${__dirname}/src/config/extra/lang/${d}`).isDirectory()).map(d => {
@@ -54,6 +55,9 @@ if (Cluster.isMaster) {
 
 	fs.writeFileSync(`${__dirname}/${__filename.endsWith(".ts") ? "" : "../"}process.pid`, process.pid);
 
+	setInterval(() => {
+		find("name", __dirname).then(v => console.log(v.filter(p => p.ppid = process.pid)));
+	}, 6e4);
 }
 
 process.on("SIGINT", () => {

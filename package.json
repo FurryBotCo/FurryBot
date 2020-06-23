@@ -22,6 +22,7 @@
     "eris-sharder": "^1.10.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "find-process": "^1.4.3",
     "fs-extra": "^9.0.0",
     "furry.services": "^1.0.1",
     "furrybotapi": "^2.0.2",
