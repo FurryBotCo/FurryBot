@@ -2,7 +2,6 @@ import { Route } from "..";
 import db, { mdb } from "../../modules/Database";
 import config from "../../config";
 import Eris from "eris";
-import { Strings } from "../../util/Functions";
 
 export default class WarnRoute extends Route {
 	constructor() {

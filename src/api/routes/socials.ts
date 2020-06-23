@@ -1,6 +1,5 @@
 import { Route } from "..";
 import config from "../../config";
-import * as fs from "fs-extra";
 import Twitter from "../../modules/External/Twitter";
 import Logger from "../../util/LoggerV10";
 import { Strings } from "../../util/Functions";

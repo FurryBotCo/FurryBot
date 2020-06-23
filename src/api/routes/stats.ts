@@ -2,7 +2,6 @@ import { Route } from "..";
 import config from "../../config";
 import { Internal } from "../../util/Functions";
 import { mdb } from "../../modules/Database";
-import Eris from "eris";
 
 export default class StatsRoute extends Route {
 	constructor() {

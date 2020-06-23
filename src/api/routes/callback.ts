@@ -1,11 +1,9 @@
 import { Route } from "..";
 import config from "../../config";
-import * as fs from "fs-extra";
 import Twitter from "../../modules/External/Twitter";
 import Logger from "../../util/LoggerV10";
-import db, { mdb } from "../../modules/Database";
+import db from "../../modules/Database";
 import { Internal } from "../../util/Functions";
-import sickbanCmd from "../../commands/meme/sickban-cmd";
 import phin from "phin";
 
 export default class CallbackRoute extends Route {

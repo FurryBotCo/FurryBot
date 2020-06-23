@@ -1,6 +1,4 @@
 import { Route } from "..";
-import config from "../../config";
-import * as fs from "fs-extra";
 import db from "../../modules/Database";
 
 export default class UnlinkRoute extends Route {
