@@ -16,11 +16,6 @@ export default new Command({
 	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const time = await Time.ms((this.bot.shards.size * 7) * 1e3, true);
-	fs.writeFileSync(`${config.dir.base}/restart.json`, JSON.stringify({
-		time: Date.now(),
-		user: msg.author.id,
-		channel: msg.channel.id
-	}));
-	return msg.reply(`restarting.. This may take ${time} or more.`).then(() => process.exit());
+	this.ipc.restartAllClusters();
+	return msg.reply(`restarting all clusters..`);
 }));

@@ -280,7 +280,7 @@ export default class Internal {
 	static async getStats() {
 		const statNames = [
 			`${config.beta ? "beta" : "prod"}:stats:commands:total`,
-			`${config.beta ? "beta" : "prod"}:stats:commands:AllTime:total`,
+			`${config.beta ? "beta" : "prod"}:stats:commands:allTime:total`,
 			`${config.beta ? "beta" : "prod"}:stats:messages`,
 			`${config.beta ? "beta" : "prod"}:events:messageCreate`,
 			`${config.beta ? "beta" : "prod"}:stats:directMessage`,
@@ -289,7 +289,7 @@ export default class Internal {
 
 		const n = {
 			commandsTotal: `${config.beta ? "beta" : "prod"}:stats:commands:total`,
-			commandsAllTime: `${config.beta ? "beta" : "prod"}:stats:commands:AllTime:total`,
+			commandsAllTime: `${config.beta ? "beta" : "prod"}:stats:commands:allTime:total`,
 			messages: `${config.beta ? "beta" : "prod"}:stats:messages`,
 			messagesAllTime: `${config.beta ? "beta" : "prod"}:events:messageCreate`,
 			directMessage: `${config.beta ? "beta" : "prod"}:stats:directMessage`,
