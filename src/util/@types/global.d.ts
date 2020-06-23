@@ -263,7 +263,7 @@ declare global {
 
 	namespace Socials {
 
-		type AnySocial = Twitter | Reddit | DiscordBio;
+		type AnySocial = Twitter | Reddit | DiscordBio | Website;
 
 		interface Twitter {
 			username: string;
@@ -281,6 +281,12 @@ declare global {
 			id: string; // used id but we need a common format here
 			slug: string; // can change very easily but who cares
 			type: "discord.bio";
+		}
+
+		interface Website {
+			id: string; // the verification meta
+			url: string;
+			type: "website";
 		}
 	}
 }
