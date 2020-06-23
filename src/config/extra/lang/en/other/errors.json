@@ -12,5 +12,6 @@
 		"category": "Category",
 		"providedArgs": "Provided Args",
 		"noArgs": "NONE"
-	}
+	},
+	"noStats": "stats have not been processed yet, please wait."
 }

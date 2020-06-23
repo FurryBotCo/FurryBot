@@ -5,6 +5,7 @@ import { Colors } from "../../util/Constants";
 import Eris from "eris";
 import { Internal, Time } from "../../util/Functions";
 import * as pkg from "../../../package.json";
+import { Stats } from "eris-fleet";
 
 export default new Command({
 	triggers: [
@@ -22,6 +23,8 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
+	const st: Stats = await this.ipc.getStats();
+	if (!st) return msg.reply("{lang:other.errors.noStats}");
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.information.info.title}")
@@ -30,12 +33,11 @@ export default new Command({
 				`\u25FD {lang:other.words.processUsage}: ${Math.round(Internal.memory.process.getUsed() / 1024 / 1024)}MB / ${Math.round(Internal.memory.process.getTotal() / 1024 / 1024)}MB`,
 				`\u25FD {lang:other.words.systemUsage}: ${Math.round(Internal.memory.system.getUsed() / 1024 / 1024 / 1024)}GB / ${Math.round(Internal.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
 				`\u25FD {lang:other.words.uptime}: ${Time.parseTime(process.uptime())} (${Time.secondsToHMS(process.uptime())})`,
-				`\u25FD {lang:other.words.shard}: ${msg.channel.guild.shard.id + 1}/${this.bot.shards.size}`,
-				`\u25FD {lang:other.words.guilds}: ${this.bot.guilds.size}`,
-				`\u25FD {lang:other.words.largeGuilds}: ${this.bot.guilds.filter(g => g.large).length}`,
-				`\u25FD {lang:other.words.users}: ${this.bot.users.size}`,
-				`\u25FD {lang:other.words.channels}: ${Object.keys(this.bot.channelGuildMap).length}`,
-				`\u25FD {lang:other.words.voiceConnections}: ${this.bot.voiceConnections.size}`,
+				`\u25FD {lang:other.words.shard}: ${msg.channel.guild.shard.id + 1}/${st.clusters.reduce((a, b) => b.shardStats.length + a, 0)}`,
+				`\u25FD {lang:other.words.guilds}: ${st.clusters.reduce((a, b) => b.guilds + a, 0)}`,
+				`\u25FD {lang:other.words.largeGuilds}: ${st.clusters.reduce((a, b) => b.largeGuilds + a, 0)}`,
+				`\u25FD {lang:other.words.users}: ${st.clusters.reduce((a, b) => b.users + a, 0)}`,
+				`\u25FD {lang:other.words.voiceConnections}: ${st.clusters.reduce((a, b) => b.voice + a, 0)}`,
 				`\u25FD {lang:other.words.commands}: ${this.cmd.commands.length} (${this.cmd.categories.length} {lang:other.words.categories})`,
 				"",
 				"**{lang:other.words.creators}**:",

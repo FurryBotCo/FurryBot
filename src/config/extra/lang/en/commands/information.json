@@ -177,7 +177,12 @@
 		"channelCount": "Channel Count",
 		"shardCount": "Shard Count",
 		"uptime": "Uptime",
-		"directMessage": "Direct Messages"
+		"directMessage": "Direct Messages",
+		"memoryUsage": "Memory Usage",
+		"memoryUsageTotal": "Total",
+		"memoryUsageMaster": "Master",
+		"memoryUsageClusters": "Clusters",
+		"memoryUsageServices": "Services"
 	},
 	"status": {
 		"description": "Get some status about certain websites.",
