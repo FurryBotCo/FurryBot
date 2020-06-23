@@ -32,9 +32,11 @@ export default class UserConfig {
 	socials: ({
 		username: string;
 		id: string;
-		token: string;
-		secret: string;
 		type: "twitter";
+	} | {
+		username: string;
+		id: string;
+		type: "reddit";
 	})[];
 	constructor(id: string, data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		this.id = id;

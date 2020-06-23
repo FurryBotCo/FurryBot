@@ -17,6 +17,18 @@ export default class SocialsRoute extends Route {
 
 		app
 			.get("/", async (req, res) => res.status(200).render("socials"))
+			.get("/reddit", async (req, res) => {
+				if (!req.session.user) {
+					req.session.return = req.originalUrl;
+					return res.redirect("/socials/discord");
+				}
+
+				req.session.state = Strings.random(32);
+
+				const c = config.beta ? config.apiKeys.reddit.beta : config.apiKeys.reddit.prod;
+
+				return res.redirect(`https://www.reddit.com/api/v1/authorize?client_id=${c.clientId}&response_type=${c.responseType}&state=${req.session.state}&redirect_uri=${c.callbackURL}&duration=${c.duration}&scope=${c.scopes.join("$20")}`);
+			})
 			.get("/twitter", async (req, res) => {
 				if (!req.session.user) {
 					req.session.return = req.originalUrl;

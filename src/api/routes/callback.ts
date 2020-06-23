@@ -6,6 +6,7 @@ import Logger from "../../util/LoggerV10";
 import db, { mdb } from "../../modules/Database";
 import { Internal } from "../../util/Functions";
 import sickbanCmd from "../../commands/meme/sickban-cmd";
+import phin from "phin";
 
 export default class CallbackRoute extends Route {
 	constructor() {
@@ -18,6 +19,124 @@ export default class CallbackRoute extends Route {
 		const client = this.client;
 
 		app
+			.get("/reddit", async (req, res) => {
+				if (!req.session.user) {
+					req.session.return = req.originalUrl;
+					return res.redirect("/socials/discord");
+				}
+
+				if (req.query.error) {
+					switch (req.query.error.toString().toLowerCase()) {
+						case "access_denied": {
+							return res.status(400).end("You denied the request.");
+							break;
+						}
+
+						default: {
+							Logger.error("Reddit Social Callback", `Query Error: ${req.query.error}`);
+							return res.status(400).end("Unknown Reddit error.");
+						}
+					}
+				}
+
+				if (!req.query.state || req.query.state !== req.session.state) return res.status(400).end("Invalid state.");
+
+				if (!req.query.code) return res.status(400).end("Missing code.");
+
+				const c = config.beta ? config.apiKeys.reddit.beta : config.apiKeys.reddit.prod;
+
+				interface RResponse {
+					access_token: string;
+					token_type: "bearer";
+					expires_in: number;
+					scope: string;
+					refresh_token?: string; // will not be present due to temporary access
+				}
+
+				const r = await phin<RResponse>({
+					method: "POST",
+					url: "https://www.reddit.com/api/v1/access_token",
+					form: {
+						grant_type: "authorization_code",
+						code: req.query.code.toString(),
+						redirect_uri: c.callbackURL
+					},
+					headers: {
+						"User-Agent": config.web.userAgent,
+						"Authorization": `Basic ${Buffer.from(`${c.clientId}:${c.secret}`).toString("base64")}`
+					},
+					parse: "json"
+				});
+
+				if (r.statusCode !== 200) {
+					Logger.error("Reddit Callback Router", `non 200-OK: ${r.statusCode} ${r.statusMessage}`);
+					Logger.error("Reddit Callback Router", JSON.stringify(r.body));
+					return res.status(500).end("Unknown internal error.");
+				}
+
+				const us = await phin({
+					method: "GET",
+					url: "https://oauth.reddit.com/api/v1/me",
+					headers: {
+						"User-Agent": config.web.userAgent,
+						"Authorization": `Bearer ${r.body.access_token}`
+					}
+				});
+
+				if (us.statusCode !== 200) {
+					Logger.error("Reddit Callback Router", `non 200-OK: ${us.statusCode} ${us.statusMessage}`);
+					Logger.error("Reddit Callback Router", JSON.stringify(us.body.toString()));
+					return res.status(500).end("Unknown internal error.");
+				}
+
+				let user: {
+					// definitely not all it returns, but really all we care about right now
+					name: string;
+					id: string;
+				};
+				try {
+					user = JSON.parse(us.body.toString());
+				} catch (e) {
+					Logger.error("Reddit Callback Router", e);
+					Logger.error("Reddit Callback Router", us.body.toString());
+					return res.status(500).end("Unknown internal error.");
+				}
+
+				const u = await db.getUser(req.session.user.id);
+
+				if (!!u.socials.find(s => s.type === "reddit" && s.id === user.id)) {
+					Logger.debug("Reddit Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with a duplicate Reddit account, @${user.name} (${user.id}).`);
+					return res.status(400).end("Duplicate account detected. To refresh your username, remove the account and log back in.");
+				}
+
+				await u.mongoEdit({
+					$push: {
+						socials: {
+							type: "reddit",
+							id: user.id,
+							username: user.name
+						}
+					}
+				});
+
+				// revoke after done
+				await phin({
+					method: "POST",
+					url: "https://www.reddit.com/api/v1/revoke_token",
+					form: {
+						token: r.body.access_token,
+						token_type_hint: "access_token"
+					},
+					headers: {
+						"User-Agent": config.web.userAgent,
+						"Authorization": `Basic ${Buffer.from(`${c.clientId}:${c.secret}`).toString("base64")}`
+					}
+				}).catch(err => null);
+
+				Logger.debug("Reddit Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with Reddit, @${user.name} (${user.id}).`);
+
+				return res.status(200).end("Finished, check your profile (f!uinfo).");
+			})
 			.get("/twitter", async (req, res) => {
 				if (!req.session.user) {
 					req.session.return = req.originalUrl;
@@ -29,7 +148,7 @@ export default class CallbackRoute extends Route {
 					oauth_verifier: req.query.oauth_verifier
 				}, req.session.tokenSecret, async (err, user) => {
 					if (err) {
-						Logger.error("Callback Router", err);
+						Logger.error("Twitter Social Callback", err);
 						return res.status(500).end("Internal Server Error.");
 					}
 
@@ -38,7 +157,7 @@ export default class CallbackRoute extends Route {
 					const u = await db.getUser(req.session.user.id);
 
 					if (!!u.socials.find(s => s.type === "twitter" && s.id === user.userId)) {
-						Logger.debug("Social Callback", `User ${user.username}#${user.discriminator} (${user.id}) signed in with a duplicate Twitter account, @${user.userName} (${user.userId}).`);
+						Logger.debug("Twitter Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with a duplicate Twitter account, @${user.userName} (${user.userId}).`);
 						return res.status(400).end("Duplicate account detected. To refresh your username, remove the account and log back in.");
 					}
 
@@ -47,14 +166,12 @@ export default class CallbackRoute extends Route {
 							socials: {
 								type: "twitter",
 								id: user.userId,
-								username: user.userName,
-								token: user.userToken,
-								secret: user.userTokenSecret
+								username: user.userName
 							}
 						}
 					});
 
-					Logger.debug("Social Callback", `User ${user.username}#${user.discriminator} (${user.id}) signed in with Twitter, @${user.userName} (${user.userId}).`);
+					Logger.debug("Twitter Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with Twitter, @${user.userName} (${user.userId}).`);
 
 					return res.status(200).end("Finished, check your profile (f!uinfo).");
 				});

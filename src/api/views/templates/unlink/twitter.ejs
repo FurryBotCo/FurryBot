@@ -7,7 +7,7 @@
 
 <body>
 	Chose one to unlink:<br>
-	<%- locals.accounts.map(s => `<a href="/unlink/confirm?type=twitter&id=${s.id}">${s.username}</a>`).join("<br>") %>
+	<%- locals.accounts.map(s => `<a href="/unlink/confirm?type=twitter&id=${s.id}">@${s.username}</a>`).join("<br>") %>
 </body>
 
 </html>

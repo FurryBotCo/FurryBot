@@ -79,7 +79,13 @@ export default new Command({
 				...(c.socials.length === 0 ? [`{lang:other.words.none}`] : c.socials.map(s => {
 					switch (s.type) {
 						case "twitter": {
-							return `${config.emojis.twitter} [${s.username}](https://twitter.com/intent/user?user_id=${s.id})`;
+							return `${config.emojis.twitter} [@${s.username}](https://twitter.com/intent/user?user_id=${s.id})`;
+							break;
+						}
+
+						case "reddit": {
+							return `${config.emojis.reddit} [u/${s.username}](https://reddit.com/user/${s.username})`;
+							break;
 						}
 					}
 				})),
