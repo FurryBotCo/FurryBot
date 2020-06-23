@@ -37,10 +37,8 @@ export default (async (manager: Fleet) => {
 			parse: "json"
 		})
 			.then(req => {
-				try {
-					return JSON.parse(req.body.toString());
-				} catch (e) {
-					Logger.error("Bot List Stats", req.body);
+				if (![200, 204].includes(req.statusCode)) {
+					Logger.error("Bot List Stats", JSON.stringify(req.body));
 					Logger.error("Bot List Stats", `${req.statusCode} ${req.statusMessage}`);
 				}
 			});
