@@ -90,7 +90,7 @@ export default new Command({
 						}
 
 						case "discord.bio": {
-							return `${config.emojis["discord.bio"]} [${s.slug}](https://dsc.bio/${s.slug})`;
+							return `${config.emojis["discord.bio"]} [dsc.bio/${s.slug}](https://dsc.bio/${s.slug})`;
 							break;
 						}
 					}
