@@ -17,7 +17,10 @@ export default class HolderV2 {
 
 	add(name: string, time?: number) {
 		const added = Date.now();
-		if (this.entries.filter(e => e.name.toLowerCase() === name.toLowerCase()).length !== 0) throw new TypeError("Duplicate entry.");
+		if (this.entries.filter(e => e.name.toLowerCase() === name.toLowerCase()).length !== 0) {
+			// throw new TypeError("Duplicate entry.");
+			return false; // soft fail
+		}
 		this.entries.push({
 			name,
 			added,
