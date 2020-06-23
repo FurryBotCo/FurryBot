@@ -75,7 +75,7 @@ export default new Command({
 				...around.map(a => a === msg.author.id ? `- [#${m.indexOf(a) + 1}] **<@!${a}>**` : `- [#${m.indexOf(a) + 1}] <@!${a}>`),
 				"",
 				"**{lang:commands.information.uinfo.socialProfiles}:**",
-				...(c.id !== msg.author.id ? [] : [`[[{lang:other.words.add}]](https://${config.web.api.host}/socials) [[{lang:other.words.remove}]](https://${config.web.api.host}/unlink)`]),
+				...(c.id !== msg.author.id ? [] : [`[[{lang:other.words.add}](https://${config.web.api.host}/socials)] [[{lang:other.words.remove}](https://${config.web.api.host}/unlink)]`]),
 				...(c.socials.length === 0 ? [`{lang:other.words.none}`] : c.socials.map(s => {
 					switch (s.type) {
 						case "twitter": {
