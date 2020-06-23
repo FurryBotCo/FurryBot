@@ -228,24 +228,25 @@ export default class TimedTasks {
 
 	static async runDailyJoins(client: FurryBot) {
 		if (client.clusterID !== 0) return;
+		const st = await client.ipc.getStats();
 		// @TODO fix daily joins
-		/*const d = new Date((Date.now() - 432e5) - 8.64e+7);
+		const d = new Date((Date.now() - 6e4));
 		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-		let k = await mdb.collection("dailyjoins").findOne({ id }).then(r => r.guildCount).catch(err => null);
+		let k: string | number = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:stats:dailyJoins:${id}`).then(v => !v ? 0 : Number(v));
 		if (!k) k = "Unknown.";
-		else k = (client.guilds.size - k).toString();
+		else k = (st.clusters.reduce((a, b) => b.guilds + a, 0) - Number(k)).toString();
 		client.log("log", `Daily joins for ${id}: ${k}`, "Daily Joins");
 		await client.w.get("dailyjoins").execute({
 			embeds: [
 				{
 					title: `Daily Joins for ${id}`,
-					description: `Total Servers Joined Today: ${k}\nTotal Servers: ${client.guilds.size}`,
+					description: `Total Servers Joined Today: ${k}\nTotal Servers: ${st.clusters.reduce((a, b) => b.guilds + a, 0)}`,
 					timestamp: new Date().toISOString()
 				}
 			],
 			username: `Daily Joins${config.beta ? " - Beta" : ""}`,
 			avatarURL: config.images.botIcon
-		});*/
+		});
 	}
 
 	static async runStatusChange(client: FurryBot, num: number) {

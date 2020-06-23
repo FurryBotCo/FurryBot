@@ -308,8 +308,8 @@ export default class Internal {
 	static async incrementDailyCounter(incr: boolean) {
 		const d = new Date();
 		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-		await Redis[incr ? "INCR" : "DECR"](`prod:stats:dailyJoins:${id}`);
-		const st = await this.fetchRedisKey(`prod:stats:dailyJoins:${id}`);
+		await Redis[incr ? "INCR" : "DECR"](`${config.beta ? "beta" : "prod"}:stats:dailyJoins:${id}`);
+		const st = await this.fetchRedisKey(`${config.beta ? "beta" : "prod"}:stats:dailyJoins:${id}`);
 		return st;
 	}
 
