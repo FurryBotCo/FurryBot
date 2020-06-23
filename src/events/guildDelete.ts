@@ -9,6 +9,7 @@ import { Internal } from "../util/Functions";
 export default new ClientEvent("guildDelete", (async function (this: FurryBot, guild: Eris.Guild) {
 	await this.track("events", "guildDelete");
 	await Internal.incrementDailyCounter(false);
+	const st = await this.ipc.getStats();
 
 	let author = {
 		name: "Unknown#0000",
@@ -27,12 +28,12 @@ export default new ClientEvent("guildDelete", (async function (this: FurryBot, g
 	}
 
 
-	this.log("info", `Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members! We now have ${this.bot.guilds.size} guilds.`, `Shard #${guild.shard.id} | Client`);
+	this.log("info", `Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members! We now have ${st.guilds} guilds.`, `Shard #${guild.shard.id} | Client`);
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Left!",
 		description: [
-			`Guild #${this.bot.guilds.size + 1}`,
-			`Current Total: ${this.bot.guilds.size}`,
+			`Guild #${st.guilds + 1}`,
+			`Current Total: ${st.guilds}`,
 			"",
 			"**Guild Info**:",
 			`${"\u25FD"} Name: ${guild.name}`,

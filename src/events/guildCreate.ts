@@ -9,6 +9,7 @@ import { Internal } from "../util/Functions";
 export default new ClientEvent("guildCreate", (async function (this: FurryBot, guild: Eris.Guild) {
 	await this.track("events", "guildCreate");
 	await Internal.incrementDailyCounter(true);
+	const st = await this.ipc.getStats();
 
 	let author = {
 		name: "Unknown#0000",
@@ -27,12 +28,12 @@ export default new ClientEvent("guildCreate", (async function (this: FurryBot, g
 	}
 
 
-	this.log("info", `Joined guild ${guild.name} (${guild.id}), owner: ${owner}, this guild has ${guild.memberCount} members! This guild has been placed on shard ${guild.shard.id}. We now have ${this.bot.guilds.size} guilds!`, `Shard #${guild.shard.id} | Client`);
+	this.log("info", `Joined guild ${guild.name} (${guild.id}), owner: ${owner}, this guild has ${guild.memberCount} members! This guild has been placed on shard ${guild.shard.id}. We now have ${st.guilds} guilds!`, `Shard #${guild.shard.id} | Client`);
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Joined!",
 		description: [
-			`Guild #${this.bot.guilds.size}`,
-			`Current Total: ${this.bot.guilds.size}`,
+			`Guild #${st.guilds}`,
+			`Current Total: ${st.guilds}`,
 			"",
 			"**Guild Info**:",
 			`${"\u25FD"} Name: ${guild.name}`,
