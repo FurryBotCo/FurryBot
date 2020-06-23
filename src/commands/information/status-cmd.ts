@@ -88,8 +88,7 @@ export default new Command({
 		"cdnYiff": await fetch<FurryBotAPIStatus>("https://yiff.media/online"),
 		"discord": await fetch<StatusPage>("https://srhpyqt94yxb.statuspage.io/api/v2/summary.json"),
 		"cloudflare": await fetch<StatusPage>("https://yh6f0r4529hb.statuspage.io/api/v2/summary.json"),
-		"ll-us-east": await fetch("https://us-east.lavalink.furry.bot/version", config.apiKeys.lavalink.find(n => n.httpHost === "https://us-east.lavalink.furry.bot").password, null),
-		"ll-eu-uk": await fetch("https://eu-uk.lavalink.furry.bot/version", config.apiKeys.lavalink.find(n => n.httpHost === "https://eu-uk.lavalink.furry.bot").password, null)
+		"ll-us-east": await fetch("https://us-east.lavalink.furry.bot/version", config.apiKeys.lavalink.password, null)
 	};
 	if (msg.args.length === 0) {
 		return msg.channel.createMessage({
@@ -100,7 +99,6 @@ export default new Command({
 				.addField("FurCDN.Net", !status.cdnFur ? `Offline, Unreachable.` : `Online: ${!!status.cdnFur.body.success ? "Yes" : "No"}\nUptime: ${!status.cdnFur.body.uptime ? "None" : Time.ms(status.cdnFur.body.uptime * 1000, true)}`, false)
 				.addField("Yiff.Media", !status.cdnYiff ? `Offline, Unreachable.` : `Online: ${!!status.cdnYiff.body.success ? "Yes" : "No"}\nUptime: ${!status.cdnYiff.body.uptime ? "None" : Time.ms(status.cdnYiff.body.uptime * 1000, true)}`, false)
 				.addField("Furry Bot Lavalink US-EAST", `Online: ${!!status["ll-us-east"] ? "Yes" : "No"}\nVersion: ${!status["ll-us-east"] ? "N/A" : status["ll-us-east"].body}`, false)
-				.addField("Furry Bot Lavalink EU-UK", `Online: ${!!status["ll-eu-uk"] ? "Yes" : "No"}\nVersion: ${!status["ll-eu-uk"] ? "N/A" : status["ll-eu-uk"].body}`, false)
 				.addField("Discord (*)", `Status: ${status.discord.body.status.indicator}${status.discord.body.status.indicator !== "operational" ? ` \nDescription: ${status.discord.body.status.description || "No Description"}` : ""}`, false)
 				.addField("Cloudflare (*)", `Status: ${status.cloudflare.body.status.indicator}${status.cloudflare.body.status.indicator !== "operational" ? ` \nDescription: ${status.cloudflare.body.status.description || "No Description"}` : ""}`, false)
 				.setTimestamp(new Date().toISOString())

@@ -13,7 +13,7 @@ import API from "./api";
 import ClientEvent from "./util/ClientEvent";
 import * as fs from "fs-extra";
 import HolderV2 from "./modules/Holders/HolderV2";
-import { Cluster } from "lavalink";
+import { Node } from "lavalink";
 import Collection from "./util/Collection";
 import MusicQueue from "./util/MusicQueue";
 import { BaseClusterWorker } from "eris-fleet";
@@ -33,7 +33,7 @@ export default class FurryBot extends BaseClusterWorker {
 	cmd: CommandHandler;
 	api: API;
 	firstReady: boolean;
-	v: Cluster;
+	v: Node;
 	q: Collection<MusicQueue>;
 	threads: Map<number, Worker>;
 	bot: Eris.Client;
@@ -101,7 +101,7 @@ export default class FurryBot extends BaseClusterWorker {
 		return q;
 	}
 
-	getRecommendedNode() { return this.v.sort()[0]; }
+	getRecommendedNode() { return this.v; }
 
 	async shutdown(done) {
 		return done();

@@ -4,7 +4,7 @@ import { TimedTasks, Time } from "../util/Functions";
 import Eris from "eris";
 import * as fs from "fs";
 import db from "../modules/Database";
-import { Cluster } from "lavalink";
+import { Node } from "lavalink";
 import Logger from "../util/LoggerV10";
 
 export default new ClientEvent("ready", (async function () {
@@ -13,29 +13,15 @@ export default new ClientEvent("ready", (async function () {
 	this.firstReady = true;
 	db.setClient(this);
 	if (Number(this.clusterID) === 0) this.api.launch();
-	const v = this.v = new Cluster({
-		nodes: config.apiKeys.lavalink.map(l => ({
-			password: l.password,
-			userID: this.bot.user.id,
-			shardCount: this.bot.shards.size,
-			hosts: {
-				rest: l.httpHost,
-				ws: l.wsHost
-			}
-		})),
-		send: (guildID, packet) => this.bot.shards.get(Number((BigInt(guildID) >> 22n) % BigInt(this.bot.shards.size))).sendWS(packet.op, packet.d, true),
-		filter: (node, guildID) => {
-			const g = this.bot.guilds.get(guildID);
-			if (!g) return true;
-			const regions = config.apiKeys.lavalink.map(l => l.regions).reduce((a, b) => a.concat(b));
-			if (!regions.includes(g.region)) {
-				Logger.error("Lavalink", `filter with unknown region "${g.region}"`);
-				return true;
-			}
-			const c = config.apiKeys.lavalink.find(n => n.wsHost === node.connection.url);
-			if (!c) return true;
-			return c.regions.includes(g.region);
-		}
+	const v = this.v = new Node({
+		password: config.apiKeys.lavalink.password,
+		userID: this.bot.user.id,
+		shardCount: this.bot.shards.size,
+		hosts: {
+			rest: config.apiKeys.lavalink.httpHost,
+			ws: config.apiKeys.lavalink.wsHost
+		},
+		send: (guildID, packet) => this.bot.shards.get(Number((BigInt(guildID) >> 22n) % BigInt(this.bot.shards.size))).sendWS(packet.op, packet.d, true)
 	});
 
 	this.bot

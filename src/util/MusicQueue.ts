@@ -48,7 +48,7 @@ export default class MusicQueue {
 	}
 
 	get entries() { return new EntryArray(this._entires); }
-	get player() { return this.client.v.get(this.guild.id); }
+	get player() { return this.client.v.players.get(this.guild.id); }
 
 	async setup() {
 		this.gConfig = await db.getGuild(this.guild.id, true);

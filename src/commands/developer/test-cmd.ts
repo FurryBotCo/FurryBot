@@ -130,7 +130,7 @@ export default new Command({
 
 		case "music": {
 			console.log("a");
-			const p = this.v.get(msg.channel.guild.id);
+			const p = this.v.players.get(msg.channel.guild.id);
 			console.log("b");
 			if (!msg.member.voiceState || !msg.member.voiceState.channelID) return msg.reply("join a voice channel.");
 			console.log("c");
