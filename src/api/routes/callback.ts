@@ -37,7 +37,10 @@ export default class CallbackRoute extends Route {
 
 					const u = await db.getUser(req.session.user.id);
 
-					if (!!u.socials.find(s => s.type === "twitter" && s.id === user.userId)) return res.status(400).end("Duplicate account detected. To refresh your username, remove the account and log back in.");
+					if (!!u.socials.find(s => s.type === "twitter" && s.id === user.userId)) {
+						Logger.debug("Social Callback", `User ${user.username}#${user.discriminator} (${user.id}) signed in with a duplicate Twitter account, @${user.userName} (${user.userId}).`);
+						return res.status(400).end("Duplicate account detected. To refresh your username, remove the account and log back in.");
+					}
 
 					await u.mongoEdit({
 						$push: {
@@ -50,6 +53,8 @@ export default class CallbackRoute extends Route {
 							}
 						}
 					});
+
+					Logger.debug("Social Callback", `User ${user.username}#${user.discriminator} (${user.id}) signed in with Twitter, @${user.userName} (${user.userId}).`);
 
 					return res.status(200).end("Finished, check your profile (f!uinfo).");
 				});
@@ -77,6 +82,8 @@ export default class CallbackRoute extends Route {
 				const user = await Internal.getSelfUser(req.session.discord.accessToken);
 
 				if (!user) return res.status(500).render("error", { title: "Internal Error", status: 500, message: "We had an internal error while authorizing, please try again later." });
+
+				Logger.debug("Social Callback", `User ${user.username}#${user.discriminator} (${user.id}) signed in with Discord.`);
 
 				req.session.user = client.bot.users.has(user.id) ? client.bot.users.get(user.id) : await client.bot.getRESTUser(user.id);
 
