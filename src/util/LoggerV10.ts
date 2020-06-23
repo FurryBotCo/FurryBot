@@ -29,6 +29,7 @@ class Logger {
 
 	static _log(type: string) {
 		return (async (source: string, msg?: any): Promise<boolean> => {
+			if (msg instanceof Error) msg = msg.stack;
 			if (typeof process.send !== "undefined") {
 				if (!["log", "warn", "error", "debug"].includes(type)) type = "log";
 				process.send({
