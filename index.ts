@@ -28,10 +28,22 @@ const Admiral = new Fleet({
 
 if (Cluster.isMaster) {
 	Admiral
-		.on("log", (m) => Logger.log("Log", m))
-		.on("debug", (m) => Logger.debug("Debug", m))
-		.on("warn", (m) => Logger.warn("Warn", m))
-		.on("error", (m) => Logger.error("Error", m));
+		.on("log", (m) => {
+			if (m instanceof Error) m = m.stack;
+			Logger.log("Log", m);
+		})
+		.on("debug", (m) => {
+			if (m instanceof Error) m = m.stack;
+			Logger.debug("Debug", m);
+		})
+		.on("warn", (m) => {
+			if (m instanceof Error) m = m.stack;
+			Logger.warn("Warn", m);
+		})
+		.on("error", (m) => {
+			if (m instanceof Error) m = m.stack;
+			Logger.error("Error", m);
+		});
 
 	if (!config.beta) setInterval(() => ListStats(Admiral), 9e5);
 
