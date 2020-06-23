@@ -220,6 +220,7 @@ export default class TimedTasks {
 	}
 
 	static async runAutoPosting(client: FurryBot, time: number) {
+		if (client.clusterID !== 0) return;
 		if (time === 0) time = 60;
 		const entries = await mdb.collection<GlobalTypes.AutoEntry>("auto").find({ time: time as any }).toArray();
 
