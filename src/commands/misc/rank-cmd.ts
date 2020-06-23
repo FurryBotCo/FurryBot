@@ -34,11 +34,13 @@ export default new Command({
 
 	let u: { id: string; level: number; }[] = await Promise.all(msg.channel.guild.members.filter(m => !m.user.bot).map(async (m) => new Promise((a, b) => Redis.GET(`${config.beta ? "beta" : "prod"}:leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
 	const f = u.filter(a => a.level === null).length;
-	u = u.filter(a => a.level !== null).sort((a, b) => b.level - a.level);
-
 	const lvl = config.leveling.calcLevel(c.getLevel(msg.channel.guild.id));
 	const n = config.leveling.calcExp(lvl.level + 1);
-	const pos = u.indexOf(u.find(a => a.id === msg.author.id));
+	const t = { id: user.id, level: lvl.total };
+	if (u.indexOf(t) === -1) u.push(t);
+
+	u = u.filter(a => a.level !== null).sort((a, b) => b.level - a.level);
+	const pos = u.indexOf(u.find(a => a.id === user.id));
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle(`${user.username}#${user.discriminator}'s Rank`)
@@ -48,7 +50,7 @@ export default new Command({
 				`{lang:other.words.xp}: ${lvl.leftover}/${n.lvl} (${lvl.total} {lang:other.words.total})`,
 				...[[undefined, null].includes(pos) ? "" : `{lang:other.words.position}: ${pos + 1}/${u.length} ({lang:other.words.cached})`]
 			].join("\n"))
-			.setDescription(new Date().toISOString())
+			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.gold)
 			.toJSON()
 	});
