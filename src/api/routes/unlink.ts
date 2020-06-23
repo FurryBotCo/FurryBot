@@ -41,7 +41,7 @@ export default class UnlinkRoute extends Route {
 				switch (req.query.type.toString()) {
 					case "twitter": {
 						if (!req.query.id) return res.status(400).end("Missing id.");
-						const s = u.socials.find(s => s.id === req.query.id.toString() && s.type === "twitter") as typeof u["socials"][0] & { type: "twitter"; };
+						const s = u.socials.find(s => s.id === req.query.id.toString() && s.type === "twitter") as Socials.Twitter;
 						if (!s) return res.status(400).end("Id not found in your socials.");
 						await u.mongoEdit({
 							$pull: {
@@ -54,7 +54,7 @@ export default class UnlinkRoute extends Route {
 
 					case "reddit": {
 						if (!req.query.id) return res.status(400).end("Missing id.");
-						const s = u.socials.find(s => s.id === req.query.id.toString() && s.type === "reddit") as typeof u["socials"][0] & { type: "reddit"; };
+						const s = u.socials.find(s => s.id === req.query.id.toString() && s.type === "reddit") as Socials.Reddit;
 						if (!s) return res.status(400).end("Id not found in your socials.");
 						await u.mongoEdit({
 							$pull: {
@@ -67,14 +67,14 @@ export default class UnlinkRoute extends Route {
 
 					case "discord.bio": {
 						if (!req.query.id) return res.status(400).end("Missing id.");
-						const s = u.socials.find(s => s.id === req.query.id.toString() && s.type === "discord.bio") as typeof u["socials"][0] & { type: "discord.bio"; };
+						const s = u.socials.find(s => s.id === req.query.id.toString() && s.type === "discord.bio") as Socials.DiscordBio;
 						if (!s) return res.status(400).end("Id not found in your socials.");
 						await u.mongoEdit({
 							$pull: {
 								socials: s
 							}
 						});
-						return res.status(200).end(`Unlinked Reddit @${s.slug}.`);
+						return res.status(200).end(`Unlinked Discord.Bio @${s.slug}.`);
 						break;
 					}
 

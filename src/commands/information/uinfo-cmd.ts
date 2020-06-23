@@ -49,6 +49,7 @@ export default new Command({
 	if (config.developers.includes(user.id)) f.push(config.flags.dev);
 	if (config.contributors.includes(user.id)) f.push(config.flags.contrib);
 	if (config.helpers.includes(user.id)) f.push(config.flags.helper);
+	if (config.horny.includes(user.id)) f.push(config.flags.horny);
 	try { if (this.bot.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.staff) || user.id === this.bot.guilds.get(config.client.mainGuild).ownerID) f.push(config.flags.staff); } catch (e) { }
 	try { if (this.bot.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.booster)) f.push(config.flags.booster); } catch (e) { }
 	const c = await db.getUser(user.id);
@@ -85,6 +86,11 @@ export default new Command({
 
 						case "reddit": {
 							return `${config.emojis.reddit} [u/${s.username}](https://reddit.com/user/${s.username})`;
+							break;
+						}
+
+						case "discord.bio": {
+							return `${config.emojis["discord.bio"]} [${s.slug}](https://dsc.bio/${s.slug})`;
 							break;
 						}
 					}

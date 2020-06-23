@@ -260,4 +260,27 @@ declare global {
 			premium_type: number;
 		}
 	}
+
+	namespace Socials {
+
+		type AnySocial = Twitter | Reddit | DiscordBio;
+
+		interface Twitter {
+			username: string;
+			id: string;
+			type: "twitter";
+		}
+
+		interface Reddit {
+			username: string;
+			id: string;
+			type: "reddit";
+		}
+
+		interface DiscordBio {
+			id: string; // used id but we need a common format here
+			slug: string; // can change very easily but who cares
+			type: "discord.bio";
+		}
+	}
 }
