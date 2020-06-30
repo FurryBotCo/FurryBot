@@ -1,6 +1,7 @@
 import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import phin from "phin";
+import config from "../../config";
 
 export default new Command({
 	triggers: [
@@ -20,8 +21,12 @@ export default new Command({
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const img = await phin<any>({
 		method: "GET",
-		url: "https://aws.random.cat/meow",
-		parse: "json"
+		url: "https://api.thecatapi.com/v1/images/search",
+		parse: "json",
+		headers: {
+			"X-API-Key": config.apiKeys.cat,
+			"User-Agent": config.web.userAgent
+		}
 	}).then(b => b.body);
 
 	return msg.channel.createMessage({
@@ -31,7 +36,7 @@ export default new Command({
 				.setTimestamp(new Date().toISOString())
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))
-				.setImage(img.file)
+				.setImage(img[0].url)
 				.toJSON()
 	});
 }));
