@@ -18,10 +18,10 @@ export default new Command({
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const hard = msg.dashedArgs.unparsed.value.includes("hard");
 	if (msg.dashedArgs.unparsed.value.includes("full")) {
+		await msg.reply(`performing full ${hard ? "hard " : ""}shutdown.`);
 		this.ipc.totalShutdown(true);
-		return msg.reply(`performing full ${hard ? "hard " : ""}shutdown.`);
 	} else {
+		await msg.reply(`performing a ${hard ? "hard" : "soft"} restart on all clusters.`);
 		this.ipc.restartAllClusters();
-		return msg.reply(`performing a ${hard ? "hard" : "soft"} restart on all clusters.`);
 	}
 }));
