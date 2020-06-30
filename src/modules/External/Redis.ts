@@ -4,7 +4,7 @@ import config from "../../config";
 import Logger from "../../util/LoggerV10";
 import RedisClient from "async-redis";
 
-const Redis = RedisClient.createClient(config.apiKeys.redis.port, config.apiKeys.redis.host, {
+const Redis = RedisClient.createClient(config.apiKeys.redis.port, config.beta ? config.apiKeys.redis.hostBeta : config.apiKeys.redis.host, {
 	password: config.apiKeys.redis.password
 });
 
