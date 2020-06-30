@@ -16,6 +16,12 @@ export default new Command({
 	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	this.ipc.restartAllClusters();
-	return msg.reply(`restarting all clusters..`);
+	const hard = msg.dashedArgs.unparsed.value.includes("hard");
+	if (msg.dashedArgs.unparsed.value.includes("full")) {
+		this.ipc.totalShutdown(true);
+		return msg.reply(`performing full ${hard ? "hard " : ""}shutdown.`);
+	} else {
+		this.ipc.restartAllClusters();
+		return msg.reply(`performing a ${hard ? "hard" : "soft"} restart on all clusters.`);
+	}
 }));
