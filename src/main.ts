@@ -72,6 +72,8 @@ export default class FurryBot extends BaseClusterWorker {
 
 	// because they don't construct this until the cluster is ready??
 	async setup() {
+		this.ipc.register("eval", (...d) => console.log(d));
+		this.ipc.sendTo(0, "eval", { code: "", clusterId: this.clusterID });
 		require(`${__dirname}/events/ready`).default.listener.call(this);
 
 		fs.readdirSync(`${__dirname}/events`).map(d => {
