@@ -13,6 +13,7 @@ import Language from "../../util/Language";
 import { Permissions } from "../../util/Constants";
 import { Redis } from "../../modules/External";
 import Logger from "../../util/LoggerV10";
+import truncate from "truncate";
 
 export default new Command({
 	triggers: [
@@ -32,10 +33,9 @@ export default new Command({
 	const
 		silent = msg.dashedArgs.unparsed.value.includes("s"),
 		deleteInvoke = msg.dashedArgs.unparsed.value.includes("d");
-	let error = false;
+	let error = false, res, o, stack;
 
 	const start = performance.now();
-	let res, o;
 	try {
 		// an external functions is used because typescript screws with the context and the variables
 		res = await _eval.call(this, msg.unparsedArgs.join(" "), {
@@ -105,7 +105,16 @@ export default new Command({
 			res = `Uploaded ${req.body.toString()}`;
 		}
 
-		if (error) this.log("error", ![undefined, null].includes(o) ? o : res, `Shard #${msg.channel.guild.shard.id}`);
+		if (error) {
+			this.log("error", ![undefined, null].includes(o) ? o : res, `Shard #${msg.channel.guild.shard.id}`);
+			const st: string[] = o.stack.split("\n");
+			let i = 0;
+			if (!stack) stack = "";
+
+			// extra 50 for padding
+			for (const line of st) if ((res.length + 50) + stack.length < 950) (stack += `\n${line}`, ++i);
+			if (st.length !== i) stack += `\n(...) and ${st.length - i} more lines`;
+		}
 
 		return msg.channel.createMessage({
 			embed: {
@@ -119,12 +128,12 @@ export default new Command({
 				fields: [
 					{
 						name: ":inbox_tray: Input",
-						value: `\`\`\`js\n${msg.unparsedArgs.join(" ")}\`\`\``,
+						value: `\`\`\`js\n${truncate(msg.unparsedArgs.join(" "), 1000)}\`\`\``,
 						inline: false
 					},
 					{
 						name: ":outbox_tray: Output",
-						value: `\`\`\`js\n${res}\`\`\``,
+						value: `\`\`\`js\n${res}\`\`\`${error && res.indexOf("Uploaded") === -1 ? `\n[stack (hover)](https://furry.bot '${stack}')` : ""}`,
 						inline: false
 					}
 				]
