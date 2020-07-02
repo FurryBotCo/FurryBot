@@ -234,7 +234,7 @@ export default class TimedTasks {
 		// @TODO fix daily joins
 		const d = new Date((Date.now() - 6e4));
 		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-		let k: string | number = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:stats:dailyJoins:${id}`).then(v => !v ? 0 : Number(v));
+		let k: string | number = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:stats:dailyJoins:${id}`).then(v => !v ? 0 : st.guilds - Number(v));
 		if (!k) k = "Unknown.";
 		else k = (st.clusters.reduce((a, b) => b.guilds + a, 0) - Number(k)).toString();
 		client.log("log", `Daily joins for ${id}: ${k}`, "Daily Joins");
