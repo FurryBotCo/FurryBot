@@ -1,7 +1,7 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import * as fs from "fs-extra";
 import MakeFile from "./src/config/extra/lang/MakeFile";
-import find from "find-process";
+import * as util from "util";
 
 // regen lang before launch
 fs.readdirSync(`${__dirname}/src/config/extra/lang`).filter(d => fs.lstatSync(`${__dirname}/src/config/extra/lang/${d}`).isDirectory()).map(d => {
@@ -31,18 +31,22 @@ if (Cluster.isMaster) {
 	Admiral
 		.on("log", (m) => {
 			if (m instanceof Error) m = m.stack;
+			if (typeof m !== "string") m = util.inspect(m, { depth: null, colors: true, showHidden: true });
 			Logger.log("Log", m);
 		})
 		.on("debug", (m) => {
 			if (m instanceof Error) m = m.stack;
+			if (typeof m !== "string") m = util.inspect(m, { depth: null, colors: true, showHidden: true });
 			Logger.debug("Debug", m);
 		})
 		.on("warn", (m) => {
 			if (m instanceof Error) m = m.stack;
+			if (typeof m !== "string") m = util.inspect(m, { depth: null, colors: true, showHidden: true });
 			Logger.warn("Warn", m);
 		})
 		.on("error", (m) => {
 			if (m instanceof Error) m = m.stack;
+			if (typeof m !== "string") m = util.inspect(m, { depth: null, colors: true, showHidden: true });
 			Logger.error("Error", m);
 		});
 

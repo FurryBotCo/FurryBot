@@ -52,8 +52,12 @@ class Logger {
 					try {
 						if (typeof msg === "object") msg = util.inspect(msg, { depth: 3, colors: true });
 					} catch (e) {
+						try {
+							msg = JSON.stringify(msg);
+						} catch (e) { }
 						// apparently some random error throws the Logger class into here,
 						// throwing a circular error which then screws up more by being thrown above the logger
+						// so we just add a catch here and do less parsing on it with another catch
 					}
 					if (msg instanceof Buffer) msg = msg.toString();
 					if (msg instanceof Function) msg = msg.toString();

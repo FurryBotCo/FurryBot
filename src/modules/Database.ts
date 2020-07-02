@@ -85,10 +85,6 @@ class Database {
 		else return cb(null, u);
 	}
 
-	getUserSync(id: string, skipCache?: boolean): ThenArg<ReturnType<this["getUser"]>> {
-		return deasync(this.getUser).call(this, id, skipCache);
-	}
-
 
 	async getGuild(id: string, skipCache?: boolean): Promise<GuildConfig>;
 	async getGuild<F extends (err: Error, d: GuildConfig) => any>(id: string, skipCache: boolean, cb: F): Promise<GuildConfig>;
@@ -134,11 +130,6 @@ class Database {
 
 		if (!cb) return g;
 		else return cb(null, g);
-	}
-
-	getGuildSync(id: string, skipCache?: boolean): ThenArg<ReturnType<this["getGuild"]>> {
-		console.log("g");
-		return deasync(this.getGuild).call(this, id, skipCache);
 	}
 
 	async checkBl(type: "guild", guildId: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Blacklist.GuildEntry[]; }>;
@@ -210,9 +201,9 @@ class Database {
 	}
 
 	async checkVote(user: string) {
-		const v = await mdb.collection<Vote.DBLVote>("votes").find({ user }).toArray();
+		const v = await mongo.db("furrybot").collection<Vote.DBLVote>("votes").find({ user }).toArray();
 
-		const e = v.find(e => e.time < Date.now() + 4.32e+7);
+		const e = v.find(e => Date.now() < e.time + 4.32e+7);
 
 		return {
 			voted: !!e,
