@@ -94,7 +94,8 @@
 		"cmdErrored": "we recieved an error while reloading the command **{0}**.\n\n```js\n{1}```",
 		"cmdDone": "reloaded the command **{0}**.",
 		"invalid": "invalid selection \"{0}\" provided.",
-		"lang": "successfully reloaded **{0}** language file(s)."
+		"lang": "successfully reloaded **{0}** language file(s).",
+		"all": "Successfully removed **{0}** cache entries."
 	},
 	"restart": {
 		"description": "Make me restart.",

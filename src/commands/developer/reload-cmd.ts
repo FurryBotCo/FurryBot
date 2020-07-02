@@ -36,6 +36,13 @@ export default new Command({
 			return msg.reply(`{lang:commands.developer.reload.lang|${i}}`);
 			break;
 		}
+
+		case "all": {
+			const cache = Object.keys(require.cache);
+			for (const r of cache) delete require.cache[r];
+			return msg.reply(`{lang:commands.developer.reload.all|${cache.length}}`);
+		}
+
 		default: {
 			return msg.reply(`{lang:commands.developer.reload.invalid|${msg.args[0].toLowerCase()}}`);
 		}
