@@ -14,6 +14,7 @@ import { Permissions } from "../../util/Constants";
 import { Redis } from "../../modules/External";
 import Logger from "../../util/LoggerV10";
 import truncate from "truncate";
+import EmbedBuilder from "../../util/EmbedBuilder";
 
 export default new Command({
 	triggers: [
@@ -88,21 +89,8 @@ export default new Command({
 
 	if (!silent) {
 		if (res.length > 1000) {
-			const req = await phin({
-				method: "POST",
-				url: "https://pastebin.com/api/api_post.php",
-				form: {
-					api_dev_key: config.apiKeys.pastebin.devKey,
-					api_user_key: config.apiKeys.pastebin.userKey,
-					api_option: "paste",
-					api_paste_code: res,
-					api_paste_private: "2",
-					api_paste_name: "Furry Bot Eval",
-					api_paste_expire_date: "1D"
-				},
-				timeout: 5e3
-			});
-			res = `Uploaded ${req.body.toString()}`;
+			const pasteURL = await F.Internal.makePastebinPost(res, "2", "Furry Bot Eval", "1D");
+			res = `Uploaded ${pasteURL}`;
 		}
 
 		if (error) {
@@ -117,45 +105,19 @@ export default new Command({
 		}
 
 		return msg.channel.createMessage({
-			embed: {
-				title: `Evaluated in \`${(end - start).toFixed(3)}ms\``,
-				author: {
-					name: msg.author.tag,
-					icon_url: msg.author.avatarURL
-				},
-				timestamp: new Date().toISOString(),
-				color: error ? 16711680 : Math.floor(Math.random() * 0xFFFFFF),
-				fields: [
-					{
-						name: ":inbox_tray: Input",
-						value: `\`\`\`js\n${truncate(msg.unparsedArgs.join(" "), 1000)}\`\`\``,
-						inline: false
-					},
-					{
-						name: ":outbox_tray: Output",
-						value: `\`\`\`js\n${res}\`\`\`${error && res.indexOf("Uploaded") === -1 ? `\n[stack (hover)](https://furry.bot '${stack}')` : ""}`,
-						inline: false
-					}
-				]
-			}
+			embed: new EmbedBuilder(config.defaults.config.guild.settings.lang)
+				.setTitle(`Evaluated in \`${(end - start).toFixed(3)}ms\``)
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setTimestamp(new Date().toISOString())
+				.setColor(error ? 16711680 : Math.floor(Math.random() * 0xFFFFFF))
+				.addField(":inbox_tray: Input", `\`\`\`js\n${truncate(msg.unparsedArgs.join(" "), 1000)}\`\`\``, false)
+				.addField(":outbox_tray: Output", `\`\`\`js\n${res}\`\`\`${error && res.indexOf("Uploaded") === -1 ? `\n[stack (hover)](https://furry.bot '${stack}')` : ""}`, false)
+				.toJSON()
 		});
 	} else {
 		if (res.length > 3000) {
-			const req = await phin({
-				method: "POST",
-				url: "https://pastebin.com/api/api_post.php",
-				form: {
-					api_dev_key: config.apiKeys.pastebin.devKey,
-					api_user_key: config.apiKeys.pastebin.userKey,
-					api_option: "paste",
-					api_paste_code: res,
-					api_paste_private: "2",
-					api_paste_name: "Furry Bot Silent Eval",
-					api_paste_expire_date: "1D"
-				},
-				timeout: 5e3
-			});
-			res = `Uploaded ${req.body.toString()}`;
+			const pasteURL = await F.Internal.makePastebinPost(res, "2", "Furry Bot Silent Eval", "1D");
+			res = pasteURL;
 		}
 
 		return this.log("log", `Silent eval return: ${res}`, `Shard #${msg.channel.guild.shard.id}`);

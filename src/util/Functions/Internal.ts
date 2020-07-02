@@ -316,4 +316,21 @@ export default class Internal {
 	static emojiStringToId(e: string) {
 		return e.match("<:([a-zA-Z]{2,}:[0-9]{15,21})>")[1];
 	}
+
+	static async makePastebinPost(content: string, privacy?: "0" | "1" | "2", name?: string, expiry?: string) {
+		return phin({
+			method: "POST",
+			url: "https://pastebin.com/api/api_post.php",
+			form: {
+				api_dev_key: config.apiKeys.pastebin.devKey,
+				api_user_key: config.apiKeys.pastebin.userKey,
+				api_option: "paste",
+				api_paste_code: content,
+				api_paste_private: privacy || "2",
+				api_paste_name: name || "Furry Bot Paste",
+				api_paste_expire_date: expiry || "1D"
+			},
+			timeout: 5e3
+		}).then(d => d.body.toString());
+	}
 }
