@@ -55,9 +55,9 @@ if (Cluster.isMaster) {
 
 	fs.writeFileSync(`${__dirname}/${__filename.endsWith(".ts") ? "" : "../"}process.pid`, process.pid);
 
-	setInterval(() => {
+	/*setInterval(() => {
 		find("name", __dirname).then(v => console.log(v.filter(p => p.ppid = process.pid)));
-	}, 6e4);
+	}, 6e4);*/
 }
 
 process.on("SIGINT", () => {

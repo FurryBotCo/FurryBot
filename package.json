@@ -25,7 +25,7 @@
     "find-process": "^1.4.3",
     "fs-extra": "^9.0.0",
     "furry.services": "^1.0.1",
-    "furrybotapi": "^2.0.2",
+    "furrybotapi": "^2.0.6",
     "lavalink": "github:DonovanDMC/lavalink.js",
     "login-with-twitter": "^1.2.2",
     "module-alias": "^2.2.2",
