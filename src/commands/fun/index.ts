@@ -1,5 +1,4 @@
 import Category from "../../modules/CommandHandler/Category";
-import Command from "../../modules/CommandHandler/Command";
 import * as fs from "fs-extra";
 const ext = __filename.split(".").reverse()[0];
 
