@@ -61,7 +61,7 @@ export default class Category {
 		if (cmd instanceof Command) cmd = cmd.triggers[0];
 		const c = this.commands.find(c => c.triggers.includes(cmd as string));
 		if (!c) return false;
-		this.cmds.splice(this.cmds.indexOf(c));
+		this.cmds.splice(this.cmds.indexOf(c), 1);
 		return true;
 	}
 

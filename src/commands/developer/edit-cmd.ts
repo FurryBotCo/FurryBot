@@ -17,7 +17,7 @@ export default new Command({
 	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	if (msg.unparsedArgs.length > 2) return new CommandError("ERR_INVALID_USAGE", cmd);
+	if (msg.unparsedArgs.length < 2) return new CommandError("ERR_INVALID_USAGE", cmd);
 
 	switch (msg.args[0].toLowerCase()) {
 		case "game": {
