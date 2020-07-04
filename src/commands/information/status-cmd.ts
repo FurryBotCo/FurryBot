@@ -4,6 +4,7 @@ import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Time } from "../../util/Functions";
 import { DH_NOT_SUITABLE_GENERATOR } from "constants";
+import Language from "../../util/Language";
 
 export default new Command({
 	triggers: [
@@ -90,23 +91,31 @@ export default new Command({
 		"cloudflare": await fetch<StatusPage>("https://yh6f0r4529hb.statuspage.io/api/v2/summary.json"),
 		"ll-us-east": await fetch("https://us-east.lavalink.furry.bot/version", config.apiKeys.lavalink.password, null)
 	};
-	if (msg.args.length === 0) {
-		return msg.channel.createMessage({
-			embed: new EmbedBuilder(gConfig.settings.lang)
-				.setDescription("Note: This is very basic due to me not knowing the ins and out of statuspage (the last two)'s api.\n\n* - Provide the name of these as an argument to get more detailed statuses.")
-				.addField("Furry Bot API V1", !status.fV1 ? `Offline, Unreachable.` : `Online: ${!!status.fV1.body.success ? "Yes" : "No"}\nUptime: ${!status.fV1.body.uptime ? "None" : Time.ms(status.fV1.body.uptime * 1000, true)}`, false)
-				.addField("Furry Bot API V2", !status.fV2 ? `Offline, Unreachable.` : `Online: ${!!status.fV2.body.success ? "Yes" : "No"}\nUptime: ${!status.fV2.body.uptime ? "None" : Time.ms(status.fV2.body.uptime * 1000, true)}`, false)
-				.addField("FurCDN.Net", !status.cdnFur ? `Offline, Unreachable.` : `Online: ${!!status.cdnFur.body.success ? "Yes" : "No"}\nUptime: ${!status.cdnFur.body.uptime ? "None" : Time.ms(status.cdnFur.body.uptime * 1000, true)}`, false)
-				.addField("Yiff.Media", !status.cdnYiff ? `Offline, Unreachable.` : `Online: ${!!status.cdnYiff.body.success ? "Yes" : "No"}\nUptime: ${!status.cdnYiff.body.uptime ? "None" : Time.ms(status.cdnYiff.body.uptime * 1000, true)}`, false)
-				.addField("Furry Bot Lavalink US-EAST", `Online: ${!!status["ll-us-east"] ? "Yes" : "No"}\nVersion: ${!status["ll-us-east"] ? "N/A" : status["ll-us-east"].body}`, false)
-				.addField("Discord (*)", `Status: ${status.discord.body.status.indicator}${status.discord.body.status.indicator !== "operational" ? ` \nDescription: ${status.discord.body.status.description || "No Description"}` : ""}`, false)
-				.addField("Cloudflare (*)", `Status: ${status.cloudflare.body.status.indicator}${status.cloudflare.body.status.indicator !== "operational" ? ` \nDescription: ${status.cloudflare.body.status.description || "No Description"}` : ""}`, false)
-				.setTimestamp(new Date().toISOString())
-				.toJSON()
-		});
-	} else {
+
+	const embed = new EmbedBuilder(gConfig.settings.lang)
+		.setDescription("Note: This is very basic due to me not knowing the ins and out of statuspage (the last two)'s api.\n\n* - Provide the name of these as an argument to get more detailed statuses.")
+		.addField("Furry Bot API V1", !status.fV1 ? `Offline, Unreachable.` : `Online: ${!!status.fV1.body.success ? "Yes" : "No"}\nUptime: ${!status.fV1.body.uptime ? "None" : Time.ms(status.fV1.body.uptime * 1000, true)}`, false)
+		.addField("Furry Bot API V2", !status.fV2 ? `Offline, Unreachable.` : `Online: ${!!status.fV2.body.success ? "Yes" : "No"}\nUptime: ${!status.fV2.body.uptime ? "None" : Time.ms(status.fV2.body.uptime * 1000, true)}`, false)
+		.addField("FurCDN.Net", !status.cdnFur ? `Offline, Unreachable.` : `Online: ${!!status.cdnFur.body.success ? "Yes" : "No"}\nUptime: ${!status.cdnFur.body.uptime ? "None" : Time.ms(status.cdnFur.body.uptime * 1000, true)}`, false)
+		.addField("Yiff.Media", !status.cdnYiff ? `Offline, Unreachable.` : `Online: ${!!status.cdnYiff.body.success ? "Yes" : "No"}\nUptime: ${!status.cdnYiff.body.uptime ? "None" : Time.ms(status.cdnYiff.body.uptime * 1000, true)}`, false)
+		.addField("Furry Bot Lavalink US-EAST", `Online: ${!!status["ll-us-east"] ? "Yes" : "No"}\nVersion: ${!status["ll-us-east"] ? "N/A" : status["ll-us-east"].body}`, false)
+		.addField("Discord (*)", `Status: ${status.discord.body.status.indicator}${status.discord.body.status.indicator !== "operational" ? ` \nDescription: ${status.discord.body.status.description || "No Description"}` : ""}`, false)
+		.addField("Cloudflare (*)", `Status: ${status.cloudflare.body.status.indicator}${status.cloudflare.body.status.indicator !== "operational" ? ` \nDescription: ${status.cloudflare.body.status.description || "No Description"}` : ""}`, false)
+		.setTimestamp(new Date().toISOString())
+		.toJSON();
+
+	if (msg.args.length === 0) return msg.channel.createMessage({
+		embed
+	});
+	else {
 		const s = ["discord", "cloudflare"];
-		if (!s.includes(msg.args[0].toLowerCase())) return msg.reply(`invalid selection "${msg.args[0].toLowerCase()}", valid selections: **${s.join("**, **")}**`);
+		if (!s.includes(msg.args[0].toLowerCase())) {
+			embed.description += `\n\n${Language.get(gConfig.settings.lang, "commands.information.status.filtered")}`;
+			console.log(embed.fields.map(f => f.name.toLowerCase().indexOf(msg.unparsedArgs.join(" ").toLowerCase())).join("\n"));
+			embed.fields = embed.fields.filter(f => f.name.toLowerCase().indexOf(msg.unparsedArgs.join(" ").toLowerCase()) !== -1);
+			return msg.channel.createMessage({ embed });
+		}
+		// return msg.reply(`invalid selection "${msg.args[0].toLowerCase()}", valid selections: **${s.join("**, **")}**`);
 		const groups = status[msg.args[0].toLowerCase()].body.components.filter(c => c.group === true);
 		const statuses = status[msg.args[0].toLowerCase()].body.components.filter(c => c.group === false);
 		if (msg.args.length === 1 || !groups.map(g => g.name.toLowerCase()).includes(msg.args.slice(1).join(" ").toLowerCase() as any)) return msg.reply(`please provide a valid group for "${msg.args[0].toLowerCase()}". Valid groups: **${groups.map(c => c.name.toLowerCase()).join("**, **")}**.`);
