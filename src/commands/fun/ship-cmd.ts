@@ -53,7 +53,7 @@ export default new Command({
 	const ship = {
 		amount,
 		name: member1.username.slice(0, Math.floor(Math.random() * 5) + 3) + member2.username.slice(-(Math.floor(Math.random() * 5) + 3)),
-		get image(this: typeof ship) {
+		get image() {
 			if (this.amount === 1) return "ship-1-percent";
 			else if (this.amount >= 2 && this.amount <= 19) return "ship-2-19-percent";
 			else if (this.amount >= 20 && this.amount <= 39) return "ship-20-39-percent";
