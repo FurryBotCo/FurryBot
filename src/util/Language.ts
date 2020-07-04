@@ -8,24 +8,11 @@ interface LangString extends String {
 
 // required because ts is being dumb
 (String as any).prototype.format = (function <T extends string = string>(...args: T[]) {
-	let res = this.toString();
+	let res: string = this.toString();
 	if (!res) return null;
-	const a = res.match(/({\d})/g);
-	if (!a) return null;
-	const e = ((s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"));
-	a.map((b, i) => args[i] !== undefined ? res = res.replace(new RegExp(e(b), "g"), args[i]) : null);
+	args.map((a, i) => res = res.replace(new RegExp(`\\{${i}\\}`, "g"), a));
 	return res;
 });
-
-/*Object.defineProperty(String.prototype, "format", function (...args: string[]) {
-	let res = this.toString();
-	if (!res) return null;
-	const a = res.match(/({\d})/g);
-	if (!a) return null;
-	const e = ((s: string) => s.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&"));
-	a.map((b, i) => args[i] !== undefined ? res = res.replace(new RegExp(e(b), "g"), args[i]) : null);
-	return res;
-});*/
 
 class SpecificLanguage {
 	lang: string;
