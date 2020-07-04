@@ -18,7 +18,7 @@ export default new Command({
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const member = msg.args.length === 0 ? msg.channel.guild.members.get(this.bot.user.id) : await msg.getMemberFromArgs();
 	if (!member) return msg.errorEmbed("INVALID_MEMBER");
-	const img = await DankMemerAPI.bed([member.avatarURL, msg.author.avatarURL]);
+	const img = await DankMemerAPI.bed([msg.author.avatarURL, member.avatarURL]);
 
 	return msg.channel.createMessage("", {
 		file: img.file,
