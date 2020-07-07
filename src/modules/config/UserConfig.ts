@@ -30,6 +30,7 @@ export default class UserConfig {
 	};
 	deletion?: number;
 	socials: Socials.AnySocial[];
+	booster: boolean;
 	constructor(id: string, data: DeepPartial<{ [K in keyof UserConfig]: UserConfig[K]; }>) {
 		this.id = id;
 		if (!data) data = config.defaults.config.user;

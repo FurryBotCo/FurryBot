@@ -25,6 +25,7 @@ export default new Command({
 	const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs(0, false, true, 0);
 
 	if (!user) return msg.errorEmbed("INVALID_MEMBER");
+	const u = await db.getUser(user.id);
 	let flags: number = user.user.publicFlags;
 	if (typeof flags !== "number") {
 		const u = await this.bot.getRESTUser(user.id);
@@ -50,8 +51,8 @@ export default new Command({
 	if (config.contributors.includes(user.id)) f.push(config.flags.contrib);
 	if (config.helpers.includes(user.id)) f.push(config.flags.helper);
 	if (config.horny.includes(user.id)) f.push(config.flags.horny);
-	try { if (this.bot.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.staff) || user.id === this.bot.guilds.get(config.client.mainGuild).ownerID) f.push(config.flags.staff); } catch (e) { }
-	try { if (this.bot.guilds.get(config.client.mainGuild).members.get(user.id).roles.includes(config.roles.booster)) f.push(config.flags.booster); } catch (e) { }
+	// try { if (u.staff) f.push(config.flags.staff); } catch (e) { }
+	try { if (u.booster) f.push(config.flags.booster); } catch (e) { }
 	const c = await db.getUser(user.id);
 	const p = await c.premiumCheck();
 	const ubl = await uConfig.checkBlacklist();
