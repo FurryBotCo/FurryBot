@@ -17,7 +17,7 @@ export default new Command({
 	},
 	cooldown: 0,
 	donatorCooldown: 0,
-	restrictions: [],
+	restrictions: ["developer"],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const member = msg.args.length === 0 ? msg.member : await msg.getMemberFromArgs();

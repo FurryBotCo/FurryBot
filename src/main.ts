@@ -19,6 +19,7 @@ import MusicQueue from "./util/MusicQueue";
 import { BaseClusterWorker } from "eris-fleet";
 import { Strings } from "./util/Functions";
 import { performance } from "perf_hooks";
+import { exit } from "process";
 
 const ew = process.emitWarning;
 process.emitWarning = ((w, name, code) => {
@@ -150,6 +151,19 @@ export default class FurryBot extends BaseClusterWorker {
 
 	// because they don't construct this until the cluster is ready??
 	async setup() {
+		fs.writeFileSync(`${__dirname}/../tmp/cluster-${this.clusterID}.pid`, process.pid.toString());
+
+		function exit() {
+			if (fs.existsSync(`${__dirname}/../tmp/cluster-${this.clusterID}.pid`)) try { fs.unlinkSync(`${__dirname}/../tmp/cluster-${this.clusterID}.pid`); } catch (e) { }
+			process.kill(process.pid);
+		}
+
+		process
+			.on("exit", exit.bind(null))
+			.on("SIGINT", exit.bind(null))
+			.on("SIGUSR1", exit.bind(null))
+			.on("SIGUSR2", exit.bind(null));
+
 		this.ipc.register("eval", async (d: EvalMessage) => {
 			let result, error = false;
 			const start = parseFloat(performance.now().toFixed(2));
@@ -220,6 +234,8 @@ export default class FurryBot extends BaseClusterWorker {
 	getRecommendedNode() { return this.v; }
 
 	async shutdown(done) {
+		this.api.srv.close();
+		Logger.log("Shutdown", "Closed API Server.");
 		return done();
 	}
 }

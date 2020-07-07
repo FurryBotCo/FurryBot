@@ -33,6 +33,17 @@ export default new ClientEvent("guildMemberUpdate", (async function (this: Furry
 	member.roles.map(r => oldMember.roles.includes(r) ? null : added.push(r));
 	oldMember.roles.map(r => member.roles.includes(r) ? null : removed.push(r));
 
+	if (member.guild.id === config.client.mainGuild) {
+		const user = await db.getUser(member.id, true);
+		if (added && added.length > 0 && added.includes(config.roles.booster)) await user.edit({
+			booster: true
+		});
+
+		if (removed && removed.length > 0 && removed.includes(config.roles.booster)) await user.edit({
+			booster: false
+		});
+	}
+
 	if (member.nick !== oldMember.nick) changes.push("nick");
 
 	if (changes.length === 0 && added.length === 0 && removed.length === 0) return;

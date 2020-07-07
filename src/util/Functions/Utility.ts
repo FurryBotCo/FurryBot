@@ -1,10 +1,10 @@
 import config from "../../config";
-import Eris, { Guild } from "eris";
+import Eris from "eris";
 import { Utility as T } from "../@types/Functions";
-import FurryBot from "../../main";
 import * as URL from "url";
-import phin from "phin";
 import { BaseClusterWorker } from "eris-fleet";
+import * as http from "http";
+import * as https from "https";
 
 export default class Utility {
 	private constructor() {
@@ -154,11 +154,25 @@ export default class Utility {
 	 * @memberof Utility
 	 */
 	static validateURL(url: string) {
-		return URL.parse(url).hostname ? phin({
-			method: "HEAD",
-			url,
-			timeout: 5e3
-		}).then(d => d.statusCode === 200) : false;
+		const uri = URL.parse(url);
+		if (!uri.hostname) return;
+		return new Promise((a, b) => {
+			(uri.protocol === "https:" ? https : http).request({
+				method: "HEAD",
+				host: uri.host,
+				path: uri.path,
+				protocol: uri.protocol,
+				port: uri.port || uri.protocol === "https:" ? 443 : 80,
+				timeout: 5e3,
+				headers: {
+					"User-Agent": config.web.userAgent
+				}
+			}, (res) => {
+				res
+					.on("error", (err) => b(err))
+					.on("end", () => a(res.statusCode >= 200 || res.statusCode <= 299));
+			}).end();
+		});
 	}
 
 	/**

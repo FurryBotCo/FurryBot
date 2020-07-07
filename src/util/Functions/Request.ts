@@ -1,6 +1,9 @@
+import * as fs from "fs-extra";
+import * as https from "https";
+import * as http from "http";
+import URL from "url";
 import config from "../../config";
 import phin from "phin";
-import * as fs from "fs-extra";
 import Logger from "../LoggerV10";
 
 export default class Request {
@@ -12,22 +15,46 @@ export default class Request {
 	 * get the image at a url as a buffer
 	 * @static
 	 * @param {string} url
-	 * @returns
+	 * @returns {Promise<Buffer>}
 	 * @memberof Request
 	 */
-	static async getImageFromURL(url: string) {
-		return phin({ url }).then(res => Buffer.from(res.body));
+	static async fetchURL(url: string): Promise<Buffer> {
+		return new Promise((a, b) => {
+			const uri = URL.parse(url);
+			(uri.protocol === "https:" ? https : http).request({
+				method: "GET",
+				host: uri.host,
+				path: uri.path,
+				protocol: uri.protocol,
+				port: uri.port || uri.protocol === "https:" ? 443 : 80,
+				timeout: 3e4,
+				headers: {
+					"User-Agent": config.web.userAgent
+				}
+			}, (res) => {
+				const data = [];
+				res
+					.on("data", (d) => data.push(d))
+					.on("error", (err) => b(err))
+					.on("end", () => a(Buffer.concat(data)));
+			}).end();
+		});
 	}
+
+	static get getImageFromURL() { return this.fetchURL; }
 
 	/**
 	 * Download an image to a directory
 	 * @static
 	 * @param {string} url
 	 * @param {string} filename
-	 * @returns {Promise<fs.WriteStream>}
+	 * @returns {Promise<void>}
 	 * @memberof Request
 	 */
-	static async downloadImage(url: string, filename: string): Promise<fs.WriteStream> { return phin({ url, timeout: 5e3 }).then(res => res.pipe(fs.createWriteStream(filename))); }
+	static async downloadImage(url: string, filename: string): Promise<void> {
+		return this.fetchURL(url).then(img => fs.writeFileSync(filename, img));
+	}
+
 
 	static async chewyBotAPIRequest(cat: string): Promise<string> {
 		let r: phin.IResponse;

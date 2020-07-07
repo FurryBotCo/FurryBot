@@ -4,7 +4,7 @@ const ext = __filename.split(".").reverse()[0];
 
 const cat = new Category({
 	name: "economy",
-	restrictions: [],
+	restrictions: ["developer"],
 	file: __filename
 });
 

@@ -5,7 +5,18 @@
 		"usage": "<question>",
 		"said": "The Magic 8ball said",
 		"disclaimer": "Disclaimer: Do not take any answers seriously!",
-		"possible": ["It is certain", "Without a doubt", "Most likely", "Yes", "Reply was hazy, try again later", "Ask again later", "My answer is no", "No", "Very doubtful", "Concentrate and ask again", "As I see it, yes"]
+		"possible": [
+			"It is certain",
+			"Without a doubt",
+			"Most likely", "Yes",
+			"Reply was hazy, try again later",
+			"Ask again later",
+			"My answer is no",
+			"No",
+			"Very doubtful",
+			"Concentrate and ask again",
+			"As I see it, yes"
+		]
 	},
 	"awoo": {
 		"description": "Start a howl, or join in!",
@@ -96,6 +107,13 @@
 	"fursuit": {
 		"description": "Get a random fursuit image!",
 		"usage": ""
+	},
+	"gayrate": {
+		"description": "Get someone's gayness!",
+		"usage": "[@user/id]",
+		"title": "{0}'s Gayness!",
+		"percentSelf": "You are **{1}**% gay!",
+		"percentOther": "{0} is **{1}**% gay!"
 	},
 	"giphy": {
 		"description": "Get a gif from giphy",

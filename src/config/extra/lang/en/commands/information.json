@@ -186,7 +186,8 @@
 	},
 	"status": {
 		"description": "Get some status about certain websites.",
-		"usage": "[service] [group]"
+		"usage": "[service] [group]",
+		"filtered": "Results have been filtered due to provided arguments not matching a valid selection."
 	},
 	"uinfo": {
 		"description": "Get some info about a user.",

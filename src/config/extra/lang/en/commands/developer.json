@@ -95,7 +95,10 @@
 		"cmdDone": "reloaded the command **{0}**.",
 		"invalid": "invalid selection \"{0}\" provided.",
 		"lang": "successfully reloaded **{0}** language file(s).",
-		"all": "Successfully removed **{0}** cache entries."
+		"all": "Successfully removed **{0}** cache entries.",
+		"file": "Successfully reloaded the file **{0}**.",
+		"files": "Successfully reloaded **{0}** files.\nFiles:",
+		"fileNotFound": "Couldn't find any cached file matching **{0}**."
 	},
 	"restart": {
 		"description": "Make me restart.",

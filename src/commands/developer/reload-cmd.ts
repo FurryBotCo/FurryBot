@@ -43,6 +43,18 @@ export default new Command({
 			return msg.reply(`{lang:commands.developer.reload.all|${cache.length}}`);
 		}
 
+		case "file": {
+			const nm = msg.dashedArgs.unparsed.value.indexOf("--node-modules");
+			let c = Object.keys(require.cache).filter(e => e.toLowerCase().indexOf(msg.args[1].toLowerCase()) !== -1);
+			if (!nm) c = c.filter(e => e.indexOf("node_modules") === -1);
+			if (!c || c.length === 0) return msg.reply(`{lang:commands.developer.reload.fileNotFound|${msg.args[1]}}`);
+			c.map(e => delete require.cache[e]);
+
+			if (c.length === 1) return msg.reply(`{lang:commands.developer.reload.file|${c[0]}}`);
+			else return msg.reply(`{lang:commands.developer.reload.files|${c.length}}\n${c.map(e => `- **${e}**`).join("\n")}`);
+
+		}
+
 		default: {
 			return msg.reply(`{lang:commands.developer.reload.invalid|${msg.args[0].toLowerCase()}}`);
 		}

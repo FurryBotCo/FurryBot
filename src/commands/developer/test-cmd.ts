@@ -1,5 +1,8 @@
 import Command from "../../modules/CommandHandler/Command";
 import { Strings } from "../../util/Functions";
+import Eris from "eris";
+import Logger from "../../util/LoggerV10";
+import { fstat } from "fs";
 
 export default new Command({
 	triggers: [
@@ -142,6 +145,34 @@ export default new Command({
 			q.add(t[0], msg.author.id, true);
 			console.log("f");
 			return msg.reply("playing.");
+			break;
+		}
+
+		case "fetch": {
+			let messages: Eris.Message<Eris.TextChannel>[] = [];
+			const ch = this.bot.getChannel("591805043972243486") as Eris.TextChannel;
+			async function fetch(id?: string) {
+				const m = await ch.getMessages(100, id || null, null);
+				messages.push(...m);
+				if (m.length === 100) await fetch(Array.from(m).reverse()[0].id);
+			}
+
+			await fetch();
+
+			messages = messages.filter(m => !m.author.discriminator || m.author.discriminator === "0000").reverse();
+
+			let txt = "";
+
+			for (const message of messages) {
+				if (!message.embeds) continue;
+				const d = message.embeds[0].title.split(" ").reverse()[0];
+				const c = message.embeds[0].description.split("\n");
+				txt += `### ${d.replace(/-/g, "/")}\nJoined: ${c[0].split(" ").reverse()[0] || "Unknown"}\nTotal: ${!c[1] ? "Unknown" : c[1].split(" ").reverse()[0] || "Unknown"}\n\n`;
+			}
+
+			require("fs").writeFileSync(`${__dirname}/test.md`, txt);
+
+			return msg.reply(`Total: ${messages.length}`);
 			break;
 		}
 

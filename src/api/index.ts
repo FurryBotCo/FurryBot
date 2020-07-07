@@ -35,10 +35,16 @@ export default class API {
 	app: express.Application;
 	setupRan: boolean;
 	srv: http.Server | https.Server;
+	launchAttempts: number;
+	maxAttempts: number;
+	timeBetweenAttempts: number;
 	constructor(client: FurryBot) {
 		this.client = client;
 		this.app = express();
 		this.setupRan = false;
+		this.launchAttempts = 0;
+		this.maxAttempts = 8;
+		this.timeBetweenAttempts = 1.5e4;
 	}
 
 	addRoute<R extends Route = any>(route: R) {
@@ -78,6 +84,7 @@ export default class API {
 	}
 
 	launch() {
+		this.launchAttempts++;
 		if (!this.setupRan) this.setup();
 		const client = this.client;
 		let srv: http.Server | https.Server;
@@ -89,7 +96,12 @@ export default class API {
 		else srv = http.createServer(this.app);
 
 		const svr = http.createServer(express())
-			.on("error", () => client.log("warn", "Attempted to start api server, but the port is in use.", "APIServer"))
+			.on("error", () => {
+				client.log("warn", `[${this.launchAttempts}/${this.maxAttempts}]: Attempted to start api server, but the port is in use. ${this.launchAttempts >= this.maxAttempts ? "Max start attempts reached, not attempting to start anymore." : `Attempting to start again in ${this.timeBetweenAttempts / 1000} seconds.`}`, "APIServer");
+				if (this.launchAttempts >= this.maxAttempts) return;
+				// this seems to throw an internal error
+				setTimeout(this.launch.bind(this), this.timeBetweenAttempts);
+			})
 			.on("listening", () => (svr.close(), this.srv = srv.listen(config.web.api.port, config.web.api.ip, () => client.log("debug", `Listening on ${config.web.api.ip}:${config.web.api.port}`, "APIServer"))))
 			.on("close", () => client.log("debug", "Port test server closed, starting bot api server.", "APIServer"))
 			.listen(config.web.api.port, config.web.api.ip);

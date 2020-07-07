@@ -24,7 +24,9 @@ export default new Command({
 		const categories = [...this.cmd.categories];
 
 		categories.map(c => {
-			if ((c.restrictions.includes("developer") && !config.developers.includes(msg.author.id))) categories.splice(categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()), categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()));
+			if (
+				(c.restrictions.includes("developer") && !config.developers.includes(msg.author.id))
+			) categories.splice(categories.map(cat => cat.name.toLowerCase()).indexOf(c.name.toLowerCase()), 1);
 		});
 
 		return msg.channel.createMessage({

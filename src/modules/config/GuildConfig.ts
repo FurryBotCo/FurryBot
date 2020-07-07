@@ -62,7 +62,6 @@ export default class GuildConfig {
 		all: true;
 	}))[];
 	deletion?: number;
-
 	constructor(id: string, data: DeepPartial<{ [K in keyof GuildConfig]: GuildConfig[K]; }>) {
 		this.id = id;
 		if (!data) data = config.defaults.config.guild;

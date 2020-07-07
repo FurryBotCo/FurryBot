@@ -47,6 +47,13 @@
 			"until": "until level up"
 		}
 	},
+	"link": {
+		"description": "Sync your patronage with the bot.",
+		"usage": "",
+		"previous": "You have already linked your patreon account. Run `{0}unlink` to unlink it.",
+		"failed": "Failed to link your account. Make sure you're a patreon of {0}, and you've linked your Discord account in your settings, and try again in a few minutes. If you believe this to be an error, contact a developer in our support server: {1}.",
+		"linked": "Your patreon account has been linked. You have been given the rewards for the **${0}** tier."
+	},
 	"rank": {
 		"description": "Get a users rank.",
 		"usage": "[@user]",
@@ -64,5 +71,12 @@
 		"usage": "",
 		"enabled": "enabled tips.",
 		"disabled": "disabled tips."
+	},
+	"unlink": {
+		"description": "Unlink your patreon account.",
+		"usage": "",
+		"notLinked": "You do not have a linked patreon account. Run `{0}unlink` to unlink it.",
+		"failed": "Failed to link your account. Make sure you're a patreon of {0}, and you've linked your Discord account in your settings, and try again in a few minutes. If you believe this to be an error, contact a developer in our support server: {1}.",
+		"linked": "Your patreon account has been linked. You have been given the rewards for the **${0}** tier."
 	}
 }

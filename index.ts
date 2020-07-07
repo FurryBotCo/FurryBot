@@ -57,13 +57,20 @@ if (Cluster.isMaster) {
 		Logger.log("Setup | Assets", `Copied assets directory ${`${config.dir.base}/src/assets`} to ${config.dir.base}/build/src/assets`);
 	}
 
-	fs.writeFileSync(`${__dirname}/${__filename.endsWith(".ts") ? "" : "../"}process.pid`, process.pid);
+	fs.writeFileSync(`${__dirname}/tmp/master.pid`, process.pid.toString());
 
 	/*setInterval(() => {
 		find("name", __dirname).then(v => console.log(v.filter(p => p.ppid = process.pid)));
 	}, 6e4);*/
 }
 
-process.on("SIGINT", () => {
+function exit() {
+	if (fs.existsSync(`${__dirname}/tmp/master.pid`)) try { fs.unlinkSync(`${__dirname}/tmp/master.pid`); } catch (e) { }
 	process.kill(process.pid);
-});
+}
+
+process
+	.on("exit", exit.bind(null))
+	.on("SIGINT", exit.bind(null))
+	.on("SIGUSR1", exit.bind(null))
+	.on("SIGUSR2", exit.bind(null));
