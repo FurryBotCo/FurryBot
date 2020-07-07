@@ -204,6 +204,8 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (!msg.prefix || !msg.content.toLowerCase().startsWith(msg.prefix.toLowerCase()) || msg.content.toLowerCase() === msg.prefix.toLowerCase() || !msg.cmd || !msg.cmd.cmd) return;
 		const cmd = msg.cmd.cmd;
 
+
+		t.start("disable");
 		if (gConfig.disable.length > 0 && !config.developers.includes(msg.author.id) && !msg.member.permission.has("administrator")) {
 			const a = gConfig.disable.filter((d: any) => d.type === "server" && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
 			const b = gConfig.disable.filter((d: any) => d.type === "user" && d.id === msg.author.id && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
@@ -211,7 +213,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			const d = gConfig.disable.filter((d: any) => d.type === "channel" && d.id === msg.channel.id && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
 			if (a.length > 0 || b.length > 0 || c.length > 0 || d.length > 0) return;
 		}
+		t.end("disable");
 
+		t.start("antispam");
 		if (!config.developers.includes(msg.author.id)) {
 			this.cmd.antiSpamHandler.add(msg.author.id, "command", cmd.triggers[0]);
 
@@ -259,11 +263,15 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}
 			}
 		}
+		t.end("antispam");
 
+		t.start("restrictions");
 		try {
 			await Promise.all(this.cmd.restrictions.filter(r => cmd.restrictions.includes(r.name as any)).map(async (r) => r.check(msg, this, cmd, uConfig, gConfig)));
 		} catch (e) { if (e instanceof RestrictionError) return; else throw e; }
+		t.end("restrictions");
 
+		t.start("userperms");
 		if (cmd.permissions.user.length > 0) {
 			if (cmd.permissions.user.some(perm => !msg.member.permission.has(perm))) {
 				const p = cmd.permissions.user.filter(perm => !msg.member.permission.has(perm));
@@ -278,7 +286,9 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}).catch(err => null);
 			}
 		}
+		t.end("userperms");
 
+		t.start("botperms");
 		if (cmd.permissions.bot.length > 0) {
 			if (cmd.permissions.bot.some(perm => !msg.channel.guild.me.permission.has(perm))) {
 				const p = cmd.permissions.bot.filter(perm => !msg.channel.guild.me.permission.has(perm));
@@ -294,9 +304,13 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				}).catch(err => null);
 			}
 		}
+		t.end("botperms");
 
+		t.start("premium");
 		const donator = await uConfig.premiumCheck();
+		t.end("premium");
 
+		t.start("cooldown");
 		if (!config.developers.includes(msg.author.id)) {
 			const cool = this.cmd.cooldownHandler.get(msg.author.id, cmd.triggers[0]);
 			const time = !cool ? 0 : cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;
@@ -319,6 +333,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				});
 			}
 		}
+		t.end("cooldown");
 
 		if (cmd.cooldown !== 0 && !config.developers.includes(msg.author.id)) this.cmd.cooldownHandler.add(msg.author.id, cmd.triggers[0], donator.active ? cmd.donatorCooldown : cmd.cooldown);
 		const a = msg.content.slice(msg.prefix.length).trim().split(" ")[0];
