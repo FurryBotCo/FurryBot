@@ -4,7 +4,6 @@ import config from "../../config";
 import { Colors } from "../../util/Constants";
 import Eris from "eris";
 import * as fs from "fs-extra";
-import { Canvas } from "canvas-constructor";
 
 export default new Command({
 	triggers: [
@@ -32,14 +31,14 @@ export default new Command({
 
 	}
 
-	const f = `${config.dir.base}/src/config/extra/other/ship.json`;
-	if (!fs.existsSync(f)) fs.writeFileSync(f, JSON.stringify([]));
-	const a = JSON.parse(fs.readFileSync(f).toString()) as {
+	// const f = `${config.dir.base}/src/config/extra/other/ship.json`;
+	// if (!fs.existsSync(f)) fs.writeFileSync(f, JSON.stringify([]));
+	const a = []; /*JSON.parse(fs.readFileSync(f).toString()) as {
 		user1: string;
 		user2: string;
 		amount: number;
 		name: string;
-	}[];
+	}[];*/
 
 	if (msg.args.length === 0) member2 = msg.channel.guild.members.random();
 	else if (msg.args.length === 1) member2 = await msg.getMemberFromArgs(0, false);
@@ -54,16 +53,17 @@ export default new Command({
 		amount,
 		name: member1.username.slice(0, Math.floor(Math.random() * 5) + 3) + member2.username.slice(-(Math.floor(Math.random() * 5) + 3)),
 		get image() {
-			if (this.amount === 1) return "ship-1-percent";
-			else if (this.amount >= 2 && this.amount <= 19) return "ship-2-19-percent";
-			else if (this.amount >= 20 && this.amount <= 39) return "ship-20-39-percent";
-			else if (this.amount >= 40 && this.amount <= 59) return "ship-40-59-percent";
-			else if (this.amount >= 60 && this.amount <= 79) return "ship-60-79-percent";
-			else if (this.amount >= 80 && this.amount <= 99) return "ship-80-99-percent";
-			else if (this.amount === 100) return "ship-100-percent";
+			if (this.amount === 1) return "1-percent";
+			else if (this.amount >= 2 && this.amount <= 19) return "2-19-percent";
+			else if (this.amount >= 20 && this.amount <= 39) return "20-39-percent";
+			else if (this.amount >= 40 && this.amount <= 59) return "40-59-percent";
+			else if (this.amount >= 60 && this.amount <= 79) return "60-79-percent";
+			else if (this.amount >= 80 && this.amount <= 99) return "80-99-percent";
+			else if (this.amount === 100) return "100-percent";
 		}
 	};
-	const c = a.find(b => b.user1 === member1.id && b.user2 === member2.id || b.user1 === member2.id && b.user2 === member1.id);
+
+	/*const c = a.find(b => b.user1 === member1.id && b.user2 === member2.id || b.user1 === member2.id && b.user2 === member1.id);
 
 	if (!reset) {
 		if (!!c) Object.assign(ship, {
@@ -88,17 +88,9 @@ export default new Command({
 			name: ship.name
 		});
 		fs.writeFileSync(f, JSON.stringify(a));
-	}
-	const sh = fs.readFileSync(`${config.dir.base}/src/assets/images/ship/${ship.image}.png`);
-	const av1 = await Request.getImageFromURL(member1.user.avatarURL);
-	const av2 = await Request.getImageFromURL(member2.user.avatarURL);
+	}*/
 
-	const img = new
-		Canvas(768, 256)
-		.addImage(av1, 0, 0, 256, 256)
-		.addImage(sh, 256, 0, 256, 256)
-		.addImage(av2, 512, 0, 256, 256)
-		.toBuffer();
+	const img = await Request.getImageFromURL(`https://api.furry.bot/V2/ship?avatars[]=${member1.user.avatarURL}&avatars[]=${member2.user.avatarURL}&shipImage=https://assets.furry.bot/ship/${ship.image}.png`);
 
 	return msg.channel.createMessage({
 		embed: {
