@@ -23,9 +23,9 @@ export default new ClientEvent("messageDelete", (async function (this: FurryBot,
 	});
 
 	// auto delete after 30 minutes
-	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:delete:${message.channel.guild.id}:content`, 1800, message.content);
-	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:delete:${message.channel.guild.id}:author`, 1800, message.author.id);
-	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:delete:${message.channel.guild.id}:time`, 1800, Date.now().toString());
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:delete:${message.channel.id}:content`, 1800, message.content);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:delete:${message.channel.id}:author`, 1800, message.author.id);
+	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:delete:${message.channel.id}:time`, 1800, Date.now().toString());
 
 	if (!g || !g.logEvents || !(g.logEvents instanceof Array)) return;
 	const e = g.logEvents.find(l => l.type === "messageDelete");

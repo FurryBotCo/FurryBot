@@ -24,9 +24,9 @@ export default new Command({
 
 	if (!ch) ch = msg.channel;
 
-	let content = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:content`);
-	const author = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:author`);
-	const time = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:time`);
+	let content = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.id}:content`);
+	const author = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.id}:author`);
+	const time = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.id}:time`);
 
 	if (!content || !author || !time) return msg.reply(`{lang:commands.utility.snipe.noSnipes|${ch.id}}`);
 
@@ -35,9 +35,9 @@ export default new Command({
 	const u = await this.bot.getRESTUser(author);
 
 
-	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:content`);
-	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:author`);
-	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.guild.id}:time`);
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.id}:content`);
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.id}:author`);
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:delete:${msg.channel.id}:time`);
 
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)

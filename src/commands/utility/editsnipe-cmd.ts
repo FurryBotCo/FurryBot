@@ -25,10 +25,10 @@ export default new Command({
 
 	if (!ch) ch = msg.channel;
 
-	let oldContent = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.guild.id}:oldContent`);
-	let newContent = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.guild.id}:newContent`);
-	const author = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.guild.id}:author`);
-	const time = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.guild.id}:time`);
+	let oldContent = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.id}:oldContent`);
+	let newContent = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.id}:newContent`);
+	const author = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.id}:author`);
+	const time = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.id}:time`);
 
 	if (!oldContent || !newContent || !author || !time) return msg.reply(`{lang:commands.utility.editsnipe.noSnipes|${ch.id}}`);
 	const i = newContent.match(new RegExp("((https?:\/\/)?(discord((app)?\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
@@ -38,10 +38,10 @@ export default new Command({
 
 	const u = await this.bot.getRESTUser(author);
 
-	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.guild.id}:oldContent`);
-	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.guild.id}:newContent`);
-	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.guild.id}:author`);
-	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.guild.id}:time`);
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.id}:oldContent`);
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.id}:newContent`);
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.id}:author`);
+	await Redis.DEL(`${config.beta ? "beta" : "prod"}:snipe:edit:${msg.channel.id}:time`);
 
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
