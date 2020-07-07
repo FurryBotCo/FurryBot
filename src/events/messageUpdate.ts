@@ -10,6 +10,8 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	this.track("events", "messageUpdate");
 	if (!this || !message || !message.author || message.author.bot || !oldMessage || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any) || message.content === oldMessage.content) return;
 
+	await messageCreate.listener.call(this, message, true);
+
 	if (config.beta && !config.client.betaEventGuilds.includes(message.channel.guild.id)) return;
 
 	const g = await db.getGuild(message.channel.guild.id);
@@ -26,7 +28,6 @@ export default new ClientEvent("messageUpdate", (async function (this: FurryBot,
 	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:author`, 1800, message.author.id);
 	await Redis.SETEX(`${config.beta ? "beta" : "prod"}:snipe:edit:${message.channel.guild.id}:time`, 1800, Date.now().toString());
 
-	await messageCreate.listener.call(this, message, true);
 
 	if (!g.logEvents) return;
 	const e = g.logEvents.find(l => l.type === "messageEdit");
