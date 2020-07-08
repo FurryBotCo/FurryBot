@@ -244,7 +244,7 @@ export default new Command({
 						expire: Date.now()
 					}
 				});
-				await this.w.get("logs").execute({
+				await this.w.get("blacklist").execute({
 					embeds: [
 						{
 							title: `${Strings.ucwords(subType)} Unblacklisted`,
@@ -302,7 +302,7 @@ export default new Command({
 						expire: Date.now()
 					}
 				});
-				await this.w.get("logs").execute({
+				await this.w.get("blacklist").execute({
 					embeds: [
 						{
 							title: `${Strings.ucwords(subType)} Unblacklisted`,

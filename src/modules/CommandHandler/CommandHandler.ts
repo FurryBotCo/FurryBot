@@ -7,6 +7,8 @@ import Logger from "../../util/LoggerV10";
 import AntiSpam from "./AntiSpam";
 import config from "../../config";
 import commandRestrictions from "../../config/extra/other/commandRestrictions";
+import Command from "./Command";
+import path from "path";
 
 
 export default class CommandHandler {
@@ -41,13 +43,7 @@ export default class CommandHandler {
 
 	removeCategory(cat: string) {
 		if (!this.categories.map(c => c.name).includes(cat)) throw new TypeError(`Attempted to remove non-present category ${cat}`);
-		this.cats.splice(this.cats.indexOf(this.cats.find(c => c.name === name)), 1);
-		return this;
-	}
-
-	reloadCategory(cat: string) {
-		if (!this.categories.map(c => c.name).includes(cat)) throw new TypeError(`Attempted to reload non-present category ${cat}`);
-		this.cats.find(c => c.name).reloadCommands();
+		this.cats.splice(this.cats.indexOf(this.cats.find(c => c.name === cat)), 1);
 		return this;
 	}
 
@@ -62,5 +58,35 @@ export default class CommandHandler {
 		}
 
 		return null;
+	}
+
+	reloadCommand(cmd: string | Command) {
+		if (typeof cmd !== "string") cmd = cmd.triggers[0];
+
+		const c = this.getCommand(cmd);
+
+		if (!c) return null;
+		return c.cat.reloadCommand(cmd);
+	}
+
+	reloadCategory(cat: string | Category) {
+		if (typeof cat !== "string") cat = cat.name;
+
+		const c = this.getCategory(cat);
+		if (!c) return false;
+
+		this.removeCategory(c.name);
+
+		let i = 0;
+
+		Object.keys(require.cache)
+			.filter(k => k.startsWith(c.file.split(path.sep.replace(/\\/, "\\\\")).slice(0, -1).join(path.sep.replace(/\\/, "\\\\")))) // because windows
+			.map(f => (i++, delete require.cache[require.resolve(f)]));
+
+		const f = require(c.file).default;
+
+		this.addCategory(f);
+
+		return true;
 	}
 }

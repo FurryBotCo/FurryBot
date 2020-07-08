@@ -30,7 +30,8 @@ export default class Request {
 				timeout: 3e4,
 				headers: {
 					"User-Agent": config.web.userAgent
-				}
+				},
+				rejectUnauthorized: false
 			}, (res) => {
 				const data = [];
 				res

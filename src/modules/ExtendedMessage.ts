@@ -161,7 +161,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
 				}
 			}
-			return this._client.editMessage.call(this._client, this.channel.id, this.id, content).then(d => new ExtendedMessage(d, this.client)).catch(err => null);;
+			return this._client.editMessage.call(this._client, this.channel.id, this.id, content).then(d => new ExtendedMessage(d, this.client)).catch(err => null);
 		});
 
 		// no prefix if dm

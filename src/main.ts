@@ -89,6 +89,10 @@ export default class FurryBot extends BaseClusterWorker {
 		super(setup);
 		this.holder = new Holder();
 		this.lvl = new HolderV2();
+		global.console.log = Logger.log.bind(null, "General");
+		global.console.error = Logger.error.bind(null, "General");
+		global.console.warn = Logger.warn.bind(null, "General");
+		global.console.debug = Logger.debug.bind(null, "General");
 
 		process
 			.on("uncaughtException", (err) => {

@@ -3,6 +3,7 @@ import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 import CommandError from "../../modules/CommandHandler/CommandError";
+import Logger from "../../util/LoggerV10";
 
 export default new Command({
 	triggers: [

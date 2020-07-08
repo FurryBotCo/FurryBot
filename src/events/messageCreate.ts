@@ -244,7 +244,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 				fs.writeFileSync(`${config.dir.logs}/spam/${msg.author.id}-${reportId}-cmd.json`, JSON.stringify(report));
 
 				this.log("log", `Possible command spam from "${msg.author.tag}" (${msg.author.id}), VL: ${spC}, Report: ${config.beta ? `https://${config.web.api.ip}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`, `Shard #${msg.channel.guild.shard.id} | Command Handler`);
-				await this.w.get("logs").execute({
+				await this.w.get("spam").execute({
 					embeds: [
 						{
 							title: `Possible Command Spam From ${msg.author.tag} (${msg.author.id}) | VL: ${spC}`,

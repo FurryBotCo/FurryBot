@@ -158,7 +158,7 @@ class Database {
 		else {
 			const d = type === "guild" ? await this.client.bot.getRESTGuild(id) : await this.client.bot.getRESTUser(id);
 			const prev = type === "guild" ? await this.getGuild(id).then(g => g.checkBlacklist().then(b => b.all.length)) : await this.getUser(id).then(u => u.checkBlacklist().then(b => b.all.length));
-			await this.client.w.get("logs").execute({
+			await this.client.w.get("blacklist").execute({
 				embeds: [
 					{
 						title: `${Strings.ucwords(type)} Blacklisted`,

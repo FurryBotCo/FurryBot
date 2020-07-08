@@ -23,11 +23,21 @@ export default new Command({
 		case "cmd": {
 			if (!msg.args[1]) return msg.reply("{lang:commands.developer.reload.cmdMissing}");
 			const c = this.cmd.getCommand(msg.args[1].toLowerCase()) as { cmd: Command; cat: Category; };
-			if (!c) return msg.reply("{lang:commands.developer.reload.cmdMissing}");
+			if (!c) return msg.reply("{lang:commands.developer.reload.cmdInvalid}");
 
 			c.cat.reloadCommand(c.cmd);
 
 			return msg.reply(`{lang:commands.developer.reload.cmdDone|${msg.args[1].toLowerCase()}}`);
+		}
+
+		case "cat": {
+			if (!msg.args[1]) return msg.reply("{lang:commands.developer.reload.catMissing}");
+			const c = this.cmd.categories.find(cat => cat.name.toLowerCase() === msg.args[1].toLowerCase());
+			if (!c) return msg.reply("{lang:commands.developer.reload.catInvalid}");
+			this.cmd.reloadCategory(c);
+
+			return msg.reply(`{lang:commands.developer.reload.catDone|${msg.args[1].toLowerCase()}}`);
+			break;
 		}
 
 		case "lang": {
@@ -52,7 +62,6 @@ export default new Command({
 
 			if (c.length === 1) return msg.reply(`{lang:commands.developer.reload.file|${c[0]}}`);
 			else return msg.reply(`{lang:commands.developer.reload.files|${c.length}}\n${c.map(e => `- **${e}**`).join("\n")}`);
-
 		}
 
 		default: {

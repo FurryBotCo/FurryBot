@@ -5,7 +5,8 @@ const ext = __filename.split(".").reverse()[0];
 const cat = new Category({
 	name: "fun",
 	file: __filename,
-	restrictions: []
+	restrictions: [],
+	displayName: "Yes"
 });
 
 const cmd = fs.readdirSync(`${__dirname}`).filter(f => f.endsWith(ext) && f !== `index.${ext}` && !fs.lstatSync(`${__dirname}/${f}`).isDirectory()).map(f => require(`${__dirname}/${f}`).default);
