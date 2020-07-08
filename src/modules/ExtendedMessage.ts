@@ -89,7 +89,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		const ch = this.channel;
 
 		if (typeof this.channel.startTyping === "undefined") Object.defineProperty(this.channel, "startTyping", {
-			value: (async (maxRounds = 6) => {
+			value: ((maxRounds = 6) => {
 				this.channel.sendTyping();
 				let i = 1;
 				const k = setInterval(async () => {
@@ -105,7 +105,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		});
 
 		if (typeof this.channel.stopTyping === "undefined") Object.defineProperty(this.channel, "stopTyping", {
-			value: (async () => {
+			value: (() => {
 				if (client.holder.has("typing", ch.id)) {
 					clearInterval(client.holder.get<NodeJS.Timer>("typing", ch.id));
 					return client.holder.remove("typing", ch.id);
@@ -135,7 +135,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
 				}
 			}
-			return this._client.createMessage.call(this._client, this.channel.id, content, file).then(d => new ExtendedMessage(d, this.client));
+			return this._client.createMessage.call(this._client, this.channel.id, content, file).then(d => new ExtendedMessage(d, this.client)).catch(err => null);
 		});
 
 		this.channel.editMessage = (async (messageID: string, content: Eris.MessageContent) => {
@@ -148,7 +148,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
 				}
 			}
-			return this._client.editMessage.call(this._client, this.channel.id, messageID, content).then(d => new ExtendedMessage(d, this.client));
+			return this._client.editMessage.call(this._client, this.channel.id, messageID, content).then(d => new ExtendedMessage(d, this.client)).catch(err => null);
 		});
 
 		this.edit = (async (content: Eris.MessageContent) => {
@@ -161,7 +161,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 					if (content.embed instanceof EmbedBuilder) content.embed = content.embed.toJSON();
 				}
 			}
-			return this._client.editMessage.call(this._client, this.channel.id, this.id, content).then(d => new ExtendedMessage(d, this.client));
+			return this._client.editMessage.call(this._client, this.channel.id, this.id, content).then(d => new ExtendedMessage(d, this.client)).catch(err => null);;
 		});
 
 		// no prefix if dm
