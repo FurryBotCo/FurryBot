@@ -103,6 +103,8 @@
 			"publicDisabledDesc": "guild has enabled the welcome screen",
 			"moreEmoji": "More Emoji",
 			"moreEmojiDesc": "I'm assuming this gives the server more than 500 emojis, but it isn't documented.",
+			"community": "Community",
+			"communitytDesc": "This does not have an official description yet.",
 			"none": "NONE"
 		},
 		"verification": {
