@@ -90,14 +90,7 @@ export default class FurryBot extends BaseClusterWorker {
 		this.setup();
 	}
 
-	async evalAtCluster<T = string>(id: number, code: string): Promise<{
-		time: {
-			start: number;
-			end: number;
-			total: number;
-		};
-		result: T;
-	}> {
+	async evalAtCluster<T = string>(id: number, code: string): Promise<EvalResult<T>> {
 		return new Promise((a, b) => {
 			const resId = Strings.random(15);
 			this.ipc.sendTo(id, "eval", {
@@ -117,7 +110,7 @@ export default class FurryBot extends BaseClusterWorker {
 		}) as any;
 	}
 
-	async broadcastEval(code: string): Promise<ThenArg<ReturnType<this["evalAtCluster"]>>[]> {
+	async broadcastEval<T = string>(code: string): Promise<EvalResult<T>[]> {
 		const count = Number(config.client.options.clusters) || 1;
 		const clusters = [];
 		for (let i = 0; i < count; i++) clusters.push(i);

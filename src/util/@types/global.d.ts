@@ -2,6 +2,22 @@ import FurryBot from "../../main";
 import Eris from "eris";
 
 declare global {
+	interface Callable<ReturnType> {
+		(...args: any[]): ReturnType;
+	}
+
+	type GenericReturnType<ReturnType, F> = F extends Callable<ReturnType>
+		? ReturnType
+		: never;
+
+	interface EvalResult<T> {
+		time: {
+			start: number;
+			end: number;
+			total: number;
+		};
+		result: T;
+	}
 
 	interface ClusterStats {
 		guilds: number;
