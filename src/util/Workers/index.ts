@@ -13,7 +13,7 @@ export default class Workers {
 
 	setup() {
 		fs
-			.readdirSync(`${__dirname}`)
+			.readdirSync(__dirname)
 			.filter(f => !f.startsWith("index"))
 			.map(f => this.workers[f.split(".")[0]] = new Worker(`${__dirname}/${f}`));
 	}
