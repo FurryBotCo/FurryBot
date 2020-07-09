@@ -244,7 +244,8 @@
 		"usage": "<@member/id>",
 		"amountTitle": "Seen On {0} Servers - {1} ({2})",
 		"amountDesc": "I see this user in {0} other servers.",
-		"tooManyServers": "Not showing names/ids, user has too many in common (>30)."
+		"tooManyServers": "Not showing names/ids, user has too many in common (>30).",
+		"cs": "[Cluster #/Shard #] Name (ID)"
 	},
 	"settings": {
 		"description": "Edit this servers settings.",
