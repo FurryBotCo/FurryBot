@@ -27,5 +27,15 @@
 	"economy": {
 		"invalidBalance": "Your balance has been reset to **{0}{1}** due to it being invalid. If you believe this to be an error, contact a developer in our support server ({2}), and tell them your balance was {3}.",
 		"invalidBalanceOther": "That user has an invalid balance, so you cannot view it."
+	},
+	"dm": {
+		"ban": "You were banned from **{0}** for **{1}**\nReason: {2}",
+		"banPermanent": "You were permanently banned from **{0}**\nReason: {2}",
+		"kick": "You were kicked from **{0}**\nReason: {1}",
+		"mute": "You were muted for {0} in **{1}**\nReason: {2}",
+		"mutePermanent": "You were permanently muted in **{0}**\nReason: {1}",
+		"unMute": "You were unmuted in **{0}**\nReason: {1}",
+		"warn": "You were warned for \"{1}\" in **{0}**",
+		"notice": "**Notice**:\nThis is an automated message, replies are not monitored and do not go to the server where this action was performed."
 	}
 }

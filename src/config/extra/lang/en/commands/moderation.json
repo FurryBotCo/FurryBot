@@ -93,7 +93,6 @@
 		"noBanSelf": "pretty sure you don't want to do this to yourself.",
 		"noBanOwner": "you cannot ban the server owner.",
 		"noBanOther": "you cannot ban **{0}** as their highest role is higher than yours!",
-		"banDm": "You were banned from **{0}**\nReason: {1}",
 		"noReason": "No Reason Specified.",
 		"userSoftbanned": "User {0} was softbanned, {1}",
 		"couldNotSoftban": "I couldn't softban **{0}**, {1}",

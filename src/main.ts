@@ -1,5 +1,5 @@
 /// <reference path="./util/@types/eris-fleet.d.ts" />
-import { Worker } from "worker_threads";
+/// <reference path="./util/@types/global.d.ts" />
 import Eris from "eris";
 import config from "./config";
 import Logger from "./util/LoggerV10";
@@ -27,45 +27,13 @@ process.emitWarning = ((w, name, code) => {
 	else return ew(w, name, code);
 });
 
-
-interface EvalMessage {
-	op: "eval";
-	msg: {
-		code: string;
-		clusterId: number;
-		resId: string;
-	};
-}
-
-interface EvalResponseMessage {
-	op: "evalResponse";
-	msg: {
-		result: string;
-		time: {
-			start: number;
-			end: number;
-			total: number;
-		};
-		clusterId: number;
-		resId: string;
-	} & ({
-		result: {
-			message: string;
-			name: string;
-			stack: string;
-		};
-		error: true;
-	} | {
-		result: string;
-		error: false;
-	});
-}
-
 class EvalError extends Error {
-	constructor(message: string, name: string, stack: string) {
+	code: string;
+	constructor(message: string, name: string, stack: string, code: string) {
 		super(message);
 		this.name = name;
 		this.stack = stack;
+		this.code = code;
 	}
 }
 
@@ -122,13 +90,13 @@ export default class FurryBot extends BaseClusterWorker {
 		this.setup();
 	}
 
-	async evalAtCluster(id: number, code: string): Promise<{
+	async evalAtCluster<T = string>(id: number, code: string): Promise<{
 		time: {
 			start: number;
 			end: number;
 			total: number;
 		};
-		result: string;
+		result: T;
 	}> {
 		return new Promise((a, b) => {
 			const resId = Strings.random(15);
@@ -142,7 +110,11 @@ export default class FurryBot extends BaseClusterWorker {
 				resolve: (...args) => (this.cb.delete(resId), a(...args)),
 				reject: (...args) => (this.cb.delete(resId), b(...args))
 			});
-		});
+		}).catch(err => {
+			console.error(err);
+			console.error(`Code: ${err.code}`);
+			throw err;
+		}) as any;
 	}
 
 	async broadcastEval(code: string): Promise<ThenArg<ReturnType<this["evalAtCluster"]>>[]> {
@@ -151,6 +123,62 @@ export default class FurryBot extends BaseClusterWorker {
 		for (let i = 0; i < count; i++) clusters.push(i);
 
 		return Promise.all(clusters.map(c => this.evalAtCluster(c, code))) as any;
+	}
+
+	async reload(type: "command" | "category", data: string) {
+		const count = Number(config.client.options.clusters) || 1;
+		for (let i = 0; i < count; i++) this.ipc.sendTo(i, "reload", { type, data });
+
+		return true;
+	}
+
+	async getStats(): Promise<Stats> {
+		const ipcStats = await this.ipc.getStats();
+		const c = [];
+		const count = Number(config.client.options.clusters) || 1;
+		for (let i = 0; i < count; i++) c.push({ // I could shove this all into one eval but it looks too messy
+			guilds: await this.evalAtCluster<number>(i, "this.bot.guilds.size").then(res => res.result),
+			users: await this.evalAtCluster<number>(i, "this.bot.users.size").then(res => res.result),
+			channels: await this.evalAtCluster<number>(i, "Object.keys(this.bot.channelGuildMap).length").then(res => res.result),
+			uptime: ipcStats.clusters[i].uptime,
+			voice: await this.evalAtCluster<number>(i, "this.bot.voiceConnections.size").then(res => res.result),
+			largeGuilds: await this.evalAtCluster<number>(i, "this.bot.guilds.filter(g => g.large).length").then(res => res.result),
+			shards: await this.evalAtCluster<number[]>(i, "this.bot.shards.map(s => s.id)").then(res => Promise.all(res.result.map(async (id) => ({
+				ready: await this.evalAtCluster<boolean>(i, `this.bot.shards.get(${id}).ready`).then(res => res.result),
+				latency: await this.evalAtCluster<number>(i, `this.bot.shards.get(${id}).latency`).then(res => res.result),
+				status: await this.evalAtCluster<Eris.Shard["status"]>(i, `this.bot.shards.get(${id}).status`).then(res => res.result),
+				guilds: await this.evalAtCluster<number>(i, `this.bot.guilds.filter(g => g.shard.id === ${id}).length`).then(res => res.result),
+				users: await this.evalAtCluster<number>(i, `this.bot.guilds.filter(g => g.shard.id === ${id}).reduce((a,b) => b.memberCount + a, 0)`).then(res => res.result)
+			})))),
+			ram: ipcStats.clusters[i].ram
+		});
+
+		return {
+			get guilds() { return this.clusters.reduce((a, b) => b.guilds + a, 0); },
+			get users() { return this.clusters.reduce((a, b) => b.users + a, 0); },
+			get largeGuilds() { return this.clusters.reduce((a, b) => b.largeGuilds + a, 0); },
+			get channels() { return this.clusters.reduce((a, b) => b.channels + a, 0); },
+			get voice() { return this.clusters.reduce((a, b) => b.voice + a, 0); },
+			ram: {
+				get clusters() { return this.clusters.reduce((a, b) => b.ram + a, 0); },
+				services: ipcStats.servicesRam,
+				master: ipcStats.masterRam,
+				total: ipcStats.totalRam
+			},
+			clusters: c,
+			get shards() { return this.clusters.reduce((a, b) => a.concat(b), []); },
+			services: ipcStats.services.map(s => ({ [s.name]: s.ram })).reduce((a, b) => ({ ...a, ...b }), {})
+		};
+	}
+
+	registerEvent(ev: string, cb: (...args: any) => any) {
+		this.ipc.register(ev, cb);
+		return this;
+	}
+
+	unregisterEvent(ev: string) {
+		this.ipc.unregister(ev);
+		return this;
 	}
 
 	// because they don't construct this until the cluster is ready??
@@ -168,43 +196,48 @@ export default class FurryBot extends BaseClusterWorker {
 			.on("SIGUSR1", exit.bind(null))
 			.on("SIGUSR2", exit.bind(null));
 
-		this.ipc.register("eval", async (d: EvalMessage) => {
-			let result, error = false;
-			const start = parseFloat(performance.now().toFixed(2));
-			try {
-				result = await eval(d.msg.code);
-			} catch (e) {
-				result = {
-					message: e.message,
-					name: e.name,
-					stack: e.stack
-				};
-				error = true;
-			}
-			const end = parseFloat(performance.now().toFixed(2));
+		this
+			.registerEvent("eval", async (d: EvalMessage) => {
+				let result, error = false;
+				const start = parseFloat(performance.now().toFixed(2));
+				try {
+					result = await eval(d.msg.code);
+				} catch (e) {
+					result = {
+						message: e.message,
+						name: e.name,
+						stack: e.stack,
+						code: d.msg.code
+					};
+					error = true;
+				}
+				const end = parseFloat(performance.now().toFixed(2));
 
-			this.ipc.sendTo(d.msg.clusterId, "evalResponse", {
-				result,
-				time: {
-					start,
-					end,
-					total: parseFloat((end - start).toFixed(2))
-				},
-				error,
-				clusterId: this.clusterID,
-				resId: d.msg.resId
-			} as EvalResponseMessage["msg"]);
-		});
-		this.ipc.register("evalResponse", (d: EvalResponseMessage) => {
-			if (!this.cb.has(d.msg.resId)) throw new TypeError(`Eval Response CB "${d.msg.resId}" not found.`);
-			const { reject, resolve } = this.cb.get(d.msg.resId);
+				this.ipc.sendTo(d.msg.clusterId, "evalResponse", {
+					result,
+					time: {
+						start,
+						end,
+						total: parseFloat((end - start).toFixed(2))
+					},
+					error,
+					clusterId: this.clusterID,
+					resId: d.msg.resId
+				} as EvalResponseMessage["msg"]);
+			})
+			.registerEvent("evalResponse", (d: EvalResponseMessage) => {
+				if (!this.cb.has(d.msg.resId)) throw new TypeError(`Eval Response CB "${d.msg.resId}" not found.`);
+				const { reject, resolve } = this.cb.get(d.msg.resId);
 
-			if (d.msg.error === true) reject(new EvalError(d.msg.result.message, d.msg.result.name, d.msg.result.stack));
-			else resolve({
-				time: d.msg.time,
-				result: d.msg.result
+				if (d.msg.error === true) reject(new EvalError(d.msg.result.message, d.msg.result.name, d.msg.result.stack, d.msg.result.code));
+				else resolve({
+					time: d.msg.time,
+					result: d.msg.result
+				});
+			})
+			.registerEvent("reload", (d: ReloadMessage) => {
+				const { type, data } = d.msg;
 			});
-		});
 
 		require(`${__dirname}/events/ready`).default.listener.call(this);
 

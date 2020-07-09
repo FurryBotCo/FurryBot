@@ -134,7 +134,7 @@ declare module "eris-fleet" {
 	}
 
 	export interface ServiceStats {
-		name: number;
+		name: string;
 		ram: number;
 	}
 

@@ -5,7 +5,6 @@ import { Colors } from "../../util/Constants";
 import Eris from "eris";
 import { Internal, Time } from "../../util/Functions";
 import * as pkg from "../../../package.json";
-import { Stats } from "eris-fleet";
 
 export default new Command({
 	triggers: [
@@ -23,7 +22,7 @@ export default new Command({
 	restrictions: [],
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
-	const st: Stats = await this.ipc.getStats();
+	const st: Stats = await this.getStats();
 	if (!st) return msg.reply("{lang:other.errors.noStats}");
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
@@ -33,11 +32,11 @@ export default new Command({
 				`\u25FD {lang:other.words.processUsage}: ${Math.round(Internal.memory.process.getUsed() / 1024 / 1024)}MB / ${Math.round(Internal.memory.process.getTotal() / 1024 / 1024)}MB`,
 				`\u25FD {lang:other.words.systemUsage}: ${Math.round(Internal.memory.system.getUsed() / 1024 / 1024 / 1024)}GB / ${Math.round(Internal.memory.system.getTotal() / 1024 / 1024 / 1024)}GB`,
 				`\u25FD {lang:other.words.uptime}: ${Time.parseTime(process.uptime())} (${Time.secondsToHMS(process.uptime())})`,
-				`\u25FD {lang:other.words.shard}: ${msg.channel.guild.shard.id + 1}/${st.clusters.reduce((a, b) => b.shardStats.length + a, 0)}`,
-				`\u25FD {lang:other.words.guilds}: ${st.clusters.reduce((a, b) => b.guilds + a, 0)}`,
-				`\u25FD {lang:other.words.largeGuilds}: ${st.clusters.reduce((a, b) => b.largeGuilds + a, 0)}`,
-				`\u25FD {lang:other.words.users}: ${st.clusters.reduce((a, b) => b.users + a, 0)}`,
-				`\u25FD {lang:other.words.voiceConnections}: ${st.clusters.reduce((a, b) => b.voice + a, 0)}`,
+				`\u25FD {lang:other.words.shard}: ${msg.channel.guild.shard.id + 1}/${st.shards.length}`,
+				`\u25FD {lang:other.words.guilds}: ${st.guilds}`,
+				`\u25FD {lang:other.words.largeGuilds}: ${st.largeGuilds}`,
+				`\u25FD {lang:other.words.users}: ${st.users}`,
+				`\u25FD {lang:other.words.voiceConnections}: ${st.voice}`,
 				`\u25FD {lang:other.words.commands}: ${this.cmd.commands.length} (${this.cmd.categories.length} {lang:other.words.categories})`,
 				"",
 				"**{lang:other.words.creators}**:",

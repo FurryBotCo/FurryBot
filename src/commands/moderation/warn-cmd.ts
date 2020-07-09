@@ -35,6 +35,7 @@ export default new Command({
 	});
 
 
+	if (!member.bot) await member.user.getDMChannel().then(dm => dm.createMessage(Language.parseString(gConfig.settings.lang, `{lang:other.dm.warn|${msg.channel.guild.name}|${reason}}\n\n{lang:other.dm.notice}`))).catch(err => null);
 	await msg.channel.createMessage(`***{lang:commands.moderation.warn.warned|${member.username}#${member.discriminator}|${reason}}***`).then(async () => {
 		await this.m.create(msg.channel, {
 			type: "warn",

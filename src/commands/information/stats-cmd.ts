@@ -3,7 +3,6 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 import config from "../../config";
 import { Time, Internal } from "../../util/Functions";
-import { Stats } from "eris-fleet";
 
 export default new Command({
 	triggers: [
@@ -21,7 +20,7 @@ export default new Command({
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const stats = await Internal.getStats();
-	const st: Stats = await this.ipc.getStats();
+	const st: Stats = await this.getStats();
 	if (!st) return msg.reply("{lang:other.errors.noStats}");
 
 	return msg.channel.createMessage({
@@ -34,23 +33,23 @@ export default new Command({
 			.addField("{lang:commands.information.stats.commandsTotal}", `${stats.commandsTotal || "{lang:other.words.noneYet}"} / ${stats.commandsAllTime || "{lang:other.words.noneYet}"}`, true)
 			.addField("{lang:commands.information.stats.messages}", `${stats.messages || "{lang:other.words.noneYet}"} / ${stats.messagesAllTime || "{lang:other.words.noneYet}"}`, true)
 			.addField("{lang:commands.information.stats.directMessage}", `${stats.directMessage || "{lang:other.words.noneYet}"}`, true)
-			.addField("{lang:commands.information.stats.guildCount}", st.clusters.reduce((a, b) => b.guilds + a, 0).toString(), true)
-			.addField("{lang:commands.information.stats.largeGuildCount}", st.clusters.reduce((a, b) => b.largeGuilds + a, 0).toString(), true)
-			.addField("{lang:commands.information.stats.userCount}", st.clusters.reduce((a, b) => b.users + a, 0).toString(), true)
-			.addField("{lang:commands.information.stats.shardCount}", st.clusters.reduce((a, b) => b.shardStats.length + a, 0).toString(), true)
+			.addField("{lang:commands.information.stats.guildCount}", st.guilds.toString(), true)
+			.addField("{lang:commands.information.stats.largeGuildCount}", st.largeGuilds.toString(), true)
+			.addField("{lang:commands.information.stats.userCount}", st.users.toString(), true)
+			.addField("{lang:commands.information.stats.shardCount}", st.shards.length.toString(), true)
 			.addField("{lang:commands.information.stats.uptime}", `${Time.ms(process.uptime() * 1000)} / ${Time.ms(stats.uptime || 0)}`, true)
 			.addField("{lang:commands.information.stats.memoryUsage}", [
 				"**{lang:commands.information.stats.memoryUsageTotal}**",
-				`${Math.floor(st.totalRam)} MB`,
+				`${Math.floor(st.ram.total)} MB`,
 				"",
 				"**{lang:commands.information.stats.memoryUsageMaster}**",
-				`${Math.floor(st.masterRam)} MB`,
+				`${Math.floor(st.ram.master)} MB`,
 				"",
 				"**{lang:commands.information.stats.memoryUsageClusters}**",
 				...st.clusters.map((c, i) => `**#${i}** - ${Math.floor(c.ram)} MB`),
 				"",
 				"**{lang:commands.information.stats.memoryUsageServices}**",
-				...st.services.map(s => `**${s.name}** - ${Math.floor(s.ram)} MB`)
+				...Object.keys(st.services).map(s => `**${s}** - ${Math.floor(st.services[s])} MB`)
 			].join("\n"), false)
 			.toJSON()
 	});

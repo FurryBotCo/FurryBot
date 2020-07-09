@@ -80,7 +80,7 @@ export default new Command({
 	}
 
 	let m: Eris.Message;
-	if (!user.bot && msg.channel.guild.members.has(user.id)) m = await user.getDMChannel().then(dm => dm.createMessage(Language.parseString(gConfig.settings.lang, `{lang:commands.moderation.ban.dm|${msg.channel.guild.name}|${reason}}`))).catch(err => null);
+	if (!user.bot && msg.channel.guild.members.has(user.id)) m = await user.getDMChannel().then(dm => dm.createMessage(Language.parseString(gConfig.settings.lang, `{lang:other.dm.ban${time === 0 ? "Permanent" : ""}|${msg.channel.guild.name}|${Time.ms(time)}|${reason}}\n\n{lang:other.dm.notice}`))).catch(err => null);
 	await msg.channel.guild.banMember(user.id, deleteDays, `Ban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 		await msg.channel.createMessage(`***{lang:commands.moderation.ban.userBanned|${user.username}#${user.discriminator}|${reason}}***`).catch(err => null);
 		await this.m.create(msg.channel, {

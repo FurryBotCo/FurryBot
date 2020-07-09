@@ -1,7 +1,87 @@
-import Eris from "eris";
 import FurryBot from "../../main";
+import Eris from "eris";
 
 declare global {
+
+	interface ClusterStats {
+		guilds: number;
+		users: number;
+		channels: number;
+		uptime: number;
+		voice: number;
+		largeGuilds: number;
+		shards: ShardStats[];
+		ram: number;
+	}
+
+	interface ShardStats {
+		ready: boolean;
+		latency: number;
+		status: Eris.Shard["status"];
+		guilds: number;
+		users: number;
+	}
+
+	interface Stats {
+		readonly guilds: number;
+		readonly users: number;
+		readonly largeGuilds: number;
+		readonly channels: number;
+		readonly voice: number;
+		ram: {
+			readonly clusters: number;
+			services: number;
+			master: number;
+			total: number;
+		};
+		clusters: ClusterStats[];
+		shards: ClusterStats["shards"];
+		services: {
+			[k: string]: number;
+		};
+	}
+	interface EvalMessage {
+		op: "eval";
+		msg: {
+			code: string;
+			clusterId: number;
+			resId: string;
+		};
+	}
+
+	interface EvalResponseMessage {
+		op: "evalResponse";
+		msg: {
+			result: string;
+			time: {
+				start: number;
+				end: number;
+				total: number;
+			};
+			clusterId: number;
+			resId: string;
+		} & ({
+			result: {
+				message: string;
+				name: string;
+				stack: string;
+				code: string;
+			};
+			error: true;
+		} | {
+			result: string;
+			error: false;
+		});
+	}
+
+	interface ReloadMessage {
+		op: "reload";
+		msg: {
+			type: "command" | "category";
+			data: string;
+		};
+	}
+
 	interface String {
 		format<T extends string = string>(...args: T[]): string;
 	}

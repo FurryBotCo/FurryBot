@@ -19,6 +19,7 @@ const obj = new (class StringFormatNames {
 
 obj
 	.add((obj) => obj instanceof Error, ["name", "message"])
+	.add((obj) => obj instanceof EvalError, ["name", "message", "code"])
 	.add((obj) => obj instanceof Eris.Guild, ["id", "name", "icon", "splash", "banner", "region", "ownerID", "memberCount", "large", "shard"])
 	.add((obj) => obj instanceof Eris.Member, ["id", "username", "discriminator", "avatar", "bot", "nick", "status"])
 	.add((obj) => obj instanceof Eris.User, ["id", "username", "discriminator", "avatar", "bot", "system"])

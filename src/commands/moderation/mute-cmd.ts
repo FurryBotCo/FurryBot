@@ -5,6 +5,8 @@ import { Utility, Time } from "../../util/Functions";
 import Language from "../../util/Language";
 import { Colors } from "../../util/Constants";
 import CommandError from "../../modules/CommandHandler/CommandError";
+import Logger from "../../util/LoggerV10";
+import Eris from "eris";
 
 export default new Command({
 	triggers: [
@@ -24,7 +26,7 @@ export default new Command({
 	file: __filename
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) throw new CommandError("ERR_INVALID_USAGE", cmd);
-	let time = 0;
+	let time = 0, m: Eris.Message;
 	// get member from message
 	const member = await msg.getMemberFromArgs();
 
@@ -98,6 +100,8 @@ export default new Command({
 	// if (user.permission.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
 	const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(gConfig.settings.lang, "other.words.noReason", false);
 
+	if (!member.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(Language.parseString(gConfig.settings.lang, `{lang:other.dm.mute${time === 0 ? "Permanent" : ""}|${msg.channel.guild.name}|${Time.ms(time)}|${reason}}\n\n{lang:other.dm.notice}`))).catch(err => null);
+
 	member.addRole(gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 		await msg.channel.createMessage(`***{lang:commands.moderation.mute.muted|${member.username}#${member.discriminator}|${reason}}***`).catch(noerr => null);
 		await this.m.create(msg.channel, {
@@ -117,10 +121,12 @@ export default new Command({
 		} as any); // apparently mongodb's types require specifying "_id" so we'll do this now
 	}).catch(async (err) => {
 		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.mute.englishOnly}`);
-		else await msg.reply(`{lang:commands.moderation.mute.couldNotMute|${member.username}#${member.discriminator}|${err}}`);
-		/*if (m !== undefined) {
+		else {
+			Logger.error("Mute Command", err);
+			await msg.reply(`{lang:commands.moderation.mute.couldNotMute|${member.username}#${member.discriminator}|${err}}`);
+
 			await m.delete();
-		}*/
+		}
 	});
 	if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) msg.delete().catch(error => null);
 }));
