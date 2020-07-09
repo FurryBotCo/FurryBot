@@ -120,7 +120,7 @@ export default class TimedTasks {
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks |  Auto Server Actions");
 					}
 
-					if (!!ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.bot.user.id).has(p))) {
+					if (ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.bot.user.id).has(p))) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks |  Auto Server Actions");
@@ -157,14 +157,14 @@ export default class TimedTasks {
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks | Auto Server Actions");
 					}
 
-					if (!!ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.bot.user.id).has(p))) {
+					if (ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.bot.user.id).has(p))) {
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
 						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks | Auto Server Actions");
 					}
 
 					if (!g.members.has(entry.userId)) {
-						if (!!ch) await ch.createMessage({
+						if (ch) await ch.createMessage({
 							embed: {
 								title: "Automatic Unmute Failed",
 								description: `I failed to automatically unmute **${m.username}#${m.discriminator}** (<@!${m.id}>)\nReason: The user is not in the server.`,
@@ -205,7 +205,7 @@ export default class TimedTasks {
 						await m.removeRole(r.id, "Automatic Unmute").catch(err => null);
 
 						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
-						if (!!ch) await client.m.create(ch, {
+						if (ch) await client.m.create(ch, {
 							type: "unmute",
 							blame: "automatic",
 							target: m,

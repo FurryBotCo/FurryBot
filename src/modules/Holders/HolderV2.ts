@@ -11,7 +11,7 @@ export default class HolderV2 {
 		this.entries = [];
 		this.i = setInterval(() => {
 			const d = Date.now();
-			for (const e of this.entries) if (!!e.time && e.added + e.time > d) this.entries.splice(this.entries.indexOf(e), 1);
+			for (const e of this.entries) if (e.time && e.added + e.time > d) this.entries.splice(this.entries.indexOf(e), 1);
 		}, 1e3);
 	}
 

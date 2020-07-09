@@ -85,7 +85,7 @@ export default new Command({
 			case "server": {
 				embed
 					.setDescription([
-						`**{lang:commands.information.sinfo.server}**:`,
+						"**{lang:commands.information.sinfo.server}**:",
 						`\u25FD {lang:commands.information.sinfo.name}: **${msg.channel.guild.name}**`,
 						`\u25FD {lang:commands.information.sinfo.id}: **${msg.channel.guild.id}**`,
 						`\u25FD {lang:commands.information.sinfo.owner}:** ${owner}**`,
@@ -147,8 +147,8 @@ export default new Command({
 				embed
 					.setImage(msg.channel.guild.iconURL)
 					.setDescription([
-						`**{lang:commands.information.sinfo.icon}**:`,
-						`${[128, 256, 1024, 2048].map(sz => `[[${sz}x${sz}]](${msg.channel.guild.iconURL.split("?")[0]}?size=${sz})`).join("  ")}`
+						"**{lang:commands.information.sinfo.icon}**:",
+						`${[128, 256, 1024, 2048, 4096].map(sz => `[[${sz}x${sz}]](${msg.channel.guild.iconURL.split("?")[0]}?size=${sz})`).join("  ")}`
 					].join("\n"));
 				break;
 			}
@@ -158,7 +158,7 @@ export default new Command({
 				embed
 					.setImage(msg.channel.guild.splashURL)
 					.setDescription([
-						`**{lang:commands.information.sinfo.splash}**:`,
+						"**{lang:commands.information.sinfo.splash}**:",
 						`${[128, 256, 1024, 2048].map(sz => `[[${sz}x${sz}]](${msg.channel.guild.splashURL.split("?")[0]}?size=${sz})`).join("  ")}`
 					].join("\n"));
 				break;

@@ -38,7 +38,7 @@ export default new Command({
 	if (msg.args.length >= 2) {
 		try {
 			time = Time.modParsing(msg.args[1]);
-			if (!!time) {
+			if (time) {
 				const a = [...msg.args];
 				a.splice(1, 1);
 				msg.args = a;
@@ -100,7 +100,7 @@ export default new Command({
 			reason
 		} as any);
 	}).catch(async (err) => {
-		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.ban.englishOnly}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply("{lang:commands.moderation.ban.englishOnly}");
 		else await msg.channel.createMessage(`{lang:commands.moderation.ban.couldNotBan|${user.username}#${user.discriminator}|${err}}`);
 		if (typeof m !== "undefined") await m.delete();
 	});

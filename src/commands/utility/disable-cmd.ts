@@ -61,7 +61,7 @@ export default new Command({
 				else return msg.reply(`{lang:commands.utility.disable.invalid|${msg.args[1].toLowerCase()}}`);
 			} else d.all = true;
 
-			if (!!d.command && c.includes(d.command.toLowerCase())) return msg.reply(`{lang:commands.utility.disable.commandNotAllowed|${d.command}}`);
+			if (d.command && c.includes(d.command.toLowerCase())) return msg.reply(`{lang:commands.utility.disable.commandNotAllowed|${d.command}}`);
 
 			if (msg.args.length === 2) {
 				if (d.all) return msg.reply("{lang:commands.utility.disable.noAllServer}");
@@ -90,7 +90,7 @@ export default new Command({
 				const role = await msg.getRoleFromArgs(2, null, null);
 				const user = await msg.getMemberFromArgs(2, null, null);
 
-				if (!!ch) {
+				if (ch) {
 					const c = {
 						type: "channel",
 						id: ch.id,
@@ -112,7 +112,7 @@ export default new Command({
 						},
 						content: `{lang:commands.utility.disable.success.${type || "all"}Channel|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${ch.id}}`
 					});
-				} else if (!!role) {
+				} else if (role) {
 					const c = {
 						type: "role",
 						id: role.id,
@@ -134,7 +134,7 @@ export default new Command({
 						},
 						content: `{lang:commands.utility.disable.success.${type || "all"}Role|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${role.id}}`
 					});
-				} else if (!!user) {
+				} else if (user) {
 					const c = {
 						type: "user",
 						id: user.id,
@@ -199,7 +199,7 @@ export default new Command({
 			return msg.channel.createMessage({
 				embed: new EmbedBuilder(gConfig.settings.lang)
 					.setDescription([
-						...pages[page - 1].map(d => `[#${gConfig.disable.indexOf(d) + 1}]: {lang:commands.utility.disable.list.${!!(d as any).command ? "cmd" : !!(d as any).category ? "cat" : "all"}${Strings.ucwords(d.type)}${!!(d as any).command ? `|${(d as any).command}` : !!(d as any).category ? `|${(d as any).category}` : ""}${d.type !== "server" ? `|${(d as any).id}` : ""}}`)
+						...pages[page - 1].map(d => `[#${gConfig.disable.indexOf(d) + 1}]: {lang:commands.utility.disable.list.${(d as any).command ? "cmd" : (d as any).category ? "cat" : "all"}${Strings.ucwords(d.type)}${(d as any).command ? `|${(d as any).command}` : (d as any).category ? `|${(d as any).category}` : ""}${d.type !== "server" ? `|${(d as any).id}` : ""}}`)
 					].join("\n"))
 					.setColor(Colors.green)
 					.setTimestamp(new Date().toISOString())

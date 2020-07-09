@@ -24,7 +24,7 @@ export default class DeleteRoute extends Route {
 				const u = await db.getUser(req.session.user.id);
 				if (req.params.id !== req.session.user.id && !config.developers.includes(req.session.user.id)) return res.status(404).render("error", { title: "You cannot delete others data." });
 				if (!u) return res.status(404).render("error", { title: "Not Found", status: 404, message: `We couldn't find any data stored for you. Make sure you are signed into the right account (${req.session.user.username}#${req.session.user.discriminator}). You can <a href="/discord/logout">logout</a> here.` });
-				if (!!u.deletion) {
+				if (u.deletion) {
 					if (config.developers.includes(req.session.user.id)) return res.status(400).render("error", { title: "Process Already Started", status: 400, message: `That user is already marked for deletion.` });
 					else return res.status(400).render("error", { title: "Process Already Started", status: 400, message: `You have already started the deletion process.` });
 				}
@@ -35,7 +35,7 @@ export default class DeleteRoute extends Route {
 				const u = await db.getUser(req.session.user.id);
 				if (req.params.id !== req.session.user.id && !config.developers.includes(req.session.user.id)) return res.status(404).render("error", { title: "You cannot delete others data." });
 				if (!u) return res.status(404).render("error", { title: "No Data Found", status: 400, message: `We couldn't find any data stored for you. Make sure you are signed into the right account (${req.session.user.username}#${req.session.user.discriminator}). You can <a href="/discord/logout">logout</a> here.` });
-				if (!!u.deletion) {
+				if (u.deletion) {
 					if (config.developers.includes(req.session.user.id)) return res.status(400).render("error", { title: "Process Already Started", status: 400, message: `That user is already marked for deletion.` });
 					else return res.status(400).render("error", { title: "Process Already Started", status: 400, message: `You have already started the deletion process.` });
 				}
@@ -57,7 +57,7 @@ export default class DeleteRoute extends Route {
 					if (j.ownerID !== req.session.user.id) return res.status(404).render("error", { title: "Unauthorized", status: 401, message: `Only the server owner (${o.username}#${o.discriminator}) can perform this action.` });
 				}
 
-				if (!!g.deletion) return res.status(400).render("error", { title: "Process Already Started", status: 400, message: `This server is already in the deletion process.` });
+				if (g.deletion) return res.status(400).render("error", { title: "Process Already Started", status: 400, message: `This server is already in the deletion process.` });
 
 				return res.status(200).render("delete/guild", { title: "Delete Confirm", id: req.params.id });
 			})
@@ -73,7 +73,7 @@ export default class DeleteRoute extends Route {
 					if (j.ownerID !== req.session.user.id) return res.status(404).render("error", { title: "Unauthorized", status: 401, message: `Only the server owner (${o.username}#${o.discriminator}) can perform this action.` });
 				}
 
-				if (!!g.deletion) return res.status(400).render("error", { title: "Process Already Started", status: 400, message: `This server is already in the deletion process.` });
+				if (g.deletion) return res.status(400).render("error", { title: "Process Already Started", status: 400, message: `This server is already in the deletion process.` });
 
 				// give a 12 hour window for dev override
 				await g.edit({ deletion: Date.now() + 4.32e+7 });

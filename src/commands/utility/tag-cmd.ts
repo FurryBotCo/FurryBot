@@ -1,7 +1,5 @@
 import Command from "../../modules/CommandHandler/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import { Colors } from "../../util/Constants";
-import Eris from "eris";
 
 export default new Command({
 	triggers: [
@@ -24,7 +22,7 @@ export default new Command({
 		else tags[t.name.toLowerCase()] = t.content;
 	}));
 	const values = Object.values(tags);
-	if (msg.args.length < 1) return msg.reply(`{lang:commands.utility.tag.invalidUsage}`);
+	if (msg.args.length < 1) return msg.reply("{lang:commands.utility.tag.invalidUsage}");
 
 	if (["create", "delete", "edit"].includes(msg.args[0].toLowerCase()) && !msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) return msg.reply("{lang:commands.utility.tag.missingPerms}");
 

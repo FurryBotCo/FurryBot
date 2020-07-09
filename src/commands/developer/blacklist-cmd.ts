@@ -58,7 +58,7 @@ export default new Command({
 		let text: string;
 		if (typeof entry.guildId !== "undefined") {
 			const d = await this.bot.getRESTGuild(entry.guildId);
-			text = `{lang:commands.developer.blacklist.get.guild|${msg.args[1]}|${!!d ? d.name : "Unknown"}}`;
+			text = `{lang:commands.developer.blacklist.get.guild|${msg.args[1]}|${d ? d.name : "Unknown"}}`;
 		} else if (typeof entry.userId !== "undefined") {
 			const d = await this.bot.getRESTUser(entry.userId);
 			text = `{lang:commands.developer.blacklist.get.user|${msg.args[1]}|${d.username}#${d.discriminator}}`;
@@ -115,19 +115,19 @@ export default new Command({
 				else if (config.contributors.includes(id) && !config.developers.includes(msg.author.id)) t = "contributor";
 				else if (config.helpers.includes(id) && !(config.developers.includes(msg.author.id) || config.contributors.includes(msg.author.id))) t = "helper";
 
-				if (!!t) return msg.reply(`{lang:commands.developer.blacklist.cannotBlacklist.${t}|${d.username}#${d.discriminator}}`);
+				if (t) return msg.reply(`{lang:commands.developer.blacklist.cannotBlacklist.${t}|${d.username}#${d.discriminator}}`);
 
 				const strike = await dbEntry.checkBlacklist().then(b => b.all.length);
 				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, date + (expire * 8.64e+7));
 
 				return msg.reply(`{lang:commands.developer.blacklist.added.user|${d.username}#${d.discriminator}|${reason}|${[null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(date + (expire * 8.64e+7))}|${strike}|${e.id}}`);
 			} else if (subType === "guild" && d instanceof Eris.Guild && dbEntry instanceof GuildConfig) {
-				if (id === config.client.mainGuild) return msg.reply(`{lang:commands.developer.blacklist.cannotBlacklist.supportServer|${!!d ? d.name : "Unknown"}}`);
+				if (id === config.client.mainGuild) return msg.reply(`{lang:commands.developer.blacklist.cannotBlacklist.supportServer|${d ? d.name : "Unknown"}}`);
 
 				const strike = await dbEntry.checkBlacklist().then(b => b.all.length);
 				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, date + (expire * 8.64e+7));
 
-				return msg.reply(`{lang:commands.developer.blacklist.added.guild|${!!d ? d.name : "Unknown"}|${reason}|${[null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(date + (expire * 8.64e+7))}|${strike}|${e.id}}`);
+				return msg.reply(`{lang:commands.developer.blacklist.added.guild|${d ? d.name : "Unknown"}|${reason}|${[null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(date + (expire * 8.64e+7))}|${strike}|${e.id}}`);
 			} else throw new TypeError("We shouldn't be here.");
 			break;
 		}
@@ -174,10 +174,10 @@ export default new Command({
 				const e = expired.length >= page ? expired[page - 1] : [];
 				const c = current.length >= page ? current[page - 1] : [];
 
-				if ((!expired || expired.length === 0) && (!current || current.length === 0)) return msg.reply(`{lang:commands.developer.blacklist.check.noHistoryGuild|${!!d ? d.name : "Unknown"}}`);
+				if ((!expired || expired.length === 0) && (!current || current.length === 0)) return msg.reply(`{lang:commands.developer.blacklist.check.noHistoryGuild|${d ? d.name : "Unknown"}}`);
 				if ((!e || e.length === 0) && (!c || c.length === 0)) return msg.reply(`{lang:commands.developer.blacklist.check.invalidPage|${page}|${expired.length > current.length ? expired.length : current.length}}`);
 
-				await msg.reply(`{lang:commands.developer.blacklist.check.${current.length === 0 ? "notBlacklistedGuild" : "isBlacklistedGuild"}|${!!d ? d.name : "Unknown"}}${expired.length === 0 ? "" : " {lang:commands.developer.blacklist.check.previouslyBlacklistedGuild}"} {lang:commands.developer.blacklist.check.entries}.`);
+				await msg.reply(`{lang:commands.developer.blacklist.check.${current.length === 0 ? "notBlacklistedGuild" : "isBlacklistedGuild"}|${d ? d.name : "Unknown"}}${expired.length === 0 ? "" : " {lang:commands.developer.blacklist.check.previouslyBlacklistedGuild}"} {lang:commands.developer.blacklist.check.entries}.`);
 				await msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
 						.setTitle("{lang:other.words.expired}")
@@ -266,11 +266,11 @@ export default new Command({
 			else if (subType === "guild" && d instanceof Eris.Guild && dbEntry instanceof GuildConfig) {
 				const bl = await dbEntry.checkBlacklist();
 
-				if (bl.current.length === 0) return msg.reply(`{lang:commands.developer.blacklist.remove.notBlacklistedGuild|${!!d ? d.name : "Unknown"}}`);
+				if (bl.current.length === 0) return msg.reply(`{lang:commands.developer.blacklist.remove.notBlacklistedGuild|${d ? d.name : "Unknown"}}`);
 
 				let m: Eris.Message;
 				if (bl.current.length === 1) {
-					await msg.reply(`{lang:commands.developer.blacklist.remove.confirmGuild|${!!d ? d.name : "Unknown"}}`);
+					await msg.reply(`{lang:commands.developer.blacklist.remove.confirmGuild|${d ? d.name : "Unknown"}}`);
 					const k = await this.c.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id, 1);
 					if (!k.content || k.content.toLowerCase() !== "yes") return msg.reply("{lang:other.words.canceled}.");
 					m = { content: bl.current[0].id } as any;

@@ -13,7 +13,7 @@ export default class Timers {
 	constructor(client: FurryBot, log?: boolean) {
 		this.timers = {};
 		this.client = client;
-		this.log = !!log;
+		this.log = log;
 	}
 
 	start(label: string) {
@@ -30,7 +30,7 @@ export default class Timers {
 		if (this.timers[label].end !== null) throw new TypeError(`Timer with the label "${label}" has already ended.`);
 
 		this.timers[label].end = parseFloat(performance.now().toFixed(3));
-		if (this.log) this.client.log("debug", `${label} took ${this.calc(label, label)}ms`, `Timers`);
+		if (this.log) this.client.log("debug", `${label} took ${this.calc(label, label)}ms`, "Timers");
 		return this.timers[label].end;
 	}
 

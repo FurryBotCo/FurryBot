@@ -33,8 +33,8 @@ export default new Command({
 	if (!oldContent || !newContent || !author || !time) return msg.reply(`{lang:commands.utility.editsnipe.noSnipes|${ch.id}}`);
 	const i = newContent.match(new RegExp("((https?:\/\/)?(discord((app)?\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
 	const iN = oldContent.match(new RegExp("((https?:\/\/)?(discord((app)?\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
-	if (!!i) i.map(k => newContent = newContent.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
-	if (!!iN) iN.map(k => oldContent = oldContent.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
+	if (i) i.map(k => newContent = newContent.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
+	if (iN) iN.map(k => oldContent = oldContent.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
 
 	const u = await this.bot.getRESTUser(author);
 

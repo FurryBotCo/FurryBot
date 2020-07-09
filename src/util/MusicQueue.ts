@@ -80,7 +80,7 @@ export default class MusicQueue {
 
 	async processNext(track?: string) {
 		await this.testReady();
-		if (!!track && this._entires.length >= 1 && Buffer.from(track, "base64").toString("ascii").indexOf(this._entires[0].info.identifier) !== -1) this._entires.shift();
+		if (track && this._entires.length >= 1 && Buffer.from(track, "base64").toString("ascii").indexOf(this._entires[0].info.identifier) !== -1) this._entires.shift();
 		const e = this._entires[0];
 		if (!e) {
 			// end, nothing left in the queue
@@ -125,7 +125,7 @@ export default class MusicQueue {
 				.setFooter(`{lang:other.music.footer|${this.vc.name}}`)
 				.toJSON()
 		});
-		if (!!e) Logger.warn(`MusicQueue[${this.guild.id}]`, `Error while processing https://www.youtube.com/watch?v=${e.info.identifier}`);
+		if (e) Logger.warn(`MusicQueue[${this.guild.id}]`, `Error while processing https://www.youtube.com/watch?v=${e.info.identifier}`);
 
 		return !e ? this.processNext() : this.processNext(e.track);
 	}
@@ -139,7 +139,7 @@ export default class MusicQueue {
 			addedTime: d,
 			addedBy
 		});
-		if (!!immediate) this.processNext();
+		if (immediate) this.processNext();
 
 		return this;
 	}

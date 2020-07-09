@@ -79,7 +79,7 @@ export default new Command({
 	if (msg.args.length >= 2) {
 		try {
 			time = Time.modParsing(msg.args[1]);
-			if (!!time) {
+			if (time) {
 				const a = [...msg.args];
 				a.splice(1, 1);
 				msg.args = a;
@@ -120,7 +120,7 @@ export default new Command({
 			reason
 		} as any); // apparently mongodb's types require specifying "_id" so we'll do this now
 	}).catch(async (err) => {
-		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.mute.englishOnly}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply("{lang:commands.moderation.mute.englishOnly}");
 		else {
 			Logger.error("Mute Command", err);
 			await msg.reply(`{lang:commands.moderation.mute.couldNotMute|${member.username}#${member.discriminator}|${err}}`);

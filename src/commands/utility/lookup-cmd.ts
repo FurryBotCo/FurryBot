@@ -81,7 +81,7 @@ export default new Command({
 					false
 				);
 
-				if (!!inviter) {
+				if (inviter) {
 					embed.addField(
 						"{lang:commands.utility.lookup.inviter}",
 						[

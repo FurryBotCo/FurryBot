@@ -29,7 +29,7 @@ export default class ClusterManager extends EventEmitter<{}> {
 		this.mainFile = mainFile;
 		this.options = {
 			stats: {
-				enable: !options.stats ? false : !!options.stats.enable,
+				enable: !options.stats ? false : options.stats.enable,
 				time: !options.stats ? 5e3 : options.stats.time || 1e3
 			},
 			webhooks: {

@@ -40,7 +40,7 @@ export default new ClientEvent("ready", (async function () {
 						}
 
 						case "GUILD_CREATE": {
-							if (!!packet.d && !!packet.d.voice_states) for (const state of packet.d.voice_states) v.voiceStateUpdate(state);
+							if (packet.d && packet.d.voice_states) for (const state of packet.d.voice_states) v.voiceStateUpdate(state);
 							break;
 						}
 					}
@@ -55,7 +55,7 @@ export default new ClientEvent("ready", (async function () {
 			case "TrackEndEvent": {
 				if (d.reason !== "FINISHED") Logger.warn("Lavalink", `Non "FINISHED" end reason "${d.reason}"`);
 				const q = this.q.get(d.guildId);
-				if (!q) return Logger.warn("Lavalink", `TrackEndEvent without valid queue entry`);
+				if (!q) return Logger.warn("Lavalink", "TrackEndEvent without valid queue entry");
 				const j = await q.processNext(d.track);
 				if (!j) this.q.delete(q.guild.id);
 				break;
@@ -68,7 +68,7 @@ export default new ClientEvent("ready", (async function () {
 
 			case "TrackExceptionEvent": {
 				const q = this.q.get(d.guildId);
-				if (!q) return Logger.warn("Lavalink", `TrackExceptionEvent without valid queue entry`);
+				if (!q) return Logger.warn("Lavalink", "TrackExceptionEvent without valid queue entry");
 				q.handleException(d.error);
 			}
 		}

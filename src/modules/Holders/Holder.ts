@@ -18,7 +18,7 @@ export default class Holder {
 
 	add<T = any>(type: string, sub: string, value: T): boolean;
 	add<T = any>(type: string, sub: string, value: T) {
-		if (!!sub) {
+		if (sub) {
 			if (!this.entries.has(type)) this.entries.set(type, new Map());
 			if (this.entries.get(type).has(sub)) {
 				const t = this.get<T[]>(type, sub);
@@ -45,7 +45,7 @@ export default class Holder {
 	set<T = any>(type: string, sub: string, value?: T): boolean;
 	set<T = any>(type: string, sub?: string, value?: T): boolean;
 	set<T = any>(type: string, sub?: string, value?: T) {
-		if (!!sub) {
+		if (sub) {
 			if (!this.entries.has(type)) this.entries.set(type, new Map());
 			this.entries.get(type).set(sub, value);
 		} else this.entries.set(type, value);
@@ -54,16 +54,16 @@ export default class Holder {
 
 	remove<T = any>(type: string, sub?: string, value?: T) {
 		if (!this.entries.has(type)) return false;
-		if (!!sub) {
+		if (sub) {
 			if (!this.entries.get(type).has(sub)) return false;
-			if (!!value) {
+			if (value) {
 				const t = this.get<T[]>(type, sub);
 				if (t.indexOf(value) === -1) return false;
 				t.splice(t.indexOf(value));
 				this.set(type, sub, t);
 			} else (this.get<any>(type) as Map<string, any>).delete(sub);
 		} else {
-			if (!!value) {
+			if (value) {
 				const t = this.get<T[]>(type) as T[];
 				if (t.indexOf(value) === -1) return false;
 				t.splice(t.indexOf(value), 1);
@@ -75,7 +75,7 @@ export default class Holder {
 
 	clear(type: string, sub?: string) {
 		if (!this.entries.has(type)) return false;
-		if (!!sub) {
+		if (sub) {
 			if (!this.entries.get(type).has(sub)) return false;
 			else this.entries.get(type).delete(sub);
 		}
@@ -85,7 +85,7 @@ export default class Holder {
 
 	has<T = any>(type: string, sub?: string, value?: T) {
 		if (!this.entries.has(type)) return false;
-		if (!!value) {
+		if (value) {
 			if (!sub) return this.entries.get(type).includes(value);
 			else return this.entries.get(type).get(sub).includes(value);
 		}

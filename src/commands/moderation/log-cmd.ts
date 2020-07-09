@@ -42,7 +42,7 @@ export default new Command({
 		} else {
 			const ev = config.logEvents[config.logEvents.map(k => k.toLowerCase()).indexOf(msg.args[1].toLowerCase())];
 			const f = gConfig.logEvents.find(e => e.type === ev);
-			if (!!f) await gConfig.mongoEdit({
+			if (f) await gConfig.mongoEdit({
 				$pull: {
 					logEvents: f
 				} as any

@@ -81,7 +81,7 @@ export default new Command({
 				title: `${i.n}${i.char}`,
 				url: `https://prnt.sc/${i.n}${i.char}`,
 				footer: {
-					text: `random image from prnt.sc (images are not filtered)`
+					text: "random image from prnt.sc (images are not filtered)"
 				}
 			}
 		}).catch(h);

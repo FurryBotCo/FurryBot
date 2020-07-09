@@ -31,7 +31,7 @@ export default new Command({
 	if (!content || !author || !time) return msg.reply(`{lang:commands.utility.snipe.noSnipes|${ch.id}}`);
 
 	const i = content.match(new RegExp("((https?:\/\/)?(discord(app\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
-	if (!!i) i.map(k => content = content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
+	if (i) i.map(k => content = content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
 	const u = await this.bot.getRESTUser(author);
 
 

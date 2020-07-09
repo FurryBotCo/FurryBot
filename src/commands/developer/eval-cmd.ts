@@ -70,7 +70,7 @@ export default new Command({
 		if (typeof res === "undefined") res = "No Return";
 		else {
 			const j = res instanceof Object ? F.Utility.toStringFormat(res) : null;
-			if (!!j && j !== res.toString()) {
+			if (j && j !== res.toString()) {
 				if (res instanceof Error) (error = true, o = res);
 				res = j;
 			}

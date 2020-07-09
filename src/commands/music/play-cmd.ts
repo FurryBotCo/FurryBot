@@ -25,7 +25,7 @@ export default new Command({
 }, (async function (msg, uConfig, gConfig, cmd) {
 	if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 	if (!msg.member.voiceState || !msg.member.voiceState.channelID) return msg.reply("{lang:other.music.joinVC}");
-	if (!!(msg.channel.guild.me.voiceState && msg.channel.guild.me.voiceState.channelID) && msg.channel.guild.me.voiceState.channelID !== msg.member.voiceState.channelID) return msg.reply("{lang:other.music.wrongVC}");
+	if ((msg.channel.guild.me.voiceState && msg.channel.guild.me.voiceState.channelID) && msg.channel.guild.me.voiceState.channelID !== msg.member.voiceState.channelID) return msg.reply("{lang:other.music.wrongVC}");
 	const q = this.getQueue(msg.channel.guild.id, msg.channel.id, msg.member.voiceState.channelID);
 	const s = await q.search("youtube", msg.args.join(" ")).then(j => j.slice(0, 10));
 	if (!s || s.length === 0) return msg.reply(`{lang:commands.music.play.noResults|${msg.args.join(" ")}}`);

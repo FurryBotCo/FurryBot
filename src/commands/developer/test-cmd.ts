@@ -4,6 +4,12 @@ import Eris from "eris";
 import Logger from "../../util/LoggerV10";
 import { fstat } from "fs";
 
+async function fetch(ch: Eris.TextChannel, messages: Eris.Message<typeof ch>[], id?: string) {
+	const m = await ch.getMessages(100, id || null, null);
+	messages.push(...m);
+	if (m.length === 100) await fetch(ch, messages, Array.from(m).reverse()[0].id);
+}
+
 export default new Command({
 	triggers: [
 		"test"
@@ -151,13 +157,8 @@ export default new Command({
 		case "fetch": {
 			let messages: Eris.Message<Eris.TextChannel>[] = [];
 			const ch = this.bot.getChannel("591805043972243486") as Eris.TextChannel;
-			async function fetch(id?: string) {
-				const m = await ch.getMessages(100, id || null, null);
-				messages.push(...m);
-				if (m.length === 100) await fetch(Array.from(m).reverse()[0].id);
-			}
 
-			await fetch();
+			await fetch(ch, messages);
 
 			messages = messages.filter(m => !m.author.discriminator || m.author.discriminator === "0000").reverse();
 

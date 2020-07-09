@@ -51,7 +51,7 @@ export default new Command({
 			`\u25FD {lang:commands.utility.inviteinfo.channelType}: ${ChannelNames[channel.type]}`
 		].join("\n"), false);
 
-	if (!!inviter) {
+	if (inviter) {
 		embed.addField(
 			"{lang:commands.utility.inviteinfo.inviter}",
 			[

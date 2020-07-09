@@ -78,7 +78,7 @@ export default new Command({
 				"",
 				"**{lang:commands.information.uinfo.socialProfiles}:**",
 				...(c.id !== msg.author.id ? [] : [`[[{lang:other.words.add}](https://${config.web.api.host}/socials)] [[{lang:other.words.remove}](https://${config.web.api.host}/unlink)]`]),
-				...(c.socials.length === 0 ? [`{lang:other.words.none}`] : c.socials.map(s => {
+				...(c.socials.length === 0 ? ["{lang:other.words.none}"] : c.socials.map(s => {
 					switch (s.type) {
 						case "twitter": {
 							return `${config.emojis.twitter} [@${s.username}](https://twitter.com/intent/user?user_id=${s.id})`;

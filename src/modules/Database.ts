@@ -21,7 +21,7 @@ class Database {
 	client: FurryBot;
 	constructor(host: string, port: number, database: string, opt: MongoClientOptions, debug?: boolean) {
 		this.conn = DB(host, port, database, opt);
-		this.debug = !!debug;
+		this.debug = debug;
 		this.client = {
 			log: () => null
 		} as any;
@@ -46,7 +46,7 @@ class Database {
 	async getUser(id: string, skipCache?: boolean): Promise<UserConfig>;
 	async getUser<F extends (err: Error, d: UserConfig) => any>(id: string, skipCache: boolean, cb: F): Promise<UserConfig>;
 	async getUser<F extends (err: Error, d: UserConfig) => any>(id: string, skipCache?: boolean, cb?: F): Promise<UserConfig | F> {
-		skipCache = !!skipCache;
+		skipCache = skipCache;
 		const t = new Timers(this.client);
 		t.start("user");
 		let u: UserConfig;
@@ -79,7 +79,7 @@ class Database {
 			u = await this.collection("users").findOne({ id }).then(res => res ? new UserConfig(id, res) : null);
 		}
 		t.end("user");
-		if (this.debug) this.client.log("debug", `Database query for the user "${id}" took ${t.calc("user", "user")}ms.`, `Database`);
+		if (this.debug) this.client.log("debug", `Database query for the user "${id}" took ${t.calc("user", "user")}ms.`, "Database");
 
 		if (!cb) return u;
 		else return cb(null, u);
@@ -89,7 +89,7 @@ class Database {
 	async getGuild(id: string, skipCache?: boolean): Promise<GuildConfig>;
 	async getGuild<F extends (err: Error, d: GuildConfig) => any>(id: string, skipCache: boolean, cb: F): Promise<GuildConfig>;
 	async getGuild<F extends (err: Error, d: GuildConfig) => any>(id: string, skipCache?: boolean, cb?: F): Promise<GuildConfig | F> {
-		skipCache = !!skipCache;
+		skipCache = skipCache;
 		const t = new Timers(this.client);
 		t.start("guild");
 		let g: GuildConfig;
@@ -117,16 +117,16 @@ class Database {
 			delete t.settings;
 			await this.mdb.collection("guilds").insertOne({ ...t, settings: { ...config.defaults.config.guild.settings, prefix: config.defaults.prefix }, id }).catch((err: MongoError) => {
 				switch (err.code) {
-					case 11000: { this.client.log("warn", `Duplicate key error (key: ${(err as any).keyValue.id})`, `Database`); break; }
-					default: this.client.log("error", err, `Database`);
+					case 11000: { this.client.log("warn", `Duplicate key error (key: ${(err as any).keyValue.id})`, "Database"); break; }
+					default: this.client.log("error", err, "Database");
 				}
 			});
-			this.client.log("debug", `Created guild entry "${id}".`, `Database`);
+			this.client.log("debug", `Created guild entry "${id}".`, "Database");
 			g = await this.collection("guilds").findOne({ id }).then(res => res ? new GuildConfig(id, res) : null);
 		}
 
 		t.end("guild");
-		if (this.debug) this.client.log("debug", `Database query for the guild "${id}" took ${t.calc("guild", "guild")}ms.`, `Database`);
+		if (this.debug) this.client.log("debug", `Database query for the guild "${id}" took ${t.calc("guild", "guild")}ms.`, "Database");
 
 		if (!cb) return g;
 		else return cb(null, g);
@@ -170,7 +170,7 @@ class Database {
 							`Blame: ${blame} (${blameId})`,
 							`Expiry: ${[0, null, undefined].includes(expire) ? "Never" : Time.formatDateWithPadding(expire, false)}`,
 							`Previous Blacklists: ${prev} (Strike #${prev + 1})`,
-							...(!!report ? [`Report: ${report}`] : [])
+							...(report ? [`Report: ${report}`] : [])
 						].join("\n"),
 						color: Colors.red,
 						timestamp: new Date().toISOString()
@@ -206,8 +206,8 @@ class Database {
 		const e = v.find(e => Date.now() < e.time + 4.32e+7);
 
 		return {
-			voted: !!e,
-			weekend: !!e && !!e.weekend
+			voted: e,
+			weekend: e && e.weekend
 		};
 	}
 }

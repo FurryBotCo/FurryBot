@@ -233,7 +233,7 @@ export default class Internal {
 				if (k.indexOf("#") !== -1) m = msg.channel.guild.members.filter(u => (`${u.username}#${u.discriminator}`).toLowerCase() === k.toLowerCase())[0];
 				else m = msg.channel.guild.members.filter(u => u.username.toLowerCase() === k.toLowerCase() || (u.nick && u.nick.toLowerCase() === k.toLowerCase()))[0];
 
-				if (!!m) str = str.replace(k, `<@!${m.id}>`);
+				if (m) str = str.replace(k, `<@!${m.id}>`);
 			});
 
 		return str;

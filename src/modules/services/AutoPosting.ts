@@ -151,7 +151,7 @@ export default class AutoPostingWorker extends BaseServiceWorker {
 			.setTimestamp(new Date().toISOString())
 			.setImage(`attachment://auto-${entry.type}.png`);
 
-		if (!!data) embed.setDescription(`${data.sources.length > 0 ? `[[source]](${data.sources[0]}) ` : ""}[[Short URL]](${data.shorturl}) [[Direct Image URL]](${data.url})`);
+		if (data) embed.setDescription(`${data.sources.length > 0 ? `[[source]](${data.sources[0]}) ` : ""}[[Short URL]](${data.shorturl}) [[Direct Image URL]](${data.url})`);
 
 		await this.client.executeWebhook(entry.webhook.id, entry.webhook.token, {
 			embeds: [

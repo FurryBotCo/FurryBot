@@ -32,8 +32,8 @@ export default new Command({
 			const s = Number(msg.args[1]);
 			if (!this.bot.shards.has(s)) return msg.reply(`invalid shard id "${s}".`);
 
-			this.bot.shards.get(s).disconnect({ reconnect: !!msg.args[2] });
-			return msg.reply(`disconnected shard **#${s}**. ${!!msg.args[2] ? "Automatically reconnecting." : "Not reconnecting."}`);
+			this.bot.shards.get(s).disconnect({ reconnect: msg.args[2] });
+			return msg.reply(`disconnected shard **#${s}**. ${msg.args[2] ? "Automatically reconnecting." : "Not reconnecting."}`);
 			break;
 		}
 

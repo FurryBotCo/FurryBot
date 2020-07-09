@@ -207,10 +207,10 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 
 		t.start("disable");
 		if (gConfig.disable.length > 0 && !config.developers.includes(msg.author.id) && !msg.member.permission.has("administrator")) {
-			const a = gConfig.disable.filter((d: any) => d.type === "server" && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
-			const b = gConfig.disable.filter((d: any) => d.type === "user" && d.id === msg.author.id && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
-			const c = gConfig.disable.filter((d: any) => d.type === "role" && msg.member.roles.includes(d.id) && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
-			const d = gConfig.disable.filter((d: any) => d.type === "channel" && d.id === msg.channel.id && (d.all || (!!d.command && cmd.triggers.includes(d.command.toLowerCase())) || (!!d.category && d.category === cmd.category)));
+			const a = gConfig.disable.filter((d: any) => d.type === "server" && (d.all || (d.command && cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === cmd.category)));
+			const b = gConfig.disable.filter((d: any) => d.type === "user" && d.id === msg.author.id && (d.all || (d.command && cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === cmd.category)));
+			const c = gConfig.disable.filter((d: any) => d.type === "role" && msg.member.roles.includes(d.id) && (d.all || (d.command && cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === cmd.category)));
+			const d = gConfig.disable.filter((d: any) => d.type === "channel" && d.id === msg.channel.id && (d.all || (d.command && cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === cmd.category)));
 			if (a.length > 0 || b.length > 0 || c.length > 0 || d.length > 0) return;
 		}
 		t.end("disable");
@@ -314,7 +314,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 		if (!config.developers.includes(msg.author.id)) {
 			const cool = this.cmd.cooldownHandler.get(msg.author.id, cmd.triggers[0]);
 			const time = !cool ? 0 : cool.time < 1000 ? 1000 : Math.round(cool.time / 1000) * 1000;
-			if (!!cool && !isNaN(time) && cmd.cooldown !== 0 && cool.time !== 0) {
+			if (cool && !isNaN(time) && cmd.cooldown !== 0 && cool.time !== 0) {
 				const t = Time.ms(time, true);
 				const n = Time.ms(cmd.cooldown, true);
 				const d = Time.ms(cmd.donatorCooldown, true);

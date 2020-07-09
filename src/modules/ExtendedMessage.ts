@@ -127,7 +127,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 
 		this.channel.createMessage = (async (content: Eris.MessageContent, file?: Eris.MessageFile) => {
 			// easier than type checking
-			if (!!this.channel.guild) {
+			if (this.channel.guild) {
 				const g = await db.getGuild(this.channel.guild.id);
 				if (typeof content === "string") content = Language.get(g.settings.lang).parseString(content);
 				if (typeof content === "object") {
@@ -140,7 +140,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 
 		this.channel.editMessage = (async (messageID: string, content: Eris.MessageContent) => {
 			// easier than type checking
-			if (!!this.channel.guild) {
+			if (this.channel.guild) {
 				const g = await db.getGuild(this.channel.guild.id);
 				if (typeof content === "string") content = Language.get(g.settings.lang).parseString(content);
 				if (typeof content === "object") {
@@ -153,7 +153,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 
 		this.edit = (async (content: Eris.MessageContent) => {
 			// easier than type checking
-			if (!!this.channel.guild) {
+			if (this.channel.guild) {
 				const g = await db.getGuild(this.channel.guild.id);
 				if (typeof content === "string") content = Language.get(g.settings.lang).parseString(content);
 				if (typeof content === "object") {
@@ -214,7 +214,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		if (join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
@@ -243,7 +243,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		if (join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
@@ -256,10 +256,10 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		// member ID
 		if (![undefined, null, ""].includes(args[argPosition]) && args[argPosition].match(/[0-9]{17,19}/) && !(args.length === argPosition || !args || this.mentionMap.members.length >= mentionPosition + 1)) {
 			let m = this.channel.guild.members.get(args[argPosition]);
-			if (!!m) return m as M;
+			if (m) return m as M;
 			else {
 				m = await this.channel.guild.getRESTMember(args[argPosition]).catch(err => null);
-				if (!!m) {
+				if (m) {
 					this.channel.guild.members.add(m);
 					return m as M;
 				}
@@ -280,7 +280,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		if (join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
@@ -306,7 +306,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		if (join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		if (!this.channel.guild) throw new TypeError("invalid or missing guild on this");
@@ -333,7 +333,7 @@ export default class ExtendedMessage<T extends Eris.TextableChannel = Eris.Texta
 		let argObject: string, args: string[];
 		argObject = unparsed ? "unparsedArgs" : "args";
 		if (!this[argObject]) throw new TypeError(`${argObject} property not found on message`);
-		if (!!join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
+		if (join) (args = [this[argObject].join(" ")].filter(a => !a.startsWith("--")), argPosition = 0);
 		else args = this[argObject].filter(a => !a.startsWith("--"));
 
 		// server id

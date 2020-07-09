@@ -38,7 +38,7 @@ export default class CallbackRoute extends Route {
 
 				const u = await db.getUser(req.session.user.id);
 
-				if (!!u.socials.find(s => s.type === "discord.bio" && s.id === req.session.user.id)) {
+				if (u.socials.find(s => s.type === "discord.bio" && s.id === req.session.user.id)) {
 					await this.client.w.get("social").execute({
 						username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
 						avatarURL: "https://i.furry.bot/furry.png",
@@ -171,7 +171,7 @@ export default class CallbackRoute extends Route {
 
 				const u = await db.getUser(req.session.user.id);
 
-				if (!!u.socials.find(s => s.type === "reddit" && s.id === user.id)) {
+				if (u.socials.find(s => s.type === "reddit" && s.id === user.id)) {
 					Logger.debug("Reddit Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with a duplicate Reddit account, @${user.name} (${user.id}).`);
 					await this.client.w.get("social").execute({
 						username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
@@ -258,7 +258,7 @@ export default class CallbackRoute extends Route {
 
 					const u = await db.getUser(req.session.user.id);
 
-					if (!!u.socials.find(s => s.type === "twitter" && s.id === user.userId)) {
+					if (u.socials.find(s => s.type === "twitter" && s.id === user.userId)) {
 						Logger.debug("Twitter Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with a duplicate Twitter account, @${user.userName} (${user.userId}).`);
 						await this.client.w.get("social").execute({
 							username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,

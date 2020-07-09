@@ -36,7 +36,7 @@ export default new Command({
 				.setTimestamp(new Date().toISOString())
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))
 				.addFields(...categories.map(c => ({
-					name: `${c.displayName}`,
+					name: c.displayName,
 					value: `\`${gConfig.settings.prefix}help ${c.name}\`\n[{lang:commands.misc.help.hoverInfo}](https://furry.bot '${c.description}\n${c.commands.length} {lang:commands.misc.help.cmdTotal}')`,
 					inline: true
 				})))
@@ -60,13 +60,13 @@ export default new Command({
 				.setDescription([
 					cmd.description,
 					"",
-					`**{lang:other.words.restrictions}**:`,
-					`{lang:commands.misc.help.embed.restrictionsTip}`,
+					"**{lang:other.words.restrictions}**:",
+					"{lang:commands.misc.help.embed.restrictionsTip}",
 					"```diff",
 					...this.cmd.restrictions.map(r => `${cmd.restrictions.includes(r.name as any) ? "+" : "-"} {lang:other.commandRestrictions.${r.name}}`),
 					"```",
 					"",
-					`**{lang:other.words.permissions}**:`,
+					"**{lang:other.words.permissions}**:",
 					`\u25FD {lang:other.words.bot}: **${cmd.permissions.bot.length === 0 ? "{lang:other.words.none}" : cmd.permissions.bot.join("**, **")}**`,
 					`\u25FD {lang:other.words.user}: **${cmd.permissions.user.length === 0 ? "{lang:other.words.none}" : cmd.permissions.user.join("**, **")}**`,
 					"",

@@ -89,7 +89,7 @@ export default class ModLogUtil {
 		if (data.type !== "custom") {
 			const blame = data.blame instanceof Eris.User ? `${data.blame.username}#${data.blame.discriminator}` : !data.blame || ["automatic"].includes((data.blame as unknown as string).toLowerCase()) ? null : data.blame as unknown as string;
 			embed.setFooter(!blame ? "{lang:other.modlog.actionAuto}" : `{lang:other.modlog.action|${blame}}`, !blame ? config.images.botIcon : (data.blame as unknown as Eris.User).avatarURL);
-			reason = !!data.reason ? data.reason : "None Provided";
+			reason = data.reason ? data.reason : "None Provided";
 		}
 
 		let e: InsertOneWriteOpResult<WithId<ModLogEntry.GenericEntry>>;
@@ -367,6 +367,6 @@ export default class ModLogUtil {
 			embed: embed.toJSON()
 		}).catch(err => null);
 
-		if (!!msg && !!e && e.ops.length !== 0) await mdb.collection<ModLogEntry.GenericEntry>("modlog").findOneAndUpdate({ _id: e.ops[0]._id }, { $set: { messageId: msg.id } });
+		if (msg && e && e.ops.length !== 0) await mdb.collection<ModLogEntry.GenericEntry>("modlog").findOneAndUpdate({ _id: e.ops[0]._id }, { $set: { messageId: msg.id } });
 	}
 }

@@ -64,7 +64,7 @@ export default new Command({
 	};*/
 
 	const m = await msg.channel.createMessage({ embed });
-	const inst = await msg.channel.createMessage(`To navigate posts, you can reply with one of the following:\n**first**, **back**, **stop**, **next**, **last**.`);
+	const inst = await msg.channel.createMessage("To navigate posts, you can reply with one of the following:\n**first**, **back**, **stop**, **next**, **last**.");
 
 	const f = (async () => {
 		const d = await this.c.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id || m.member.permission.has("administrator"), 1);

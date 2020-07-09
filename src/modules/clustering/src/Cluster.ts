@@ -176,7 +176,7 @@ export default class Cluster {
 	}
 
 	startStats(time?: number) {
-		if (!!time) this.statsTime = time;
+		if (time) this.statsTime = time;
 		if (!this.statsTime) return;
 		this._statsInterval = setInterval(this.postStats.bind(this), this.statsTime);
 	}

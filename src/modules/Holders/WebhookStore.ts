@@ -29,8 +29,8 @@ class Webhook<e> {
 			wait: true
 		};
 
-		if (!!this.avatar && !payload.avatarURL) data.avatarURL = this.avatar;
-		if (!!this.username && !payload.username) data.username = this.username;
+		if (this.avatar && !payload.avatarURL) data.avatarURL = this.avatar;
+		if (this.username && !payload.username) data.username = this.username;
 		return this.client.bot.executeWebhook(this.id, this.token, data);
 	}
 }

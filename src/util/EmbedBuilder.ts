@@ -59,7 +59,7 @@ export default class EmbedBuilder {
 		this.data.footer = {
 			text: Language.get(this.lang).parseString(text)
 		};
-		if (!!icon) this.data.footer.icon_url = icon;
+		if (icon) this.data.footer.icon_url = icon;
 		return this;
 	}
 
@@ -84,8 +84,8 @@ export default class EmbedBuilder {
 		this.data.author = {
 			name: Language.get(this.lang).parseString(name)
 		};
-		if (!!icon) this.data.author.icon_url = icon;
-		if (!!url) this.data.author.url = url;
+		if (icon) this.data.author.icon_url = icon;
+		if (url) this.data.author.url = url;
 		return this;
 	}
 
@@ -101,7 +101,7 @@ export default class EmbedBuilder {
 	}
 
 	addFields(...fields: { name: string; value: string; inline?: boolean; }[]) {
-		fields.filter(f => !!f).map(f => this.addField(f.name, f.value, f.inline));
+		fields.filter(f => f).map(f => this.addField(f.name, f.value, f.inline));
 		return this;
 	}
 

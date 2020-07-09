@@ -40,7 +40,7 @@ export default new Command({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.misc.suggest.title}")
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setDescription(`{lang:commands.misc.suggest.desc}`)
+			.setDescription("{lang:commands.misc.suggest.desc}")
 			.setTimestamp(new Date().toISOString())
 			.setColor(Math.floor(Math.random() * 0xFFFFFF))
 			.toJSON()

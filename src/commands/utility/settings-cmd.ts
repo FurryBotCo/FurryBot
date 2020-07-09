@@ -52,7 +52,7 @@ export default new Command({
 
 						switch (s.type) {
 							case "boolean": {
-								v = !!s.value ? config.emojis.greenTick : config.emojis.redTick;
+								v = s.value ? config.emojis.greenTick : config.emojis.redTick;
 								break;
 							}
 

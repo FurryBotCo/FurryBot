@@ -6,7 +6,7 @@ module.exports = (async function (txt, v) {
 		global[k] = v[k];
 	}*/
 	for (const k in v) {
-		new Function("value", k + " = value ")(v[k]) // attempt to set the value
+		new Function("value", k + " = value ")(v[k]); // attempt to set the value
 	}
 	return eval(txt);
 });

@@ -66,7 +66,7 @@ export default new Command({
 	/*const c = a.find(b => b.user1 === member1.id && b.user2 === member2.id || b.user1 === member2.id && b.user2 === member1.id);
 
 	if (!reset) {
-		if (!!c) Object.assign(ship, {
+		if (c) Object.assign(ship, {
 			amount: c.amount,
 			name: c.name
 		});
@@ -80,7 +80,7 @@ export default new Command({
 			fs.writeFileSync(f, JSON.stringify(a));
 		}
 	} else {
-		if (!!c) a.splice(a.indexOf(c));
+		if (c) a.splice(a.indexOf(c));
 		a.push({
 			user1: member1.id,
 			user2: member2.id,

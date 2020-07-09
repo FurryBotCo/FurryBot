@@ -23,7 +23,7 @@ export default new Command({
 }, (async function (msg, uConfig, gConfig, cmd) {
 	const p = uConfig.socials.find(s => s.type === "patreon");
 
-	if (!!p) return msg.reply(`{lang:commands.misc.link.previous|${gConfig.settings.prefix}}`);
+	if (p) return msg.reply(`{lang:commands.misc.link.previous|${gConfig.settings.prefix}}`);
 	const patrons = await Internal.loopPatrons();
 
 	const d = patrons.find(p => p.attributes.social_connections.discord && p.attributes.social_connections.discord.user_id === msg.author.id);
