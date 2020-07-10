@@ -159,7 +159,7 @@ export default class FurryBot extends BaseClusterWorker {
 				total: ipcStats.totalRam
 			},
 			clusters: c,
-			get shards() { return this.clusters.reduce((a, b) => a.concat(b), []); },
+			get shards() { return this.clusters.reduce((a, b) => a.concat(...b.shards), []); },
 			services: ipcStats.services.map(s => ({ [s.name]: s.ram })).reduce((a, b) => ({ ...a, ...b }), {})
 		};
 	}
