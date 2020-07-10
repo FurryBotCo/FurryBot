@@ -61,7 +61,7 @@ export default new Command({
 
 	return msg.channel.createMessage({
 		embed: new EmbedBuilder(gConfig.settings.lang)
-			.setTitle(`{lang:commands.information.uinfo.title}`)
+			.setTitle("{lang:commands.information.uinfo.title}")
 			.setImage(user.avatarURL)
 			.setDescription([
 				"**{lang:commands.information.uinfo.mainInfo}**:",

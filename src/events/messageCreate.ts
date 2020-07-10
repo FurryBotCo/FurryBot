@@ -355,7 +355,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 	} catch (e) {
 		const err: Error & { code?: string; } = e; // typescript doesn't allow annotating of catch clause variables, TS-1196
 		if (!["ERR_INVALID_USAGE", "RETURN"].includes(err.message)) {
-			this.log("error", err, msg && msg.channel && msg.channel.guild && msg.channel.guild.shard ? `Shard #${msg.channel.guild.shard.id} | Error` : `Error`);
+			this.log("error", err, msg && msg.channel && msg.channel.guild && msg.channel.guild.shard ? `Shard #${msg.channel.guild.shard.id} | Error` : "Error");
 			if (!msg || !msg.channel || !msg.channel.guild || !msg.channel.guild.shard) return;
 		}
 		const cmd = msg.cmd !== null ? msg.cmd.cmd : null;
@@ -367,7 +367,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			case "ERR_INVALID_USAGE": {
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
-						.setTitle(`:x: {lang:other.errors.invalidUsage.title}`)
+						.setTitle(": x: { lang: other.errors.invalidUsage.title }")
 						.setDescription([
 							"**{lang:other.errors.invalidUsage.info}**:",
 							`\u25FD {lang:other.errors.invalidUsage.command}: ${cmd.triggers[0]}`,

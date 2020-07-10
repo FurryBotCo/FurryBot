@@ -82,9 +82,9 @@ declare module "eris-fleet" {
 		/** Guilds per shard */
 		guildsPerShard?: number;
 		/** Number of shards */
-		shards?: number | 'auto';
+		shards?: number | "auto";
 		/** Number of clusters */
-		clusters?: number | 'auto';
+		clusters?: number | "auto";
 		/** Options to pass to the Eris client constructor */
 		clientOptions?: Eris.ClientOptions;
 		/** How long to wait for shards to connect to discord */
@@ -96,7 +96,7 @@ declare module "eris-fleet" {
 		/** Node arguments to pass to the clusters */
 		nodeArgs?: string[];
 		/** How often to update the stats after all clusters are spawned (set to "disable" to disable automated stats) */
-		statsInterval?: number | 'disable';
+		statsInterval?: number | "disable";
 		/** Services to start by name and path */
 		services?: ServiceCreator[];
 		/** First shard ID to use on this instance of eris-fleet */

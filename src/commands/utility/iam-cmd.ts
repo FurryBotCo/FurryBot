@@ -24,7 +24,7 @@ export default new Command({
 		return { name: b.name.toLowerCase(), id: a };
 	});
 	if (!roles.map(r => r.name).includes(msg.args.join(" ").toLowerCase())) {
-		if (msg.channel.guild.roles.find(r => r.name.toLowerCase() === msg.args.join(" ").toLowerCase())) return msg.reply(`{lang:commands.utility.iam.notAssignable}`);
+		if (msg.channel.guild.roles.find(r => r.name.toLowerCase() === msg.args.join(" ").toLowerCase())) return msg.reply("{lang:commands.utility.iam.notAssignable}");
 		return msg.reply("{lang:commands.utility.iam.notFound}");
 	}
 	let role;

@@ -32,5 +32,5 @@ export default new Command({
 		blame: msg.author
 	});
 
-	return msg.reply(`{lang:commands.moderation.unlock.removed}`);
+	return msg.reply("{lang:commands.moderation.unlock.removed}");
 }));

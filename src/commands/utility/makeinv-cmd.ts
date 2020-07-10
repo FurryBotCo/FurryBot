@@ -24,8 +24,8 @@ export default new Command({
 		embed: new EmbedBuilder(gConfig.settings.lang)
 			.setTitle("{lang:commands.utility.makeinv.helpTitle}")
 			.setDescription([
-				`{lang:commands.utility.makeinv.helpDesc}`,
-				`{lang:commands.utility.makeinv.helpUsage}:`,
+				"{lang:commands.utility.makeinv.helpDesc}",
+				"{lang:commands.utility.makeinv.helpUsage}:",
 				`{lang:commands.utility.makeinv.temp}: \`${gConfig.settings.prefix}makeinv -t\``,
 				`{lang:commands.utility.makeinv.maxAge}: \`${gConfig.settings.prefix}makeinv --maxAge=<seconds>\``,
 				`{lang:commands.utility.makeinv.maxUses}: \`${gConfig.settings.prefix}makeinv --maxUses=<number>\``

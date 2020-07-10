@@ -38,7 +38,7 @@ export default new Command({
 			});
 
 			if (c) return msg.reply(`{lang:commands.moderation.log.enabledAll|${ch.id}}`);
-			else return msg.reply(`{lang:commands.moderation.log.disableAll}`);
+			else return msg.reply("{lang:commands.moderation.log.disableAll}");
 		} else {
 			const ev = config.logEvents[config.logEvents.map(k => k.toLowerCase()).indexOf(msg.args[1].toLowerCase())];
 			const f = gConfig.logEvents.find(e => e.type === ev);

@@ -106,7 +106,7 @@ export default class TimedTasks {
 					if (!g) {
 						return mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
-					await g.unbanMember(entry.userId, `Automatic Unban`).catch(err => null);
+					await g.unbanMember(entry.userId, "Automatic Unban").catch(err => null);
 					const u = client.bot.users.has(entry.userId) ? client.bot.users.get(entry.userId) : await client.bot.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
 					if (!c.settings.modlog) {

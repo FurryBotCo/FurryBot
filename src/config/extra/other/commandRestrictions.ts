@@ -30,7 +30,7 @@ export default ((config: typeof cnf) => {
 				if (!gConfig) gConfig = await db.getGuild(msg.channel.guild.id);
 
 				if (!msg.channel.nsfw) {
-					await msg.reply(`this command can only be ran in nsfw channels.`, {
+					await msg.reply("this command can only be ran in nsfw channels", {
 						file: await Request.getImageFromURL(config.images.nsfw),
 						name: "nsfw.gif"
 					}).catch(err => null);
@@ -38,7 +38,7 @@ export default ((config: typeof cnf) => {
 				}
 
 				if (!gConfig.settings.nsfw) {
-					await msg.reply(`nsfw commands are not enabled in this server. To enable them, have an administrator run \`${gConfig.settings.prefix}settings nsfw commands enabled\`.`).catch(err => null);
+					await msg.reply(`nsfw commands are not enabled in this server.To enable them, have an administrator run \`${gConfig.settings.prefix}settings nsfw commands enabled\`.`).catch(err => null);
 					throw new RestrictionError("NSFW", "NSFW_NOT_ENABLED");
 				}
 			})
@@ -52,7 +52,7 @@ export default ((config: typeof cnf) => {
 				if (!config.developers.includes(msg.author.id)) {
 					Redis.INCR(`${config.beta ? "beta" : "prod"}:stats:restrictions:developer`);
 					client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer/contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
-					await msg.reply(`you must be a developer to use this command.`).catch(err => null);
+					await msg.reply("you must be a developer to use this command.").catch(err => null);
 					throw new RestrictionError("DEVELOPER", "NOT_A_DEVELOPER");
 				}
 			})
@@ -66,7 +66,7 @@ export default ((config: typeof cnf) => {
 				if (!config.contributors.includes(msg.author.id)) {
 					Redis.INCR(`${config.beta ? "beta" : "prod"}:stats:restrictions:contributor`);
 					client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run developer/contributor command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
-					await msg.reply(`you must be at least a contributor to use this command.`).catch(err => null);
+					await msg.reply("you must be at least a contributor to use this command.").catch(err => null);
 					throw new RestrictionError("CONTRIBUTOR", "NOT_A_CONTRIBUTOR");
 				}
 			})
@@ -80,7 +80,7 @@ export default ((config: typeof cnf) => {
 				if (!config.helpers.includes(msg.author.id)) {
 					Redis.INCR(`${config.beta ? "beta" : "prod"}:restrictions:helper`);
 					client.log("debug", `${msg.author.tag} (${msg.author.id}) attempted to run helper command "${cmd.triggers[0]}" in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`, `Shard #${msg.channel.guild.shard.id}`);
-					await msg.reply(`you must be a helper or higher to use this command.`).catch(err => null);
+					await msg.reply("you must be a helper or higher to use this command.").catch(err => null);
 					throw new RestrictionError("HELPER", "NOT_A_HELPER");
 				}
 			})
@@ -103,7 +103,7 @@ export default ((config: typeof cnf) => {
 				const d = await uConfig.premiumCheck();
 
 				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) {
-					await msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
+					await msg.reply("some requirement was not met, but I need the `embedLinks` permission to tell you what.").catch(err => null);
 					throw new RestrictionError("DONATOR", "EMBED_LINKS_MISSING");
 				}
 
@@ -133,7 +133,7 @@ export default ((config: typeof cnf) => {
 				const d = await gConfig.premiumCheck();
 
 				if (!msg.channel.permissionsOf(this.user.id).has("embedLinks")) {
-					await msg.reply(`some requirement was not met, but I need the \`embedLinks\` permission to tell you what.`).catch(err => null);
+					await msg.reply("some requirement was not met, but I need the `embedLinks` permission to tell you what.").catch(err => null);
 					throw new RestrictionError("PREMIUM", "EMBED_LINKS_MISSING");
 				}
 

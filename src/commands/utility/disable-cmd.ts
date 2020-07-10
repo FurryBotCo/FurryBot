@@ -29,7 +29,7 @@ export default new Command({
 				`\u25FD {lang:commands.utility.disable.help.specificChannel}: \`${msg.prefix}disable add all <channel>\``,
 				`\u25FD {lang:commands.utility.disable.help.specificRole}: \`${msg.prefix}disable add all <role>\``,
 				`\u25FD {lang:commands.utility.disable.help.specificUser}: \`${msg.prefix}disable add all <user>\``,
-				`\u25FD {lang:commands.utility.disable.help.cmdTip}`,
+				"\u25FD {lang:commands.utility.disable.help.cmdTip}",
 				"",
 				"**{lang:commands.utility.disable.help.remove}**:",
 				`\u25FD {lang:commands.utility.disable.help.withId}: \`${msg.prefix}disable remove <id>\``,

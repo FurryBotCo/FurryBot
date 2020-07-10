@@ -57,7 +57,7 @@ export default class Message {
 			const c = client.cmd.getCommand(t);
 			return c || null;
 		} catch (e) {
-			client.log("error", `Error parsing command:`, "Message Parse");
+			client.log("error", "Error parsing command:", "Message Parse");
 			client.log("error", e, "Message Parse");
 			return null;
 		}

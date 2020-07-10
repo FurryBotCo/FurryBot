@@ -15,7 +15,7 @@ export default new ClientEvent("debug", (async function (this: FurryBot, info: s
 			const color = code <= 399 ? chalk.green : code <= 499 ? chalk.blue : code <= 599 ? chalk.red : (t) => t;
 			return [undefined, null].includes(id) ? this.log("debug", info, `Debug | Request[${color(code)}]`) : this.log("debug", info, `Shard #${id} | Debug | Request[${color(code)}]`);
 		}
-		if (Logger !== undefined) return [undefined, null].includes(id) ? this.log("debug", info, `Debug`) : this.log("debug", info, `Shard #${id} | Debug`);
+		if (Logger !== undefined) return [undefined, null].includes(id) ? this.log("debug", info, "Debug") : this.log("debug", info, `Shard #${id} | Debug`);
 		else return console.debug(info);
 	}
 }));

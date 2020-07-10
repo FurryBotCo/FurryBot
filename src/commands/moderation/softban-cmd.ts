@@ -68,7 +68,7 @@ export default new Command({
 			});
 		});
 	}).catch(async (err) => {
-		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.ban.englishOnly}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply("{lang:commands.moderation.ban.englishOnly}");
 		else await msg.channel.createMessage(`{lang:commands.moderation.ban.couldNotBan|${member.username}#${member.discriminator}|${err}}`);
 		// if (typeof m !== "undefined") await m.delete();
 	});

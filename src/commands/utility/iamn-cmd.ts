@@ -25,8 +25,8 @@ export default new Command({
 		return { name: b.name.toLowerCase(), id: a };
 	});
 	if (!roles.map(r => r.name).includes(msg.args.join(" ").toLowerCase())) {
-		if (msg.channel.guild.roles.find(r => r.name.toLowerCase() === msg.args.join(" ").toLowerCase())) return msg.reply(`{lang:commands.utility.iamn.notAssignable}`);
-		return msg.reply(`{lang:commands.utility.iamn.notFound}`);
+		if (msg.channel.guild.roles.find(r => r.name.toLowerCase() === msg.args.join(" ").toLowerCase())) return msg.reply("{lang:commands.utility.iamn.notAssignable}");
+		return msg.reply("{lang:commands.utility.iamn.notFound}");
 	}
 	let role;
 	role = roles.filter(r => r.name === msg.args.join(" ").toLowerCase());
@@ -34,7 +34,7 @@ export default new Command({
 	role = role[0];
 	if (!msg.member.roles.includes(role.id)) return msg.reply(`{lang:commands.utility.iamn.notHave|${gConfig.settings.prefix}}`);
 	const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), role);
-	if (a.higher || a.same) return msg.reply(`{lang:commands.utility.iamn.higher}`);
+	if (a.higher || a.same) return msg.reply("{lang:commands.utility.iamn.higher}");
 	await msg.member.removeRole(role.id, "iamnot command");
 
 	// await msg.gConfig.modlog.add({ blame: this.client.user.id, action: "removeRole", role: role.id, reason: "iamnot command", userId: msg.author.id, timestamp: Date.now() });

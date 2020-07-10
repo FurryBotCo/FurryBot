@@ -48,7 +48,7 @@ export default new Command({
 			blame: msg.author
 		});
 	}).catch(async (err) => {
-		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.unban.englishOnly}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply("{lang:commands.moderation.unban.englishOnly}");
 		else await msg.channel.createMessage(`{lang:commands.moderation.unban.couldNotUnban|${user.username}#${user.discriminator}|${err}}`);
 	});
 

@@ -34,5 +34,5 @@ export default new Command({
 		blame: msg.author
 	});
 
-	return msg.reply(`{lang:commands.moderation.lock.executed}`);
+	return msg.reply("{lang:commands.moderation.lock.executed}");
 }));

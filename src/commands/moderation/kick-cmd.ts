@@ -44,7 +44,7 @@ export default new Command({
 			blame: msg.author
 		});
 	}).catch(async (err) => {
-		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.kick.englishOnly}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply("{lang:commands.moderation.kick.englishOnly}");
 		else await msg.reply(`{lang:commands.moderation.kick.couldNotKick|${member.username}#${member.discriminator}|${err}}`);
 		if (m !== undefined) await m.delete();
 	});

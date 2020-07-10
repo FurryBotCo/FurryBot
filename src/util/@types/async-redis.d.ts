@@ -1,8 +1,8 @@
 declare module "async-redis" {
 	/// <reference types="node" />
 
-	import { EventEmitter } from 'events';
-	import { Duplex } from 'stream';
+	import { EventEmitter } from "events";
+	import { Duplex } from "stream";
 
 	export interface RetryStrategyOptions {
 		error: NodeJS.ErrnoException;
@@ -148,8 +148,8 @@ declare module "async-redis" {
 		/**
 		 * Set multiple hash fields to multiple values.
 		 */
-		hmset: OverloadedSetCommand<string | number, 'OK', Promise<R>>;
-		HMSET: OverloadedSetCommand<string | number, 'OK', Promise<R>>;
+		hmset: OverloadedSetCommand<string | number, "OK", Promise<R>>;
+		HMSET: OverloadedSetCommand<string | number, "OK", Promise<R>>;
 
 		/**
 		 * Listen for messages published to the given channels.
@@ -184,8 +184,8 @@ declare module "async-redis" {
 		/**
 		 * Asynchronously rewrite the append-only file.
 		 */
-		bgrewriteaof(cb?: Callback<'OK'>): Promise<R>;
-		BGREWRITEAOF(cb?: Callback<'OK'>): Promise<R>;
+		bgrewriteaof(cb?: Callback<"OK">): Promise<R>;
+		BGREWRITEAOF(cb?: Callback<"OK">): Promise<R>;
 
 		/**
 		 * Asynchronously save the dataset to disk.
@@ -328,8 +328,8 @@ declare module "async-redis" {
 		/**
 		 * Discard all commands issued after MULTI.
 		 */
-		discard(cb?: Callback<'OK'>): Promise<R>;
-		DISCARD(cb?: Callback<'OK'>): Promise<R>;
+		discard(cb?: Callback<"OK">): Promise<R>;
+		DISCARD(cb?: Callback<"OK">): Promise<R>;
 
 		/**
 		 * Return a serialized version of the value stored at the specified key.
@@ -362,7 +362,7 @@ declare module "async-redis" {
 		EXISTS: OverloadedCommand<string, number, Promise<R>>;
 
 		/**
-		 * Set a key's time to live in seconds.
+		 * Set a key"s time to live in seconds.
 		 */
 		expire(key: string, seconds: number, cb?: Callback<number>): Promise<R>;
 		EXPIRE(key: string, seconds: number, cb?: Callback<number>): Promise<R>;
@@ -379,15 +379,15 @@ declare module "async-redis" {
 		flushall(cb?: Callback<string>): Promise<R>;
 		flushall(async: "ASYNC", cb?: Callback<string>): Promise<R>;
 		FLUSHALL(cb?: Callback<string>): Promise<R>;
-		FLUSHALL(async: 'ASYNC', cb?: Callback<string>): Promise<R>;
+		FLUSHALL(async: "ASYNC", cb?: Callback<string>): Promise<R>;
 
 		/**
 		 * Remove all keys from the current database.
 		 */
-		flushdb(cb?: Callback<'OK'>): Promise<R>;
+		flushdb(cb?: Callback<"OK">): Promise<R>;
 		flushdb(async: "ASYNC", cb?: Callback<string>): Promise<R>;
-		FLUSHDB(cb?: Callback<'OK'>): Promise<R>;
-		FLUSHDB(async: 'ASYNC', cb?: Callback<string>): Promise<R>;
+		FLUSHDB(cb?: Callback<"OK">): Promise<R>;
+		FLUSHDB(async: "ASYNC", cb?: Callback<string>): Promise<R>;
 
 		/**
 		 * Add one or more geospatial items in the geospatial index represented using a sorted set.
@@ -566,8 +566,8 @@ declare module "async-redis" {
 		/**
 		 * Insert an element before or after another element in a list.
 		 */
-		linsert(key: string, dir: 'BEFORE' | 'AFTER', pivot: string, value: string, cb?: Callback<string>): Promise<R>;
-		LINSERT(key: string, dir: 'BEFORE' | 'AFTER', pivot: string, value: string, cb?: Callback<string>): Promise<R>;
+		linsert(key: string, dir: "BEFORE" | "AFTER", pivot: string, value: string, cb?: Callback<string>): Promise<R>;
+		LINSERT(key: string, dir: "BEFORE" | "AFTER", pivot: string, value: string, cb?: Callback<string>): Promise<R>;
 
 		/**
 		 * Get the length of a list.
@@ -608,14 +608,14 @@ declare module "async-redis" {
 		/**
 		 * Set the value of an element in a list by its index.
 		 */
-		lset(key: string, index: number, value: string, cb?: Callback<'OK'>): Promise<R>;
-		LSET(key: string, index: number, value: string, cb?: Callback<'OK'>): Promise<R>;
+		lset(key: string, index: number, value: string, cb?: Callback<"OK">): Promise<R>;
+		LSET(key: string, index: number, value: string, cb?: Callback<"OK">): Promise<R>;
 
 		/**
 		 * Trim a list to the specified range.
 		 */
-		ltrim(key: string, start: number, stop: number, cb?: Callback<'OK'>): Promise<R>;
-		LTRIM(key: string, start: number, stop: number, cb?: Callback<'OK'>): Promise<R>;
+		ltrim(key: string, start: number, stop: number, cb?: Callback<"OK">): Promise<R>;
+		LTRIM(key: string, start: number, stop: number, cb?: Callback<"OK">): Promise<R>;
 
 		/**
 		 * Get the values of all given keys.
@@ -660,7 +660,7 @@ declare module "async-redis" {
 		PERSIST(key: string, cb?: Callback<number>): Promise<R>;
 
 		/**
-		 * Remove a key's time to live in milliseconds.
+		 * Remove a key"s time to live in milliseconds.
 		 */
 		pexpire(key: string, milliseconds: number, cb?: Callback<number>): Promise<R>;
 		PEXPIRE(key: string, milliseconds: number, cb?: Callback<number>): Promise<R>;
@@ -692,8 +692,8 @@ declare module "async-redis" {
 		/**
 		 * Set the value and expiration in milliseconds of a key.
 		 */
-		psetex(key: string, milliseconds: number, value: string, cb?: Callback<'OK'>): Promise<R>;
-		PSETEX(key: string, milliseconds: number, value: string, cb?: Callback<'OK'>): Promise<R>;
+		psetex(key: string, milliseconds: number, value: string, cb?: Callback<"OK">): Promise<R>;
+		PSETEX(key: string, milliseconds: number, value: string, cb?: Callback<"OK">): Promise<R>;
 
 		/**
 		 * Inspect the state of the Pub/Sub subsytem.
@@ -710,8 +710,8 @@ declare module "async-redis" {
 		/**
 		 * Close the connection.
 		 */
-		quit(cb?: Callback<'OK'>): Promise<R>;
-		QUIT(cb?: Callback<'OK'>): Promise<R>;
+		quit(cb?: Callback<"OK">): Promise<R>;
+		QUIT(cb?: Callback<"OK">): Promise<R>;
 
 		/**
 		 * Return a random key from the keyspace.
@@ -734,8 +734,8 @@ declare module "async-redis" {
 		/**
 		 * Rename a key.
 		 */
-		rename(key: string, newkey: string, cb?: Callback<'OK'>): Promise<R>;
-		RENAME(key: string, newkey: string, cb?: Callback<'OK'>): Promise<R>;
+		rename(key: string, newkey: string, cb?: Callback<"OK">): Promise<R>;
+		RENAME(key: string, newkey: string, cb?: Callback<"OK">): Promise<R>;
 
 		/**
 		 * Rename a key, only if the new key does not exist.
@@ -746,8 +746,8 @@ declare module "async-redis" {
 		/**
 		 * Create a key using the provided serialized value, previously obtained using DUMP.
 		 */
-		restore(key: string, ttl: number, serializedValue: string, cb?: Callback<'OK'>): Promise<R>;
-		RESTORE(key: string, ttl: number, serializedValue: string, cb?: Callback<'OK'>): Promise<R>;
+		restore(key: string, ttl: number, serializedValue: string, cb?: Callback<"OK">): Promise<R>;
+		RESTORE(key: string, ttl: number, serializedValue: string, cb?: Callback<"OK">): Promise<R>;
 
 		/**
 		 * Return the role of the instance in the context of replication.
@@ -828,14 +828,14 @@ declare module "async-redis" {
 		/**
 		 * Set the string value of a key.
 		 */
-		set(key: string, value: string, cb?: Callback<'OK'>): Promise<R>;
-		set(key: string, value: string, flag: string, cb?: Callback<'OK'>): Promise<R>;
-		set(key: string, value: string, mode: string, duration: number, cb?: Callback<'OK' | undefined>): Promise<R>;
-		set(key: string, value: string, mode: string, duration: number, flag: string, cb?: Callback<'OK' | undefined>): Promise<R>;
-		SET(key: string, value: string, cb?: Callback<'OK'>): Promise<R>;
-		SET(key: string, value: string, flag: string, cb?: Callback<'OK'>): Promise<R>;
-		SET(key: string, value: string, mode: string, duration: number, cb?: Callback<'OK' | undefined>): Promise<R>;
-		SET(key: string, value: string, mode: string, duration: number, flag: string, cb?: Callback<'OK' | undefined>): Promise<R>;
+		set(key: string, value: string, cb?: Callback<"OK">): Promise<R>;
+		set(key: string, value: string, flag: string, cb?: Callback<"OK">): Promise<R>;
+		set(key: string, value: string, mode: string, duration: number, cb?: Callback<"OK" | undefined>): Promise<R>;
+		set(key: string, value: string, mode: string, duration: number, flag: string, cb?: Callback<"OK" | undefined>): Promise<R>;
+		SET(key: string, value: string, cb?: Callback<"OK">): Promise<R>;
+		SET(key: string, value: string, flag: string, cb?: Callback<"OK">): Promise<R>;
+		SET(key: string, value: string, mode: string, duration: number, cb?: Callback<"OK" | undefined>): Promise<R>;
+		SET(key: string, value: string, mode: string, duration: number, flag: string, cb?: Callback<"OK" | undefined>): Promise<R>;
 
 		/**
 		 * Sets or clears the bit at offset in the string value stored at key.
@@ -982,8 +982,8 @@ declare module "async-redis" {
 		/**
 		 * Forget about all watched keys.
 		 */
-		unwatch(cb?: Callback<'OK'>): Promise<R>;
-		UNWATCH(cb?: Callback<'OK'>): Promise<R>;
+		unwatch(cb?: Callback<"OK">): Promise<R>;
+		UNWATCH(cb?: Callback<"OK">): Promise<R>;
 
 		/**
 		 * Wait for the synchronous replication of all the write commands sent in the context of the current connection.
@@ -994,8 +994,8 @@ declare module "async-redis" {
 		/**
 		 * Watch the given keys to determine execution of the MULTI/EXEC block.
 		 */
-		watch: OverloadedCommand<string, 'OK', Promise<R>>;
-		WATCH: OverloadedCommand<string, 'OK', Promise<R>>;
+		watch: OverloadedCommand<string, "OK", Promise<R>>;
+		WATCH: OverloadedCommand<string, "OK", Promise<R>>;
 
 		/**
 		 * Add one or more members to a sorted set, or update its score if it already exists.
@@ -1176,10 +1176,10 @@ declare module "async-redis" {
 		server_info: ServerInfo;
 		stream: Duplex;
 
-		on(event: 'message' | 'message_buffer', listener: (channel: string, message: string) => void): this;
-		on(event: 'pmessage' | 'pmessage_buffer', listener: (pattern: string, channel: string, message: string) => void): this;
-		on(event: 'subscribe' | 'unsubscribe', listener: (channel: string, count: number) => void): this;
-		on(event: 'psubscribe' | 'punsubscribe', listener: (pattern: string, count: number) => void): this;
+		on(event: "message" | "message_buffer", listener: (channel: string, message: string) => void): this;
+		on(event: "pmessage" | "pmessage_buffer", listener: (pattern: string, channel: string, message: string) => void): this;
+		on(event: "subscribe" | "unsubscribe", listener: (channel: string, count: number) => void): this;
+		on(event: "psubscribe" | "punsubscribe", listener: (pattern: string, count: number) => void): this;
 		on(event: string, listener: (...args: any[]) => void): this;
 
 		/**

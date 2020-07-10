@@ -82,7 +82,7 @@ export default new ClientEvent("ready", (async function () {
 	// makes commands only load at ready
 	const cmd = await import("../commands").then(async (d) => d.default);
 	cmd.map(c => this.cmd.addCategory(c));
-	this.log("log", `Cluster ready with ${this.bot.users.size} users, in ${Object.keys(this.bot.channelGuildMap).length} channels, of ${this.bot.guilds.size} guilds, with ${this.cmd.commands.length} commands.`, `Ready`);
+	this.log("log", `Cluster ready with ${this.bot.users.size} users, in ${Object.keys(this.bot.channelGuildMap).length} channels, of ${this.bot.guilds.size} guilds, with ${this.cmd.commands.length} commands.`, "Ready");
 
 
 	if (fs.existsSync(`${config.dir.base}/restart.json`)) {

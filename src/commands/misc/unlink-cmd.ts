@@ -31,5 +31,5 @@ export default new Command({
 		}
 	});
 
-	return msg.reply(`{lang:commands.misc.unlink.unlinked}`);
+	return msg.reply("{lang:commands.misc.unlink.unlinked}");
 }));

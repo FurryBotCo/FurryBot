@@ -87,7 +87,7 @@ export default new Command({
 			reason
 		});
 	}).catch(async (err) => {
-		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(`{lang:commands.moderation.unmute.englishOnly}`);
+		if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply("{lang:commands.moderation.unmute.englishOnly}");
 		else await msg.channel.createMessage(`{lang:commands.moderation.unmute.couldNotUnmute|${member.username}#${member.discriminator}|${err}}`);
 		if (m !== undefined) {
 			await m.delete();
