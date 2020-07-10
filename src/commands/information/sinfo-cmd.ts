@@ -169,7 +169,7 @@ export default new Command({
 				embed
 					.setImage(msg.channel.guild.bannerURL)
 					.setDescription([
-						`**{lang:commands.information.sinfo.banner}**:`,
+						"**{lang:commands.information.sinfo.banner}**:",
 						`${[128, 256, 1024, 2048].map(sz => `[[${sz}x${sz}]](${msg.channel.guild.bannerURL.split("?")[0]}?size=${sz})`).join("  ")}`
 					].join("\n"));
 				break;
