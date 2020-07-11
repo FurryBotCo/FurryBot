@@ -102,7 +102,7 @@ export default class TimedTasks {
 			if (entry.expiry > Date.now()) return;
 			switch (entry.type) {
 				case "ban": {
-					const g = client.bot.guilds.has(entry.guildId) ? client.bot.guilds.get(entry.guildId) : await client.bot.getRESTGuild(entry.guildId);
+					const g = client.bot.guilds.has(entry.guildId) ? client.bot.guilds.get(entry.guildId) : await client.ipc.fetchGuild(entry.guildId);
 					if (!g) {
 						return mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
@@ -138,7 +138,7 @@ export default class TimedTasks {
 				}
 
 				case "mute": {
-					const g = client.bot.guilds.has(entry.guildId) ? client.bot.guilds.get(entry.guildId) : await client.bot.getRESTGuild(entry.guildId);
+					const g = client.bot.guilds.has(entry.guildId) ? client.bot.guilds.get(entry.guildId) : await client.ipc.fetchGuild(entry.guildId);
 					if (!g) {
 						return mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
