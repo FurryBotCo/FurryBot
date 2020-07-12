@@ -367,7 +367,7 @@ export default new ClientEvent("messageCreate", (async function (this: FurryBot,
 			case "ERR_INVALID_USAGE": {
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(gConfig.settings.lang)
-						.setTitle(": x: { lang: other.errors.invalidUsage.title }")
+						.setTitle(": x: {lang:other.errors.invalidUsage.title}")
 						.setDescription([
 							"**{lang:other.errors.invalidUsage.info}**:",
 							`\u25FD {lang:other.errors.invalidUsage.command}: ${cmd.triggers[0]}`,
