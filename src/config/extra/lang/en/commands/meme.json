@@ -27,7 +27,7 @@
 		"description": "Nothing will pop this.",
 		"usage": "balloon"
 	},
-	"batslap": {
+	"mslap": {
 		"description": "slap someone",
 		"usage": "<@user>"
 	},
@@ -223,7 +223,7 @@
 		"description": "MoCk SoMe TeXt",
 		"usage": "<text>"
 	},
-	"note": {
+	"mnote": {
 		"description": "Passing notes..",
 		"usage": "<text>"
 	},
@@ -355,7 +355,7 @@
 		"description": "No Description Yet.",
 		"usage": ""
 	},
-	"lick": {
+	"mlick": {
 		"description": "No Description Yet.",
 		"usage": ""
 	},
