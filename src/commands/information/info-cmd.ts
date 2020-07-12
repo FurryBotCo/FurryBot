@@ -40,7 +40,7 @@ export default new Command({
 				`\u25FD {lang:other.words.commands}: ${this.cmd.commands.length} (${this.cmd.categories.length} {lang:other.words.categories})`,
 				"",
 				"**{lang:other.words.creators}**:",
-				"e\u25FD [Donovan_DMC](https://furry.cool)",
+				"\u25FD [Donovan_DMC](https://furry.cool)",
 				"",
 				"**{lang:other.words.other}**:",
 				`\u25FD {lang:other.words.library}: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev) (**${Eris.VERSION}**) | [Eris Fleet](https://npm.im/eris-fleet) (**${pkg.dependencies["eris-fleet"].replace("^", "")}**)`,
