@@ -118,14 +118,14 @@ export default new Command({
 				if (t) return msg.reply(`{lang:commands.developer.blacklist.cannotBlacklist.${t}|${d.username}#${d.discriminator}}`);
 
 				const strike = await dbEntry.checkBlacklist().then(b => b.all.length);
-				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, date + (expire * 8.64e+7));
+				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, !expire ? 0 : date + (expire * 8.64e+7));
 
 				return msg.reply(`{lang:commands.developer.blacklist.added.user|${d.username}#${d.discriminator}|${reason}|${[null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(date + (expire * 8.64e+7))}|${strike}|${e.id}}`);
 			} else if (subType === "guild" && d instanceof Eris.Guild && dbEntry instanceof GuildConfig) {
 				if (id === config.client.mainGuild) return msg.reply(`{lang:commands.developer.blacklist.cannotBlacklist.supportServer|${d ? d.name : "Unknown"}}`);
 
 				const strike = await dbEntry.checkBlacklist().then(b => b.all.length);
-				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, date + (expire * 8.64e+7));
+				const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, !expire ? 0 : date + (expire * 8.64e+7));
 
 				return msg.reply(`{lang:commands.developer.blacklist.added.guild|${d ? d.name : "Unknown"}|${reason}|${[null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(date + (expire * 8.64e+7))}|${strike}|${e.id}}`);
 			} else throw new TypeError("We shouldn't be here.");
