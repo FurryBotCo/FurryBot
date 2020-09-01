@@ -195,10 +195,10 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 	/* start disable */
 	if (msg.gConfig.disable.length > 0 && !config.developers.includes(msg.author.id) && !msg.member.permission.has("administrator")) {
-		const a = msg.gConfig.disable.filter((d: any) => d.type === "server" && (d.all || (d.command && cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === cmd.category)));
-		const b = msg.gConfig.disable.filter((d: any) => d.type === "user" && d.id === msg.author.id && (d.all || (d.command && cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === cmd.category)));
-		const c = msg.gConfig.disable.filter((d: any) => d.type === "role" && msg.member.roles.includes(d.id) && (d.all || (d.command && cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === cmd.category)));
-		const d = msg.gConfig.disable.filter((d: any) => d.type === "channel" && d.id === msg.channel.id && (d.all || (d.command && cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === cmd.category)));
+		const a = msg.gConfig.disable.filter((d: any) => d.type === "server" && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
+		const b = msg.gConfig.disable.filter((d: any) => d.type === "user" && d.id === msg.author.id && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
+		const c = msg.gConfig.disable.filter((d: any) => d.type === "role" && msg.member.roles.includes(d.id) && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
+		const d = msg.gConfig.disable.filter((d: any) => d.type === "channel" && d.id === msg.channel.id && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
 		if (a.length > 0 || b.length > 0 || c.length > 0 || d.length > 0) return;
 	}
 	/* end disable */
