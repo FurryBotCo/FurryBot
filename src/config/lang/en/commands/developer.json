@@ -1,0 +1,34 @@
+{
+	"eval": {
+		"description": "Evaluate code.",
+		"usage": "<code>"
+	},
+	"test": {
+		"description": "Run some tests.",
+		"usage": "<name>",
+		"invalid": "Invalid test specified. See source code for valid test names."
+	},
+	"dmuser": {
+		"description": "Dm a user.",
+		"usage": "<user> <message>",
+		"title": "Direct Message From A Developer",
+		"success": "Successfully sent the message to **{0}**",
+		"failure": "Failed to send message: **{0}**"
+	},
+	"reload": {
+		"description": "Reload something.",
+		"usage": "<cmd/cat/all>",
+		"cmdMissing": "Please provide a command to reload.",
+		"cmdInvalid": "Invalid command provided.",
+		"catMissing": "Please provide a category to reload.",
+		"catInvalid": "Invalid category provided.",
+		"error": "We recieved an error while reloading the {0} **{1}**.\n\n```js\n{2}```",
+		"cmdDone": "Reloaded the command **{0}**.",
+		"catDone": "Reloaded the category **{0}**.",
+		"invalid": "Invalid selection \"{0}\" provided.",
+		"all": "Successfully removed **{0}** cache entries.",
+		"file": "Successfully reloaded the file **{0}**.",
+		"files": "Successfully reloaded **{0}** files.\nFiles:",
+		"fileNotFound": "Couldn't find any cached file matching **{0}**."
+	}
+}

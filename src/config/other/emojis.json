@@ -1,0 +1,59 @@
+{
+	"default": {
+		"numbers": {
+			"one": "\u0031\ufe0f\u20e3",
+			"two": "\u0032\ufe0f\u20e3",
+			"three": "\u0033\ufe0f\u20e3",
+			"four": "\u0034\ufe0f\u20e3",
+			"five": "\u0035\ufe0f\u20e3",
+			"six": "\u0036\ufe0f\u20e3",
+			"seven": "\u0037\ufe0f\u20e3",
+			"eight": "\u0038\ufe0f\u20e3",
+			"nine": "\u0039\ufe0f\u20e3",
+			"zero": "\u0030\ufe0f\u20e3"
+		},
+		"arrows": {
+			"right": "\u2b05\ufe0f",
+			"left": "\u27a1\ufe0f"
+		},
+		"stop": "\u23f9\ufe0f",
+		"dot": "\u25FD",
+		"heart": "\u2764\ufe0f",
+		"wave": "\ud83d\udc4b",
+		"human": "\ud83d\ude4b\u200d\u2642\ufe0f"
+	},
+	"custom": {
+		"greenTick": "greenTick:714726282792927263",
+		"redTick": "redTick:714726273456275569",
+		"awoo": "Awoo:596965580481888258",
+		"conga": "furdancing:596817635023519777",
+		"spray": "spray:690058083837280268",
+		"bot": "bot:649700031187779584"
+	},
+	"status": {
+		"online": "online:708581051357986870",
+		"idle": "idle:708581071658418196",
+		"dnd": "dnd:708581082366214165",
+		"offline": "offline:708581061910593587"
+	},
+	"socials": {
+		"twitter": "twitter:723930021965725706",
+		"reddit": "reddit:724820279058104331",
+		"discord.bio": "DiscordBio:724837154534064269"
+	},
+	"badges": {
+		"DiscordStaff": "DiscordStaff:706259176405336135",
+		"DiscordPartner": "DiscordPartner:706259226745634866",
+		"HypesquadEvents": "HypesquadEvents:706259276871761971",
+		"HypesquadBravery": "HypesquadBravery:706259386133119014",
+		"HypesquadBrilliance": "HypesquadBrilliance:706259403896258660",
+		"HypesquadBalance": "HypesquadBalance:706259448204886037",
+		"EarlySupporter": "EarlySupporter:706259496661680168",
+		"BugHunter": "BugHunter:706259545072336907",
+		"BugHunter2": "BugHunter2:706259571085410355",
+		"VerifiedBot": "VerifiedBot:706259621890752544",
+		"VerifiedDev": "VerifiedDev:706259657240477717",
+		"NitroBooster": "NitroBooster:706261703712571425",
+		"ServerStaff": "ServerStaff:706262018784493638"
+	}
+}

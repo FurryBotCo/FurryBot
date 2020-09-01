@@ -41,29 +41,26 @@ typings/
 
 # config
 src/config/*
-!src/config/extra
-src/config/extra/*
 
 # config defaults
-src/config/extra/defaults/*
-!src/config/extra/defaults
-!src/config/extra/defaults/guildConfig.json
-!src/config/extra/defaults/userConfig.json
+src/config/defaults/*
+!src/config/defaults
+!src/config/defaults/guildConfig.json
+!src/config/defaults/userConfig.json
 
 # config lang
-!src/config/extra/lang
-!src/config/extra/lang/**/*
-src/config/extra/lang/*.json
+!src/config/lang
+!src/config/lang/**/*
+src/config/lang/*.json
 
 #config other
-!src/config/extra/other
-src/config/extra/other/*
-!src/config/extra/other/dm.json
-!src/config/extra/other/emojis.json
-!src/config/extra/other/leveling.json
-!src/config/extra/other/settings.json
-!src/config/extra/other/toStringFormatNames.ts
-!src/config/extra/other/commandRestrictions.ts
+!src/config/other
+src/config/other/*
+!src/config/other/emojis.json
+!src/config/other/colors.json
+!src/config/other/settings.json
+!src/config/other/toStringFormatNames.ts
+!src/config/other/commandRestrictions.ts
 
 # test directory
 test/

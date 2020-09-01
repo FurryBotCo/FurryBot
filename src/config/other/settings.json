@@ -1,0 +1,51 @@
+[{
+		"type": "boolean",
+		"subType": null,
+		"name": "NSFW Commands",
+		"dbName": "nsfw",
+		"description": "Enables the usage of nsfw commands (in nsfw channels) in this server."
+	},
+	{
+		"type": "custom",
+		"subType": null,
+		"name": "Default Yiff Type",
+		"dbName": "defaultYiffType",
+		"description": "Changes the default type returned with the `yiff` command. Valid: **gay**, **straight**, **lesbian**, **dickgirl**"
+	}, {
+		"type": "boolean",
+		"subType": null,
+		"name": "Announce Level Increases",
+		"dbName": "announceLevelUp",
+		"description": "Sends a message to the channel when someone levels up (f!rank)"
+	}, {
+		"type": "boolean",
+		"subType": null,
+		"name": "Command Images",
+		"dbName": "commandImages",
+		"description": "Displays images on some commands in the fun category."
+	}, {
+		"type": "boolean",
+		"subType": null,
+		"name": "Delete Mod Commands",
+		"dbName": "deleteModCmds",
+		"description": "Toggles deleting the invocation of moderation commands after execution."
+	}, {
+		"type": "role",
+		"subType": null,
+		"name": "Mute Role",
+		"dbName": "muteRole",
+		"description": "Sets the role to give to people when they are muted."
+	}, {
+		"type": "channel",
+		"subType": null,
+		"name": "Modlog Channel",
+		"dbName": "modlog",
+		"description": "Sets the channel to send modlog entries to (also enables the modlog)."
+	}, {
+		"type": "custom",
+		"subType": null,
+		"name": "Language",
+		"dbName": "lang",
+		"description": "Sets the language the bot will use in this server (english only currently)."
+	}
+]

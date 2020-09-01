@@ -1,0 +1,123 @@
+{
+	"test1": "hi",
+	"test2": "HELL{0}",
+	"test3": "what's up",
+	"help": {
+		"green": "green (plus) = not needed",
+		"red": "red (minus) = needed"
+	},
+	"blacklisted": {
+		"guild": "This server has been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}",
+		"user": "You have been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}"
+	},
+	"permissions": {
+		"createInstantInvite": "Create Instant Invite",
+		"kickMembers": "Kick Members",
+		"banMembers": "Ban Members",
+		"administrator": "Administrator",
+		"manageChannels": "Manage Channels",
+		"manageGuild": "Manage Server",
+		"addReactions": "Add Reactions",
+		"viewAuditLogs": "View Audit Logs",
+		"voicePrioritySpeaker": "Voice Priority Speaker",
+		"stream": "Stream",
+		"readMessages": "Read Messages",
+		"sendMessages": "Send Messages",
+		"sendTTSMessages": "Send TTS Messages",
+		"manageMessages": "Manage Messages",
+		"embedLinks": "Embed Links",
+		"attachFiles": "Attach Files",
+		"readMessageHistory": "Read Message History",
+		"mentionEveryone": "Mention @everyone, @here, and All Roles",
+		"externalEmojis": "Use External Emojis",
+		"viewGuildInsights": "View Server Insights",
+		"voiceConnect": "Connect to Voice Channels",
+		"voiceSpeak": "Speak in Voice Channels",
+		"voiceMuteMembers": "Server Mute Voice Members",
+		"voiceDeafenMembers": "Server Deafen Voice Members",
+		"voiceMoveMembers": "Move Voice Members",
+		"voiceUseVAD": "Use Voice Activity Detection",
+		"changeNickname": "Change Nickname",
+		"manageNicknames": "Manage Nicknames",
+		"manageRoles": "Manage Roles",
+		"manageWebhooks": "Manage Webhooks",
+		"manageEmojis": "Manage Emojis"
+	},
+	"dm": {
+		"normal": [
+			"Hello! I'm **{0}**, your one stop shop for all of your servers needs.",
+			"If you would like to invite me to a server, you can use [this link]({2}).",
+			"",
+			"Here's some other links as well:",
+			"- [Support Server]({3})",
+			"- [Twitter]({4})",
+			"- [Website]({5})",
+			"",
+			"Commands **__CANNOT__** be ran in my DMs! Please use my [invite link]({2}) to invite me to a server to be able to use commands."
+		],
+		"invite": [
+			"It seems you have sent me a server invite, I cannot use these.",
+			"Bots must be invited in a special way. Here are the steps:",
+			"1.) Open [this link]({0}).",
+			"2.) Select the server you want to invite me to (you must have the **Manage Server** permission to invite bots.",
+			"3.) Click the **continue** button.",
+			"4.) On the next page, uncheck any permissions you don't want (we recommend not touching these).",
+			"5.) Click the **authorize** button.",
+			"6.) Use me in your server. For example, to list my commands, you can use `{1}help` in any channel I can see."
+		],
+		"title": "Direct Message Response",
+		"vote": [],
+		"ban": "You were banned from **{0}** for **{1}**.\nReason: {2}",
+		"softBan": "You were softbanned from **{0}**.\nReason: {1}",
+		"banPermanent": "You were permanently banned from **{0}**.\nReason: {2}",
+		"kick": "You were kicked from **{0}**.\nReason: {1}",
+		"mute": "You were muted for {0} in **{1}**.\nReason: {2}",
+		"mutePermanent": "You were permanently muted in **{0}**.\nReason: {1}",
+		"unMute": "You were unmuted in **{0}**.\nReason: {1}",
+		"warn": "You were warned for \"{1}\" in **{0}**.",
+		"notice": "**Notice**:\nThis is an automated message, replies are not monitored and do not go to the server where this action was performed."
+	},
+	"mention": {
+		"desc": "Hi, **{0}**! Since you've mentioned me, here's a little about me:\nMy prefix here is **{1}**, you can see my commands by using `{1}help`, you can change my prefix by using `{1}prefix <new prefix>`,\nIf you want to invite me to another server, you can use [this link]({2}), or, if that isn't working, you can visit [https://furry.bot/add](https://furry.bot/add)\nIf you need support, you can visit our server [here]({3})",
+		"title": "Hello!"
+	},
+	"errorEmbed": {
+		"INVALID_USER": {
+			"title": "User Not Found",
+			"description": "The specified user was not found. Please provide either a mention, a username, a full tag, or an id."
+		},
+		"INVALID_MEMBER": {
+			"title": "Member Not Found",
+			"description": "The specified member was not found. Please provide either a mention, a username, a full tag, or an id."
+		},
+		"INVALID_ROLE": {
+			"title": "Role Not Found",
+			"description": "The specified role was not found. Please provide either a mention, a name, or an id."
+		},
+		"INVALID_CHANNEL": {
+			"title": "Channel Not Found",
+			"description": "The specified channel was not found. Please provide either a mention, a name, or an id."
+		}
+	},
+	"music": {
+		"leave": {
+			"title": "Left Channel",
+			"description": "Someone has requested I leave the voice channel, so I have"
+		}
+	},
+	"selfDestructMessage": "This message will self destruct in {0} seconds.",
+	"images": {
+		"shortURL": "Short URL",
+		"reportURL": "Report URL",
+		"source": "Source",
+		"noSource": "No Source"
+	}
+	,
+	"leveling": {
+		"embedTitle": "Level Up!",
+		"embedDescription": "You leveled up to level **{0}**!",
+		"embedFooter": "This can be disabled via the setting \"Announce Level Increases\".",
+		"message": "<@!{0}> leveled up to level **{1}**!\n(This would look different if I had the permission **embedLinks**.)",
+		"directMessage": "You leveled up to level **{0}** in the server **{1}**!\n(I sent this here because I cannot send messages in the channel you actually leveled up in)"
+	}
+}

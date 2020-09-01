@@ -1,0 +1,45 @@
+{
+	"avatar": {
+		"description": "Get your avatar, or another person's avatar.",
+		"usage": "[@user]",
+		"title": "Avatar of {0}"
+	},
+	"help": {
+		"description": "List my commands, or get help with a command or category.",
+		"usage": "[command/restrictions]",
+		"hoverInfo": "Hover for more info",
+		"helpMe": "Ha ha, very funny. Please specify either a command, category, or nothing.",
+		"neitherFound": "Neither a command nor category was found with what you supplied.",
+		"commandList": "Command List #{0}",
+		"cmdCount": "Total Commands: **{0}**"
+	},
+	"afk": {
+		"description": "Mark yourself as away-from-keyboard.",
+		"usage": "[global]",
+		"done": "You are now afk. If anyone mentions you, they will get a warning that you are afk. Your afk status will be removed if you chat in this server.",
+		"doneGlobal": "You are now afk. If anyone mentions you in any server we share, they will get a warning that you are afk. Your afk status will be removed if you chat in any server we share.",
+		"title": "AFK",
+		"titleGlobal": "Global AFK",
+		"message": {
+			"title": "AFK Warning",
+			"description": "<@!{0}> has been afk since **{1}**."
+		},
+		"removed": {
+			"global": {
+				"title": "Global AFK Removed",
+				"description": "Your global afk has been removed due to a message from you."
+			},
+			"server": {
+				"title": "AFK Removed",
+				"description": "Your afk in this server has been removed due to a message from you."
+			}
+		}
+	},
+	"weirdedit": {
+		"description": "Make a message with a weird little edit thing.",
+		"usage": "some, text",
+		"missing1": "First text missing. You must provide some text separated by commas.",
+		"missing2": "Second text missing. You must provide some text separated by commas.",
+		"edited": "This message will be edited soon."
+	}
+}

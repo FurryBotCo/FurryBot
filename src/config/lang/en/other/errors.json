@@ -1,0 +1,9 @@
+{
+	"imageAPI": "Failed to fetch image from api, please try again later.",
+	"permissionMissing": "I am missing the `{0}` permission to be able to run this properly!",
+	"invalidTime": "invalid time argument provided. It must be in this format: <X>m<X>h<X>d<X>n<X>y (<X> being a placeholder for the amount of minutes/hours/days/months/years)\nm = minutes\nh = hours\nd = days\nn = months\ny = years",
+	"dankMemer": "We recieved an error when contacting an external api: **{0}: {1}**.",
+	"noStats": "Stats have not been processed yet, please wait a bit longer to execute this command.",
+	"unknown": "Unknown error.",
+	"join": "There was an error while executing that. You can report this in out Discord server: <{0}>\nCode: `{1}`\n\n**{2}: {3}**"
+}

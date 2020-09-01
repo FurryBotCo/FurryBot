@@ -1,0 +1,49 @@
+{
+	"restrictions": {
+		"beta": {
+			"name": "Beta",
+			"error": "This command may only be used on the beta instance of this bot."
+		},
+		"developer": {
+			"name": "Developer",
+			"error": "You must be a developer of this bot to use this command."
+		},
+		"donator": {
+			"name": "Donator",
+			"error": "You must be a donator of this bot to use this command."
+		},
+		"guildOwner": {
+			"name": "Server Owner",
+			"error": "You must be the server owner to use this command."
+		},
+		"nsfw": {
+			"name": "NSFW",
+			"error": "This command must be ran in an nsfw channel."
+		},
+		"premium": {
+			"name": "Premium",
+			"error": "This server must be premium to use this command."
+		},
+		"supportServer": {
+			"name": "Support Server",
+			"error": "This command can only be ran in my support server."
+		}
+	},
+	"permission": {
+		"user": {
+			"title": "Missing permission{0}.",
+			"description": "You are missing the permission{0} **{1}**, please fix this issue to run this command."
+		},
+		"bot": {
+			"title": "Missing Permission{0}.",
+			"description": "I am missing the permission{0} **{1}**, please fix this issue to run this command."
+		}
+	},
+	"cooldown": {
+		"title": "Woah there, slow down!",
+		"description": "This command is on cooldown for another **{0}**, please don't spam.\nThe cooldown of this command is **{1}**."
+	},
+	"invalidUsage": {
+		"title": "\u274c Invalid Usage"
+	}
+}

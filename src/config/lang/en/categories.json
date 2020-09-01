@@ -1,0 +1,42 @@
+{
+	"animals": {
+		"displayName": "\ud83d\udc36 Animals",
+		"description": "Cute little animals to brighten your day!"
+	},
+	"developer": {
+		"displayName": "\uD83D\uDEE0 Developer",
+		"description": "Tools to make development easy and smooth."
+	},
+	"information": {
+		"displayName": "\u2139\ufe0f Information",
+		"description": "Get some information about me."
+	},
+	"misc": {
+		"displayName": "\uD83D\uDEE0 Miscellaneous",
+		"description": "Other miscellaneous commands."
+	},
+	"moderation": {
+		"displayName": "\ud83d\udd28 Moderation",
+		"description": "Some useful tools to keep your server in order."
+	},
+	"music": {
+		"displayName": "\ud83c\udfb5 Music",
+		"description": "Bring some tunes into your Discord server!"
+	},
+	"utility": {
+		"displayName": "\uD83D\uDEE0 Utility",
+		"description": "Some useful utility commands."
+	},
+	"nsfw": {
+		"displayName": "\ud83d\ude0f NSFW",
+		"description": "That stuff your parents warned you about.."
+	},
+	"images": {
+		"displayName": "\ud83d\udcf7 Images",
+		"description": "Image fetching or manipulation commands."
+	},
+	"fun": {
+		"displayName": "\ud83d\ude04 Fun",
+		"description": "Some commands to spice up your chat"
+	}
+}

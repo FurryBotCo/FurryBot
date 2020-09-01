@@ -1,0 +1,38 @@
+{
+	"e621": {
+		"description": "Search for posts on e621.",
+		"usage": "[tags]",
+		"permsRequired": "This command requires me to have the permission `manageMessages` (for reactions).",
+		"loading": "Loading...",
+		"num": "Post {0}/{1}",
+		"noPosts": "No posts were found with the tags you provided.",
+		"post": "View the post on [e621]({0})",
+		"video": "This post appears to be a video, please directly view it on [e621]({0})",
+		"swf": "This post appears to be flash, please directly view it on [e621]({0})",
+		"filterTitle": "Filtering Information",
+		"filterNote": "You can filter videos by adding `--no-video`, and flash by adding `--no-flash`. Due to a limitation from e621, only one will be sent. The rest of the filtering will be done on our side.",
+		"videoFilter": "Filtering Video",
+		"flashFilter": "Filtering Flash",
+		"title": "E621 Posts"
+	},
+	"yiff": {
+		"description": "Get a yiff image.",
+		"usage": "[gay/straight/lesbian/dickgirl]",
+		"titles": {
+			"gay": "Gay Yiff",
+			"straight": "Straight Yiff",
+			"lesbian": "Lesbian Yiff",
+			"dickgirl": "DickGirl Yiff"
+		}
+	},
+	"fursuitbutt": {
+		"description": "Get a picture of a fursuit butt.",
+		"usage": "",
+		"title": "Fursuit Butt"
+	},
+	"bulge": {
+		"description": "Get a picture of a bulge.",
+		"usage": "",
+		"title": "Bulge"
+	}
+}
