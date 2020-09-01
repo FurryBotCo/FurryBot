@@ -13,11 +13,19 @@ import Internal from "../../util/Functions/Internal";
 import db, { mdb } from "../../util/Database";
 import Language from "../../util/Language";
 import crypto from "crypto";
+import Timers from "../../util/Timers";
 
 export default new ClientEvent("messageCreate", async function (message, update) {
+	const t = new Timers(config.developers.includes(message.author.id), `${message.channel.id}/${message.id}/${message.author.id}`);
+	t.start("main");
+	t.start("stats.msg");
 	await this.sh.processMessage(message);
+	t.end("stats.msg");
 	// can't do the length bit because of things like AFK
 	if (message.author.bot/* || message.content.length < 2*/) return;
+
+	/* start dm */
+	t.start("dm");
 	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) {
 		await this.sh.track("stats", "directMessages", "general");
 		await this.sh.track("stats", "directMessages", "session");
@@ -27,11 +35,16 @@ export default new ClientEvent("messageCreate", async function (message, update)
 			return message.channel.createMessage(config.text.normalDM(config.devLanguage, this));
 
 	}
+	t.end("dm");
+	/* end dm */
 
+	t.start("process");
 	const msg = new ExtendedMessage(message as Eris.Message<Eris.GuildTextableChannel>, this);
 	const l = await msg.load(); // returns false if message does not start with prefix
+	t.end("process");
 
 	/* start blacklist */
+	t.start("blacklist");
 	let gBl: { [k in "all" | "expired" | "current" | "notice"]: Blacklist.GenericEntry[]; };
 	const uBl = await db.checkBl("user", msg.author.id);
 
@@ -79,10 +92,12 @@ export default new ClientEvent("messageCreate", async function (message, update)
 			if (msg.member.roles.includes(config.roles.blacklist)) msg.member.removeRole(config.roles.blacklist, "User is not blacklisted.");
 		}
 	}
+	t.end("blacklist");
 	/* end blacklist */
 
 
 	/* start leveling */
+	t.start("leveling");
 	const k = await Redis.exists(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`).then(v => v !== 0);
 	if (!k) {
 		const v = await msg.uConfig.checkVote();
@@ -117,18 +132,22 @@ export default new ClientEvent("messageCreate", async function (message, update)
 			} else await msg.author.getDMChannel().then(dm => dm.createMessage(`{lang:other.leveling.directMessage|${nlvl.level}|${msg.channel.guild.name}}`)).catch(err => null);
 		}
 	}
+	t.end("leveling");
 	/* end leveling */
 
 	/* start mention */
+	t.start("mention");
 	if (new RegExp(`^<@!?${this.bot.user.id}>$`).test(message.content)) {
 		await msg.channel.createMessage(config.text.mention(msg, this));
 		return;
 	}
+	t.end("mention");
 	/* end mention */
 
 
 	/* start afk */
 	// if(true) to make the variables block scoped
+	t.start("afk");
 	if (true) {
 		const g = await Redis.get(`afk:global:${msg.author.id}`);
 		const s = await Redis.get(`afk:servers:${msg.channel.guild.id}:${msg.author.id}`);
@@ -189,11 +208,13 @@ export default new ClientEvent("messageCreate", async function (message, update)
 			if (m) setTimeout(() => m.delete().catch(err => null), 1.5e4);
 		}
 	}
+	t.end("afk");
 	/* end afk */
 
 	if (!l || !msg.cmd) return;
 
 	/* start disable */
+	t.start("disable");
 	if (msg.gConfig.disable.length > 0 && !config.developers.includes(msg.author.id) && !msg.member.permission.has("administrator")) {
 		const a = msg.gConfig.disable.filter((d: any) => d.type === "server" && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
 		const b = msg.gConfig.disable.filter((d: any) => d.type === "user" && d.id === msg.author.id && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
@@ -201,9 +222,11 @@ export default new ClientEvent("messageCreate", async function (message, update)
 		const d = msg.gConfig.disable.filter((d: any) => d.type === "channel" && d.id === msg.channel.id && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
 		if (a.length > 0 || b.length > 0 || c.length > 0 || d.length > 0) return;
 	}
+	t.end("disable");
 	/* end disable */
 
 	/* start antispam */
+	t.start("antispam");
 	if (!config.developers.includes(msg.author.id)) {
 		this.cmd.anti.add(msg.author.id, "command", msg.cmd.triggers[0]);
 
@@ -253,13 +276,18 @@ export default new ClientEvent("messageCreate", async function (message, update)
 			}
 		}
 	}
+	t.end("antispam");
 	/* end antispam */
 
 	const { cmd } = msg;
 
 	if (cmd) {
+		t.start("stats.cmd");
 		await this.sh.processCommand(msg);
+		t.end("stats.cmd");
+
 		/* start command restrictions */
+		t.start("restrictions");
 		if (!config.developers.includes(msg.author.id)) {
 			const v = await new Promise(async (a, b) => {
 				for (const r of Object.values(this.cmd.restrictions)) {
@@ -272,14 +300,18 @@ export default new ClientEvent("messageCreate", async function (message, update)
 			});
 			if (!v) return;
 		}
+		t.end("restrictions");
 		/* end command restrictions */
 
 		/* start permission checks */
+		t.start("permission");
 		const p = await this.cmd.handlers.checkPermissions(this, msg, cmd);
 		if (!p) return;
+		t.end("permission");
 		/* end permission checks */
 
 		/* start command cooldown */
+		t.start("cooldown");
 		if (!config.developers.includes(msg.author.id)) {
 			const c = this.cmd.cool.checkCooldown(msg.author.id, cmd);
 			if (c.active) {
@@ -303,6 +335,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 			this.cmd.cool.addCooldown(msg.author.id, cmd);
 		}
+		t.end("cooldown");
 		/* end command cooldown */
 
 		Logger.info([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, "Message Handler"], `Command "${cmd.triggers[0]}" ran with ${msg.args.length === 0 ? "no arguments" : `the arguments "${msg.args.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
@@ -310,6 +343,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 		const start = performance.now();
 
 		/* start run command */
+		t.start("run");
 		cmd
 			.run
 			.call(this, msg, cmd)
@@ -331,7 +365,9 @@ export default new ClientEvent("messageCreate", async function (message, update)
 					Logger.error([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, "Command Handler"], err);
 				}
 			});
+		t.end("run");
 		/* end command error handler */
 		/* start run command */
 	}
+	t.end("main");
 });

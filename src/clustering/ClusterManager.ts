@@ -35,6 +35,7 @@ export default class ClusterManager {
 			enabled: boolean;
 			interval: number;
 		};
+		wait: boolean;
 	};
 	clusters: Map<number, {
 		worker: cluster.Worker;
@@ -64,7 +65,8 @@ export default class ClusterManager {
 				stats: {
 					enabled: !!options?.stats?.enabled,
 					interval: options?.stats?.interval || 1.5e4
-				}
+				},
+				wait: !!options?.wait
 			};
 			this.clusters = new Map();
 			this.cb = new Map();
@@ -129,7 +131,8 @@ export default class ClusterManager {
 						file: this.file,
 						shards,
 						firstShardId,
-						lastShardId
+						lastShardId,
+						wait: this.options.wait
 					}
 				});
 			}
@@ -270,9 +273,7 @@ export default class ClusterManager {
 				break;
 			}
 
-			case "CONTINUE": {
-				// wait some time before connecting next cluster
-				await new Promise((a, b) => setTimeout(a, 5e3));
+			case "DONE": {
 				this.connectCluster(id + 1);
 				break;
 			}

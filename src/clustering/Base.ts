@@ -15,6 +15,7 @@ export default class Base {
 	get bot() { return this.cluster.bot; }
 	get ipc() { return this.cluster.ipc; }
 	get clusterId() { return this.cluster.id; }
+	get done() { return this.cluster.done.bind(this.cluster); }
 
 	async launch(shards: number) {
 	}

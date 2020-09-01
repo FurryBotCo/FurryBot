@@ -1,23 +1,27 @@
 import { performance } from "perf_hooks";
 import Logger from "./Logger";
+import crypto from "crypto";
 
 interface Timer {
-	[k: string]: {
-		start: number;
-		end: number;
-	};
+	start: number;
+	end: number;
 }
 
 export default class Timers {
-	timers: Timer[];
+	id: string;
+	timers: {
+		[k: string]: Timer;
+	}[];
 	log: boolean;
-	constructor(log?: boolean) {
+	constructor(log?: boolean, id?: string) {
+		this.id = id || crypto.randomBytes(10).toString("hex");
 		this.timers = [];
 		this.log = !!log;
 	}
 
 	start(label: string) {
 		if (Object.keys(this.timers).includes(label)) throw new TypeError(`Timer with the label "${label}" has already been started.`);
+		if (this.log) Logger.info(`Timers[${this.id}]`, `Timer with label ${label} started.`);
 		const t = this.timers[label] = {
 			start: parseFloat(performance.now().toFixed(3)),
 			end: null
@@ -26,11 +30,14 @@ export default class Timers {
 	}
 
 	end(label: string) {
-		if (!Object.keys(this.timers).includes(label)) throw new TypeError(`Timer with the label "${label}" has not been started.`);
-		if (this.timers[label].end !== null) throw new TypeError(`Timer with the label "${label}" has already ended.`);
+		if (!Object.keys(this.timers).includes(label)) throw new TypeError(`[${this.id}] Timer with the label "${label}" has not been started.`);
+		if (this.timers[label].end !== null) throw new TypeError(`[${this.id}] Timer with the label "${label}" has already ended.`);
 
 		this.timers[label].end = parseFloat(performance.now().toFixed(3));
-		if (this.log) Logger.debug("Timers", `${label} took ${this.calc(label, label)}ms`);
+		if (this.log) {
+			Logger.info(`Timers[${this.id}]`, `Timer with label ${label} ended.`);
+			Logger.debug(`Timers[${this.id}]`, `${label} took ${this.calc(label, label)}ms`);
+		}
 		return this.timers[label].end;
 	}
 

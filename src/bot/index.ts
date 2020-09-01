@@ -19,6 +19,7 @@ import TimedTasks from "../util/Functions/TimedTasks";
 import EmbedBuilder from "../util/EmbedBuilder";
 import { Colors } from "../util/Constants";
 import Internal from "../util/Functions/Internal";
+import { performance } from "perf_hooks";
 
 class FurryBot extends Base {
 	cmd: CommandHandler;
@@ -62,28 +63,32 @@ class FurryBot extends Base {
 		this.cpuUsage = 0;
 	}
 
-	loadCommands() {
+	async loadCommands() {
+		const start = performance.now();
 		Logger.debug([`Cluster #${this.cluster.id}`, "Command Handler"], "Loading commands.");
-		fs.readdirSync(`${__dirname}/commands`).map(c => {
+		const c = fs.readdirSync(`${__dirname}/commands`);
+		for (const f of c) {
 			let cat;
 			try {
-				cat = require(`${__dirname}/commands/${c}/index.ts`);
+				cat = await import(`${__dirname}/commands/${f}/index.ts`);
 				if (cat.default) cat = cat.default;
 			} catch (e) {
 				console.error(e);
 			}
 
 			if (cat instanceof Category) this.cmd.addCategory(cat);
-			else throw new TypeError(`Missing or Invalid index in category "${c}" (${path.resolve(`${__dirname}/commands/${c}`)})`);
-		});
+			else throw new TypeError(`Missing or Invalid index in category "${f}" (${path.resolve(`${__dirname}/commands/${f}`)})`);
+		}
+		const end = performance.now();
 
-		Logger.debug([`Cluster #${this.cluster.id}`, "Command Handler"], `Finished loading ${this.cmd.commands.length} commands.`);
+		Logger.debug([`Cluster #${this.cluster.id}`, "Command Handler"], `Finished loading ${this.cmd.commands.length} commands in ${(end - start).toFixed(3)}ms.`);
 	}
 
 	async loadEvents(removeAll: boolean) {
+		const start = performance.now();
 		if (removeAll) {
 			this.bot.removeAllListeners();
-			Logger.debug([`Cluster #${this.cluster.id}`, "EventLoader"], `Removing all listeners before loading events.`);
+			Logger.debug([`Cluster #${this.cluster.id}`, "Event Loader"], `Removing all listeners before loading events.`);
 		}
 		const events = fs.readdirSync(`${__dirname}/events`);
 
@@ -98,15 +103,19 @@ class FurryBot extends Base {
 					event: e
 				});
 				this.bot.on(e.event, handler);
-				Logger.debug([`Cluster #${this.cluster.id}`, "EventLoader"], `Loaded the event "${e.event}".`);
+				Logger.debug([`Cluster #${this.cluster.id}`, "Event Loader"], `Loaded the event "${e.event}".`);
 			} else {
-				Logger.error([`Cluster #${this.cluster.id}`, "EventLoader"], `Error loading the event file "${event}", export is not an instance of ClientEvent.`);
+				Logger.error([`Cluster #${this.cluster.id}`, "Event Loader"], `Error loading the event file "${event}", export is not an instance of ClientEvent.`);
 				continue;
 			}
 		}
+		const end = performance.now();
+
+		Logger.debug([`Cluster #${this.cluster.id}`, "Event Loader"], `Finished loading ${events.length} events in ${(end - start).toFixed(3)}ms.`);
 	}
 
 	async launch(shards) {
+		const start = performance.now();
 		await this.loadEvents(true);
 		this.cmd = new CommandHandler(this);
 		this.w = new WebhookStore(this);
@@ -115,11 +124,8 @@ class FurryBot extends Base {
 		this.col = new MessageCollector(this);
 		this.music = new MusicHandler(this);
 
-
-		Logger.info([`Cluster #${this.cluster.id}`, "General"], `Ready with ${this.bot.guilds.size} guild${this.bot.guilds.size === 1 ? "" : "s"}, ${this.bot.users.size} user${this.bot.users.size === 1 ? "" : "s"}, and ${Object.keys(this.bot.channelGuildMap).length} guild channel${Object.keys(this.bot.channelGuildMap).length === 1 ? "" : "s"}.`);
-
 		this.api.launch();
-		this.loadCommands();
+		await this.loadCommands();
 
 		const s = config.statuses(this);
 
@@ -148,6 +154,11 @@ class FurryBot extends Base {
 		setInterval(async () => {
 			this.cpuUsage = await Internal.getCPUUsage();
 		}, 5e3);
+
+		const end = performance.now();
+		Logger.info([`Cluster #${this.cluster.id}`, "General"], `Ready with ${this.bot.guilds.size} guild${this.bot.guilds.size === 1 ? "" : "s"}, ${this.bot.users.size} user${this.bot.users.size === 1 ? "" : "s"}, and ${Object.keys(this.bot.channelGuildMap).length} guild channel${Object.keys(this.bot.channelGuildMap).length === 1 ? "" : "s"}. Launch processing took ${(end - start).toFixed(3)}ms.`);
+
+		this.done();
 	}
 }
 

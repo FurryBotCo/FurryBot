@@ -16,6 +16,7 @@ declare namespace Clustering {
 			enabled: boolean;
 			interval?: number;
 		};
+		wait?: boolean;
 	}
 
 	export interface ShardStats {

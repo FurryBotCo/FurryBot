@@ -20,6 +20,7 @@ export default class Cluster {
 	lastShardId: number;
 	client: Eris.Client;
 	ipc: IPC;
+	wait: boolean;
 	constructor() {
 		this.id = null;
 		this.clientOptions = {};
@@ -39,6 +40,8 @@ export default class Cluster {
 	}
 
 	get bot() { return this.client; }
+
+	async done() { this.sendMessage("DONE", null); }
 
 	sendMessage(op: string, d: object) {
 		process.send({
@@ -63,6 +66,7 @@ export default class Cluster {
 				this.shards = msg.d.shards;
 				this.firstShardId = msg.d.firstShardId;
 				this.lastShardId = msg.d.lastShardId;
+				this.wait = msg.d.wait;
 
 				if (!fs.existsSync(this.file)) throw new Error(`Invalid client file (${this.file}) provided.`);
 				const f = await import(this.file).then(v => v.default || v);
@@ -100,7 +104,7 @@ export default class Cluster {
 						id
 					}))
 					.once("ready", () => {
-						this.sendMessage("CONTINUE", {});
+						if (!this.wait) this.done();
 						b.launch(this.shards.length);
 					})
 					.on("ready", () => this.sendMessage("EVENT", {
