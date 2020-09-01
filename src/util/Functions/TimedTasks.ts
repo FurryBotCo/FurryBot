@@ -1,15 +1,13 @@
-import { mdb, db } from "../../modules/Database";
-import UserConfig from "../../modules/config/UserConfig";
+import { mdb, db } from "../Database";
+import UserConfig from "../config/UserConfig";
 import config from "../../config";
-import FurryBot from "../../main";
-import { Colors, GameTypes } from "../Constants";
-import GuildConfig from "../../modules/config/GuildConfig";
+import FurryBot from "../../bot";
+import { Colors } from "../Constants";
+import GuildConfig from "../config/GuildConfig";
 import Eris from "eris";
-import { Internal } from ".";
-import { Redis } from "../../modules/External";
-import phin from "phin";
-import DailyJoins from "../DailyJoins";
-import Logger from "../LoggerV10";
+import Internal from "./Internal";
+import DailyJoins from "../handlers/DailyJoinsHandler";
+import Logger from "../Logger";
 
 export default class TimedTasks {
 	private constructor() {
@@ -20,28 +18,14 @@ export default class TimedTasks {
 		const d = new Date();
 		if (d.getSeconds() === 0) {
 			if (d.getMinutes() === 0) {
-				await this.runDeleteUsers(client).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Delete Users"));
-				await this.runDeleteGuilds(client).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Delete Guilds"));
+				await this.runDeleteUsers(client).then(() => Logger.debug("Timed Tasks |  Delete Users", "Finished processing."));
+				await this.runDeleteGuilds(client).then(() => Logger.debug("Timed Tasks |  Delete Guilds", "Finished processing."));
 			}
 
-			for (const n of [5, 10, 15, 30]) {
-				if ((d.getMinutes() % n) === 0) await this.runAutoPosting(client, n).then(() => client.log("debug", "Finished processing.", `Timed Tasks |  Run Auto Posting [${n}]`));
-			}
-			// if ([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [5]"));
-			// if ([0, 10, 20, 30, 40, 50].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [10]"));
-			// if ([0, 15, 30, 45].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [15]"));
-			// if ([0, 30].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [30]"));
-			// if ([0].includes(d.getMinutes())) await this.runAutoPosting(client, d.getMinutes()).then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Posting [60]"));
-
-			if (!config.beta && d.getHours() === 0 && d.getMinutes() === 0) await this.runDailyJoins(client).then(() => client.log("debug", "Finished processing.", "Timed Tasks | Daily Joins"));
+			if (!config.beta && d.getHours() === 0 && d.getMinutes() === 0) await this.runDailyJoins(client).then(() => Logger.debug("Timed Tasks | Daily Joins", "Finished processing."));
 		}
 
-		if ((d.getSeconds() % 15) === 0) {
-			await this.runStatusChange(client, (d.getSeconds() / 15) - 1); // .then(() => config.beta ? client.log("debug", "Finished processing.", "Timed Tasks | Status Change") : null);
-			await this.runStatsUpdate(client); // .then(() => client.log("debug", "Finished Processing.", "Timed Tasks | Stats Update"));
-		}
-
-		await this.runAutoServerActions(client); // .then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Actions"));
+		// await this.runAutoServerActions(client); // .then(() => client.log("debug", "Finished processing.", "Timed Tasks |  Run Auto Actions"));
 	}
 
 
@@ -54,7 +38,7 @@ export default class TimedTasks {
 		}).toArray();
 
 		if (d.length === 0) {
-			if (config.beta) client.log("debug", "No processable entries found.", "Timed Tasks |  Delete Users");
+			if (config.beta) Logger.debug("Timed Tasks |  Delete Users", "No processable entries found.");
 			return;
 		}
 
@@ -71,7 +55,7 @@ export default class TimedTasks {
 			})).catch(err => null);
 
 			await mdb.collection<UserConfig>("users").findOneAndDelete({ id: u.id });
-			client.log("debug", `Deleted the user "${u.id}"`, "Timed Tasks |  Delete Users");
+			Logger.debug("Timed Tasks |  Delete Users", `Deleted the user "${u.id}"`);
 		}));
 	}
 
@@ -84,83 +68,77 @@ export default class TimedTasks {
 		}).toArray();
 
 		if (d.length === 0) {
-			if (config.beta) client.log("warn", "No processable entries found.", "Timed Tasks |  Delete Guilds");
+			if (config.beta) Logger.debug("Timed Tasks |  Delete Guilds", "No processable entries found.");
 			return;
 		}
 
 		await Promise.all(d.map(async (u) => {
 			await mdb.collection<GuildConfig>("guilds").findOneAndDelete({ id: u.id });
-			client.log("debug", `Deleted the guild "${u.id}"`, "Timed Tasks |  Delete Guild");
+			Logger.debug("Timed Tasks |  Delete Guild", `Deleted the guild "${u.id}"`);
 		}));
 	}
 
-	static async runAutoServerActions(client: FurryBot) {
-		if (client.clusterID !== 0) return;
-		const a = await mdb.collection<GlobalTypes.TimedEntry>("timed").find({}).toArray();
+	/*static async runAutoServerActions(client: FurryBot) {
+		const a = await mdb.collection<TimedEntry>("timed").find({}).toArray();
 
 		await Promise.all(a.map(async (entry) => {
 			if (entry.expiry > Date.now()) return;
 			switch (entry.type) {
 				case "ban": {
-					const g = client.bot.guilds.has(entry.guildId) ? client.bot.guilds.get(entry.guildId) : await client.ipc.fetchGuild(entry.guildId);
+					const g = client.guilds.get(entry.guildId);
 					if (!g) {
-						return mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+						return mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 					await g.unbanMember(entry.userId, "Automatic Unban").catch(err => null);
-					const u = client.bot.users.has(entry.userId) ? client.bot.users.get(entry.userId) : await client.bot.getRESTUser(entry.userId);
+					const u = client.users.has(entry.userId) ? client.users.get(entry.userId) : await client.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
 					if (!c.settings.modlog) {
-						mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+						mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 
-					const ch = (g.channels.has(c.settings.modlog) ? g.channels.get(c.settings.modlog) : await client.bot.getRESTChannel(c.settings.modlog)) as Eris.GuildTextableChannel;
+					const ch = (g.channels.has(c.settings.modlog) ? g.channels.get(c.settings.modlog) : await client.getRESTChannel(c.settings.modlog)) as Eris.GuildTextableChannel;
 					if (!ch) {
-						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+						await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
-						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks |  Auto Server Actions");
+						Logger.warn("Timed Tasks |  Auto Server Actions", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`);
 					}
 
-					if (ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.bot.user.id).has(p))) {
-						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+					if (ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
+						await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
-						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks |  Auto Server Actions");
+						Logger.warn("Timed Tasks |  Auto Server Actions", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`);
 					}
 
-					await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
-					await client.m.create(ch, {
-						type: "unban",
-						blame: "automatic",
-						target: u,
-						reason: "Automatic action due to expiry"
-					});
+					await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+					await client.m.createUnbanEntry(ch, "automatic", u, "Automatic action due to expiry");
 
 					break;
 				}
 
 				case "mute": {
-					const g = client.bot.guilds.has(entry.guildId) ? client.bot.guilds.get(entry.guildId) : await client.ipc.fetchGuild(entry.guildId);
+					const g = client.guilds.get(entry.guildId);
 					if (!g) {
-						return mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+						return mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 					// fetch user from api if they aren't in the server
-					const m = g.members.has(entry.userId) ? g.members.get(entry.userId) : await client.bot.getRESTUser(entry.userId);
+					const m = g.members.has(entry.userId) ? g.members.get(entry.userId) : await client.getRESTUser(entry.userId);
 					const c = await db.getGuild(entry.guildId);
 					const r = g.roles.get(c.settings.muteRole);
 					if (!c.settings.modlog) {
-						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+						await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 
-					const ch = (g.channels.has(c.settings.modlog) ? g.channels.get(c.settings.modlog) : await client.bot.getRESTChannel(c.settings.modlog)) as Eris.GuildTextableChannel;
+					const ch = (g.channels.has(c.settings.modlog) ? g.channels.get(c.settings.modlog) : await client.getRESTChannel(c.settings.modlog)) as Eris.GuildTextableChannel;
 					if (!ch) {
-						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+						await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
-						client.log("warn", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`, "Timed Tasks | Auto Server Actions");
+						Logger.warn("Timed Tasks | Auto Server Actions", `failed to send mod log entry to "${entry.guildId}" because its mod log channel does not exist.`);
 					}
 
-					if (ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.bot.user.id).has(p))) {
-						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+					if (ch && !["sendMessages", "embedLinks"].some(p => ch.permissionsOf(client.user.id).has(p))) {
+						await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 						await c.edit({ settings: { modlog: null } });
-						client.log("warn", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`, "Timed Tasks | Auto Server Actions");
+						Logger.log("Timed Tasks | Auto Server Actions", `failed to send mod log entry to "${entry.guildId}" as I do not have permission to send there.`);
 					}
 
 					if (!g.members.has(entry.userId)) {
@@ -171,17 +149,17 @@ export default class TimedTasks {
 								timestamp: new Date().toISOString(),
 								color: Colors.red,
 								author: {
-									name: `${client.bot.user.username}#${client.bot.user.discriminator}`,
-									icon_url: client.bot.user.avatarURL
+									name: `${client.user.username}#${client.user.discriminator}`,
+									icon_url: client.user.avatarURL
 								}
 							}
 						}).catch(err => null);
-						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+						await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 					}
 
 					if (m instanceof Eris.Member) {
 						if (!m.roles.includes(c.settings.muteRole)) {
-							await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+							await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 							return;
 						}
 
@@ -193,88 +171,37 @@ export default class TimedTasks {
 									timestamp: new Date().toISOString(),
 									color: Colors.red,
 									author: {
-										name: `${client.bot.user.username}#${client.bot.user.discriminator}`,
-										icon_url: client.bot.user.avatarURL
+										name: `${client.bot.user.username}#${client.user.discriminator}`,
+										icon_url: client.user.avatarURL
 									}
 								}
 							}).catch(err => null);
-							await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+							await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
 							return;
 						}
 
 						await m.removeRole(r.id, "Automatic Unmute").catch(err => null);
 
-						await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
-						if (ch) await client.m.create(ch, {
-							type: "unmute",
-							blame: "automatic",
-							target: m,
-							reason: "Automatic action due to expiry."
-						});
+						await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+						if (ch) await client.m.createUnmuteEntry(ch, "automatic", m, "Automatic action due to expiry.");
 					}
 					break;
 				}
 
 				default: {
-					await mdb.collection<GlobalTypes.TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
-					client.log("warn", `Unknown timed type "${entry.type}" found.`, "Timed Tasks | Auto Server Actions");
+					await mdb.collection<TimedEntry>("timed").findOneAndDelete({ _id: entry._id });
+					Logger.warn("Timed Tasks | Auto Server Actions", `Unknown timed type "${entry.type}" found.`);
 				}
 			}
 		}));
-	}
-
-	static async runAutoPosting(client: FurryBot, time: number) {
-		if (client.clusterID !== 0) return;
-		if (time === 0) time = 60;
-		const entries = await mdb.collection<GlobalTypes.AutoEntry>("auto").find({ time: time as any }).toArray();
-
-		await Promise.all(entries.map(async (entry) => client.ipc.command("AutoPosting", entry, false)));
-	}
+	}*/
 
 	static async runDailyJoins(client: FurryBot) {
-		if (client.clusterID !== 0) return;
 		DailyJoins(client);
 	}
 
-	static async runStatusChange(client: FurryBot, num: number) {
-		const st = await client.ipc.getStats();
-		switch (num) {
-			case 0: {
-				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help with ${st.clusters.reduce((a, b) => b.users + a, 0)} furries`, type: GameTypes.PLAYING });
-				break;
-			}
-
-			case 1: {
-				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help in ${st.clusters.reduce((a, b) => b.guilds + a, 0)} servers`, type: GameTypes.WATCHING });
-				break;
-			}
-
-			case 2: {
-				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help with ${client.cmd.commands.length} commands`, type: GameTypes.PLAYING });
-				break;
-			}
-
-			case 3: {
-				await client.bot.editStatus("online", { name: `${config.defaults.prefix}help at https://furry.bot`, type: GameTypes.PLAYING });
-				break;
-			}
-		}
-	}
-
-	static async runStatsUpdate(client: FurryBot) {
-		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:guildCount`, client.guilds.size.toString());
-		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:largeGuildCount`, client.guilds.filter(g => g.large).length.toString());
-		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:channelCount`, Object.keys(client.channelGuildMap).length.toString());
-		// rClient.SET(`${config.beta ? "beta" : "prod"}:stats:userCount`, client.users.size.toString());
-		const v = await Internal.fetchRedisKey(`${config.beta ? "beta" : "prod"}:stats:uptime`).then(v => !v ? 0 : Number(v));
-		const up = Math.floor(process.uptime() * 1000);
-		if (up > v) await Redis.SET(`${config.beta ? "beta" : "prod"}:stats:uptime`, up.toString());
-	}
-
 	static async runRefreshBoosters(client: FurryBot) {
-		if (client.clusterID !== 0) return;
-
-		const g = client.bot.guilds.get(config.client.mainGuild) || await client.bot.getRESTGuild(config.client.mainGuild);
+		const g = client.bot.guilds.get(config.client.supportServerId);
 		await g.fetchAllMembers();
 
 		await mdb.collection("users").updateMany({

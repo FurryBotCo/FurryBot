@@ -1,128 +1,98 @@
-/// <reference path="../@types/global.d.ts" />
+/// <reference path="../@types/Discord.d.ts" />
+import Category from "../cmd/Category";
+import path from "path";
+import Command from "../cmd/Command";
+import * as fs from "fs-extra";
 import * as os from "os";
-import { mdb } from "../../modules/Database";
-import config from "../../config";
+import ExtendedMessage from "../ExtendedMessage";
 import Eris from "eris";
-import ExtendedMessage from "../../modules/ExtendedMessage";
 import phin from "phin";
-import loopPatrons from "../patreon/loopPatrons";
-import refreshPatreonToken from "../patreon/refreshPatreonToken";
-import { Time } from ".";
-import { Redis } from "../../modules/External";
-import { Worker } from "worker_threads";
-import FurryBot from "../../main";
+import config from "../../config";
 
 export default class Internal {
 	private constructor() {
 		throw new TypeError("This class may not be instantiated, use static methods.");
 	}
 
-	static async fetchBlacklistEntries(id: string, type: "guild"): Promise<{
-		current: Blacklist.GuildEntry[];
-		past: Blacklist.GuildEntry[];
-		active: boolean;
-	}>;
-	static async fetchBlacklistEntries(id: string, type: "user"): Promise<{
-		current: Blacklist.UserEntry[];
-		past: Blacklist.UserEntry[];
-		active: boolean;
-	}>;
 	/**
-	 * fetches blacklist entries for users/guilds
+	 * Merge objects for configuration purposes
 	 * @static
-	 * @param {string} id - the user or guild id
-	 * @param {("guild" | "user")} type - the type, user or guild
-	 * @returns {Promise<any>}
-	 * @memberof Internal
+	 * @param {object} a - The object to put the properties on
+	 * @param {object} b - The provided data
+	 * @param {object} c - The default data
+	 * @returns
+	 * @memberof Functions
 	 */
-	static async fetchBlacklistEntries(id: string, type: "guild" | "user") {
-		if (!["guild", "user"].includes(type.toLowerCase())) throw new TypeError("Invalid type.");
-
-		if (type.toLowerCase() === "guild") {
-			const b: Blacklist.GuildEntry[] = await mdb.collection("blacklist").find({ guildId: id }).toArray();
-
-			if (b.length === 0) return {
-				current: [],
-				past: [],
-				active: false
-			};
-		} else {
-			const b: Blacklist.UserEntry[] = await mdb.collection("blacklist").find({ userId: id }).toArray();
-
-			if (b.length === 0) return {
-				current: [],
-				past: [],
-				active: false
-			};
-		}
+	static goKeys(a: object, b: object, c: object): void {
+		const obj = Object.keys(c).length === 0 ? b : c;
+		Object.keys(obj).map(k => {
+			if (typeof c[k] === "object" && c[k] !== null) {
+				if (c[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
+				else {
+					if ([undefined, null, ""].includes(a[k])) a[k] = c[k];
+					if (![undefined, null, ""].includes(b[k])) return this.goKeys(a[k], b[k], c[k]);
+				}
+			} else return a[k] = [undefined].includes(b[k]) ? c[k] : b[k];
+		});
 	}
-	/**
-	 * memory info
-	 * @readonly
-	 * @static
-	 * @memberof Internal
-	 */
-	static get memory() {
+
+	static loadCommands(dir: string, cat: Category) {
+		const ext = __filename.split(".").slice(-1)[0];
+		fs.readdirSync(dir).filter(f => !fs.lstatSync(`${dir}/${f}`).isDirectory() && f.endsWith(ext) && f !== `index.${ext}`).map(f => {
+			let c = require(`${dir}/${f}`);
+			if (c.default) c = c.default;
+			if (c instanceof Command) cat.addCommand(c);
+			else throw new TypeError(`Invalid command in file "${path.resolve(`${dir}/${f}`)}"`);
+		});
+	}
+
+	static extraArgParsing(msg: ExtendedMessage) {
+		let str = msg.args.join(" ");
+		try {
+			str
+				.match(new RegExp("[0-9]{16,21}", "g"))
+				.filter(k => !str.split(" ")[str.split(" ").indexOf(k)].match(new RegExp("<@!?[0-9]{16,21}>")) || msg.channel.guild.members.has(k))
+				.map(k => str = str.replace(k, `<@!${k}>`));
+
+		} catch (e) { }
+		str
+			.split(" ")
+			.filter(k => !k.match(new RegExp("<@!?[0-9]{16,21}>", "i")) && k.length >= 3)
+			.map(k => {
+				let m: Eris.Member;
+				if (k.indexOf("#") !== -1) m = msg.channel.guild.members.filter(u => (`${u.username}#${u.discriminator}`).toLowerCase() === k.toLowerCase())[0];
+				else m = msg.channel.guild.members.filter(u => u.username.toLowerCase() === k.toLowerCase() || (u.nick && u.nick.toLowerCase() === k.toLowerCase()))[0];
+
+				if (m) str = str.replace(k, `<@!${m.id}>`);
+			});
+
+		return str;
+	}
+
+	static getCPUInfo() {
+		const c = os.cpus();
+
+		let total = 0, idle = 0;
+
+		for (const { times } of c) {
+			Object.values(times).map(t => total += t);
+			idle += times.idle;
+		}
+
 		return {
-			process: {
-				/**
-				 * process total memory
-				 * @returns {number}
-				 */
-				getTotal: (() => process.memoryUsage().heapTotal),
-				/**
-				 * process used memory
-				 * @returns {number}
-				 */
-				getUsed: (() => process.memoryUsage().heapUsed),
-				/**
-				 * process rss memory
-				 * @returns {number}
-				 */
-				getRSS: (() => process.memoryUsage().rss),
-				/**
-				 * process external memory
-				 * @returns {number}
-				 */
-				getExternal: (() => process.memoryUsage().external),
-				/**
-				 * process memory usage
-				 * @returns {T.ProcessMemory}
-				 */
-				getAll: (() => ({
-					total: process.memoryUsage().heapTotal,
-					used: process.memoryUsage().heapUsed,
-					rss: process.memoryUsage().rss,
-					external: process.memoryUsage().external
-				}))
-			},
-			system: {
-				/**
-				 * system total memory
-				 * @returns {number}
-				 */
-				getTotal: (() => os.totalmem()),
-				/**
-				 * system used memory
-				 * @returns {number}
-				 */
-				getUsed: (() => os.totalmem() - os.freemem()),
-				/**
-				 * system free memory
-				 * @returns {number}
-				 */
-				getFree: (() => os.freemem()),
-				/**
-				 * system memory usage
-				 * @returns {T.SystemMemory}
-				 */
-				getAll: (() => ({
-					total: os.totalmem(),
-					used: os.totalmem() - os.freemem(),
-					free: os.freemem()
-				}))
-			}
+			idle,
+			total,
+			idleAverage: (idle / c.length),
+			totalAverage: (total / c.length)
 		};
+	}
+
+	static async getCPUUsage() {
+		const { idleAverage: i1, totalAverage: t1 } = this.getCPUInfo();
+		await new Promise((a, b) => setTimeout(a, 1e3));
+		const { idleAverage: i2, totalAverage: t2 } = this.getCPUInfo();
+
+		return (10000 - Math.round(10000 * (i2 - i1) / (t2 - t1))) / 100;
 	}
 
 	/**
@@ -136,27 +106,21 @@ export default class Internal {
 		userTag: string;
 		userId: string;
 		generatedTimestamp: number;
-		type: "cmd" | "response";
+		type: "cmd";
 		beta: boolean;
 		entries: {
 			time: number;
 			cmd: string;
-		}[] | {
-			time: number;
-			response: string;
 		}[];
 	}[]): {
 		userTag: string;
 		userId: string;
 		generatedTimestamp: number;
-		type: "cmd" | "response";
+		type: "cmd";
 		beta: boolean;
 		entries: {
 			time: number;
 			cmd: string;
-		}[] | {
-			time: number;
-			response: string;
 		}[];
 	} {
 		if (Array.from(new Set(reports.map(r => r.userId))).length > 1) throw new TypeError("Cannot combine reports of different users.");
@@ -172,71 +136,6 @@ export default class Internal {
 			beta: reports[0].beta,
 			entries
 		};
-	}
-
-	static get loopPatrons() { return loopPatrons; }
-	static get refreshPatreonToken() { return refreshPatreonToken; }
-
-	static sanitize(str: string) {
-		if (typeof str !== "string") str = (str as any).toString();
-		["*", "_", "@"].map(s => str = str.replace(new RegExp(`\\${s}`, "gi"), `\\${s}`));
-		return str;
-	}
-
-	static formatWelcome(str: string, user: Eris.User, guild: Eris.Guild) {
-		const d = new Date(user.createdAt);
-		const f = {
-			"user.username": user.username,
-			"user.discriminator": user.discriminator,
-			"user.tag": `${user.username}#${user.discriminator}`,
-			"user.id": user.id,
-			"user.mention": `<@!${user.id}>`,
-			"user.creationAgo": Time.formatAgo(d),
-			"user.creationUS": `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear}`,
-			"user.creationUK": `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear}`,
-			"user.creationISO": `${d.getFullYear}-${d.getMonth() + 1}-${d.getDate()}`,
-			"server.name": guild.name,
-			"server.id": guild.id
-		};
-
-		Object.keys(f).map(k => str = str.replace(new RegExp(`\\{${k}\\}`, "g"), f[k]));
-
-		return str;
-	}
-
-	static memeParsing<M extends ExtendedMessage<Eris.TextableChannel> = ExtendedMessage<Eris.GuildTextableChannel>>(msg: M, def: string) {
-		let str = msg.unparsedArgs.join(" ") || def;
-		let m;
-		while (m = /(?:<@!?)([0-9]{16,21})(?:>)/.exec(str)) {
-			const u = msg.channel.guild.members.get(m[1]);
-			if (!u) continue;
-			else str = str.replace(m[0], u.username);
-		}
-
-		return str;
-	}
-
-	static extraArgParsing<M extends ExtendedMessage<Eris.TextableChannel> = ExtendedMessage<Eris.GuildTextableChannel>>(msg: M) {
-		let str = msg.args.join(" ");
-		try {
-			str
-				.match(new RegExp("[0-9]{16,21}", "g"))
-				.filter(k => !str.split(" ")[str.split(" ").indexOf(k)].match(new RegExp("<@!?[0-9]{16,21}>")) || msg.channel.guild.members.has(k))
-				.map(k => str = str.replace(k, `<@!${k}>`));
-
-		} catch (e) { }
-		str
-			.split(" ")
-			.filter(k => !k.match(new RegExp("<@!?[0-9]{17,18}>", "i")) && k.length >= 3)
-			.map(k => {
-				let m: Eris.Member;
-				if (k.indexOf("#") !== -1) m = msg.channel.guild.members.filter(u => (`${u.username}#${u.discriminator}`).toLowerCase() === k.toLowerCase())[0];
-				else m = msg.channel.guild.members.filter(u => u.username.toLowerCase() === k.toLowerCase() || (u.nick && u.nick.toLowerCase() === k.toLowerCase()))[0];
-
-				if (m) str = str.replace(k, `<@!${m.id}>`);
-			});
-
-		return str;
 	}
 
 	static async authorizeOAuth(code: string): Promise<Discord.Oauth2Token> {
@@ -273,64 +172,14 @@ export default class Internal {
 		return p.statusCode !== 200 ? null : p.body;
 	}
 
-	static async fetchRedisKey(key: string) {
-		return new Promise<string>((a, b) => Redis.GET(key, (err, reply) => !err ? a(reply) : b(err)));
+	static sanitize(str: string) {
+		if (typeof str !== "string") str = (str as any).toString();
+		["*", "_", "@"].map(s => str = str.replace(new RegExp(`\\${s}`, "gi"), `\\${s}`));
+		return str;
 	}
 
-	static async getStats() {
-		const statNames = [
-			`${config.beta ? "beta" : "prod"}:stats:commands:total`,
-			`${config.beta ? "beta" : "prod"}:stats:commands:allTime:total`,
-			`${config.beta ? "beta" : "prod"}:stats:messages`,
-			`${config.beta ? "beta" : "prod"}:events:messageCreate`,
-			`${config.beta ? "beta" : "prod"}:stats:directMessage`,
-			`${config.beta ? "beta" : "prod"}:stats:uptime`
-		];
-
-		const n = {
-			commandsTotal: `${config.beta ? "beta" : "prod"}:stats:commands:total`,
-			commandsAllTime: `${config.beta ? "beta" : "prod"}:stats:commands:allTime:total`,
-			messages: `${config.beta ? "beta" : "prod"}:stats:messages`,
-			messagesAllTime: `${config.beta ? "beta" : "prod"}:events:messageCreate`,
-			directMessage: `${config.beta ? "beta" : "prod"}:stats:directMessage`,
-			uptime: `${config.beta ? "beta" : "prod"}:stats:uptime`
-		};
-
-		const stats: { [k in keyof typeof n]: number; } = {} as any;
-
-		for (const k of Object.keys(n)) {
-			stats[k] = await this.fetchRedisKey(n[k]).then(s => !s ? null : Number(s));
-		}
-
-		return stats;
-	}
-
-	static async incrementDailyCounter(incr: boolean) {
-		const d = new Date();
-		const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
-		await Redis[incr ? "INCR" : "DECR"](`${config.beta ? "beta" : "prod"}:stats:dailyJoins:${id}`);
-		const st = await this.fetchRedisKey(`${config.beta ? "beta" : "prod"}:stats:dailyJoins:${id}`);
-		return st;
-	}
-
-	static emojiStringToId(e: string) {
-		return e.match("<:([a-zA-Z]{2,}:[0-9]{15,21})>")[1];
-	}
-
-	static async makePastebinPost(content: string, privacy?: "0" | "1" | "2", name?: string, expiry?: string) {
-		return phin({
-			method: "POST",
-			url: "https://pastebin.com/api/api_post.php",
-			form: {
-				api_dev_key: config.apiKeys.pastebin.devKey,
-				api_user_key: config.apiKeys.pastebin.userKey,
-				api_option: "paste",
-				api_paste_code: content,
-				api_paste_private: privacy || "2",
-				api_paste_name: name || "Furry Bot Paste",
-				api_paste_expire_date: expiry || "1D"
-			},
-			timeout: 5e3
-		}).then(d => d.body.toString());
+	static consoleSanitize(str: string) {
+		if (typeof str !== "string") str = (str as any).toString();
+		return str.replace(/\u001B\[[0-9]{1,2}m/g, "");
 	}
 }

@@ -1,3 +1,0 @@
-In our server info command, status counts are based on the members we have cached (have seen), not the actual members in the server.
-This may mean we miss a few, but there isn't too much we can do about this.
-It isn't very noticable in a small server, but it may be very noticable on large servers (>1000 members).

@@ -1,109 +1,154 @@
-import Eris, { Embed } from "eris";
-import Language from "./Language";
-import GuildConfig from "../modules/config/GuildConfig";
+import Eris from "eris";
+import Language, { Languages } from "./Language";
 
 export default class EmbedBuilder {
-	private data: Eris.EmbedOptions;
-	private lang: string;
-	constructor(lang: string, d?: Eris.EmbedOptions | EmbedBuilder)
-	// tslint:disable-next-line: unified-signatures
-	constructor(gConfig: GuildConfig, d?: Eris.EmbedOptions | EmbedBuilder)
-	constructor(langOrGConfig: string | GuildConfig, d?: Eris.EmbedOptions | EmbedBuilder) {
-		this.lang = langOrGConfig instanceof GuildConfig ? langOrGConfig.settings.lang : langOrGConfig;
-		if (!d) this.data = {};
-		else this.data = d instanceof EmbedBuilder ? d.toJSON() : d;
+	#lang: Languages;
+	#json: Eris.EmbedOptions;
+	constructor(lang: Languages, json?: Eris.EmbedOptions) {
+		this.#lang = lang;
+		this.#json = json || {};
 	}
 
-	getEmbedData() { return { ...this.data }; }
-	loadEmbedData(data: Eris.EmbedOptions | EmbedBuilder) {
-		this.data = new EmbedBuilder(this.lang, { ...this.data, ...(data instanceof EmbedBuilder ? data.toJSON() : data) }).toJSON();
+	getTitle() { return this.#json.title; }
+
+	setTitle(title: string) {
+		this.#json.title = Language.parseString(this.#lang, title);
 		return this;
 	}
 
-	getTitle() { return String(this.data.title); }
-	setTitle(str: string) {
-		this.data.title = Language.get(this.lang).parseString(str);
+	removeTitle() {
+		delete this.#json.title;
 		return this;
 	}
 
-	getDescription() { return String(this.data.description); }
-	setDescription(desc: string | string[]) {
-		if (desc instanceof Array) desc = desc.join("\n");
-		this.data.description = Language.get(this.lang).parseString(desc);
+	getDescription() { return this.#json.description; }
+
+	setDescription(description: string) {
+		this.#json.description = Language.parseString(this.#lang, description);
 		return this;
 	}
 
-	getUrl() { return String(this.data.url); }
-	setUrl(url: string) {
-		this.data.url = url;
+	removeDescription() {
+		delete this.#json.description;
 		return this;
 	}
 
-	getColor() { return Number(this.data.color); }
-	setColor(color: number) {
-		this.data.color = color;
+	getURL() { return this.#json.url; }
+
+	setURL(url: string) {
+		this.#json.url = url;
 		return this;
 	}
 
-	getTimestamp() { return String(this.data.timestamp); }
-	setTimestamp(t: "now" | Date | string | number) {
-		if (t === "now") t = new Date().toISOString();
-		if (typeof t === "number") t = new Date(t).toISOString();
-		if (t instanceof Date) t = t.toISOString();
-		this.data.timestamp = t;
+	removeURL() {
+		delete this.#json.url;
 		return this;
 	}
 
-	getFooter() { return { ...this.data.footer }; }
-	setFooter(text: string, icon?: string) {
-		this.data.footer = {
-			text: Language.get(this.lang).parseString(text)
+	getColor() { return this.#json.color; }
+
+	setColor(color: number | string) {
+		this.#json.color = typeof color === "string" ? parseInt(color.toString().replace(/#/g, ""), 16) : color;
+		return this;
+	}
+
+	removeColor() {
+		delete this.#json.color;
+		return this;
+	}
+
+	getTimestamp() { return this.#json.timestamp; }
+
+	setTimestamp(timestamp: number | Date | string) {
+		this.#json.timestamp = timestamp instanceof Date ? timestamp : new Date(timestamp);
+		return this;
+	}
+
+	removeTimestamp() {
+		delete this.#json.timestamp;
+		return this;
+	}
+
+	getFooter() { return this.#json.footer; }
+
+	setFooter(text: string, iconURL?: string) {
+		this.#json.footer = {
+			text: Language.parseString(this.#lang, text)
 		};
-		if (icon) this.data.footer.icon_url = icon;
+		if (iconURL) this.#json.footer.icon_url = iconURL;
 		return this;
 	}
 
-	getThumbnail() { return { ...this.data.thumbnail }; }
+	removeFooter() {
+		delete this.#json.footer;
+		return this;
+	}
+
+	getThumbnail() { return this.#json.thumbnail; }
+
 	setThumbnail(url: string) {
-		this.data.thumbnail = {
+		this.#json.thumbnail = {
 			url
 		};
 		return this;
 	}
 
-	getImage() { return { ...this.data.image }; }
+	removeThumbnail() {
+		delete this.#json.thumbnail;
+		return this;
+	}
+
+	getImage() { return this.#json.image; }
+
 	setImage(url: string) {
-		this.data.image = {
+		this.#json.image = {
 			url
 		};
 		return this;
 	}
 
-	getAuthor() { return { ...this.data.author }; }
-	setAuthor(name: string, icon?: string, url?: string) {
-		this.data.author = {
-			name: Language.get(this.lang).parseString(name)
-		};
-		if (icon) this.data.author.icon_url = icon;
-		if (url) this.data.author.url = url;
+	removeImage() {
+		delete this.#json.image;
 		return this;
 	}
 
-	getField(i: number) { return { ...this.data.fields[i] }; }
-	addField(name: string, value: string, inline = false) {
-		if (!this.data.fields) this.data.fields = [];
-		this.data.fields.push({
-			name: Language.get(this.lang).parseString(name),
-			value: Language.get(this.lang).parseString(value),
+	getAuthor() { return this.#json.author; }
+
+	setAuthor(name: string, iconURL?: string, url?: string) {
+		this.#json.author = {
+			name: Language.parseString(this.#lang, name)
+		};
+		if (iconURL) this.#json.author.icon_url = iconURL;
+		if (url) this.#json.author.url = url;
+		return this;
+	}
+
+	removeAuthor() {
+		delete this.#json.author;
+		return this;
+	}
+
+	addField(name: string, value: string, inline?: boolean) {
+		inline = !!inline;
+		if (!(this.#json.fields instanceof Array)) this.#json.fields = [];
+		this.#json.fields.push({
+			name: Language.parseString(this.#lang, name),
+			value: Language.parseString(this.#lang, value),
 			inline
 		});
 		return this;
 	}
 
-	addFields(...fields: { name: string; value: string; inline?: boolean; }[]) {
-		fields.filter(f => f).map(f => this.addField(f.name, f.value, f.inline));
+	addEmptyField(inline?: boolean) { return this.addField("\u200b", "\u200b", inline); }
+
+	addFields(...args: Eris.EmbedField[]) {
+		args.map(a => this.addField(a.name, a.value, a.inline));
 		return this;
 	}
 
-	toJSON() { return { ...this.data }; }
+	toJSON(): Eris.EmbedOptions {
+		return Object(this.#json); // to prevent external editing of internal properties
+	}
+
+	get [Symbol.toStringTag]() { return "EmbedBuilder"; }
 }

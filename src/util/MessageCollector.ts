@@ -1,14 +1,13 @@
 import Eris from "eris";
-import { Base } from "eris-sharder";
-import FurryBot from "../main";
+import FurryBot from "../bot";
 
 
 export default class MessageCollector {
 	client: FurryBot;
 	collectors: {
 		channel: string;
-		filter: (msg: Eris.Message) => boolean;
-		resolve: (value: Eris.Message[] | Eris.Message) => void;
+		filter: (msg: Eris.Message<Eris.TextableChannel>) => boolean;
+		resolve: (value: Eris.Message<Eris.TextableChannel>[] | Eris.Message<Eris.TextableChannel>) => void;
 		limit: number;
 		messages: Eris.Message[];
 		timeout: number;
@@ -43,7 +42,7 @@ export default class MessageCollector {
 				limit: limit || 1,
 				messages: [],
 				timeout,
-				i: setTimeout(a.bind(null, []), timeout)
+				i: setTimeout(a.bind(null, !limit || limit === 1 ? null : []), timeout)
 			});
 		});
 	}

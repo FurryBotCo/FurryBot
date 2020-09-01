@@ -1,7 +1,0 @@
-{
-	"bal": {
-		"description": "Get your economy balance.",
-		"usage": "[@member/id]",
-		"title": "{0}'s Balance"
-	}
-}

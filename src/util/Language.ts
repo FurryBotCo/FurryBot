@@ -1,79 +1,103 @@
 import * as fs from "fs-extra";
 import config from "../config";
 import dot from "dot-object";
-import MakeFile from "../config/extra/lang/MakeFile";
-interface LangString extends String {
-	format<T extends any = string>(...args: T[]): string;
-}
+import JSON5 from "json5";
+import Logger from "./Logger";
+import Strings from "./Functions/Strings";
 
-// required because ts is being dumb
-(String as any).prototype.format = (function <T extends string = string>(...args: T[]) {
-	let res: string = this.toString();
-	if (!res) return null;
-	args.map((a, i) => res = res.replace(new RegExp(`\\{${i}\\}`, "g"), a));
-	return res;
-});
+/*
+FORMAT (parsing):
+Normal - {lang:some.language.location}
+Formatting - {lang:some.language.location|arg} (use {0} and up for arg locations)
+Modifiers - {lang:some.language.location$ucwords$}
+Both formatting and modifiers can be combined. Order does not matter, prefer formatting then modifiers.
+*/
 
-class SpecificLanguage {
-	lang: string;
-	private entries: { [k: string]: object; };
-	constructor(lang: string, entries: { [k: string]: object; }) {
-		this.lang = lang;
-		this.entries = entries;
-	}
-
-	get(str: string) {
-		let s = dot.pick(str, this.entries) as unknown as LangString;
-		if ([undefined, null].includes(s)) return null;
-		if (s instanceof Array) s = s[Math.floor(Math.random() * s.length)];
-
-		return s;
-	}
-
-	parseString(str: string): string {
-		if (!str) return "";
-		const r = new RegExp("{lang:(.*?)}"); // make match non-greedy with ?
-		const m = str.match(r);
-		if (!m || m.length === 0) return str;
-		else {
-			const k = m[1].split("|");
-			let l = this.get(k[0]);
-			if ([undefined, null].includes(l)) l = m[0].replace(":", "\u200b:") as any; // insert ZWSP on no match to avoid looping
-			else if (k.length > 1) l = l.format(...k.slice(1)) as any;
-			str = str.replace(m[0], l as any);
-			return this.parseString(str);
-		}
+class LanguageError extends Error {
+	constructor(name: string, message: string) {
+		super(message);
+		if (!name.toLowerCase().endsWith("error")) name += "Error";
+		this.name = name;
 	}
 }
 
+export type Languages = typeof Language["LANGUAGES"][number];
 export default class Language {
+	// this shouldn't really be hardcoded but typings
+	static LANGUAGES = [
+		"en"
+	] as const;
+	static MODIFIERS = {
+		ucwords: (str: string) => Strings.ucwords(str),
+		upper: (str: string) => str.toUpperCase(),
+		lower: (str: string) => str.toLowerCase(),
+		italic: (str: string) => `*${str}*`,
+		bold: (str: string) => `**${str}**`
+	};
 	private constructor() { }
 
-	static genJSON(lang: string) {
-		if (!fs.existsSync(`${config.dir.lang}/${lang}`)) throw new TypeError(`Invalid language "${lang}".`);
-		MakeFile(lang);
-	}
+	static get(lang: Languages, path: string, formatArgs: (string | number)[], nullOnNotFound: boolean, random: false): string[];
+	static get(lang: Languages, path: string, formatArgs?: (string | number)[], nullOnNotFound?: boolean, random?: true): string;
+	static get(lang: Languages, path: string, formatArgs?: (string | number)[], nullOnNotFound?: boolean, random?: boolean): string | string[] {
+		function loop(dir: string, parts: string[]): string | string[] {
+			if (fs.existsSync(`${dir}/${parts[0]}.json`)) {
+				const f = JSON5.parse(fs.readFileSync(`${dir}/${parts[0]}.json`));
+				const v = dot.pick(parts.slice(1).join("."), f);
+				if (v) return v;
+			}
 
-	static get(lang: string): SpecificLanguage;
-	static get(lang: string, path: string, parseable?: true): LangString;
-	static get(lang: string, path: string, parseable: false): string;
-	static get(lang: string, path?: string, parseable?: boolean) {
-		if (!fs.existsSync(`${config.dir.lang}/${lang}`)) lang = "en"; // (prefer default over error) throw new TypeError("invalid language");
-		if (!fs.existsSync(`${config.dir.lang}/${lang}.json`)) this.genJSON(lang);
-		const l = JSON.parse(fs.readFileSync(`${config.dir.lang}/${lang}.json`).toString());
-		const ln = new SpecificLanguage(lang, l);
-		if (!path) return ln;
-		else {
-			const s = ln.get(path);
-			if (!s) return `{lang:${path}}`;
-			return !parseable ? s.toString() : s;
+			if (!fs.existsSync(`${dir}/${parts[0]}`)) {
+				if (!fs.existsSync(`${dir}/${parts[0]}.json`)) return null;
+				const f = JSON5.parse(fs.readFileSync(`${dir}/${parts[0]}.json`));
+				return dot.pick(parts.slice(1).join("."), f) ?? null;
+			}
+			else return loop(`${dir}/${parts[0]}`, parts.slice(1));
+		}
+
+		let str = loop(`${config.dir.lang}/${lang}`, path.split("."));
+		if ([undefined, null].includes(str)) return nullOnNotFound ? null : `{lang:${path}}`;
+
+		if (str instanceof Array) {
+			if ([null, undefined].includes(random) || random) {
+				str = str[Math.floor(Math.random() * str.length)];
+				if (formatArgs) str = Strings.formatString(str, formatArgs);
+			} else {
+				if (formatArgs) str.map((s, i) => (str[i] as any) = Strings.formatString(s, formatArgs));
+			}
+
+			return str;
+		} else {
+			if (formatArgs) str = Strings.formatString(str, formatArgs);
+			return str;
 		}
 	}
 
 	static has(lang: string) { return fs.existsSync(`${config.dir.lang}/${lang}.json`); }
 
-	static parseString(lang: string, str: string) {
-		if (!this.has(lang)) throw new TypeError("Invalid language.");
-		else return this.get(lang).parseString(str);
+	static parseString(lang: Languages, str: string): string {
+		if (!str) return "";
+		const a = str.match(/{lang:(.*?)}/);
+		if (!a) return str;
+		const b = a[0];
+		let c = a[1];
+		const mods: ((str: string) => string)[] = [];
+		(c.match(/\$(.*?)\$/g) || []).map(mod => {
+			mod = mod.replace(/\$/g, "");
+			c = c.replace(`$${mod}$`, "");
+			const j = this.MODIFIERS[mod];
+			if (!j) {
+				const e = new LanguageError("UnknownModifierError", `Unknown modifier "${mod}"`).stack;
+				Logger.warn("Language", e);
+			} else mods.push(j);
+		});
+		const d = c.split("|");
+		let l = this.get(lang, d[0], d.slice(1), true);
+		if ([undefined, null].includes(l)) {
+			l = b.replace(":", "\u200b:").split("|")[0].split("$")[0];
+			if (!l.replace("\u200b", "").startsWith("{lang:")) l = `{lang:\u200b${l}`;
+			if (!l.endsWith("}")) l += "}";
+		} else mods.map(mod => l = mod(l));
+		str = str.replace(b, l);
+		return this.parseString(lang, str);
 	}
 }

@@ -1,10 +1,10 @@
+import deasync from "deasync";
 import config from "../../config";
+import { Languages } from "../Language";
+import EmbedBuilder from "../EmbedBuilder";
 import Eris from "eris";
-import { Utility as T } from "../@types/Functions";
-import * as URL from "url";
-import { BaseClusterWorker } from "eris-fleet";
-import * as http from "http";
-import * as https from "https";
+import y from "yargs";
+import { Colors } from "../Constants";
 
 export default class Utility {
 	private constructor() {
@@ -12,225 +12,16 @@ export default class Utility {
 	}
 
 	/**
-	 * remove duplicates from an array
-	 * @static
+	 * get the output of an async function synchronously
+	 * @param {Promise<T>} func - the function to get the result of synchronously
 	 * @template T
-	 * @param {T[]} array
-	 * @returns
-	 * @memberof Utility
 	 */
-	static removeDuplicates<T>(array: T[]) { return Array.from(new Set(array)); }
+	static sync<T>(func: Promise<T>) {
+		async function go(f: typeof func, cb: (err?: Error, res?: any) => void) {
+			return f.then(res => cb(null, res)).catch(err => cb(err, null));
+		}
 
-	/**
-	 * compare 2 members with eachother
-	 * @static
-	 * @param {Eris.Member} member1
-	 * @param {Eris.Member} member2
-	 * @returns {T.CompareMembersResult}
-	 * @memberof Utility
-	 */
-	static compareMembers(member1: Eris.Member, member2: Eris.Member): T.CompareMembersResult {
-		// some things that we can immediately return so we don't process them
-		if (member1.id === member2.id) return {
-			member1: {
-				higher: false,
-				lower: false,
-				same: true
-			},
-			member2: {
-				higher: false,
-				lower: false,
-				same: true
-			}
-		};
-		else if (member1.id === member1.guild.ownerID) return {
-			member1: {
-				higher: true,
-				lower: false,
-				same: false
-			},
-			member2: {
-				higher: false,
-				lower: true,
-				same: false
-			}
-		};
-		else if (member2.id === member1.guild.ownerID) return {
-			member1: {
-				higher: false,
-				lower: false,
-				same: false
-			},
-			member2: {
-				higher: true,
-				lower: false,
-				same: false
-			}
-		};
-
-		const a = member1.roles.map(r => member1.guild.roles.get(r));
-		let b: Eris.Role;
-		if (a.length > 0) b = a.filter(r => r.position === Math.max.apply(Math, a.map(p => p.position)))[0];
-
-		const c = member2.roles.map(r => member2.guild.roles.get(r));
-		let d: Eris.Role;
-		if (c.length > 0) d = c.filter(r => r.position === Math.max.apply(Math, c.map(p => p.position)))[0];
-
-		if (!b && d) return {
-			member1: {
-				higher: false,
-				lower: true,
-				same: false
-			},
-			member2: {
-				higher: true,
-				lower: false,
-				same: false
-			}
-		};
-
-		if (b && !d) return {
-			member1: {
-				higher: true,
-				lower: false,
-				same: false
-			},
-			member2: {
-				higher: false,
-				lower: true,
-				same: false
-			}
-		};
-
-		if (!b && !d) return {
-			member1: {
-				higher: false,
-				lower: false,
-				same: true
-			},
-			member2: {
-				higher: false,
-				lower: false,
-				same: true
-			}
-		};
-		return {
-			member1: {
-				higher: b.position > d.position,
-				lower: b.position < d.position,
-				same: b.position === d.position
-			},
-			member2: {
-				higher: d.position > b.position,
-				lower: d.position < b.position,
-				same: d.position === b.position
-			}
-		};
-	}
-
-	/**
-	 * compare a member with a role
-	 * @static
-	 * @param {Eris.Member} member
-	 * @param {Eris.Role} role
-	 * @returns {T.CompareMemberWithRoleResult}
-	 * @memberof Utility
-	 */
-	static compareMemberWithRole(member: Eris.Member, role: Eris.Role): T.CompareMemberWithRoleResult {
-		if (member.id === member.guild.ownerID) return { higher: false, lower: true, same: false };
-		const a = member.roles.map(r => member.guild.roles.get(r)).map(r => r.position).sort((a, b) => b - a)[0];
-
-		return {
-			higher: a > role.position,
-			lower: a < role.position,
-			same: a === role.position
-		};
-	}
-
-	/**
-	 * validate a url
-	 * @param {string} url
-	 * @returns
-	 * @memberof Utility
-	 */
-	static validateURL(url: string) {
-		const uri = URL.parse(url);
-		if (!uri.hostname) return;
-		return new Promise((a, b) => {
-			(uri.protocol === "https:" ? https : http).request({
-				method: "HEAD",
-				host: uri.host,
-				path: uri.path,
-				protocol: uri.protocol,
-				port: uri.port || uri.protocol === "https:" ? 443 : 80,
-				timeout: 5e3,
-				headers: {
-					"User-Agent": config.web.userAgent
-				}
-			}, (res) => {
-				res
-					.on("error", (err) => b(err))
-					.on("end", () => a(res.statusCode >= 200 || res.statusCode <= 299));
-			}).end();
-		});
-	}
-
-	/**
-	 * Fetch audit logs from a guild
-	 * @static
-	 * @param {Eris.Guild} guild
-	 * @param {number} type
-	 * @param {string} [targetID]
-	 * @param {number} [fetchAmount=5]
-	 * @returns {(Promise<T.AuditLogReturn>}
-	 * @memberof Utility
-	 */
-	static async fetchAuditLogEntries(client: BaseClusterWorker, guild: Eris.Guild, type: number, targetID?: string, fetchAmount = 5): Promise<T.AuditLogReturn> {
-		if (!guild.members.get(client.bot.user.id).permission.has("viewAuditLogs")) return {
-			success: false,
-			error: {
-				text: "Missing `auditLog` permissions.",
-				code: 3
-			}
-		};
-		const logs = await guild.getAuditLogs(fetchAmount, null, type).then(j => j.entries);
-		if (logs.length > 0) {
-			let et = -1;
-			for (const entry of logs) {
-				if (entry.actionType === type) {
-					if (targetID === null) et = logs.indexOf(entry);
-					if (entry.targetID === targetID) et = logs.indexOf(entry);
-					break;
-				}
-				continue;
-			}
-
-			if (et !== -1) {
-				const entry = logs[et];
-				if (logs[et].reason) return {
-					success: true,
-					blame: entry.user,
-					reason: entry.reason
-				};
-				else return {
-					success: true,
-					blame: entry.user,
-					reason: "Couldn't find a reason."
-				};
-			} else return {
-				success: false,
-				error: {
-					text: "Failed to fetch audit log entry.",
-					code: 1
-				}
-			};
-		} else return {
-			success: false,
-			error: {
-				text: "Failed to fetch audit log entry.",
-				code: 2
-			}
-		};
+		return deasync(go)(func);
 	}
 
 	static toStringFormat<T>(d: T) {
@@ -258,5 +49,160 @@ export default class Utility {
 		}
 
 		return d.toString();
+	}
+
+	static genErrorEmbed(lang: Languages, type: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL", json: true): Eris.EmbedOptions;
+	static genErrorEmbed(lang: Languages, type: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL", json?: false): EmbedBuilder;
+	static genErrorEmbed(lang: Languages, type: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL", json?: boolean) {
+		const e = new EmbedBuilder(lang)
+			.setTitle(`{lang:other.errorEmbed.${type}.title}`)
+			.setDescription(`{lang:other.errorEmbed.${type}.description}`)
+			.setTimestamp(new Date().toISOString())
+			.setColor(Colors.red);
+		return json ? e.toJSON() : e;
+	}
+
+	static numberToEmoji(num: number | string) {
+		if (typeof num === "number") num = num.toString();
+		const m = {
+			0: config.emojis.default.numbers.zero,
+			1: config.emojis.default.numbers.one,
+			2: config.emojis.default.numbers.two,
+			3: config.emojis.default.numbers.three,
+			4: config.emojis.default.numbers.four,
+			5: config.emojis.default.numbers.five,
+			6: config.emojis.default.numbers.six,
+			7: config.emojis.default.numbers.seven,
+			8: config.emojis.default.numbers.eight,
+			9: config.emojis.default.numbers.nine
+		};
+		Object.keys(m).map(v => num = num.toString().replace(new RegExp(v, "g"), m[v]));
+		return num;
+	}
+
+	static getLongestString(arr: (string | number)[]) {
+		let longest = 0;
+		for (const v of arr) if (v.toString().length > longest) longest = v.toString().length;
+		return longest;
+	}
+
+	static getPercents(arr: number[]) {
+		const total = arr.reduce((a, b) => a + b, 0);
+		const a: {
+			input: number;
+			percent: string;
+		}[] = [];
+		for (const v of arr) {
+			let s = (Math.round(((v / total) * 100) * 10) / 10).toString();
+			if (s.indexOf(".") === -1) s = s.padStart(2, "0");
+			else s = s.padStart(4, "0");
+
+			s = s.padEnd(4, ".0");
+			a.push({
+				input: v,
+				percent: s
+			});
+		}
+		return a;
+	}
+
+	static compareMembers(member1: Eris.Member, member2: Eris.Member) {
+		const g = member1.guild;
+		const m1r = member1.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0];
+		const m2r = member2.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0];
+		if (member1.id === g.ownerID) return {
+			member1: {
+				higher: true,
+				same: false,
+				lower: false
+			},
+			member2: {
+				higher: false,
+				same: false,
+				lower: true
+			}
+		};
+
+		if (member2.id === g.ownerID || m1r < m2r) return {
+			member1: {
+				higher: false,
+				same: false,
+				lower: true
+			},
+			member2: {
+				higher: true,
+				same: false,
+				lower: false
+			}
+		};
+
+		if (m1r > m2r) return {
+			member1: {
+				higher: true,
+				same: false,
+				lower: false
+			},
+			member2: {
+				higher: false,
+				same: false,
+				lower: true
+			}
+		};
+
+		if (member1.id === member2.id || m1r === m2r) return {
+			member1: {
+				higher: false,
+				same: true,
+				lower: false
+			},
+			member2: {
+				higher: false,
+				same: true,
+				lower: false
+			}
+		};
+	}
+
+	static compareMemberWithRole(member: Eris.Member, role: Eris.Role) {
+		const g = member.guild;
+		const mr = member.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0];
+
+		if (member.id === g.ownerID || mr > role.position) return {
+			higher: true,
+			same: false,
+			lower: false
+		};
+
+		if (mr < role.position) return {
+			higher: false,
+			same: false,
+			lower: true
+		};
+
+		if (mr === role.position) return {
+			higher: false,
+			same: true,
+			lower: false
+		};
+	}
+
+	static parseArgs<V extends { [k: string]: any; } = { [k: string]: string | boolean | number; }, P extends (string | string[]) = any>(args: P): {
+		args: {
+			[K in keyof V]: V[K];
+		};
+		unused: (string | number | boolean)[];
+		provided: P;
+	} {
+		const v = y.parse(args);
+		delete v.$0;
+		const a: {
+			[K in keyof V]: V[K];
+		} = { ...v } as any;
+		delete a._;
+		return {
+			args: a,
+			unused: v._,
+			provided: args
+		};
 	}
 }

@@ -1,14 +1,46 @@
-import * as fs from "fs-extra";
-import * as https from "https";
 import * as http from "http";
-import URL from "url";
+import * as https from "https";
+import qs from "querystring";
 import config from "../../config";
+import Logger from "../Logger";
+import URL from "url";
 import phin from "phin";
-import Logger from "../LoggerV10";
 
 export default class Request {
 	private constructor() {
 		throw new TypeError("This class may not be instantiated, use static methods.");
+	}
+
+	static async createPaste(content: string, name: string, expire?: string, privacy?: 0 | 1 | 2) {
+		return new Promise<string>((a, b) => {
+			const d = qs.stringify({
+				api_option: "paste",
+				api_dev_key: config.keys.pastebin.devKey,
+				api_user_key: config.keys.pastebin.userKey,
+				api_paste_code: content,
+				api_paste_private: privacy ?? 2,
+				api_paste_name: name,
+				api_paste_expire_date: expire || "1D"
+			});
+
+			const req = https.request({
+				hostname: "pastebin.com",
+				port: 443,
+				path: "/api/api_post.php",
+				method: "POST",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded"
+				}
+			}, (res) => {
+				const data = [];
+				res
+					.on("data", (d) => data.push(d))
+					.on("error", (err) => b(err))
+					.on("end", () => a(Buffer.concat(data).toString()));
+			});
+			req.write(d);
+			req.end();
+		});
 	}
 
 	/**
