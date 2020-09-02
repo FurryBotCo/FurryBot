@@ -52,7 +52,7 @@ export default class TimedActionsHandler {
 		const u = this.#client.bot.users.get(entry.userId) || await this.#client.bot.getRESTUser(entry.userId).catch(err => null);
 		if (!c.settings.modlog) return this.deleteEntry(entry);
 		const ch = (g.channels.get(c.settings.modlog) || this.#client.bot.getRESTChannel(c.settings.modlog).catch(err => null)) as Eris.GuildTextableChannel;
-		if (!ch) {
+		if (!ch || !ch.permissionsOf) {
 			await this.deleteEntry(entry);
 			await c.edit({
 				settings: {
@@ -85,7 +85,7 @@ export default class TimedActionsHandler {
 		const u = this.#client.bot.users.get(entry.userId) || await this.#client.bot.getRESTUser(entry.userId).catch(err => null);
 		if (!c.settings.modlog) return this.deleteEntry(entry);
 		const ch = (g.channels.get(c.settings.modlog) || this.#client.bot.getRESTChannel(c.settings.modlog).catch(err => null)) as Eris.GuildTextableChannel;
-		if (!ch) {
+		if (!ch || !ch.permissionsOf) {
 			await this.deleteEntry(entry);
 			await c.edit({
 				settings: {
