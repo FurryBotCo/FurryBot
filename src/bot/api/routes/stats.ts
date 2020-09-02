@@ -28,7 +28,7 @@ export default class StatsRoute extends Route {
 					clientStatus: "online",
 					guildCount: (st.guilds || client.bot.guilds.size),
 					userCount: (st.users || client.bot.users.size),
-					shardCount: (st.shards || client.bot.shards.size),
+					shardCount: ((st.shards || client.bot.shards).size),
 					largeGuildCount: (st.largeGuilds || client.bot.guilds.filter(g => g.large).length),
 					botVersion: config.version,
 					library: "eris",
