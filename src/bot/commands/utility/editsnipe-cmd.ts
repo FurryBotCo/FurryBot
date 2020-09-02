@@ -6,7 +6,7 @@ import EmbedBuilder from "../../../util/EmbedBuilder";
 import Language from "../../../util/Language";
 import Redis from "../../../util/Redis";
 
-export default new Command(["editsnipe", "es"], __filename)
+export default new Command(["editsnipe", "esnipe", "es"], __filename)
 	.setBotPermissions([])
 	.setUserPermissions([])
 	.setRestrictions([])
@@ -17,8 +17,8 @@ export default new Command(["editsnipe", "es"], __filename)
 
 		if (!ch) ch = msg.channel;
 
-		if (ch.permissionsOf(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userCantSee`));
-		if (ch.permissionsOf(this.bot.user.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfCantSee`));
+		if (!ch.permissionsOf(msg.author.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userCantSee`));
+		if (!ch.permissionsOf(this.bot.user.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfCantSee`));
 
 		let oldContent = await Redis.get(`snipe:edit:${msg.channel.id}:oldContent`);
 		let newContent = await Redis.get(`snipe:edit:${msg.channel.id}:newContent`);

@@ -17,8 +17,8 @@ export default new Command(["snipe"], __filename)
 
 		if (!ch) ch = msg.channel;
 
-		if (ch.permissionsOf(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userCantSee`));
-		if (ch.permissionsOf(this.bot.user.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfCantSee`));
+		if (!ch.permissionsOf(msg.author.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userCantSee`));
+		if (!ch.permissionsOf(this.bot.user.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfCantSee`));
 
 		let content = await Redis.get(`snipe:delete:${msg.channel.id}:content`);
 		const author = await Redis.get(`snipe:delete:${msg.channel.id}:author`);
