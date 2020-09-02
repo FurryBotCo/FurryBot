@@ -26,8 +26,9 @@ export default new Command(["info"], __filename)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setDescription([
 					"**{lang:other.words.stats$ucwords$}**:",
-					`${config.emojis.default.dot} {lang:other.words.processUsage$ucwords$}: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024).toLocaleString()}MB / ${Math.round(process.memoryUsage().heapTotal / 1024 / 1024).toLocaleString()}MB`,
-					`${config.emojis.default.dot} {lang:other.words.systemUsage$ucwords$}: ${Math.round((os.totalmem() - os.freemem()) / 1024 / 1024).toLocaleString()}MB / ${Math.round(os.totalmem() / 1024 / 1024).toLocaleString()}MB`,
+					`${config.emojis.default.dot} {lang:${cmd.lang}.memoryUsage.process}: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024).toLocaleString()}MB / ${Math.round(process.memoryUsage().heapTotal / 1024 / 1024).toLocaleString()}MB`,
+					`${config.emojis.default.dot} {lang:${cmd.lang}.memoryUsage.total}: ${Math.round(st.memory.all.heapUsed / 1024 / 1024).toLocaleString()}MB / ${Math.round(st.memory.all.heapTotal / 1024 / 1024).toLocaleString()}MB`,
+					`${config.emojis.default.dot} {lang:${cmd.lang}.memoryUsage.system}: ${Math.round((os.totalmem() - os.freemem()) / 1024 / 1024).toLocaleString()}MB / ${Math.round(os.totalmem() / 1024 / 1024).toLocaleString()}MB`,
 					`${config.emojis.default.dot} {lang:other.words.cpuUsage}: ${this.cpuUsage}%`,
 					// GB = 1000, GiB = 1024 apparently ??
 					// https://en.wikipedia.org/wiki/Gibibyte

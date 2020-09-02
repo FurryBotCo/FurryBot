@@ -16,7 +16,12 @@
 		"gatewayVersion": "Gateway Version",
 		"version": "Bot Version",
 		"nodeVersion": "Node Version",
-		"supportServer": "Support Server"
+		"supportServer": "Support Server",
+		"memoryUsage": {
+			"process": "Process Memory Usage",
+			"total": "Total Memory Usage",
+			"system": "System Memory Usage"
+		}
 	},
 	"perms": {
 		"description": "Check your permissions, and my permissions.",
