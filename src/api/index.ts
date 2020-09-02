@@ -98,13 +98,13 @@ export default class API {
 
 		const svr = http.createServer(express())
 			.on("error", () => {
-				Logger.warn("API Server", `[${this.launchAttempts}/${this.maxAttempts}]: Attempted to start api server, but the port is in use. ${this.launchAttempts >= this.maxAttempts ? "Max start attempts reached, not attempting to start anymore." : `Attempting to start again in ${this.timeBetweenAttempts / 1000} seconds.`}`);
+				Logger.warn([`Cluster #${this.client.cluster.id}`, "API Server"], `[${this.launchAttempts}/${this.maxAttempts}]: Attempted to start api server, but the port is in use. ${this.launchAttempts >= this.maxAttempts ? "Max start attempts reached, not attempting to start anymore." : `Attempting to start again in ${this.timeBetweenAttempts / 1000} seconds.`}`);
 				if (this.launchAttempts >= this.maxAttempts) return;
 				// this seems to throw an internal error
 				setTimeout(this.launch.bind(this), this.timeBetweenAttempts);
 			})
-			.on("listening", () => (svr.close(), this.srv = srv.listen(config.web.api.port, config.web.api.ip, () => Logger.debug("API Server", `Listening on ${config.web.api.host}:${config.web.api.port}`))))
-			.on("close", () => Logger.debug("API Server | Port Test", "Port test server closed, starting bot api server."))
+			.on("listening", () => (svr.close(), this.srv = srv.listen(config.web.api.port, config.web.api.ip, () => Logger.debug([`Cluster #${this.client.cluster.id}`, "API Server"], `Listening on ${config.web.api.host}:${config.web.api.port}`))))
+			.on("close", () => Logger.debug([`Cluster #${this.client.cluster.id}`, "API Server", "Port Test"], "Port test server closed, starting bot api server."))
 			.listen(config.web.api.port, config.web.api.ip);
 	}
 }

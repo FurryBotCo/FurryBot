@@ -124,7 +124,7 @@ class FurryBot extends Base {
 		this.col = new MessageCollector(this);
 		this.music = new MusicHandler(this);
 
-		this.api.launch();
+		if (this.cluster.id === 0) this.api.launch();
 		await this.loadCommands();
 
 		const s = config.statuses(this);
