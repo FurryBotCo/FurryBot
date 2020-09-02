@@ -5,7 +5,7 @@ import EmbedBuilder from "../../../util/EmbedBuilder";
 import Time from "../../../util/Functions/Time";
 import Language from "../../../util/Language";
 
-export default new Command(["sinfo", "serverinfo"], __filename)
+export default new Command(["sinfo", "serverinfo", "si"], __filename)
 	.setBotPermissions([
 		"embedLinks"
 	])

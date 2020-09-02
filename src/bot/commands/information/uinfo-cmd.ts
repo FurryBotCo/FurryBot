@@ -5,7 +5,7 @@ import config from "../../../config";
 import EmbedBuilder from "../../../util/EmbedBuilder";
 import Time from "../../../util/Functions/Time";
 
-export default new Command(["uinfo", "userinfo"], __filename)
+export default new Command(["uinfo", "userinfo", "ui"], __filename)
 	.setBotPermissions([
 		"embedLinks"
 	])
