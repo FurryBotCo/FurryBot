@@ -11,7 +11,7 @@ import TimedActionsHandler from "../util/handlers/TimedActionsHandler";
 import StatsHandler from "../util/handlers/StatsHandler";
 import MusicHandler from "../util/handlers/music/MusicHandler";
 import MessageCollector from "../util/MessageCollector";
-import API from "./api";
+import API from "../api";
 import Base from "../clustering/Base";
 import Cluster from "../clustering/Cluster";
 import config from "../config";

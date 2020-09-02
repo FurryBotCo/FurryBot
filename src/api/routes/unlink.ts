@@ -1,5 +1,5 @@
 import { Route } from "..";
-import db from "../../../util/Database";
+import db from "../../util/Database";
 
 export default class UnlinkRoute extends Route {
 	constructor() {

@@ -1,7 +1,7 @@
 import { Route } from "..";
-import config from "../../../config";
-import Twitter from "../../../util/handlers/TwitterLoginHandler";
-import Logger from "../../../util/Logger";
+import config from "../../config";
+import Twitter from "../../util/handlers/TwitterLoginHandler";
+import Logger from "../../util/Logger";
 import crypto from "crypto";
 
 export default class SocialsRoute extends Route {

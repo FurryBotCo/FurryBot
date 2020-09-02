@@ -1,12 +1,12 @@
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
-import FurryBot from "..";
-import config from "../../config";
+import FurryBot from "../bot";
+import config from "../config";
 import http from "http";
 import https from "https";
 import * as fs from "fs-extra";
-import Logger from "../../util/Logger";
+import Logger from "../util/Logger";
 
 export class Route {
 	client: FurryBot;

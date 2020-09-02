@@ -1,6 +1,6 @@
 import { Route } from "..";
 import { ObjectID } from "mongodb";
-import { mdb } from "../../../util/Database";
+import { mdb } from "../../util/Database";
 
 export default class TimingRoute extends Route {
 	constructor() {

@@ -1,6 +1,6 @@
 import { Route } from "..";
-import db, { mdb } from "../../../util/Database";
-import config from "../../../config";
+import db, { mdb } from "../../util/Database";
+import config from "../../config";
 import Eris from "eris";
 
 export default class WarnRoute extends Route {

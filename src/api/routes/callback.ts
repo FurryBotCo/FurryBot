@@ -1,12 +1,12 @@
 import { Route } from "..";
-import config from "../../../config";
-import Twitter from "../../../util/handlers/TwitterLoginHandler";
-import Logger from "../../../util/Logger";
-import db from "../../../util/Database";
-import Internal from "../../../util/Functions/Internal";
+import config from "../../config";
+import Twitter from "../../util/handlers/TwitterLoginHandler";
+import Logger from "../../util/Logger";
+import db from "../../util/Database";
+import Internal from "../../util/Functions/Internal";
 import phin from "phin";
-import EmbedBuilder from "../../../util/EmbedBuilder";
-import { Colors } from "../../../util/Constants";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
 
 export default class CallbackRoute extends Route {
 	constructor() {

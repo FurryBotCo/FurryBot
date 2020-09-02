@@ -1,5 +1,5 @@
 import { Route } from "..";
-import config from "../../../config";
+import config from "../../config";
 import * as fs from "fs-extra";
 
 export default class BulkDeleteRoute extends Route {

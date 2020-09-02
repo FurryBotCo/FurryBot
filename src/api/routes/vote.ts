@@ -1,8 +1,8 @@
-/// <reference path="../../../util/@types/Vote.d.ts" />
+/// <reference path="../../util/@types/Vote.d.ts" />
 import { Route } from "..";
-import { mdb } from "../../../util/Database";
-import config from "../../../config";
-import Logger from "../../../util/Logger";
+import { mdb } from "../../util/Database";
+import config from "../../config";
+import Logger from "../../util/Logger";
 
 export default class VoteRoute extends Route {
 	constructor() {

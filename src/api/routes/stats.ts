@@ -1,7 +1,7 @@
 import { Route } from "..";
-import config from "../../../config";
-import Internal from "../../../util/Functions/Internal";
-import Redis from "../../../util/Redis";
+import config from "../../config";
+import Internal from "../../util/Functions/Internal";
+import Redis from "../../util/Redis";
 
 export default class StatsRoute extends Route {
 	constructor() {

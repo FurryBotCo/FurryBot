@@ -1,6 +1,6 @@
 import { Route } from "..";
-import config from "../../../config";
-import db from "../../../util/Database";
+import config from "../../config";
+import db from "../../util/Database";
 
 export default class DeleteRoute extends Route {
 	constructor() {

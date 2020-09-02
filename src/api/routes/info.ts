@@ -1,5 +1,5 @@
 import { Route } from "..";
-import config from "../../../config";
+import config from "../../config";
 
 export default class InfoRoute extends Route {
 	constructor() {

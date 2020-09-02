@@ -5,5 +5,5 @@
 	"dankMemer": "We recieved an error when contacting an external api: **{0}: {1}**.",
 	"noStats": "Stats have not been processed yet, please wait a bit longer to execute this command.",
 	"unknown": "Unknown error.",
-	"join": "There was an error while executing that. You can report this in out Discord server: <{0}>\nCode: `{1}`\n\n**{2}: {3}**"
+	"join": "There was an error while executing that. You can report this in our Discord server: <{0}>\nCode: `{1}`\n\n**{2}: {3}**"
 }
