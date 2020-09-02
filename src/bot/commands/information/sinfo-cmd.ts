@@ -102,10 +102,10 @@ export default new Command(["sinfo", "serverinfo", "si"], __filename)
 						.setDescription([
 							`**{lang:${cmd.lang}.members}**:`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.total}: ${msg.channel.guild.memberCount} ([{lang:${cmd.lang}.note}](https://botapi.furry.bot/note/sinfo '{lang:${cmd.lang}.noteContent}'))`,
-							`${config.emojis.default.dot} ${config.emojis.status.online}: ${msg.channel.guild.members.filter(m => m.status === "online").length}`,
-							`${config.emojis.default.dot} ${config.emojis.status.idle}: ${msg.channel.guild.members.filter(m => m.status === "idle").length}`,
-							`${config.emojis.default.dot} ${config.emojis.status.dnd}: ${msg.channel.guild.members.filter(m => m.status === "dnd").length}`,
-							`${config.emojis.default.dot} ${config.emojis.status.offline}: ${msg.channel.guild.members.filter(m => m.status === "offline").length}`,
+							`${config.emojis.default.dot} <:${config.emojis.status.online}>: ${msg.channel.guild.members.filter(m => m.status === "online").length}`,
+							`${config.emojis.default.dot} <:${config.emojis.status.idle}>: ${msg.channel.guild.members.filter(m => m.status === "idle").length}`,
+							`${config.emojis.default.dot} <:${config.emojis.status.dnd}>: ${msg.channel.guild.members.filter(m => m.status === "dnd").length}`,
+							`${config.emojis.default.dot} <:${config.emojis.status.offline}>: ${msg.channel.guild.members.filter(m => m.status === "offline").length}`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.nonBots}: ${msg.channel.guild.members.filter(m => !m.bot).length}`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.bots}: ${msg.channel.guild.members.filter(m => m.bot).length}`
 						].join("\n"))
