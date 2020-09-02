@@ -124,7 +124,7 @@ export default class ModLogUtil {
 			embed: new EmbedBuilder(g.settings.lang)
 				.setAuthor(ch.guild.name, ch.guild.iconURL)
 				.setTitle(`{lang:other.modlog.titles.unlock} | {lang:other.modlog.titles.general|${pos}}`)
-				.setColor(Colors.red)
+				.setColor(Colors.green)
 				.setDescription([
 					`{lang:other.modlog.fields.target}: ${target.name} <#${target.id}>`,
 					`{lang:other.modlog.fields.reason}: ${reason}`
@@ -182,7 +182,7 @@ export default class ModLogUtil {
 			embed: new EmbedBuilder(g.settings.lang)
 				.setAuthor(ch.guild.name, ch.guild.iconURL)
 				.setTitle(`{lang:other.modlog.titles.unlockdown} | {lang:other.modlog.titles.general|${pos}}`)
-				.setColor(Colors.red)
+				.setColor(Colors.green)
 				.setDescription([
 					`{lang:other.modlog.fields.reason}: ${reason}`
 				].join("\n"))
@@ -210,7 +210,7 @@ export default class ModLogUtil {
 			embed: new EmbedBuilder(g.settings.lang)
 				.setAuthor(ch.guild.name, ch.guild.iconURL)
 				.setTitle(`{lang:other.modlog.titles.warn} | {lang:other.modlog.titles.general|${pos}}`)
-				.setColor(Colors.red)
+				.setColor(Colors.gold)
 				.setDescription([
 					`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
 					`{lang:other.modlog.fields.reason}: ${reason}`,
@@ -242,7 +242,7 @@ export default class ModLogUtil {
 			embed: new EmbedBuilder(g.settings.lang)
 				.setAuthor(ch.guild.name, ch.guild.iconURL)
 				.setTitle(`{lang:other.modlog.titles.clearwarnings} | {lang:other.modlog.titles.general|${pos}}`)
-				.setColor(Colors.red)
+				.setColor(Colors.green)
 				.setDescription([
 					`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
 					`{lang:other.modlog.fields.totalWarnings}: ${total}`,
@@ -287,7 +287,7 @@ export default class ModLogUtil {
 			embed: new EmbedBuilder(g.settings.lang)
 				.setAuthor(ch.guild.name, ch.guild.iconURL)
 				.setTitle(`{lang:other.modlog.titles.delwarn} | {lang:other.modlog.titles.general|${pos}}`)
-				.setColor(Colors.red)
+				.setColor(Colors.green)
 				.setDescription([
 					`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
 					`{lang:other.modlog.fields.reason}: ${reason}`,
@@ -351,7 +351,7 @@ export default class ModLogUtil {
 			embed: new EmbedBuilder(g.settings.lang)
 				.setAuthor(ch.guild.name, ch.guild.iconURL)
 				.setTitle(`{lang:other.modlog.titles.unban} | {lang:other.modlog.titles.general|${pos}}`)
-				.setColor(Colors.red)
+				.setColor(Colors.green)
 				.setDescription([
 					`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
 					`{lang:other.modlog.fields.reason}: ${reason}`
@@ -381,7 +381,7 @@ export default class ModLogUtil {
 			embed: new EmbedBuilder(g.settings.lang)
 				.setAuthor(ch.guild.name, ch.guild.iconURL)
 				.setTitle(`{lang:other.modlog.titles.unmute} | {lang:other.modlog.titles.general|${pos}}`)
-				.setColor(Colors.red)
+				.setColor(Colors.green)
 				.setDescription([
 					`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
 					`{lang:other.modlog.fields.reason}: ${reason}`
