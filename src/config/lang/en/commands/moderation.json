@@ -64,7 +64,7 @@
 		"description": "Clear messages in a channel.",
 		"usage": "<2-100>",
 		"done": "Purged **{0}** messages.",
-		"amount": "please provide a valid number between two (2) and 100.",
+		"amount": "please provide a valid number between two (2) and 1000.",
 		"skipped": "Skipped {0} message(s), reason: they are over 2 weeks old.\nNote: this is a technical limitation from Discord, not us."
 	},
 	"reason": {
