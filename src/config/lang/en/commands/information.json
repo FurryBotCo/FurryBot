@@ -28,8 +28,12 @@
 		"editTime": "Message Edit Time",
 		"deleteTime": "Message Delete Time",
 		"clusterTime": "Cluster Latency [#{0}]",
+		"toCluster": "Inter-Cluster Latency [{0} -> {1}]: **{2}**",
 		"shardTime": "Shard Latency [#{0}]",
-		"shardAverage": "Shard Average [{0}]"
+		"shardAverage": "Shard Average [{0}]",
+		"notReadyYet": "Not Ready Yet",
+		"noResponse": "No Response",
+		"unknown": "Unknown Response"
 	},
 	"sinfo": {
 		"description": "Get some info about the current server.",

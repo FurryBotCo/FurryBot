@@ -5,12 +5,11 @@ import Logger from "../util/Logger";
 import Base from "./Base";
 import IPC from "./IPC";
 import { performance } from "perf_hooks";
-import { DEBUG } from "./ClusterManager";
+import ClusterManager from "./ClusterManager";
+import { DEBUG } from "./Constants";
 
 export default class Cluster {
 	id: number;
-	clientOptions: Eris.ClientOptions;
-	clusterCount: number;
 	maxShards: number;
 	token: string;
 	file: string;
@@ -20,11 +19,10 @@ export default class Cluster {
 	lastShardId: number;
 	client: Eris.Client;
 	ipc: IPC;
-	wait: boolean;
+	options: ClusterManager["options"];
+	ready: boolean;
 	constructor() {
 		this.id = null;
-		this.clientOptions = {};
-		this.clusterCount = 0;
 		this.maxShards = 0;
 		this.token = null;
 		this.file = null;
@@ -33,6 +31,8 @@ export default class Cluster {
 		this.lastShardId = 0;
 		this.client = null;
 		this.ipc = new IPC(this);
+		this.options = null;
+		this.ready = false;
 		process
 			.on("message", this.messageHandler.bind(this))
 			.on("uncaughtException", (err) => Logger.error([`Cluster #${this.id}`, "Uncaught Exception"], err))
@@ -41,7 +41,10 @@ export default class Cluster {
 
 	get bot() { return this.client; }
 
-	async done() { this.sendMessage("DONE", null); }
+	async done() {
+		this.ready = true;
+		this.sendMessage("DONE", null);
+	}
 
 	sendMessage(op: string, d: object) {
 		process.send({
@@ -58,15 +61,13 @@ export default class Cluster {
 		switch (msg.op) {
 			case "SETUP": {
 				this.id = msg.d.id;
-				this.clientOptions = msg.d.clientOptions;
-				this.clusterCount = msg.d.clusterCount;
+				this.options = msg.d.options;
 				this.maxShards = msg.d.maxShards;
 				this.token = msg.d.token;
 				this.file = msg.d.file;
 				this.shards = msg.d.shards;
 				this.firstShardId = msg.d.firstShardId;
 				this.lastShardId = msg.d.lastShardId;
-				this.wait = msg.d.wait;
 
 				if (!fs.existsSync(this.file)) throw new Error(`Invalid client file (${this.file}) provided.`);
 				const f = await import(this.file).then(v => v.default || v);
@@ -75,7 +76,7 @@ export default class Cluster {
 				const b = this.class = new f(this);
 
 				const client = this.client = new Eris.Client(this.token, {
-					...this.clientOptions,
+					...this.options.erisOptions,
 					maxShards: this.maxShards,
 					firstShardID: this.firstShardId,
 					lastShardID: this.lastShardId
@@ -104,7 +105,7 @@ export default class Cluster {
 						id
 					}))
 					.once("ready", () => {
-						if (!this.wait) this.done();
+						if (!this.options.wait) this.done();
 						b.launch(this.shards.length);
 					})
 					.on("ready", () => this.sendMessage("EVENT", {
@@ -256,30 +257,43 @@ export default class Cluster {
 					}
 
 					case "evalAtCluster": {
-						const start = parseFloat(performance.now().toFixed(3));
-						let result, error = false;
-						try {
-							result = await eval(msg.d.code);
-						} catch (e) {
-							error = true;
-							result = {
-								name: e.name,
-								message: e.message,
-								stack: e.stack
-							};
-						}
-						const end = parseFloat(performance.now().toFixed(3));
-
-						this.sendMessage("COMMAND_RESPONSE", {
-							type: "evalAtCluster",
-							ipc: true,
-							callbackId: msg.d.callbackId,
-							data: {
-								result,
-								error,
-								time: parseFloat((end - start).toFixed(3))
+						if (this.ready) {
+							const start = parseFloat(performance.now().toFixed(3));
+							let result, error = false;
+							try {
+								result = await eval(msg.d.code);
+							} catch (e) {
+								error = true;
+								result = {
+									name: e.name,
+									message: e.message,
+									stack: e.stack
+								};
 							}
-						});
+							const end = parseFloat(performance.now().toFixed(3));
+
+							this.sendMessage("COMMAND_RESPONSE", {
+								type: "evalAtCluster",
+								ipc: true,
+								callbackId: msg.d.callbackId,
+								data: {
+									result,
+									error,
+									time: parseFloat((end - start).toFixed(3))
+								}
+							});
+						} else {
+							this.sendMessage("COMMAND_RESPONSE", {
+								type: "evalAtCluster",
+								ipc: true,
+								callbackId: msg.d.callbackId,
+								data: {
+									result: "NOT_READY",
+									error: false,
+									time: 0
+								}
+							});
+						}
 					}
 				}
 				break;

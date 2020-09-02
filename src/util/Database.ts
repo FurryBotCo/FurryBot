@@ -63,13 +63,13 @@ class Database {
 					...config.defaults.config.user,
 					id
 				} as any).then(res => new UserConfig(id, res.ops[0]));
-				Logger.info("Database | User", `Created user entry "${id}".`);
+				Logger.info(["Database", "User"], `Created user entry "${id}".`);
 			}
 		} catch (err) {
 			if (err instanceof MongoError) {
 				switch (err.code) {
 					case 11000: {
-						Logger.warn("Database | User", `Duplicate key erro (key: ${id})`);
+						Logger.warn(["Database", "User"], `Duplicate key erro (key: ${id})`);
 						return this.getUser(id);
 					}
 
@@ -90,13 +90,13 @@ class Database {
 					...config.defaults.config.guild,
 					id
 				} as any).then(res => new GuildConfig(id, res.ops[0]));
-				Logger.info("Database | Guild", `Created guild entry "${id}".`);
+				Logger.info(["Database", "Guild"], `Created guild entry "${id}".`);
 			}
 		} catch (err) {
 			if (err instanceof MongoError) {
 				switch (err.code) {
 					case 11000: {
-						Logger.warn("Database | Guild", `Duplicate key erro (key: ${id})`);
+						Logger.warn(["Database", "Guild"], `Duplicate key error (key: ${id})`);
 						return this.getGuild(id);
 					}
 

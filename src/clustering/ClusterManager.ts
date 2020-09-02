@@ -10,9 +10,8 @@ import config from "../config";
 import { Colors } from "../util/Constants";
 import Stats from "./Stats";
 import { performance } from "perf_hooks";
+import { DEBUG, SHARDS_PER_CLUSTER } from "./Constants";
 
-const SHARDS_PER_CLUSTER = 5;
-export const DEBUG = false;
 
 export default class ClusterManager {
 	// private client for webhooks & shard count
@@ -36,6 +35,7 @@ export default class ClusterManager {
 			interval: number;
 		};
 		wait: boolean;
+		evalTimeout: number;
 	};
 	clusters: Map<number, {
 		worker: cluster.Worker;
@@ -66,7 +66,8 @@ export default class ClusterManager {
 					enabled: !!options?.stats?.enabled,
 					interval: options?.stats?.interval || 1.5e4
 				},
-				wait: !!options?.wait
+				wait: !!options?.wait,
+				evalTimeout: options?.evalTimeout || 2e4
 			};
 			this.clusters = new Map();
 			this.cb = new Map();
@@ -124,15 +125,13 @@ export default class ClusterManager {
 					op: "SETUP",
 					d: {
 						id,
-						clientOptions: this.options.erisOptions,
-						clusterCount: this.options.clusterCount,
 						maxShards: this.options.shardCount,
 						token: this.token,
 						file: this.file,
 						shards,
 						firstShardId,
 						lastShardId,
-						wait: this.options.wait
+						options: this.options
 					}
 				});
 			}
@@ -168,11 +167,12 @@ export default class ClusterManager {
 					.setColor(Colors.gold)
 					.setTimestamp(new Date().toISOString())
 					.setTitle("Fully Ready")
-					.setDescription(`Client is fully ready, with ${this.stats.guilds} servers.`)
+					.setDescription(`Client is fully ready, with (approximately) ${this.stats.guilds} servers.`)
 					.setFooter(`${this.options.shardCount} Shard${this.options.shardCount !== 1 ? "s" : ""} | ${this.options.clusterCount} Cluster${this.options.clusterCount !== 1 ? "s" : ""}`)
 					.toJSON()
 			});
 			this.ready = true;
+			Logger.info("Cluster Manager", `Fully ready, with (approximately) ${this.stats.guilds} servers.`);
 		} else {
 			this.sendTo(id, "CONNECT", null);
 		}
@@ -192,7 +192,7 @@ export default class ClusterManager {
 								.setTimestamp(new Date().toISOString())
 								.setTitle("Shard Connect")
 								.setDescription(`Shard #${msg.d.id} is connecting.`)
-								.setFooter(`${l} Shard${l === 1 ? "" : "s"} Remaining. | Cluster #${id + 1}/${this.options.clusterCount}`)
+								.setFooter(`${l} Shard${l === 1 ? "" : "s"} Remaining. | Cluster ${id + 1}/${this.options.clusterCount}`)
 								.toJSON()
 						});
 						Logger.info(["Cluster Manager", `Cluster #${id}`], `Shard #${msg.d.id} is connecting.`);
@@ -208,7 +208,7 @@ export default class ClusterManager {
 								.setTimestamp(new Date().toISOString())
 								.setTitle("Shard Ready")
 								.setDescription(`Shard #${msg.d.id} is ready.`)
-								.setFooter(`${l} Shard${l === 1 ? "" : "s"} Remaining. | Cluster #${id + 1}/${this.options.clusterCount}`)
+								.setFooter(`${l} Shard${l === 1 ? "" : "s"} Remaining. | Cluster ${id + 1}/${this.options.clusterCount}`)
 								.toJSON()
 						});
 						Logger.info(["Cluster Manager", `Cluster #${id}`], `Shard #${msg.d.id} is ready.`);
@@ -222,7 +222,7 @@ export default class ClusterManager {
 								.setTimestamp(new Date().toISOString())
 								.setTitle("Shard Resumed")
 								.setDescription(`Shard #${msg.d.id} resumed.`)
-								.setFooter(`Shard #${msg.d.id}/${this.options.shardCount} | Cluster #${id + 1}/${this.options.clusterCount}`)
+								.setFooter(`Shard #${msg.d.id}/${this.options.shardCount} | Cluster ${id + 1}/${this.options.clusterCount}`)
 								.toJSON()
 						});
 						Logger.info(["Cluster Manager", `Cluster #${id}`], `Shard #${msg.d.id} resumed.`);
@@ -236,7 +236,7 @@ export default class ClusterManager {
 								.setTimestamp(new Date().toISOString())
 								.setTitle("Shard Disconnect")
 								.setDescription(`Shard #${msg.d.id} disconnected.`)
-								.setFooter(`Shard #${msg.d.id}/${this.options.shardCount} | Cluster #${id + 1}/${this.options.clusterCount}`)
+								.setFooter(`Shard ${msg.d.id}/${this.options.shardCount} | Cluster ${id + 1}/${this.options.clusterCount}`)
 								.toJSON()
 						});
 						Logger.info(["Cluster Manager", `Cluster #${id}`], `Shard #${msg.d.id} disconnected.`);
@@ -251,7 +251,7 @@ export default class ClusterManager {
 								.setTimestamp(new Date().toISOString())
 								.setTitle("Cluster Ready")
 								.setDescription(`Cluster #${id + 1} is ready.`)
-								.setFooter(`Cluster #${id + 1}/${this.options.clusterCount}`)
+								.setFooter(`Cluster ${id + 1}/${this.options.clusterCount}`)
 								.toJSON()
 						});
 						break;
@@ -263,8 +263,8 @@ export default class ClusterManager {
 								.setColor(Colors.red)
 								.setTimestamp(new Date().toISOString())
 								.setTitle("Cluster Disconnect")
-								.setDescription(`Cluster #${id} disconnected.`)
-								.setFooter(`Cluster #${id}/${this.options.clusterCount}`)
+								.setDescription(`Cluster #${id + 1} disconnected.`)
+								.setFooter(`Cluster ${id + 1}/${this.options.clusterCount}`)
 								.toJSON()
 						});
 						break;
@@ -379,7 +379,9 @@ export default class ClusterManager {
 		}
 	}
 
-	private async clusterDisconnectHandler(id: number) { }
+	private async clusterDisconnectHandler(id: number) {
+		Logger.error("Cluster Manager", `Cluster #${id} disconnected.`);
+	}
 
 	spreadShards(shards: number[], clusterCount: number) {
 		if (clusterCount < 2) return [shards];
@@ -409,7 +411,7 @@ export default class ClusterManager {
 			wait: false
 		};
 		if (w.avatar) p.avatarURL = w.avatar;
-		if (w.username) p.username = w.username;
+		if (w.username) p.username = config.beta ? w.username.replace(/Furry Bot/, "Furry Bot Beta") : w.username;
 		if (typeof data === "string") p.content = data;
 		else {
 			if (data.content) p.content = data.content;

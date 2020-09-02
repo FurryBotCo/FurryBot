@@ -1,8 +1,7 @@
 import Cluster from "./Cluster";
 import crypto from "crypto";
-import Eris from "eris";
 import Logger from "../util/Logger";
-import { DEBUG } from "./ClusterManager";
+import { DEBUG, EVAL_CODES } from "./Constants";
 import Stats from "./Stats";
 
 class EvalError extends Error {
@@ -17,7 +16,11 @@ export default class IPC {
 	// I could make it fully private with "#" but that's overkill
 	private cluster: Cluster;
 	cb: Map<string, {
-		resolve: (value?: unknown) => void;
+		resolve: (value: {
+			result: any;
+			time: number;
+			code: typeof EVAL_CODES[keyof typeof EVAL_CODES];
+		}) => void;
 		reject: (reason?: any) => void;
 		data?: any;
 	}>;
@@ -35,7 +38,7 @@ export default class IPC {
 	}>(d: D) {
 		if (DEBUG) Logger.log(["IPC", this.cluster.id?.toString()], d);
 		const c = this.cb.get(d.callbackId);
-		if (!c) throw new TypeError("IPC message recieved with an invalid callback id.");
+		if (!c) Logger.warn([`Cluster #${this.cluster.id}`, "IPC"], `IPC message recieved with an invalid callback id. (ID: ${d.callbackId || "NONE"})`);
 		switch (d.type) {
 			/*case "fetchGuild":
 			case "fetchUser":
@@ -61,11 +64,18 @@ export default class IPC {
 			}*/
 
 			case "evalAtCluster": {
+				// if ([1, 3].includes(d.from) && d.data?.result !== "NOT_READY") return;
 				this.cb.delete(d.callbackId);
 				if (d.data.error) c.reject(new EvalError(d.data.res.name, d.data.res.message, d.data.res.stack));
+				else if (d.data.result === "NOT_READY") c.resolve({
+					result: null,
+					time: 0,
+					code: EVAL_CODES.NOT_READY
+				});
 				else c.resolve({
 					result: d.data.result,
-					time: d.data.time
+					time: d.data.time,
+					code: EVAL_CODES.SUCCESS
 				});
 				break;
 			}
@@ -75,7 +85,8 @@ export default class IPC {
 				if (d.data.error) c.reject(new EvalError(d.data.res.name, d.data.res.message, d.data.res.stack));
 				else c.resolve({
 					result: d.data.result,
-					time: d.data.time
+					time: d.data.time,
+					code: 0
 				});
 				break;
 			}
@@ -89,7 +100,7 @@ export default class IPC {
 	}
 
 	async broadcastEval<R = any>(code: string): Promise<(Clustering.EvalResponse<R> & { clusterId: number; })[]> {
-		return Promise.all(Array.from(Array(this.cluster.clusterCount).keys()).map(async (id) => this.evalAtCluster<R>(id, code).then(v => ({ ...v, clusterId: id }))));
+		return Promise.all(Array.from(Array(this.cluster.options.clusterCount).keys()).map(async (id) => this.evalAtCluster<R>(id, code).then(v => ({ ...v, clusterId: id }))));
 	}
 
 	async evalAtCluster<R = any>(id: number, code: string) {
@@ -101,6 +112,13 @@ export default class IPC {
 				callbackId,
 				code
 			});
+			setTimeout(() => {
+				resolve({
+					result: null,
+					time: 0,
+					code: EVAL_CODES.NO_RESPONSE
+				});
+			}, this.cluster.options.evalTimeout);
 			this.cb.set(callbackId, {
 				resolve,
 				reject
@@ -122,43 +140,6 @@ export default class IPC {
 			});
 		});
 	}
-
-	/*async getStats(): Promise<Clustering.Stats> {
-		const {
-			result: {
-				clusters: cl,
-				shards: sh,
-				guilds,
-				largeGuilds,
-				channels,
-				users,
-				uptime,
-				memory
-			}
-		} = await this.evalAtMaster<Clustering.EvalStats>("this.stats");
-		const clusters: Clustering.Stats["clusters"] = new Map();
-		const shards: Clustering.Stats["shards"] = new Map();
-		for (const [id, d] of cl) {
-			const t = d as any;
-			t.shards = new Map(d.shards);
-			clusters.set(id, t);
-		}
-
-		for (const [id, s] of sh) shards.set(id, s);
-
-		return {
-			clusters,
-			shards,
-			guilds,
-			largeGuilds,
-			channels,
-			users,
-			uptime,
-			memory
-		};
-	}*/
-
-
 
 	async getStats() {
 		return new Promise<Stats>((resolve, reject) => {
@@ -186,7 +167,7 @@ export default class IPC {
 						uptime,
 						memory
 					}));
-				}),
+				}) as any, // special case callback
 				reject
 			});
 		});

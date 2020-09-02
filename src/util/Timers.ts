@@ -21,7 +21,7 @@ export default class Timers {
 
 	start(label: string) {
 		if (Object.keys(this.timers).includes(label)) throw new TypeError(`Timer with the label "${label}" has already been started.`);
-		if (this.log) Logger.info(`Timers[${this.id}]`, `Timer with label ${label} started.`);
+		// if (this.log) Logger.info(`Timers[${this.id}]`, `Timer with label ${label} started.`);
 		const t = this.timers[label] = {
 			start: parseFloat(performance.now().toFixed(3)),
 			end: null
@@ -35,7 +35,7 @@ export default class Timers {
 
 		this.timers[label].end = parseFloat(performance.now().toFixed(3));
 		if (this.log) {
-			Logger.info(`Timers[${this.id}]`, `Timer with label ${label} ended.`);
+			// Logger.info(`Timers[${this.id}]`, `Timer with label ${label} ended.`);
 			Logger.debug(`Timers[${this.id}]`, `${label} took ${this.calc(label, label)}ms`);
 		}
 		return this.timers[label].end;
