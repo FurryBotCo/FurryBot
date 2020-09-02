@@ -1,4 +1,9 @@
 {
+	"bulge": {
+		"description": "Get a picture of a bulge.",
+		"usage": "",
+		"title": "Bulge"
+	},
 	"e621": {
 		"description": "Search for posts on e621.",
 		"usage": "[tags]",
@@ -15,6 +20,11 @@
 		"flashFilter": "Filtering Flash",
 		"title": "E621 Posts"
 	},
+	"fursuitbutt": {
+		"description": "Get a picture of a fursuit butt.",
+		"usage": "",
+		"title": "Fursuit Butt"
+	},
 	"yiff": {
 		"description": "Get a yiff image.",
 		"usage": "[gay/straight/lesbian/dickgirl]",
@@ -24,15 +34,5 @@
 			"lesbian": "Lesbian Yiff",
 			"dickgirl": "DickGirl Yiff"
 		}
-	},
-	"fursuitbutt": {
-		"description": "Get a picture of a fursuit butt.",
-		"usage": "",
-		"title": "Fursuit Butt"
-	},
-	"bulge": {
-		"description": "Get a picture of a bulge.",
-		"usage": "",
-		"title": "Bulge"
 	}
 }

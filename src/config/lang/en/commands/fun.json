@@ -5,18 +5,7 @@
 		"usage": "<question>",
 		"said": "The Magic 8ball said",
 		"disclaimer": "Disclaimer: Do not take any answers seriously!",
-		"possible": [
-			"It is certain",
-			"Without a doubt",
-			"Most likely", "Yes",
-			"Reply was hazy, try again later",
-			"Ask again later",
-			"My answer is no",
-			"No",
-			"Very doubtful",
-			"Concentrate and ask again",
-			"As I see it, yes"
-		]
+		"possible": ["It is certain", "Without a doubt", "Most likely", "Yes", "Reply was hazy, try again later", "Ask again later", "My answer is no", "No", "Very doubtful", "Concentrate and ask again", "As I see it, yes"]
 	},
 	"awoo": {
 		"description": "Start a howl, or join in!",
@@ -63,6 +52,12 @@
 	"dadjoke": {
 		"description": "Get a dadjoke",
 		"usage": ""
+	},
+	"dice": {
+		"description": "Roll the dice.",
+		"usage": "[min] [max]",
+		"minLess": "the minimum must be less than the maximum.",
+		"text": "you rolled a {0}!"
 	},
 	"dictionary": {
 		"description": "Throw a dictionary at someone to teach them some knowledge!",
@@ -187,12 +182,6 @@
 		"description": "Pounce on someone! uwu",
 		"usage": "<@member/text>",
 		"possible": ["<@!{0}> pounces onto {1} uwu"]
-	},
-	"dice": {
-		"description": "Roll the dice.",
-		"usage": "[min] [max]",
-		"minLess": "the minimum must be less than the maximum.",
-		"text": "you rolled a {0}!"
 	},
 	"russianroulette": {
 		"description": "Play Russian Roulette",

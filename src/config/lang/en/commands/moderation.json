@@ -17,23 +17,6 @@
 		"couldNotBan": "I couldn't ban **{0}**, {1}",
 		"englishOnly": "The provided reason must be comprised of English characters only."
 	},
-	"softban": {
-		"description": "Ban someone, then immediately unban them to remove their messages.",
-		"usage": "<@member/id> [time] [reason] [--days=<0-14>]",
-		"deleteLessThan": "delete days cannot be less than zero.",
-		"deleteMoreThan": "delete days cannot be more than 14.",
-		"timeLessThan": "time cannot be less than one (1).",
-		"timeInvalid": "invalid time.",
-		"alredyBanned": "User already banned",
-		"alreadyBannedDesc": "It looks like **{0}** is already banned here..",
-		"noSoftBanSelf": "pretty sure you don't want to do this to yourself.",
-		"noSoftBanOwner": "you cannot ban the server owner.",
-		"noSoftBanOther": "you cannot ban **{0}** as their highest role is higher than yours!",
-		"noReason": "No Reason Specified.",
-		"userSoftBanned": "User {0} was softbanned, {1}",
-		"couldNotSoftBan": "I couldn't softban **{0}**, {1}",
-		"englishOnly": "The provided reason must be comprised of English characters only."
-	},
 	"kick": {
 		"description": "Kick members from your server.",
 		"usage": "<@member/id> [reason]",
@@ -45,13 +28,6 @@
 		"englishOnly": "The provided reason must be comprised of English characters only.",
 		"noKickOwner": "you cannot kick the server owner."
 	},
-	"prune": {
-		"description": "Clear messages in a channel.",
-		"usage": "<2-100>",
-		"done": "Purged **{0}** messages.",
-		"amount": "please provide a valid number between two (2) and 100.",
-		"skipped": "Skipped {0} message(s), reason: they are over 2 weeks old.\nNote: this is a technical limitation from Discord, not us."
-	},
 	"lock": {
 		"description": "Lock a channel to prevent people talking in it.",
 		"usage": "[channel]",
@@ -59,24 +35,11 @@
 		"alreadyDeniedThat": "the send messages permission seems to already be denied on that channel",
 		"executed": "lock executed.\nNote: This lock will not work if a user has the `administrator` permission, or if `send messages` is ticked to yes in the channels permission overrides."
 	},
-	"unlock": {
-		"description": "Unlock a channel after it has been locked.",
-		"usage": "[channel]",
-		"thisNotLocked": "this channel doesn't seem to be locked.",
-		"thatNotLocked": "that channel doesn't seem to be locked.",
-		"removed": "lock removed."
-	},
 	"lockdown": {
 		"description": "Lock all channels in the server.",
 		"usage": "",
 		"alreadyDone": "The server seems to be locked down already. If you believe this is an error, please ask for help in our support server. (`support` command)",
 		"finished": "Lockdown finished. Updated **{0}** channels."
-	},
-	"unlockdown": {
-		"description": "Unlock all channels in the server.",
-		"usage": "",
-		"notDone": "The server does not seem to be locked down. If you believe this is an error, please ask for help in our support server. (`support` command)",
-		"finished": "Unlockdown finished. Updated **{0}** channels."
 	},
 	"mute": {
 		"description": "Stop someone from chatting.",
@@ -97,6 +60,13 @@
 		"alreadyMutedDesc": "The user **{0}** seems to already be muted.. You can unmute them with `{1}unmute {0} [reason]`",
 		"englishOnly": "The provided reason must be comprised of English characters only."
 	},
+	"prune": {
+		"description": "Clear messages in a channel.",
+		"usage": "<2-100>",
+		"done": "Purged **{0}** messages.",
+		"amount": "please provide a valid number between two (2) and 100.",
+		"skipped": "Skipped {0} message(s), reason: they are over 2 weeks old.\nNote: this is a technical limitation from Discord, not us."
+	},
 	"reason": {
 		"description": "Change the reason for a modlog entry",
 		"usage": "<id> [reason]",
@@ -108,6 +78,46 @@
 		"englishOnly": "The provided reason must be comprised of English characters only.",
 		"tooLong": "that reason is too long, it must be at most 200 characters.",
 		"edited": "the reason for case **#{0}** has been updated to \"{1}\"."
+	},
+	"softban": {
+		"description": "Ban someone, then immediately unban them to remove their messages.",
+		"usage": "<@member/id> [time] [reason] [--days=<0-14>]",
+		"deleteLessThan": "delete days cannot be less than zero.",
+		"deleteMoreThan": "delete days cannot be more than 14.",
+		"timeLessThan": "time cannot be less than one (1).",
+		"timeInvalid": "invalid time.",
+		"alredyBanned": "User already banned",
+		"alreadyBannedDesc": "It looks like **{0}** is already banned here..",
+		"noSoftBanSelf": "pretty sure you don't want to do this to yourself.",
+		"noSoftBanOwner": "you cannot ban the server owner.",
+		"noSoftBanOther": "you cannot ban **{0}** as their highest role is higher than yours!",
+		"noReason": "No Reason Specified.",
+		"userSoftBanned": "User {0} was softbanned, {1}",
+		"couldNotSoftBan": "I couldn't softban **{0}**, {1}",
+		"englishOnly": "The provided reason must be comprised of English characters only."
+	},
+	"unban": {
+		"description": "Remove bans for people that have already been banned.",
+		"usage": "<id> [reason]",
+		"notBanned": "User not banned",
+		"notBannedDesc": "It doesn't look like {0} is banned here..",
+		"noReason": "No Reason Specified.",
+		"unbanned": "Unbanned {0}, {1}",
+		"couldNotUnban": "I couldn't unban **{0}**, {1}",
+		"englishOnly": "The provided reason must be comprised of English characters only."
+	},
+	"unlock": {
+		"description": "Unlock a channel after it has been locked.",
+		"usage": "[channel]",
+		"thisNotLocked": "this channel doesn't seem to be locked.",
+		"thatNotLocked": "that channel doesn't seem to be locked.",
+		"removed": "lock removed."
+	},
+	"unlockdown": {
+		"description": "Unlock all channels in the server.",
+		"usage": "",
+		"notDone": "The server does not seem to be locked down. If you believe this is an error, please ask for help in our support server. (`support` command)",
+		"finished": "Unlockdown finished. Updated **{0}** channels."
 	},
 	"unmute": {
 		"description": "Remove a mute from someone.",
@@ -123,28 +133,6 @@
 		"unmuted": "User {0} was unmuted, {1}",
 		"couldNotUnmute": "I couldn't unmute **{0}**, {1}",
 		"englishOnly": "The provided reason must be comprised of English characters only."
-	},
-	"unban": {
-		"description": "Remove bans for people that have already been banned.",
-		"usage": "<id> [reason]",
-		"notBanned": "User not banned",
-		"notBannedDesc": "It doesn't look like {0} is banned here..",
-		"noReason": "No Reason Specified.",
-		"unbanned": "Unbanned {0}, {1}",
-		"couldNotUnban": "I couldn't unban **{0}**, {1}",
-		"englishOnly": "The provided reason must be comprised of English characters only."
-	},
-	"reason": {
-		"description": "Change the reason for a modlog entry",
-		"usage": "<id> [reason]",
-		"invalidId": "invalid id \"{0}\" provided.",
-		"noModlog": "I couldn't find the mod log for this server, so previous entries cannot be edited.",
-		"noMessage": "the specified entry ({0}) does not have a message id associated with it, so it cannot be edited.",
-		"messageNotFound": "the message for that entry could not be found. If the mod log channel has changed, the entry cannot be edited.",
-		"badlyFormed": "the embed for the mod log entry seems to be badly formed, it cannot be edited.",
-		"englishOnly": "The provided reason must be comprised of English characters only.",
-		"tooLong": "that reason is too long, it must be at most 200 characters.",
-		"edited": "the reason for case **#{0}** has been updated to \"{1}\"."
 	},
 	"warn": {
 		"description": "Add a warning to someone.",

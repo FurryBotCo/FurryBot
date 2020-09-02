@@ -1,19 +1,4 @@
 {
-	"poll": {
-		"description": "Start a poll. Provide a list of options, separated by semicolons (;).",
-		"usage": "<time> <options>",
-		"wrongOptionsAmount": "You must provide between 2 and {0} options.",
-		"optionTooLarge": "Each option must be at most 200 characters.",
-		"example": "{0}poll 5m option 1; option 2",
-		"double": "Note: If you vote twice, only your first vote will be counted.",
-		"title": "Poll by {0}",
-		"invalidTime": "Invalid time provided. Time must be between 5 minutes and 1 day. See [this link](https://bot.furry.bot/notes/time) for a list of time conversions.",
-		"endsAt": "Ends At",
-		"endedAt": "Ended At",
-		"time": "Time Remaining",
-		"results": "Results from poll started {0} ago.",
-		"noVotes": "No votes were casted."
-	},
 	"asar": {
 		"description": "Add a self assignable role.",
 		"usage": "<@role/id/name>",
@@ -211,6 +196,21 @@
 		"yes": "Yes",
 		"no": "No",
 		"none": "None"
+	},
+	"poll": {
+		"description": "Start a poll. Provide a list of options, separated by semicolons (;).",
+		"usage": "<time> <options>",
+		"wrongOptionsAmount": "You must provide between 2 and {0} options.",
+		"optionTooLarge": "Each option must be at most 200 characters.",
+		"example": "{0}poll 5m option 1; option 2",
+		"double": "Note: If you vote twice, only your first vote will be counted.",
+		"title": "Poll by {0}",
+		"invalidTime": "Invalid time provided. Time must be between 5 minutes and 1 day. See [this link](https://bot.furry.bot/notes/time) for a list of time conversions.",
+		"endsAt": "Ends At",
+		"endedAt": "Ended At",
+		"time": "Time Remaining",
+		"results": "Results from poll started {0} ago.",
+		"noVotes": "No votes were casted."
 	},
 	"prefix": {
 		"description": "List this servers prefix, or change my prefix for this server.",

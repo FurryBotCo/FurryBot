@@ -1,18 +1,33 @@
 {
-	"invalidChannel": "The current modlog channel was invalid, so it has been reset to none.",
-	"missingPermissions": "I am missing some permissions to be able to send modlog messages. Make sure I have the permissions **send messages**, and **embed links** in this servers mod log channel.",
+	"action": "Action carried out by {0}",
+	"actionAuto": "Action performed automatically.",
 	"autoAction": "Action performed automatically.",
 	"autoExpiry": "Automatic action due to expiry.",
+	"autoUnbanFail": {
+		"title": "Automatic Unban Failed",
+		"description": "I failed to automatically unban **{0}** (<@!{1}>)\nReason: {2}"
+	},
 	"autoUnmuteFail": {
 		"title": "Automatic Unmute Failed",
 		"description": "I failed to automatically unmute **{0}** (<@!{1}>)\nReason: {2}",
 		"reasonNotPresent": "The user is not in the server."
 	},
-	"autoUnbanFail": {
-		"title": "Automatic Unban Failed",
-		"description": "I failed to automatically unban **{0}** (<@!{1}>)\nReason: {2}"
+	"fields": {
+		"target": "Target",
+		"reason": "Reason",
+		"deleteDays": "Message Delete Days",
+		"time": "Time",
+		"permanent": "Permanent",
+		"id": "ID",
+		"warningReason": "Warning Reason",
+		"oldBlame": "Old Blame",
+		"unknown": "Unknown",
+		"totalWarnings": "Total Warnings"
 	},
+	"invalidChannel": "The current modlog channel was invalid, so it has been reset to none.",
+	"missingPermissions": "I am missing some permissions to be able to send modlog messages. Make sure I have the permissions **send messages**, and **embed links** in this servers mod log channel.",
 	"noReason": "No Reason Provided.",
+	"noneProvided": "None Provided.",
 	"titles": {
 		"general": "Case #{0}",
 		"ban": "Member Ban",
@@ -28,20 +43,5 @@
 		"unlock": "Channel Unlocked",
 		"lockdown": "Server Locked",
 		"unlockdown": "Server Unlocked"
-	},
-	"fields": {
-		"target": "Target",
-		"reason": "Reason",
-		"deleteDays": "Message Delete Days",
-		"time": "Time",
-		"permanent": "Permanent",
-		"id": "ID",
-		"warningReason": "Warning Reason",
-		"oldBlame": "Old Blame",
-		"unknown": "Unknown",
-		"totalWarnings": "Total Warnings"
-	},
-	"noneProvided": "None Provided.",
-	"actionAuto": "Action performed automatically.",
-	"action": "Action carried out by {0}"
+	}
 }

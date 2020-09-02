@@ -1,4 +1,21 @@
 {
+	"cooldown": {
+		"title": "Woah there, slow down!",
+		"description": "This command is on cooldown for another **{0}**, please don't spam.\nThe cooldown of this command is **{1}**."
+	},
+	"invalidUsage": {
+		"title": "❌ Invalid Usage"
+	},
+	"permission": {
+		"user": {
+			"title": "Missing permission{0}.",
+			"description": "You are missing the permission{0} **{1}**, please fix this issue to run this command."
+		},
+		"bot": {
+			"title": "Missing Permission{0}.",
+			"description": "I am missing the permission{0} **{1}**, please fix this issue to run this command."
+		}
+	},
 	"restrictions": {
 		"beta": {
 			"name": "Beta",
@@ -28,22 +45,5 @@
 			"name": "Support Server",
 			"error": "This command can only be ran in my support server."
 		}
-	},
-	"permission": {
-		"user": {
-			"title": "Missing permission{0}.",
-			"description": "You are missing the permission{0} **{1}**, please fix this issue to run this command."
-		},
-		"bot": {
-			"title": "Missing Permission{0}.",
-			"description": "I am missing the permission{0} **{1}**, please fix this issue to run this command."
-		}
-	},
-	"cooldown": {
-		"title": "Woah there, slow down!",
-		"description": "This command is on cooldown for another **{0}**, please don't spam.\nThe cooldown of this command is **{1}**."
-	},
-	"invalidUsage": {
-		"title": "\u274c Invalid Usage"
 	}
 }

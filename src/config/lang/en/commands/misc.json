@@ -1,18 +1,4 @@
 {
-	"avatar": {
-		"description": "Get your avatar, or another person's avatar.",
-		"usage": "[@user]",
-		"title": "Avatar of {0}"
-	},
-	"help": {
-		"description": "List my commands, or get help with a command or category.",
-		"usage": "[command/restrictions]",
-		"hoverInfo": "Hover for more info",
-		"helpMe": "Ha ha, very funny. Please specify either a command, category, or nothing.",
-		"neitherFound": "Neither a command nor category was found with what you supplied.",
-		"commandList": "Command List #{0}",
-		"cmdCount": "Total Commands: **{0}**"
-	},
 	"afk": {
 		"description": "Mark yourself as away-from-keyboard.",
 		"usage": "[global]",
@@ -34,6 +20,20 @@
 				"description": "Your afk in this server has been removed due to a message from you."
 			}
 		}
+	},
+	"avatar": {
+		"description": "Get your avatar, or another person's avatar.",
+		"usage": "[@user]",
+		"title": "Avatar of {0}"
+	},
+	"help": {
+		"description": "List my commands, or get help with a command or category.",
+		"usage": "[command/restrictions]",
+		"hoverInfo": "Hover for more info",
+		"helpMe": "Ha ha, very funny. Please specify either a command, category, or nothing.",
+		"neitherFound": "Neither a command nor category was found with what you supplied.",
+		"commandList": "Command List #{0}",
+		"cmdCount": "Total Commands: **{0}**"
 	},
 	"weirdedit": {
 		"description": "Make a message with a weird little edit thing.",

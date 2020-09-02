@@ -1,4 +1,11 @@
 {
+	"clear": {
+		"description": "Remove all queue entries.",
+		"usage": "",
+		"mustBeInChannel": "You must be in a voice channel to use this command.\n(or have the `administrator` permission to bypass this.)",
+		"alreadyEmpty": "The queue seems to already be empty.",
+		"cleared": "Cleared the queue, removing **{0}** entries, totaling **{1}**."
+	},
 	"join": {
 		"description": "Make me join a voice channel.",
 		"usage": "",
@@ -15,39 +22,6 @@
 		"mustBeInChannel": "You must be in a voice channel to use this command.\n(or have the `administrator` permission to bypass this.)",
 		"notInChannel": "I don't seem to be in a voice channel.",
 		"left": "Left the voice channel."
-	},
-	"stop": {
-		"description": "Stop the music playback.",
-		"usage": "",
-		"mustBeInChannel": "You must be in a voice channel to use this command.\n(or have the `administrator` permission to bypass this.)",
-		"notInChannel": "I don't seem to be in a voice channel.",
-		"notPlaying": "I don't seem to be playing anything.",
-		"stopped": "Stopped playback and left the voice channel."
-	},
-	"clear": {
-		"description": "Remove all queue entries.",
-		"usage": "",
-		"mustBeInChannel": "You must be in a voice channel to use this command.\n(or have the `administrator` permission to bypass this.)",
-		"alreadyEmpty": "The queue seems to already be empty.",
-		"cleared": "Cleared the queue, removing **{0}** entries, totaling **{1}**."
-	},
-	"queue": {
-		"description": "List all of the songs in the queue.",
-		"usage": "[page]",
-		"empty": "The queue is currently empty.",
-		"invalidPage": "Invalid page provided. Page number must be between **1** an **{0}**.",
-		"embed": {
-			"title": "Queue for {0}",
-			"description": "added by <@!{0}>",
-			"footer": "Page {0}/{1}"
-		}
-	},
-	"remove": {
-		"description": "Remove a specific song from the queue.",
-		"usage": "<index>",
-		"mustBeInChannel": "You must be in a voice channel to use this command.\n(or have the `administrator` permission to bypass this.)",
-		"invalidIndex": "Invalid index **{0}** provided, there are only **{1}** songs in the queue.",
-		"removed": "Removed the entry **{0}**, **{1}**"
 	},
 	"play": {
 		"description": "Play a song.",
@@ -73,5 +47,31 @@
 			"title": "Added To Queue",
 			"description": "Added **{0}** by **{1}** to the queue.\nEstimated time until playing: **{2}**"
 		}
+	},
+	"queue": {
+		"description": "List all of the songs in the queue.",
+		"usage": "[page]",
+		"empty": "The queue is currently empty.",
+		"invalidPage": "Invalid page provided. Page number must be between **1** an **{0}**.",
+		"embed": {
+			"title": "Queue for {0}",
+			"description": "added by <@!{0}>",
+			"footer": "Page {0}/{1}"
+		}
+	},
+	"remove": {
+		"description": "Remove a specific song from the queue.",
+		"usage": "<index>",
+		"mustBeInChannel": "You must be in a voice channel to use this command.\n(or have the `administrator` permission to bypass this.)",
+		"invalidIndex": "Invalid index **{0}** provided, there are only **{1}** songs in the queue.",
+		"removed": "Removed the entry **{0}**, **{1}**"
+	},
+	"stop": {
+		"description": "Stop the music playback.",
+		"usage": "",
+		"mustBeInChannel": "You must be in a voice channel to use this command.\n(or have the `administrator` permission to bypass this.)",
+		"notInChannel": "I don't seem to be in a voice channel.",
+		"notPlaying": "I don't seem to be playing anything.",
+		"stopped": "Stopped playback and left the voice channel."
 	}
 }
