@@ -245,7 +245,7 @@ export default class Cluster {
 									status: s.status,
 									guilds: this.client.guilds.filter(g => g.shard.id === s.id).length,
 									largeGuilds: this.client.guilds.filter(g => g.shard.id === s.id && g.large).length,
-									channels: this.client.guilds.filter(g => g.shard.id === s.id).reduce((a, b) => a | b.channels.size, 0)
+									channels: this.client.guilds.filter(g => g.shard.id === s.id).reduce((a, b) => a + b.channels.size, 0)
 								}]),
 								users: this.client.users.size,
 								voiceConnections: this.client.voiceConnections.size,
