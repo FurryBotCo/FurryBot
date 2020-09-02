@@ -20,9 +20,9 @@ export default new Command(["snipe"], __filename)
 		if (!ch.permissionsOf(msg.author.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userCantSee`));
 		if (!ch.permissionsOf(this.bot.user.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfCantSee`));
 
-		let content = await Redis.get(`snipe:delete:${msg.channel.id}:content`);
-		const author = await Redis.get(`snipe:delete:${msg.channel.id}:author`);
-		const time = await Redis.get(`snipe:delete:${msg.channel.id}:time`);
+		let content = await Redis.get(`snipe:delete:${ch.id}:content`);
+		const author = await Redis.get(`snipe:delete:${ch.id}:author`);
+		const time = await Redis.get(`snipe:delete:${ch.id}:time`);
 
 		if (!content || !author || !time) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noSnipes`, [ch.id]));
 
@@ -31,9 +31,9 @@ export default new Command(["snipe"], __filename)
 		const u = await this.bot.getRESTUser(author);
 
 
-		await Redis.del(`snipe:delete:${msg.channel.id}:content`);
-		await Redis.del(`snipe:delete:${msg.channel.id}:author`);
-		await Redis.del(`snipe:delete:${msg.channel.id}:time`);
+		await Redis.del(`snipe:delete:${ch.id}:content`);
+		await Redis.del(`snipe:delete:${ch.id}:author`);
+		await Redis.del(`snipe:delete:${ch.id}:time`);
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

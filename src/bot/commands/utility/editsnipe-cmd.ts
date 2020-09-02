@@ -20,10 +20,10 @@ export default new Command(["editsnipe", "esnipe", "es"], __filename)
 		if (!ch.permissionsOf(msg.author.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userCantSee`));
 		if (!ch.permissionsOf(this.bot.user.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfCantSee`));
 
-		let oldContent = await Redis.get(`snipe:edit:${msg.channel.id}:oldContent`);
-		let newContent = await Redis.get(`snipe:edit:${msg.channel.id}:newContent`);
-		const author = await Redis.get(`snipe:edit:${msg.channel.id}:author`);
-		const time = await Redis.get(`snipe:edit:${msg.channel.id}:time`);
+		let oldContent = await Redis.get(`snipe:edit:${ch.id}:oldContent`);
+		let newContent = await Redis.get(`snipe:edit:${ch.id}:newContent`);
+		const author = await Redis.get(`snipe:edit:${ch.id}:author`);
+		const time = await Redis.get(`snipe:edit:${ch.id}:time`);
 
 		if (!oldContent || !newContent || !author || !time) return msg.reply(`{lang:${cmd.lang}.noSnipes|${ch.id}}`);
 		const i = newContent.match(new RegExp("((https?:\/\/)?(discord((app)?\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
@@ -33,10 +33,10 @@ export default new Command(["editsnipe", "esnipe", "es"], __filename)
 
 		const u = await this.bot.getRESTUser(author);
 
-		await Redis.del(`snipe:edit:${msg.channel.id}:oldContent`);
-		await Redis.del(`snipe:edit:${msg.channel.id}:newContent`);
-		await Redis.del(`snipe:edit:${msg.channel.id}:author`);
-		await Redis.del(`snipe:edit:${msg.channel.id}:time`);
+		await Redis.del(`snipe:edit:${ch.id}:oldContent`);
+		await Redis.del(`snipe:edit:${ch.id}:newContent`);
+		await Redis.del(`snipe:edit:${ch.id}:author`);
+		await Redis.del(`snipe:edit:${ch.id}:time`);
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
