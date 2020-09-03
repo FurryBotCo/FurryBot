@@ -17,6 +17,7 @@ export default new Command(["e621", "e6"], __filename)
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		// @FIXME ratelimiting?
+		if (this.e6Active.includes(msg.channel.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.alreadyRunning`, [config.emojis.default.stop]));
 		if (!msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.permsRequired`));
 		const noVideo = msg.dashedArgs.value.includes("no-video");
 		const noFlash = msg.dashedArgs.value.includes("no-flash");
@@ -44,6 +45,7 @@ export default new Command(["e621", "e6"], __filename)
 			embed: e.toJSON()
 		});
 		for (const r of reactions) await m.addReaction(r);
+		this.e6Active.push(msg.channel.id);
 		function filtering() {
 			return [
 				`**{lang:${cmd.lang}.filterTitle}**`,
@@ -69,6 +71,7 @@ export default new Command(["e621", "e6"], __filename)
 		await setPost(0);
 		const remove = (async () => {
 			if (int) clearTimeout(int);
+			this.e6Active.splice(this.e6Active.indexOf(msg.channel.id), 1);
 			this.bot.off("messageReactionAdd", f);
 			await m.removeReactions().catch(err => null);
 		});

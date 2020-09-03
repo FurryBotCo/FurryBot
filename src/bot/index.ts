@@ -44,6 +44,7 @@ class FurryBot extends Base {
 		}
 	};
 	api: API;
+	e6Active: string[];
 	// this is stored here to avoid making the info command take at least 1 second on each run
 	// will this make it inaccurate? Well yes, of course, but it makes the command not sit there stalling,
 	// waiting for the test to finish
@@ -61,6 +62,7 @@ class FurryBot extends Base {
 		};
 		this.api = new API(this);
 		this.cpuUsage = 0;
+		this.e6Active = [];
 	}
 
 	async loadCommands() {
