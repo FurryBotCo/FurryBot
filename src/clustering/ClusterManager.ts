@@ -167,12 +167,12 @@ export default class ClusterManager {
 					.setColor(Colors.gold)
 					.setTimestamp(new Date().toISOString())
 					.setTitle("Fully Ready")
-					.setDescription(`Client is fully ready, with (approximately) ${this.stats.guilds} servers.`)
+					.setDescription(`Client is fully ready, with (approximately) ${this.stats?.guilds || "Unknown"} servers.`)
 					.setFooter(`${this.options.shardCount} Shard${this.options.shardCount !== 1 ? "s" : ""} | ${this.options.clusterCount} Cluster${this.options.clusterCount !== 1 ? "s" : ""}`)
 					.toJSON()
 			});
 			this.ready = true;
-			Logger.info("Cluster Manager", `Fully ready, with (approximately) ${this.stats.guilds} servers.`);
+			Logger.info("Cluster Manager", `Fully ready, with (approximately) ${this.stats?.guilds || "Unknown"} servers.`);
 		} else {
 			this.sendTo(id, "CONNECT", null);
 		}

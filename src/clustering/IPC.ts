@@ -4,6 +4,12 @@ import Logger from "../util/Logger";
 import { DEBUG, EVAL_CODES } from "./Constants";
 import Stats from "./Stats";
 
+function parse(d: Function | string) {
+	if (typeof d === "string") return d;
+	if (typeof d === "function") d = d.toString();
+	return `(async()=>{${d.slice(d.indexOf("{") + 1, d.lastIndexOf("}")).trim()}})()`;
+}
+
 class EvalError extends Error {
 	constructor(name: string, message: string, stack: string) {
 		super(message);
@@ -99,18 +105,18 @@ export default class IPC {
 		}
 	}
 
-	async broadcastEval<R = any>(code: string): Promise<(Clustering.EvalResponse<R> & { clusterId: number; })[]> {
+	async broadcastEval<R = any>(code: ((this: Cluster) => Promise<any>) | string): Promise<(Clustering.EvalResponse<R> & { clusterId: number; })[]> {
 		return Promise.all(Array.from(Array(this.cluster.options.clusterCount).keys()).map(async (id) => this.evalAtCluster<R>(id, code).then(v => ({ ...v, clusterId: id }))));
 	}
 
-	async evalAtCluster<R = any>(id: number, code: string) {
+	async evalAtCluster<R = any>(id: number, code: ((this: Cluster) => Promise<any>) | string) {
 		return new Promise<Clustering.EvalResponse<R>>((resolve, reject) => {
 			const callbackId = crypto.randomBytes(32).toString("hex");
 			this.cluster.sendMessage("COMMAND", {
 				type: "evalAtCluster",
 				id,
 				callbackId,
-				code
+				code: parse(code)
 			});
 			setTimeout(() => {
 				resolve({
@@ -126,13 +132,13 @@ export default class IPC {
 		});
 	}
 
-	async evalAtMaster<R = any>(code: string) {
+	async evalAtMaster<R = any>(code: ((this: Cluster) => Promise<any>) | string) {
 		return new Promise<Clustering.EvalResponse<R>>((resolve, reject) => {
 			const callbackId = crypto.randomBytes(32).toString("hex");
 			this.cluster.sendMessage("COMMAND", {
 				type: "evalAtMaster",
 				callbackId,
-				code
+				code: parse(code)
 			});
 			this.cb.set(callbackId, {
 				resolve,
