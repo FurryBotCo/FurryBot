@@ -14,6 +14,7 @@ import db, { mdb } from "../../util/Database";
 import Language from "../../util/Language";
 import crypto from "crypto";
 import Timers from "../../util/Timers";
+import * as fs from "fs-extra";
 
 export default new ClientEvent("messageCreate", async function (message, update) {
 	const t = new Timers(config.developers.includes(message.author.id), message.channel.id); // `${message.channel.id}/${message.id}/${message.author.id}`);
