@@ -1,6 +1,5 @@
 import FurryBot from "../../bot";
 import db, { mdb } from "../Database";
-import { emptyDir } from "fs-extra";
 import { ObjectId } from "mongodb";
 import Eris from "eris";
 import Logger from "../Logger";
@@ -52,7 +51,7 @@ export default class TimedActionsHandler {
 		const u = this.#client.bot.users.get(entry.userId) || await this.#client.bot.getRESTUser(entry.userId).catch(err => null);
 		if (!c.settings.modlog) return this.deleteEntry(entry);
 		const ch = (g.channels.get(c.settings.modlog) || this.#client.bot.getRESTChannel(c.settings.modlog).catch(err => null)) as Eris.GuildTextableChannel;
-		if (!ch || !ch.permissionsOf) {
+		if (!ch || typeof ch.permissionsOf !== "function") {
 			await this.deleteEntry(entry);
 			await c.edit({
 				settings: {
@@ -60,6 +59,7 @@ export default class TimedActionsHandler {
 				}
 			});
 			Logger.warn("Timed Actions Handler", `Failed to send modlog to "${entry.guildId}" because its modlog channel does not exist.`);
+			return;
 		}
 
 		if (["sendMessages", "embedLinks"].some(p => !ch.permissionsOf(this.#client.bot.user.id).has(p))) {
@@ -70,6 +70,7 @@ export default class TimedActionsHandler {
 				}
 			});
 			Logger.warn("Timed Actions Handler", `Failed to send modlog to "${entry.guildId}" because I am missing permissions.`);
+			return;
 		}
 
 		await this.deleteEntry(entry);
@@ -85,7 +86,7 @@ export default class TimedActionsHandler {
 		const u = this.#client.bot.users.get(entry.userId) || await this.#client.bot.getRESTUser(entry.userId).catch(err => null);
 		if (!c.settings.modlog) return this.deleteEntry(entry);
 		const ch = (g.channels.get(c.settings.modlog) || this.#client.bot.getRESTChannel(c.settings.modlog).catch(err => null)) as Eris.GuildTextableChannel;
-		if (!ch || !ch.permissionsOf) {
+		if (!ch || typeof ch.permissionsOf !== "function") {
 			await this.deleteEntry(entry);
 			await c.edit({
 				settings: {
@@ -93,6 +94,7 @@ export default class TimedActionsHandler {
 				}
 			});
 			Logger.warn("Timed Actions Handler", `Failed to send modlog to "${entry.guildId}" because its modlog channel does not exist.`);
+			return;
 		}
 
 		if (["sendMessages", "embedLinks"].some(p => !ch.permissionsOf(this.#client.bot.user.id).has(p))) {
@@ -103,6 +105,7 @@ export default class TimedActionsHandler {
 				}
 			});
 			Logger.warn("Timed Actions Handler", `Failed to send modlog to "${entry.guildId}" because I am missing permissions.`);
+			return;
 		}
 
 		if (!g.roles.has(c.settings.muteRole)) {
