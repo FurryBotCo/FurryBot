@@ -10,6 +10,12 @@
 		"description": "Evaluate code.",
 		"usage": "<code>"
 	},
+	"dependencies": {
+		"description": "Show the version of installed dependencies.",
+		"usage": "",
+		"titleMain": "Main Dependencies #{0}",
+		"titleDev": "Development Dependencies #{0}"
+	},
 	"reload": {
 		"description": "Reload something.",
 		"usage": "<cmd/cat/all>",
