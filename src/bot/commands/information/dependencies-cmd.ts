@@ -10,8 +10,8 @@ import Eris from "eris";
 export default new Command(["dependencies", "dep"], __filename)
 	.setBotPermissions([])
 	.setUserPermissions([])
-	.setRestrictions(["developer"])
-	.setCooldown(0, true)
+	.setRestrictions([])
+	.setCooldown(1e4, true)
 	.setExecutor(async function (msg, cmd) {
 		const dep: {
 			[k in "main" | "dev" | string]: {

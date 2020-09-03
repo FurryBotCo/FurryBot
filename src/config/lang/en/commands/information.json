@@ -1,4 +1,10 @@
 {
+	"dependencies": {
+		"description": "Show the dependencies I use for operation.",
+		"usage": "",
+		"titleMain": "Main Dependencies #{0}",
+		"titleDev": "Development Dependencies #{0}"
+	},
 	"info": {
 		"description": "Get some info about me.",
 		"usage": "",
