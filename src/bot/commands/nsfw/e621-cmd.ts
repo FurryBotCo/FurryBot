@@ -24,12 +24,12 @@ export default new Command(["e621", "e6"], __filename)
 		if (t.every(j => j.indexOf("order") === -1)) t.push("order:favcount");
 		if (noVideo) t.push("-type:webm");
 		else if (noFlash) t.push("-type:swf");
-		const img = await E6API.listPosts(t, 50, null, null, config.apis.e621.blacklistedTags);
+		const img = await E6API.listPosts(t, 50, null, null, config.apis.e621.blacklistedTags).then(v => v.filter(p =>
+			noVideo && p.file.ext === "webm" ? false :
+				noFlash && p.file.ext === "swf" ? false :
+					true));
 		if (img.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noPosts`));
-		for (const p of img) {
-			if (noVideo && p.file.ext === "webm") img.splice(img.indexOf(p), 1);
-			if (noFlash && p.file.ext === "swf") img.splice(img.indexOf(p), 1);
-		}
+
 		const reactions = [config.emojis.default.arrows.right, config.emojis.default.stop, config.emojis.default.arrows.left];
 		let v = 0;
 		const e = new EmbedBuilder(msg.gConfig.settings.lang)
@@ -75,10 +75,11 @@ export default new Command(["e621", "e6"], __filename)
 
 		let int = setTimeout(remove, 6e4);
 
-		async function reactionHandler(this: FurryBot, message: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, userID: string) {
+		async function reactionHandler(this: FurryBot, message: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, reactor: Eris.Member | string) {
+			if (reactor instanceof Eris.Member) reactor = reactor.id;
 			if (message.id !== m.id) return;
-			await m.removeReaction(emoji.id || emoji.name, userID);
-			if (!reactions.includes(emoji.name) || userID !== msg.author.id) return;
+			await m.removeReaction(emoji.id || emoji.name, reactor);
+			if (!reactions.includes(emoji.name) || reactor !== msg.author.id) return;
 			switch (emoji.name) {
 				case reactions[0]: { // back
 					v--;
