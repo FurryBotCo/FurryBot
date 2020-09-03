@@ -26,6 +26,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 	/* start dm */
 	t.start("dm");
+	// @FIXME DM LOGGING
 	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) {
 		await this.sh.track("stats", "directMessages", "general");
 		await this.sh.track("stats", "directMessages", "session");

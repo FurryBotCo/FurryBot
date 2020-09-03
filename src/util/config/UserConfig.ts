@@ -42,7 +42,7 @@ export default class UserConfig {
 		return this;
 	}
 
-	async mongoEdit<T = UserConfig>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
+	async mongoEdit<T = UserConfig>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption<T>) {
 		const j = await mdb.collection<T>("users").findOneAndUpdate({ id: this.id } as any, d, opt);
 		await this.reload();
 		return j;

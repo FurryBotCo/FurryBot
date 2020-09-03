@@ -66,7 +66,7 @@ export default class GuildConfig {
 		return this;
 	}
 
-	async mongoEdit<T = GuildConfig>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption) {
+	async mongoEdit<T = GuildConfig>(d: UpdateQuery<T>, opt?: FindOneAndUpdateOption<T>) {
 		const j = await mdb.collection<T>("guilds").findOneAndUpdate({ id: this.id } as any, d, opt);
 		await this.reload();
 		return j;
