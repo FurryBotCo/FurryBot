@@ -53,6 +53,7 @@
 	"restrictions": "restrictions",
 	"servers": "servers",
 	"shard": "shard",
+	"cluster": "cluster",
 	"stats": "stats",
 	"status": "status",
 	"supportServer": "support server",

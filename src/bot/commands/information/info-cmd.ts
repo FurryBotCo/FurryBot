@@ -35,6 +35,7 @@ export default new Command(["info"], __filename)
 					`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$}: ${((d.total - d.free) / 1000 / 1000 / 1000).toFixed(2)}GB / ${(d.total / 1000 / 1000 / 1000).toFixed(2)}GB`,
 					`${config.emojis.default.dot} {lang:other.words.uptime$ucwords$}: ${Time.ms(process.uptime() * 1000, true)} (${Time.secondsToHMS(process.uptime())})`,
 					`${config.emojis.default.dot} {lang:other.words.shard$ucwords$}: ${msg.channel.guild.shard.id + 1}/${st.shards.size}`,
+					`${config.emojis.default.dot} {lang:other.words.cluster$ucwords$}: ${this.cluster.id + 1}/${this.cluster.options.clusterCount}`,
 					`${config.emojis.default.dot} {lang:other.words.guilds$ucwords$}: ${st.guilds}`,
 					`${config.emojis.default.dot} {lang:other.words.largeGuilds$ucwords$}: ${st.largeGuilds}`,
 					`${config.emojis.default.dot} {lang:other.words.users$ucwords$}: ${st.users}`,
