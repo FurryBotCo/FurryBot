@@ -254,7 +254,14 @@
 		"tooManyServers": "Not showing names/ids, user has too many in common (>30).",
 		"cs": "[Shard #][ID][Member Count] Name",
 		"csn": "[Shard #][Member Count] Name",
-		"list": "Server List #{0}"
+		"list": "Server List #{0}",
+		"flags": "This command has some flags that can be utilized. Provide them as arguments to use them.\n\n`--show-location` - Show the server's cluster id & shard id.\n`--show-id` - Show the server's id.\nYou can also use `--show-all` to use all of them.",
+		"info": {
+			"location": "[Cluster # / Shard #]",
+			"id": "[ID]",
+			"memberCount": "[Member Count]",
+			"name": "Name"
+		}
 	},
 	"settings": {
 		"description": "Edit this servers settings.",
