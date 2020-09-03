@@ -217,7 +217,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 	/* start disable */
 	t.start("disable");
-	if (msg.gConfig.disable.length > 0 && !config.developers.includes(msg.author.id) && !msg.member.permission.has("administrator")) {
+	if (msg.gConfig.disable.length > 0 && !config.developers.includes(msg.author.id) && !msg.member.permissions.has("administrator")) {
 		const a = msg.gConfig.disable.filter((d: any) => d.type === "server" && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
 		const b = msg.gConfig.disable.filter((d: any) => d.type === "user" && d.id === msg.author.id && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
 		const c = msg.gConfig.disable.filter((d: any) => d.type === "role" && msg.member.roles.includes(d.id) && (d.all || (d.command && msg.cmd.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd.category)));
