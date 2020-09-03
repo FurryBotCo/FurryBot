@@ -12,6 +12,9 @@ export default new Command(["seen"], __filename)
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		// @TODO across clusters
+		const showCluster = msg.dashedArgs.value.includes("cluster");
+		const showShard = msg.dashedArgs.value.includes("shard");
+		const showIds = msg.dashedArgs.value.includes("show-ids");
 		let user = msg.args.length === 0 || !msg.args ? msg.author : await msg.getMemberFromArgs().then(m => !m ? null : m.user);
 		if (!user) user = await msg.getUserFromArgs();
 
@@ -26,7 +29,7 @@ export default new Command(["seen"], __filename)
 		let i = 0;
 
 		for (const s of seen) {
-			const t = `[#${s.shard.id + 1}] ${s.name} (${s.id})`;
+			const t = `[#${s.shard.id + 1}]${showIds ? `[${s.id}]` : ""}[${s.memberCount}] ${s.name}`;
 			if (!guilds[i]) guilds[i] = "";
 			if (guilds[i].length > 1000 || +guilds[i].length + t.length > 1000) {
 				i++;
@@ -46,7 +49,7 @@ export default new Command(["seen"], __filename)
 
 		const embed = new EmbedBuilder(msg.gConfig.settings.lang)
 			.setTitle(`{lang:${cmd.lang}.amountTitle|${seen.length}|${user.username}#${user.discriminator}|${user.id}}`)
-			.setDescription(`{lang:${cmd.lang}.amountDesc|${seen.length}}\n\n{lang:${cmd.lang}.cs}`)
+			.setDescription(`{lang:${cmd.lang}.amountDesc|${seen.length}}\n\n{lang:${cmd.lang}.cs${showIds ? "" : "n"}}`)
 			.setColor(Math.random() * 0xFFFFFF)
 			.setTimestamp(new Date().toISOString());
 

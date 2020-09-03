@@ -153,7 +153,8 @@
 			"listDesc": "List the warnings a user has.",
 			"removeDesc": "Remove a warning from a user.",
 			"clearDesc": "Clear a users warnings.",
-			"noPerms": "No permissions are required for this subcommand."
+			"noPerms": "No permissions are required for this subcommand.",
+			"example": "Example: `{0}warnings list <user>`"
 		},
 		"list": {
 			"noWarnings": "The user **{0}** has no warnings to list.",

@@ -16,7 +16,7 @@ export default new Command(["warnings"], __filename)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 2) throw new CommandError("ERR_INVALID_USAGE", cmd);
 
-		const member = await msg.getMemberFromArgs();
+		const member = await msg.getMemberFromArgs(1);
 		if (!member) return msg.channel.createMessage({
 			embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_MEMBER", true)
 		});
@@ -108,6 +108,8 @@ export default new Command(["warnings"], __filename)
 					`{lang:${cmd.lang}.help.subNotice}`,
 					`\\* - {lang:${cmd.lang}.help.requiresPerm1|manageMessages}`,
 					`\\+ - {lang:${cmd.lang}.help.requiresPerm1|manageServer}`,
+					"",
+					`{lang:${cmd.lang}.help.example|${msg.gConfig.settings.prefix}}`,
 					"",
 					`\`list\` - {lang:${cmd.lang}.help.listDesc}`,
 					`(\\*) \`remove\` - {lang:${cmd.lang}.help.removeDesc}`,
