@@ -46,7 +46,7 @@ export default new Command(["info"], __filename)
 					"**{lang:other.words.creators$ucwords$}**:",
 					`${config.emojis.default.dot} [Donovan_DMC](https://furry.cool)`,
 					"",
-					"**{lang:other.words.othe$ucwords$r}**:",
+					"**{lang:other.words.other$ucwords$}**:",
 					`${config.emojis.default.dot} {lang:other.words.library$ucwords$}: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev) (**${Eris.VERSION}**, \`${pkgLock.dependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
 					`${config.emojis.default.dot} {lang:other.words.apiVersion$ucwords$}: ${Eris.Constants.REST_VERSION}`,
 					`${config.emojis.default.dot} {lang:other.words.gatewayVersion$ucwords$}: ${Eris.Constants.GATEWAY_VERSION}`,
