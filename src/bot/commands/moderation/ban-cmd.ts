@@ -17,7 +17,7 @@ export default new Command(["ban"], __filename)
 	.setRestrictions([])
 	.setCooldown(1e3, true)
 	.setExecutor(async function (msg, cmd) {
-		const a = [...msg.args];
+		const a = [...msg.args], noDM = msg.dashedArgs.value.includes("no-dm");
 		let time, deleteDays = 1;
 		if (Object.keys(msg.dashedArgs.keyValue).includes("days")) {
 			deleteDays = Number(msg.dashedArgs.keyValue.days);
@@ -66,7 +66,7 @@ export default new Command(["ban"], __filename)
 		}
 
 		let m: Eris.Message;
-		if (!user.bot && msg.channel.guild.members.has(user.id)) m = await user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, `other.dm.ban${time === 0 ? "Permanent" : ""}`, [msg.channel.guild.name, Time.ms(time, true), reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
+		if (!noDM && !user.bot && msg.channel.guild.members.has(user.id)) m = await user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, `other.dm.ban${time === 0 ? "Permanent" : ""}`, [msg.channel.guild.name, Time.ms(time, true), reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
 		await msg.channel.guild.banMember(user.id, deleteDays, `Ban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userBanned${time === 0 ? "" : "Timed"}`, [`${user.username}#${user.discriminator}`, Time.ms(time, true), reason])}***`).catch(err => null);
 			await this.m.createBanEntry(msg.channel, msg.author, user, time, deleteDays);
