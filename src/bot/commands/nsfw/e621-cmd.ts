@@ -80,7 +80,7 @@ export default new Command(["e621", "e6"], __filename)
 			else e.setImage(p.file.url).setDescription(`${filtering()}{lang:${cmd.lang}.post|https://e621.net/posts/${p.id}}`);
 			await m.edit({
 				embed: e.toJSON()
-			});
+			}).catch(err => null);
 		});
 
 		await setPost(0);
@@ -91,7 +91,7 @@ export default new Command(["e621", "e6"], __filename)
 			e.setFooter(`{lang:${cmd.lang}.inactive}`);
 			await m.edit({
 				embed: e.toJSON()
-			});
+			}).catch(err => null);
 			this.bot.off("messageReactionAdd", f);
 			await m.removeReactions().catch(err => null);
 		});
