@@ -244,10 +244,10 @@ export default new ClientEvent("messageCreate", async function (message, update)
 				beta: config.beta
 			};
 
-			const d = fs.readdirSync(config.dir.logs.spam).filter(d => !fs.lstatSync(`${config.dir.logs.spam}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.dir.logs.spam}/spam/${d}`).birthtimeMs + 1.2e5 > Date.now());
+			const d = fs.readdirSync(config.dir.logs.spam).filter(d => !fs.lstatSync(`${config.dir.logs.spam}/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.dir.logs.spam}/${d}`).birthtimeMs + 1.2e5 > Date.now());
 
 			if (d.length > 0) {
-				report = Internal.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.dir.logs.spam}/spam/${f}`).toString())), report);
+				report = Internal.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.dir.logs.spam}/${f}`).toString())), report);
 				spC = report.entries.length;
 				d.map(f => fs.unlinkSync(`${config.dir.logs.spam}/${f}`));
 			}
