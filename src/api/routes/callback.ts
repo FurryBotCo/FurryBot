@@ -20,14 +20,14 @@ export default class CallbackRoute extends Route {
 
 		app
 			.get("/discord.bio", async (req, res) => {
-				if (!req.session.user) {
-					req.session.return = req.originalUrl;
+				if (!req.data.user) {
+					req.data.return = req.originalUrl;
 					return res.redirect("/socials/discord");
 				}
 
 				const d = await phin({
 					method: "GET",
-					url: `https://api.discord.bio/v1/user/details/${req.session.user.id}`,
+					url: `https://api.discord.bio/v1/user/details/${req.data.user.id}`,
 					headers: {
 						"User-Agent": config.web.userAgent
 					}
@@ -36,15 +36,15 @@ export default class CallbackRoute extends Route {
 				if (d.statusCode !== 200) return res.status(400).end("It seems like you don't have a profile on discord.bio. Make sure you're signed in to the right account.");
 				const b = JSON.parse(d.body.toString());
 
-				const u = await db.getUser(req.session.user.id);
+				const u = await db.getUser(req.data.user.id);
 
-				if (u.socials.find(s => s.type === "discord.bio" && s.id === req.session.user.id)) {
+				if (u.socials.find(s => s.type === "discord.bio" && s.id === req.data.user.id)) {
 					await this.client.w.get("social").execute({
 						username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
 						avatarURL: "https://i.furry.bot/furry.png",
 						embeds: [
 							new EmbedBuilder("en")
-								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
+								.setAuthor(`${req.data.user.username}#${req.data.user.discriminator}`, req.data.user.avatarURL)
 								.setTitle("Duplicate Social Link: Discord.Bio")
 								.setTimestamp(new Date().toISOString())
 								.setDescription([
@@ -54,7 +54,7 @@ export default class CallbackRoute extends Route {
 								.toJSON()
 						]
 					});
-					Logger.debug("Discord.Bio Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) tried to link a duplicate Discord.Bio account, ${b.payload.user.details.slug} (${req.session.user.id}).`);
+					Logger.debug("Discord.Bio Social Callback", `User ${req.data.user.username}#${req.data.user.discriminator} (${req.data.user.id}) tried to link a duplicate Discord.Bio account, ${b.payload.user.details.slug} (${req.data.user.id}).`);
 					return res.status(400).end("Duplicate account detected. To refresh your handle, remove the account and log back in.");
 				}
 
@@ -62,19 +62,19 @@ export default class CallbackRoute extends Route {
 					$push: {
 						socials: {
 							type: "discord.bio",
-							id: req.session.user.id,
+							id: req.data.user.id,
 							slug: b.payload.user.details.slug
 						}
 					}
 				});
 
-				Logger.debug("Discord.Bio Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) linked their Discord.Bio account, ${b.payload.user.details.slug} (${req.session.user.id}).`);
+				Logger.debug("Discord.Bio Social Callback", `User ${req.data.user.username}#${req.data.user.discriminator} (${req.data.user.id}) linked their Discord.Bio account, ${b.payload.user.details.slug} (${req.data.user.id}).`);
 				await this.client.w.get("social").execute({
 					username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
 					avatarURL: "https://i.furry.bot/furry.png",
 					embeds: [
 						new EmbedBuilder("en")
-							.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
+							.setAuthor(`${req.data.user.username}#${req.data.user.discriminator}`, req.data.user.avatarURL)
 							.setTitle("Successful Social Link: Discord.Bio")
 							.setTimestamp(new Date().toISOString())
 							.setDescription([
@@ -87,8 +87,8 @@ export default class CallbackRoute extends Route {
 				return res.status(200).end(`Finished, check your profile (${config.defaults.prefix}uinfo).`);
 			})
 			.get("/reddit", async (req, res) => {
-				if (!req.session.user) {
-					req.session.return = req.originalUrl;
+				if (!req.data.user) {
+					req.data.return = req.originalUrl;
 					return res.redirect("/socials/discord");
 				}
 
@@ -106,7 +106,7 @@ export default class CallbackRoute extends Route {
 					}
 				}
 
-				if (!req.query.state || req.query.state !== req.session.state) return res.status(400).end("Invalid state.");
+				if (!req.query.state || req.query.state !== req.data.state) return res.status(400).end("Invalid state.");
 
 				if (!req.query.code) return res.status(400).end("Missing code.");
 
@@ -169,16 +169,16 @@ export default class CallbackRoute extends Route {
 					return res.status(500).end("Unknown internal error.");
 				}
 
-				const u = await db.getUser(req.session.user.id);
+				const u = await db.getUser(req.data.user.id);
 
 				if (u.socials.find(s => s.type === "reddit" && s.id === user.id)) {
-					Logger.debug("Reddit Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with a duplicate Reddit account, @${user.name} (${user.id}).`);
+					Logger.debug("Reddit Social Callback", `User ${req.data.user.username}#${req.data.user.discriminator} (${req.data.user.id}) signed in with a duplicate Reddit account, @${user.name} (${user.id}).`);
 					await this.client.w.get("social").execute({
 						username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
 						avatarURL: "https://i.furry.bot/furry.png",
 						embeds: [
 							new EmbedBuilder("en")
-								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
+								.setAuthor(`${req.data.user.username}#${req.data.user.discriminator}`, req.data.user.avatarURL)
 								.setTitle("Duplicate Social Link: Reddit")
 								.setTimestamp(new Date().toISOString())
 								.setDescription([
@@ -217,14 +217,14 @@ export default class CallbackRoute extends Route {
 					}
 				}).catch(err => null);
 
-				Logger.debug("Reddit Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with Reddit, @${user.name} (${user.id}).`);
+				Logger.debug("Reddit Social Callback", `User ${req.data.user.username}#${req.data.user.discriminator} (${req.data.user.id}) signed in with Reddit, @${user.name} (${user.id}).`);
 
 				await this.client.w.get("social").execute({
 					username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
 					avatarURL: "https://i.furry.bot/furry.png",
 					embeds: [
 						new EmbedBuilder("en")
-							.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
+							.setAuthor(`${req.data.user.username}#${req.data.user.discriminator}`, req.data.user.avatarURL)
 							.setTitle("Successful Social Link: Reddit")
 							.setTimestamp(new Date().toISOString())
 							.setDescription([
@@ -240,32 +240,32 @@ export default class CallbackRoute extends Route {
 				return res.status(200).end(`Finished, check your profile (${config.defaults.prefix}uinfo).`);
 			})
 			.get("/twitter", async (req, res) => {
-				if (!req.session.user) {
-					req.session.return = req.originalUrl;
+				if (!req.data.user) {
+					req.data.return = req.originalUrl;
 					return res.redirect("/socials/discord");
 				}
 
 				return Twitter.callback({
 					oauth_token: req.query.oauth_token,
 					oauth_verifier: req.query.oauth_verifier
-				}, req.session.tokenSecret, async (err, user) => {
+				}, req.data.tokenSecret, async (err, user) => {
 					if (err) {
 						Logger.error("Twitter Social Callback", err);
 						return res.status(500).end("Internal Server Error.");
 					}
 
-					delete req.session.tokenSecret;
+					delete req.data.tokenSecret;
 
-					const u = await db.getUser(req.session.user.id);
+					const u = await db.getUser(req.data.user.id);
 
 					if (u.socials.find(s => s.type === "twitter" && s.id === user.userId)) {
-						Logger.debug("Twitter Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with a duplicate Twitter account, @${user.userName} (${user.userId}).`);
+						Logger.debug("Twitter Social Callback", `User ${req.data.user.username}#${req.data.user.discriminator} (${req.data.user.id}) signed in with a duplicate Twitter account, @${user.userName} (${user.userId}).`);
 						await this.client.w.get("social").execute({
 							username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
 							avatarURL: "https://i.furry.bot/furry.png",
 							embeds: [
 								new EmbedBuilder("en")
-									.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
+									.setAuthor(`${req.data.user.username}#${req.data.user.discriminator}`, req.data.user.avatarURL)
 									.setTitle("Duplicate Social Link: Twitter")
 									.setTimestamp(new Date().toISOString())
 									.setDescription([
@@ -290,14 +290,14 @@ export default class CallbackRoute extends Route {
 						}
 					});
 
-					Logger.debug("Twitter Social Callback", `User ${req.session.user.username}#${req.session.user.discriminator} (${req.session.user.id}) signed in with Twitter, @${user.userName} (${user.userId}).`);
+					Logger.debug("Twitter Social Callback", `User ${req.data.user.username}#${req.data.user.discriminator} (${req.data.user.id}) signed in with Twitter, @${user.userName} (${user.userId}).`);
 
 					await this.client.w.get("social").execute({
 						username: `Furry Bot${config.beta ? " Beta " : " "}Socials Logs`,
 						avatarURL: "https://i.furry.bot/furry.png",
 						embeds: [
 							new EmbedBuilder("en")
-								.setAuthor(`${req.session.user.username}#${req.session.user.discriminator}`, req.session.user.avatarURL)
+								.setAuthor(`${req.data.user.username}#${req.data.user.discriminator}`, req.data.user.avatarURL)
 								.setTitle("Successful Social Link: Twitter")
 								.setTimestamp(new Date().toISOString())
 								.setDescription([
@@ -316,7 +316,7 @@ export default class CallbackRoute extends Route {
 			.get("/discord", async (req, res) => {
 				if (!req.query.code) return res.status(400).render("error", { title: "Bad Request", status: 400, message: "Missing 'code' in query, please try again later." });
 				if (!req.query.state) return res.status(400).render("error", { title: "Bad Request", status: 400, message: "Missing 'state' in query, please try again later." });
-				if (req.query.state !== req.session.state) return res.status(400).render("error", { title: "Bad Request", status: 400, message: "Invalid 'state' in query, please try again later." });
+				if (req.query.state !== req.data.state) return res.status(400).render("error", { title: "Bad Request", status: 400, message: "Invalid 'state' in query, please try again later." });
 
 				const c = await Internal.authorizeOAuth(req.query.code as string);
 
@@ -325,7 +325,7 @@ export default class CallbackRoute extends Route {
 					return res.status(500).render("error", { title: "Internal Error", status: 500, message: "We had an internal error while authorizing, please try again later." });
 				}
 
-				req.session.discord = {
+				req.data.discord = {
 					accessToken: c.access_token,
 					expiresIn: c.expires_in,
 					refreshToken: c.refresh_token,
@@ -333,15 +333,15 @@ export default class CallbackRoute extends Route {
 					time: Date.now()
 				};
 
-				const user = await Internal.getSelfUser(req.session.discord.accessToken);
+				const user = await Internal.getSelfUser(req.data.discord.accessToken);
 
 				if (!user) return res.status(500).render("error", { title: "Internal Error", status: 500, message: "We had an internal error while authorizing, please try again later." });
 
 				Logger.debug("Social Callback", `User ${user.username}#${user.discriminator} (${user.id}) signed in with Discord.`);
 
-				req.session.user = await client.bot.getRESTUser(user.id);
+				req.data.user = await client.bot.getRESTUser(user.id);
 
-				return res.redirect(req.session.return || "/");
+				return res.redirect(req.data.return || "/");
 			});
 	}
 }

@@ -13,30 +13,30 @@ export default class UnlinkRoute extends Route {
 
 		app
 			.use(async (req, res, next) => {
-				if (!req.session.user) {
-					req.session.return = req.originalUrl;
+				if (!req.data.user) {
+					req.data.return = req.originalUrl;
 					return res.redirect("/socials/discord");
 				} else return next();
 			})
 			.get("/", async (req, res) => res.status(200).render("unlink/index"))
 			.get("/twitter", async (req, res) => {
-				const u = await db.getUser(req.session.user.id);
+				const u = await db.getUser(req.data.user.id);
 
 				const t = u.socials.filter(s => s.type === "twitter");
 				if (t.length === 0) return res.status(400).end("Couldn't find any linked twitter accounts.");
 				else return res.status(200).render("unlink/twitter", { accounts: t });
 			})
 			.get("/reddit", async (req, res) => {
-				const u = await db.getUser(req.session.user.id);
+				const u = await db.getUser(req.data.user.id);
 
 				const t = u.socials.filter(s => s.type === "reddit");
 				if (t.length === 0) return res.status(400).end("Couldn't find any linked reddit accounts.");
 				else return res.status(200).render("unlink/reddit", { accounts: t });
 			})
-			.get("/discord.bio", async (req, res) => res.redirect(`/confirm?type=discord.bio&id=${req.session.user.id}`))
+			.get("/discord.bio", async (req, res) => res.redirect(`/confirm?type=discord.bio&id=${req.data.user.id}`))
 			.get("/confirm", async (req, res) => {
 				if (!req.query.type) return res.status(400).end("Missing type.");
-				const u = await db.getUser(req.session.user.id);
+				const u = await db.getUser(req.data.user.id);
 
 				switch (req.query.type.toString()) {
 					case "twitter": {

@@ -244,17 +244,17 @@ export default new ClientEvent("messageCreate", async function (message, update)
 				beta: config.beta
 			};
 
-			const d = fs.readdirSync(`${config.dir.logs}/spam`).filter(d => !fs.lstatSync(`${config.dir.logs.spam}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.dir.logs.spam}/spam/${d}`).birthtimeMs + 1.2e5 > Date.now());
+			const d = fs.readdirSync(config.dir.logs.spam).filter(d => !fs.lstatSync(`${config.dir.logs.spam}/spam/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.dir.logs.spam}/spam/${d}`).birthtimeMs + 1.2e5 > Date.now());
 
 			if (d.length > 0) {
 				report = Internal.combineReports(...d.map(f => JSON.parse(fs.readFileSync(`${config.dir.logs.spam}/spam/${f}`).toString())), report);
 				spC = report.entries.length;
-				d.map(f => fs.unlinkSync(`${config.dir.logs.spam}/spam/${f}`));
+				d.map(f => fs.unlinkSync(`${config.dir.logs.spam}/${f}`));
 			}
 
 			const reportId = crypto.randomBytes(10).toString("hex");
 
-			fs.writeFileSync(`${config.dir.logs}/spam/${msg.author.id}-${reportId}-cmd.json`, JSON.stringify(report));
+			fs.writeFileSync(`${config.dir.logs.spam}/${msg.author.id}-${reportId}-cmd.json`, JSON.stringify(report));
 
 			Logger.log([`Shard #${msg.channel.guild.shard.id}`, "Command Handler"], `Possible command spam from "${msg.author.tag}" (${msg.author.id}), VL: ${spC}, Report: ${config.beta ? `https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`);
 			await this.w.get("spam").execute({

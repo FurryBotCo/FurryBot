@@ -34,7 +34,7 @@ export default class PollHandler extends EventEmitter<{
 				if (!e) return;
 				const v = e.description.split("\n");
 				const l = Math.floor((p.end - d.getTime()) / 1e3) * 1e3;
-				Logger.debug("Poll Handler", Time.ms(l, true));
+				if (config.beta) Logger.debug("Poll Handler", Time.ms(l, true));
 
 				if (l <= 0) {
 					v[0] = `${Language.get(p.lang, "commands.utility.poll.time")}: **Finished**`;
@@ -52,21 +52,21 @@ export default class PollHandler extends EventEmitter<{
 							await p.message.edit({
 								embed: e
 							}).catch(err => null);
-							Logger.debug("Poll Handler", "15 second update");
+							if (config.beta) Logger.debug("Poll Handler", "15 second update");
 						}
 					} else if (l <= 6e5) {
 						if (l % 6e4 === 0) {
 							await p.message.edit({
 								embed: e
 							}).catch(err => null);
-							Logger.debug("Poll Handler", "60 second update");
+							if (config.beta) Logger.debug("Poll Handler", "60 second update");
 						}
 					} else {
 						if (l % 3e5 === 0) {
 							await p.message.edit({
 								embed: e
 							}).catch(err => null);
-							Logger.debug("Poll Handler", "5 minute update");
+							if (config.beta) Logger.debug("Poll Handler", "5 minute update");
 						}
 					}
 				}

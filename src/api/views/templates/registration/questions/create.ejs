@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+	<title>
+		Furry Bot Registration - Create Question
+	</title>
+	<style>
+		table,
+		td,
+		th {
+			border: 1px solid black;
+			text-align: center;
+			padding: 10px;
+		}
+
+		table {
+			border-collapse: collapse;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>
+		Create A Question For "<%= locals.serverName %>".
+	</h1>
+	<table>
+		<tbody id="main">
+			<tr>
+				<td>
+					Question Name (Max: 50) <span class="required"></span>
+				</td>
+				<td>
+					<input name="question-name" type="text" maxlength="50" placeholder="My Amazing Question">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Question Body / Description (Max: 500) <span class="required"></span>
+				</td>
+				<td>
+					<textarea name="question-body" maxlength="500" placeholder=""></textarea>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Question Type <span class="required"></span>
+				</td>
+				<td>
+					<select name="question-type" onchange="selectChange(this)">
+						<option disabled="disabled" selected="selected">Select An Option</option>
+						<option value="free-text">Free Text Input</option>
+						<option value="boolean">Boolean (true/false)</option>
+						<option value="number">Number</option>
+						<option value="values">Specific Values</option>
+					</select>
+				</td>
+			</tr>
+		</tbody>
+		<tbody id="number-min-max" style="display: none;">
+			<tr>
+				<td>
+					Number Minimum
+				</td>
+				<td>
+					<input type="number" name="number-minimum" placeholder="Leave empty for none">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Number Maximum
+				</td>
+				<td>
+					<input type="number" name="number-maximum" placeholder="Leave empty for none">
+				</td>
+			</tr>
+		</tbody>
+		<tbody id="boolean-roles" style="display: none;">
+			<tr>
+				<td>
+					&quot;False&quot; / &quot;No&quot; Role
+				</td>
+				<td>
+					<select name="boolean-false-role">
+						<option disabled="disabled" selected="selected">Select A Role</option>
+						<%- locals.roles.map(r => `<option value="${r.id}"${r.above || r.managed ? "disabled=\"disabled\"" : ""}>${r.name}</option>`).join("") %>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					&quot;True&quot; / &quot;Yes&quot; Role
+				</td>
+				<td>
+					<select name="boolean-true-role">
+						<option disabled="disabled" selected="selected">Select A Role</option>
+						<%- locals.roles.map(r => `<option value="${r.id}" ${r.above || r.managed ? "disabled=\"disabled\"" : ""}>${r.name}</option>`).join("") %>
+					</select>
+				</td>
+			</tr>
+		</tbody>
+		<tbody id="specific-values" style="display: none;">
+			<tr>
+				<td>
+					Allowed Values & Roles
+				</td>
+				<td id="allowed-values">
+					<button onclick="addEntry(true)" class="add-element">Add</button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<script>
+		function selectChange(e) {
+			const n = document.querySelector("tbody#number-min-max");
+			const b = document.querySelector("tbody#boolean-roles");
+			const s = document.querySelector("tbody#specific-values");
+			n.style.display = "none";
+			b.style.display = "none";
+			s.style.display = "none";
+			switch (e.value) {
+				case "free-text":
+					return;
+				case "number":
+					return n.style.display = "";
+				case "boolean":
+					return b.style.display = "";
+				case "values":
+					return s.style.display = "";
+			}
+		}
+
+		function addEntry(rm) {
+			const v =
+				'<%- locals.roles.map(r => `<option value="${r.id}" ${r.above || r.managed ? "disabled=\"disabled\"" : ""}>${r.name}</option>`).join("") %>';
+			const h = `\
+				<div>\
+					${rm ? `<button onclick="this.parentNode.parentNode.removeChild(this.parentNode)"
+						class="remove-element">-</button>` : ""}
+					<input type="text" name="allowed-values[]" maxlength="10" placeholder="Value (not case sensitive)">\
+					<select name="allow-values-roles[]">\
+						<option disabled="disabled" selected="selected">Select A Role</option>\
+						${v}\
+					</select>\
+				</div>\
+				`;
+			const d = document.createElement("div");
+			d.innerHTML = h;
+			document.querySelector("tbody#specific-values").querySelectorAll("td")[1].insertBefore(
+				d,
+				document.querySelector("button.add-element")
+			);
+		}
+
+		window.onload = (() => {
+			addEntry(false);
+		});
+	</script>
+</body>
+
+</html>

@@ -1,3 +1,4 @@
+/// <reference path="../util/@types/Express.d.ts" />
 import express from "express";
 import morgan from "morgan";
 import session from "express-session";
@@ -7,6 +8,8 @@ import http from "http";
 import https from "https";
 import * as fs from "fs-extra";
 import Logger from "../util/Logger";
+import onFinished from "on-finished";
+import SessionStore from "../util/SessionStore";
 
 export class Route {
 	client: FurryBot;
@@ -76,7 +79,17 @@ export default class API {
 			.use(express.json())
 			.use(express.urlencoded({
 				extended: true
-			}));
+			}))
+			.use(async (req, res, next) => {
+				if (req.session.id) {
+					req.data = SessionStore.get(req.session.id);
+					onFinished(res, () => {
+						SessionStore.set(req.sessionID, req.data);
+					});
+				}
+
+				return next();
+			});
 
 		fs
 			.readdirSync(`${__dirname}/routes`)

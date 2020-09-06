@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>Furry Bot - Server Selection</title>
+</head>
+
+<body>
+	<% if(!locals.servers) { %>
+	<h1>
+		<center>
+			No Servers Found.
+		</center>
+	</h1>
+	<% } else { %>
+	<h1>Select A Server To Manage</h1>
+	<%- locals.servers.map(s => `<a href="/registration/${s.id}">${s.name}</a>`).join("<br>") %>
+	<% } %>
+</body>
+
+</html>
