@@ -81,7 +81,7 @@ class Database {
 		}
 
 		const end = performance.now();
-		Logger.debug("Database", `Query for the user "${id}" took ${(end - start).toFixed(3)}ms.`);
+		if (config.beta || config.developers.includes(id)) Logger.debug("Database", `Query for the user "${id}" took ${(end - start).toFixed(3)}ms.`);
 
 		return d;
 	}
@@ -112,7 +112,7 @@ class Database {
 		}
 
 		const end = performance.now();
-		Logger.debug("Database", `Query for the guild "${id}" took ${(end - start).toFixed(3)}ms.`);
+		if (config.beta) Logger.debug("Database", `Query for the guild "${id}" took ${(end - start).toFixed(3)}ms.`);
 
 		return d;
 	}
