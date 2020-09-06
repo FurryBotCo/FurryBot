@@ -18,8 +18,10 @@
 		"filterNote": "You can filter videos by adding `--no-video`, and flash by adding `--no-flash`. Due to a limitation from e621, only one will be sent. The rest of the filtering will be done on our side.",
 		"videoFilter": "Filtering Video",
 		"flashFilter": "Filtering Flash",
-		"alreadyRunning": "You can only have one e621 command running at a time. Either click the {} reaction, or wait for it to timeout.",
-		"title": "E621 Posts"
+		"alreadyRunning": "You can only have one e621 command running at a time. Either click the {0} reaction, or wait for it to timeout. (about 60 seconds)",
+		"title": "E621 Posts",
+		"ratelimited": "Hey, slow down! Please wait a bit longer between navigating posts.",
+		"inactive": "Navigating Inactive."
 	},
 	"fursuitbutt": {
 		"description": "Get a picture of a fursuit butt.",

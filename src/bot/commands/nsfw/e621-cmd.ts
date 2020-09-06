@@ -16,12 +16,14 @@ export default new Command(["e621", "e6"], __filename)
 	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
-		// @FIXME ratelimiting?
+		// because we can't have nice things without jackasses ruining it,
+		// this has to have a ratelimiting system
 		if (this.e6Active.includes(msg.channel.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.alreadyRunning`, [config.emojis.default.stop]));
 		if (!msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.permsRequired`));
 		const noVideo = msg.dashedArgs.value.includes("no-video");
 		const noFlash = msg.dashedArgs.value.includes("no-flash");
 		const t = [...msg.args];
+		let ratelimited = false, rlTimeout: NodeJS.Timeout = null;
 		if (t.every(j => j.indexOf("order") === -1)) t.push("order:favcount");
 		if (noVideo) t.push("-type:webm");
 		else if (noFlash) t.push("-type:swf");
@@ -58,7 +60,18 @@ export default new Command(["e621", "e6"], __filename)
 				"\u200b"
 			].join("\n");
 		}
-		const setPost = (async (index: number) => {
+		const setPost = (async (index: number, limit?: boolean) => {
+			if (typeof limit === "undefined" || limit === true) {
+				if (ratelimited) {
+					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.ratelimited`));
+				} else {
+					ratelimited = true;
+					rlTimeout = setTimeout(() => {
+						ratelimited = false;
+						rlTimeout = null;
+					}, 3e3);
+				}
+			}
 			const p = img[index];
 			e.setFooter(`{lang:${cmd.lang}.num|${index + 1}|${img.length}}`, this.bot.user.avatarURL);
 			if (p.file.ext === "webm") e.removeImage().setDescription(`${filtering()}{lang:${cmd.lang}.video|https://e621.net/posts/${p.id}}`);
@@ -71,7 +84,12 @@ export default new Command(["e621", "e6"], __filename)
 		await setPost(0);
 		const remove = (async () => {
 			if (int) clearTimeout(int);
+			if (rlTimeout) clearTimeout(rlTimeout);
 			this.e6Active.splice(this.e6Active.indexOf(msg.channel.id), 1);
+			e.setFooter(`{lang:${cmd.lang}.inactive}`);
+			await m.edit({
+				embed: e.toJSON()
+			});
 			this.bot.off("messageReactionAdd", f);
 			await m.removeReactions().catch(err => null);
 		});
