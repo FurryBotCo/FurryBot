@@ -41,5 +41,24 @@
 		"missing1": "First text missing. You must provide some text separated by commas.",
 		"missing2": "Second text missing. You must provide some text separated by commas.",
 		"edited": "This message will be edited soon."
+	},
+	"leaderboard": {
+		"description": "Get the server leveling leaderboard.",
+		"usage": "[page]",
+		"noPages": "there don't seem to be any leaderboard pages. It may not have been populated yet, please be patient.",
+		"serverTooLarge": "this server is too large to display the leveling leaderboard.",
+		"invalidPage": "the provided page number was invalid. Valid pages: {0}",
+		"pageLessThan": "the page number cannot be less than one. Valid pages: {0}",
+		"pageMoreThan": "there are not that many pages. Valid pages: {0}",
+		"embed": {
+			"title": "Server Leaderboard",
+			"footer": "Page {0}/{1} | Skipped {2} Non Cached Users",
+			"until": "until level up"
+		}
+	},
+	"rank": {
+		"description": "Get a users rank.",
+		"usage": "[@user]",
+		"rank": "{0}'s Rank"
 	}
 }
