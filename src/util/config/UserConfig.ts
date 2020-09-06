@@ -31,7 +31,7 @@ export default class UserConfig {
 	}
 
 	private load(data: WithId<ConfigDataTypes<UserConfig, "id">>) {
-		if (data._id) delete data._id;
+		if (data?._id) delete data._id;
 		Internal.goKeys(this, data, config.defaults.config.user);
 		return this;
 	}

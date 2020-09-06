@@ -1,7 +1,6 @@
 import ClientEvent from "../../util/ClientEvent";
 import { Colors } from "../../util/Constants";
 import config from "../../config";
-import Redis from "../../util/Redis";
 import Eris from "eris";
 import Logger from "../../util/Logger";
 
@@ -26,7 +25,7 @@ export default new ClientEvent("guildDelete", async function (guild) {
 
 	const st = await this.ipc.getStats();
 
-	Logger.info([`Cluster #${this.cluster.id}`, `Shard #${guild.shard.id}`, "Guild Leave"], `Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members! This guild has been placed on shard ${guild.shard.id}. We now have ${st.guilds} guilds!`);
+	Logger.info([`Cluster #${this.cluster.id}`, `Shard #${guild.shard.id}`, "Guild Leave"], `Left guild ${guild.name} (${guild.id}), owner: ${owner}, this guild had ${guild.memberCount} members! We now have ${st.guilds - 1} guilds!`);
 
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Left!",

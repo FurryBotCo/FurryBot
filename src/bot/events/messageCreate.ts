@@ -17,6 +17,8 @@ import Timers from "../../util/Timers";
 import * as fs from "fs-extra";
 
 export default new ClientEvent("messageCreate", async function (message, update) {
+	if (config.beta && !config.developers.includes(message.author.id)) return;
+	console.log(config.defaults.config.user);
 	const t = new Timers(config.developers.includes(message.author.id), message.channel.id); // `${message.channel.id}/${message.id}/${message.author.id}`);
 	t.start("main");
 	t.start("stats.msg");

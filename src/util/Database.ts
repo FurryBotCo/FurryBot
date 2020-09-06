@@ -11,6 +11,7 @@ import crypto from "crypto";
 import Eris from "eris";
 import Time from "./Functions/Time";
 import { Colors } from "./Constants";
+import { performance } from "perf_hooks";
 
 class Database {
 	client: FurryBot;
@@ -55,12 +56,13 @@ class Database {
 	get mdb() { return this.mongo.db(config.db.botDb); }
 
 	async getUser(id: string): Promise<UserConfig> {
+		const start = performance.now();
 		let d: UserConfig;
 		d = await this.collection("users").findOne({ id }).then(res => !res ? null : new UserConfig(id, res));
 		try {
 			if (!d) {
 				d = await this.collection("users").insertOne({
-					...config.defaults.config.user,
+					...{ ...config.defaults.config.user },
 					id
 				} as any).then(res => new UserConfig(id, res.ops[0]));
 				Logger.info(["Database", "User"], `Created user entry "${id}".`);
@@ -78,10 +80,14 @@ class Database {
 			} else throw err;
 		}
 
+		const end = performance.now();
+		Logger.debug("Database", `Query for the user "${id}" took ${(end - start).toFixed(3)}ms.`);
+
 		return d;
 	}
 
 	async getGuild(id: string): Promise<GuildConfig> {
+		const start = performance.now();
 		let d: GuildConfig;
 		d = await this.collection("guilds").findOne({ id }).then(res => !res ? null : new GuildConfig(id, res));
 		try {
@@ -104,6 +110,9 @@ class Database {
 				}
 			} else throw err;
 		}
+
+		const end = performance.now();
+		Logger.debug("Database", `Query for the guild "${id}" took ${(end - start).toFixed(3)}ms.`);
 
 		return d;
 	}

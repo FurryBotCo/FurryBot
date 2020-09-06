@@ -40,7 +40,6 @@ export default new Command(["help", "h"], __filename)
 			const cat = this.cmd.getCategory(msg.args[0]);
 
 			if (c.cmd && c.cat) {
-				console.log("command");
 				const h = await c.cmd.runOverride("help", this, msg, c.cmd);
 				if (h === "DEFAULT") await this.cmd.handlers.runHelp(this, msg, c.cmd);
 			} else if (cat) {

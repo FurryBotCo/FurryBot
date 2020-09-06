@@ -24,15 +24,19 @@ export default class Internal {
 	 * @memberof Functions
 	 */
 	static goKeys(a: object, b: object, c: object): void {
-		const obj = Object.keys(c).length === 0 ? b : c;
+		// cloning because we don't want to edit the original defaults
+		// using this dirty method because spread leaves a deep reference
+		const d = JSON.parse(JSON.stringify(c));
+		const obj = Object.keys(d).length === 0 ? b : d;
+		if (a["id"]) d["id"] = a["id"]; // tslint:disable-line no-string-literal
 		Object.keys(obj).map(k => {
-			if (typeof c[k] === "object" && c[k] !== null) {
-				if (c[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? c[k] : b[k];
+			if (typeof d[k] === "object" && d[k] !== null) {
+				if (d[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? d[k] : b[k];
 				else {
-					if ([undefined, null, ""].includes(a[k])) a[k] = c[k];
-					if (![undefined, null, ""].includes(b[k])) return this.goKeys(a[k], b[k], c[k]);
+					if ([undefined, null, ""].includes(a[k])) a[k] = d[k];
+					if (![undefined, null, ""].includes(b[k])) return this.goKeys(a[k], b[k], d[k]);
 				}
-			} else return a[k] = [undefined].includes(b[k]) ? c[k] : b[k];
+			} else return a[k] = [undefined].includes(b[k]) ? d[k] : b[k];
 		});
 	}
 
