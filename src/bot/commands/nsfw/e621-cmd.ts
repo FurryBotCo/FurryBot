@@ -13,7 +13,9 @@ export default new Command(["e621", "e6"], __filename)
 		"attachFiles"
 	])
 	.setUserPermissions([])
-	.setRestrictions([])
+	.setRestrictions([
+		"nsfw"
+	])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		// because we can't have nice things without jackasses ruining it,
