@@ -67,7 +67,7 @@ export default new Command(["mute"], __filename)
 		if (member.roles.includes(msg.gConfig.settings.muteRole)) return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.alreadyMuted}`)
-				.setDescription(`{lang:${cmd.lang}.alreadyMutedDesc|${member.username}#${member.discriminator}|${msg.prefix}`)
+				.setDescription(`{lang:${cmd.lang}.alreadyMutedDesc|${member.username}#${member.discriminator}|${msg.prefix}}`)
 				.setColor(Colors.red)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setTimestamp(new Date().toISOString()).toJSON()
@@ -94,7 +94,7 @@ export default new Command(["mute"], __filename)
 		if ((b.member2.higher || b.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noMuteOther`, [`${member.username}#${member.discriminator}`]));
 		// if (user.permissions.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
 		const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
-		if (!member.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, `other.dm.mute${time === 0 ? "Permanent" : ""}`, [msg.channel.guild.name, Time.ms(time), reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
+		if (!member.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, `other.dm.mute${time === 0 ? "Permanent" : ""}`, [Time.ms(time, true), msg.channel.guild.name, reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
 
 		await member.addRole(msg.gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.muted`, [`${member.username}#${member.discriminator}`, reason])}***`).catch(noerr => null);

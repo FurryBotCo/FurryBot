@@ -16,7 +16,13 @@ export default class Strings {
 
 	static formatString(str: string, formatArgs: (string | number)[]) {
 		if ([undefined, null].includes(str)) return null;
-		formatArgs.map((a, i) => str = str?.replace(new RegExp(`\\{${i}\\}`, "g"), a?.toString()));
+		formatArgs.map((a, i) => {
+			// console.log("1", new RegExp(`\\{${i}\\}`, "g"));
+			// console.log("2", str);
+			// console.log("3", a);
+			// console.log("4", str?.replace(new RegExp(`\\{${i}\\}`, "g"), a?.toString()));
+			str = str?.replace(new RegExp(`\\{${i}\\}`, "g"), a?.toString());
+		});
 		return str;
 	}
 }
