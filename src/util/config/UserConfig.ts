@@ -25,6 +25,12 @@ export default class UserConfig {
 	};
 	marriage: string | null;
 	deletion: number | null;
+	donations: {
+		"ko-fi": {
+			name: string | null;
+		};
+		totalMonths: number;
+	};
 	constructor(id: string, data: ConfigDataTypes<UserConfig, "id">) {
 		this.id = id;
 		this.load.call(this, data);

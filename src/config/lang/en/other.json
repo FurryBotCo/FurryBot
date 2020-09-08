@@ -115,6 +115,26 @@
 		"manageWebhooks": "Manage Webhooks",
 		"manageEmojis": "Manage Emojis"
 	},
+	"donations": {
+		"ko-fi": {
+			"title": "Ko-Fi Donation!",
+			"extraInfo": "Extra Information",
+			"messageId": "Message ID",
+			"transactionId": "Transaction ID",
+			"timestamp": "Timestamp",
+			"public": "Public",
+			"email": "Email",
+			"subscription": "Subscription",
+			"firstSubscription": "First Subscription",
+			"discordUser": "Discord User",
+			"user": "Ko-Fi User",
+			"noAttempt": "No Attempt",
+			"dmStatus": "DM Status",
+			"dmFooter": "Thank You {0}{0}!",
+			"dmTitle": "Thank You For Donating!",
+			"dmDescription": "I (Donovan, the devloper) appreciate your contribution. It helps me keep this bot going. I've been doing this out of pocket for almost 3 years now, and I never imagined I'd get here. Currently, we don't have any perks. But things **are** planed in the future. If your donation lapses before we have perks, let me know as soon as some perks come out, and I'll hook you up with a free month.\n\nTotal Premium Months: {0}"
+		}
+	},
 	"selfDestructMessage": "This message will self destruct in {0} seconds.",
 	"test1": "hi",
 	"test2": "HELL{0}",

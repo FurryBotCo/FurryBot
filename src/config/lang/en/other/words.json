@@ -67,5 +67,11 @@
 	"version": "version",
 	"voiceConnections": "voice connections",
 	"xp": "xp",
-	"yes": "yes"
+	"yes": "yes",
+	"hidden": "hidden",
+	"amount": "amount",
+	"private": "private",
+	"message": "message",
+	"success": "succes",
+	"fail": "fail"
 }
