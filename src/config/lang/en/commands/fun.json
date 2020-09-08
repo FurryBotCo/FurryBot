@@ -18,7 +18,12 @@
 	"bap": {
 		"description": "Bap someone! Ouch!",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> smacks {1} hard on the snoot with a rolled up news paper!", "<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit themselves!", "<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit {2}"]
+		"possible": [
+			"<@!{0}> smacks {1} hard on the snoot with a rolled up news paper!",
+			// 95% sure this isn't proper, but it sounds better than "themselves"
+			"<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit themself!",
+			"<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit {2}"
+		]
 	},
 	"bellyrub": {
 		"description": "Give someone a nice belly rub -w-",
