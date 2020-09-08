@@ -304,6 +304,13 @@
 		"userCantSee": "You cannot snipe messages in channels you cannot see.",
 		"selfCantSee": "I cannot see that channel, so I cannot provide any snipes for it."
 	},
+	"steal": {
+		"description": "Steal an emoji from another server, and add it to this server.",
+		"usage": "<emoji> [name]",
+		"invalid": "That emoji seems to be invalid. (We could not fetch it.)",
+		"fail": "We failed to create that emoji, reason: **{0}**",
+		"success": "Created the emoji {0} with the name **{1}**."
+	},
 	"tag": {
 		"description": "Manages tags for this server.",
 		"usage": "<tag/create/delete/edit/list>",

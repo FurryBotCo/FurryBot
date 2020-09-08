@@ -50,7 +50,20 @@ export default class Request {
 	 * @returns {Promise<Buffer>}
 	 * @memberof Request
 	 */
-	static async fetchURL(url: string): Promise<Buffer> {
+	static async fetchURL(url: string, withHeaders: true): Promise<{
+		headers: http.IncomingHttpHeaders;
+		body: Buffer;
+		statusCode: number;
+		statusMessage: string;
+	}>;
+	static async fetchURL(url: string, withHeaders?: false): Promise<Buffer>;
+	static async fetchURL(url: string, withHeaders?: boolean): Promise<Buffer | {
+		headers: http.IncomingHttpHeaders;
+		body: Buffer;
+		statusCode: number;
+		statusMessage: string;
+	}> {
+		withHeaders = !!withHeaders;
 		return new Promise((a, b) => {
 			const uri = URL.parse(url);
 			(uri.protocol === "https:" ? https : http).request({
@@ -69,7 +82,13 @@ export default class Request {
 				res
 					.on("data", (d) => data.push(d))
 					.on("error", (err) => b(err))
-					.on("end", () => a(Buffer.concat(data)));
+					.on("end", () => a(withHeaders === true ? ({
+						headers: res.headers,
+						body: Buffer.concat(data),
+						statusCode: res.statusCode,
+						statusMessage: res.statusMessage
+					}) : Buffer.concat(data))
+					);
 			}).end();
 		});
 	}
@@ -85,7 +104,7 @@ export default class Request {
 	 * @memberof Request
 	 */
 	static async downloadImage(url: string, filename: string): Promise<void> {
-		return this.fetchURL(url).then(img => fs.writeFileSync(filename, img));
+		return this.fetchURL(url, false).then(img => fs.writeFileSync(filename, img));
 	}
 
 
