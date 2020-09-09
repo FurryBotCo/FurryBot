@@ -55,5 +55,7 @@ export default new Command(["lockdown"], __filename)
 
 		fs.writeFileSync(f, JSON.stringify(d));
 
+		await this.m.createLockdownEntry(msg.channel, msg.gConfig, msg.author);
+
 		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.finished`, [Object.keys(d[msg.channel.guild.id].channels).length]));
 	});

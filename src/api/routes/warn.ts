@@ -21,7 +21,7 @@ export default class WarnRoute extends Route {
 				if (!g) return res.status(404).json({ success: false, error: "invalid guild" });
 				const u: Eris.User = await client.bot.getRESTUser(req.params.user).catch(err => null);
 				const b: Eris.User = await client.bot.getRESTUser(req.body.blame).catch(err => null);
-				let ch: Eris.GuildTextableChannel, msg: Eris.Message<typeof ch>;
+				let ch: Eris.GuildTextableChannel;
 				if (!u) return res.status(404).json({ success: false, error: "invalid user" });
 				if (!b) return res.status(400).json({ success: false, error: "invalid blame" });
 				const id = await db.getGuild(g.id).then(v => v.getWarningId(u.id));
@@ -38,15 +38,14 @@ export default class WarnRoute extends Route {
 					reason: req.body.reason || "None Provided",
 					date: Date.now()
 				});
+				const e = await db.getGuild(g.id);
 
-				if (req.body.channel) msg = await client.m.createWarnEntry(ch, b, u, id, req.body.reason || "None Provided");
+				await client.m.createWarnEntry(ch, e, b, u, id, req.body.reason || "None Provided");
 
 
 				return res.status(200).json({
 					success: true,
 					data: {
-						channel: !ch ? null : ch.id,
-						msg: !ch ? null : msg.id,
 						guild: g.id,
 						user: u.id,
 						reason: req.body.reason || "None Provided",

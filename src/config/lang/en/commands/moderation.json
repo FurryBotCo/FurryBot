@@ -41,6 +41,43 @@
 		"alreadyDone": "The server seems to be locked down already. If you believe this is an error, please ask for help in our support server. (`support` command)",
 		"finished": "Lockdown finished. Updated **{0}** channels."
 	},
+	"modlog": {
+		"description": "Manage this server's moderation log.",
+		"usage": "",
+		"example": "{0}modlog set <#channel>",
+		"help": {
+			"main": "This command consists of several subcommands.",
+			"set": "`{0}modlog set <#channel>` - Set the modlog channel",
+			"disable": "`{0}modlog disable` - Disable the modlog.",
+			"list": "`{0}modlog list <@user>` - List a users modlog entries",
+			"clear": "`{0}modlog clear` - Remove all modlog entries."
+		},
+		"set": {
+			"cantCreate": "I do not have permissions to create webhooks in <#{0}>. Either update the channel's permissions, or chose a different channel.",
+			"creationError": "There wa an error while creating the webhook:\n**{0}**",
+			"title": "Moderation Log Set",
+			"desc": "Moderation actions will now be logged to this channel.",
+			"done": "Successfully set the modlog to <#{0}>."
+		},
+		"disable": {
+			"notEnabled": "The modlog is not enabled currently.",
+			"remove": "Would you like to delete the webhook that was used?\nAnswer **Yes** or **No**", // do NOT translate the yes / no, these are the accepted values
+			"invalid": "Invalid response.",
+			"title": "Moderation Logging Disabled",
+			"desc": "The modlog has been disabled by **{0}**.",
+			"deleteError": "There was an error while deleting the webhook:\n**{0}**",
+			"done": "Successfully disabled the modlog."
+		},
+		"list": {
+			"noEntries": "That user doesn't have any modlog entries to list.",
+			"invalidPage": "Invalid page **{0}**, provide a number between **1** and **{1}**.",
+			"footer": "Page {0} / {1} - {2} Total",
+			"title": "Modlog For {0}",
+			"name": "Case #{0}",
+			"legacy": "Unknown (Legacy)",
+			"note": "Note: due the the way old systems worked, this may not reflect all entries."
+		}
+	},
 	"mute": {
 		"description": "Stop someone from chatting.",
 		"usage": "<@member/id> [time] [reason]",

@@ -10,91 +10,70 @@ declare global {
 			pos: number;
 			reason: string;
 			type: string;
+			target: string;
 			guildId: string;
+			blame: string;
+			creationDate?: number; // old entries (before 9/XX/2020) will not have a creation date
 			messageId?: string;
 		}
 
 		interface ChannelLockEntry extends GenericEntry {
-			blame: string;
-			target: string;
 			type: "lock";
 		}
 
 		interface ChannelUnlockEntry extends GenericEntry {
-			blame: string;
-			target: string;
 			type: "unlock";
 		}
 
-		interface ServerLockdownEntry extends GenericEntry {
-			blame: string;
+		interface ServerLockdownEntry extends Omit<GenericEntry, "target"> {
 			type: "lockdown";
 		}
 
-		interface ServerUnlockdownEntry extends GenericEntry {
-			blame: string;
+		interface ServerUnlockdownEntry extends Omit<GenericEntry, "target"> {
 			type: "unlockdown";
 		}
 
 		interface WarnEntry extends GenericEntry {
-			blame: string;
-			target: string;
 			id: number;
 			type: "warn";
 		}
 
 		interface ClearWarningsEntry extends GenericEntry {
-			blame: string;
-			target: string;
 			totalWarnings: number;
 			type: "clearwarnings";
 		}
 
 		interface DeleteWarnEntry extends GenericEntry {
-			blame: string;
 			oldBlame: string;
-			target: string;
 			id: number;
 			type: "delwarn";
 		}
 
 		interface KickEntry extends GenericEntry {
-			blame: string;
-			target: string;
 			type: "kick";
 		}
 
 		interface UnbanEntry extends GenericEntry {
-			blame: string;
-			target: string;
 			type: "unban";
 		}
 
 		interface UnmuteEntry extends GenericEntry {
-			blame: string;
-			target: string;
 			type: "unmute";
 		}
 
 		interface SoftBanEntry extends GenericEntry {
-			blame: string;
-			target: string;
 			deleteDays?: number;
 			type: "softban";
 		}
 
 		interface BanEntry extends GenericEntry {
-			blame: string;
-			target: string;
-			time?: number;
+			expiry?: number;
 			deleteDays?: number;
 			type: "ban";
 		}
 
 		interface MuteEntry extends GenericEntry {
-			blame: string;
-			target: string;
-			time?: number;
+			expiry?: number;
 			type: "mute";
 		}
 

@@ -1,0 +1,214 @@
+import Eris from "eris";
+import Command from "../../../util/cmd/Command";
+import CommandError from "../../../util/cmd/CommandError";
+import { Colors } from "../../../util/Constants";
+import EmbedBuilder from "../../../util/EmbedBuilder";
+import Utility from "../../../util/Functions/Utility";
+import Language from "../../../util/Language";
+import chunk from "chunk";
+import { mdb } from "../../../util/Database";
+import Strings from "../../../util/Functions/Strings";
+import Time from "../../../util/Functions/Time";
+
+export default new Command(["modlog"], __filename)
+	.setBotPermissions([
+		"manageWebhooks"
+	])
+	.setUserPermissions([
+		"manageGuild"
+	])
+	.setRestrictions([])
+	.setCooldown(3e3, true)
+	.setExecutor(async function (msg, cmd) {
+		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd, "NONE_PROVIDED");
+
+		switch (msg.args[0].toLowerCase()) {
+			case "set": {
+				const ch = await msg.getChannelFromArgs(1, true, 0);
+				if (!ch) return msg.channel.createMessage({
+					embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_CHANNEL", true)
+				});
+
+				if (ch.permissionsOf(this.bot.user.id).has("manageWebhooks")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set.cantCreate`));
+
+				const w: Eris.Webhook | Error = await ch.createWebhook({
+					name: "Furry Bot Moderation Logging",
+					avatar: "https://i.furry.bot/furry.png"
+				}, `Modlog Set: ${msg.author.tag}`).catch(err => err);
+				if (w instanceof Error) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set.creationError`, [`${w.name}: ${w.message}`]));
+				await this.bot.executeWebhook(w.id, w.token, {
+					embeds: [
+						new EmbedBuilder(msg.gConfig.settings.lang)
+							.setTitle(`{lang:${cmd.lang}.set.title}`)
+							.setDescription(`{lang:${cmd.lang}.set.desc}`)
+							.setColor(Colors.gold)
+							.setTimestamp(new Date().toISOString())
+							.setAuthor(`${this.bot.user.username}#${this.bot.user.discriminator}`, this.bot.user.avatarURL)
+							.toJSON()
+					]
+				});
+				await msg.gConfig.edit({
+					modlog: {
+						enabled: true,
+						webhook: {
+							id: w.id,
+							token: w.token
+						}
+					}
+				});
+
+				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set.done`, [ch.id]));
+				break;
+			}
+
+			case "disable": {
+				if (!msg.gConfig.modlog.enabled) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.disable.notEnabled`));
+
+				await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.disable.remove`));
+				const c = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => !m.author.bot && m.author.id === msg.author.id, 1);
+				let v: boolean | null;
+				switch (c?.content?.toLowerCase()) {
+					case "yes":
+					case "y":
+					case "true": {
+						v = true;
+						break;
+					}
+
+					case "no":
+					case "n":
+					case "false": {
+						v = false;
+						break;
+					}
+
+					default: v = null;
+				}
+
+				if (v === null) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.disable.invalid`));
+
+				const w: Eris.Webhook | null = await this.bot.getWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token).catch(err => null);
+
+				if (w) {
+					await this.bot.executeWebhook(w.id, w.token, {
+						embeds: [
+							new EmbedBuilder(msg.gConfig.settings.lang)
+								.setTitle(`{lang:${cmd.lang}.disable.title}`)
+								.setDescription(`{lang:${cmd.lang}.disable.desc|${msg.author.tag}}`)
+								.setColor(Colors.red)
+								.setTimestamp(new Date().toISOString())
+								.toJSON()
+						],
+						wait: true
+					});
+					try {
+						await this.bot.deleteWebhook(w.id, w.token, `Modlog Disable: ${msg.author.tag}`);
+					} catch (e) {
+						await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.disable.deleteError`, [`${e.name}: ${e.message}`]));
+					}
+				}
+
+				await msg.gConfig.edit({
+					modlog: {
+						enabled: false,
+						webhook: {
+							id: null,
+							token: null
+						}
+					}
+				});
+
+				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.disable.done`));
+				break;
+			}
+
+			case "list": {
+				const user = await msg.getUserFromArgs(1, true, 0);
+				if (!user) return msg.channel.createMessage({
+					embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_USER", true)
+				});
+
+				const page = msg.args.length < 3 ? 1 : Number(msg.args[2]);
+				const entries = await mdb.collection<ModLogEntry.GenericEntry>("modlog").find({
+					target: user.id,
+					guildId: msg.channel.guild.id,
+					type: {
+						$in: [
+							"warn",
+							"kick",
+							"unban",
+							"unmute",
+							"softban",
+							"ban",
+							"mute"
+						]
+					}
+				}).toArray();
+				const pages = chunk(entries, 6);
+				if (pages.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.noEntries`));
+				if (page > pages.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.invalidPage`, [page, pages.length]));
+				const e = pages[page - 1];
+				let i = 0;
+
+				const em = new EmbedBuilder(msg.gConfig.settings.lang)
+					.setTitle(`{lang:${cmd.lang}.list.title|${user.username}#${user.discriminator}}`)
+					.setDescription(`{lang:${cmd.lang}.list.note}`)
+					.setAuthor(msg.author.tag, msg.author.avatarURL)
+					.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${entries.length}}`, this.bot.user.avatarURL)
+					.setColor(Colors.gold)
+					.setTimestamp(new Date().toISOString());
+
+				for (const v of e) {
+					i++;
+					const u: Eris.User | null = v.blame === "automatic" ? this.bot.user : await this.bot.users.get(v.blame) || await this.bot.getRESTUser(v.blame).catch(err => null);
+
+					em.addField(`{lang:${cmd.lang}.list.name|${v.pos}}`, [
+						`{lang:other.words.type$ucwords$}: **${Strings.ucwords(v.type)}**`,
+						`{lang:other.words.reason$ucwords$}: **${!u ? "{lang:other.words.unknown$ucwords$}" : `${u.username}#${u.discriminator}`}**`,
+						`{lang:other.words.time$ucwords$}: **${!v.creationDate ? `{lang:${cmd.lang}.list.legacy}` : Time.formatDateWithPadding(v.creationDate)}**`,
+						`{lang:other.words.reason$ucwords$}: ${v.reason}`
+					].join("\n"), true);
+
+					if ((i % 2) !== 0) em.addEmptyField(true);
+				}
+
+				return msg.channel.createMessage({
+					embed: em.toJSON()
+				});
+				break;
+			}
+
+			case "clear": {
+				break;
+			}
+
+			default: return new CommandError("ERR_INVALID_USAGE", cmd, "INVALID_SUBCOMMAND");
+		}
+	})
+	.setOverride("invalidUsage", async function (msg, cmd, err) {
+		switch (err.extra) {
+			case "NONE_PROVIDED":
+			case "INVALID_SUBCOMMAND": {
+				await msg.channel.createMessage({
+					embed: new EmbedBuilder(msg.gConfig.settings.lang)
+						.setAuthor(msg.author.tag, msg.author.avatarURL)
+						.setTitle("\u274c {lang:other.words.invalid$ucwords$} {lang:other.words.usage$ucwords$}")
+						.setDescription([
+							`{lang:${cmd.lang}.help.main}`,
+							`{lang:other.words.example$ucwords$}: \`{lang:${cmd.lang}.example|${msg.gConfig.settings.prefix}}\``,
+							`{lang:${cmd.lang}.help.set|${msg.gConfig.settings.prefix}}`,
+							`{lang:${cmd.lang}.help.disable|${msg.gConfig.settings.prefix}}`,
+							`{lang:${cmd.lang}.help.list|${msg.gConfig.settings.prefix}}`,
+							`{lang:${cmd.lang}.help.clear|${msg.gConfig.settings.prefix}}`
+						].join("\n"))
+						.setTimestamp(new Date().toISOString())
+						.setColor(Colors.red)
+						.setFooter("OwO", this.bot.user.avatarURL)
+						.toJSON()
+				});
+				break;
+			}
+
+			default: return "DEFAULT";
+		}
+	});

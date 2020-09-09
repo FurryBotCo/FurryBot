@@ -23,7 +23,7 @@ export default new Command(["unlock"], __filename)
 
 		await ch.editPermission(msg.channel.guild.id, o.allow, o.deny, "role");
 
-		await this.m.createUnlockEntry(msg.channel, msg.author, ch);
+		await this.m.createUnlockEntry(msg.channel, msg.gConfig, msg.author, ch);
 
 		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.removed`));
 	});

@@ -25,7 +25,7 @@ export default new Command(["lock"], __filename)
 
 		await ch.editPermission(msg.channel.guild.id, !o ? 0 : o.allow, !o ? 2048 : o.deny + 2048, "role");
 
-		await this.m.createLockEntry(msg.channel, msg.author, ch);
+		await this.m.createLockEntry(msg.channel, msg.gConfig, msg.author, ch);
 
 		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.executed`));
 	});

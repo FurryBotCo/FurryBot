@@ -35,7 +35,7 @@ export default new Command(["warn"], __filename)
 
 		if (!member.bot) await member.user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, "other.dm.warn", [msg.channel.guild.name, reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
 		await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.warned`, [`${member.username}#${member.discriminator}`, reason])}***`).then(async () => {
-			await this.m.createWarnEntry(msg.channel, msg.author, member, id, reason);
+			await this.m.createWarnEntry(msg.channel, msg.gConfig, msg.author, member, id, reason);
 		});
 
 		if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages") && msg.gConfig.settings.deleteModCommands) await msg.delete().catch(error => null);

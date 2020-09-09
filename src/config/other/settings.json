@@ -36,12 +36,6 @@
 		"dbName": "muteRole",
 		"description": "Sets the role to give to people when they are muted."
 	}, {
-		"type": "channel",
-		"subType": null,
-		"name": "Modlog Channel",
-		"dbName": "modlog",
-		"description": "Sets the channel to send modlog entries to (also enables the modlog)."
-	}, {
 		"type": "custom",
 		"subType": null,
 		"name": "Language",

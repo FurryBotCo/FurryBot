@@ -73,5 +73,7 @@
 	"private": "private",
 	"message": "message",
 	"success": "succes",
-	"fail": "fail"
+	"fail": "fail",
+	"type": "type",
+	"time": "time"
 }

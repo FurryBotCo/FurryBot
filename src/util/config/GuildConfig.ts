@@ -11,7 +11,6 @@ export default class GuildConfig {
 	settings: {
 		prefix: string;
 		lang: Languages;
-		modlog: string | null;
 		muteRole: string;
 		deleteModCommands: boolean;
 		commandImages: boolean;
@@ -48,6 +47,10 @@ export default class GuildConfig {
 		"voiceJoin" | "voiceLeave" | "voiceSwitch" | "voiceStateUpdate" |             // voice
 		"guildUpdate";
 	}[];
+	modlog: {
+		enabled: boolean;
+		channel: string | null;
+	};
 	deletion: number | null;
 	constructor(id: string, data: ConfigDataTypes<GuildConfig, "id">) {
 		this.id = id;
@@ -56,6 +59,7 @@ export default class GuildConfig {
 
 	private load(data: WithId<ConfigDataTypes<GuildConfig, "id">>) {
 		if (data._id) delete data._id;
+		delete data._id;
 		Internal.goKeys(this, data, config.defaults.config.guild);
 		return this;
 	}
@@ -109,6 +113,10 @@ export default class GuildConfig {
 
 	async getWarningId(userId: string) {
 		return mdb.collection<Warning>("warnings").find({ guildId: this.id, userId }).toArray().then(v => v.sort((a, b) => b.id - a.id)?.[0]?.id + 1 || 1);
+	}
+
+	async getModlogId() {
+		return (await mdb.collection<ModLogEntry.GenericEntry>("modlog").find({ guildId: this.id }).count()) + 1;
 	}
 
 	async checkPremium(): Promise<PremiumGuildEntry> {

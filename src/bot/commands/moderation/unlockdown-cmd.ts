@@ -39,6 +39,7 @@ export default new Command(["unlockdown"], __filename)
 
 		delete d[msg.channel.guild.id];
 		fs.writeFileSync(f, JSON.stringify(d));
+		await this.m.createUnlockdownEntry(msg.channel, msg.gConfig, msg.author);
 
 		await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.finished`, [i]));
 	});

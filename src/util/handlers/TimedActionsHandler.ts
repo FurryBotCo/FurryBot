@@ -8,10 +8,10 @@ import EmbedBuilder from "../EmbedBuilder";
 import { Colors } from "../Constants";
 
 export default class TimedActionsHandler {
-	#client: FurryBot;
+	client: FurryBot;
 	#interval: NodeJS.Timeout;
 	constructor(client: FurryBot) {
-		this.#client = client;
+		this.client = client;
 		this.#interval = setInterval(this.processEntries.bind(this), 1e3);
 	}
 
@@ -42,114 +42,95 @@ export default class TimedActionsHandler {
 	}
 
 	async handleBanEntry(entry: TimedEntry<"ban">) {
-		const g = this.#client.bot.guilds.get(entry.guildId) || await this.#client.bot.getRESTGuild(entry.guildId);
+		const g = await this.client.bot.getRESTGuild(entry.guildId);
 		if (!g) return this.deleteEntry(entry);
 
-		await g.unbanMember(entry.userId, "Automatic Unban").catch(err => null);
+		const user = await this.client.bot.getRESTUser(entry.userId).catch(err => null);
+		if (user === null) return this.deleteEntry(entry);
+		await g.unbanMember(user.id, "Automatic Unban").catch(err => null);
 
-		const c = await db.getGuild(entry.guildId);
-		const u = this.#client.bot.users.get(entry.userId) || await this.#client.bot.getRESTUser(entry.userId).catch(err => null);
-		if (!c.settings.modlog) return this.deleteEntry(entry);
-		const ch = (g.channels.get(c.settings.modlog) || this.#client.bot.getRESTChannel(c.settings.modlog).catch(err => null)) as Eris.GuildTextableChannel;
-		if (!ch || typeof ch.permissionsOf !== "function") {
-			await this.deleteEntry(entry);
-			await c.edit({
-				settings: {
-					modlog: null
+		const s = await db.getGuild(g.id);
+		let ch: Eris.GuildTextableChannel;
+		const l = await g.getRESTChannels();
+		const { enabled, webhook } = s.modlog;
+
+		if (enabled) {
+			const w: Eris.Webhook | null = await this.client.bot.getWebhook(webhook.id, webhook.token).catch(err => null);
+			if (w) ch = l.find(v => v.id === w.channel_id) as Eris.GuildTextableChannel;
+			else await s.edit({
+				modlog: {
+					enabled: false,
+					webhook: {
+						id: null,
+						token: null
+					}
 				}
 			});
-			Logger.warn("Timed Actions Handler", `Failed to send modlog to "${entry.guildId}" because its modlog channel does not exist.`);
-			return;
 		}
 
-		if (["sendMessages", "embedLinks"].some(p => !ch.permissionsOf(this.#client.bot.user.id).has(p))) {
-			await this.deleteEntry(entry);
-			await c.edit({
-				settings: {
-					modlog: null
-				}
-			});
-			Logger.warn("Timed Actions Handler", `Failed to send modlog to "${entry.guildId}" because I am missing permissions.`);
-			return;
-		}
+		if (!ch && g.systemChannelID) ch = l.find(c => c.id) as Eris.GuildTextableChannel;
+		else if (!ch) ch = null;
 
-		await this.deleteEntry(entry);
-		await this.#client.m.createUnbanEntry(ch, "automatic", u, Language.get(c.settings.lang, "other.modlog.autoExpiry"));
+		await this.client.m.createUnbanEntry(ch, s, "automatic", user, Language.get(s.settings.lang, "other.modlog.autoExpiry"));
 	}
 
 	async handleMuteEntry(entry: TimedEntry<"mute">) {
-		const g = this.#client.bot.guilds.get(entry.guildId) || await this.#client.bot.getRESTGuild(entry.guildId);
+		const g = await this.client.bot.getRESTGuild(entry.guildId);
 		if (!g) return this.deleteEntry(entry);
-		const m: Eris.Member = g.members.get(entry.userId) || await g.getRESTMember(entry.userId).catch(err => null);
 
-		const c = await db.getGuild(entry.guildId);
-		const u = this.#client.bot.users.get(entry.userId) || await this.#client.bot.getRESTUser(entry.userId).catch(err => null);
-		if (!c.settings.modlog) return this.deleteEntry(entry);
-		const ch = (g.channels.get(c.settings.modlog) || this.#client.bot.getRESTChannel(c.settings.modlog).catch(err => null)) as Eris.GuildTextableChannel;
-		if (!ch || typeof ch.permissionsOf !== "function") {
-			await this.deleteEntry(entry);
-			await c.edit({
-				settings: {
-					modlog: null
-				}
-			});
-			Logger.warn("Timed Actions Handler", `Failed to send modlog to "${entry.guildId}" because its modlog channel does not exist.`);
-			return;
-		}
+		const member = await g.getRESTMember(entry.userId);
 
-		if (["sendMessages", "embedLinks"].some(p => !ch.permissionsOf(this.#client.bot.user.id).has(p))) {
-			await this.deleteEntry(entry);
-			await c.edit({
-				settings: {
-					modlog: null
-				}
-			});
-			Logger.warn("Timed Actions Handler", `Failed to send modlog to "${entry.guildId}" because I am missing permissions.`);
-			return;
-		}
+		if (!member) return this.deleteEntry(entry);
 
-		if (!g.roles.has(c.settings.muteRole)) {
-			await this.deleteEntry(entry);
-			await c.edit({
+		const s = await db.getGuild(g.id);
+		let ch: Eris.GuildTextableChannel;
+		const l = await g.getRESTChannels();
+		const { enabled, webhook } = s.modlog;
+		if (!member.roles.includes(s.settings.muteRole)) return this.deleteEntry(entry);
+		if (!g.roles.has(s.settings.muteRole)) {
+			await s.edit({
 				settings: {
 					muteRole: null
 				}
 			});
-			return;
-		}
-
-		if (!m) {
-			await ch.createMessage({
-				embed: new EmbedBuilder(c.settings.lang)
-					.setTitle("{lang:other.modlog.autoUnmuteFail.title}")
-					.setDescription(`{lang:other.modlog.autoUnmuteFail.description|${!u ? "Unknown#0000" : `${u.username}#${u.discriminator}`}|${entry.userId}|${Language.get(c.settings.lang, "other.modlog.autoUnmuteFail.reasonNotPresent")}`)
-					.setTimestamp(new Date().toISOString())
-					.setColor(Colors.red)
-					.setAuthor(`${this.#client.bot.user.username}#${this.#client.bot.user.discriminator}`, this.#client.bot.user.avatarURL)
-					.toJSON()
-			});
 			return this.deleteEntry(entry);
 		}
 
-		if (!m.roles.includes(c.settings.muteRole)) return this.deleteEntry(entry);
+		const rm = await member.removeRole(s.settings.muteRole, "Automatic Unmute").then(() => true as const).catch(err => err as Error);
+		if (member.voiceState.mute) await member.edit({ mute: false }, "Automatic Unmute");
 
-		const v = await m.removeRole(c.settings.muteRole, "Automatic Unmute").catch(err => err);
-		if (m.voiceState.mute) m.edit({ mute: false }, "Automatic Unmute");
-
-		if (v === null) {
-			await ch.createMessage({
-				embed: new EmbedBuilder(c.settings.lang)
-					.setTitle("{lang:other.modlog.autoUnmuteFail.title}")
-					.setDescription(`{lang:other.modlog.autoUnmuteFail.description|${!u ? "Unknown#0000" : `${u.username}#${u.discriminator}`}|${entry.userId}|${v.name}: ${v.message}}`)
-					.setTimestamp(new Date().toISOString())
-					.setColor(Colors.red)
-					.setAuthor(`${this.#client.bot.user.username}#${this.#client.bot.user.discriminator}`, this.#client.bot.user.avatarURL)
-					.toJSON()
+		if (enabled) {
+			const w: Eris.Webhook | null = await this.client.bot.getWebhook(webhook.id, webhook.token).catch(err => null);
+			if (w) {
+				ch = l.find(v => v.id === w.channel_id) as Eris.GuildTextableChannel;
+				if (rm instanceof Error) {
+					await this.client.bot.executeWebhook(webhook.id, webhook.token, {
+						embeds: [
+							new EmbedBuilder(s.settings.lang)
+								.setTitle("{lang:other.modlog.autoUnmuteFail.title}")
+								.setDescription(`{lang:other.modlog.autoUnmuteFail.description|${member.username}#${member.discriminator}|${entry.userId}|${Language.get(s.settings.lang, "other.modlog.autoUnmuteFail.reasonNotPresent")}`)
+								.setTimestamp(new Date().toISOString())
+								.setColor(Colors.red)
+								.setAuthor(`${this.client.bot.user.username}#${this.client.bot.user.discriminator}`, this.client.bot.user.avatarURL)
+								.toJSON()
+						]
+					});
+					return this.deleteEntry(entry);
+				}
+			} else await s.edit({
+				modlog: {
+					enabled: false,
+					webhook: {
+						id: null,
+						token: null
+					}
+				}
 			});
-			return this.deleteEntry(entry);
 		}
 
-		await this.deleteEntry(entry);
-		await this.#client.m.createUnmuteEntry(ch, "automatic", u, Language.get(c.settings.lang, "other.modlog.autoExpiry"));
+		if (!ch && g.systemChannelID) ch = l.find(c => c.id) as Eris.GuildTextableChannel;
+		else if (!ch) ch = null;
+
+		await this.client.m.createUnmuteEntry(ch, s, "automatic", member, Language.get(s.settings.lang, "other.modlog.autoExpiry"));
 	}
 }

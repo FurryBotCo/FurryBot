@@ -93,7 +93,7 @@ export default new Command(["unmute"], __filename)
 
 		await member.removeRole(msg.gConfig.settings.muteRole, `Unmute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.unmuted`, [`${member.username}#${member.discriminator}`, reason])}***`).catch(noerr => null);
-			await this.m.createMuteEntry(msg.channel, msg.author, member, time, reason);
+			await this.m.createMuteEntry(msg.channel, msg.gConfig, msg.author, member, time, reason);
 			if (time !== 0) await this.t.addEntry("mute", time, Date.now() + time, member.id, msg.channel.guild.id, reason);
 		}).catch(async (err) => {
 			if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.englishOnly`));
