@@ -94,12 +94,12 @@ export default new Command(["mute"], __filename)
 		if ((b.member2.higher || b.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noMuteOther`, [`${member.username}#${member.discriminator}`]));
 		// if (user.permissions.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
 		const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
-		if (!member.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, `other.dm.mute${time === 0 ? "Permanent" : ""}`, [Time.ms(time, true), msg.channel.guild.name, reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
+		if (!member.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, `other.dm.mute${isNaN(time) || time === 0 ? "Permanent" : ""}`, [Time.ms(time, true), msg.channel.guild.name, reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
 
 		await member.addRole(msg.gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.muted`, [`${member.username}#${member.discriminator}`, reason])}***`).catch(noerr => null);
 			await this.m.createMuteEntry(msg.channel, msg.gConfig, msg.author, member, time, reason);
-			if (time !== 0) await this.t.addEntry("mute", time, Date.now() + time, member.id, msg.channel.guild.id, reason);
+			if (!isNaN(time) && time !== 0) await this.t.addEntry("mute", time, Date.now() + time, member.id, msg.channel.guild.id, reason);
 		}).catch(async (err) => {
 			if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.englishOnly`));
 			else {

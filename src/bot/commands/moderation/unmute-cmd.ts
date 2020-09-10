@@ -18,7 +18,6 @@ export default new Command(["unmute"], __filename)
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) throw new CommandError("ERR_INVALID_USAGE", cmd);
-		let time = 0;
 		// get member from message
 		const member = await msg.getMemberFromArgs();
 
@@ -70,31 +69,12 @@ export default new Command(["unmute"], __filename)
 				.setTimestamp(new Date().toISOString()).toJSON()
 		});
 
-		if (msg.args.length >= 2) {
-			try {
-				time = parseTime(msg.args[1], "ms");
-				if (time) {
-					const a = [...msg.args];
-					a.splice(1, 1);
-					msg.args = a;
-				}
-			}
-			catch (e) {
-				if (e instanceof Error) {// for typings, catch clause cannot be annotated (TS1196)
-					if (e.name !== "ERR_INVALID_FORMAT") throw e; // rethrow the error if it's not what we expect
-
-					return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.invalidTime"));
-				}
-			}
-		}
-
 		if (member.id === msg.member.id) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noSelf`));
 		const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
 
 		await member.removeRole(msg.gConfig.settings.muteRole, `Unmute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.unmuted`, [`${member.username}#${member.discriminator}`, reason])}***`).catch(noerr => null);
-			await this.m.createMuteEntry(msg.channel, msg.gConfig, msg.author, member, time, reason);
-			if (time !== 0) await this.t.addEntry("mute", time, Date.now() + time, member.id, msg.channel.guild.id, reason);
+			await this.m.createUnmuteEntry(msg.channel, msg.gConfig, msg.author, member, reason);
 		}).catch(async (err) => {
 			if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.englishOnly`));
 			else {
