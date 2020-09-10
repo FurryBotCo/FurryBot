@@ -9,6 +9,7 @@ import chunk from "chunk";
 import { mdb } from "../../../util/Database";
 import Strings from "../../../util/Functions/Strings";
 import Time from "../../../util/Functions/Time";
+import config from "../../../config";
 
 export default new Command(["modlog"], __filename)
 	.setBotPermissions([
@@ -70,6 +71,8 @@ export default new Command(["modlog"], __filename)
 			}
 
 			case "list": {
+				const dev = msg.dashedArgs.value.includes("dev");
+				if (dev && !config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.devOnlyFlag`));
 				const user = await msg.getUserFromArgs(1, true, 0);
 				if (!user) return msg.channel.createMessage({
 					embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_USER", true)
@@ -113,7 +116,10 @@ export default new Command(["modlog"], __filename)
 						`{lang:other.words.type$ucwords$}: **${Strings.ucwords(v.type)}**`,
 						`{lang:other.words.reason$ucwords$}: **${!u ? "{lang:other.words.unknown$ucwords$}" : `${u.username}#${u.discriminator}`}**`,
 						`{lang:other.words.time$ucwords$}: **${!v.creationDate ? `{lang:${cmd.lang}.list.legacy}` : Time.formatDateWithPadding(v.creationDate)}**`,
-						`{lang:other.words.reason$ucwords$}: ${v.reason}`
+						`{lang:other.words.reason$ucwords$}: ${v.reason}`,
+						...(dev ? [
+							`Internal ID: \`${v._id}\``
+						] : [])
 					].join("\n"), true);
 
 					if ((i % 2) !== 0) em.addEmptyField(true);

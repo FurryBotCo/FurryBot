@@ -73,7 +73,8 @@
 			"title": "Modlog For {0}",
 			"name": "Case #{0}",
 			"legacy": "Unknown (Legacy)",
-			"note": "Note: due the the way old systems worked, this may not reflect all entries."
+			"note": "Note: due the the way old systems worked, this may not reflect all entries.",
+			"devOnlyFlag": "The flag you provided is only accessible to developers."
 		}
 	},
 	"mute": {
@@ -197,7 +198,8 @@
 			"title": "Warnings for {0}",
 			"num": "Warning #{0}",
 			"reasonTooLong": "[REASON TOO LONG TO DISPLAY]",
-			"dateFormat": "Date Format"
+			"dateFormat": "Date Format",
+			"devOnlyFlag": "The flag you provided is only accessible to developers."
 		},
 		"remove": {
 			"noWarnings": "The user **{0}** has no warnings to remove.",

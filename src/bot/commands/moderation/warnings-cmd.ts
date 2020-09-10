@@ -7,6 +7,8 @@ import CommandError from "../../../util/cmd/CommandError";
 import { mdb } from "../../../util/Database";
 import chunk from "chunk";
 import Eris from "eris";
+import config from "../../../config";
+import { WithId } from "mongodb";
 
 export default new Command(["warnings"], __filename)
 	.setBotPermissions([])
@@ -21,13 +23,15 @@ export default new Command(["warnings"], __filename)
 			embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_MEMBER", true)
 		});
 
-		const w = await mdb.collection<Warning>("warnings").find({
+		const w = await mdb.collection<WithId<Warning>>("warnings").find({
 			guildId: msg.channel.guild.id,
 			userId: member.id
 		}).toArray();
 
 		switch (msg.args[0]?.toLowerCase()) {
 			case "list": {
+				const dev = msg.dashedArgs.value.includes("dev");
+				if (dev && !config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.devOnlyFlag`));
 				if (w.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.noWarnings`, [`${member.username}#${member.discriminator}`]));
 				const pages = chunk(w, 5);
 				const page = Number(msg.args[2] || 1);
@@ -50,7 +54,10 @@ export default new Command(["warnings"], __filename)
 									`{lang:other.words.blame$ucwords$}: ${!u ? `{lang:other.words.unknown$ucwords$}[${w.blameId}]` : `${u.username}#${u.discriminator}`}`,
 									`{lang:other.words.reason$ucwords$}: ${w.reason.length > 200 ? `{lang:${cmd.lang}.list.reasonTooLong}` : w.reason}`,
 									// I hate how long this line is
-									`{lang:other.words.date$ucwords$}: ${(d.getMonth() + 1).toString().padStart(2, "0")}/${d.getDate().toString().padStart(2, "0")}/${d.getFullYear()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}:${d.getSeconds().toString().padStart(2, "0")}`
+									`{lang:other.words.date$ucwords$}: ${(d.getMonth() + 1).toString().padStart(2, "0")}/${d.getDate().toString().padStart(2, "0")}/${d.getFullYear()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}:${d.getSeconds().toString().padStart(2, "0")}`,
+									...(dev ? [
+										`Internal ID: \`${w._id}\``
+									] : [])
 								].join("\n"),
 								inline: false
 							};
