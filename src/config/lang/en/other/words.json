@@ -75,5 +75,6 @@
 	"success": "succes",
 	"fail": "fail",
 	"type": "type",
-	"time": "time"
+	"time": "time",
+	"build": "build"
 }

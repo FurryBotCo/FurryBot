@@ -21,6 +21,7 @@ export default new Command(["info"], __filename)
 		const d = du.checkSync("/");
 		const st = await this.ipc.getStats();
 		if (!st) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.noStats"));
+		const [versionNumber, buildNumber] = pkg.version.split("-");
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
@@ -50,7 +51,7 @@ export default new Command(["info"], __filename)
 					`${config.emojis.default.dot} {lang:other.words.library$ucwords$}: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev) (**${Eris.VERSION}**, \`${pkgLock.dependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
 					`${config.emojis.default.dot} {lang:other.words.apiVersion$ucwords$}: ${Eris.Constants.REST_VERSION}`,
 					`${config.emojis.default.dot} {lang:other.words.gatewayVersion$ucwords$}: ${Eris.Constants.GATEWAY_VERSION}`,
-					`${config.emojis.default.dot} {lang:other.words.version$ucwords$}: ${pkg.version}`,
+					`${config.emojis.default.dot} {lang:other.words.version$ucwords$}: ${versionNumber} ({lang:other.words.build$ucwords$}: \`${buildNumber}\`)`,
 					`${config.emojis.default.dot} {lang:other.words.nodeVersion$ucwords$}: ${process.version}`,
 					`${config.emojis.default.dot} {lang:other.words.supportServer$ucwords$}: [${config.client.socials.discord}](${config.client.socials.discord})`,
 					`${config.emojis.default.dot} {lang:other.words.donate$ucwords$}: [${config.client.socials.patreon}](${config.client.socials.patreon})`
