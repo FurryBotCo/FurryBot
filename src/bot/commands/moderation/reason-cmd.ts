@@ -14,7 +14,7 @@ export default new Command(["reason"], __filename)
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 2) throw new CommandError("ERR_INVALID_USAGE", cmd);
-		if (!msg.gConfig.settings.modlog || !msg.channel.guild.channels.has(msg.gConfig.settings.modlog)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noModlog`));
+		if (!msg.gConfig.modlog.enabled || !msg.channel.guild.channels.has(msg.gConfig.modlog.channel)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noModlog`));
 		const id = Number(msg.args[0]);
 		const reason = msg.args.slice(1).join(" ");
 		if (reason.length > 200) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.tooLong`));
@@ -22,7 +22,7 @@ export default new Command(["reason"], __filename)
 		const entry = entries.find(e => e.pos === id);
 		if (isNaN(id) || !entry) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidId`, [msg.args[0]]));
 		if (!entry.messageId) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noMessage`, [msg.args[0]]));
-		const m = await (msg.channel.guild.channels.get(msg.gConfig.settings.modlog) as Eris.GuildTextableChannel).getMessage(entry.messageId);
+		const m = await (msg.channel.guild.channels.get(msg.gConfig.modlog.channel) as Eris.GuildTextableChannel).getMessage(entry.messageId);
 		if (!m) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.messageNotFound`));
 		const r = Language.get(msg.gConfig.settings.lang, "other.modlog.fields.reason");
 		let e: Eris.EmbedOptions, d: string[], f: string;

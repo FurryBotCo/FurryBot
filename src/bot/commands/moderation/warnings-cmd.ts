@@ -73,7 +73,7 @@ export default new Command(["warnings"], __filename)
 					userId: member.id,
 					id: j.id
 				});
-				await this.m.createDeleteWarningEntry(msg.channel, msg.author, member, j.blameId, j.id, reason);
+				await this.m.createDeleteWarningEntry(msg.channel, msg.gConfig, msg.author, member, j.blameId, j.id, reason);
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.done`, [j.id, `${member.username}#${member.discriminator}`]));
 				break;
 			}
@@ -88,7 +88,7 @@ export default new Command(["warnings"], __filename)
 					id: v.id
 				});
 				const reason = msg.args.slice(3)?.join("") || Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
-				await this.m.createClearWarningsEntry(msg.channel, msg.author, member, w.length, reason);
+				await this.m.createClearWarningsEntry(msg.channel, msg.gConfig, msg.author, member, w.length, reason);
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.done`, [w.length, `${member.username}#${member.discriminator}`]));
 				break;
 			}

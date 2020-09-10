@@ -1,6 +1,6 @@
 import FurryBot from "../bot";
 import Eris from "eris";
-import db, { mdb } from "./Database";
+import { mdb } from "./Database";
 import Language from "./Language";
 import EmbedBuilder from "./EmbedBuilder";
 import { Colors } from "./Constants";
@@ -23,25 +23,26 @@ export default class ModLogUtil {
 	}
 
 	async modLogCheck(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig) {
-		const { enabled, webhook } = gConfig.modlog;
-		if (enabled && webhook.id !== null && webhook.token !== null) {
-			const w = await this.client.bot.getWebhook(webhook.id, webhook.token).catch(err => null);
-			if (w === null) {
+		const { enabled } = gConfig.modlog;
+		const g: Eris.Guild | null = this.client.bot.guilds.get(gConfig.id) || await this.client.bot.getRESTGuild(gConfig.id).catch(err => null) || null;
+		let ml: Eris.GuildTextableChannel | null;
+		if (enabled) {
+			ml = g.channels.get(gConfig.modlog.channel) || await this.client.bot.getRESTChannel(gConfig.modlog.channel).catch(err => null) || null;
+			if (!ml) {
 				await gConfig.edit({
 					modlog: {
 						enabled: false,
-						webhook: {
-							id: null,
-							token: null
-						}
+						channel: null
 					}
 				});
 				await ch.createMessage(Language.get(gConfig.settings.lang, "other.modlog.invalidChannel")).catch(err => null);
-				return false;
 			}
 		}
 
-		return true;
+		return {
+			g,
+			ml
+		};
 	}
 
 	async createEntry(type: "lock", ...args: Parameters<ModLogUtil["createLockEntry"]>): Promise<Eris.Message<Eris.GuildTextableChannel>>;
@@ -80,24 +81,21 @@ export default class ModLogUtil {
 	async createLockEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.GuildTextableChannel, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.lock} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.red)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.name} <#${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.lock} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.red)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.name} <#${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -116,24 +114,21 @@ export default class ModLogUtil {
 	async createUnlockEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.GuildTextableChannel, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.unlock} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.green)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.name} <#${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.unlock} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.green)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.name} <#${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -152,23 +147,20 @@ export default class ModLogUtil {
 	async createLockdownEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.lockdown} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.red)
-						.setDescription([
-							`{lang:other.modlog.fields.reason}: ${reason}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.lockdown} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.red)
+					.setDescription([
+						`{lang:other.modlog.fields.reason}: ${reason}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -186,23 +178,20 @@ export default class ModLogUtil {
 	async createUnlockdownEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.unlockdown} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.green)
-						.setDescription([
-							`{lang:other.modlog.fields.reason}: ${reason}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.unlockdown} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.green)
+					.setDescription([
+						`{lang:other.modlog.fields.reason}: ${reason}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -220,25 +209,22 @@ export default class ModLogUtil {
 	async createWarnEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, id: number, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.warn} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.gold)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`,
-							`{lang:other.modlog.fields.id}: ${id}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.warn} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.gold)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`,
+						`{lang:other.modlog.fields.id}: ${id}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -258,25 +244,22 @@ export default class ModLogUtil {
 	async createClearWarningsEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, total: number, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.clearwarnings} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.green)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
-							`{lang:other.modlog.fields.totalWarnings}: ${total}`,
-							`{lang:other.modlog.fields.reason}: ${reason}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.clearwarnings} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.green)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
+						`{lang:other.modlog.fields.totalWarnings}: ${total}`,
+						`{lang:other.modlog.fields.reason}: ${reason}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -296,10 +279,10 @@ export default class ModLogUtil {
 	async createDeleteWarningEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, oldBlame: string, id: number, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
-		let res: Eris.Message<Eris.TextableChannel> | Error;
-		let b: string;
+
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
+		let res: Eris.Message<Eris.TextableChannel> | Error, b: string;
 		if (!oldBlame) b = "{lang:other.modlog.fields.unknown}";
 		else if (!oldBlame.match("^[0-9]{15,21}$")) b = oldBlame;
 		else if (ch.guild.members.has(oldBlame)) {
@@ -313,22 +296,19 @@ export default class ModLogUtil {
 			b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
 		}
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.delwarn} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.green)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`,
-							`{lang:other.modlog.fields.oldBlame}: ${b}`,
-							`{lang:other.modlog.fields.id}: ${id}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.delwarn} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.green)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`,
+						`{lang:other.modlog.fields.oldBlame}: ${b}`,
+						`{lang:other.modlog.fields.id}: ${id}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -349,24 +329,21 @@ export default class ModLogUtil {
 	async createKickEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.kick} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.red)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.kick} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.red)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -385,24 +362,21 @@ export default class ModLogUtil {
 	async createUnbanEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.User, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.unban} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.green)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.unban} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.green)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -421,24 +395,21 @@ export default class ModLogUtil {
 	async createUnmuteEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.unmute} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.green)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.unmute} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.green)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -457,25 +428,22 @@ export default class ModLogUtil {
 	async createSoftBanEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, deleteDays?: number, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.softban} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.red)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`,
-							`{lang:other.modlog.fields.deleteDays}: ${deleteDays || 0}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.softban} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.red)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`,
+						`{lang:other.modlog.fields.deleteDays}: ${deleteDays || 0}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -495,26 +463,23 @@ export default class ModLogUtil {
 	async createBanEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.User, expiry?: number, deleteDays?: number, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.ban} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.red)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`,
-							`{lang:other.modlog.fields.deleteDays}: ${deleteDays || 0}`,
-							`{lang:other.modlog.fields.time}: ${!expiry ? "{lang:other.modlog.fields.permanent}" : Time.ms(expiry, true)}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.ban} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.red)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`,
+						`{lang:other.modlog.fields.deleteDays}: ${deleteDays || 0}`,
+						`{lang:other.modlog.fields.time}: ${!expiry ? "{lang:other.modlog.fields.permanent}" : Time.ms(expiry, true)}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
@@ -535,25 +500,22 @@ export default class ModLogUtil {
 	async createMuteEntry(ch: Eris.GuildTextableChannel | null, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, expiry?: number, reason?: string): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
-		await this.modLogCheck(ch, gConfig);
-		const { enabled, webhook } = gConfig.modlog;
+		const { g, ml } = await this.modLogCheck(ch, gConfig);
+		const { enabled } = gConfig.modlog;
 		let res: Eris.Message<Eris.TextableChannel> | Error;
 		if (enabled) {
-			res = await this.client.bot.executeWebhook(webhook.id, webhook.token, {
-				embeds: [
-					new EmbedBuilder(gConfig.settings.lang)
-						.setAuthor(ch.guild.name, ch.guild.iconURL)
-						.setTitle(`{lang:other.modlog.titles.mute} | {lang:other.modlog.titles.general|${pos}}`)
-						.setColor(Colors.red)
-						.setDescription([
-							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
-							`{lang:other.modlog.fields.reason}: ${reason}`,
-							`{lang:other.modlog.fields.time}: ${!expiry ? "{lang:other.modlog.fields.permanent}" : Time.ms(expiry, true)}`
-						].join("\n"))
-						.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
-						.toJSON()
-				],
-				wait: true
+			res = await ml.createMessage({
+				embed: new EmbedBuilder(gConfig.settings.lang)
+					.setAuthor(g.name, g.iconURL)
+					.setTitle(`{lang:other.modlog.titles.mute} | {lang:other.modlog.titles.general|${pos}}`)
+					.setColor(Colors.red)
+					.setDescription([
+						`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
+						`{lang:other.modlog.fields.reason}: ${reason}`,
+						`{lang:other.modlog.fields.time}: ${!expiry ? "{lang:other.modlog.fields.permanent}" : Time.ms(expiry, true)}`
+					].join("\n"))
+					.setFooter(blame instanceof Eris.User ? `{lang:other.modlog.action|${blame.username}#${blame.discriminator}}` : Language.get(gConfig.settings.lang, "other.modlog.autoAction"), blame === "automatic" ? ch.client.user.avatarURL : blame.avatarURL)
+					.toJSON()
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}

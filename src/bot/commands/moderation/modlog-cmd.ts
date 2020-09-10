@@ -29,31 +29,25 @@ export default new Command(["modlog"], __filename)
 					embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_CHANNEL", true)
 				});
 
-				if (ch.permissionsOf(this.bot.user.id).has("manageWebhooks")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set.cantCreate`));
+				// could do a some but I want to send the perm to the user
+				for (const p of ["readMessages", "sendMessages"]) {
+					if (!ch.permissionsOf(this.bot.user.id).has(p)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set.missingPermission`, [ch.id, p]));
+				}
 
-				const w: Eris.Webhook | Error = await ch.createWebhook({
-					name: "Furry Bot Moderation Logging",
-					avatar: "https://i.furry.bot/furry.png"
-				}, `Modlog Set: ${msg.author.tag}`).catch(err => err);
-				if (w instanceof Error) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set.creationError`, [`${w.name}: ${w.message}`]));
-				await this.bot.executeWebhook(w.id, w.token, {
-					embeds: [
-						new EmbedBuilder(msg.gConfig.settings.lang)
-							.setTitle(`{lang:${cmd.lang}.set.title}`)
-							.setDescription(`{lang:${cmd.lang}.set.desc}`)
-							.setColor(Colors.gold)
-							.setTimestamp(new Date().toISOString())
-							.setAuthor(`${this.bot.user.username}#${this.bot.user.discriminator}`, this.bot.user.avatarURL)
-							.toJSON()
-					]
+				await ch.createMessage({
+					embed: new EmbedBuilder(msg.gConfig.settings.lang)
+						.setTitle(`{lang:${cmd.lang}.set.title}`)
+						.setDescription(`{lang:${cmd.lang}.set.desc}`)
+						.setColor(Colors.gold)
+						.setTimestamp(new Date().toISOString())
+						.setAuthor(`${this.bot.user.username}#${this.bot.user.discriminator}`, this.bot.user.avatarURL)
+						.toJSON()
 				});
+
 				await msg.gConfig.edit({
 					modlog: {
 						enabled: true,
-						webhook: {
-							id: w.id,
-							token: w.token
-						}
+						channel: ch.id
 					}
 				});
 
@@ -64,57 +58,10 @@ export default new Command(["modlog"], __filename)
 			case "disable": {
 				if (!msg.gConfig.modlog.enabled) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.disable.notEnabled`));
 
-				await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.disable.remove`));
-				const c = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => !m.author.bot && m.author.id === msg.author.id, 1);
-				let v: boolean | null;
-				switch (c?.content?.toLowerCase()) {
-					case "yes":
-					case "y":
-					case "true": {
-						v = true;
-						break;
-					}
-
-					case "no":
-					case "n":
-					case "false": {
-						v = false;
-						break;
-					}
-
-					default: v = null;
-				}
-
-				if (v === null) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.disable.invalid`));
-
-				const w: Eris.Webhook | null = await this.bot.getWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token).catch(err => null);
-
-				if (w) {
-					await this.bot.executeWebhook(w.id, w.token, {
-						embeds: [
-							new EmbedBuilder(msg.gConfig.settings.lang)
-								.setTitle(`{lang:${cmd.lang}.disable.title}`)
-								.setDescription(`{lang:${cmd.lang}.disable.desc|${msg.author.tag}}`)
-								.setColor(Colors.red)
-								.setTimestamp(new Date().toISOString())
-								.toJSON()
-						],
-						wait: true
-					});
-					try {
-						await this.bot.deleteWebhook(w.id, w.token, `Modlog Disable: ${msg.author.tag}`);
-					} catch (e) {
-						await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.disable.deleteError`, [`${e.name}: ${e.message}`]));
-					}
-				}
-
 				await msg.gConfig.edit({
 					modlog: {
 						enabled: false,
-						webhook: {
-							id: null,
-							token: null
-						}
+						channel: null
 					}
 				});
 
@@ -178,9 +125,10 @@ export default new Command(["modlog"], __filename)
 				break;
 			}
 
-			case "clear": {
+			// not implementing this yet
+			/*case "clear": {
 				break;
-			}
+			}*/
 
 			default: return new CommandError("ERR_INVALID_USAGE", cmd, "INVALID_SUBCOMMAND");
 		}
@@ -198,8 +146,8 @@ export default new Command(["modlog"], __filename)
 							`{lang:other.words.example$ucwords$}: \`{lang:${cmd.lang}.example|${msg.gConfig.settings.prefix}}\``,
 							`{lang:${cmd.lang}.help.set|${msg.gConfig.settings.prefix}}`,
 							`{lang:${cmd.lang}.help.disable|${msg.gConfig.settings.prefix}}`,
-							`{lang:${cmd.lang}.help.list|${msg.gConfig.settings.prefix}}`,
-							`{lang:${cmd.lang}.help.clear|${msg.gConfig.settings.prefix}}`
+							`{lang:${cmd.lang}.help.list|${msg.gConfig.settings.prefix}}`/*,
+							`{lang:${cmd.lang}.help.clear|${msg.gConfig.settings.prefix}}`*/
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)

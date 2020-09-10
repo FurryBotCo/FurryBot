@@ -6,7 +6,7 @@
 		"deleteMoreThan": "delete days cannot be more than 14.",
 		"timeLessThan": "time cannot be less than one (1).",
 		"timeInvalid": "invalid time.",
-		"alredyBanned": "User already banned",
+		"alreadyBanned": "User already banned",
 		"alreadyBannedDesc": "It looks like **{0}** is already banned here..",
 		"noBanSelf": "pretty sure you don't want to do this to yourself.",
 		"noBanOwner": "you cannot ban the server owner.",
@@ -53,8 +53,7 @@
 			"clear": "`{0}modlog clear` - Remove all modlog entries."
 		},
 		"set": {
-			"cantCreate": "I do not have permissions to create webhooks in <#{0}>. Either update the channel's permissions, or chose a different channel.",
-			"creationError": "There wa an error while creating the webhook:\n**{0}**",
+			"missingPermission": "I cannot set to <#{0}> because I am missing the permission **{1}** in that channel. Either update the permissions, or chose a different channel.",
 			"title": "Moderation Log Set",
 			"desc": "Moderation actions will now be logged to this channel.",
 			"done": "Successfully set the modlog to <#{0}>."
@@ -65,7 +64,6 @@
 			"invalid": "Invalid response.",
 			"title": "Moderation Logging Disabled",
 			"desc": "The modlog has been disabled by **{0}**.",
-			"deleteError": "There was an error while deleting the webhook:\n**{0}**",
 			"done": "Successfully disabled the modlog."
 		},
 		"list": {
