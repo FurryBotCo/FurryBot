@@ -39,13 +39,30 @@ export default class GuildConfig {
 	logEvents: {
 		channel: string;
 		type:
-		"channelCreate" | "channelDelete" | "channelUpdate" |                         // channel
-		"memberBan" | "memberUnban" | "memberJoin" | "memberLeave" | "memberUpdate" | // member
-		"roleCreate" | "roleDelete" | "roleUpdate" |                                  // role
-		"messageDelete" | "messageBulkDelete" | "messageEdit" |                       // message
-		"presenceUpdate" | "userUpdate" |                                             // user
-		"voiceJoin" | "voiceLeave" | "voiceSwitch" | "voiceStateUpdate" |             // voice
-		"guildUpdate";
+		"channelCreate" |
+		"channelDelete" |
+		"channelUpdate" |
+		"memberBan" | // guildBanAdd
+		"memberUnban" | // guildBanRemove
+		"memberJoin" | // guildMemberAdd
+		"memberLeave" | // guildMemberRemove
+		"memberUpdate" | // guildMemberUpdate
+		"roleCreate" | // guildRoleCreate
+		"roleDelete" | // guildRoleDelete
+		"roleUpdate" | // guildRoleUpdate
+		"messageDelete" |
+		"messageDeleteBulk" |
+		"messageEdit" | // messageUpdate
+		"presenceUpdate" |
+		"userUpdate" |
+		"voiceJoin" | // voiceChannelJoin
+		"voiceLeave" | // voiceChannelLeave
+		"voiceSwitch" | // voiceChannelSwitch
+		"voiceStateUpdate" |
+		"guildUpdate" |
+		"emojiCreate" | // guildEmojisUpdate
+		"inviteCreate" |
+		"inviteDelete";
 	}[];
 	modlog: {
 		enabled: boolean;
