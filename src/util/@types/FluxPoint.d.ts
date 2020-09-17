@@ -47,6 +47,8 @@ declare namespace FluxPoint {
 		type: "triangle";
 		x: number;
 		y: number;
+		width: number;
+		height: number;
 		color: Color;
 		cut: "topleft" | "topright" | "bottomleft" | "bottomright";
 	}

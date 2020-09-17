@@ -54,6 +54,9 @@ export default new Command(["ship"], __filename)
 			}
 		};
 
+		const color1 = Utility.getColorRole(member1)?.color || null;
+		const color2 = Utility.getColorRole(member2)?.color || null;
+
 		const img = await FluxPoint.custom({
 			base: {
 				type: "bitmap",
@@ -72,6 +75,32 @@ export default new Command(["ship"], __filename)
 					round: 0,
 					width: 256,
 					height: 256
+				},
+				{
+					type: "bitmap",
+					x: 256,
+					y: 0,
+					width: 256,
+					height: 256,
+					color: color1?.toString(16)?.padStart(6, "0") || "FFFFFF"
+				},
+				{
+					type: "triangle",
+					x: 256,
+					y: 0,
+					width: 128,
+					height: 256,
+					color: color2?.toString(16)?.padStart(6, "0") || "FFFFFF",
+					cut: ship.amount > 50 ? "topright" : "topleft"
+				},
+				{
+					type: "triangle",
+					x: 384,
+					y: 0,
+					width: 128,
+					height: 256,
+					color: color2?.toString(16)?.padStart(6, "0") || "FFFFFF",
+					cut: ship.amount > 50 ? "topleft" : "topright"
 				},
 				{
 					type: "url",

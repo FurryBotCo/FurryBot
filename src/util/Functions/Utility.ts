@@ -205,4 +205,13 @@ export default class Utility {
 			provided: args
 		};
 	}
+
+	static getTopRole(member: Eris.Member, filter?: (role: Eris.Role) => boolean) {
+		if (!filter) filter = () => true;
+		return member.roles.map(r => member.guild.roles.get(r)).filter(filter).sort((a, b) => b.position - a.position)[0];
+	}
+
+	static getColorRole(member: Eris.Member) {
+		return this.getTopRole(member, (role) => role.color !== 0);
+	}
 }
