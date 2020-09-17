@@ -186,4 +186,17 @@ export default class Internal {
 		if (typeof str !== "string") str = (str as any).toString();
 		return str.replace(/\u001B\[[0-9]{1,2}m/g, "");
 	}
+
+	static getDaysInMonth(month: number) { return new Date(new Date().getFullYear(), month, 0).getDate(); }
+
+
+	static getPaidTime(type: "db" | "main", amount: number, month?: number) {
+		month = month ?? new Date().getMonth() + 1;
+		const PRICE_DB = 25;
+		const PRICE_MAIN = 20;
+		const DAYS = this.getDaysInMonth(month);
+		const HOURLY = type === "db" ? PRICE_DB / DAYS : PRICE_MAIN / DAYS;
+
+		return ((Math.ceil((amount / HOURLY) * 10 / 5) * 5) / 10) * 24 * 60 * 60 * 1000;
+	}
 }

@@ -4,7 +4,9 @@ import UserConfig from "../../util/config/UserConfig";
 import { Colors } from "../../util/Constants";
 import db from "../../util/Database";
 import EmbedBuilder from "../../util/EmbedBuilder";
+import Internal from "../../util/Functions/Internal";
 import Time from "../../util/Functions/Time";
+import Language from "../../util/Language";
 
 export default class InfoRoute extends Route {
 	constructor() {
@@ -122,11 +124,13 @@ export default class InfoRoute extends Route {
 							totalMonths: user.donations.totalMonths + 1
 						}
 					});
+					const DB_TIME = Internal.getPaidTime("db", Number(b.amount));
+					const MAIN_TIME = Internal.getPaidTime("main", Number(b.amount));
 
 					d = await u.getDMChannel().then(dm => dm.createMessage({
 						embed: new EmbedBuilder(config.devLanguage)
 							.setTitle("{lang:other.donations.ko-fi.dmTitle}")
-							.setDescription(`{lang:other.donations.ko-fi.dmDescription|${user.donations.totalMonths}}`)
+							.setDescription(Language.get(config.devLanguage, "other.donations.ko-fi.dmDescription", [user.donations.totalMonths, Time.ms(DB_TIME, true, false), Time.ms(MAIN_TIME, true, false)], false, false).join("\n"))
 							.setFooter(`{lang:other.donations.ko-fi.dmFooter|${config.emojis.default.blueHeart}}`, client.bot.user.avatarURL)
 							.setTimestamp(new Date().toISOString())
 							.setColor(Colors.gold)
