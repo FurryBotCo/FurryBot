@@ -6,6 +6,7 @@ import EmbedBuilder from "../../../util/EmbedBuilder";
 import Request from "../../../util/Functions/Request";
 import Utility from "../../../util/Functions/Utility";
 import Language from "../../../util/Language";
+import FluxPoint from "../../../util/req/FluxPoint";
 
 export default new Command(["ship"], __filename)
 	.setBotPermissions([
@@ -53,8 +54,47 @@ export default new Command(["ship"], __filename)
 			}
 		};
 
-		const img = await Request.getImageFromURL(`https://api.furry.bot/V2/ship?avatars[]=${member1.user.avatarURL}&avatars[]=${member2.user.avatarURL}&shipImage=https://assets.furry.bot/ship/${ship.image}.png`);
-
+		const img = await FluxPoint.custom({
+			base: {
+				type: "bitmap",
+				x: 0,
+				y: 0,
+				width: 768,
+				height: 256,
+				color: "0, 0, 0, 0"
+			},
+			images: [
+				{
+					type: "url",
+					url: member1.user.avatarURL,
+					x: 0,
+					y: 0,
+					round: 0,
+					width: 256,
+					height: 256
+				},
+				{
+					type: "url",
+					url: `https://assets.furry.bot/ship/${ship.image}.png`,
+					x: 256,
+					y: 0,
+					round: 0,
+					width: 256,
+					height: 256
+				},
+				{
+					type: "url",
+					url: member2.user.avatarURL,
+					x: 512,
+					y: 0,
+					round: 0,
+					width: 256,
+					height: 256
+				}
+			],
+			texts: [],
+			output: "jpg"
+		});
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
