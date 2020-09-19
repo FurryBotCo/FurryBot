@@ -8,6 +8,7 @@ import ExtendedMessage from "../ExtendedMessage";
 import Eris from "eris";
 import phin from "phin";
 import config from "../../config";
+import { execSync } from "child_process";
 
 export default class Internal {
 	private constructor() {
@@ -142,7 +143,7 @@ export default class Internal {
 		};
 	}
 
-	static async authorizeOAuth(code: string): Promise<Discord.Oauth2Token> {
+	static async authorizeOAuth(code: string, redirectURL?: string): Promise<Discord.Oauth2Token> {
 		const c = await phin<Discord.Oauth2Token>({
 			method: "POST",
 			url: "https://discordapp.com/api/oauth2/token",
@@ -154,7 +155,7 @@ export default class Internal {
 				client_secret: config.client.secret,
 				grant_type: "authorization_code",
 				code,
-				redirect_uri: config.web.oauth2.redirectURL,
+				redirect_uri: redirectURL || config.web.oauth2.redirectURL,
 				scope: config.web.oauth2.scopes.join(" ")
 			},
 			parse: "json"
@@ -198,5 +199,39 @@ export default class Internal {
 		const HOURLY = type === "db" ? PRICE_DB / DAYS : PRICE_MAIN / DAYS;
 
 		return ((Math.ceil((amount / HOURLY) * 10 / 5) * 5) / 10) * 24 * 60 * 60 * 1000;
+	}
+
+	static getDiskUsage() {
+		// UNIX = df -Pk "/"
+		// WINDOWS = wmic logicaldisk get size,freespace,caption
+
+		const drives: {
+			[k: string]: {
+				total: number;
+				free: number;
+			};
+		} = {};
+		const unix = process.platform !== "win32";
+		const out = execSync(unix ? "df -Pk \"/\"" : "wmic logicaldisk get size,freespace,caption")
+			.toString()
+			.split(os.EOL)
+			.slice(1)
+			.map(v => v.trim().split(/\s+(?=[\d/])/))
+			.filter(v => v.length > 0 && v[0] !== "");
+
+		for (const line of out) {
+			if (unix) drives[line[5]] = {
+				free: Number(line[3]),
+				total: Number(line[1])
+			}; else drives[line[0]] = {
+				free: Number(line[1]),
+				total: Number(line[2])
+			};
+		}
+
+		return {
+			drives,
+			unix
+		};
 	}
 }

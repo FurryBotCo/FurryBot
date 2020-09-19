@@ -7,8 +7,8 @@ import Time from "../../../util/Functions/Time";
 import * as os from "os";
 import * as pkg from "../../../../package.json";
 import * as pkgLock from "../../../../package-lock.json";
-import du from "diskusage";
 import Language from "../../../util/Language";
+import Internal from "../../../util/Functions/Internal";
 
 export default new Command(["info"], __filename)
 	.setBotPermissions([
@@ -18,7 +18,11 @@ export default new Command(["info"], __filename)
 	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
-		const d = du.checkSync("/");
+		const { drives: diskUsage } = Internal.getDiskUsage();
+		const d = [];
+		for (const k of Object.keys(diskUsage)) {
+			d.push(`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$} (${k}): ${((diskUsage[k].total - diskUsage[k].free) / 1000 / 1000 / 1000).toFixed(2)}GB / ${(diskUsage[k].total / 1000 / 1000 / 1000).toFixed(2)}GB`);
+		}
 		const st = await this.ipc.getStats();
 		if (!st) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.noStats"));
 		const [versionNumber, buildNumber] = pkg.version.split("-");
@@ -33,7 +37,7 @@ export default new Command(["info"], __filename)
 					`${config.emojis.default.dot} {lang:other.words.cpuUsage}: ${this.cpuUsage}%`,
 					// GB = 1000, GiB = 1024 apparently ??
 					// https://en.wikipedia.org/wiki/Gibibyte
-					`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$}: ${((d.total - d.free) / 1000 / 1000 / 1000).toFixed(2)}GB / ${(d.total / 1000 / 1000 / 1000).toFixed(2)}GB`,
+					...d,
 					`${config.emojis.default.dot} {lang:other.words.uptime$ucwords$}: ${Time.ms(process.uptime() * 1000, true)} (${Time.secondsToHMS(process.uptime())})`,
 					`${config.emojis.default.dot} {lang:other.words.shard$ucwords$}: ${msg.channel.guild.shard.id + 1}/${st.shards.size}`,
 					`${config.emojis.default.dot} {lang:other.words.cluster$ucwords$}: ${this.cluster.id + 1}/${this.cluster.options.clusterCount}`,

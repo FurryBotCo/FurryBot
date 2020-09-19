@@ -27,4 +27,5 @@ declare global {
 
 	type CommandRestrictions = "beta" | "developer" | "donator" | "guildOwner" | "nsfw" | "premium" | "supportServer";
 	type CategoryRestrictions = "beta" | "developer";
+	type ThenReturnType<T extends (...args: any[]) => any> = ReturnType<T> extends Promise<infer U> ? U : never;
 }
