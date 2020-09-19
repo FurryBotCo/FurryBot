@@ -33,7 +33,9 @@
 		"helpMe": "Ha ha, very funny. Please specify either a command, category, or nothing.",
 		"neitherFound": "Neither a command nor category was found with what you supplied.",
 		"commandList": "Command List #{0}",
-		"cmdCount": "Total Commands: **{0}**"
+		"cmdCount": "Total Commands: **{0}**",
+		"devOnlyCommand": "That command is developer only",
+		"devOnlyCategory": "That category is developer only."
 	},
 	"weirdedit": {
 		"description": "Make a message with a weird little edit thing.",

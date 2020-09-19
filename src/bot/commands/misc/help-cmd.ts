@@ -40,12 +40,16 @@ export default new Command(["help", "h"], __filename)
 			const cat = this.cmd.getCategory(msg.args[0]);
 
 			if (c.cmd && c.cat) {
+				if (c.cmd.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyCommand`));
+				if (c.cat.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyCategory`));
 				const h = await c.cmd.runOverride("help", this, msg, c.cmd);
 				if (h === "DEFAULT") await this.cmd.handlers.runHelp(this, msg, c.cmd);
 			} else if (cat) {
+				if (cat.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyCategory`));
 				const list = [];
 				let i = 0;
 				for (const t of cat.commands) {
+					if (t.restrictions.includes("developer")) continue;
 					const v = `\`${t.triggers[0]}\` - ${t.description || `{lang:commands.${t.category.name}.${t.triggers[0]}.description}`}`;
 					if (!list[i]) list[i] = "";
 					if (list[i].length + v.length > 1024) list[++i] = `${v}\n`;
