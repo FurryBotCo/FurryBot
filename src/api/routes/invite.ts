@@ -17,14 +17,23 @@ export default class AppealRoute extends Route {
 
 		app
 			.get("/go", async (req, res) =>
-				res.redirect(config.client.socials.discordInviteSource(req.query.source?.toString()?.toLowerCase() || "botapi"))
+				res.redirect(config.client.socials.discordInviteSource(req.query.source?.toString()?.toLowerCase() as any || "botapi"))
 			)
-			.get("/finished/:source", async (req, res) => {
+			.get("/finished/", async (req, res) => {
+				// storing source in state because it makes my life easier and elss cluttered
+				let state: {
+					source: string;
+					creationTime: number;
+				} = null;
+				try {
+					state = JSON.parse(req.query.state.toString());
+				} catch (e) { }
+				const src = (state && state.source) || "unknown";
 				if (!req.query.code) return res.status(400).end("Missing &quot;code&quot; in request.");
 				if (!req.query.guild_id) return res.status(400).end("Missing &quot;guild_id&quot; in request.");
 				const perms = Number(req.query.permissions) || 0;
 
-				const auth: ThenReturnType<typeof Internal["authorizeOAuth"]> = await Internal.authorizeOAuth(req.query.code.toString(), config.web.oauth2.redirectURLInvite(req.params.source.toString().toLowerCase())).catch(err => null);
+				const auth: ThenReturnType<typeof Internal["authorizeOAuth"]> = await Internal.authorizeOAuth(req.query.code.toString(), config.web.oauth2.redirectURLInvite(src.toString().toLowerCase() as any)).catch(err => null);
 				if (!auth) return res.status(400).end("Failed to authorize code.");
 				const user: ThenReturnType<typeof Internal["getSelfUser"]> = await Internal.getSelfUser(auth.access_token).catch(err => null);
 				if (!user) return res.status(400).end("Failed to fetch Discord user from code.");
@@ -37,7 +46,7 @@ export default class AppealRoute extends Route {
 					embeds: [
 						new EmbedBuilder(config.devLanguage)
 							.setTitle(`{lang:other.serverInvite.title|${g.name}}`)
-							.setDescription(`{lang:other.serverInvite.desc|${g.name}|${g.id}|${!o ? "Unknown#0000" : `${o.username}#${o.discriminator}`}|${g.ownerID}|${g.memberCount}|${user.username}#${user.discriminator}|${user.id}|${perms}|${req.params.source.toUpperCase()}}`)
+							.setDescription(`{lang:other.serverInvite.desc|${g.name}|${g.id}|${!o ? "Unknown#0000" : `${o.username}#${o.discriminator}`}|${g.ownerID}|${g.memberCount}|${user.username}#${user.discriminator}|${user.id}|${perms}|${src.toUpperCase()}}`)
 							.setFooter(`{lang:other.serverInvite.footer|${client.bot.guilds.size}}`, client.bot.user.avatarURL)
 							.setTimestamp(new Date().toISOString())
 							.setColor(Colors.gold)

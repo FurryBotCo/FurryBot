@@ -59,6 +59,7 @@ src/config/other/*
 !src/config/other/emojis.json
 !src/config/other/colors.json
 !src/config/other/settings.json
+!src/config/other/sources.json
 !src/config/other/toStringFormatNames.ts
 !src/config/other/commandRestrictions.ts
 
