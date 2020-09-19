@@ -14,8 +14,7 @@ export default class Stats implements Clustering.Stats {
 			rss: 0,
 			heapTotal: 0,
 			heapUsed: 0,
-			external: 0,
-			arrayBuffers: 0
+			external: 0
 		};
 
 		try {
@@ -75,8 +74,7 @@ export default class Stats implements Clustering.Stats {
 			rss: a.rss + b.memory.rss,
 			heapUsed: a.heapUsed + b.memory.heapUsed,
 			heapTotal: a.heapTotal + b.memory.heapTotal,
-			external: a.external + b.memory.external,
-			arrayBuffers: a.arrayBuffers + b.memory.arrayBuffers
+			external: a.external + b.memory.external
 		}) as NodeJS.MemoryUsage, {
 			rss: 0,
 			heapTotal: 0,
@@ -91,8 +89,7 @@ export default class Stats implements Clustering.Stats {
 			rss: a.rss + b.memory.rss,
 			heapUsed: a.heapUsed + b.memory.heapUsed,
 			heapTotal: a.heapTotal + b.memory.heapTotal,
-			external: a.external + b.memory.external,
-			arrayBuffers: a.arrayBuffers + b.memory.arrayBuffers
+			external: a.external + b.memory.external
 		}) as NodeJS.MemoryUsage, {
 			rss: 0,
 			heapTotal: 0,
@@ -113,8 +110,7 @@ export default class Stats implements Clustering.Stats {
 					rss: a.rss + b.memory.rss,
 					heapUsed: a.heapUsed + b.memory.heapUsed,
 					heapTotal: a.heapTotal + b.memory.heapTotal,
-					external: a.external + b.memory.external,
-					arrayBuffers: a.arrayBuffers + b.memory.arrayBuffers
+					external: a.external + b.memory.external
 				}) as NodeJS.MemoryUsage, {
 					rss: 0,
 					heapTotal: 0,
@@ -128,8 +124,7 @@ export default class Stats implements Clustering.Stats {
 					rss: a.rss + b.memory.rss,
 					heapUsed: a.heapUsed + b.memory.heapUsed,
 					heapTotal: a.heapTotal + b.memory.heapTotal,
-					external: a.external + b.memory.external,
-					arrayBuffers: a.arrayBuffers + b.memory.arrayBuffers
+					external: a.external + b.memory.external
 				}) as NodeJS.MemoryUsage, {
 					rss: 0,
 					heapTotal: 0,
