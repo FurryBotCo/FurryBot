@@ -106,3 +106,6 @@ src/util/Functions/RPG.ts
 
 # other
 src/util/DailyJoins.ts
+
+# temp
+src/bot/commands/utility/welcomer-cmd.ts

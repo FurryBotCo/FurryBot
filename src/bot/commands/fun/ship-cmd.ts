@@ -6,6 +6,7 @@ import EmbedBuilder from "../../../util/EmbedBuilder";
 import Request from "../../../util/Functions/Request";
 import Utility from "../../../util/Functions/Utility";
 import Language from "../../../util/Language";
+import Logger from "../../../util/Logger";
 import FluxPoint from "../../../util/req/FluxPoint";
 
 export default new Command(["ship"], __filename)
@@ -57,7 +58,7 @@ export default new Command(["ship"], __filename)
 		const color1 = Utility.getColorRole(member1)?.color || null;
 		const color2 = Utility.getColorRole(member2)?.color || null;
 
-		const img = await FluxPoint.custom({
+		const img = await FluxPoint.customGen({
 			base: {
 				type: "bitmap",
 				x: 0,
@@ -124,6 +125,11 @@ export default new Command(["ship"], __filename)
 			texts: [],
 			output: "jpg"
 		});
+
+		if (!(img instanceof Buffer)) {
+			Logger.error("FluxPoint Gen", img);
+			throw new TypeError("Unknown Error");
+		}
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

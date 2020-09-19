@@ -23,7 +23,6 @@
         "node_modules",
         "build",
         "out",
-        "test",
         "tmp",
         "logs"
     ]

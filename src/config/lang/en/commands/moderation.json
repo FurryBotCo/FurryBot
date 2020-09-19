@@ -60,7 +60,8 @@
 		},
 		"disable": {
 			"notEnabled": "The modlog is not enabled currently.",
-			"remove": "Would you like to delete the webhook that was used?\nAnswer **Yes** or **No**", // do NOT translate the yes / no, these are the accepted values
+			"remove": "Would you like to delete the webhook that was used?\nAnswer **Yes** or **No**",
+			"_": "^ do NOT translate the yes / no, these are the accepted values",
 			"invalid": "Invalid response.",
 			"title": "Moderation Logging Disabled",
 			"desc": "The modlog has been disabled by **{0}**.",
