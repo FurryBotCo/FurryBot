@@ -221,8 +221,8 @@ export default class Internal {
 
 		for (const line of out) {
 			if (unix) drives[line[5]] = {
-				free: Number(line[3]),
-				total: Number(line[1])
+				free: Number(line[3]) * 1024,
+				total: Number(line[1]) * 1024
 			}; else drives[line[0]] = {
 				free: Number(line[1]),
 				total: Number(line[2])
