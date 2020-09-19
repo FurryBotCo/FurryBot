@@ -84,7 +84,7 @@ export default class ExtendedMessage {
 	async load() {
 		const g = this.#gConfig = await db.getGuild(this.channel.guild.id);
 		const u = this.#uConfig = await db.getUser(this.author.id);
-		const p = this.#msg.content.match(new RegExp(`(${g.settings.prefix}|<@!?${this.#client.bot.user.id}>)(?:\s+)*`, "i"));
+		const p = this.#msg.content.match(new RegExp(`(${g.settings.prefix.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")}|<@!?${this.#client.bot.user.id}>)(?:\s+)*`, "i"));
 		if (!p || p.length === 0) return false;
 		const prefix = this.#prefix = p[1].toLowerCase();
 		if (!this.#msg.content.toLowerCase().startsWith(prefix)) return false;
