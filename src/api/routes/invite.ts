@@ -33,7 +33,7 @@ export default class AppealRoute extends Route {
 				if (!req.query.guild_id) return res.status(400).end("Missing &quot;guild_id&quot; in request.");
 				const perms = Number(req.query.permissions) || 0;
 
-				const auth: ThenReturnType<typeof Internal["authorizeOAuth"]> = await Internal.authorizeOAuth(req.query.code.toString(), config.web.oauth2.redirectURLInvite(src.toString().toLowerCase() as any)).catch(err => null);
+				const auth: ThenReturnType<typeof Internal["authorizeOAuth"]> = await Internal.authorizeOAuth(req.query.code.toString(), config.web.oauth2.redirectURLInviteFinished).catch(err => null);
 				if (!auth) return res.status(400).end("Failed to authorize code.");
 				const user: ThenReturnType<typeof Internal["getSelfUser"]> = await Internal.getSelfUser(auth.access_token).catch(err => null);
 				if (!user) return res.status(400).end("Failed to fetch Discord user from code.");
