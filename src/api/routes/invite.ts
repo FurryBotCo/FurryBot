@@ -26,7 +26,7 @@ export default class AppealRoute extends Route {
 					creationTime: number;
 				} = null;
 				try {
-					state = JSON.parse(req.query.state.toString());
+					state = JSON.parse(Buffer.from(req.query.state.toString(), "base64").toString());
 				} catch (e) { }
 				const src = (state && state.source) || "unknown";
 				if (!req.query.code) return res.status(400).end("Missing &quot;code&quot; in request.");
