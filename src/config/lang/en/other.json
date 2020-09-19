@@ -145,7 +145,7 @@
 	},
 	"serverInvite": {
 		"title": "Invited To {0}",
-		"desc": "I was added to a server.\n\nServer: **{0}** ({1})\nOwner: **{2}** ({3})\nMember Count: {4}\nInviter: **{5}** ({6})\nPermissions Provided: {7}\n\nSource: {8$upper$}",
+		"desc": "I was added to a server.\n\nServer: **{0}** ({1})\nOwner: **{2}** ({3})\nMember Count: {4}\nInviter: **{5}** ({6})\nPermissions Provided: {7}\n\nSource: {8}",
 		"footer": "Total Servers: {0}"
 	},
 	"selfDestructMessage": "This message will self destruct in {0} seconds.",

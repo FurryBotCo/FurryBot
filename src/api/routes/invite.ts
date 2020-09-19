@@ -16,6 +16,9 @@ export default class AppealRoute extends Route {
 		const client = this.client;
 
 		app
+			.get("/go", async (req, res) =>
+				res.redirect(config.client.socials.discordInviteSource(req.query.source?.toString()?.toLowerCase() || "botapi"))
+			)
 			.get("/finished/:source", async (req, res) => {
 				if (!req.query.code) return res.status(400).end("Missing &quot;code&quot; in request.");
 				if (!req.query.guild_id) return res.status(400).end("Missing &quot;guild_id&quot; in request.");
@@ -34,7 +37,7 @@ export default class AppealRoute extends Route {
 					embeds: [
 						new EmbedBuilder(config.devLanguage)
 							.setTitle(`{lang:other.serverInvite.title|${g.name}}`)
-							.setDescription(`{lang:other.serverInvite.desc|${g.name}|${g.id}|${!o ? "Unknown#0000" : `${o.username}#${o.discriminator}`}|${g.ownerID}|${g.memberCount}|${user.username}#${user.discriminator}|${user.id}|${perms}|${req.params.source}}`)
+							.setDescription(`{lang:other.serverInvite.desc|${g.name}|${g.id}|${!o ? "Unknown#0000" : `${o.username}#${o.discriminator}`}|${g.ownerID}|${g.memberCount}|${user.username}#${user.discriminator}|${user.id}|${perms}|${req.params.source.toUpperCase()}}`)
 							.setFooter(`{lang:other.serverInvite.footer|${client.bot.guilds.size}}`, client.bot.user.avatarURL)
 							.setTimestamp(new Date().toISOString())
 							.setColor(Colors.gold)
