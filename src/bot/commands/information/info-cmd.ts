@@ -55,7 +55,7 @@ export default new Command(["info"], __filename)
 					`${config.emojis.default.dot} {lang:other.words.library$ucwords$}: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev) (**${Eris.VERSION}**, \`${pkgLock.dependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
 					`${config.emojis.default.dot} {lang:other.words.apiVersion$ucwords$}: ${Eris.Constants.REST_VERSION}`,
 					`${config.emojis.default.dot} {lang:other.words.gatewayVersion$ucwords$}: ${Eris.Constants.GATEWAY_VERSION}`,
-					`${config.emojis.default.dot} {lang:other.words.version$ucwords$}: ${versionNumber} ({lang:other.words.build$ucwords$}: \`${buildNumber}\`)`,
+					`${config.emojis.default.dot} {lang:other.words.version$ucwords$}: ${versionNumber} ({lang:other.words.build$ucwords$} (${buildNumber.slice(4, 6)}/${buildNumber.slice(6, 8)}/${buildNumber.slice(0, 4)}): \`${buildNumber}\`)`,
 					`${config.emojis.default.dot} {lang:other.words.nodeVersion$ucwords$}: ${process.version}`,
 					`${config.emojis.default.dot} {lang:other.words.supportServer$ucwords$}: [${config.client.socials.discord}](${config.client.socials.discord})`,
 					`${config.emojis.default.dot} {lang:other.words.donate$ucwords$}: [${config.client.socials.patreon}](${config.client.socials.patreon})`
