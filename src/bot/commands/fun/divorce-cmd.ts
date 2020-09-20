@@ -12,7 +12,7 @@ export default new Command(["divorce"], __filename)
 
 		const m = await db.getUser(msg.uConfig.marriage);
 
-		const u = await this.bot.getRESTUser(msg.uConfig.marriage).catch(err => ({ username: "Unknown", discriminator: "0000" }));
+		const u = await this.getUser(msg.uConfig.marriage).catch(err => ({ username: "Unknown", discriminator: "0000" }));
 		await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.confirm`, [`${u.username}#${u.discriminator}`])).then(async () => {
 			const d = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id, 1);
 			if (!d || !["yes", "no"].includes(d.content.toLowerCase())) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidOption`));

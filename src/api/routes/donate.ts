@@ -98,7 +98,7 @@ export default class InfoRoute extends Route {
 				const user = await db.collection("users").findOne({
 					"donations.ko-fi.name": new RegExp(b.from_name, "i")
 				}).then(v => !v ? null : new UserConfig(v.id, v));
-				const u = !user ? null : await client.bot.getRESTUser(user.id);
+				const u = !user ? null : await client.getUser(user.id);
 
 				const pub = !!b.is_public;
 

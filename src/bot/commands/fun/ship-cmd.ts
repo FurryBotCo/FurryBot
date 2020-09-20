@@ -17,7 +17,7 @@ export default new Command(["ship"], __filename)
 	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
-		let member1 = msg.member as Eris.Member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1;
+		let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1;
 		if (Object.keys(msg.dashedArgs.keyValue).includes("percent")) {
 			if (!config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyOption`, ["percent"]));
 			amount = Number(msg.dashedArgs.keyValue.percent);

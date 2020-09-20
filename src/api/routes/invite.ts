@@ -48,7 +48,7 @@ export default class AppealRoute extends Route {
 
 				const g: Eris.Guild = client.bot.guilds.get(req.query.guild_id.toString()) || await client.bot.getRESTGuild(req.query.guild_id.toString()).catch(err => null);
 				if (!g) return res.status(500).end("Failed to fetch server.");
-				const o: Eris.User = client.bot.users.get(g.ownerID) || await client.bot.getRESTUser(g.ownerID).catch(err => null);
+				const o: Eris.User = client.bot.users.get(g.ownerID) || await client.getUser(g.ownerID).catch(err => null);
 
 				await client.w.get("invites").execute({
 					embeds: [

@@ -17,7 +17,7 @@ export default new ClientEvent("guildCreate", async function (guild) {
 	};
 	let owner = "Unknown#0000 (000000000000000000)";
 	if (guild.ownerID) {
-		const u: Eris.User = await this.bot.getRESTUser(guild.ownerID).catch(err => null);
+		const u: Eris.User = await this.getUser(guild.ownerID).catch(err => null);
 		if (u !== null) {
 			author = {
 				name: `${u.username}#${u.discriminator}`,

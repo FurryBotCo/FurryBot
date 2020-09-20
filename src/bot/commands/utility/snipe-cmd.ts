@@ -28,7 +28,7 @@ export default new Command(["snipe"], __filename)
 
 		const i = content.match(new RegExp("((https?:\/\/)?(discord((app)?\.com\/invite|\.gg))\/[a-zA-Z0-9]{1,10})", "gi"));
 		if (i) i.map(k => content = content.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
-		const u = await this.bot.getRESTUser(author);
+		const u = await this.getUser(author);
 
 
 		await Redis.del(`snipe:delete:${ch.id}:content`);

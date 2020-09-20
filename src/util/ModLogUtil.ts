@@ -292,7 +292,7 @@ export default class ModLogUtil {
 			const m = this.client.bot.users.get(oldBlame);
 			b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
 		} else {
-			const m = await this.client.bot.getRESTUser(oldBlame);
+			const m = await this.client.getUser(oldBlame);
 			b = `${m.username}#${m.discriminator} (<@!${m.id}>)`;
 		}
 		if (enabled) {

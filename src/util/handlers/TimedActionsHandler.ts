@@ -47,7 +47,7 @@ export default class TimedActionsHandler {
 		const g: Eris.Guild | null = this.client.bot.guilds.get(entry.guildId) || await this.client.bot.getRESTGuild(entry.guildId).catch(err => null) || null;
 		if (g === null) return this.deleteEntry(entry);
 
-		const user: Eris.User | null = this.client.bot.users.get(entry.userId) || await this.client.bot.getRESTUser(entry.userId).catch(err => null) || null;
+		const user: Eris.User | null = this.client.bot.users.get(entry.userId) || await this.client.getUser(entry.userId).catch(err => null) || null;
 		if (user === null) return this.deleteEntry(entry);
 		await g.unbanMember(user.id, "Automatic Unban").catch(err => null);
 

@@ -21,7 +21,7 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 		const u = await db.getUser(user.id);
 		let flags: number = user.user.publicFlags;
 		if (typeof flags !== "number") {
-			const u = await this.bot.getRESTUser(user.id);
+			const u = await this.getUser(user.id);
 			flags = u.publicFlags;
 		}
 

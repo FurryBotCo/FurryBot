@@ -19,6 +19,8 @@ import TimedTasks from "../util/Functions/TimedTasks";
 import Internal from "../util/Functions/Internal";
 import { performance } from "perf_hooks";
 import Language from "../util/Language";
+import "../util/ErisUtil";
+import Eris from "eris";
 
 class FurryBot extends Base {
 	cmd: CommandHandler;
@@ -162,7 +164,14 @@ class FurryBot extends Base {
 		this.done();
 	}
 
-	get lang() { return Language; }
+	async getUser(id: string) {
+		if (this.bot.users.has(id)) return this.bot.users.get(id);
+		const user: Eris.User = await this.getUser(id).catch(err => null);
+		if (user) {
+			this.bot.users.set(id, user);
+			return user;
+		} else return null;
+	}
 }
 
 export default FurryBot;

@@ -31,7 +31,7 @@ export default new Command(["editsnipe", "esnipe", "es"], __filename)
 		if (i) i.map(k => newContent = newContent.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
 		if (iN) iN.map(k => oldContent = oldContent.replace(new RegExp(k, "gi"), `[\[INVITE\]](${k})`));
 
-		const u = await this.bot.getRESTUser(author);
+		const u = await this.getUser(author);
 
 		await Redis.del(`snipe:edit:${ch.id}:oldContent`);
 		await Redis.del(`snipe:edit:${ch.id}:newContent`);

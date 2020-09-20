@@ -35,7 +35,7 @@ export default new Command(["prune", "purge"], __filename)
 		await Promise.all(chunk(f, 100).map(t => msg.channel.deleteMessages(t.map(m => m.id))));
 		const t = [];
 		for (const k of Object.keys(del)) {
-			let u: Eris.Member | Eris.User = msg.channel.guild.members.get(k) || this.bot.users.get(k) || await this.bot.getRESTUser(k).catch(err => null);
+			let u: Eris.Member | Eris.User = msg.channel.guild.members.get(k) || this.bot.users.get(k) || await this.getUser(k).catch(err => null);
 			if (u instanceof Eris.Member) u = u.user;
 			if (!u) {
 				t.push(`**${k}**: ${del[k]}`);

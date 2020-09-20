@@ -110,7 +110,7 @@ export default new Command(["modlog"], __filename)
 
 				for (const v of e) {
 					i++;
-					const u: Eris.User | null = v.blame === "automatic" ? this.bot.user : await this.bot.users.get(v.blame) || await this.bot.getRESTUser(v.blame).catch(err => null);
+					const u: Eris.User | null = v.blame === "automatic" ? this.bot.user : await this.bot.users.get(v.blame) || await this.getUser(v.blame).catch(err => null);
 
 					em.addField(`{lang:${cmd.lang}.list.name|${v.pos}}`, [
 						`{lang:other.words.type$ucwords$}: **${Strings.ucwords(v.type)}**`,

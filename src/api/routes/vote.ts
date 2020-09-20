@@ -27,7 +27,7 @@ export default class VoteRoute extends Route {
 					type: req.body.type,
 					time
 				});
-				const u = client.bot.users.has(req.body.user) ? client.bot.users.get(req.body.user) : await client.bot.getRESTUser(req.body.user);
+				const u = client.bot.users.has(req.body.user) ? client.bot.users.get(req.body.user) : await client.getUser(req.body.user);
 				await client.w.get("vote").execute({
 					embeds: [
 						{

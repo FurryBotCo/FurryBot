@@ -19,8 +19,8 @@ export default class WarnRoute extends Route {
 				if (!req.body.blame) return res.status(400).json({ success: false, error: "missing blame" });
 				const g: Eris.Guild = await client.bot.getRESTGuild(req.params.guild).catch(err => null);
 				if (!g) return res.status(404).json({ success: false, error: "invalid guild" });
-				const u: Eris.User = await client.bot.getRESTUser(req.params.user).catch(err => null);
-				const b: Eris.User = await client.bot.getRESTUser(req.body.blame).catch(err => null);
+				const u: Eris.User = await client.getUser(req.params.user).catch(err => null);
+				const b: Eris.User = await client.getUser(req.body.blame).catch(err => null);
 				let ch: Eris.GuildTextableChannel;
 				if (!u) return res.status(404).json({ success: false, error: "invalid user" });
 				if (!b) return res.status(400).json({ success: false, error: "invalid blame" });

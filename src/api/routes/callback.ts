@@ -339,7 +339,7 @@ export default class CallbackRoute extends Route {
 
 				Logger.debug("Social Callback", `User ${user.username}#${user.discriminator} (${user.id}) signed in with Discord.`);
 
-				req.data.user = await client.bot.getRESTUser(user.id);
+				req.data.user = await client.getUser(user.id);
 
 				return res.redirect(req.data.return || "/");
 			});

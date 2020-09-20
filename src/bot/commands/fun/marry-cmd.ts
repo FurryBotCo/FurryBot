@@ -25,7 +25,7 @@ export default new Command(["marry"], __filename)
 		if (msg.author.id === member.id) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noSelf`));
 		if (member.bot) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noBot`));
 		if (msg.uConfig.marriage) {
-			const u = await this.bot.getRESTUser(msg.uConfig.marriage).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
+			const u = await this.getUser(msg.uConfig.marriage).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
 			return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfAlreadyMarried`, [u]));
 		}
 
@@ -34,10 +34,10 @@ export default new Command(["marry"], __filename)
 				await msg.uConfig.edit({
 					marriage: m.id
 				});
-				const u = await this.bot.getRESTUser(msg.uConfig.marriage).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
+				const u = await this.getUser(msg.uConfig.marriage).then(res => `${res.username}#${res.discriminator}`).catch(err => "Unknown#0000");
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfAlreadyMarried`, [u]));
 			}
-			const u = await this.bot.getRESTUser(m.marriage).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
+			const u = await this.getUser(m.marriage).then(res => `${res.username}#${res.discriminator}`) || "Unknown#0000";
 			return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.otherAlreadyMarried`, [u]));
 		}
 

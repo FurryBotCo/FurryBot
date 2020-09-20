@@ -1,3 +1,4 @@
+/// <reference path="./@types/Eris.d.ts" />
 import Eris from "eris";
 import FurryBot from "../bot";
 import { db } from "./Database";
@@ -5,20 +6,10 @@ import GuildConfig from "./config/GuildConfig";
 import UserConfig from "./config/UserConfig";
 import Command from "./cmd/Command";
 import config from "../config";
-import GuildMusicHandler from "./handlers/music/GuildMusicHandler";
 
 export default class ExtendedMessage {
 	#client: FurryBot;
-	#msg: Eris.Message<Eris.GuildTextableChannel> & {
-		author: Eris.User & { tag: string; };
-		member: Eris.Member & { tag: string; };
-		channel: Eris.GuildTextableChannel & {
-			guild: Eris.Guild & {
-				readonly me: Eris.Member;
-				readonly music: GuildMusicHandler;
-			};
-		};
-	};
+	#msg: Eris.Message<Eris.GuildTextableChannel>;
 	#gConfig: GuildConfig;
 	#uConfig: UserConfig;
 	#args: string[];
@@ -33,22 +24,7 @@ export default class ExtendedMessage {
 	constructor(msg: Eris.Message<Eris.GuildTextableChannel>, client: FurryBot) {
 		this.#msg = msg as any;
 		this.#client = client;
-
-		if (!this.#msg.author.tag) Object.defineProperty(this.#msg.author, "tag", {
-			get() { return `${this.username}#${this.discriminator}`; }
-		});
-
-		if (!this.#msg.member.tag) Object.defineProperty(this.#msg.member, "tag", {
-			get() { return `${this.user.username}#${this.user.discriminator}`; }
-		});
-
-		if (!this.#msg.channel.guild.me) Object.defineProperty(this.#msg.channel.guild, "me", {
-			get() { return this.members.get(this._client.user.id); }
-		});
-
-		/*if (!this.#msg.channel.guild.music) Object.defineProperty(this.#msg.channel.guild, "music", {
-			get() { return this._client.music.get(this.id); }
-		});*/
+		// tag & me were moved to ErisUtil
 	}
 
 	get id() { return this.#msg.id; }
@@ -79,7 +55,6 @@ export default class ExtendedMessage {
 	get cmd() { return this.#cmd; }
 	get prefix() { return this.#prefix; }
 	get timestamp() { return this.#msg.timestamp; }
-	get music() { return this.#msg.channel.guild.music; }
 
 	async load() {
 		const g = this.#gConfig = await db.getGuild(this.channel.guild.id);
@@ -112,13 +87,13 @@ export default class ExtendedMessage {
 		let id: Eris.User;
 		if (/[0-9]{15,21}/.test(t)) {
 			id = this.#client.bot.users.find(u => u.id === this.args[argPos]);
-			if (!id) id = await this.#client.bot.getRESTUser(t).catch(err => null);
+			if (!id) id = await this.#client.getUser(t).catch(err => null);
 			if (id) this.#client.bot.users.add(id);
 		}
 
 		if (mention && !id) {
 			id = this.#client.bot.users.find(u => u.id === mention);
-			if (!id) id = await this.#client.bot.getRESTUser(mention).catch(err => null);
+			if (!id) id = await this.#client.getUser(mention).catch(err => null);
 			if (id) this.#client.bot.users.add(id);
 		}
 

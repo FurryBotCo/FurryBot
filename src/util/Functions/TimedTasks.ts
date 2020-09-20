@@ -41,7 +41,7 @@ export default class TimedTasks {
 		}
 
 		await Promise.all(d.map(async (u) => {
-			const s = await client.bot.getRESTUser(u.id);
+			const s = await client.getUser(u.id);
 
 			await s.getDMChannel().then(dm => dm.createMessage({
 				embed: {

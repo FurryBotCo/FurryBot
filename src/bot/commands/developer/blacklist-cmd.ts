@@ -55,7 +55,7 @@ export default new Command(["blacklist", "bl"], __filename)
 				const d = await this.bot.getRESTGuild(entry.guildId);
 				text = Language.get(config.devLanguage, `${cmd.lang}.get.guild`, [msg.args[1], d ? d.name : "Unknown"]);
 			} else if (typeof entry.userId !== "undefined") {
-				const d = await this.bot.getRESTUser(entry.userId);
+				const d = await this.getUser(entry.userId);
 				text = Language.get(config.devLanguage, `${cmd.lang}.get.user`, [msg.args[1], `${d.username}#${d.discriminator}`]);
 			} else throw new TypeError("Invalid blacklist entry.");
 
@@ -89,7 +89,7 @@ export default new Command(["blacklist", "bl"], __filename)
 
 			case "user": {
 				try {
-					d = await this.bot.getRESTUser(id);
+					d = await this.getUser(id);
 					dbEntry = await db.getUser(id);
 				} catch (e) {
 					return msg.reply(Language.get(config.devLanguage, `${cmd.lang}.invalidUser`, [id]));

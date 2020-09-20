@@ -37,7 +37,7 @@ export default new Command(["leaderboard", "lb"], __filename)
 						...(await Promise.all(c[page - 1].map(async (k, i) => {
 							const l = config.leveling.calcLevel(k.amount);
 							const g: Eris.Guild = this.bot.guilds.get(k.guild);
-							const u: Eris.User = this.bot.users.get(k.user) || await this.bot.getRESTUser(k.user).catch(err => null);
+							const u: Eris.User = this.bot.users.get(k.user) || await this.getUser(k.user).catch(err => null);
 							if (!this.bot.users.has(u.id)) this.bot.users.set(u.id, u);
 							const pText = Internal.genTooltip(msg.gConfig.settings.lang, `**#${(i + 1) + ((page - 1) * 5)}**`, `{lang:${cmd.lang}.embed.guild|${g?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}|${g?.memberCount || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}}`);
 							const uText = Internal.genTooltip(msg.gConfig.settings.lang, `${u.username}#${u.discriminator}`, `{lang:${cmd.lang}.embed.user|${u.id}}`);
