@@ -34,7 +34,7 @@ export default new Command(["leaderboard", "lb"], __filename)
 						`{lang:${cmd.lang}.embed.hover}`,
 						...c[page - 1].map((k, i) => {
 							const l = config.leveling.calcLevel(k.amount);
-							return `[**#${(i + 1) + ((page - 1) * 10)}**](http://furry.bot '{lang:${cmd.lang}.embed.in|${this.bot.guilds.get(k.guild)?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}}'): <@!${k.user}> - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
+							return `[**#${(i + 1) + ((page - 1) * 10)}**](http://furry.bot '{lang:${cmd.lang}.embed.in|${this.bot.guilds.get(k.guild)?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}}'): <@!${k.user}> - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
 						})
 					].join("\n"))
 					.setFooter(`{lang:${cmd.lang}.embed.footer|${page}|${c.length}|${this.bot.users.size - entries.length}|${time}}`)
