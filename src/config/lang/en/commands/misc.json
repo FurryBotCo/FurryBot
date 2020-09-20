@@ -57,8 +57,9 @@
 			"titleGlobal": "Global Leaderboard",
 			"footer": "Page {0}/{1} | Skipped {2} Non Cached Users | Generated In {3}ms",
 			"until": "until level up",
-			"in": "In the server {0} ({1}).",
-			"hover": "Hover over the position to see the server it's from.",
+			"guild": "Server: {0} ({1}).\nMember Count: {2}",
+			"user": "User ID: {0}",
+			"hover": "Hover over the position and tag to show more info.",
 			"global": "you can add \"--global\" to see the global leaderboard."
 		}
 	},

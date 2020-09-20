@@ -7,6 +7,7 @@ import Language from "../../../util/Language";
 import config from "../../../config";
 import Utility from "../../../util/Functions/Utility";
 import { performance } from "perf_hooks";
+import Eris from "eris";
 
 export default new Command(["leaderboard", "lb"], __filename)
 	.setBotPermissions([
@@ -32,10 +33,12 @@ export default new Command(["leaderboard", "lb"], __filename)
 					.setTitle(`{lang:${cmd.lang}.embed.titleGlobal}`)
 					.setDescription([
 						`{lang:${cmd.lang}.embed.hover}`,
-						...c[page - 1].map((k, i) => {
+						...(await Promise.all(c[page - 1].map(async (k, i) => {
 							const l = config.leveling.calcLevel(k.amount);
-							return `[**#${(i + 1) + ((page - 1) * 10)}**](http://furry.bot '{lang:${cmd.lang}.embed.in|${this.bot.guilds.get(k.guild)?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}}'): <@!${k.user}> - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
-						})
+							const g: Eris.Guild = this.bot.guilds.get(k.guild) || await this.bot.getRESTGuild(k.guild).catch(err => null);
+							const u: Eris.User = this.bot.users.get(k.user) || await this.bot.getRESTUser(k.user).catch(err => null);
+							return `[**#${(i + 1) + ((page - 1) * 10)}**](http://furry.bot '{lang:${cmd.lang}.embed.guild|${this.bot.guilds.get(k.guild)?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}|${g.memberCount}}'): [${u.username}#${u.discriminator}](https://furry.bot '{${cmd.lang}.embed.user|${u.id}}') - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
+						})))
 					].join("\n"))
 					.setFooter(`{lang:${cmd.lang}.embed.footer|${page}|${c.length}|${this.bot.users.size - entries.length}|${time}}`)
 					.setColor(Colors.gold)
