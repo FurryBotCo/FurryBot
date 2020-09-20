@@ -23,7 +23,7 @@ export default new Command(["leaderboard", "lb"], __filename)
 
 		if (global) {
 			const { entries, time } = await Utility.getHighestLevels(false);
-			const c = chunk(entries, 10);
+			const c = chunk(entries, 7);
 			if (c.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noPages`));
 			if (isNaN(page)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidPage`, [c.length]));
 			if (page < 1) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.pageLessThan`, [c.length]));
@@ -35,9 +35,10 @@ export default new Command(["leaderboard", "lb"], __filename)
 						`{lang:${cmd.lang}.embed.hover}`,
 						...(await Promise.all(c[page - 1].map(async (k, i) => {
 							const l = config.leveling.calcLevel(k.amount);
-							const g: Eris.Guild = this.bot.guilds.get(k.guild) || await this.bot.getRESTGuild(k.guild).catch(err => null);
+							const g: Eris.Guild = this.bot.guilds.get(k.guild);
 							const u: Eris.User = this.bot.users.get(k.user) || await this.bot.getRESTUser(k.user).catch(err => null);
-							return `[**#${(i + 1) + ((page - 1) * 10)}**](http://furry.bot '{lang:${cmd.lang}.embed.guild|${this.bot.guilds.get(k.guild)?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}|${g.memberCount}}'): [${u.username}#${u.discriminator}](https://furry.bot '{${cmd.lang}.embed.user|${u.id}}') - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
+							if (!this.bot.users.has(u.id)) this.bot.users.set(u.id, u);
+							return `[**#${(i + 1) + ((page - 1) * 10)}**](http://furry.bot '{lang:${cmd.lang}.embed.guild|${g?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}|${g?.memberCount || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}}'): [${u.username}#${u.discriminator}](https://furry.bot '{lang:${cmd.lang}.embed.user|${u.id}}') - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
 						})))
 					].join("\n"))
 					.setFooter(`{lang:${cmd.lang}.embed.footer|${page}|${c.length}|${this.bot.users.size - entries.length}|${time}}`)
