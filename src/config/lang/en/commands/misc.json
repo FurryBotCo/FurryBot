@@ -59,7 +59,7 @@
 			"until": "until level up",
 			"guild": "Server: {0} ({1}).\nMember Count: {2}",
 			"user": "User ID: {0}",
-			"hover": "Hover over the position and tag to show more info.",
+			"hover": "Hover over the position and tag to show more info.\n(you can also click to view it in your browser)",
 			"global": "you can add \"--global\" to see the global leaderboard."
 		}
 	},
