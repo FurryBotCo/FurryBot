@@ -17,17 +17,11 @@ export default new Command(["ship"], __filename)
 	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
-		let member1 = msg.member as Eris.Member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1, reset = false;
+		let member1 = msg.member as Eris.Member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1;
 		if (Object.keys(msg.dashedArgs.keyValue).includes("percent")) {
-			if (!config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyOption`));
+			if (!config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyOption`, ["percent"]));
 			amount = Number(msg.dashedArgs.keyValue.percent);
 			msg.args = msg.args.filter(a => a !== `--percent=${amount}`);
-		}
-
-		if (msg.dashedArgs.value.includes("reset")) {
-			if (!config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyOption`));
-			reset = true;
-
 		}
 
 		if (msg.args.length === 0) member2 = msg.channel.guild.members.random();
