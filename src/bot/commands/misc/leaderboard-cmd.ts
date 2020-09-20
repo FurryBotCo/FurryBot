@@ -24,7 +24,7 @@ export default new Command(["leaderboard", "lb"], __filename)
 
 		if (global) {
 			const { entries, time } = await Utility.getHighestLevels(false);
-			const c = chunk(entries, 7);
+			const c = chunk(entries, 5);
 			if (c.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noPages`));
 			if (isNaN(page)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidPage`, [c.length]));
 			if (page < 1) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.pageLessThan`, [c.length]));
@@ -39,7 +39,7 @@ export default new Command(["leaderboard", "lb"], __filename)
 							const g: Eris.Guild = this.bot.guilds.get(k.guild);
 							const u: Eris.User = this.bot.users.get(k.user) || await this.bot.getRESTUser(k.user).catch(err => null);
 							if (!this.bot.users.has(u.id)) this.bot.users.set(u.id, u);
-							const pText = Internal.genTooltip(msg.gConfig.settings.lang, `**#${(i + 1) + ((page - 1) * 7)}**`, `{lang:${cmd.lang}.embed.guild|${g?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}|${g?.memberCount || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}}`);
+							const pText = Internal.genTooltip(msg.gConfig.settings.lang, `**#${(i + 1) + ((page - 1) * 5)}**`, `{lang:${cmd.lang}.embed.guild|${g?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}|${g?.memberCount || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}}`);
 							const uText = Internal.genTooltip(msg.gConfig.settings.lang, `${u.username}#${u.discriminator}`, `{lang:${cmd.lang}.embed.user|${u.id}}`);
 							return `${pText}: ${uText} - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
 						})))
