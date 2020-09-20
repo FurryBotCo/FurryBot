@@ -9,6 +9,7 @@ import Eris from "eris";
 import phin from "phin";
 import config from "../../config";
 import { execSync } from "child_process";
+import Language, { Languages } from "../Language";
 
 export default class Internal {
 	private constructor() {
@@ -233,5 +234,10 @@ export default class Internal {
 			drives,
 			unix
 		};
+	}
+
+	static genTooltip(lang: Languages, text: string, content: string) {
+		const ct = Language.parseString(lang, content);
+		return `[${Language.parseString(lang, text)}](https://botapi.furry.bot/note/show?content=${encodeURIComponent(ct)} '${ct}')`;
 	}
 }
