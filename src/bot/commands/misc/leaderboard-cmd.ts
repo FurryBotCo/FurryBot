@@ -38,7 +38,7 @@ export default new Command(["leaderboard", "lb"], __filename)
 							const g: Eris.Guild = this.bot.guilds.get(k.guild);
 							const u: Eris.User = this.bot.users.get(k.user) || await this.bot.getRESTUser(k.user).catch(err => null);
 							if (!this.bot.users.has(u.id)) this.bot.users.set(u.id, u);
-							return `[**#${(i + 1) + ((page - 1) * 10)}**](http://furry.bot '{lang:${cmd.lang}.embed.guild|${g?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}|${g?.memberCount || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}}'): [${u.username}#${u.discriminator}](https://furry.bot '{lang:${cmd.lang}.embed.user|${u.id}}') - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
+							return `[**#${(i + 1) + ((page - 1) * 7)}**](http://furry.bot '{lang:${cmd.lang}.embed.guild|${g?.name || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}|${k.guild}|${g?.memberCount || Language.get(msg.gConfig.settings.lang, "other.words.unknown")}}'): [${u.username}#${u.discriminator}](https://furry.bot '{lang:${cmd.lang}.embed.user|${u.id}}') - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
 						})))
 					].join("\n"))
 					.setFooter(`{lang:${cmd.lang}.embed.footer|${page}|${c.length}|${this.bot.users.size - entries.length}|${time}}`)
