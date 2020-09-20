@@ -9,6 +9,7 @@ import * as pkg from "../../../../package.json";
 import * as pkgLock from "../../../../package-lock.json";
 import Language from "../../../util/Language";
 import Internal from "../../../util/Functions/Internal";
+import phin from "phin";
 
 export default new Command(["info"], __filename)
 	.setBotPermissions([
@@ -22,6 +23,25 @@ export default new Command(["info"], __filename)
 		const d = [];
 		for (const k of Object.keys(diskUsage)) {
 			d.push(`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$} (${k}): ${((diskUsage[k].total - diskUsage[k].free) / 1000 / 1000 / 1000).toFixed(2)}GB / ${(diskUsage[k].total / 1000 / 1000 / 1000).toFixed(2)}GB`);
+		}
+		if (os.hostname() === "2020.extra-v4.furry.bot") {
+			const { body: k } = await phin<{
+				drives: {
+					[k: string]: {
+						free: number;
+						total: number;
+					};
+				};
+				unix: boolean;
+			}>({
+				method: "GET",
+				url: "https://10.20.10.129:22222",
+				headers: {
+					"User-Agent": config.web.userAgent
+				},
+				parse: "json"
+			});
+			d.push(`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$} (DB): ${((k.drives["/"].total - k.drives["/"].free) / 1000 / 1000 / 1000).toFixed(2)}GB / ${(k.drives["/"].total / 1000 / 1000 / 1000).toFixed(2)}GB`);
 		}
 		const st = await this.ipc.getStats();
 		if (!st) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.noStats"));
