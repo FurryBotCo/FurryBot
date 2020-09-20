@@ -1,7 +1,7 @@
 @echo off
-npm list furrybot | grep -Po "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" > tmp.version
-set /p NPM_VERSION= < tmp.version
-del tmp.version
+npm list furrybot | grep -Po "[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}" > version.tmp
+set /p NPM_VERSION= < version.tmp
+del version.tmo
 FOR /f "tokens=2 delims==" %%G in ('wmic os get localdatetime /value') do set datetime=%%G & SET BUILD=%datetime:~0,4%%datetime:~4,2%%datetime:~6,2%
 
 set NEW_VERSION=%NPM_VERSION%-%BUILD%
