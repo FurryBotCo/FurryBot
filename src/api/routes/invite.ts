@@ -4,6 +4,7 @@ import config from "../../config";
 import { Colors } from "../../util/Constants";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import Internal from "../../util/Functions/Internal";
+import Language from "../../util/Language";
 import Logger from "../../util/Logger";
 
 export default class AppealRoute extends Route {
@@ -51,9 +52,10 @@ export default class AppealRoute extends Route {
 
 				await client.w.get("invites").execute({
 					embeds: [
+						// using Language.get to escape pipes
 						new EmbedBuilder(config.devLanguage)
-							.setTitle(`{lang:other.serverInvite.title|${g.name}}`)
-							.setDescription(`{lang:other.serverInvite.desc|${g.name}|${g.id}|${!o ? "Unknown#0000" : `${o.username}#${o.discriminator}`}|${g.ownerID}|${g.memberCount}|${user.username}#${user.discriminator}|${user.id}|${perms}|${src.toUpperCase()}}`)
+							.setTitle(Language.get(config.devLanguage, "other.serverInvite.title", [g.name]))
+							.setDescription(Language.get(config.devLanguage, "other.serverInvite.desc", [g.name, g.id, !o ? "Unknown#0000" : `${o.username}#${o.discriminator}`, g.ownerID, g.memberCount, `${user.username}#${user.discriminator}`, user.id, `[${perms}](https://discordapi.com/permissions.html#${perms})`, src.toUpperCase()]))
 							.setFooter(`{lang:other.serverInvite.footer|${client.bot.guilds.size}}`, client.bot.user.avatarURL)
 							.setTimestamp(new Date().toISOString())
 							.setColor(Colors.gold)
