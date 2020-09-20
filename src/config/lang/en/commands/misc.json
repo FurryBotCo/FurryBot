@@ -54,8 +54,12 @@
 		"pageMoreThan": "there are not that many pages. Valid pages: {0}",
 		"embed": {
 			"title": "Server Leaderboard",
-			"footer": "Page {0}/{1} | Skipped {2} Non Cached Users",
-			"until": "until level up"
+			"titleGlobal": "Global Leaderboard",
+			"footer": "Page {0}/{1} | Skipped {2} Non Cached Users | Generated In {3}ms",
+			"until": "until level up",
+			"in": "In the server {0}.",
+			"hover": "Hover over the position to see the server it's from.",
+			"global": "you can add \"--global\" to see the global leaderboard."
 		}
 	},
 	"rank": {

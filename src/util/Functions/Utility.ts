@@ -5,6 +5,8 @@ import EmbedBuilder from "../EmbedBuilder";
 import Eris from "eris";
 import y from "yargs";
 import { Colors } from "../Constants";
+import Redis from "../Redis";
+import { performance } from "perf_hooks";
 
 export default class Utility {
 	private constructor() {
@@ -213,5 +215,56 @@ export default class Utility {
 
 	static getColorRole(member: Eris.Member) {
 		return this.getTopRole(member, (role) => role.color !== 0);
+	}
+
+	// because it came to my attention that I should *not* use KEYS in production
+	static async getKeys(pattern: string, cur: number | string, keys?: string[], maxPerRun?: number): Promise<string[]> {
+		keys = keys || [];
+		maxPerRun = maxPerRun || 10000;
+		if (config.beta) return Redis.keys(pattern);
+		const s = await Redis.scan(cur, "MATCH", pattern, "COUNT", maxPerRun);
+		keys.push(...s[1]);
+		if (s[0] !== "0") return this.getKeys(pattern, s[0], keys, maxPerRun);
+		else return keys;
+	}
+
+	static async getHighestLevels(skipCache?: boolean, sort?: "asc" | "desc"): Promise<{
+		entries: {
+			amount: number;
+			guild: string;
+			user: string;
+		}[];
+		time: number;
+	}> {
+		skipCache = !!skipCache;
+		const start = performance.now();
+		if (skipCache) Redis.del("leveling:global-cache");
+		const cache = await Redis.get("leveling:global-cache");
+		let entries: ThenReturnType<(typeof Utility)["getHighestLevels"]>["entries"];
+		if (!cache) {
+			const keys = await this.getKeys("leveling:*:*", 0, [], 10000);
+			const values = await Redis.mget(keys);
+			entries = keys.map((v, i) => ({
+				amount: Number(values[i]),
+				guild: v.split(":")[1],
+				user: v.split(":")[2]
+			}));
+			await Redis.setex("leveling:global-cache", 3600, JSON.stringify(entries));
+		} else {
+			try {
+				entries = JSON.parse(cache);
+			} catch (e) {
+				return this.getHighestLevels(true);
+			}
+		}
+
+		entries = entries.sort((a, b) => b.amount - a.amount);
+		if (sort === "asc") entries = entries.reverse();
+		const end = performance.now();
+
+		return {
+			entries,
+			time: parseFloat((end - start).toFixed(3))
+		};
 	}
 }

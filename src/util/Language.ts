@@ -1,8 +1,6 @@
 import * as fs from "fs-extra";
-import config from "../config";
 import dot from "dot-object";
 import JSON5 from "json5";
-import Logger from "./Logger";
 import Strings from "./Functions/Strings";
 
 /*
@@ -13,6 +11,8 @@ Modifiers - {lang:some.language.location$ucwords$}
 Both formatting and modifiers can be combined. Order does not matter, prefer formatting then modifiers.
 */
 
+// because circular dependencies
+const dir = `${__dirname}/../config/lang`;
 class LanguageError extends Error {
 	constructor(name: string, message: string) {
 		super(message);
@@ -54,7 +54,7 @@ export default class Language {
 			else return loop(`${dir}/${parts[0]}`, parts.slice(1));
 		}
 
-		let str = loop(`${config.dir.lang}/${lang}`, path.split("."));
+		let str = loop(`${dir}/${lang}`, path.split("."));
 		if ([undefined, null].includes(str)) return nullOnNotFound ? null : `{lang:${path}}`;
 
 		if (str instanceof Array) {
@@ -72,7 +72,7 @@ export default class Language {
 		}
 	}
 
-	static has(lang: string) { return fs.existsSync(`${config.dir.lang}/${lang}.json`); }
+	static has(lang: string) { return fs.existsSync(`${dir}/${lang}.json`); }
 
 	static parseString(lang: Languages, str: string): string {
 		if (!str) return "";
@@ -87,7 +87,8 @@ export default class Language {
 			const j = this.MODIFIERS[mod];
 			if (!j) {
 				const e = new LanguageError("UnknownModifierError", `Unknown modifier "${mod}"`).stack;
-				Logger.warn("Language", e);
+				// would be Logger but circular dependencies suck
+				console.warn("Language", e);
 			} else mods.push(j);
 		});
 		const d = c.split("|");

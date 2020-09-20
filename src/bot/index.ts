@@ -16,10 +16,9 @@ import Base from "../clustering/Base";
 import Cluster from "../clustering/Cluster";
 import config from "../config";
 import TimedTasks from "../util/Functions/TimedTasks";
-import EmbedBuilder from "../util/EmbedBuilder";
-import { Colors } from "../util/Constants";
 import Internal from "../util/Functions/Internal";
 import { performance } from "perf_hooks";
+import Language from "../util/Language";
 
 class FurryBot extends Base {
 	cmd: CommandHandler;
@@ -162,6 +161,8 @@ class FurryBot extends Base {
 
 		this.done();
 	}
+
+	get lang() { return Language; }
 }
 
 export default FurryBot;
