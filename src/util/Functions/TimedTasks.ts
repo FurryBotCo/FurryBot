@@ -16,7 +16,6 @@ export default class TimedTasks {
 
 	static async runAll(client: FurryBot) {
 		const d = new Date();
-		console.log([d.getHours(), d.getMinutes(), d.getSeconds()]);
 		if (d.getSeconds() === 0) {
 			if (d.getMinutes() === 0) {
 				await this.runDeleteUsers(client).then(() => Logger.debug("Timed Tasks |  Delete Users", "Finished processing."));
