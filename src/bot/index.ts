@@ -166,7 +166,7 @@ class FurryBot extends Base {
 
 	async getUser(id: string) {
 		if (this.bot.users.has(id)) return this.bot.users.get(id);
-		const user: Eris.User = await this.getUser(id).catch(err => null);
+		const user: Eris.User = await this.bot.getRESTUser(id).catch(err => null);
 		if (user) {
 			this.bot.users.set(id, user);
 			return user;

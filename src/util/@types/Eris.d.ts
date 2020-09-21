@@ -31,6 +31,12 @@ declare module "eris" {
 		 */
 		readonly me: Member;
 		/**
+		 * The Member instance of the guild owner
+		 * @type {Member}
+		 * @memberof Guild
+		 */
+		readonly owner: Member;
+		/**
 		 * The client instance (should NOT be used, but we have to here)
 		 * @type {Client}
 		 * @memberof Guild

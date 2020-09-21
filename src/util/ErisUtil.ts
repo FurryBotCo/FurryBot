@@ -11,3 +11,7 @@ Object.defineProperty(Eris.Member.prototype, "tag", {
 Object.defineProperty(Eris.Guild.prototype, "me", {
 	get(this: Eris.Guild) { return this.members.get(this._client.user.id); }
 });
+
+Object.defineProperty(Eris.Guild.prototype, "owner", {
+	get(this: Eris.Guild) { return this.members.get(this.ownerID); }
+});
