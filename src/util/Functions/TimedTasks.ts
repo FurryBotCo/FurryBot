@@ -16,13 +16,13 @@ export default class TimedTasks {
 
 	static async runAll(client: FurryBot) {
 		const d = new Date();
+		console.log([d.getHours(), d.getMinutes(), d.getSeconds()]);
 		if (d.getSeconds() === 0) {
 			if (d.getMinutes() === 0) {
 				await this.runDeleteUsers(client).then(() => Logger.debug("Timed Tasks |  Delete Users", "Finished processing."));
 				await this.runDeleteGuilds(client).then(() => Logger.debug("Timed Tasks |  Delete Guilds", "Finished processing."));
+				if (!config.beta && d.getHours() === 0) await this.runDailyJoins(client).then(() => Logger.debug("Timed Tasks | Daily Joins", "Finished processing."));
 			}
-
-			if (/*!config.beta && */d.getHours() === 1 && d.getMinutes() === 23) await this.runDailyJoins(client).then(() => Logger.debug("Timed Tasks | Daily Joins", "Finished processing."));
 		}
 	}
 
