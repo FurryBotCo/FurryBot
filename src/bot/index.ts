@@ -21,6 +21,8 @@ import { performance } from "perf_hooks";
 import Language from "../util/Language";
 import "../util/ErisUtil";
 import Eris from "eris";
+import BLClient from "../util/handlers/BotListHandler";
+import phin from "phin";
 
 class FurryBot extends Base {
 	cmd: CommandHandler;
@@ -159,6 +161,36 @@ class FurryBot extends Base {
 		}, 5e3);
 
 		setInterval(() => TimedTasks.runAll(this), 1e3);
+
+		BLClient
+			.on("beforePost", async () => {
+				BLClient.update(this.bot.guilds.size, this.bot.shards.map(s => ({
+					id: s.id,
+					count: this.bot.guilds.filter(g => g.shard.id === s.id).length
+				})).reduce((a, b) => a.concat(b), []));
+				await phin({
+					method: "POST",
+					url: "https://top.gg/api/bots/398251412246495233/stats",
+					headers: {
+						"Authorization": config.client.botLists["top.gg"].token,
+						"User-Agent": config.web.userAgent
+					},
+					data: {
+						server_count: this.bot.guilds.size,
+						shards: this.bot.shards.map(s => this.bot.guilds.filter(g => g.shard.id === s.id).length)
+					} as any
+				}).then(res => {
+					Logger.debug(["Bot List Stats", "DBL"], res.statusCode === 200 ? "Successfully posted stats" : "failed to post stats");
+					if (res.statusCode !== 200) Logger.error(["Bot List Stats", "DBL"], res.body.toString());
+				});
+			})
+			.on("afterPost", (successful, failed) =>
+				Logger.debug("Bot List Stats", `Finished posting to ${successful + failed} lists. ${successful} succeeded, ${failed} failed.`)
+			)
+			.on("error", (err) =>
+				Logger.error("Bot List Stats", err)
+			)
+			.start();
 
 		const end = performance.now();
 		Logger.info([`Cluster #${this.cluster.id}`, "General"], `Ready with ${this.bot.guilds.size} guild${this.bot.guilds.size === 1 ? "" : "s"}, ${this.bot.users.size} user${this.bot.users.size === 1 ? "" : "s"}, and ${Object.keys(this.bot.channelGuildMap).length} guild channel${Object.keys(this.bot.channelGuildMap).length === 1 ? "" : "s"}. Launch processing took ${(end - start).toFixed(3)}ms.`);
