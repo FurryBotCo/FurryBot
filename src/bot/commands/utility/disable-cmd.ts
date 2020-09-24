@@ -69,6 +69,12 @@ export default new Command(["disable"], __filename)
 							...d
 						};
 
+						if (!msg.gConfig.disable || !(msg.gConfig.disable instanceof Array)) await msg.gConfig.mongoEdit({
+							$set: {
+								disable: []
+							}
+						});
+
 						for (const dis of msg.gConfig.disable) if (JSON.stringify(dis) === JSON.stringify(c)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.duplicate`));
 
 						await msg.gConfig.mongoEdit({
@@ -80,9 +86,9 @@ export default new Command(["disable"], __filename)
 							allowedMentions: {
 								everyone: false,
 								roles: false,
-								users: false
+								users: [msg.author.id]
 							},
-							content: `{lang:${cmd.lang}.success.${type || "all"}Channel|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${ch.id}}`
+							content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.success.${type || "all"}Channel|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${ch.id}}`)
 						});
 					} else if (role) {
 						const c = {
@@ -102,7 +108,7 @@ export default new Command(["disable"], __filename)
 							allowedMentions: {
 								everyone: false,
 								roles: false,
-								users: false
+								users: [msg.author.id]
 							},
 							content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.success.${type || "all"}Role|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${role.id}}`)
 						});
@@ -121,16 +127,20 @@ export default new Command(["disable"], __filename)
 							}
 						});
 						return msg.reply({
-							allowedMentions: {},
-							content: `{lang:${cmd.lang}.success.${type || "all"}User|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${user.id}}`
+							allowedMentions: {
+								everyone: false,
+								roles: false,
+								users: [msg.author.id]
+							},
+							content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.success.${type || "all"}User|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${user.id}}`)
 						});
 					} else return msg.reply({
 						allowedMentions: {
 							everyone: false,
 							roles: false,
-							users: false
+							users: [msg.author.id]
 						},
-						content: `{lang:${cmd.lang}.noAddFound|${msg.args[2].toLowerCase()}}`
+						content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.noAddFound|${msg.args[2].toLowerCase()}}`)
 					});
 				}
 				break;
@@ -156,7 +166,7 @@ export default new Command(["disable"], __filename)
 							disable: e
 						}
 					});
-					return msg.reply(`{lang:${cmd.lang}.remove.success|${id}}`);
+					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.success`, [id]));
 				}
 				break;
 			}
