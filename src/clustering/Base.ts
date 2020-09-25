@@ -1,10 +1,4 @@
 import Cluster from "./Cluster";
-import IPC from "./IPC";
-
-export default interface Base {
-	new(d: Cluster): this; // tslint:disable-line callable-types
-}
-
 
 export default class Base {
 	cluster: Cluster;
