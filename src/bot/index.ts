@@ -119,7 +119,7 @@ class FurryBot extends Base {
 		Logger.debug([`Cluster #${this.cluster.id}`, "Event Loader"], `Finished loading ${events.length} events in ${(end - start).toFixed(3)}ms.`);
 	}
 
-	async launch(shards) {
+	async launch(shards: number) {
 		const start = performance.now();
 		await this.loadEvents(true);
 		this.cmd = new CommandHandler(this);
@@ -195,7 +195,7 @@ class FurryBot extends Base {
 		const end = performance.now();
 		Logger.info([`Cluster #${this.cluster.id}`, "General"], `Ready with ${this.bot.guilds.size} guild${this.bot.guilds.size === 1 ? "" : "s"}, ${this.bot.users.size} user${this.bot.users.size === 1 ? "" : "s"}, and ${Object.keys(this.bot.channelGuildMap).length} guild channel${Object.keys(this.bot.channelGuildMap).length === 1 ? "" : "s"}. Launch processing took ${(end - start).toFixed(3)}ms.`);
 
-		this.done();
+		super.done();
 	}
 
 	async getUser(id: string) {
