@@ -5,5 +5,6 @@
 	"join": "There was an error while executing that. You can report this in our Discord server: <{0}>\nCode: `{1}`\n\n**{2}: {3}**",
 	"noStats": "Stats have not been processed yet, please wait a bit longer to execute this command.",
 	"permissionMissing": "I am missing the `{0}` permission to be able to run this properly!",
-	"unknown": "Unknown error."
+	"unknown": "Unknown error.",
+	"command": "There was an unknown error while running that command.\nIf you believe this is ian issue, please contact us in our support server: {0}.\n\n**{1}**"
 }

@@ -10,6 +10,7 @@ import * as pkgLock from "../../../../package-lock.json";
 import Language from "../../../util/Language";
 import Internal from "../../../util/Functions/Internal";
 import phin from "phin";
+import { performance } from "perf_hooks";
 
 export default new Command(["info"], __filename)
 	.setBotPermissions([
@@ -58,7 +59,8 @@ export default new Command(["info"], __filename)
 					// GB = 1000, GiB = 1024 apparently ??
 					// https://en.wikipedia.org/wiki/Gibibyte
 					...d,
-					`${config.emojis.default.dot} {lang:other.words.uptime$ucwords$}: ${Time.ms(process.uptime() * 1000, true)} (${Time.secondsToHMS(process.uptime())})`,
+					`${config.emojis.default.dot} {lang:other.words.processUptime$ucwords$}: ${Time.ms(performance.nodeTiming.duration, true)} (${Time.secondsToHMS(process.uptime())})`,
+					`${config.emojis.default.dot} {lang:other.words.readyUptime$ucwords$}: ${Time.ms(process.uptime() * 1000, true)} (${Time.secondsToHMS(process.uptime())})`,
 					`${config.emojis.default.dot} {lang:other.words.shard$ucwords$}: ${msg.channel.guild.shard.id + 1}/${st.shards.size}`,
 					`${config.emojis.default.dot} {lang:other.words.cluster$ucwords$}: ${this.cluster.id + 1}/${this.cluster.options.clusterCount}`,
 					`${config.emojis.default.dot} {lang:other.words.guilds$ucwords$}: ${st.guilds}`,
