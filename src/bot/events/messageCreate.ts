@@ -365,7 +365,13 @@ export default new ClientEvent("messageCreate", async function (message, update)
 						}
 					}
 				} else {
-					await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.command", [config.client.socials.discord, `${err.name}: ${err.message}`]));
+					switch (err.name) {
+						case "'tags' conatins a tag that is listed in 'filterTags'": {
+							await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.e6Blacklist"));
+							break;
+						}
+						default: await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.command", [config.client.socials.discord, `${err.name}: ${err.message}`]));
+					}
 					Logger.error([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, "Command Handler"], err);
 				}
 			});
