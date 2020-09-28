@@ -2,6 +2,7 @@ import FurryBot from "../../bot";
 import ExtendedMessage from "../ExtendedMessage";
 import Eris from "eris";
 import Redis from "../Redis";
+import config from "../../config";
 
 export default class StatsHandler {
 	#client: FurryBot;
@@ -82,8 +83,19 @@ export default class StatsHandler {
 				session: await Redis.get("stats:commands:session:total").then(v => Number(v)),
 				specific: await Promise.all(this.#client.cmd.commands.map(c => c.triggers[0]).map(async (c) => ({
 					general: await Redis.get(`stats:commands:general:${c}`).then(v => Number(v)),
-					session: await Redis.get(`stats:commands:session:${c}`).then(v => Number(v))
-				})))
+					session: await Redis.get(`stats:commands:session:${c}`).then(v => Number(v)),
+					cmd: c
+				}))).then(v =>
+					v
+						.sort((a, b) => b.general - a.general)
+						.map(v => ({
+							[v.cmd]: {
+								general: v.general,
+								session: v.session
+							}
+						}))
+						.reduce((a, b) => ({ ...a, ...b }), {})
+				)
 			}
 		};
 	}
