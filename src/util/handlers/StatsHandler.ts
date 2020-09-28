@@ -68,6 +68,17 @@ export default class StatsHandler {
 		await this.track("stats", "messages", "session");
 	}
 
+	async resetSessionStats() {
+		await Redis.del("stats:messages:session");
+		await Redis.del("stats:directMessages:session");
+		await Redis.del("stats:messages:session");
+		await Redis.del("stats:commands:session:total");
+		const keys = await Redis.keys("stats:commands:session:*");
+		for (const key of keys) {
+			await Redis.del(key);
+		}
+	}
+
 	async getStats() {
 		return {
 			messages: {

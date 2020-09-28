@@ -121,6 +121,7 @@ class FurryBot extends Base {
 
 	async launch(shards: number) {
 		const start = performance.now();
+		await this.sh.resetSessionStats();
 		await this.loadEvents(true);
 		this.cmd = new CommandHandler(this);
 		this.w = new WebhookStore(this);
