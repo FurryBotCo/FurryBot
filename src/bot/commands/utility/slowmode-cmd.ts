@@ -25,5 +25,5 @@ export default new Command(["slowmode"], __filename)
 
 		await ch.edit({ rateLimitPerUser: s }, `Command: ${msg.author.tag}`);
 
-		return msg.reply(s === 0 ? Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove`, [ch.id]) : Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set`, [ch.id, s, s === 1 ? "\u200b" : "s"]));
+		return msg.reply(s === 0 ? Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove`, [ch.id]) : Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set`, [ch.id, s, s === 1 ? "OwO" : "s"]));
 	});

@@ -22,7 +22,7 @@ export default new Command(["gayrate"], __filename)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setDescription(`{lang:${cmd.lang}.percent${member.id === msg.author.id ? "Self" : "Other"}|<@!${member.id}>|${Math.floor(Math.random() * 100)}}`)
 				.setTimestamp(new Date().toISOString())
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.setColor(Colors.gold)
 				.toJSON()
 		});

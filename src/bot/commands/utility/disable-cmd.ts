@@ -216,7 +216,7 @@ export default new Command(["disable"], __filename)
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.gold)
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.toJSON()
 		});
 		else return "DEFAULT";
@@ -242,7 +242,7 @@ export default new Command(["disable"], __filename)
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.gold)
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.toJSON()
 		});
 	});

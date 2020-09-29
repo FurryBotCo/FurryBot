@@ -28,7 +28,7 @@ export default new Command(["whoplays"], __filename)
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.gold)
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.toJSON()
 		});
 	});

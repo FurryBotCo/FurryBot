@@ -21,7 +21,7 @@ export default new Command(["invite", "inv", "discord"], __filename)
 				.setColor(Colors.green)
 				.setTimestamp(new Date().toISOString())
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.toJSON()
 		});
 	});

@@ -22,7 +22,7 @@ export default new Command(["bap"], __filename)
 				.setDescription(`{lang:${cmd.lang}.possible|${msg.author.id}|${Internal.extraArgParsing(msg)}|${r.username}#${r.discriminator}}`)
 				.setImage("https://assets.furry.bot/bap.gif")
 				.setTimestamp(new Date().toISOString())
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.setColor(Colors.gold)
 				.toJSON()
 		});

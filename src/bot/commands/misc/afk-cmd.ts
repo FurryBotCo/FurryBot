@@ -19,7 +19,7 @@ export default new Command(["afk"], __filename)
 				.setDescription(`{lang:${cmd.lang}.done${type === "global" ? "Global" : ""}}`)
 				.setTimestamp(new Date().toISOString())
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.setColor(Colors.gold)
 				.toJSON()
 		});

@@ -21,7 +21,7 @@ export default new Command(["bulge"], __filename)
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.setTimestamp(new Date().toISOString())
 				.setDescription([
 					`[[{lang:other.images.shortURL}]](${img.shortURL})`,

@@ -20,7 +20,7 @@ export default new Command(["spray"], __filename)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setDescription(`{lang:${cmd.lang}.possible|${msg.author.id}|${Internal.extraArgParsing(msg)}}\n<:${config.emojis.custom.spray}><:${config.emojis.custom.spray}><:${config.emojis.custom.spray}>`)
 				.setTimestamp(new Date().toISOString())
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.setColor(Colors.gold)
 				.toJSON()
 		});

@@ -16,7 +16,7 @@ export default new Command(["whosagoodboi", "whosagoodboy", "goodboi", "goodboy"
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setDescription(`{lang:${cmd.lang}.${msg.args.length === 0 ? "me" : "other"}|${Internal.extraArgParsing(msg)}}`)
 				.setTimestamp(new Date().toISOString())
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.setColor(Colors.gold)
 				.toJSON()
 		});

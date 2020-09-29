@@ -73,7 +73,7 @@ export default new Command(["modlog"], __filename)
 			case "list": {
 				const dev = msg.dashedArgs.value.includes("dev");
 				if (dev && !config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.devOnlyFlag`));
-				const user = await msg.getUserFromArgs(1, true, 0);
+				const user = msg.args.length === 1 ? msg.author : await msg.getUserFromArgs(1, true, 0);
 				if (!user) return msg.channel.createMessage({
 					embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_USER", true)
 				});
@@ -114,7 +114,7 @@ export default new Command(["modlog"], __filename)
 
 					em.addField(`{lang:${cmd.lang}.list.name|${v.pos}}`, [
 						`{lang:other.words.type$ucwords$}: **${Strings.ucwords(v.type)}**`,
-						`{lang:other.words.reason$ucwords$}: **${!u ? "{lang:other.words.unknown$ucwords$}" : `${u.username}#${u.discriminator}`}**`,
+						`{lang:other.words.blame$ucwords$}: **${!u ? "{lang:other.words.unknown$ucwords$}" : `${u.username}#${u.discriminator}`}**`,
 						`{lang:other.words.time$ucwords$}: **${!v.creationDate ? `{lang:${cmd.lang}.list.legacy}` : Time.formatDateWithPadding(v.creationDate)}**`,
 						`{lang:other.words.reason$ucwords$}: ${v.reason}`,
 						...(dev ? [

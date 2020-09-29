@@ -55,7 +55,7 @@ export default new Command(["ping"], __filename)
 							`{lang:${cmd.lang}.shardAverage|${sh.length}}: **${Math.abs(Math.floor(sh.reduce((a, b) => a + b.latency, 0) / sh.length))}ms**`
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
-						.setFooter("\u200b", this.bot.user.avatarURL)
+						.setFooter("OwO", this.bot.user.avatarURL)
 						.setColor(Colors.gold)
 						.toJSON()
 				});

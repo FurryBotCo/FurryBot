@@ -30,7 +30,7 @@ export default class ExtraHandlers {
 						.setDescription(`{lang:other.commandChecks.permission.user.description|${userMissing.length === 1 ? "" : "s"}|${userMissing.join(", ")}}`)
 						.setColor(Colors.red)
 						.setTimestamp(new Date().toISOString())
-						.setFooter("\u200b", client.bot.user.avatarURL)
+						.setFooter("OwO", client.bot.user.avatarURL)
 						.toJSON()
 				});
 			}
@@ -48,7 +48,7 @@ export default class ExtraHandlers {
 						.setDescription(`{lang:other.commandChecks.permission.bot.description|${botMissing.length === 1 ? "" : "s"}|${botMissing.join(", ")}}`)
 						.setColor(Colors.red)
 						.setTimestamp(new Date().toISOString())
-						.setFooter("\u200b", client.bot.user.avatarURL)
+						.setFooter("OwO", client.bot.user.avatarURL)
 						.toJSON()
 				});
 			}

@@ -18,7 +18,7 @@ export default new Command(["warnings"], __filename)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 2) throw new CommandError("ERR_INVALID_USAGE", cmd);
 
-		const member = await msg.getMemberFromArgs(1);
+		const member = await msg.getMemberFromArgs(1, true, 0);
 		if (!member) return msg.channel.createMessage({
 			embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_MEMBER", true)
 		});
@@ -26,7 +26,7 @@ export default new Command(["warnings"], __filename)
 		const w = await mdb.collection<WithId<Warning>>("warnings").find({
 			guildId: msg.channel.guild.id,
 			userId: member.id
-		}).toArray();
+		}).toArray().then(w => w.sort((a, b) => a.id - b.id));
 
 		switch (msg.args[0]?.toLowerCase()) {
 			case "list": {
@@ -109,7 +109,7 @@ export default new Command(["warnings"], __filename)
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.help.title}`)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.setColor(Colors.red)
 				.setDescription([
 					`{lang:${cmd.lang}.help.subNotice}`,
@@ -131,7 +131,7 @@ export default new Command(["warnings"], __filename)
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.help.title} - {lang:other.words.list$ucwords$}`)
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
-					.setFooter("\u200b", this.bot.user.avatarURL)
+					.setFooter("OwO", this.bot.user.avatarURL)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:${cmd.lang}.help.noPerms}`,
@@ -146,7 +146,7 @@ export default new Command(["warnings"], __filename)
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.help.title} - {lang:other.words.remove$ucwords$}`)
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
-					.setFooter("\u200b", this.bot.user.avatarURL)
+					.setFooter("OwO", this.bot.user.avatarURL)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:${cmd.lang}.help.requiresPerm2|manageMessages}`,
@@ -161,7 +161,7 @@ export default new Command(["warnings"], __filename)
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.help.title} - {lang:other.words.clear$ucwords$}`)
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
-					.setFooter("\u200b", this.bot.user.avatarURL)
+					.setFooter("OwO", this.bot.user.avatarURL)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:${cmd.lang}.help.requiresPerm2|manageServer}`,

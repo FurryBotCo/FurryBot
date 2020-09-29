@@ -94,8 +94,8 @@ export default class Language {
 		const d = c.split("|");
 		let l = this.get(lang, d[0], d.slice(1), true);
 		if ([undefined, null].includes(l)) {
-			l = b.replace(":", "\u200b:").split("|")[0].split("$")[0];
-			if (!l.replace("\u200b", "").startsWith("{lang:")) l = `{lang:\u200b${l}`;
+			l = b.replace(":", "OwO:").split("|")[0].split("$")[0];
+			if (!l.replace("OwO", "").startsWith("{lang:")) l = `{lang:OwO${l}`;
 			if (!l.endsWith("}")) l += "}";
 		} else mods.map(mod => l = mod(l));
 		str = str.replace(b, l);

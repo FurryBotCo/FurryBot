@@ -139,7 +139,7 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	addEmptyField(inline?: boolean) { return this.addField("\u200b", "\u200b", inline); }
+	addEmptyField(inline?: boolean) { return this.addField("OwO", "OwO", inline); }
 
 	addFields(...args: Eris.EmbedField[]) {
 		args.map(a => this.addField(a.name, a.value, a.inline));

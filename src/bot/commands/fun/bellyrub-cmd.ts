@@ -20,7 +20,7 @@ export default new Command(["bellyrub"], __filename)
 				.setDescription(`{lang:${cmd.lang}.possible|${msg.author.id}|${Internal.extraArgParsing(msg)}}`)
 				.setImage("https://assets.furry.bot/bellyrub.gif")
 				.setTimestamp(new Date().toISOString())
-				.setFooter("\u200b", this.bot.user.avatarURL)
+				.setFooter("OwO", this.bot.user.avatarURL)
 				.setColor(Colors.gold)
 				.toJSON()
 		});
