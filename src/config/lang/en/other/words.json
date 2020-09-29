@@ -76,5 +76,9 @@
 	"fail": "fail",
 	"type": "type",
 	"time": "time",
-	"build": "build"
+	"build": "build",
+	"messages": "messages",
+	"direct": "direct",
+	"server": "server",
+	"thisSession": "this session"
 }

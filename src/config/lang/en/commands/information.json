@@ -163,6 +163,21 @@
 		"yes": "Yes",
 		"invalidType": "invalid type, valid types: \"channels\", \"members\", \"server\", \"icon\", \"splash\", \"banner\""
 	},
+	"stats": {
+		"description": "Get some statistics about me.",
+		"usage": "",
+		"titleGeneral": "General Stats",
+		"titleCommand": "Command Stats",
+		"fieldMessages": "Messages",
+		"fieldCommands": "Commands",
+		"commandsNum": "Commands #{0}",
+		"total": "Total",
+		"thisSession": "This Session",
+		"cmdFull": "Use `{0}stats commands` for full command stats.",
+		"footer": "Fetched in {0}ms",
+		"invalidType": "Invalid type provided.",
+		"info": "Total / This Session"
+	},
 	"uinfo": {
 		"description": "Get some info about a user.",
 		"usage": "[@member/id]",
