@@ -58,6 +58,8 @@ export default class TimedActionsHandler {
 		if (s.modlog.enabled) ch = await g.getRESTChannels().then(v => v.find(c => c.id === s.modlog.channel)).then(v => !v ? null : v as Eris.GuildTextableChannel).catch(err => null);
 
 		await this.client.m.createUnbanEntry(ch, s, "automatic", user, Language.get(s.settings.lang, "other.modlog.autoExpiry"));
+
+		this.deleteEntry(entry);
 	}
 
 	async handleMuteEntry(entry: TimedEntry<"mute">) {
@@ -109,5 +111,7 @@ export default class TimedActionsHandler {
 		}
 
 		await this.client.m.createUnmuteEntry(ch, s, "automatic", member, Language.get(s.settings.lang, "other.modlog.autoExpiry"));
+
+		this.deleteEntry(entry);
 	}
 }
