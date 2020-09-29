@@ -28,16 +28,16 @@ export default new Command(["stats"], __filename)
 				.setTitle(`{lang:${cmd.lang}.titleGeneral}`)
 				.addField("{lang:other.words.messages$ucwords$}", [
 					"{lang:other.words.server$ucwords$} {lang:other.words.messages$ucwords$}",
-					`{lang:other.words.total$ucwords$}: ${stats.messages.general}`,
-					`{lang:other.words.thisSession$ucwords$}: ${stats.messages.session}`,
+					`{lang:other.words.total$ucwords$}: ${stats.messages.general.toLocaleString()}`,
+					`{lang:other.words.thisSession$ucwords$}: ${stats.messages.session.toLocaleString()}`,
 					"",
 					"{lang:other.words.direct$ucwords$} {lang:other.words.messages$ucwords$}",
-					`{lang:other.words.total$ucwords$}: ${stats.directMessages.general}`,
-					`{lang:other.words.thisSession$ucwords$}: ${stats.directMessages.session}`
+					`{lang:other.words.total$ucwords$}: ${stats.directMessages.general.toLocaleString()}`,
+					`{lang:other.words.thisSession$ucwords$}: ${stats.directMessages.session.toLocaleString()}`
 				].join("\n"), false)
 				.addField("{lang:other.words.commands$ucwords$}", [
-					`{lang:other.words.total$ucwords$}: ${stats.commands.general}`,
-					`{lang:other.words.thisSession$ucwords$}: ${stats.commands.session}`,
+					`{lang:other.words.total$ucwords$}: ${stats.commands.general.toLocaleString()}`,
+					`{lang:other.words.thisSession$ucwords$}: ${stats.commands.session.toLocaleString()}`,
 					"",
 					`{lang:${cmd.lang}.cmdFull|${msg.gConfig.settings.prefix}}`
 				].join("\n"));
@@ -55,7 +55,7 @@ export default new Command(["stats"], __filename)
 							`\t{lang:other.words.thisSession$ucwords$}: ${cmd.session}`,
 							"",
 							""*/
-							`**${Strings.ucwords(k)}**: ${cmd.general} / ${cmd.session}`,
+							`**${Strings.ucwords(k)}**: ${cmd.general.toLocaleString()} / ${cmd.session.toLocaleString()}`,
 							""
 						].join("\n");
 						if (text[i].length + v.length >= 1024) {
