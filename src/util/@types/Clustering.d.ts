@@ -9,12 +9,7 @@ declare global {
 			clusterCount?: number | "auto";
 			shardCount?: number | "auto";
 			webhooks?: {
-				[k in "shard" | "cluster"]?: {
-					id: string;
-					token: string;
-					avatar?: string;
-					username?: string;
-				};
+				[k in "shard" | "cluster"]?: WebhookOptions | WebhookOptions[];
 			};
 			stats?: {
 				enabled: boolean;
@@ -100,4 +95,10 @@ declare global {
 		}
 	}
 
+	export interface WebhookOptions {
+		id: string;
+		token: string;
+		avatar?: string;
+		username?: string;
+	}
 }

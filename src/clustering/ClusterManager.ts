@@ -23,12 +23,7 @@ export default class ClusterManager {
 		clusterCount: number; // 0 for "auto"
 		shardCount: number; // 0 for "auto"
 		webhooks: {
-			[k in "shard" | "cluster"]: {
-				id: string;
-				token: string;
-				avatar?: string;
-				username?: string;
-			};
+			[k in "shard" | "cluster"]: WebhookOptions | WebhookOptions[];
 		};
 		stats: {
 			enabled: boolean;
@@ -404,20 +399,25 @@ export default class ClusterManager {
 		return c;
 	}
 
-	async executeWebhook(type: keyof ClusterManager["options"]["webhooks"], data: Eris.MessageContent) {
-		const w = this.options.webhooks[type];
+	async executeWebhook(type: keyof ClusterManager["options"]["webhooks"], data: Eris.MessageContent, index?: number) {
+		let w = this.options.webhooks[type];
+		if (typeof index === "number") w = w[index]!;
 		if (!w) return;
 		const p: Eris.WebhookPayload = {
 			wait: false
 		};
-		if (w.avatar) p.avatarURL = w.avatar;
-		if (w.username) p.username = config.beta ? w.username.replace(/Furry Bot/, "Furry Bot Beta") : w.username;
-		if (typeof data === "string") p.content = data;
+		if (w instanceof Array) await Promise.all(w.map(async (_, i) => this.executeWebhook(type, data, i)));
 		else {
-			if (data.content) p.content = data.content;
-			if (data.embed) p.embeds = [data.embed];
+			if (w.avatar) p.avatarURL = w.avatar;
+			if (w.username) p.username = config.beta ? w.username.replace(/Furry Bot/, "Furry Bot Beta") : w.username;
+			if (typeof data === "string") p.content = data;
+			else {
+				if (data.content) p.content = data.content;
+				if (data.embed) p.embeds = [data.embed];
+			}
+
+			await this.#eris.executeWebhook(w.id, w.token, p);
 		}
-		return this.#eris.executeWebhook(w.id, w.token, p);
 	}
 
 	broadcast(op: string, d: object) {
