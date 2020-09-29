@@ -19,8 +19,8 @@ export default new Command(["slap"], __filename)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setDescription(`{lang:${cmd.lang}.possible|${msg.author.id}|${Internal.extraArgParsing(msg)}}`)
 				.setTimestamp(new Date().toISOString())
-				.setFooter("OwOthis.bot.user.avatarURL)
-					.setColor(Colors.gold)
-					.toJSON()
+				.setFooter("OwO", this.bot.user.avatarURL)
+				.setColor(Colors.gold)
+				.toJSON()
 		});
 	});
