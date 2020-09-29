@@ -25,4 +25,18 @@ export default class Strings {
 		});
 		return str;
 	}
+
+	static formatBytes(str: string | number, precision?: number) {
+		if ([undefined, null].includes(precision)) precision = 2;
+		str = Number(str);
+		const { KB, MB, GB } = {
+			KB: 1000,
+			MB: 1000000,
+			GB: 1000000000
+		};
+		if (str >= GB) return `${(str / GB).toFixed(precision)} GB`;
+		else if (str >= MB) return `${(str / MB).toFixed(precision)} MB`;
+		else if (str >= KB) return `${(str / KB).toFixed(precision)} KB`;
+		else return `${str} B`;
+	}
 }

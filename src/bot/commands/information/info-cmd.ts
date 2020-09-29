@@ -10,6 +10,7 @@ import * as pkgLock from "../../../../package-lock.json";
 import Language from "../../../util/Language";
 import Internal from "../../../util/Functions/Internal";
 import phin from "phin";
+import Strings from "../../../util/Functions/Strings";
 
 export default new Command(["info"], __filename)
 	.setBotPermissions([
@@ -22,7 +23,7 @@ export default new Command(["info"], __filename)
 		const { drives: diskUsage } = Internal.getDiskUsage();
 		const d = [];
 		for (const k of Object.keys(diskUsage)) {
-			d.push(`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$} (${k}): ${((diskUsage[k].total - diskUsage[k].free) / 1000 / 1000 / 1000).toFixed(2)}GB / ${(diskUsage[k].total / 1000 / 1000 / 1000).toFixed(2)}GB`);
+			d.push(`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$} (${k}): ${Strings.formatBytes(diskUsage[k].total - diskUsage[k].free)} / ${Strings.formatBytes(diskUsage[k].total)}`);
 		}
 		if (os.hostname() === "2020.extra-v4.furry.bot") {
 			const { body: k } = await phin<{
@@ -41,7 +42,7 @@ export default new Command(["info"], __filename)
 				},
 				parse: "json"
 			});
-			d.push(`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$} (DB): ${((k.drives["/"].total - k.drives["/"].free) / 1000 / 1000 / 1000).toFixed(2)}GB / ${(k.drives["/"].total / 1000 / 1000 / 1000).toFixed(2)}GB`);
+			d.push(`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$} (DB): ${Strings.formatBytes(k.drives["/"].total - k.drives["/"].free)} / ${Strings.formatBytes(k.drives["/"].total)}`);
 		}
 		const st = await this.ipc.getStats();
 		if (!st) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.noStats"));
@@ -51,9 +52,9 @@ export default new Command(["info"], __filename)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setDescription([
 					"**{lang:other.words.stats$ucwords$}**:",
-					`${config.emojis.default.dot} {lang:${cmd.lang}.memoryUsage.process}: ${Math.round(process.memoryUsage().heapUsed / 1024 / 1024).toLocaleString()}MB / ${Math.round(process.memoryUsage().heapTotal / 1024 / 1024).toLocaleString()}MB`,
-					`${config.emojis.default.dot} {lang:${cmd.lang}.memoryUsage.total}: ${Math.round(st.memory.all.heapUsed / 1024 / 1024).toLocaleString()}MB / ${Math.round(st.memory.all.heapTotal / 1024 / 1024).toLocaleString()}MB`,
-					`${config.emojis.default.dot} {lang:${cmd.lang}.memoryUsage.system}: ${Math.round((os.totalmem() - os.freemem()) / 1024 / 1024).toLocaleString()}MB / ${Math.round(os.totalmem() / 1024 / 1024).toLocaleString()}MB`,
+					`${config.emojis.default.dot} {lang:${cmd.lang}.memoryUsage.process}: ${Strings.formatBytes(process.memoryUsage().heapUsed)} / ${Strings.formatBytes(process.memoryUsage().heapTotal)}`,
+					`${config.emojis.default.dot} {lang:${cmd.lang}.memoryUsage.total}: ${Strings.formatBytes(st.memory.all.heapUsed)} / ${Strings.formatBytes(st.memory.all.heapTotal)}`,
+					`${config.emojis.default.dot} {lang:${cmd.lang}.memoryUsage.system}: ${Strings.formatBytes((os.totalmem() - os.freemem()))} / ${Strings.formatBytes(os.totalmem())}`,
 					`${config.emojis.default.dot} {lang:other.words.cpuUsage}: ${this.cpuUsage}%`,
 					// GB = 1000, GiB = 1024 apparently ??
 					// https://en.wikipedia.org/wiki/Gibibyte

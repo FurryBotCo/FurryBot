@@ -168,15 +168,18 @@
 		"usage": "",
 		"titleGeneral": "General Stats",
 		"titleCommand": "Command Stats",
-		"fieldMessages": "Messages",
-		"fieldCommands": "Commands",
 		"commandsNum": "Commands #{0}",
 		"total": "Total",
 		"thisSession": "This Session",
 		"cmdFull": "Use `{0}stats commands` for full command stats.",
 		"footer": "Fetched in {0}ms",
 		"invalidType": "Invalid type provided.",
-		"info": "Total / This Session"
+		"info": "Total / This Session",
+		"connections": "Connections",
+		"cmdsProcessed": "Commands Processed",
+		"ops": "Operations",
+		"netIn": "Network Bytes In",
+		"netOut": "Network Bytes Out"
 	},
 	"uinfo": {
 		"description": "Get some info about a user.",

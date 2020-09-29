@@ -80,5 +80,7 @@
 	"messages": "messages",
 	"direct": "direct",
 	"server": "server",
-	"thisSession": "this session"
+	"thisSession": "this session",
+	"redis": "redis",
+	"second": "second"
 }
