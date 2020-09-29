@@ -10,9 +10,7 @@ export default new Command(["stats"], __filename)
 		"embedLinks"
 	])
 	.setUserPermissions([])
-	.setRestrictions([
-		"developer"
-	])
+	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		const start = performance.now();
