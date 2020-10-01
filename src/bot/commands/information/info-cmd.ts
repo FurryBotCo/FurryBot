@@ -72,7 +72,7 @@ export default new Command(["info"], __filename)
 					"**{lang:other.words.creators$ucwords$}**:",
 					`${config.emojis.default.dot} [Donovan_DMC](https://furry.cool) <-- **OwO**`,
 					`${config.emojis.default.dot} [August](https://augu.dev) <-- **Cutie**`,
-					`${config.emojis.default.dot} [Lio](https://himbo.cat/) <-- **Dumbass Lino**`,
+					`${config.emojis.default.dot} [Lio](https://himbo.cat/) <-- **Dumbass Lion**`,
 					"",
 					"**{lang:other.words.other$ucwords$}**:",
 					`${config.emojis.default.dot} {lang:other.words.library$ucwords$}: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev) (**${Eris.VERSION}**, \`${pkgLock.dependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
