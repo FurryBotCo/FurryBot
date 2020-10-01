@@ -3,9 +3,13 @@ import { Colors } from "../../util/Constants";
 import config from "../../config";
 import Eris from "eris";
 import Logger from "../../util/Logger";
+import Redis from "../../util/Redis";
 
 export default new ClientEvent("guildDelete", async function (guild) {
 	await this.sh.track("events", "guildDelete");
+	const d = new Date();
+	const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
+	await Redis.decr(`stats:dailyJoins:${id}`);
 
 	let author = {
 		name: "Unknown#0000",
