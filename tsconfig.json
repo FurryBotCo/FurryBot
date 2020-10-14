@@ -3,7 +3,7 @@
     "compilerOptions": {
         "outDir": "./build",
         "allowJs": true,
-        "target": "es2020",
+        "target": "esnext",
         "baseUrl": "src",
         "resolveJsonModule": true,
         "esModuleInterop": true,
@@ -14,7 +14,8 @@
         "typeRoots": [
             "./node_modules/@types",
             "./src/util/@types"
-        ]
+        ],
+        "inlineSourceMap": true
     },
     "include": [
         "**/*"
@@ -24,6 +25,10 @@
         "build",
         "out",
         "tmp",
-        "logs"
+        "logs",
+        "test",
+        "scripts/version.ts",
+        "./ConfigManager.ts",
+        "scripts"
     ]
 }

@@ -23,7 +23,6 @@ export default new Command(["eval", "ev"], __filename)
 	.setRestrictions(["developer"])
 	.setCooldown(0, true)
 	.setExecutor(async function (msg, cmd) {
-
 		if (msg.args.length === 0) return new CommandError("ERR_INVALID_USAGE", cmd);
 		const
 			silent = !!msg.dashedArgs.value.includes("silent"),
@@ -79,7 +78,7 @@ export default new Command(["eval", "ev"], __filename)
 
 		if (!silent) {
 			if (res.length > 1000) {
-				const pasteURL = await Request.createPaste(res, "FurryBot Eval", "1H", 2);
+				const pasteURL = await Request.createPaste(res, "FurryBot Eval", "1H", 1);
 				res = `Uploaded ${pasteURL}`;
 			}
 

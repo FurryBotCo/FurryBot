@@ -98,7 +98,7 @@ export default class PollHandler extends EventEmitter<{
 				.setDescription([
 					...(total === 0 ?
 						[
-							`{lang:commands.utility.poll.noVotes}`
+							"{lang:commands.utility.poll.noVotes}"
 						] :
 						c.map((v, i) => `(${p[i].percent}%) ${Utility.numberToEmoji(v.toString().padStart(longest, "0"))} - ${options[i]}`)
 					)

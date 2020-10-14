@@ -1,11 +1,11 @@
 {
+	"command": "There was an error running that command. If you believe this is an issue, report it in our support server, along with the code `{0}`: {1}.\n\n**{2}**",
 	"dankMemer": "We recieved an error when contacting an external api: **{0}: {1}**.",
+	"e6Blacklist": "That query contained a blacklisted tag.",
 	"imageAPI": "Failed to fetch image from api, please try again later.",
 	"invalidTime": "invalid time argument provided. It must be in this format: <X>m<X>h<X>d<X>n<X>y (<X> being a placeholder for the amount of minutes/hours/days/months/years)\nm = minutes\nh = hours\nd = days\nn = months\ny = years",
 	"join": "There was an error while executing that. You can report this in our Discord server: <{0}>\nCode: `{1}`\n\n**{2}: {3}**",
 	"noStats": "Stats have not been processed yet, please wait a bit longer to execute this command.",
 	"permissionMissing": "I am missing the `{0}` permission to be able to run this properly!",
-	"unknown": "Unknown error.",
-	"command": "There was an unknown error while running that command.\nIf you believe this is ian issue, please contact us in our support server: {0}.\n\n**{1}**",
-	"e6Blacklist": "That query contained a blacklisted tag."
+	"unknown": "Unknown error."
 }

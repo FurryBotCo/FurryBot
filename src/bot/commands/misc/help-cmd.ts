@@ -34,7 +34,7 @@ export default new Command(["help", "h"], __filename)
 					.toJSON()
 			});
 		} else {
-			if (msg.args[0].toLowerCase() === "me") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}`));
+			if (msg.args[0].toLowerCase() === "me") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.helpMe`));
 
 			const c = this.cmd.getCommand(msg.args[0]);
 			const cat = this.cmd.getCategory(msg.args[0]);
@@ -49,7 +49,7 @@ export default new Command(["help", "h"], __filename)
 				const list = [];
 				let i = 0;
 				for (const t of cat.commands) {
-					if (t.restrictions.includes("developer")) continue;
+					if (t.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) continue;
 					const v = `\`${t.triggers[0]}\` - ${t.description || `{lang:commands.${t.category.name}.${t.triggers[0]}.description}`}`;
 					if (!list[i]) list[i] = "";
 					if (list[i].length + v.length > 1024) list[++i] = `${v}\n`;

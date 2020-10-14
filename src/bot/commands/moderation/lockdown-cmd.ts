@@ -2,6 +2,8 @@ import Command from "../../../util/cmd/Command";
 import Language from "../../../util/Language";
 import * as fs from "fs-extra";
 import Eris from "eris";
+import config from "../../../config";
+import Redis from "../../../util/Redis";
 
 export default new Command(["lockdown"], __filename)
 	.setBotPermissions([
@@ -14,26 +16,15 @@ export default new Command(["lockdown"], __filename)
 	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
-		const f = `${__dirname}/../../config/other/lockdown.json`;
-		const d: {
-			[k: string]: {
-				lockdown: boolean;
-				channels: {
-					[k: string]: {
-						allow: number;
-						deny: number;
-					};
-				};
-			};
-		} = JSON.parse(fs.readFileSync(f).toString());
+		const v = await Redis.get(`lockdown:${msg.channel.guild.id}`);
 
-		if (d[msg.channel.guild.id]) {
-			if (d[msg.channel.guild.id].lockdown) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.alreadyDone`));
-			delete d[msg.channel.guild.id];
-		}
-		d[msg.channel.guild.id] = {
-			lockdown: true,
-			channels: {}
+		if (v) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.alreadyDone`));
+		const ch: {
+			[k: string]: {
+				allow: number;
+				deny: number;
+			};
+		} = {
 		};
 
 		const h = msg.channel.guild.channels.filter(c => [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type as any));
@@ -44,7 +35,7 @@ export default new Command(["lockdown"], __filename)
 			} as any;
 			if ([Eris.Constants.Permissions.sendMessages].some(v => p.deny & v)) continue; // skip if send is already denied
 			else {
-				d[msg.channel.guild.id].channels[c.id] = {
+				ch[c.id] = {
 					allow: p.allow,
 					deny: p.deny
 				};
@@ -53,9 +44,9 @@ export default new Command(["lockdown"], __filename)
 			}
 		}
 
-		fs.writeFileSync(f, JSON.stringify(d));
+		await Redis.set(`lockdown:${msg.channel.guild.id}`, JSON.stringify(ch));
 
 		await this.m.createLockdownEntry(msg.channel, msg.gConfig, msg.author);
 
-		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.finished`, [Object.keys(d[msg.channel.guild.id].channels).length]));
+		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.finished`, [Object.keys(ch).length]));
 	});

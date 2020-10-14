@@ -62,7 +62,9 @@ export default new Command(["ban"], __filename)
 		if (msg.channel.guild.members.has(user.id)) {
 			const m = msg.channel.guild.members.get(user.id);
 			const c = Utility.compareMembers(msg.member, m);
-			if ((c.member2.higher || c.member2.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noBanOther`, [`${user.username}#${user.discriminator}`]));
+			if ((c.member1.higher || c.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noBanOther`, [`${user.username}#${user.discriminator}`]));
+			const d = Utility.compareMembers(m, msg.channel.guild.me);
+			if ((d.member1.higher || d.member1.same)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.meNoBan`, [`${m.user.username}#${m.user.discriminator}`]));
 		}
 
 		let m: Eris.Message;

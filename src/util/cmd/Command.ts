@@ -3,6 +3,7 @@ import Category from "./Category";
 import FurryBot from "../../bot";
 import ExtendedMessage from "../ExtendedMessage";
 import CommandError from "./CommandError";
+import path from "path";
 
 type OverrideReturn = any | "DEFAULT" | "ALLOW";
 
@@ -65,6 +66,7 @@ export default class Command {
 	}
 
 	get lang() { return `commands.${this.category.name}.${this.triggers[0]}`; }
+	get tsFile() { return `${path.dirname(this.file).replace(/build(\\|\/)/, "")}/${path.basename(this.file).replace(/.js/, ".ts")}`; }
 
 	setTriggers(data: Command["triggers"]) {
 		if (!data) throw new TypeError("One or more triggers must be provided.");

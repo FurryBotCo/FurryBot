@@ -21,7 +21,7 @@ export default new Command(["lookup"], __filename)
 
 		const w = await phin<any>({
 			method: "GET",
-			url: `https://discordapp.com/api/guilds/${msg.args[0]}/widget.json`,
+			url: `https://discord.com/api/guilds/${msg.args[0]}/widget.json`,
 			headers: {
 				"Authorization": `Bot ${config.client.token}`,
 				"User-Agent": config.web.userAgent
@@ -37,18 +37,18 @@ export default new Command(["lookup"], __filename)
 					.setColor(Colors.green)
 					.setTimestamp(new Date().toISOString());
 
-				const code = w.body.instant_invite.match(new RegExp("^((https?\:\/\/)?(discord\.gg|discordapp\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"))[4];
-				const inv = (await this.bot.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
+				const [_, code] = w.body.instant_invite?.match(new RegExp("^(?:(?:https?\:\/\/)?(?:discord\.gg|discord(?:app)?\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i")) ?? [];
+				const inv = !code ? null : (await this.bot.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
 				if (!inv) {
 					embed.addField(
-						"{lang:other.words.info}",
+						"{lang:other.words.info$ucwords$}",
 						[
 							`${config.emojis.default.dot} {lang:${cmd.lang}.serverName}: ${w.body.name}`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.creation}: ${Time.formatDateWithPadding(new Date(Number(BigInt(w.body.id) / 4194304n + 1420070400000n)), true)}`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.list}: ${w.body.presence_count}`,
-							`\t<:${config.emojis.status.online}> ${w.body.members.filter(m => m.status === "online").length}`,
-							`\t<:${config.emojis.status.idle}> ${w.body.members.filter(m => m.status === "idle").length}`,
-							`\t<:${config.emojis.status.dnd}> ${w.body.members.filter(m => m.status === "dnd").length}`
+							`${config.emojis.default.dot} \t<:${config.emojis.status.online}> ${w.body.members.filter(m => m.status === "online").length}`,
+							`${config.emojis.default.dot} \t<:${config.emojis.status.idle}> ${w.body.members.filter(m => m.status === "idle").length}`,
+							`${config.emojis.default.dot} f!help\t<:${config.emojis.status.dnd}> ${w.body.members.filter(m => m.status === "dnd").length}`
 						].join("\n"),
 						false
 					);
@@ -57,17 +57,17 @@ export default new Command(["lookup"], __filename)
 					embed.addField(
 						`{lang:${cmd.lang}.srvChInfo}`,
 						[
-							`**{lang:${cmd.lang}.extra}**:`,
+							"**{lang:other.words.extra$ucwords$}**:",
 							`${config.emojis.default.dot} {lang:${cmd.lang}.code}: [${inv.code}](https://discord.gg/${inv.code})`,
 							"",
-							`**{lang:${cmd.lang}.server}**:`,
+							"**{lang:other.words.server$ucwords$}**:",
 							`${config.emojis.default.dot} {lang:${cmd.lang}.serverName}: [${guild.name}](https://discord.gg/${inv.code})`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.serverId}: ${guild.id}`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.memberCount}: ${inv.memberCount || "{lang:other.words.unknown}"}`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.presenceCount}: ${inv.presenceCount || "{lang:other.words.unknown}"}`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.vanityURLCode}: ${inv.guild.vanityUrlCode || "{lang:other.words.none}"}`,
 							"",
-							`**{lang:${cmd.lang}.channel}**:`,
+							"**{lang:other.words.channel$ucwords$}**:",
 							`${config.emojis.default.dot} {lang:${cmd.lang}.channelName}: ${channel.name}`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.channelId}: ${channel.id}`,
 							`${config.emojis.default.dot} {lang:${cmd.lang}.channelType}: ${ChannelNames[channel.type]}`
@@ -77,12 +77,12 @@ export default new Command(["lookup"], __filename)
 
 					if (inviter) {
 						embed.addField(
-							`{lang:${cmd.lang}.inviter}`,
+							"{lang:other.words.inviter$ucwords$}",
 							[
-								`{lang:${cmd.lang}.name}: ${inviter.username}#${inviter.discriminator}`,
-								`{lang:${cmd.lang}.id}: ${inviter.id}`,
-								`{lang:${cmd.lang}.bot}: ${inviter.bot ? "{lang:other.words.yes}" : "{lang:other.words.no}"}`,
-								`{lang:${cmd.lang}.system}: ${inviter.system ? "{lang:other.words.yes}" : "{lang:other.words.no}"}`
+								`{lang:other.words.name$ucwords$}: ${inviter.username}#${inviter.discriminator}`,
+								`{lang:other.words.id$ucwords$}: ${inviter.id}`,
+								`{lang:other.words.bot$ucwords$}: ${inviter.bot ? "{lang:other.words.yes$ucwords$}" : "{lang:other.words.no$ucwords$}"}`,
+								`{lang:other.words.system$ucwords$}: ${inviter.system ? "{lang:other.words.yes$ucwords$}" : "{lang:other.words.no$ucwords$}"}`
 							].join("\n"),
 							false
 						);

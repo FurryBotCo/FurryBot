@@ -5,7 +5,7 @@ import FurryBotAPI from "../../../util/req/FurryBotAPI";
 import { JSONResponse } from "furrybotapi/src/typings";
 import Language from "../../../util/Language";
 
-export default new Command(["fursuitbutt"], __filename)
+export default new Command(["fursuitbutt", "fursuitbutts"], __filename)
 	.setBotPermissions([
 		"embedLinks",
 		"attachFiles"
@@ -18,7 +18,7 @@ export default new Command(["fursuitbutt"], __filename)
 	.setExecutor(async function (msg, cmd) {
 		if (!msg.channel.nsfw) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.nsfw`));
 		const img = await FurryBotAPI.furry.butts("json", 1) as JSONResponse;
-		if (!img) throw new TypeError(`API method "furry.butts" did not return an image.`);
+		if (!img) throw new TypeError("API method \"furry.butts\" did not return an image.");
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
@@ -28,7 +28,7 @@ export default new Command(["fursuitbutt"], __filename)
 				.setDescription([
 					`[[{lang:other.images.shortURL}]](${img.shortURL})`,
 					`[[{lang:other.images.reportURL}]](${img.reportURL})`,
-					`${!img.sources || img.sources.length === 0 || !img.sources[0] ? `[{lang:other.images.noSource}]` : `[[{lang:other.images.source}]](${img.sources[0]})`}`
+					`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 				].join("\n"))
 				.setColor(Colors.gold)
 				.setImage(img.url)

@@ -1,5 +1,8 @@
 /// <reference path="../@types/global.d.ts" />
 import Command from "./Command";
+import * as fs from "fs-extra";
+import path from "path";
+import { ReloadError } from "./CommandHandler";
 
 export default class Category {
 	name: string;
@@ -19,6 +22,7 @@ export default class Category {
 
 	get commands() { return [...this.#cmds]; }
 	get triggers() { return this.#cmds.reduce((a, b) => a.concat(b.triggers), [] as string[]); }
+	get tsFile() { return `${path.dirname(this.file).replace(/build(\\|\/)/, "")}/${path.basename(this.file).replace(/.js/, ".ts")}`; }
 
 	setDisplayName(data: Category["displayName"]) {
 		this.displayName = data;
@@ -51,10 +55,14 @@ export default class Category {
 		return true;
 	}
 
-	async reloadCommand(cmd: string | Command) {
+	async reloadCommand(cmd: string | Command, force?: boolean) {
 		if (cmd instanceof Command) cmd = cmd.triggers[0];
 		const c = this.commands.find(c => c.triggers.includes(cmd as string));
-		if (!c) return null;
+		if (!c) return false;
+		if (!force) {
+			if (!fs.existsSync(c.file)) throw new ReloadError("The JS command file does not exist, refusing to reload.", "command", c);
+			if (!fs.existsSync(c.tsFile)) throw new ReloadError("The TS command file does not exist, refusing to reload.", "command", c);
+		}
 		delete require.cache[require.resolve(c.file)];
 		const f = await import(c.file).then(d => d.default) as Command;
 		this.removeCommand(cmd);

@@ -23,6 +23,7 @@
 		"version": "Bot Version",
 		"nodeVersion": "Node Version",
 		"supportServer": "Support Server",
+		"buildDate": "Build Date",
 		"memoryUsage": {
 			"process": "Process Memory Usage",
 			"total": "Total Memory Usage",
@@ -49,6 +50,8 @@
 		"toCluster": "Inter-Cluster Latency [{0} -> {1}]: **{2}**",
 		"shardTime": "Shard Latency [#{0}]",
 		"shardAverage": "Shard Average [{0}]",
+		"dbPing": "Database Ping",
+		"redisPing": "Redis Ping",
 		"notReadyYet": "Not Ready Yet",
 		"noResponse": "No Response",
 		"unknown": "Unknown Response"
@@ -179,7 +182,12 @@
 		"cmdsProcessed": "Commands Processed",
 		"ops": "Operations",
 		"netIn": "Network Bytes In",
-		"netOut": "Network Bytes Out"
+		"netOut": "Network Bytes Out",
+		"dbCurrent": "Current Connections",
+		"dbTotal": "Total Connections",
+		"dbActive": "Active Connections",
+		"devOnly": "This section is for developers only.",
+		"botInvites": "Bot Invite Sources"
 	},
 	"uinfo": {
 		"description": "Get some info about a user.",

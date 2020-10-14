@@ -146,7 +146,7 @@
 		"info": "Info",
 		"serverName": "Server Name",
 		"creation": "Creation Date",
-		"list": "Online.Idle/DnD Members",
+		"list": "Online/Idle/DnD Members",
 		"srvChInfo": "Server/Channel Info",
 		"code": "Invite Code",
 		"server": "Server",

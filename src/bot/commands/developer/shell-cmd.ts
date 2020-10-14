@@ -8,7 +8,7 @@ import Logger from "../../../util/Logger";
 import { performance } from "perf_hooks";
 import config from "../../../config";
 
-export default new Command(["shell"], __filename)
+export default new Command(["shell", "sh"], __filename)
 	.setBotPermissions([])
 	.setUserPermissions([])
 	.setRestrictions(["developer"])
@@ -42,7 +42,7 @@ export default new Command(["shell"], __filename)
 		if (!silent) {
 
 			if (res.length > 1000) {
-				const link = await Request.createPaste(res, "FurryBot Shell Execution", "1H", 2);
+				const link = await Request.createPaste(res, "FurryBot Shell Execution", "1H", 1);
 				res = `Uploaded ${link}`;
 			}
 

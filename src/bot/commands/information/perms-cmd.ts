@@ -16,6 +16,11 @@ export default new Command(["perms"], __filename)
 		if (!member) return msg.channel.createMessage({
 			embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_MEMBER", true)
 		});
+		const v = {
+			plus: [],
+			minus: []
+		};
+		Object.keys(Permissions.constant).filter(p => !remove.includes(p)).map(p => (member.permissions.has(p) ? v.plus : v.minus).push(`${member.permissions.has(p) ? "+" : "-"} ${msg.dashedArgs.value.includes("compact") ? p : `{lang:other.permissions.${p}}`}`));
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
@@ -24,9 +29,10 @@ export default new Command(["perms"], __filename)
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.green)
 				.setDescription([
-					`{lang:${cmd.lang}.${member.id === msg.member.id ? "self" : `other|${msg.author.tag}`}}`,
+					`{lang:${cmd.lang}.${member.id === msg.member.id ? "self" : `other|${member.user.username}#${member.user.discriminator}`}}`,
 					"```diff",
-					...Object.keys(Permissions.constant).filter(p => !remove.includes(p)).map(p => `${member.permissions.has(p) ? "+" : "-"} ${msg.dashedArgs.value.includes("compact") ? p : `{lang:other.permissions.${p}}`}`),
+					...v.plus,
+					...v.minus,
 					"```",
 					...(!msg.dashedArgs.value.includes("compact") ? [
 						"",

@@ -15,6 +15,7 @@ import Language from "../../util/Language";
 import crypto from "crypto";
 import Timers from "../../util/Timers";
 import * as fs from "fs-extra";
+import Utility from "../../util/Functions/Utility";
 
 export default new ClientEvent("messageCreate", async function (message, update) {
 	if (config.beta && !config.developers.includes(message.author.id)) return;
@@ -163,7 +164,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.gold)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter(`{lang:other.selfDestructMessage|15}`, this.bot.user.avatarURL)
+				.setFooter("{lang:other.selfDestructMessage|15}", this.bot.user.avatarURL)
 				.toJSON();
 
 			let m: Eris.Message = await msg.channel.createMessage({
@@ -193,12 +194,12 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 		if (p.length > 0) {
 			const embed = new EmbedBuilder(msg.gConfig.settings.lang)
-				.setTitle(`{lang:commands.misc.afk.message.title}`)
+				.setTitle("{lang:commands.misc.afk.message.title}")
 				.setDescription(p.map(v => `{lang:commands.misc.afk.message.description|${v.id}|${Time.formatAgo(v.time, true, false)}}`).join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.gold)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter(`{lang:other.selfDestructMessage|15}`, this.bot.user.avatarURL)
+				.setFooter("{lang:other.selfDestructMessage|15}", this.bot.user.avatarURL)
 				.toJSON();
 
 			let m: Eris.Message = await msg.channel.createMessage({
@@ -245,6 +246,8 @@ export default new ClientEvent("messageCreate", async function (message, update)
 				beta: config.beta
 			};
 
+			if (!fs.existsSync(config.dir.logs.spam)) fs.mkdirpSync(config.dir.logs.spam);
+
 			const d = fs.readdirSync(config.dir.logs.spam).filter(d => !fs.lstatSync(`${config.dir.logs.spam}/${d}`).isDirectory() && d.startsWith(msg.author.id) && d.endsWith("-cmd.json") && fs.lstatSync(`${config.dir.logs.spam}/${d}`).birthtimeMs + 1.2e5 > Date.now());
 
 			if (d.length > 0) {
@@ -274,7 +277,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 			if (spC >= config.antiSpam.cmd.blacklist) {
 				const expire = config.bl.getTime("cmd", uBl.current.length, true, true);
-				await msg.uConfig.addBlacklist("automatic", this.bot.user.id, "Spamming Commands.", expire, `https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`);
+				await db.addBl("user", msg.author.id, "automatic", this.bot.user.id, "Spamming Commands.", expire, `https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`);
 				Logger.log([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, "Command Handler"], `User "${msg.author.tag}" (${msg.author.id}) blacklisted for spamming, VL: ${spC}, Report: https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`);
 			}
 		}
@@ -326,7 +329,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 							.setDescription(`{lang:other.commandChecks.cooldown.description|${Time.ms(c.time, true)}|${Time.ms(cmd.cooldown, true)}}`)
 							.setColor(Colors.red)
 							.setTimestamp(new Date().toISOString())
-							.setFooter(`{lang:other.selfDestructMessage|20}`, this.bot.user.avatarURL)
+							.setFooter("{lang:other.selfDestructMessage|20}", this.bot.user.avatarURL)
 							.toJSON()
 					});
 
@@ -357,6 +360,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 			})
 			/* start command error handler */
 			.catch(async (err: Error) => {
+				const { code } = await Utility.logError(this, err, "message", msg);
 				if (err instanceof CommandError) {
 					switch (err.message) {
 						case "ERR_INVALID_USAGE": {
@@ -365,8 +369,8 @@ export default new ClientEvent("messageCreate", async function (message, update)
 						}
 					}
 				} else {
-					if (err.message.indexOf("filterTags")) await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.e6Blacklist"));
-					else await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.command", [config.client.socials.discord, `${err.name}: ${err.message}`]));
+					if (err.message.indexOf("filterTags") !== -1) await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.e6Blacklist"));
+					else await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.command", [code, config.client.socials.discord, `${err.name}: ${err.message}`]));
 					Logger.error([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, "Command Handler"], err);
 				}
 			});

@@ -4,6 +4,7 @@ import config from "../../config";
 import Redis from "../../util/Redis";
 import Eris from "eris";
 import Logger from "../../util/Logger";
+import Language from "../../util/Language";
 
 export default new ClientEvent("guildCreate", async function (guild) {
 	await this.sh.track("events", "guildCreate");
@@ -11,6 +12,19 @@ export default new ClientEvent("guildCreate", async function (guild) {
 	const id = `${d.getMonth() + 1}-${d.getDate()}-${d.getFullYear()}`;
 	await Redis.incr(`stats:dailyJoins:${id}`);
 
+	// wait to make sure invite has been processed, if it happened
+	await new Promise((a, b) => setTimeout(a, 3e3));
+	const v = await Redis.get(`invites:${guild.id}`);
+	let c: {
+		inviter: string;
+		inviterUser: Eris.User;
+		permissions: number;
+		source: string;
+	};
+	if (v) {
+		c = JSON.parse(v);
+		c.inviterUser = this.bot.users.get(c.inviter);
+	}
 	let author = {
 		name: "Unknown#0000",
 		icon_url: "https://i.furcdn.net/noicon.png"
@@ -32,8 +46,8 @@ export default new ClientEvent("guildCreate", async function (guild) {
 	const embed: Eris.EmbedOptions = {
 		title: "Guild Joined!",
 		description: [
-			`Guild #${st.guilds}`,
-			`Current Total: ${st.guilds}`,
+			`Guild #${st.guilds + 1}`,
+			`Current Total: ${st.guilds + 1}`,
 			"",
 			"**Guild Info**:",
 			`${config.emojis.default.dot} Name: ${guild.name}`,
@@ -44,9 +58,17 @@ export default new ClientEvent("guildCreate", async function (guild) {
 			`\t<:${config.emojis.status.dnd}>: ${guild.members.filter(m => m.status === "dnd").length}`,
 			`\t<:${config.emojis.status.offline}>: ${guild.members.filter(m => m.status === "offline").length}`,
 			`\t<:${config.emojis.custom.bot}>: ${guild.members.filter(m => m.user.bot).length}`,
-			`\t<:${config.emojis.default.human}>: ${guild.members.filter(m => !m.user.bot).length}`,
+			`\t${config.emojis.default.human}: ${guild.members.filter(m => !m.user.bot).length}`,
 			`${config.emojis.default.dot} Large: ${guild.large ? "Yes" : "No"} (${guild.memberCount})`,
-			`${config.emojis.default.dot} Owner: ${owner}`
+			`${config.emojis.default.dot} Owner: ${owner}`,
+			...(!c ?
+				[] :
+				[
+					`${config.emojis.default.dot} Inviter: **${c.inviterUser?.tag || "Unknown#0000"}** (${c.inviter})`,
+					`${config.emojis.default.dot} Permissions Provided: [${c.permissions}](https://discordapi.com/permissions.html#${c.permissions})`,
+					`${config.emojis.default.dot} Source: **${c.source.toUpperCase()}**`
+				]
+			)
 		].join("\n"),
 		author,
 		image: {
@@ -65,9 +87,9 @@ export default new ClientEvent("guildCreate", async function (guild) {
 
 	if (embed.author.icon_url) embed.thumbnail.url = embed.author.icon_url;
 
-	return this.bot.executeWebhook(config.webhooks.guilds.id, config.webhooks.guilds.token, {
+	await this.w.get("guilds").execute({
 		embeds: [
 			embed
 		]
-	}).catch(err => null);
+	});
 });

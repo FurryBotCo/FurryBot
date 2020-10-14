@@ -107,6 +107,7 @@ src/util/Functions/RPG.ts
 
 # other
 src/util/DailyJoins.ts
+config.key
 
 # temp
 src/bot/commands/utility/welcomer-cmd.ts

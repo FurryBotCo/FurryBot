@@ -10,6 +10,8 @@ import phin from "phin";
 import config from "../../config";
 import { execSync } from "child_process";
 import Language, { Languages } from "../Language";
+import JSON5 from "json5";
+import ts from "typescript";
 
 export default class Internal {
 	private constructor() {
@@ -239,5 +241,34 @@ export default class Internal {
 	static genTooltip(lang: Languages, text: string, content: string) {
 		const ct = Language.parseString(lang, content);
 		return `[${Language.parseString(lang, text)}](https://botapi.furry.bot/note/show?content=${encodeURIComponent(ct)} '${ct}')`;
+	}
+
+	static getTSConfig(file?: string | null) {
+		if (!file) file = `${config.dir.base}/tsconfig.json`;
+		const c = JSON5.parse(fs.readFileSync(file).toString());
+		return {
+			...c,
+			compilerOptions: {
+				...c.compilerOptions,
+				target: ts.ScriptTarget.ESNext,
+				moduleResolution: ts.ModuleResolutionKind.NodeJs,
+				module: ts.ModuleKind.CommonJS,
+				lib: [
+					"lib.es2015.d.ts",
+					"lib.es2016.d.ts",
+					"lib.es2017.d.ts",
+					"lib.es2018.d.ts",
+					"lib.es2019.d.ts",
+					"lib.es2020.d.ts",
+					"lib.esnext.d.ts"
+				]
+			}
+		} as ts.TranspileOptions;
+	}
+
+	static transpile(file: string, tsconfig?: ts.TranspileOptions | string) {
+		const cnf = typeof tsconfig === "object" ? tsconfig : this.getTSConfig(tsconfig || null);
+
+		return ts.transpileModule(file, cnf).outputText;
 	}
 }

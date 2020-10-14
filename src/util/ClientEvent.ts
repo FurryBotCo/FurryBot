@@ -1,6 +1,8 @@
 import Eris from "eris";
 import FurryBot from "../bot";
 
+// @TODO UPDATE EVENTS
+// @TODO FIND A WAY TO MAKE THIS NOT MANUAL
 export default class ClientEvent {
 	// I've spent 6 hours trying to figure this out, *these can stay as any*
 	event: any;
@@ -17,8 +19,8 @@ export default class ClientEvent {
 	constructor(event: "channelUpdate", listener: (this: FurryBot, channel: Eris.AnyGuildChannel, oldChannel: Eris.OldGuildChannel) => void);
 	constructor(event: "friendSuggestionCreate", listener: (this: FurryBot, user: Eris.User, reasons: Eris.FriendSuggestionReasons) => void);
 	constructor(event: "friendSuggestionDelete", listener: (this: FurryBot, user: Eris.User) => void);
-	constructor(event: "guildAvailable" | "guildBanAdd" | "guildBanRemove", listener: (this: FurryBot, guild: Eris.Guild, user: Eris.User) => void);
-	constructor(event: "guildDelete" | "guildUnavailable" | "guildCreate", listener: (this: FurryBot, guild: Eris.Guild) => void);
+	constructor(event: "guildBanAdd" | "guildBanRemove", listener: (this: FurryBot, guild: Eris.Guild, user: Eris.User) => void);
+	constructor(event: "guildDelete" | "guildUnavailable" | "guildCreate" | "guildAvailable", listener: (this: FurryBot, guild: Eris.Guild) => void);
 	constructor(event: "guildEmojisUpdate", listener: (this: FurryBot, guild: Eris.Guild, emojis: Eris.Emoji[], oldEmojis: Eris.Emoji[]) => void);
 	constructor(event: "guildMemberAdd", listener: (this: FurryBot, guild: Eris.Guild, member: Eris.Member) => void);
 	constructor(event: "guildMemberChunk", listener: (this: FurryBot, guild: Eris.Guild, members: Eris.Member[]) => void);

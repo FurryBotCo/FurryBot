@@ -7,6 +7,10 @@ import y from "yargs";
 import { Colors } from "../Constants";
 import Redis from "../Redis";
 import { performance } from "perf_hooks";
+import FurryBot from "../../bot";
+import crypto from "crypto";
+import Time from "./Time";
+import ExtendedMessage from "../ExtendedMessage";
 
 export default class Utility {
 	private constructor() {
@@ -110,8 +114,8 @@ export default class Utility {
 
 	static compareMembers(member1: Eris.Member, member2: Eris.Member) {
 		const g = member1.guild;
-		const m1r = member1.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0];
-		const m2r = member2.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0];
+		const m1r = member1.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0] || 0;
+		const m2r = member2.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0] || 0;
 		if (member1.id === g.ownerID) return {
 			member1: {
 				higher: true,
@@ -167,7 +171,7 @@ export default class Utility {
 
 	static compareMemberWithRole(member: Eris.Member, role: Eris.Role) {
 		const g = member.guild;
-		const mr = member.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0];
+		const mr = member.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0] || 0;
 
 		if (member.id === g.ownerID || mr > role.position) return {
 			higher: true,
@@ -266,5 +270,82 @@ export default class Utility {
 			entries,
 			time: parseFloat((end - start).toFixed(3))
 		};
+	}
+
+	static async logError(client: FurryBot, err: Error & { code?: number; }, type: "event", extra: {}): Promise<{
+		message: Eris.Message<Eris.TextableChannel>;
+		code: string;
+	}>;
+	static async logError(client: FurryBot, err: Error & { code?: number; }, type: "message", extra: ExtendedMessage): Promise<{
+		message: Eris.Message<Eris.TextableChannel>;
+		code: string;
+	}>;
+	static async logError(client: FurryBot, err: Error, type: "message" | "event", extra?: ExtendedMessage | {}): Promise<{
+		message: Eris.Message<Eris.TextableChannel>;
+		code: string;
+	}> {
+		if ([1006, 1012, "ERR_INVALID_USAGE"].some(v => err.message.indexOf(v.toString()) !== -1)) return { message: null, code: "" };
+
+		const d = new Date();
+		const code = `err.${config.beta ? "beta" : "prod"}.${crypto.randomBytes(8).toString("hex")}`;
+		const p = await client.createPaste(err.stack, "Furry Bot Error", "1W", 1);
+		const e = new EmbedBuilder(config.devLanguage)
+			.setTitle("\u274c Error")
+			.setTimestamp(d)
+			.setColor(Colors.red)
+			.setDescription([
+				"**Error:**",
+				`${config.emojis.default.dot} Stack: ${p}`,
+				`${config.emojis.default.dot} Error Name: ${err.name}`,
+				`${config.emojis.default.dot} Error Message: ${err.message}`,
+				`${config.emojis.default.dot} Code: \`${code || "None"}\``
+			].join("\n"));
+
+		switch (type) {
+			case "event": {
+				e.setDescription([
+					e.getDescription(),
+					"",
+					"**Other Info:**",
+					`${config.emojis.default.dot} Time: **${Time.formatDateWithPadding(d)}**`
+				].join("\n"));
+				break;
+			}
+
+			case "message": {
+				const v = extra as ExtendedMessage;
+				e.setDescription([
+					e.getDescription(),
+					"",
+					"**Other Info:**",
+					`${config.emojis.default.dot} Message Content: **${v.content}**`,
+					`${config.emojis.default.dot} Message ID: **${v.id}**`,
+					`${config.emojis.default.dot} Channel: **${v.channel.name}**`,
+					`${config.emojis.default.dot} Channel ID: **${v.channel.id}**`,
+					`${config.emojis.default.dot} Guild: **${v.channel.guild.name}**`,
+					`${config.emojis.default.dot} Guild ID: **${v.channel.guild.id}**`,
+					`${config.emojis.default.dot} Cluster: **#${client.clusterId}**`,
+					`${config.emojis.default.dot} Shard: **#${v.channel.guild.shard.id}**`,
+					`${config.emojis.default.dot} Time: **${Time.formatDateWithPadding(d)}**`
+				].join("\n"));
+				break;
+			}
+		}
+
+		const message = await client.w.get("errors").execute({
+			embeds: [
+				e.toJSON()
+			]
+		});
+
+		return {
+			message,
+			code
+		};
+	}
+
+	static callFunction<F extends (...args: any) => any>(func: F, thisArg: ThisParameterType<F>, ...argArray: Parameters<F>): ReturnType<F> {
+		// apparently it can't figure out that argArray is an ARRAY!
+		return func.call(thisArg, ...(argArray as any));
 	}
 }

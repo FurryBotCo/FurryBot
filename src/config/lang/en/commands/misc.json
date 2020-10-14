@@ -37,13 +37,6 @@
 		"devOnlyCommand": "That command is developer only",
 		"devOnlyCategory": "That category is developer only."
 	},
-	"weirdedit": {
-		"description": "Make a message with a weird little edit thing.",
-		"usage": "some, text",
-		"missing1": "First text missing. You must provide some text separated by commas.",
-		"missing2": "Second text missing. You must provide some text separated by commas.",
-		"edited": "This message will be edited soon."
-	},
 	"leaderboard": {
 		"description": "Get the server leveling leaderboard.",
 		"usage": "[page]",
@@ -60,12 +53,20 @@
 			"guild": "Server: {0} ({1}).\nMember Count: {2}",
 			"user": "User ID: {0}",
 			"hover": "Hover over the position and tag to show more info.\n(you can also click to view it in your browser)",
-			"global": "you can add \"--global\" to see the global leaderboard."
+			"global": "you can add \"--global\" to see the global leaderboard.",
+			"listNum": "List #{0}"
 		}
 	},
 	"rank": {
 		"description": "Get a users rank.",
 		"usage": "[@user]",
 		"rank": "{0}'s Rank"
+	},
+	"weirdedit": {
+		"description": "Make a message with a weird little edit thing.",
+		"usage": "some, text",
+		"missing1": "First text missing. You must provide some text separated by commas.",
+		"missing2": "Second text missing. You must provide some text separated by commas.",
+		"edited": "This message will be edited soon."
 	}
 }

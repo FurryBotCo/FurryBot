@@ -16,7 +16,7 @@ export default new Command(["bulge"], __filename)
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		const img = await FurryBotAPI.furry.bulge("json", 1) as JSONResponse;
-		if (!img) throw new TypeError(`API method "furry.bulge" did not return an image.`);
+		if (!img) throw new TypeError("API method \"furry.bulge\" did not return an image.");
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
@@ -26,7 +26,7 @@ export default new Command(["bulge"], __filename)
 				.setDescription([
 					`[[{lang:other.images.shortURL}]](${img.shortURL})`,
 					`[[{lang:other.images.reportURL}]](${img.reportURL})`,
-					`${!img.sources || img.sources.length === 0 || !img.sources[0] ? `[{lang:other.images.noSource}]` : `[[{lang:other.images.source}]](${img.sources[0]})`}`
+					`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 				].join("\n"))
 				.setColor(Colors.gold)
 				.setImage(img.url)

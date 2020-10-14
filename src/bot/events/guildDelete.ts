@@ -46,7 +46,7 @@ export default new ClientEvent("guildDelete", async function (guild) {
 			`\t<:${config.emojis.status.dnd}>: ${guild.members.filter(m => m.status === "dnd").length}`,
 			`\t<:${config.emojis.status.offline}>: ${guild.members.filter(m => m.status === "offline").length}`,
 			`\t<:${config.emojis.custom.bot}>: ${guild.members.filter(m => m.user.bot).length}`,
-			`\t<:${config.emojis.default.human}>: ${guild.members.filter(m => !m.user.bot).length}`,
+			`\t${config.emojis.default.human}: ${guild.members.filter(m => !m.user.bot).length}`,
 			`${config.emojis.default.dot} Large: ${guild.large ? "Yes" : "No"} (${guild.memberCount})`,
 			`${config.emojis.default.dot} Owner: ${owner}`
 		].join("\n"),
@@ -58,7 +58,7 @@ export default new ClientEvent("guildDelete", async function (guild) {
 			url: "https://i.furcdn.net/noicon.png"
 		},
 		timestamp: new Date().toISOString(),
-		color: Colors.green,
+		color: Colors.red,
 		footer: {
 			text: `Shard ${guild.shard.id + 1}/${st.shards.size}`,
 			icon_url: this.bot.user.avatarURL
@@ -67,9 +67,9 @@ export default new ClientEvent("guildDelete", async function (guild) {
 
 	if (embed.author.icon_url) embed.thumbnail.url = embed.author.icon_url;
 
-	return this.bot.executeWebhook(config.webhooks.guilds.id, config.webhooks.guilds.token, {
+	await this.w.get("guilds").execute({
 		embeds: [
 			embed
 		]
-	}).catch(err => null);
+	});
 });

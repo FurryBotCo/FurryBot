@@ -1,6 +1,6 @@
 import * as fs from "fs-extra";
 import util from "util";
-import chalk from "chalk";
+import leeks from "leeks.js";
 import config from "../config";
 import Strings from "./Functions/Strings";
 import Utility from "./Functions/Utility";
@@ -10,13 +10,13 @@ type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R ? (...arg
 
 export default class Logger {
 	private static COLORS = {
-		time: chalk.gray,
-		log: chalk.green,
-		info: chalk.green,
-		error: chalk.red,
-		warn: chalk.yellow,
-		debug: chalk.cyan,
-		command: chalk.green
+		time: leeks.colors.gray,
+		log: leeks.colors.green,
+		info: leeks.colors.green,
+		error: leeks.colors.red,
+		warn: leeks.colors.yellow,
+		debug: leeks.colors.cyan,
+		command: leeks.colors.green
 	};
 
 	static get log(): OmitFirstArg<typeof Logger["_log"]> { return this._log.bind(this, "log"); }

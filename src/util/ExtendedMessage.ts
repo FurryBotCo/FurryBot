@@ -1,4 +1,3 @@
-/// <reference path="./@types/Eris.d.ts" />
 import Eris from "eris";
 import FurryBot from "../bot";
 import { db } from "./Database";
@@ -55,6 +54,7 @@ export default class ExtendedMessage {
 	get cmd() { return this.#cmd; }
 	get prefix() { return this.#prefix; }
 	get timestamp() { return this.#msg.timestamp; }
+	get erisMessage() { return this.#msg; }
 
 	async load() {
 		const g = this.#gConfig = await db.getGuild(this.channel.guild.id);
@@ -158,7 +158,7 @@ export default class ExtendedMessage {
 	}
 
 	async getReplyText(content: Eris.MessageContent, type?: "mention" | "quote" | "new", id?: string) {
-		if (!type) type = config.beta ? "new" : "mention";
+		if (!type) type = config.beta ? "mention" : "mention"; // quote is undergoing changes
 		if (!id) id = this.id;
 		switch (type) {
 			case "mention": {

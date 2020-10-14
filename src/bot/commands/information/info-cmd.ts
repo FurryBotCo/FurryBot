@@ -25,7 +25,7 @@ export default new Command(["info"], __filename)
 		for (const k of Object.keys(diskUsage)) {
 			d.push(`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$} (${k}): ${Strings.formatBytes(diskUsage[k].total - diskUsage[k].free)} / ${Strings.formatBytes(diskUsage[k].total)}`);
 		}
-		if (os.hostname() === "2020.extra-v4.furry.bot") {
+		if (os.hostname() === "boop") {
 			const { body: k } = await phin<{
 				drives: {
 					[k: string]: {
@@ -59,7 +59,7 @@ export default new Command(["info"], __filename)
 					// GB = 1000, GiB = 1024 apparently ??
 					// https://en.wikipedia.org/wiki/Gibibyte
 					...d,
-					`${config.emojis.default.dot} {lang:other.words.uptime$ucwords$}: ${Time.ms(process.uptime(), true)} (${Time.secondsToHMS(process.uptime())})`,
+					`${config.emojis.default.dot} {lang:other.words.uptime$ucwords$}: ${Time.ms(process.uptime() * 1000, true)} (${Time.secondsToHMS(process.uptime())})`,
 					`${config.emojis.default.dot} {lang:other.words.shard$ucwords$}: ${msg.channel.guild.shard.id + 1}/${st.shards.size}`,
 					`${config.emojis.default.dot} {lang:other.words.cluster$ucwords$}: ${this.cluster.id + 1}/${this.cluster.options.clusterCount}`,
 					`${config.emojis.default.dot} {lang:other.words.guilds$ucwords$}: ${st.guilds}`,
@@ -69,16 +69,15 @@ export default new Command(["info"], __filename)
 					`${config.emojis.default.dot} {lang:other.words.voiceConnections$ucwords$}: ${st.voiceConnections}`,
 					`${config.emojis.default.dot} {lang:other.words.commands$ucwords$}: ${this.cmd.commands.length} (${this.cmd.categories.length} {lang:other.words.categories})`,
 					"",
-					"**{lang:other.words.creators$ucwords$}**:",
-					`${config.emojis.default.dot} [Donovan_DMC](https://furry.cool) <-- **OwO**`,
-					`${config.emojis.default.dot} [August](https://augu.dev) <-- **Cutie**`,
-					`${config.emojis.default.dot} [Lio](https://himbo.cat/) <-- **Dumbass Lion**`,
+					"**{lang:other.words.developers$ucwords$}**:",
+					`${config.emojis.default.dot} [{lang:other.words.creator$ucwords$}] [Donovan_DMC](https://furry.cool) <-- **OwO**`,
+					`${config.emojis.default.dot} [{lang:other.words.contributor$ucwords$}] [August](https://augu.dev) <-- **Dumbass Cutie**`,
 					"",
 					"**{lang:other.words.other$ucwords$}**:",
 					`${config.emojis.default.dot} {lang:other.words.library$ucwords$}: [Eris Dev](https://github.com/abalabahaha/eris/tree/dev) (**${Eris.VERSION}**, \`${pkgLock.dependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
 					`${config.emojis.default.dot} {lang:other.words.apiVersion$ucwords$}: ${Eris.Constants.REST_VERSION}`,
 					`${config.emojis.default.dot} {lang:other.words.gatewayVersion$ucwords$}: ${Eris.Constants.GATEWAY_VERSION}`,
-					`${config.emojis.default.dot} {lang:other.words.version$ucwords$}: ${versionNumber} ({lang:other.words.build$ucwords$} (${buildNumber.slice(4, 6)}/${buildNumber.slice(6, 8)}/${buildNumber.slice(0, 4)}): \`${buildNumber}\`)`,
+					`${config.emojis.default.dot} {lang:other.words.version$ucwords$}: ${versionNumber} ({lang:${cmd.lang}.buildDate$ucwords$}: ${buildNumber.slice(4, 6)}/${buildNumber.slice(6, 8)}/${buildNumber.slice(0, 4)})`,
 					`${config.emojis.default.dot} {lang:other.words.nodeVersion$ucwords$}: ${process.version}`,
 					`${config.emojis.default.dot} {lang:other.words.supportServer$ucwords$}: [${config.client.socials.discord}](${config.client.socials.discord})`,
 					`${config.emojis.default.dot} {lang:other.words.donate$ucwords$}: [${config.client.socials.patreon}](${config.client.socials.patreon})`

@@ -12,7 +12,7 @@ Both formatting and modifiers can be combined. Order does not matter, prefer for
 */
 
 // because circular dependencies
-const dir = `${__dirname}/../config/lang`;
+const dir = `${__dirname}/..${__filename.endsWith(".ts") ? "" : "/../../src"}/config/lang`;
 class LanguageError extends Error {
 	constructor(name: string, message: string) {
 		super(message);
@@ -41,14 +41,14 @@ export default class Language {
 	static get(lang: Languages, path: string, formatArgs?: (string | number)[], nullOnNotFound?: boolean, random?: boolean): string | string[] {
 		function loop(dir: string, parts: string[]): string | string[] {
 			if (fs.existsSync(`${dir}/${parts[0]}.json`)) {
-				const f = JSON5.parse(fs.readFileSync(`${dir}/${parts[0]}.json`));
+				const f = JSON5.parse(fs.readFileSync(`${dir}/${parts[0]}.json`).toString());
 				const v = dot.pick(parts.slice(1).join("."), f);
 				if (v) return v;
 			}
 
 			if (!fs.existsSync(`${dir}/${parts[0]}`)) {
 				if (!fs.existsSync(`${dir}/${parts[0]}.json`)) return null;
-				const f = JSON5.parse(fs.readFileSync(`${dir}/${parts[0]}.json`));
+				const f = JSON5.parse(fs.readFileSync(`${dir}/${parts[0]}.json`).toString());
 				return dot.pick(parts.slice(1).join("."), f) ?? null;
 			}
 			else return loop(`${dir}/${parts[0]}`, parts.slice(1));
@@ -94,8 +94,8 @@ export default class Language {
 		const d = c.split("|");
 		let l = this.get(lang, d[0], d.slice(1), true);
 		if ([undefined, null].includes(l)) {
-			l = b.replace(":", "OwO:").split("|")[0].split("$")[0];
-			if (!l.replace("OwO", "").startsWith("{lang:")) l = `{lang:OwO${l}`;
+			l = b.replace(":", "\u200b:").split("|")[0].split("$")[0];
+			if (!l.replace("\u200b", "").startsWith("{lang:")) l = `{lang:\u200b${l}`;
 			if (!l.endsWith("}")) l += "}";
 		} else mods.map(mod => l = mod(l));
 		str = str.replace(b, l);

@@ -3,6 +3,9 @@ import Language from "../../../util/Language";
 import EmbedBuilder from "../../../util/EmbedBuilder";
 import { Colors } from "../../../util/Constants";
 import { EVAL_CODES } from "../../../clustering/Constants";
+import { mongo } from "../../../util/Database";
+import { performance } from "perf_hooks";
+import Redis from "../../../util/Redis";
 
 export default new Command(["ping"], __filename)
 	.setBotPermissions([
@@ -19,6 +22,14 @@ export default new Command(["ping"], __filename)
 				await msg.channel.sendTyping();
 				edit = m.editedTimestamp;
 				await m.delete().then(() => del = Date.now());
+				const dbStart = performance.now();
+				await mongo.db("admin").command({
+					ping: 1
+				});
+				const dbEnd = performance.now();
+				const redisStart = performance.now();
+				await Redis.ping();
+				const redisEnd = performance.now();
 				const sh: Clustering.ShardStats[] = await this.ipc.getStats().then(v => v.shards && v.shards.size > 0 ? Array.from(v.shards?.values()) : this.bot.shards.map(s => ({
 					latency: s.latency,
 					lastHeartbeatReceived: s.lastHeartbeatReceived,
@@ -46,6 +57,8 @@ export default new Command(["ping"], __filename)
 					embed: new EmbedBuilder(msg.gConfig.settings.lang)
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
 						.setDescription([
+							`{lang:${cmd.lang}.dbPing}: **${Math.abs(dbStart - dbEnd).toFixed(3)}ms**`,
+							`{lang:${cmd.lang}.redisPing}: **${Math.abs(redisStart - redisEnd).toFixed(3)}ms**`,
 							`{lang:${cmd.lang}.generalTime}: **${Math.abs(Math.floor(create - msg.timestamp))}ms**`,
 							`{lang:${cmd.lang}.editTime}: **${Math.abs(Math.floor(edit - create))}ms**`,
 							`{lang:${cmd.lang}.deleteTime}: **${Math.abs(Math.floor(del - create))}ms**`,

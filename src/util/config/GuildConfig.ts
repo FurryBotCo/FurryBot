@@ -38,6 +38,12 @@ export default class GuildConfig {
 	}[];
 	logEvents: {
 		channel: string;
+		// plans to convert this to "filter"
+		// with type: "blacklist" | "whitelist"
+		ignore: {
+			type: "user" | "channel" | "role";
+			id: string;
+		}[];
 		type:
 		"channelCreate" |
 		"channelDelete" |
@@ -46,6 +52,7 @@ export default class GuildConfig {
 		"memberUnban" | // guildBanRemove
 		"memberJoin" | // guildMemberAdd
 		"memberLeave" | // guildMemberRemove
+		"userKick" | // guildMemberRemove
 		"memberUpdate" | // guildMemberUpdate
 		"roleCreate" | // guildRoleCreate
 		"roleDelete" | // guildRoleDelete

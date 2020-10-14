@@ -7,6 +7,22 @@ import CooldownHandler from "./CooldownHandler";
 import AntiSpam from "./AntiSpam";
 import FurryBot from "../../bot";
 import path from "path";
+import Strings from "../Functions/Strings";
+
+
+export class ReloadError<T extends ("command" | "category")> extends Error {
+	type: T;
+	info: T extends "command" ? Command : Category;
+	constructor(message: string, type: T, info: ReloadError<T>["info"]) {
+		super(message);
+		this.name = `ReloadError[${Strings.ucwords(type)}]`;
+		this.type = type;
+		this.info = info;
+	}
+
+	get file() { return this.info.file; }
+	get tsFile() { return this.info.tsFile; }
+}
 
 export default class CommandHandler {
 	#cats: Category[];

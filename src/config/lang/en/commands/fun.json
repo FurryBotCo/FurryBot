@@ -5,7 +5,19 @@
 		"usage": "<question>",
 		"said": "The Magic 8ball said",
 		"disclaimer": "Disclaimer: Do not take any answers seriously!",
-		"possible": ["It is certain", "Without a doubt", "Most likely", "Yes", "Reply was hazy, try again later", "Ask again later", "My answer is no", "No", "Very doubtful", "Concentrate and ask again", "As I see it, yes"]
+		"possible": [
+			"It is certain",
+			"Without a doubt",
+			"Most likely",
+			"Yes",
+			"Reply was hazy, try again later",
+			"Ask again later",
+			"My answer is no",
+			"No",
+			"Very doubtful",
+			"Concentrate and ask again",
+			"As I see it, yes"
+		]
 	},
 	"awoo": {
 		"description": "Start a howl, or join in!",
@@ -18,9 +30,9 @@
 	"bap": {
 		"description": "Bap someone! Ouch!",
 		"usage": "<@member/text>",
+		"$": "97% sure \"themself\" isn't proper, but it sounds better than \"themselves\"",
 		"possible": [
 			"<@!{0}> smacks {1} hard on the snoot with a rolled up news paper!",
-			// 95% sure this isn't proper, but it sounds better than "themselves"
 			"<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit themself!",
 			"<@!{0}> goes to smack {1} on the snoot with a news paper, but missed and hit {2}"
 		]
@@ -28,17 +40,25 @@
 	"bellyrub": {
 		"description": "Give someone a nice belly rub -w-",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> rubs the belly of {1}!"]
+		"possible": [
+			"<@!{0}> rubs the belly of {1}!"
+		]
 	},
 	"blep": {
 		"description": "Do a little blep!",
 		"usage": "",
-		"possible": ["<@!{0}> did a little blep!", "<@!{0}> stuck their tongue out cutely!"]
+		"possible": [
+			"<@!{0}> did a little blep!",
+			"<@!{0}> stuck their tongue out cutely!"
+		]
 	},
 	"boop": {
 		"description": "Boop someones snoot!",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> has booped {1}!\nOwO", "<@!{0}> lightly pokes the nose of {1}!\nOwO"]
+		"possible": [
+			"<@!{0}> has booped {1}!\nOwO",
+			"<@!{0}> lightly pokes the nose of {1}!\nOwO"
+		]
 	},
 	"conga": {
 		"description": "Start a conga with someone, or join in!",
@@ -52,7 +72,10 @@
 	"cuddle": {
 		"description": "Cuddle someone!",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> has cuddled {1}\nThey're so cute", "<@!{0}> sneaks up behind {1} and cuddles them\nIsn't that sweet"]
+		"possible": [
+			"<@!{0}> has cuddled {1}\nThey're so cute",
+			"<@!{0}> sneaks up behind {1} and cuddles them\nIsn't that sweet"
+		]
 	},
 	"dadjoke": {
 		"description": "Get a dadjoke",
@@ -67,7 +90,11 @@
 	"dictionary": {
 		"description": "Throw a dictionary at someone to teach them some knowledge!",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> throws a dictionary at {1} screaming \"KNOWLEDGE\"!", "<@!{0}> drops some knowledge on {1}, with their dictionary!", "<@!{0}> drops their entire english folder onto {1}, it seems to have flattened them!"]
+		"possible": [
+			"<@!{0}> throws a dictionary at {1} screaming \"KNOWLEDGE\"!",
+			"<@!{0}> drops some knowledge on {1}, with their dictionary!",
+			"<@!{0}> drops their entire english folder onto {1}, it seems to have flattened them!"
+		]
 	},
 	"divorce": {
 		"description": "Revoke your marriage..",
@@ -93,7 +120,10 @@
 	"flop": {
 		"description": "Flop onto someone! OwO",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> flops over onto {1}!\nOof", "<@!{0}> lays on {1}.. owo"]
+		"possible": [
+			"<@!{0}> flops over onto {1}!\nOof",
+			"<@!{0}> lays on {1}.. owo"
+		]
 	},
 	"furpile": {
 		"description": "Start a furpile on someone, or join in!",
@@ -125,27 +155,41 @@
 	"glomp": {
 		"description": "Pounce onto someone lovingly~!",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> pounced onto {1}, tackling them to the floor in a giant hug! <@!{0}> whispers \"I love you~\" quietly into {1}'s ear."]
+		"possible": [
+			"<@!{0}> pounced onto {1}, tackling them to the floor in a giant hug! <@!{0}> whispers \"I love you~\" quietly into {1}'s ear."
+		]
 	},
 	"huff": {
 		"description": "Blow someone's house down..",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> huffed, and puffed, and blew {1}'s house down!"]
+		"possible": [
+			"<@!{0}> huffed, and puffed, and blew {1}'s house down!"
+		]
 	},
 	"hug": {
 		"description": "Hug someone!",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> sneaks up behind {1}, and when they aren't looking, tackles them from behind in the biggest hug ever!", "<@!{0}> gently wraps their arms around {1}!", "<@!{0}> wraps their arms around {1}, giving them a big warm hug"]
+		"possible": [
+			"<@!{0}> sneaks up behind {1}, and when they aren't looking, tackles them from behind in the biggest hug ever!",
+			"<@!{0}> gently wraps their arms around {1}!",
+			"<@!{0}> wraps their arms around {1}, giving them a big warm hug"
+		]
 	},
 	"kiss": {
 		"description": "Kiss someone 0.0",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> kisses {1}\nThey must be in love!\n:blue_heart:", "<@!{0}> kisses {1}\nCute!"]
+		"possible": [
+			"<@!{0}> kisses {1}\nThey must be in love!\n:blue_heart:",
+			"<@!{0}> kisses {1}\nCute!"
+		]
 	},
 	"lick": {
 		"description": "Lick someone.. owo",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> licks {1}\nUwU", "<@!{0}> decides to make {1}'s fur a little slimy...'"]
+		"possible": [
+			"<@!{0}> licks {1}\nUwU",
+			"<@!{0}> decides to make {1}'s fur a little slimy...'"
+		]
 	},
 	"marry": {
 		"description": "Promose to someone!",
@@ -166,27 +210,38 @@
 	"nap": {
 		"description": "Flop onto someone.. then take a nap?",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> decided to take a nap on {1}.. {1} might need a forklift for this one!"]
+		"possible": [
+			"<@!{0}> decided to take a nap on {1}.. {1} might need a forklift for this one!"
+		]
 	},
 	"nuzzle": {
 		"description": "Nuzzle someone!",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> nuzzles {1} gently\nIsn't that cute!"]
+		"possible": [
+			"<@!{0}> nuzzles {1} gently\nIsn't that cute!"
+		]
 	},
 	"pat": {
 		"description": "Pat someone uwu",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> pats {1} on the head for being a good boi (or girl/other)", "<@!{0}> gently pets {1}"]
+		"possible": [
+			"<@!{0}> pats {1} on the head for being a good boi (or girl/other)",
+			"<@!{0}> gently pets {1}"
+		]
 	},
 	"poke": {
 		"description": "Poke someone!",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> pokes {1}\nDon't make them mad.."]
+		"possible": [
+			"<@!{0}> pokes {1}\nDon't make them mad.."
+		]
 	},
 	"pounce": {
 		"description": "Pounce on someone! uwu",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> pounces onto {1} uwu"]
+		"possible": [
+			"<@!{0}> pounces onto {1} uwu"
+		]
 	},
 	"russianroulette": {
 		"description": "Play Russian Roulette",
@@ -203,28 +258,38 @@
 	},
 	"slap": {
 		"description": "Slap someone..",
-		"possible": ["<@!{0}> slaps {1}.. ouch"],
+		"possible": [
+			"<@!{0}> slaps {1}.. ouch"
+		],
 		"usage": "<@member/text>"
 	},
 	"sniff": {
 		"description": "Sniff someone..?",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> siffs {1}\nMaybe they smell good..?"]
+		"possible": [
+			"<@!{0}> siffs {1}\nMaybe they smell good..?"
+		]
 	},
 	"snowball": {
 		"description": "Throw a snowball at someone!",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> throws a snowball at {1}!"]
+		"possible": [
+			"<@!{0}> throws a snowball at {1}!"
+		]
 	},
 	"spray": {
 		"description": "Spray someone with a bottle of water..",
 		"usage": "<@member/text>",
-		"possible": ["<@!{0}> sprays {1} with a bottle of water, yelling \"bad fur\"!"]
+		"possible": [
+			"<@!{0}> sprays {1} with a bottle of water, yelling \"bad fur\"!"
+		]
 	},
 	"wag": {
 		"description": "Wag your little tail!",
 		"usage": "",
-		"possible": ["<@!{0}> wags their little tail, aren't they cute ^-^"]
+		"possible": [
+			"<@!{0}> wags their little tail, aren't they cute ^-^"
+		]
 	},
 	"weirdedit": {
 		"description": "Make a message with a weird little edit thing.",

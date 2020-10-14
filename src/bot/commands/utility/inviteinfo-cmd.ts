@@ -8,17 +8,14 @@ import Language from "../../../util/Language";
 
 export default new Command(["inviteinfo", "invinfo"], __filename)
 	.setBotPermissions([
-		"manageRoles"
+		"embedLinks"
 	])
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
-		const k = msg.args.join("").match(new RegExp("^((https?\:\/\/)?(discord\.gg|discord(app)?\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i"));
-
-		if (!k || k.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noInv`));
-		const code = k[5];
+		const [_, code] = msg.args.join("").match(new RegExp("^(?:(?:https?\:\/\/)?(?:discord\.gg|discord(?:app)?\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i")) ?? [];
 
 		if (!code) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noInv`));
 
@@ -43,7 +40,7 @@ export default new Command(["inviteinfo", "invinfo"], __filename)
 				"",
 				`**{lang:${cmd.lang}.channel}**:`,
 				`${config.emojis.default.dot} {lang:${cmd.lang}.channelName}: ${channel.name}`,
-				`${config.emojis.default.dot} {lang:${cmd.lang}.channelId: ${channel.id}`,
+				`${config.emojis.default.dot} {lang:${cmd.lang}.channelId}: ${channel.id}`,
 				`${config.emojis.default.dot} {lang:${cmd.lang}.channelType}: ${ChannelNames[channel.type]}`
 			].join("\n"), false);
 

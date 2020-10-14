@@ -77,6 +77,15 @@ export default class Time {
 		return words ? str.reverse().join(", ") : Object.keys(r).filter(k => r[k] > 0).map(k => `${Math.floor(r[k])}${k}`).reverse().reduce((a, b) => a + b, "");
 	}
 
+	/**
+	 * Format milliseconds ago
+	 * @static
+	 * @param {(number | Date)} t - milliseconds
+	 * @param {boolean} [sub] - sub ms from now
+	 * @param {boolean} [seconds] - include seconds
+	 * @returns
+	 * @memberof Time
+	 */
 	static formatAgo(t: number | Date, sub?: boolean, seconds?: boolean) {
 		if (t instanceof Date) t = t.getTime();
 		if (sub) t = Date.now() - t;
@@ -92,9 +101,20 @@ export default class Time {
 	 * @returns
 	 * @memberof Time
 	 */
-	static formatDateWithPadding(d: Date | number = new Date(), hms = true, ms = false) {
+	static formatDateWithPadding(d: Date | number = new Date(), hms = true, ms = false, words = false, useLang = false) {
+		const months = [
+			"January", "February", "March", "April",
+			"May", "June", "July", "August",
+			"September", "October", "November", "December"
+		];
+		const days = [
+			"Sunday", "Monday", "Tuesday",
+			"Wednesday", "Thursday", "Friday",
+			"Saturday"
+		];
 		if (typeof d === "number") d = new Date(d);
-		return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()}${hms ? ` ${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
+		if (words) return `${useLang ? `{lang:other.dayOfWeek.${d.getDay()}}` : days[d.getDay()]} ${useLang ? `{lang:other.months.${d.getMonth()}}` : months[d.getMonth()]} ${(d.getDate()).toString().padStart(2, "0")}, ${d.getFullYear()} ${d.getHours()} ${useLang ? `{lang:other.words.${d.getHours() < 12 ? "am" : "pm"}$upper$}` : d.getHours() < 12 ? "AM" : "PM"}`;
+		else return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()}${hms ? ` ${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
 	}
 
 	/**

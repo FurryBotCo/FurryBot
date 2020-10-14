@@ -33,7 +33,7 @@ export default new Command(["yiff"], __filename)
 				.setDescription([
 					`[[{lang:other.images.shortURL}]](${img.shortURL})`,
 					`[[{lang:other.images.reportURL}]](${img.reportURL})`,
-					`${!img.sources || img.sources.length === 0 || !img.sources[0] ? `[{lang:other.images.noSource}]` : `[[{lang:other.images.source}]](${img.sources[0]})`}`
+					`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 				].join("\n"))
 				.setColor(Colors.gold)
 				.setImage(img.url)

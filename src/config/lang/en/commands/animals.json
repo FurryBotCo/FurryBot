@@ -24,6 +24,11 @@
 		"usage": "",
 		"title": "Foxxo!"
 	},
+	"koala": {
+		"description": "Get a picture of a koala!",
+		"usage": "",
+		"title": "Koala"
+	},
 	"otter": {
 		"description": "Get a picture of an otter!",
 		"usage": "",
@@ -43,6 +48,11 @@
 		"description": "Get a picture of a turtle!",
 		"usage": "",
 		"title": "Turtle"
+	},
+	"wah": {
+		"description": "Get a picture of a cute wah!",
+		"usage": "",
+		"title": "Wah"
 	},
 	"wolf": {
 		"description": "Get a picture of a wolf!",

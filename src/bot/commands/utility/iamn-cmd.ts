@@ -22,7 +22,7 @@ export default new Command(["iamn"], __filename)
 		if (!roles || roles.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.notFound`));
 		if (msg.member.roles.includes(role.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.notHave`, [msg.gConfig.settings.prefix]));
 		const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), msg.channel.guild.roles.get(role.id));
-		if (a.higher || a.same) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.higher`));
+		if (a.lower || a.same) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.higher`));
 		await msg.member.removeRole(role.id, "iamn command");
 
 		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.removed`, [role.name]));

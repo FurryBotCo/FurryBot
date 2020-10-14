@@ -18,7 +18,7 @@ export default new Command(["asar"], __filename)
 		});
 		const a = Utility.compareMemberWithRole(msg.member, role);
 		const b = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), role);
-		if ((a.higher || a.same) && msg.channel.guild.ownerID !== msg.member.id) return msg.reply("{lang:commands.utility.asar.higherUser}");
+		if ((a.lower || a.same) && msg.channel.guild.ownerID !== msg.member.id) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.higherUser`));
 		if (b.lower || b.same) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.higherBot`));
 		if (role.managed) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.managed`));
 		const roles = msg.gConfig.selfAssignableRoles;

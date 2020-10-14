@@ -74,7 +74,7 @@ export default class API {
 				saveUninitialized: true
 			}))
 			.set("view engine", "ejs")
-			.set("views", `${__dirname}/views/templates`)
+			.set("views", `${config.dir.base}/src/views/templates`)
 			.use(morgan("dev"))
 			.use(express.json())
 			.use(express.urlencoded({
