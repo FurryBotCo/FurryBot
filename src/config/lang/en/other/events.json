@@ -57,5 +57,8 @@
 	},
 	"voiceStateUpdate": {
 		"title": "Voice State Updated"
+	},
+	"messageDeleteBulk": {
+		"title": "Message Bulk Deletion"
 	}
 }
