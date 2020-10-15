@@ -44,6 +44,7 @@ class Database {
 		}
 	}
 
+	collection(col: "banlists"): Collection<BanList>;
 	collection(col: "guilds"): Collection<GuildDBKeys>;
 	collection(col: "users"): Collection<UserDBKeys>;
 	collection<T = any>(col: string): Collection<T> {
