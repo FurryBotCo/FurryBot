@@ -11,6 +11,19 @@ export default class Request {
 		throw new TypeError("This class may not be instantiated, use static methods.");
 	}
 
+	/**
+	 * Create a pastebin paste.
+	 * @static
+	 * @param {string} content - The content of the paste.
+	 * @param {string} name - The title of the paste.
+	 * @param {string} [expire] - The expiry of the paste. (default 1Day)
+	 * @param {(0 | 1 | 2)} [privacy] - The privacy of the paste.
+	 * @returns {string}
+	 * @memberof Request
+	 * @example Request.createPaste("Example Content", "Example Title");
+	 * @example Request.createPaste("Example Content", "Example Title", "1D");
+	 * @example Request.createPaste("Example Content", "Example Title", "1W", 1);
+	 */
 	static async createPaste(content: string, name: string, expire?: string, privacy?: 0 | 1 | 2) {
 		return new Promise<string>((a, b) => {
 			const d = qs.stringify({
@@ -49,6 +62,8 @@ export default class Request {
 	 * @param {string} url
 	 * @returns {Promise<Buffer>}
 	 * @memberof Request
+	 * @example Request.fetchURL("https://api.furry.bot/V2/furry/yiff/gay/image");
+	 * @example Request.fetchURL("https://api.furry.bot/V2/furry/yiff/gay/image", true);
 	 */
 	static async fetchURL(url: string, withHeaders: true): Promise<{
 		headers: http.IncomingHttpHeaders;
@@ -98,16 +113,25 @@ export default class Request {
 	/**
 	 * Download an image to a directory
 	 * @static
-	 * @param {string} url
-	 * @param {string} filename
+	 * @param {string} url - The url of the image to download.
+	 * @param {string} filename - The filename to save the image to
 	 * @returns {Promise<void>}
 	 * @memberof Request
+	 * @example Request.downloadImage("https://api.furry.bot/V2/furry/bulge/image", "/opt/FurryBot/bulge.png");
 	 */
 	static async downloadImage(url: string, filename: string): Promise<void> {
 		return this.fetchURL(url, false).then(img => fs.writeFileSync(filename, img));
 	}
 
 
+	/**
+	 * Make a request to api.chewy-bot.top.
+	 * @static
+	 * @param {string} cat - The category to fetch from.
+	 * @returns {Promise<string>}
+	 * @memberof Request
+	 * @example Request.chewyBotAPIRequest("bunny");
+	 */
 	static async chewyBotAPIRequest(cat: string): Promise<string> {
 		let r: phin.IResponse;
 		try {

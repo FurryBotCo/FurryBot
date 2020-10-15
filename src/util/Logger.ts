@@ -37,7 +37,6 @@ export default class Logger {
 		}
 		if (typeof message !== "string") {
 			if (message instanceof Buffer || typeof message === "function") message = message.toString();
-			if (message instanceof Promise) message = Utility.sync<any>(message);
 			if (typeof message === "object") message = util.inspect(message, { depth: null, colors: true, showHidden: true });
 		}
 

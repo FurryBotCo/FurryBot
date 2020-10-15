@@ -11,6 +11,7 @@ import FurryBot from "../../bot";
 import crypto from "crypto";
 import Time from "./Time";
 import ExtendedMessage from "../ExtendedMessage";
+import * as os from "os";
 
 export default class Utility {
 	private constructor() {
@@ -18,18 +19,14 @@ export default class Utility {
 	}
 
 	/**
-	 * get the output of an async function synchronously
-	 * @param {Promise<T>} func - the function to get the result of synchronously
-	 * @template T
+	 * Convert a class to a string format (usually for eval returns).
+	 * @static
+	 * @template T - The class' type.
+	 * @param {T} d - The class.
+	 * @returns {string}
+	 * @memberof Utility
+	 * @example Utility.toStringFormat(new Error());
 	 */
-	static sync<T>(func: Promise<T>) {
-		async function go(f: typeof func, cb: (err?: Error, res?: any) => void) {
-			return f.then(res => cb(null, res)).catch(err => cb(err, null));
-		}
-
-		return deasync(go)(func);
-	}
-
 	static toStringFormat<T>(d: T) {
 		function format(obj: T, props: string[]) {
 			const str: [string, string][] = [] as any;
@@ -57,6 +54,17 @@ export default class Utility {
 		return d.toString();
 	}
 
+	/**
+	 * Generate an error embed.
+	 * @static
+	 * @param {Languages} lang - The language for the embed.
+	 * @param {("INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL")} type - The type of the embed.
+	 * @param {boolean} [json=false] - If json or {@link Eris#EmbedOptions} should be returned.
+	 * @returns {string | Eris.EmbedOptions}
+	 * @memberof Utility
+	 * @example Utility.genErrorEmbed("en", "INVALID_USER");
+	 * @example Utility.genErrorEmbed("en", "INVALID_MEMBER", true);
+	 */
 	static genErrorEmbed(lang: Languages, type: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL", json: true): Eris.EmbedOptions;
 	static genErrorEmbed(lang: Languages, type: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL", json?: false): EmbedBuilder;
 	static genErrorEmbed(lang: Languages, type: "INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL", json?: boolean) {
@@ -68,6 +76,14 @@ export default class Utility {
 		return json ? e.toJSON() : e;
 	}
 
+	/**
+	 * Conver a number into an emoji (single digit only).
+	 * @static
+	 * @param {(number | string)} num - The number to convert.
+	 * @returns {string}
+	 * @memberof Utility
+	 * @example Utility.numberToEmoji(1);
+	 */
 	static numberToEmoji(num: number | string) {
 		if (typeof num === "number") num = num.toString();
 		const m = {
@@ -86,12 +102,34 @@ export default class Utility {
 		return num;
 	}
 
+	/**
+	 * Get the longest string in an array.
+	 * @static
+	 * @param {((string | number)[])} arr - The array to check
+	 * @returns {(string | number)}
+	 * @memberof Utility
+	 * @example Utility.getLongestString(["hi", "hello"]);
+	 */
 	static getLongestString(arr: (string | number)[]) {
 		let longest = 0;
 		for (const v of arr) if (v.toString().length > longest) longest = v.toString().length;
 		return longest;
 	}
 
+	/**
+	 * @typedef {object} GetPercentsResult
+	 * @prop {number} input
+	 * @prop {string} percent
+	 */
+
+	/**
+	 * Convert an array of numbers into percentages.
+	 * @static
+	 * @param {number[]} arr - The array to convert.
+	 * @returns {GetPercentsResult[]}
+	 * @memberof Utility
+	 * @example Utility.getPercents([1, 5, 4, 2]);
+	 */
 	static getPercents(arr: number[]) {
 		const total = arr.reduce((a, b) => a + b, 0);
 		const a: {
@@ -112,6 +150,28 @@ export default class Utility {
 		return a;
 	}
 
+	/**
+	 * @typedef {object} CompareResult
+	 * @prop {boolean} higher
+	 * @prop {boolean} same
+	 * @prop {boolean} lower
+	 */
+
+	/**
+	 * @typedef {object} CompareMembersResult
+	 * @prop {CompareResult} member1
+	 * @prop {CompareResult} member2
+	 */
+
+	/**
+	 * Compare one member with another.
+	 * @static
+	 * @param {Eris.Member} member1 - The first member of the comparison.
+	 * @param {Eris.Member} member2 - The second member of the comparison.
+	 * @returns {CompareMembersResult}
+	 * @memberof Utility
+	 * @example Utility.compareMembers(<Member1>, <Member2>);
+	 */
 	static compareMembers(member1: Eris.Member, member2: Eris.Member) {
 		const g = member1.guild;
 		const m1r = member1.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0] || 0;
@@ -169,6 +229,15 @@ export default class Utility {
 		};
 	}
 
+	/**
+	 * Compare a member with a role.
+	 * @static
+	 * @param {Eris.Member} member - The member to compare.
+	 * @param {Eris.Role} role - The role to compare.
+	 * @returns {CompareResult}
+	 * @memberof Utility
+	 * @example Utility.compareMemberWithRole(<Member>, <Role>);
+	 */
 	static compareMemberWithRole(member: Eris.Member, role: Eris.Role) {
 		const g = member.guild;
 		const mr = member.roles.map(r => g.roles.get(r).position).sort((a, b) => b - a)[0] || 0;
@@ -192,6 +261,21 @@ export default class Utility {
 		};
 	}
 
+	/**
+	 * Parse message arguments.
+	 * @static
+	 * @template V
+	 * @template P
+	 * @param {P} args
+	 * @returns {({
+	 * 		args: {
+	 * 			[K in keyof V]: V[K];
+	 * 		};
+	 * 		unused: (string | number | boolean)[];
+	 * 		provided: P;
+	 * 	})}
+	 * @memberof Utility
+	 */
 	static parseArgs<V extends { [k: string]: any; } = { [k: string]: string | boolean | number; }, P extends (string | string[]) = any>(args: P): {
 		args: {
 			[K in keyof V]: V[K];
@@ -212,16 +296,47 @@ export default class Utility {
 		};
 	}
 
+	/**
+	 * Get a member's top role.
+	 * @static
+	 * @param {Eris.Member} member - The member to get the top role of.
+	 * @param {(role: Eris.Role) => boolean} [filter] - Filter roles.
+	 * @returns {Eris.Role}
+	 * @memberof Utility
+	 * @example Utility.getTopRole(<Member>);
+	 * @example Utility.getTopRole(<Member>, (role) => role.id !== "someId");
+	 */
 	static getTopRole(member: Eris.Member, filter?: (role: Eris.Role) => boolean) {
 		if (!filter) filter = () => true;
 		return member.roles.map(r => member.guild.roles.get(r)).filter(filter).sort((a, b) => b.position - a.position)[0];
 	}
 
+	/**
+	 * Get a member's color role.
+	 * @static
+	 * @param {Eris.Member} member - The member to get the color role of.
+	 * @returns {Eris.Role}
+	 * @memberof Utility
+	 * @example Utility.getColorRole(<Member>);
+	 */
 	static getColorRole(member: Eris.Member) {
 		return this.getTopRole(member, (role) => role.color !== 0);
 	}
 
-	// because it came to my attention that I should *not* use KEYS in production
+	/**
+	 * Get keys from Redis.
+	 *
+	 * Because it came to my attention that I should *not* use KEYS in production.
+	 * @static
+	 * @param {string} pattern - The seatch pattern to use.
+	 * @param {(number | string)} cur - Internal use only, provide "0".
+	 * @param {string[]} [keys] - Internal use only, Provide none or null.
+	 * @param {number} [maxPerRun] - The maximum amount of keys to fetch per round.
+	 * @returns {Promise<string[]>}
+	 * @memberof Utility
+	 * @example Utility.getKeys("some:pattern", "0");
+	 * @example Utility.getKeys("some:pattern", "0", null, 10000);
+	 */
 	static async getKeys(pattern: string, cur: number | string, keys?: string[], maxPerRun?: number): Promise<string[]> {
 		keys = keys || [];
 		maxPerRun = maxPerRun || 10000;
@@ -232,6 +347,27 @@ export default class Utility {
 		else return keys;
 	}
 
+	// I could make all of the typedef stuff for the below but I
+	// cannot be bothered right now
+
+	/**
+	 * Get the highest user levels.
+	 * @static
+	 * @param {boolean} [skipCache] - If the cache should be skipped.
+	 * @param {("asc" | "desc")} [sort] - The sort order.
+	 * @returns {Promise<{
+	 * 		entries: {
+	 * 			amount: number;
+	 * 			guild: string;
+	 * 			user: string;
+	 * 		}[];
+	 * 		time: number;
+	 * 	}>}
+	 * @memberof Utility
+	 * @example Utility.getHighestLevels();
+	 * @example Utility.getHighestLevels(true);
+	 * @example Utility.getHighestLevels(true, "asc");
+	 */
 	static async getHighestLevels(skipCache?: boolean, sort?: "asc" | "desc"): Promise<{
 		entries: {
 			amount: number;
@@ -272,11 +408,29 @@ export default class Utility {
 		};
 	}
 
-	static async logError(client: FurryBot, err: Error & { code?: number; }, type: "event", extra: {}): Promise<{
+	/**
+	 * @typedef {object} LogErrorResult
+	 * @prop {Eris.Message<Eris.TextableChannel>} message
+	 * @prop {string} code
+	 */
+
+	/**
+	 * Log an error
+	 * @static
+	 * @param {FurryBot} client - The bot client.
+	 * @param {Error} err - The error instance.
+	 * @param {("event" | "message")} type - The error type.
+	 * @param {any} extra - Extra info to provide.
+	 * @returns {LogErrorResult}
+	 * @memberof Utility
+	 * @example Utility.logError(<Client>, new Error(), "event", {});
+	 * @example Utility.logError(<Client>, new Error(), "message", <ExtendedMessage>);
+	 */
+	static async logError(client: FurryBot, err: Error, type: "event", extra: {}): Promise<{
 		message: Eris.Message<Eris.TextableChannel>;
 		code: string;
 	}>;
-	static async logError(client: FurryBot, err: Error & { code?: number; }, type: "message", extra: ExtendedMessage): Promise<{
+	static async logError(client: FurryBot, err: Error, type: "message", extra: ExtendedMessage): Promise<{
 		message: Eris.Message<Eris.TextableChannel>;
 		code: string;
 	}>;
@@ -344,8 +498,66 @@ export default class Utility {
 		};
 	}
 
+	/**
+	 * Internal use only.
+	 * @static
+	 * @template F
+	 * @param {F} func
+	 * @param {ThisParameterType<F>} thisArg
+	 * @param {...Parameters<F>} argArray
+	 * @returns {ReturnType<F>}
+	 * @memberof Utility
+	 */
 	static callFunction<F extends (...args: any) => any>(func: F, thisArg: ThisParameterType<F>, ...argArray: Parameters<F>): ReturnType<F> {
 		// apparently it can't figure out that argArray is an ARRAY!
 		return func.call(thisArg, ...(argArray as any));
+	}
+
+	/**
+	 * @typedef {object} CPUInfo
+	 * @prop {number} idle
+	 * @prop {number} total
+	 * @prop {number} idleAverage
+	 * @prop {number} totalAverage
+	 */
+
+	/**
+	 * Get info about the CPU.
+	 * @static
+	 * @returns {CPUInfo}
+	 * @memberof Utility
+	 * @example Utility.getCPUInfo();
+	 */
+	static getCPUInfo() {
+		const c = os.cpus();
+
+		let total = 0, idle = 0;
+
+		for (const { times } of c) {
+			Object.values(times).map(t => total += t);
+			idle += times.idle;
+		}
+
+		return {
+			idle,
+			total,
+			idleAverage: (idle / c.length),
+			totalAverage: (total / c.length)
+		};
+	}
+
+	/**
+	 * Get CPU Usage.
+	 * @static
+	 * @returns {number}
+	 * @memberof Utility
+	 * @example Utility.getCPUUsage();
+	 */
+	static async getCPUUsage() {
+		const { idleAverage: i1, totalAverage: t1 } = this.getCPUInfo();
+		await new Promise((a, b) => setTimeout(a, 1e3));
+		const { idleAverage: i2, totalAverage: t2 } = this.getCPUInfo();
+
+		return (10000 - Math.round(10000 * (i2 - i1) / (t2 - t1))) / 100;
 	}
 }

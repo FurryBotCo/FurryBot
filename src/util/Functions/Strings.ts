@@ -4,11 +4,12 @@ export default class Strings {
 	}
 
 	/**
-	 * first letter of every word uppercase
+	 * first letter of every word uppercase.
 	 * @static
-	 * @param {string} str
+	 * @param {string} str - The string to perform the operation on.
 	 * @returns {string}
 	 * @memberof Strings
+	 * @example Strings.ucwords("some string of words");
 	 */
 	static ucwords(str: string) {
 		return str.toString().toLowerCase().replace(/^(.)|\s+(.)/g, (r) => r.toUpperCase());
@@ -26,6 +27,16 @@ export default class Strings {
 		return str;
 	}
 
+	/**
+	 * Format byte measurements for human readability.
+	 * @static
+	 * @param {(string | number)} str - The amount to format.
+	 * @param {number} [precision] - Where to cut off floating point numbers at.
+	 * @returns {string}
+	 * @memberof Strings
+	 * @example Strings.formatBytes("10000000");
+	 * @example Strings.formatBytes("1000000000", 2);
+	 */
 	static formatBytes(str: string | number, precision?: number) {
 		if ([undefined, null].includes(precision)) precision = 2;
 		str = Number(str);

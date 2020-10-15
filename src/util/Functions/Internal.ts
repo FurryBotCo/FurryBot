@@ -19,13 +19,14 @@ export default class Internal {
 	}
 
 	/**
-	 * Merge objects for configuration purposes
+	 * Merge objects for configuration purposes.
 	 * @static
-	 * @param {object} a - The object to put the properties on
-	 * @param {object} b - The provided data
-	 * @param {object} c - The default data
+	 * @param {object} a - The object to put the properties on.
+	 * @param {object} b - The provided data.
+	 * @param {object} c - The default data.
 	 * @returns
-	 * @memberof Functions
+	 * @memberof Internal
+	 * @example Internal.goKeys(Object1, Object2, Object3);
 	 */
 	static goKeys(a: object, b: object, c: object): void {
 		// cloning because we don't want to edit the original defaults
@@ -44,6 +45,14 @@ export default class Internal {
 		});
 	}
 
+	/**
+	 * Load commands in a directory into a category.
+	 * @static
+	 * @param {string} dir - The directory to laod from.
+	 * @param {Category} cat - The category to add on to.
+	 * @memberof Internal
+	 * @example Internal.loadCommands("/opt/FurryBot/src/commands/developer", <Category>);
+	 */
 	static loadCommands(dir: string, cat: Category) {
 		const ext = __filename.split(".").slice(-1)[0];
 		fs.readdirSync(dir).filter(f => !fs.lstatSync(`${dir}/${f}`).isDirectory() && f.endsWith(ext) && f !== `index.${ext}`).map(f => {
@@ -54,6 +63,14 @@ export default class Internal {
 		});
 	}
 
+	/**
+	 * Extra argument parsing for some commands.
+	 * @static
+	 * @param {ExtendedMessage} msg - The message instance.
+	 * @returns {string}
+	 * @memberof Internal
+	 * @example Internal.extraArgParsing(<ExtendedMessage>);
+	 */
 	static extraArgParsing(msg: ExtendedMessage) {
 		let str = msg.args.join(" ");
 		try {
@@ -77,38 +94,25 @@ export default class Internal {
 		return str;
 	}
 
-	static getCPUInfo() {
-		const c = os.cpus();
-
-		let total = 0, idle = 0;
-
-		for (const { times } of c) {
-			Object.values(times).map(t => total += t);
-			idle += times.idle;
-		}
-
-		return {
-			idle,
-			total,
-			idleAverage: (idle / c.length),
-			totalAverage: (total / c.length)
-		};
-	}
-
-	static async getCPUUsage() {
-		const { idleAverage: i1, totalAverage: t1 } = this.getCPUInfo();
-		await new Promise((a, b) => setTimeout(a, 1e3));
-		const { idleAverage: i2, totalAverage: t2 } = this.getCPUInfo();
-
-		return (10000 - Math.round(10000 * (i2 - i1) / (t2 - t1))) / 100;
-	}
+	/**
+	 * @typedef {object} SpamReport
+	 * @param {string} userTag
+	 * @param {string} userId
+	 * @param {number} generatedTimestamp
+	 * @param {("cmd")} type
+	 * @param {boolean} beta
+	 * @param {object[]} entries
+	 * @param {number} entries.time
+	 * @param {string} entries.cmd
+	 */
 
 	/**
-	 *
+	 * Combine multiple spam reports into one report.
 	 * @static
-	 * @param {any[]} reports
-	 * @returns {any}
+	 * @param {SpamReport[]} reports
+	 * @returns {SpamReport}
 	 * @memberof Internal
+	 * @example Internal.combineReports(<SpamReport[]>);
 	 */
 	static combineReports(...reports: {
 		userTag: string;
@@ -146,6 +150,16 @@ export default class Internal {
 		};
 	}
 
+	/**
+	 * Authorize with Discord's OAuth.
+	 * @static
+	 * @param {string} code - The code of the authorization.
+	 * @param {string} [redirectURL] - The redirect URL used.
+	 * @returns {Promise<Discord.Oauth2Token>}
+	 * @memberof Internal
+	 * @example Internal.authorizeOAuth("someCodeFromDiscord");
+	 * @example Internal.authorizeOAuth("someCodeFromDiscord", "https://example.com");
+	 */
 	static async authorizeOAuth(code: string, redirectURL?: string): Promise<Discord.Oauth2Token> {
 		const c = await phin<Discord.Oauth2Token>({
 			method: "POST",
@@ -168,6 +182,14 @@ export default class Internal {
 		else throw new Error(JSON.stringify(c.body));
 	}
 
+	/**
+	 * Get the user behind a Discord authorization token.
+	 * @static
+	 * @param {string} auth - The bearer token.
+	 * @returns
+	 * @memberof Internal
+	 * @example Internal.getSelfUser("discordBearerToken");
+	 */
 	static async getSelfUser(auth: string) {
 		const p = await phin<Discord.APISelfUser>({
 			method: "GET",
@@ -180,20 +202,59 @@ export default class Internal {
 		return p.statusCode !== 200 ? null : p.body;
 	}
 
+	/**
+	 * Sanitize text to replace certain characters
+	 * @static
+	 * @param {string} str - The string to sanitize.
+	 * @returns {string}
+	 * @memberof Internal
+	 * @example Internal.sanitize("Some (at)everyone text here");
+	 */
 	static sanitize(str: string) {
 		if (typeof str !== "string") str = (str as any).toString();
 		["*", "_", "@"].map(s => str = str.replace(new RegExp(`\\${s}`, "gi"), `\\${s}`));
 		return str;
 	}
 
+	/**
+	 * Sanitize console output to remove special characters.
+	 * @static
+	 * @param {string} str - The string to sanitize-
+	 * @returns {string}
+	 * @memberof Internal
+	 * @example Internal.consoleSanitize("someString");
+	 */
 	static consoleSanitize(str: string) {
 		if (typeof str !== "string") str = (str as any).toString();
 		return str.replace(/\u001B\[[0-9]{1,2}m/g, "");
 	}
 
+	/**
+	 * Get the number of days in a given month.
+	 *
+	 * Not zero based.
+	 * @static
+	 * @param {number} month
+	 * @returns {number}
+	 * @memberof Internal
+	 * @example Internal.getDaysInMonth(2);
+	 */
 	static getDaysInMonth(month: number) { return new Date(new Date().getFullYear(), month, 0).getDate(); }
 
 
+	/**
+	 * Get the paid time for a dollar amount.
+	 * @static
+	 * @param {("db" | "main")} type - The type we're calculating for.
+	 * @param {number} amount - The amount we're calculating for.
+	 * @param {number} [month] - The month we're calculating for. (Zero based)
+	 * @returns
+	 * @memberof Internal
+	 * @example Internal.getPaidTime("db", 3);
+	 * @example Internal.getPaidTime("db", 5, 1);
+	 * @example Internal.getPaidTime("main", 7);
+	 * @example Internal.getPaidTime("main", 10, 4);
+	 */
 	static getPaidTime(type: "db" | "main", amount: number, month?: number) {
 		month = month ?? new Date().getMonth() + 1;
 		const PRICE_DB = 25;
@@ -204,6 +265,25 @@ export default class Internal {
 		return ((Math.ceil((amount / HOURLY) * 10 / 5) * 5) / 10) * 24 * 60 * 60 * 1000;
 	}
 
+	/**
+	 * @typedef {object} DiskUsage
+	 * @prop {Object.<string, DUsage>} drives
+	 * @prop {boolean} unix
+	 */
+
+	/**
+	 * @typedef {object} DUsage
+	 * @prop {number} total
+	 * @prop {number} free
+	 */
+
+	/**
+	 * Get the local disk usage.
+	 * @static
+	 * @returns {DiskUsage}
+	 * @memberof Internal
+	 * @example Internal.getDiskUsage()
+	 */
 	static getDiskUsage() {
 		// UNIX = df -Pk "/"
 		// WINDOWS = wmic logicaldisk get size,freespace,caption
@@ -238,11 +318,30 @@ export default class Internal {
 		};
 	}
 
+	/**
+	 * Generate a tooltip for an embed.
+	 * @static
+	 * @param {Languages} lang - The language of the tooltip.
+	 * @param {string} text - The title of the tooltip.
+	 * @param {string} content - The content of the tooltip.
+	 * @returns {string}
+	 * @memberof Internal
+	 * @example Internal.genTooltip("en", "Test Test", "Test Content");
+	 */
 	static genTooltip(lang: Languages, text: string, content: string) {
 		const ct = Language.parseString(lang, content);
 		return `[${Language.parseString(lang, text)}](https://botapi.furry.bot/note/show?content=${encodeURIComponent(ct)} '${ct}')`;
 	}
 
+	/**
+	 * Get our tsconfig file in a json format.
+	 * @static
+	 * @param {(string | null)} [file] - A file to read from.
+	 * @returns {ts.TranspileOptions}
+	 * @memberof Internal
+	 * @example Internal.getTSConfig();
+	 * @example Internal.getTSConfig("/opt/FurryBot/tsconfig.json");
+	 */
 	static getTSConfig(file?: string | null) {
 		if (!file) file = `${config.dir.base}/tsconfig.json`;
 		const c = JSON5.parse(fs.readFileSync(file).toString());
@@ -266,9 +365,19 @@ export default class Internal {
 		} as ts.TranspileOptions;
 	}
 
-	static transpile(file: string, tsconfig?: ts.TranspileOptions | string) {
+	/**
+	 * Transpile a single file, returning the transpiled contents.
+	 * @static
+	 * @param {string} mod - The code to transpile
+	 * @param {(ts.TranspileOptions | string)} [tsconfig] - the tsconfig to use
+	 * @returns {string}
+	 * @memberof Internal
+	 * @example Internal.transpile(fs.readFileSync("/opt/FurryBot/index.ts"));
+	 * @example Internal.transpile(fs.readFileSync("/opt/FurryBot/index.ts"), "/opt/FurryBot/tsconfig.json");
+	 */
+	static transpile(mod: string, tsconfig?: ts.TranspileOptions | string) {
 		const cnf = typeof tsconfig === "object" ? tsconfig : this.getTSConfig(tsconfig || null);
 
-		return ts.transpileModule(file, cnf).outputText;
+		return ts.transpileModule(mod, cnf).outputText;
 	}
 }

@@ -18,10 +18,12 @@ export default class Time {
 	/**
 	 * Convert milliseconds into readable time.
 	 * @static
-	 * @param {number} time
-	 * @param {boolean} [words]
+	 * @param {number} time - The time to convert.
+	 * @param {boolean} [words=false] - If we should return full words or just letters.
 	 * @returns {(Promise<string | T.MsResponse>)}
 	 * @memberof Time
+	 * @example Time.ms(120000);
+	 * @example Time.ms(240000, true);
 	 */
 	static ms(time: number, words?: true, seconds?: boolean): string;
 	static ms(time: number, words?: false, seconds?: boolean): MsResponse;
@@ -78,13 +80,14 @@ export default class Time {
 	}
 
 	/**
-	 * Format milliseconds ago
+	 * Format milliseconds ago.
 	 * @static
-	 * @param {(number | Date)} t - milliseconds
-	 * @param {boolean} [sub] - sub ms from now
-	 * @param {boolean} [seconds] - include seconds
-	 * @returns
+	 * @param {(number | Date)} t - The milliseconds to format.
+	 * @param {boolean} [sub] - If we should sub the ms provided from the current time.
+	 * @param {boolean} [seconds] - If seconds should be included in the return.
+	 * @returns {string}
 	 * @memberof Time
+	 * @example()
 	 */
 	static formatAgo(t: number | Date, sub?: boolean, seconds?: boolean) {
 		if (t instanceof Date) t = t.getTime();
@@ -95,11 +98,15 @@ export default class Time {
 	/**
 	 * format a date into dd/mm/yyyy hh:mm:ss.ms
 	 * @static
-	 * @param {(Date | number)} [d=new Date()]
-	 * @param {boolean} [seconds=true]
-	 * @param {boolean} [ms=false]
-	 * @returns
+	 * @param {(Date | number)} [d=new Date()] - The date to format.
+	 * @param {boolean} [hms=true] - If hh:mm:ss should be returned.
+	 * @param {boolean} [ms=false] - If ms should be returned.
+	 * @returns {string}
 	 * @memberof Time
+	 * @example Time.formatDateWithPadding();
+	 * @example Time.formatDateWithPadding(new Date());
+	 * @example Time.formatDateWithPadding(new Date(), true);
+	 * @example Time.formatDateWithPadding(new Date(), true, true);
 	 */
 	static formatDateWithPadding(d: Date | number = new Date(), hms = true, ms = false, words = false, useLang = false) {
 		const months = [
@@ -113,16 +120,17 @@ export default class Time {
 			"Saturday"
 		];
 		if (typeof d === "number") d = new Date(d);
-		if (words) return `${useLang ? `{lang:other.dayOfWeek.${d.getDay()}}` : days[d.getDay()]} ${useLang ? `{lang:other.months.${d.getMonth()}}` : months[d.getMonth()]} ${(d.getDate()).toString().padStart(2, "0")}, ${d.getFullYear()} ${d.getHours()} ${useLang ? `{lang:other.words.${d.getHours() < 12 ? "am" : "pm"}$upper$}` : d.getHours() < 12 ? "AM" : "PM"}`;
+		if (words) return `${useLang ? `{lang:other.dayOfWeek.${d.getDay()}}` : days[d.getDay()]} ${useLang ? `{lang:other.months.${d.getMonth()}}` : months[d.getMonth()]} ${(d.getDate()).toString().padStart(2, "0")}, ${d.getFullYear()} ${d.getHours() % 12} ${useLang ? `{lang:other.words.${d.getHours() < 12 ? "am" : "pm"}$upper$}` : d.getHours() < 12 ? "AM" : "PM"}`;
 		else return `${(d.getMonth() + 1).toString().padStart(2, "0")}/${(d.getDate()).toString().padStart(2, "0")}/${d.getFullYear()}${hms ? ` ${(d.getHours()).toString().padStart(2, "0")}:${(d.getMinutes()).toString().padStart(2, "0")}:${(d.getSeconds()).toString().padStart(2, "0")}` : ""}${ms ? `.${(d.getMilliseconds()).toString().padStart(3, "0")}` : ""}`;
 	}
 
 	/**
-	 * convert seconds to HH:MM:SS
+	 * Convert seconds to HH:MM:SS
 	 * @static
-	 * @param {number} sec - seconds
-	 * @returns
+	 * @param {number} sec - The seconds to convert.
+	 * @returns {string}
 	 * @memberof Time
+	 * @example Time.secondsToHMS(1800);
 	 */
 	static secondsToHMS(sec: number) {
 		let hours: string | number = Math.floor(sec / 3600);
