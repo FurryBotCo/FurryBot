@@ -60,5 +60,10 @@
 	},
 	"messageDeleteBulk": {
 		"title": "Message Bulk Deletion"
+	},
+	"userUpdate": {
+		"title": "User Update",
+		"oldAvNote": "Old avatar is displayed in the thumbnail (upper right)",
+		"newAvNote": "New avatar is displayed in the image (below this)"
 	}
 }

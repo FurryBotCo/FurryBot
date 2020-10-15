@@ -141,5 +141,7 @@
 	"web": "web",
 	"xp": "xp",
 	"yes": "yes",
-	"log": "log"
+	"log": "log",
+	"avatar": "avatar",
+	"discriminator": "discriminator"
 }
