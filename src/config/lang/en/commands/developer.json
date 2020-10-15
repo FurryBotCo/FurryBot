@@ -30,5 +30,12 @@
 		"description": "Run some tests.",
 		"usage": "<name>",
 		"invalid": "Invalid test specified. See source code for valid test names."
+	},
+	"todo": {
+		"description": "Add something to the todo list.",
+		"usage": "<item>",
+		"missingTitle": "Missing title. Separate a title a description with a pipe (|).",
+		"missingDescription": "Missing description. Separate a title a description with a pipe (|).",
+		"done": "Todo successfully added.\nView it here: {0}"
 	}
 }

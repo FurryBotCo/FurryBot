@@ -68,5 +68,19 @@
 		"missing1": "First text missing. You must provide some text separated by commas.",
 		"missing2": "Second text missing. You must provide some text separated by commas.",
 		"edited": "This message will be edited soon."
+	},
+	"suggest": {
+		"description": "Suggest something be added to the bot!",
+		"usage": "Suggestion Title | Suggestion Description",
+		"missingTitle": "Missing suggestion title. Separate a title a description with a pipe (|).",
+		"missingDescription": "Missing suggestion description. Separate a title a description with a pipe (|).",
+		"done": "Your suggestion was successfully posted.\nYou can view it here: {0}"
+	},
+	"bugreport": {
+		"description": "Report a bug you found in the bot.",
+		"usage": "Report Title | Report Description",
+		"missingTitle": "Missing report title. Separate a title a description with a pipe (|).",
+		"missingDescription": "Missing report description. Separate a title a description with a pipe (|).",
+		"done": "Your report was successfully posted.\nYou can view it and add more details here: {0}"
 	}
 }
