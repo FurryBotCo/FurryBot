@@ -67,7 +67,6 @@ export default class GuildConfig {
 		"voiceSwitch" | // voiceChannelSwitch
 		"voiceStateUpdate" |
 		"guildUpdate" |
-		"emojiCreate" | // guildEmojisUpdate
 		"inviteCreate" |
 		"inviteDelete";
 	}[];
