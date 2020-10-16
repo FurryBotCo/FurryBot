@@ -16,7 +16,6 @@ import Base from "../clustering/Base";
 import Cluster from "../clustering/Cluster";
 import config from "../config";
 import TimedTasks from "../util/Functions/TimedTasks";
-import Internal from "../util/Functions/Internal";
 import { performance } from "perf_hooks";
 import "../util/MonkeyPatch";
 import Eris from "eris";
@@ -24,6 +23,7 @@ import BLClient from "../util/handlers/BotListHandler";
 import phin from "phin";
 import db from "../util/Database";
 import Request from "../util/Functions/Request";
+import Utility from "../util/Functions/Utility";
 
 // create log directories if they don't exist
 for (const l of Object.keys(config.dir.logs)) if (!fs.existsSync(config.dir.logs[l])) fs.mkdirpSync(config.dir.logs[l]);
@@ -163,7 +163,7 @@ class FurryBot extends Base {
 
 		// explination in index.ts
 		setInterval(async () => {
-			this.cpuUsage = await Internal.getCPUUsage();
+			this.cpuUsage = await Utility.getCPUUsage();
 		}, 5e3);
 
 		setInterval(() => TimedTasks.runAll(this), 1e3);
