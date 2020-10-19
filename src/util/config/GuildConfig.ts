@@ -2,7 +2,7 @@
 import config from "../../config";
 import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";
-import Language, { Languages } from "../Language";
+import { Languages } from "../Language";
 import Internal from "../Functions/Internal";
 
 export type DBKeys = ConfigDataTypes<GuildConfig>;
@@ -84,6 +84,7 @@ export default class GuildConfig {
 		if (data._id) delete data._id;
 		delete data._id;
 		Internal.goKeys(this, data, config.defaults.config.guild);
+		if (!(this.logEvents instanceof Array)) this.logEvents = [];
 		return this;
 	}
 
