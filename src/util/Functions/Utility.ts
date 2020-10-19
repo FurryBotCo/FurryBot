@@ -438,7 +438,7 @@ export default class Utility {
 		message: Eris.Message<Eris.TextableChannel>;
 		code: string;
 	}> {
-		if ([1006, 1012, "ERR_INVALID_USAGE"].some(v => err.message.indexOf(v.toString()) !== -1)) return { message: null, code: "" };
+		if ([1006, 1012, "ERR_INVALID_USAGE", "Connection reset by peer"].some(v => err.message.indexOf(v.toString()) !== -1)) return { message: null, code: "" };
 
 		const d = new Date();
 		const code = `err.${config.beta ? "beta" : "prod"}.${crypto.randomBytes(8).toString("hex")}`;
