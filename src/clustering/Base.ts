@@ -11,5 +11,5 @@ export default abstract class Base {
 	get clusterId() { return this.cluster.id; }
 	get done(): () => Promise<void> { return this.cluster.done.bind(this.cluster); }
 
-	async abstract launch(shards: number): Promise<void>;
+	abstract launch(shards: number): Promise<void>;
 }
