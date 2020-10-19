@@ -215,6 +215,12 @@ class FurryBot extends Base {
 		} else return null;
 	}
 
+	async getGuild(id: string) {
+		if (this.bot.guilds.has(id)) return this.bot.guilds.get(id);
+		const guild: Eris.Guild = await this.bot.getRESTGuild(id).catch(err => null);
+		return guild || null;
+	}
+
 	get createPaste() { return Request.createPaste; }
 }
 

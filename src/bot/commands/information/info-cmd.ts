@@ -70,7 +70,7 @@ export default new Command(["info"], __filename)
 					`${config.emojis.default.dot} {lang:other.words.commands$ucwords$}: ${this.cmd.commands.length} (${this.cmd.categories.length} {lang:other.words.categories})`,
 					"",
 					"**{lang:other.words.developers$ucwords$}**:",
-					`${config.emojis.default.dot} [{lang:other.words.creator$ucwords$}] [Donovan_DMC](https://furry.cool) <-- **OwO**`,
+					`${config.emojis.default.dot} [{lang:other.words.creator$ucwords$}] [Donovan_DMC](https://furry.cool) <-- **Dumbass ÙwÚ**`,
 					`${config.emojis.default.dot} [{lang:other.words.contributor$ucwords$}] [August](https://augu.dev) <-- **Dumbass Cutie**`,
 					"",
 					"**{lang:other.words.other$ucwords$}**:",
