@@ -442,7 +442,7 @@ export default class Utility {
 
 		const d = new Date();
 		const code = `err.${config.beta ? "beta" : "prod"}.${crypto.randomBytes(8).toString("hex")}`;
-		const p = await client.createPaste(err.stack, "Furry Bot Error", "1W", 1);
+		const p = await client.createPaste(err.stack, "Furry Bot Error", "2D", 1);
 		const e = new EmbedBuilder(config.devLanguage)
 			.setTitle("\u274c Error")
 			.setTimestamp(d)
