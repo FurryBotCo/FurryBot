@@ -1,5 +1,5 @@
 import Eris from "eris";
-import FurryBot from "../bot";
+import FurryBot from "../main";
 
 
 export default class MessageCollector {

@@ -7,7 +7,7 @@ import y from "yargs";
 import { Colors } from "../Constants";
 import Redis from "../Redis";
 import { performance } from "perf_hooks";
-import FurryBot from "../../bot";
+import FurryBot from "../../main";
 import crypto from "crypto";
 import Time from "./Time";
 import ExtendedMessage from "../ExtendedMessage";

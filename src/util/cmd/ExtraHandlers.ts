@@ -1,6 +1,6 @@
 import ExtendedMessage from "../ExtendedMessage";
 import Command from "./Command";
-import FurryBot from "../../bot";
+import FurryBot from "../../main";
 import EmbedBuilder from "../EmbedBuilder";
 import { Colors } from "../Constants";
 import Time from "../Functions/Time";

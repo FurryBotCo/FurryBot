@@ -1,5 +1,5 @@
 import Eris from "eris";
-import FurryBot from "../bot";
+import FurryBot from "../main";
 import { db } from "./Database";
 import GuildConfig from "./config/GuildConfig";
 import UserConfig from "./config/UserConfig";

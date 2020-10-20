@@ -1,4 +1,4 @@
-import FurryBot from "../../bot";
+import FurryBot from "../../main";
 import db, { mdb } from "../Database";
 import { ObjectId } from "mongodb";
 import Eris from "eris";

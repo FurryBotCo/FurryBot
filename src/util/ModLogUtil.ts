@@ -1,4 +1,4 @@
-import FurryBot from "../bot";
+import FurryBot from "../main";
 import Eris from "eris";
 import { mdb } from "./Database";
 import Language from "./Language";

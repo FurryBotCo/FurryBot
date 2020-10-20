@@ -5,7 +5,7 @@ import * as Restrictions from "./restrictions";
 import ExtraHandlers from "./ExtraHandlers";
 import CooldownHandler from "./CooldownHandler";
 import AntiSpam from "./AntiSpam";
-import FurryBot from "../../bot";
+import FurryBot from "../../main";
 import path from "path";
 import Strings from "../Functions/Strings";
 

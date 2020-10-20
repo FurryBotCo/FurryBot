@@ -1,5 +1,5 @@
 import Eris from "eris";
-import FurryBot from "../bot";
+import FurryBot from "../main";
 
 // @TODO UPDATE EVENTS
 // @TODO FIND A WAY TO MAKE THIS NOT MANUAL

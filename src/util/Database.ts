@@ -6,7 +6,7 @@ import GuildConfig, { DBKeys as GuildDBKeys } from "./config/GuildConfig";
 import Timers from "./Timers";
 import DB from "@donovan_dmc/db";
 import Strings from "./Functions/Strings";
-import FurryBot from "../bot";
+import FurryBot from "../main";
 import crypto from "crypto";
 import Eris from "eris";
 import Time from "./Functions/Time";

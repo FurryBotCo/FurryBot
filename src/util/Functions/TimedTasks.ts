@@ -1,7 +1,7 @@
 import { mdb, db } from "../Database";
 import UserConfig from "../config/UserConfig";
 import config from "../../config";
-import FurryBot from "../../bot";
+import FurryBot from "../../main";
 import { Colors } from "../Constants";
 import GuildConfig from "../config/GuildConfig";
 import Eris from "eris";

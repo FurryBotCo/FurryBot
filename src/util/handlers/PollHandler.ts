@@ -1,4 +1,4 @@
-import FurryBot from "../../bot";
+import FurryBot from "../../main";
 import { EventEmitter } from "tsee";
 import { keyword } from "chalk";
 import Logger from "../Logger";

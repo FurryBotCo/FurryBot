@@ -1,4 +1,4 @@
-import FurryBot from "../../bot";
+import FurryBot from "../../main";
 import Internal from "../Functions/Internal";
 import * as https from "https";
 import config from "../../config";

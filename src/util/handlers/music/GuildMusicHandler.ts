@@ -1,4 +1,4 @@
-import FurryBot from "../../../bot";
+import FurryBot from "../../../main";
 import QueueHandler from "./QueueHandler";
 import Eris, { IntegrationOptions } from "eris";
 import Logger from "../../Logger";

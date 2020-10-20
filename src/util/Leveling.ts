@@ -1,4 +1,4 @@
-import FurryBot from "../bot";
+import FurryBot from "../main";
 
 export class Leveling {
 	client: FurryBot;

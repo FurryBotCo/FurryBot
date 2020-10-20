@@ -1,4 +1,4 @@
-import FurryBot from "../../../bot";
+import FurryBot from "../../../main";
 import ExtendedMessage from "../../ExtendedMessage";
 import Command from "../Command";
 import Language from "../../Language";

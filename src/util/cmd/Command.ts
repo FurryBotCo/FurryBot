@@ -1,6 +1,6 @@
 /// <reference path="../@types/global.d.ts" />
 import Category from "./Category";
-import FurryBot from "../../bot";
+import FurryBot from "../../main";
 import ExtendedMessage from "../ExtendedMessage";
 import CommandError from "./CommandError";
 import path from "path";

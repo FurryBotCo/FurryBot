@@ -1,6 +1,6 @@
 import config from "../config";
 import Eris from "eris";
-import FurryBot from "../bot";
+import FurryBot from "../main";
 
 class Webhook<e> {
 	client: FurryBot;

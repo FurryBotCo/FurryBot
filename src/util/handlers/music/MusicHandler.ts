@@ -1,4 +1,4 @@
-import FurryBot from "../../../bot";
+import FurryBot from "../../../main";
 import GuildMusicHandler from "./GuildMusicHandler";
 
 export default class MusicHandler {
