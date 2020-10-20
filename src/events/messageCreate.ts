@@ -360,7 +360,14 @@ export default new ClientEvent("messageCreate", async function (message, update)
 			})
 			/* start command error handler */
 			.catch(async (err: Error) => {
-				const { code } = await Utility.logError(this, err, "message", msg);
+				const {
+					code,
+					message: {
+						embeds: [
+							e
+						]
+					}
+				} = await Utility.logError(this, err, "message", msg);
 				if (err instanceof CommandError) {
 					switch (err.message) {
 						case "ERR_INVALID_USAGE": {
@@ -370,7 +377,10 @@ export default new ClientEvent("messageCreate", async function (message, update)
 					}
 				} else {
 					if (err.message.indexOf("filterTags") !== -1) await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.e6Blacklist"));
-					else await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.command", [code, config.client.socials.discord, `${err.name}: ${err.message}`]));
+					else {
+						if (config.developers.includes(msg.author.id)) await msg.channel.createMessage({ embed: e });
+						else await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.command", [code, config.client.socials.discord, `${err.name}: ${err.message}`]));
+					}
 					Logger.error([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, "Command Handler"], err);
 				}
 			});
