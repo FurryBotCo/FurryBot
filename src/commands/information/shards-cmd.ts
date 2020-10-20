@@ -1,4 +1,4 @@
-/// <reference path="../../../util/@types/Clustering.d.ts" />
+/// <reference path="../../util/@types/Clustering.d.ts" />
 import Command from "../../util/cmd/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
