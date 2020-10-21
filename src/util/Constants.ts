@@ -30,7 +30,8 @@ export const GAME_TYPES = {
 	STREAMING: 1,
 	LISTENING: 2,
 	WATCHING: 3,
-	CUSTOM: 4
+	CUSTOM: 4,
+	COMPETING: 5
 } as const;
 
 
