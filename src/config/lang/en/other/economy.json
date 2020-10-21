@@ -1,0 +1,19 @@
+{
+	"rarities": {
+		"common": "Common",
+		"uncommon": "Uncommon",
+		"rare": "Rare",
+		"epic": "Epic",
+		"legendary": "Legendary"
+	},
+	"items": {
+		"lucky-apple": {
+			"name": "Lucky Apple",
+			"description": "It doesn't seem to do much.."
+		},
+		"2020-pumpkin": {
+			"name": "2020 Pumpkin",
+			"description": "Collectible item for Halloween 2020."
+		}
+	}
+}

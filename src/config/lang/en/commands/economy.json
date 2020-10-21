@@ -1,0 +1,26 @@
+{
+	"bal": {
+		"usage": "[@user]",
+		"description": "Get someone's economy balance.",
+		"self": "Your Balance",
+		"other": "{0}'s Balance"
+	},
+	"hourly": {
+		"usage": "",
+		"description": "Claim your hourly coins.",
+		"title": "Here's Your Coins!",
+		"desc": "You got **{0}** {1}, they have been placed in your wallet."
+	},
+	"daily": {
+		"usage": "",
+		"description": "Claim your daily coins.",
+		"title": "Here's Your Coins!",
+		"desc": "You got **{0}** {1}, they have been placed in your wallet."
+	},
+	"weekly": {
+		"usage": "",
+		"description": "Claim your weekly coins. Donators only.",
+		"title": "Here's Your Coins!",
+		"desc": "You got **{0}** {1}, they have been placed in your wallet."
+	}
+}

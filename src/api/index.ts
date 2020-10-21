@@ -89,7 +89,8 @@ export default class API {
 				}
 
 				return next();
-			});
+			})
+			.use("/assets/items", express.static(`${config.dir.base}/src/assets/items`));
 
 		fs
 			.readdirSync(`${__dirname}/routes`)

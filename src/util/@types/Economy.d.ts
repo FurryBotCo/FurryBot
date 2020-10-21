@@ -1,50 +1,61 @@
-declare namespace Economy {
-	interface EcoUser {
-		bal: number;
-		inv: Inventory;
-		history: Economy.HistoryEntry.Any[];
+import config from "../../config";
+
+declare global {
+	namespace Economy {
+		interface EcoUser {
+			bal: number;
+			inv: Inventory;
+			history: Economy.HistoryEntry.Any[];
+		}
+
+		interface Inventory {
+			items: {
+				id: Economy.Items.Any;
+				amount: number;
+			}[];
+		}
 	}
 
-	interface Inventory {
-		items: Economy.Items.Any[];
+	namespace Economy.HistoryEntry {
+		type Any = ShareEntry | BegEntry | ClaimEntry;
+
+		interface ShareEntry {
+			type: "share";
+			amount: number;
+			time: string;
+			beforeBalance: {
+				from: number;
+				to: number;
+			};
+			afterBalance: {
+				from: number;
+				to: number;
+			};
+		}
+
+		interface BegEntry {
+			type: "beg";
+			amount: number;
+			time: string;
+			beforeBalance: number;
+			afterBalance: number;
+		}
+
+		interface ClaimEntry {
+			type: "claim";
+			subType: "hourly" | "daily" | "weekly";
+			amount: number;
+			time: string;
+			beforeBalance: number;
+			afterBalance: number;
+		}
 	}
-}
 
-declare namespace Economy.HistoryEntry {
-	type Any = ShareEntry | BegEntry | ClaimEntry;
+	namespace Economy.Items {
+		type Any = (keyof (typeof config)["eco"]["items"]);
 
-	interface ShareEntry {
-		type: "share";
-		amount: number;
-		time: string;
-		beforeBalance: {
-			from: number;
-			to: number;
-		};
-		afterBalance: {
-			from: number;
-			to: number;
-		};
+		// I planned on defining these here, but the JSON makes more sense in the long run
+		// src/config/other/items.json
 	}
 
-	interface BegEntry {
-		type: "beg";
-		amount: number;
-		time: string;
-		beforeBalance: number;
-		afterBalance: number;
-	}
-
-	interface ClaimEntry {
-		type: "claim";
-		subType: "hourly" | "daily" | "weekly";
-		amount: number;
-		time: string;
-		beforeBalance: number;
-		afterBalance: number;
-	}
-}
-
-declare namespace Economy.Items {
-	type Any = [];
 }

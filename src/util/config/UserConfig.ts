@@ -31,6 +31,7 @@ export default class UserConfig {
 		};
 		totalMonths: number;
 	};
+	eco: Economy.EcoUser;
 	constructor(id: string, data: ConfigDataTypes<UserConfig, "id">) {
 		this.id = id;
 		this.load.call(this, data);

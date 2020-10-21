@@ -38,5 +38,9 @@
 	"utility": {
 		"displayName": "🛠 Utility",
 		"description": "Some useful utility commands."
+	},
+	"economy": {
+		"displayName": "💰 Economy",
+		"description": "Play some games and such for virtual money!"
 	}
 }

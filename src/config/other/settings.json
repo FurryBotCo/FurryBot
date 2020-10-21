@@ -41,5 +41,11 @@
 		"name": "Language",
 		"dbName": "lang",
 		"description": "Sets the language the bot will use in this server (english only currently)."
+	}, {
+		"type": "string",
+		"subType": null,
+		"name": "Economy Emoji",
+		"dbName": "ecoEmoji",
+		"description": "Sets the emoji to use in economy commands."
 	}
 ]
