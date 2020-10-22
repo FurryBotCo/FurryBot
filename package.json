@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "10.2.1-20201021",
+  "version": "10.2.1-20201022",
   "description": "A fun bot for furry Discord servers!",
   "main": "index.js",
   "scripts": {
@@ -15,7 +15,8 @@
     "run:beta": "node index.js --force-beta",
     "run:prod": "node index.js --force-prod",
     "circ": "dpdm --tree=false --circular=true --warning=false -T .",
-    "sort-lang": "ts-node scripts/sort-lang"
+    "sort-lang": "ts-node scripts/sort-lang",
+    "test:rarity": "ts-node scripts/test-rarity"
   },
   "repository": {
     "type": "git",
@@ -74,6 +75,7 @@
     "@types/yargs": "^15.0.9",
     "compressing": "^1.5.1",
     "es-main": "^1.0.2",
+    "progress-bar": "^0.1.1",
     "rimraf": "^3.0.2",
     "source-map-support": "^0.5.19",
     "ts-node": "^9.0.0",
