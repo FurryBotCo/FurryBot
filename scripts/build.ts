@@ -4,10 +4,6 @@ import rimraf from "rimraf";
 import yargs from "yargs";
 import CLITest from "./CLITest";
 
-function promisify(entity: any) {
-
-}
-
 function build(del?: boolean) {
 	if (del) {
 		rimraf.sync(`${__dirname}/../build`);
