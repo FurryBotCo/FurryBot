@@ -420,7 +420,7 @@ export default class ClusterManager {
 			await this.#eris.executeWebhook(w.id, w.token, p);
 		}
 	}
-	
+
 	broadcast(op: string, d: object) {
 		const res = new Array(this.options.clusterCount).fill(false);
 		for (const [id] of this.clusters) {
