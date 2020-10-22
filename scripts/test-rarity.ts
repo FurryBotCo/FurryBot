@@ -43,3 +43,6 @@ for (const k of Object.keys(res)) {
 	const off = parseFloat((values[k] - parseFloat(per[k].toFixed(3))).toFixed(3)) * -1;
 	console.log(`${leeks.colors.cyan(k)}: ${leeks.colors.blue(res[k].toLocaleString())} - ${leeks.colors.magenta(`${per[k].toFixed(3)}%`)} (Expected: ${leeks.colors.magentaBright(`${values[k]}%`)}, off by ${leeks.colors[off === 0 ? "greenBright" : off < 0 ? "redBright" : "green"](`${off.toString()}%`)})`);
 }
+
+// exit after it's done, because ts-node is dumb
+process.exit(0);
