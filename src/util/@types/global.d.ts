@@ -16,7 +16,8 @@ declare global {
 	};
 	type AllowedNames<Base, Condition> = FilterFlags<Base, Condition>[keyof Base];
 	type BetterFilter<Base, Condition> = Pick<Base, keyof Omit<Base, AllowedNames<Base, Condition>>>;
-	type WithoutFunctions<T> = BetterFilter<T, Function>; // eslint-disable-line
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	type WithoutFunctions<T> = BetterFilter<T, Function>;
 	type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 

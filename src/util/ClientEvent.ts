@@ -25,7 +25,7 @@ export default class ClientEvent {
 	constructor(event: "guildMemberAdd", listener: (this: FurryBot, guild: Eris.Guild, member: Eris.Member) => void);
 	constructor(event: "guildMemberChunk", listener: (this: FurryBot, guild: Eris.Guild, members: Eris.Member[]) => void);
 	constructor(event: "guildMemberRemove", listener: (this: FurryBot, guild: Eris.Guild, member: Eris.Member | Eris.MemberPartial) => void);
-	constructor(event: "guildMemberUpdate", listener: (this: FurryBot, guild: Eris.Guild, member: Eris.Member, oldMember: { roles: string[]; nick?: string }) => void);
+	constructor(event: "guildMemberUpdate", listener: (this: FurryBot, guild: Eris.Guild, member: Eris.Member, oldMember: { roles: string[]; nick?: string; }) => void);
 	constructor(event: "guildRoleCreate" | "guildRoleDelete", listener: (this: FurryBot, guild: Eris.Guild, role: Eris.Role) => void);
 	constructor(event: "guildRoleUpdate", listener: (this: FurryBot, guild: Eris.Guild, role: Eris.Role, oldRole: Eris.OldRole) => void);
 	constructor(event: "guildUpdate", listener: (this: FurryBot, guild: Eris.Guild, oldGuild: Eris.OldGuild) => void);
@@ -41,10 +41,10 @@ export default class ClientEvent {
 	constructor(event: "rawREST", listener: (this: FurryBot, request: Eris.RawRESTRequest) => void);
 	constructor(event: "rawWS" | "unknown", listener: (this: FurryBot, packet: Eris.RawPacket, id: number) => void);
 	constructor(event: "relationshipAdd" | "relationshipRemove", listener: (this: FurryBot, relationship: Eris.Relationship) => void);
-	constructor(event: "relationshipUpdate", listener: (this: FurryBot, relationship: Eris.Relationship, oldRelationship: { type: number }) => void);
+	constructor(event: "relationshipUpdate", listener: (this: FurryBot, relationship: Eris.Relationship, oldRelationship: { type: number; }) => void);
 	constructor(event: "typingStart", listener: (this: FurryBot, channel: Eris.TextableChannel, user: Eris.User) => void);
 	constructor(event: "unavailableGuildCreate", listener: (this: FurryBot, guild: Eris.UnavailableGuild) => void);
-	constructor(event: "userUpdate", listener: (this: FurryBot, user: Eris.User, oldUser: { username: string; discriminator: string; avatar?: string }) => void);
+	constructor(event: "userUpdate", listener: (this: FurryBot, user: Eris.User, oldUser: { username: string; discriminator: string; avatar?: string; }) => void);
 	constructor(event: "voiceChannelJoin", listener: (this: FurryBot, member: Eris.Member, newChannel: Eris.VoiceChannel) => void);
 	constructor(event: "voiceChannelLeave", listener: (this: FurryBot, member: Eris.Member, oldChannel: Eris.VoiceChannel) => void);
 	constructor(event: "voiceChannelSwitch", listener: (this: FurryBot, member: Eris.Member, newChannel: Eris.VoiceChannel, oldChannel: Eris.VoiceChannel) => void);

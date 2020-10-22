@@ -46,7 +46,7 @@ export default class IPC {
 		const c = this.cb.get(d.callbackId);
 		if (!c) Logger.warn([`Cluster #${this.cluster.id}`, "IPC"], `IPC message recieved with an invalid callback id. (ID: ${d.callbackId || "NONE"})`);
 		switch (d.type) {
-			/* ecase "fetchGuild":
+			/* case "fetchGuild":
 			case "fetchUser":
 			case "fetchChannel": {
 				c.data.clustersAccountedFor.push(d.from);

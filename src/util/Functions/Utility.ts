@@ -1,7 +1,3 @@
-/* eslint-disable jsdoc/check-indentation */
-/* eslint-disable @typescript-eslint/ban-types */
-
-import deasync from "deasync";
 import config from "../../config";
 import { Languages } from "../Language";
 import EmbedBuilder from "../EmbedBuilder";
@@ -278,16 +274,10 @@ export default class Utility {
 	 * @template V
 	 * @template P
 	 * @param {P} args
-	 * @returns {({
-	 * 		args: {
-	 * 			[K in keyof V]: V[K];
-	 * 		};
-	 * 		unused: (string | number | boolean)[];
-	 * 		provided: P;
-	 * 	})}
+	 * @returns {object}
 	 * @memberof Utility
 	 */
-	static parseArgs<V extends { [k: string]: any } = { [k: string]: string | boolean | number }, P extends (string | string[]) = any>(args: P): {
+	static parseArgs<V extends { [k: string]: any; } = { [k: string]: string | boolean | number; }, P extends (string | string[]) = any>(args: P): {
 		args: {
 			[K in keyof V]: V[K];
 		};
@@ -370,14 +360,7 @@ export default class Utility {
 	 * @static
 	 * @param {boolean} [skipCache] - If the cache should be skipped.
 	 * @param {("asc" | "desc")} [sort] - The sort order.
-	 * @returns {Promise<{
-	 * 		entries: {
-	 * 			amount: number;
-	 * 			guild: string;
-	 * 			user: string;
-	 * 		}[];
-	 * 		time: number;
-	 * 	}>}
+	 * @returns {Promise<object>}
 	 * @memberof Utility
 	 * @example Utility.getHighestLevels();
 	 * @example Utility.getHighestLevels(true);
@@ -442,6 +425,7 @@ export default class Utility {
 	 * @example Utility.logError(<Client>, new Error(), "event", {});
 	 * @example Utility.logError(<Client>, new Error(), "message", <ExtendedMessage>);
 	 */
+	// eslint-disable-next-line @typescript-eslint/ban-types
 	static async logError(client: FurryBot, err: Error, type: "event", extra: {}): Promise<{
 		message: Eris.Message<Eris.TextableChannel>;
 		code: string;
@@ -450,6 +434,7 @@ export default class Utility {
 		message: Eris.Message<Eris.TextableChannel>;
 		code: string;
 	}>;
+	// eslint-disable-next-line @typescript-eslint/ban-types
 	static async logError(client: FurryBot, err: Error, type: "message" | "event", extra?: ExtendedMessage | {}): Promise<{
 		message: Eris.Message<Eris.TextableChannel>;
 		code: string;

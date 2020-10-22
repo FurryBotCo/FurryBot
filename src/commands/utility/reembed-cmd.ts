@@ -27,7 +27,7 @@ export default new Command(["reembed"], __filename)
 
 		if (!channel || ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(channel.type)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidChannel`));
 
-		const message = await channel.getMessage(id).catch(null) as Eris.Message & { flags: number };
+		const message = await channel.getMessage(id).catch(null) as Eris.Message & { flags: number; };
 
 		if (!message) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidMessage`));
 		if (!(message.flags & Eris.Constants.MessageFlags.SUPPRESS_EMBEDS)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.notSuppressed`));

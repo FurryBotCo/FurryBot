@@ -1,5 +1,5 @@
 /// <reference path="../@types/Discord.d.ts" />
-/* eslint-disable @typescript-eslint/ban-types */
+
 
 import Category from "../cmd/Category";
 import path from "path";
@@ -31,12 +31,12 @@ export default class Internal {
 	 * @memberof Internal
 	 * @example Internal.goKeys(Object1, Object2, Object3);
 	 */
-	static goKeys(a: object, b: object, c: object): void {
+	static goKeys(a: object & { id?: string; }, b: object, c: object): void {
 		// cloning because we don't want to edit the original defaults
 		// using this dirty method because spread leaves a deep reference
 		const d = JSON.parse(JSON.stringify(c));
 		const obj = Object.keys(d).length === 0 ? b : d;
-		if (a.id) d.id = a.id; // tslint:disable-line no-string-literal
+		if (a.id) d.id = a.id;
 		Object.keys(obj).map(k => {
 			if (typeof d[k] === "object" && d[k] !== null) {
 				if (d[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? d[k] : b[k];

@@ -28,7 +28,7 @@ export default new Command(["rank"], __filename)
 		});
 		const c = await db.getUser(member.id);
 
-		let u: { id: string; level: number }[] = await Promise.all(msg.channel.guild.members.filter(m => !m.user.bot).map(async (m) => new Promise((a, b) => Redis.get(`leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
+		let u: { id: string; level: number; }[] = await Promise.all(msg.channel.guild.members.filter(m => !m.user.bot).map(async (m) => new Promise((a, b) => Redis.get(`leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err))))) as any;
 		const lvl = config.leveling.calcLevel(c.getLevel(msg.channel.guild.id));
 		const n = config.leveling.calcExp(lvl.level + 1);
 		const t = { id: member.id, level: lvl.total };

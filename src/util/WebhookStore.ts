@@ -28,7 +28,7 @@ class Webhook<e> {
 		return this.client.bot.deleteWebhook(this.id, this.token, reason);
 	}
 	async execute(payload: Omit<Eris.WebhookPayload, "wait">) {
-		const data: Eris.WebhookPayload & { wait: true } = {
+		const data: Eris.WebhookPayload & { wait: true; } = {
 			...payload,
 			wait: true
 		};

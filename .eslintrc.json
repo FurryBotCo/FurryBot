@@ -49,7 +49,8 @@
 				  "String": {
 					  "message": "Avoid using the `String` type. Did you mean `string`?"
 				  },
-				  "object": false
+				  "object": false,
+				  "{}:": false
 			  }
 		  }
 	  ],
