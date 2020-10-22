@@ -42,8 +42,8 @@ export default new ClientEvent("guildUpdate", async function (guild, old) {
 		}
 
 		if (guild.verificationLevel !== old.verificationLevel) {
-			content[0].push(`{lang:other.words.verification$ucwords$}: **{lang:other.words.verif_level.${old.verificationLevel}$ucwords$}**`);
-			content[1].push(`{lang:other.words.verification$ucwords$}: **{lang:other.words.verif_level.${guild.verificationLevel}$ucwords$}**`);
+			content[0].push(`{lang:other.words.verification$ucwords$}: **{lang:other.words.verif_level_${old.verificationLevel}$ucwords$}**`);
+			content[1].push(`{lang:other.words.verification$ucwords$}: **{lang:other.words.verif_level_${guild.verificationLevel}$ucwords$}**`);
 		}
 
 		if (guild.region !== old.region) {

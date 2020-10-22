@@ -143,5 +143,14 @@
 	"yes": "yes",
 	"log": "log",
 	"avatar": "avatar",
-	"discriminator": "discriminator"
+	"discriminator": "discriminator",
+	"afk": "afk timeout",
+	"verif_level": "verification level",
+	"verif_level_0": "unrestricted",
+	"verif_level_1": "low",
+	"verif_level_2": "medium",
+	"verif_level_3": "high",
+	"verif_level_4": "highest",
+	"region": "region",
+	"features": "guild features"
 }
