@@ -1,5 +1,5 @@
 /// <reference path="../util/@types/Clustering.d.ts" />
-/* eslint-disable @typescript-eslint/ban-types */
+
 
 import Eris from "eris";
 import * as fs from "fs-extra";

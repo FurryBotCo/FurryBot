@@ -46,7 +46,7 @@ export default class IPC {
 		const c = this.cb.get(d.callbackId);
 		if (!c) Logger.warn([`Cluster #${this.cluster.id}`, "IPC"], `IPC message recieved with an invalid callback id. (ID: ${d.callbackId || "NONE"})`);
 		switch (d.type) {
-			/* case "fetchGuild":
+			/* ecase "fetchGuild":
 			case "fetchUser":
 			case "fetchChannel": {
 				c.data.clustersAccountedFor.push(d.from);
@@ -105,7 +105,7 @@ export default class IPC {
 		}
 	}
 
-	async broadcastEval<R = any>(code: ((this: Cluster) => Promise<any>) | string): Promise<(Clustering.EvalResponse<R> & { clusterId: number })[]> {
+	async broadcastEval<R = any>(code: ((this: Cluster) => Promise<any>) | string): Promise<(Clustering.EvalResponse<R> & { clusterId: number; })[]> {
 		return Promise.all(Array.from(Array(this.cluster.options.clusterCount).keys()).map(async (id) => this.evalAtCluster<R>(id, code).then(v => ({ ...v, clusterId: id }))));
 	}
 
