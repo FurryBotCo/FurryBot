@@ -7,7 +7,7 @@
     "config:pull": "ts-node ConfigManager.ts pull",
     "config:push": "ts-node ConfigManager.ts push",
     "ver": "ts-node scripts/version.ts",
-    "build": "ts scripts/npm-build",
+    "build": "ts-node scripts/npm-build",
     "start": "npm run build && node index.js",
     "start:beta": "npm run build && node index.js --force-beta",
     "start:prod": "npm run build && node index.js --force-prod",
