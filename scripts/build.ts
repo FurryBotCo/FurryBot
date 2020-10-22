@@ -10,18 +10,18 @@ function build(del?: boolean) {
 		console.debug("[build.ts]: Removing previous built files.");
 	} else console.debug("[build.ts]: Not removing previous built files.");
 
-	let result: boolean = false;
+	let result = false;
 	const child = exec("tsc -b --verbose", { cwd: path.resolve(`${__dirname}/../`) });
 	child.stdout.on("data", console.debug);
-	child.on("error", (error) => {
-		console.warn("[build.ts]: `tsc` command has failed to run, view below for stacktrace");
-		console.error(error);
-	});
-
-	child.on("exit", (code, signal) => {
-		console.info(`[build.ts]: \`tsc\` command closed with exit code ${code}${signal ? ` with signal "${signal}"` : ''} (success: ${code === 0 ? 'yes' : 'no'})`);
-		if (code === 0) result = true;
-	});
+	child
+		.on("error", (error) => {
+			console.warn("[build.ts]: `tsc` command has failed to run, view below for stacktrace");
+			console.error(error);
+		})
+		.on("exit", (code, signal) => {
+			console.info(`[build.ts]: \`tsc\` command closed with exit code ${code}${signal ? ` with signal "${signal}"` : ""} (success: ${code === 0 ? "yes" : "no"})`);
+			if (code === 0) result = true;
+		});
 
 	return result;
 }
