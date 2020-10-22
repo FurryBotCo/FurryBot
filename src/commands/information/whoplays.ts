@@ -15,7 +15,7 @@ export default new Command(["whoplays"], __filename)
 		// if (msg.channel.guild.memberCount < 1000 && msg.channel.guild.members.size !== msg.channel.guild.memberCount) await msg.channel.guild.fetchAllMembers();
 		let l = msg.channel.guild.members.filter(m => m.game && m.game.name.toLowerCase().indexOf(msg.args.join(" ").toLowerCase()) !== -1), limit = false;
 		const len = l.length;
-		if (len > 15) (l = [], limit = true);
+		if (len > 15) (l = [], limit = true); // eslint-disable-line @typescript-eslint/no-unused-expressions
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

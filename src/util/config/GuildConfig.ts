@@ -156,6 +156,10 @@ export default class GuildConfig {
 		else return r[0];
 	}
 
-	async checkBlacklist() { return db.checkBl("guild", this.id); }
-	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) { return db.addBl("guild", this.id, blame, blameId, reason, expire, report); }
+	async checkBlacklist() {
+		return db.checkBl("guild", this.id);
+	}
+	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
+		return db.addBl("guild", this.id, blame, blameId, reason, expire, report);
+	}
 }

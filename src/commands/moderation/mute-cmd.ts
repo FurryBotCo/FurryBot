@@ -79,8 +79,7 @@ export default new Command(["mute"], __filename)
 				if (time) a.splice(1, 1);
 				else time = 0;
 				msg.args = a;
-			}
-			catch (e) {
+			} catch (e) {
 				if (e instanceof Error) {// for typings, catch clause cannot be annotated (TS1196)
 					if (e.name !== "ERR_INVALID_FORMAT") throw e; // rethrow the error if it's not what we expect
 

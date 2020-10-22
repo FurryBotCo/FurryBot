@@ -22,9 +22,15 @@ class Store {
 		this.entries = new Map();
 	}
 
-	get(id: string) { return this.entries.get(id) || {}; }
-	set(id: string, d: Partial<SessionData>) { return this.entries.set(id, d); }
-	delete(id: string) { return this.entries.delete(id); }
+	get(id: string) {
+		return this.entries.get(id) || {};
+	}
+	set(id: string, d: Partial<SessionData>) {
+		return this.entries.set(id, d);
+	}
+	delete(id: string) {
+		return this.entries.delete(id);
+	}
 }
 
 const SessionStore = new Store();

@@ -43,7 +43,7 @@ declare global {
 		export interface Stats {
 			clusters: Map<number, ClusterStats>;
 			readonly shards: Map<number, ShardStats & {
-				clusterId: number
+				clusterId: number;
 			}>;
 			readonly guilds: number;
 			readonly largeGuilds: number;
@@ -58,7 +58,7 @@ declare global {
 			};
 		}
 
-		/*export interface EvalStats {
+		/* export interface EvalStats {
 			clusters: [number, ClusterStats & {
 				shards: [number, ShardStats][];
 			}][];

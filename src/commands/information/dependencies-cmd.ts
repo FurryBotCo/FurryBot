@@ -87,7 +87,7 @@ export default new Command(["dependencies", "dep"], __filename)
 				i++;
 				emb.addField(`{lang:${cmd.lang}.title${Strings.ucwords(key)}|${i}}`, text.join("\n"), false);
 			}
-			i = 0, text = [];
+			i = 0, text = []; // eslint-disable-line @typescript-eslint/no-unused-expressions
 		}
 
 		return msg.channel.createMessage({

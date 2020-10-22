@@ -44,7 +44,9 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 		// if (config.contributors.includes(user.id)) f.push(config.flags.contrib);
 		// if (config.helpers.includes(user.id)) f.push(config.flags.helper);
 		// try { if (u.staff) f.push(config.flags.staff); } catch (e) { }
-		try { if (u.booster) f.push(config.flags.booster); } catch (e) { }
+		try {
+			if (u.booster) f.push(config.flags.booster);
+		} catch (e) { }
 		const c = await db.getUser(user.id);
 		const p = await c.checkPremium();
 		const ubl = await c.checkBlacklist();

@@ -20,7 +20,7 @@ export default new ClientEvent("presenceUpdate", async function (other, oldPrese
 			}
 
 			// game/activities is a TODO
-			/*function k(t: (typeof GAME_TYPES)[keyof typeof GAME_TYPES]) {
+			/* function k(t: (typeof GAME_TYPES)[keyof typeof GAME_TYPES]) {
 
 			}*/
 

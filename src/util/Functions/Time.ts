@@ -17,6 +17,7 @@ export default class Time {
 
 	/**
 	 * Convert milliseconds into readable time.
+	 *
 	 * @static
 	 * @param {number} time - The time to convert.
 	 * @param {boolean} [words=false] - If we should return full words or just letters.
@@ -41,14 +42,26 @@ export default class Time {
 			y: 0
 		};
 
-		while (time >= 1e3) { r.s++; time -= 1e3; }
-		while (r.s >= 60) { r.m++; r.s -= 60; }
-		while (r.m >= 60) { r.h++; r.m -= 60; }
-		while (r.h >= 24) { r.d++; r.h -= 24; }
+		while (time >= 1e3) {
+			r.s++; time -= 1e3;
+		}
+		while (r.s >= 60) {
+			r.m++; r.s -= 60;
+		}
+		while (r.m >= 60) {
+			r.h++; r.m -= 60;
+		}
+		while (r.h >= 24) {
+			r.d++; r.h -= 24;
+		}
 		// while (r.d >= 7) { r.w++; r.d -= 7; }
 		// while (r.w >= 4 && r.d >= 2) { r.mn++; r.w -= 4; r.d -= 2; }
-		while (r.d >= 30) { r.mn++; r.d -= 30; }
-		while (r.mn >= 12) { r.y++; r.mn -= 12; }
+		while (r.d >= 30) {
+			r.mn++; r.d -= 30;
+		}
+		while (r.mn >= 12) {
+			r.y++; r.mn -= 12;
+		}
 		if (time > 0) r.s += time / 1000;
 
 		Object.keys(r).map(k => r[k] = Math.floor(r[k]));
@@ -81,6 +94,7 @@ export default class Time {
 
 	/**
 	 * Format milliseconds ago.
+	 *
 	 * @static
 	 * @param {(number | Date)} t - The milliseconds to format.
 	 * @param {boolean} [sub] - If we should sub the ms provided from the current time.
@@ -97,6 +111,7 @@ export default class Time {
 
 	/**
 	 * format a date into dd/mm/yyyy hh:mm:ss.ms
+	 *
 	 * @static
 	 * @param {(Date | number)} [d=new Date()] - The date to format.
 	 * @param {boolean} [hms=true] - If hh:mm:ss should be returned.
@@ -126,6 +141,7 @@ export default class Time {
 
 	/**
 	 * Convert seconds to HH:MM:SS
+	 *
 	 * @static
 	 * @param {number} sec - The seconds to convert.
 	 * @returns {string}

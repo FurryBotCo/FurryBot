@@ -63,10 +63,9 @@ export default new Command(["eval", "ev"], __filename)
 			else {
 				const j = res instanceof Object ? Utility.toStringFormat(res) : null;
 				if (j && j !== res.toString()) {
-					if (res instanceof Error) (error = true, o = res);
+					if (res instanceof Error) (error = true, o = res); // eslint-disable-line @typescript-eslint/no-unused-expressions
 					res = j;
-				}
-				else if (typeof res === "object") res = util.inspect(res, { depth: 2, showHidden: true });
+				} else if (typeof res === "object") res = util.inspect(res, { depth: 2, showHidden: true });
 				else if (res instanceof Promise) res = await res;
 				else if (res instanceof Function) res = res.toString();
 				else if (res instanceof Buffer) res = res.toString();
@@ -91,7 +90,7 @@ export default new Command(["eval", "ev"], __filename)
 				if (!stack) stack = "";
 
 				// extra 50 for padding
-				for (const line of st) if ((res.length + 50) + stack.length < 950) (stack += `\n${line}`, ++i);
+				for (const line of st) if ((res.length + 50) + stack.length < 950) (stack += `\n${line}`, ++i); // eslint-disable-line @typescript-eslint/no-unused-expressions
 				if (st.length !== i) stack += `\n(...) and ${st.length - i} more lines`;
 			}
 

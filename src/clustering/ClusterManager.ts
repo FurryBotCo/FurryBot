@@ -1,5 +1,7 @@
 /// <reference path="../util/@types/Events.d.ts" />
 /// <reference path="../util/@types/Clustering.d.ts" />
+/* eslint-disable @typescript-eslint/ban-types */
+
 import cluster from "cluster";
 import Cluster from "./Cluster";
 import Eris from "eris";

@@ -20,8 +20,12 @@ export class ReloadError<T extends ("command" | "category")> extends Error {
 		this.info = info;
 	}
 
-	get file() { return this.info.file; }
-	get tsFile() { return this.info.tsFile; }
+	get file() {
+		return this.info.file;
+	}
+	get tsFile() {
+		return this.info.tsFile;
+	}
 }
 
 export default class CommandHandler {
@@ -38,14 +42,30 @@ export default class CommandHandler {
 		this.#anti = new AntiSpam(client);
 	}
 
-	get handlers() { return this.#extra; }
-	get cool() { return this.#cool; }
-	get anti() { return this.#anti; }
-	get restrictions() { return Restrictions; }
-	get categories() { return [...this.#cats]; }
-	get commands(): Command[] { return [...this.#cats.reduce((a, b) => a.concat(b.commands), [])]; }
-	get triggers(): string[] { return [...this.#cats.reduce((a, b) => a.concat(b.commands.reduce((c, d) => c.concat(d.triggers), [])), [])]; }
-	get categoryNames() { return this.#cats.map(c => c.name); }
+	get handlers() {
+		return this.#extra;
+	}
+	get cool() {
+		return this.#cool;
+	}
+	get anti() {
+		return this.#anti;
+	}
+	get restrictions() {
+		return Restrictions;
+	}
+	get categories() {
+		return [...this.#cats];
+	}
+	get commands(): Command[] {
+		return [...this.#cats.reduce((a, b) => a.concat(b.commands), [])];
+	}
+	get triggers(): string[] {
+		return [...this.#cats.reduce((a, b) => a.concat(b.commands.reduce((c, d) => c.concat(d.triggers), [])), [])];
+	}
+	get categoryNames() {
+		return this.#cats.map(c => c.name);
+	}
 
 	getCategory(data: string) {
 		if (!data) throw new TypeError("Missing category.");

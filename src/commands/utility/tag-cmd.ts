@@ -9,7 +9,7 @@ export default new Command(["tag"], __filename)
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		const tags: {
-			[k: string]: string
+			[k: string]: string;
 		} = {};
 		await Promise.all(msg.gConfig.tags.map(async (t, i) => {
 			if (!msg.gConfig.tags[i] || !msg.gConfig.tags[i].content) await msg.gConfig.mongoEdit({ $pull: { tags: t } });
@@ -27,7 +27,7 @@ export default new Command(["tag"], __filename)
 				const name = Object.keys(tags)[values.indexOf(tag)];
 				if (!pages[i]) pages[i] = [];
 				const len = pages[i].reduce((a, b) => a + b.length, 0);
-				if (len + tag.length >= 1000) (i++, pages[i] = []);
+				if (len + tag.length >= 1000) (i++, pages[i] = []); // eslint-disable-line @typescript-eslint/no-unused-expressions
 				pages[i].push(tag);
 			}
 			if (pages.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noTags`));

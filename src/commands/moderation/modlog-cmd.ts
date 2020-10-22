@@ -132,7 +132,7 @@ export default new Command(["modlog"], __filename)
 			}
 
 			// not implementing this yet
-			/*case "clear": {
+			/* case "clear": {
 				break;
 			}*/
 
@@ -152,7 +152,7 @@ export default new Command(["modlog"], __filename)
 							`{lang:other.words.example$ucwords$}: \`{lang:${cmd.lang}.example|${msg.gConfig.settings.prefix}}\``,
 							`{lang:${cmd.lang}.help.set|${msg.gConfig.settings.prefix}}`,
 							`{lang:${cmd.lang}.help.disable|${msg.gConfig.settings.prefix}}`,
-							`{lang:${cmd.lang}.help.list|${msg.gConfig.settings.prefix}}`/*,
+							`{lang:${cmd.lang}.help.list|${msg.gConfig.settings.prefix}}`/* ,
 							`{lang:${cmd.lang}.help.clear|${msg.gConfig.settings.prefix}}`*/
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())

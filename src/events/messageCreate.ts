@@ -131,7 +131,9 @@ export default new ClientEvent("messageCreate", async function (message, update)
 				});
 				else msg.channel.createMessage(`{lang:other.leveling.message|${msg.author.id}|${nlvl.level}}`);
 				setTimeout(() => {
-					try { m.delete(); } catch (e) { }
+					try {
+						m.delete();
+					} catch (e) { }
 				}, 2e4);
 			} else await msg.author.getDMChannel().then(dm => dm.createMessage(`{lang:other.leveling.directMessage|${nlvl.level}|${msg.channel.guild.name}}`)).catch(err => null);
 		}

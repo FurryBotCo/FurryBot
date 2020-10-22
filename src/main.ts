@@ -221,7 +221,9 @@ class FurryBot extends Base {
 		return guild || null;
 	}
 
-	get createPaste() { return Request.createPaste; }
+	get createPaste() {
+		return Request.createPaste;
+	}
 }
 
 export default FurryBot;

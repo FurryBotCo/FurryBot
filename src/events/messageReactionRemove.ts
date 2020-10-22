@@ -4,14 +4,14 @@ import Eris from "eris";
 
 export default new ClientEvent("messageReactionRemove", async function (message, emoji) {
 	let m: Eris.Message;
-	if (!message["author"]) return; // tslint:disable-line no-string-literal
-	/*if (!message["author"]) { // tslint:disable-line no-string-literal
+	if (!(message as any).author) return; // tslint:disable-line no-string-literal
+	/* if (!message["author"]) { // tslint:disable-line no-string-literal
 		let ch = this.bot.guilds.map(g => g.channels.filter(c => [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type as any))).reduce((a, b) => a.concat(b), [] as Eris.GuildTextableChannel[]).find(c => c.id === message.channel.id) as Eris.GuildTextableChannel;
 		if (!ch) ch = await this.bot.getRESTChannel(message.channel.id).catch(err => null) as Eris.GuildTextableChannel;
 		if (!ch) return; // invalid channel & can't determine where it came from
 		m = await ch.getMessage(message.id).catch(err => null);
 		if (!m) return; // can't find message
-	} else*/ m = message as any;
+	} else*/ m = message as any; // eslint-disable-line
 
 	const e = Object.values(config.emojis.default.numbers);
 	if (e.includes(emoji.name)) {

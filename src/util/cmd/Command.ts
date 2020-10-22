@@ -24,14 +24,14 @@ export default class Command {
 	run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<any>;
 	// allow isn't used right now but it can be a bypass system in the future
 	overrides:
-		{
-			permissionError: (this: FurryBot, msg: ExtendedMessage, cmd: Command, type: "user" | "bot", permissions: ErisPermissions[]) => Promise<OverrideReturn>;
-			invalidUsage: (this: FurryBot, msg: ExtendedMessage, cmd: Command, err: CommandError<"ERR_INVALID_USAGE">) => Promise<OverrideReturn>;
-			help: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<OverrideReturn>;
-			cooldown: (this: FurryBot, msg: ExtendedMessage, cmd: Command, time: number) => Promise<OverrideReturn>;
-		} & {
-			[k in "beta" | "developer" | "donator" | "guildOwner" | "nsfw" | "premium" | "supportServer"]: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<OverrideReturn>;
-		};
+	{
+		permissionError: (this: FurryBot, msg: ExtendedMessage, cmd: Command, type: "user" | "bot", permissions: ErisPermissions[]) => Promise<OverrideReturn>;
+		invalidUsage: (this: FurryBot, msg: ExtendedMessage, cmd: Command, err: CommandError<"ERR_INVALID_USAGE">) => Promise<OverrideReturn>;
+		help: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<OverrideReturn>;
+		cooldown: (this: FurryBot, msg: ExtendedMessage, cmd: Command, time: number) => Promise<OverrideReturn>;
+	} & {
+		[k in "beta" | "developer" | "donator" | "guildOwner" | "nsfw" | "premium" | "supportServer"]: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<OverrideReturn>;
+	};
 	file: string;
 	constructor(triggers: ArrayOneOrMore<string>, file: string) {
 		if (!triggers) throw new TypeError("One or more triggers must be provided.");
@@ -65,8 +65,12 @@ export default class Command {
 		this.file = file;
 	}
 
-	get lang() { return `commands.${this.category.name}.${this.triggers[0]}`; }
-	get tsFile() { return `${path.dirname(this.file).replace(/build(\\|\/)/, "")}/${path.basename(this.file).replace(/.js/, ".ts")}`; }
+	get lang() {
+		return `commands.${this.category.name}.${this.triggers[0]}`;
+	}
+	get tsFile() {
+		return `${path.dirname(this.file).replace(/build(\\|\/)/, "")}/${path.basename(this.file).replace(/.js/, ".ts")}`;
+	}
 
 	setTriggers(data: Command["triggers"]) {
 		if (!data) throw new TypeError("One or more triggers must be provided.");

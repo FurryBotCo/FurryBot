@@ -13,6 +13,7 @@ export default class Request {
 
 	/**
 	 * Create a pastebin paste.
+	 *
 	 * @static
 	 * @param {string} content - The content of the paste.
 	 * @param {string} name - The title of the paste.
@@ -58,6 +59,7 @@ export default class Request {
 
 	/**
 	 * get the image at a url as a buffer
+	 *
 	 * @static
 	 * @param {string} url
 	 * @returns {Promise<Buffer>}
@@ -108,10 +110,13 @@ export default class Request {
 		});
 	}
 
-	static get getImageFromURL() { return this.fetchURL; }
+	static get getImageFromURL() {
+		return this.fetchURL;
+	}
 
 	/**
 	 * Download an image to a directory
+	 *
 	 * @static
 	 * @param {string} url - The url of the image to download.
 	 * @param {string} filename - The filename to save the image to
@@ -126,6 +131,7 @@ export default class Request {
 
 	/**
 	 * Make a request to api.chewy-bot.top.
+	 *
 	 * @static
 	 * @param {string} cat - The category to fetch from.
 	 * @returns {Promise<string>}

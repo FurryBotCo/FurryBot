@@ -21,8 +21,12 @@ class Webhook<e> {
 		this.username = data.username;
 	}
 
-	async fetch() { return this.client.bot.getWebhook(this.id, this.token); }
-	async delete(reason?: string) { return this.client.bot.deleteWebhook(this.id, this.token, reason); }
+	async fetch() {
+		return this.client.bot.getWebhook(this.id, this.token);
+	}
+	async delete(reason?: string) {
+		return this.client.bot.deleteWebhook(this.id, this.token, reason);
+	}
 	async execute(payload: Omit<Eris.WebhookPayload, "wait">) {
 		const data: Eris.WebhookPayload & { wait: true } = {
 			...payload,
@@ -49,5 +53,7 @@ export default class WebhookStore<W extends string = keyof typeof config["webhoo
 		);
 	}
 
-	get(name: W) { return this.webhooks.has(name) ? this.webhooks.get(name) : null; }
+	get(name: W) {
+		return this.webhooks.has(name) ? this.webhooks.get(name) : null;
+	}
 }

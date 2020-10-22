@@ -5,6 +5,7 @@ export default class Strings {
 
 	/**
 	 * first letter of every word uppercase.
+	 *
 	 * @static
 	 * @param {string} str - The string to perform the operation on.
 	 * @returns {string}
@@ -29,6 +30,7 @@ export default class Strings {
 
 	/**
 	 * Format byte measurements for human readability.
+	 *
 	 * @static
 	 * @param {(string | number)} str - The amount to format.
 	 * @param {number} [precision] - Where to cut off floating point numbers at.

@@ -50,8 +50,7 @@ export default class Language {
 				if (!fs.existsSync(`${dir}/${parts[0]}.json`)) return null;
 				const f = JSON5.parse(fs.readFileSync(`${dir}/${parts[0]}.json`).toString());
 				return dot.pick(parts.slice(1).join("."), f) ?? null;
-			}
-			else return loop(`${dir}/${parts[0]}`, parts.slice(1));
+			} else return loop(`${dir}/${parts[0]}`, parts.slice(1));
 		}
 
 		let str = loop(`${dir}/${lang}`, path.split("."));
@@ -72,7 +71,9 @@ export default class Language {
 		}
 	}
 
-	static has(lang: string) { return fs.existsSync(`${dir}/${lang}.json`); }
+	static has(lang: string) {
+		return fs.existsSync(`${dir}/${lang}.json`);
+	}
 
 	static parseString(lang: Languages, str: string): string {
 		if (!str) return "";

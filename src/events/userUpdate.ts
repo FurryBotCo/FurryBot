@@ -54,8 +54,8 @@ export default new ClientEvent("userUpdate", async function (user, oldUser) {
 			}
 
 			if (user.avatar !== oldUser.avatar) {
-				content[0].push(`{lang:other.words.avatar$ucwords$}: {lang:other.events.userUpdate.oldAvNote}`);
-				content[1].push(`{lang:other.words.avatar$ucwords$}: {lang:other.events.userUpdate.newAvNote}`);
+				content[0].push("{lang:other.words.avatar$ucwords$}: {lang:other.events.userUpdate.oldAvNote}");
+				content[1].push("{lang:other.words.avatar$ucwords$}: {lang:other.events.userUpdate.newAvNote}");
 				e
 					.setThumbnail(a(oldUser.avatar))
 					.setImage(a(user.avatar));

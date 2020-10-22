@@ -1,4 +1,6 @@
 /// <reference path="../util/@types/Clustering.d.ts" />
+/* eslint-disable @typescript-eslint/ban-types */
+
 import Eris from "eris";
 import * as fs from "fs-extra";
 import Logger from "../util/Logger";
@@ -39,7 +41,9 @@ export default class Cluster {
 			.on("unhandledRejection", (r, p) => Logger.error([`Cluster #${this.id}`, "Unhandled Rejection"], (r as Error).stack || r));
 	}
 
-	get bot() { return this.client; }
+	get bot() {
+		return this.client;
+	}
 
 	async done() {
 		this.ready = true;

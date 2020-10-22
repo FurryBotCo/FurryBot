@@ -4,7 +4,7 @@ import Logger from "../util/Logger";
 import { DEBUG, EVAL_CODES } from "./Constants";
 import Stats from "./Stats";
 
-function parse(d: Function | string) {
+function parse(d: Function | string) { // eslint-disable-line @typescript-eslint/ban-types
 	if (typeof d === "string") return d;
 	if (typeof d === "function") d = d.toString();
 	return `(async()=>{${d.slice(d.indexOf("{") + 1, d.lastIndexOf("}")).trim()}})()`;
@@ -46,7 +46,7 @@ export default class IPC {
 		const c = this.cb.get(d.callbackId);
 		if (!c) Logger.warn([`Cluster #${this.cluster.id}`, "IPC"], `IPC message recieved with an invalid callback id. (ID: ${d.callbackId || "NONE"})`);
 		switch (d.type) {
-			/*case "fetchGuild":
+			/* case "fetchGuild":
 			case "fetchUser":
 			case "fetchChannel": {
 				c.data.clustersAccountedFor.push(d.from);
@@ -105,7 +105,7 @@ export default class IPC {
 		}
 	}
 
-	async broadcastEval<R = any>(code: ((this: Cluster) => Promise<any>) | string): Promise<(Clustering.EvalResponse<R> & { clusterId: number; })[]> {
+	async broadcastEval<R = any>(code: ((this: Cluster) => Promise<any>) | string): Promise<(Clustering.EvalResponse<R> & { clusterId: number })[]> {
 		return Promise.all(Array.from(Array(this.cluster.options.clusterCount).keys()).map(async (id) => this.evalAtCluster<R>(id, code).then(v => ({ ...v, clusterId: id }))));
 	}
 
@@ -179,7 +179,7 @@ export default class IPC {
 		});
 	}
 
-	/*async fetchGuild(id: string) {
+	/* async fetchGuild(id: string) {
 		return new Promise<Eris.Guild>((resolve, reject) => {
 			const callbackId = crypto.randomBytes(32).toString("hex");
 			this.cluster.sendMessage("COMMAND", {

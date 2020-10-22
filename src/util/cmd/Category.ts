@@ -20,9 +20,15 @@ export default class Category {
 
 	}
 
-	get commands() { return [...this.#cmds]; }
-	get triggers() { return this.#cmds.reduce((a, b) => a.concat(b.triggers), [] as string[]); }
-	get tsFile() { return `${path.dirname(this.file).replace(/build(\\|\/)/, "")}/${path.basename(this.file).replace(/.js/, ".ts")}`; }
+	get commands() {
+		return [...this.#cmds];
+	}
+	get triggers() {
+		return this.#cmds.reduce((a, b) => a.concat(b.triggers), [] as string[]);
+	}
+	get tsFile() {
+		return `${path.dirname(this.file).replace(/build(\\|\/)/, "")}/${path.basename(this.file).replace(/.js/, ".ts")}`;
+	}
 
 	setDisplayName(data: Category["displayName"]) {
 		this.displayName = data;

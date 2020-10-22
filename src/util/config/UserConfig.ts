@@ -86,8 +86,14 @@ export default class UserConfig {
 		return ((this.levels && this.levels[g]) ?? 0) as unknown as number;
 	}
 
-	async checkBlacklist() { return db.checkBl("user", this.id); }
-	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) { return db.addBl("user", this.id, blame, blameId, reason, expire, report); }
+	async checkBlacklist() {
+		return db.checkBl("user", this.id);
+	}
+	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
+		return db.addBl("user", this.id, blame, blameId, reason, expire, report);
+	}
 
-	async checkVote() { return db.checkVote(this.id); }
+	async checkVote() {
+		return db.checkVote(this.id);
+	}
 }

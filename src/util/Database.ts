@@ -24,7 +24,9 @@ class Database {
 		this.launch();
 	}
 
-	setClient(client: FurryBot) { this.client = client; }
+	setClient(client: FurryBot) {
+		this.client = client;
+	}
 
 	async launch() {
 		this.connect();
@@ -52,10 +54,18 @@ class Database {
 		return this.mdb.collection(col);
 	}
 
-	get ready() { return Boolean(this.#connected); /* using Boolean() to make value unchangable */ }
-	get connection() { return this.#conn; }
-	get mongo() { return this.connection; }
-	get mdb() { return this.mongo.db(config.db.botDb); }
+	get ready() {
+		return Boolean(this.#connected); /* using Boolean() to make value unchangable */
+	}
+	get connection() {
+		return this.#conn;
+	}
+	get mongo() {
+		return this.connection;
+	}
+	get mdb() {
+		return this.mongo.db(config.db.botDb);
+	}
 
 	async getUser(id: string): Promise<UserConfig> {
 		const start = performance.now();

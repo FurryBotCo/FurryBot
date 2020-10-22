@@ -5,10 +5,10 @@ declare global {
 		interface EcoUser {
 			bal: number;
 			inv: {
-				id: Economy.Items.Any;
+				id: Items.Any;
 				amount: number;
 			}[];
-			history: Economy.HistoryEntry.Any[];
+			history: HistoryEntry.Any[];
 		}
 	}
 

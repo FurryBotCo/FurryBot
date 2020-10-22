@@ -15,7 +15,9 @@ export default class TimedActionsHandler {
 		this.interval = setInterval(this.processEntries.bind(this), 5e3);
 	}
 
-	get col() { return mdb.collection<TimedEntry>("timed"); }
+	get col() {
+		return mdb.collection<TimedEntry>("timed");
+	}
 
 	async deleteEntry(id: ObjectId | TimedEntry) {
 		if (!(id instanceof ObjectId)) id = id._id;
@@ -38,7 +40,7 @@ export default class TimedActionsHandler {
 		const entries = await this.col.find({}).toArray();
 		for (const entry of entries) {
 			if (entry.expiry > Date.now()) continue;
-			await entry.type === "ban" ? this.handleBanEntry(entry as any) : this.handleMuteEntry(entry as any);
+			await entry.type === "ban" ? this.handleBanEntry(entry as any) : this.handleMuteEntry(entry as any); // eslint-disable-line
 		}
 	}
 

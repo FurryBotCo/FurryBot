@@ -136,8 +136,12 @@ export default class Stats implements Clustering.Stats {
 
 				return m;
 			},
-			get master() { return self.#memory; },
-			set master(m) { self.#memory = m; }
+			get master() {
+				return self.#memory;
+			},
+			set master(m) {
+				self.#memory = m;
+			}
 		} as Clustering.Stats["memory"];
 
 		return obj;

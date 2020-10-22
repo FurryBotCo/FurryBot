@@ -18,7 +18,7 @@ export default new Command(["reembed"], __filename)
 		// could possibly do destructuring, but this works
 		if (
 			(m = msg.args[0].match(/^https?:\/\/(?:canary|ptb)?\.discord(?:app)?\.com\/channels\/([0-9]{15,21})\/([0-9]{15,21})\/([0-9]{15,21})$/))
-		) (g = m[1], ch = m[2], id = m[3]);
+		) (g = m[1], ch = m[2], id = m[3]); // eslint-disable-line @typescript-eslint/no-unused-expressions
 
 		if (!id) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noId`));
 		if (!g) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidGuild`));
@@ -27,7 +27,7 @@ export default new Command(["reembed"], __filename)
 
 		if (!channel || ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(channel.type)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidChannel`));
 
-		const message = await channel.getMessage(id).catch(null) as Eris.Message & { flags: number; };
+		const message = await channel.getMessage(id).catch(null) as Eris.Message & { flags: number };
 
 		if (!message) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidMessage`));
 		if (!(message.flags & Eris.Constants.MessageFlags.SUPPRESS_EMBEDS)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.notSuppressed`));

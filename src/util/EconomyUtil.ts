@@ -34,7 +34,7 @@ export default class EconomyUtil {
 			[id: string]: {
 				id: string;
 				amount: number;
-			}[]
+			}[];
 		} = JSON.parse(fs.readFileSync(f).toString());
 		if (typeof old[id] === "undefined") old[id] = [];
 		old[id].push(...removed);
@@ -83,8 +83,7 @@ export default class EconomyUtil {
 					amount: a
 				});
 				res = a;
-			}
-			else res = 0;
+			} else res = 0;
 		}
 
 		await user.mongoEdit({

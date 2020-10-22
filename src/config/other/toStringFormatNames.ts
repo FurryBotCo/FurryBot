@@ -5,7 +5,9 @@ const obj = new (class StringFormatNames {
 		test<T>(obj: T): boolean;
 		props: string[];
 	}[];
-	constructor() { this.values = []; }
+	constructor() {
+		this.values = [];
+	}
 
 	add(test: <T>(obj: T) => boolean, props: string[]) {
 		this.values.push({

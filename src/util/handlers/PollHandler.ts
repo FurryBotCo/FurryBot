@@ -84,7 +84,7 @@ export default class PollHandler extends EventEmitter<{
 			c[i] = 0;
 			for (const u of r) {
 				if (users.includes(u)) continue;
-				else (users.push(u), c[i]++);
+				else (users.push(u), c[i]++); // eslint-disable-line
 			}
 			i++;
 		}

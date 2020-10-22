@@ -6,10 +6,13 @@ import { WithId } from "mongodb";
 export default class BanlistUtil {
 	private constructor() { }
 
-	static get col() { return db.collection("banlists"); }
+	static get col() {
+		return db.collection("banlists");
+	}
 
 	/**
 	 * Get a ban list
+	 *
 	 * @static
 	 * @param {string} id - The id of the list.
 	 * @returns {BanList}
@@ -30,6 +33,7 @@ export default class BanlistUtil {
 
 	/**
 	 * Check the privacy values of a list.
+	 *
 	 * @static
 	 * @param {string} id - The id of the list.
 	 * @param {string} [userId] - The id of the user to check.
@@ -51,6 +55,7 @@ export default class BanlistUtil {
 
 	/**
 	 * Create a ban list.
+	 *
 	 * @static
 	 * @param {string} name - The name of the list.
 	 * @param {string} description - The description of the list.
@@ -78,6 +83,7 @@ export default class BanlistUtil {
 
 	/**
 	 * Delete a ban list.
+	 *
 	 * @static
 	 * @param {string} id - The id of the list to delete.
 	 * @returns {boolean}
@@ -90,6 +96,7 @@ export default class BanlistUtil {
 
 	/**
 	 * Add a user entry to a ban list.
+	 *
 	 * @static
 	 * @param {string} id - The id of the list to add to.
 	 * @param {string} blame - The user that added them.
@@ -118,6 +125,7 @@ export default class BanlistUtil {
 
 	/**
 	 * Remove a user from a ban list.
+	 *
 	 * @static
 	 * @param {string} id - The id of the list to remove from.
 	 * @param {string} userId - The id of the user to remove.

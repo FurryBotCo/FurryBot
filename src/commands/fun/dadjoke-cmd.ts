@@ -8,7 +8,7 @@ export default new Command(["dadjoke"], __filename)
 	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
-		const req = await phin<{ joke: string; }>({
+		const req = await phin<{ joke: string }>({
 			method: "GET",
 			url: "https://icanhazdadjoke.com",
 			headers: {

@@ -1,3 +1,6 @@
+/* eslint-disable jsdoc/check-indentation */
+/* eslint-disable @typescript-eslint/ban-types */
+
 import deasync from "deasync";
 import config from "../../config";
 import { Languages } from "../Language";
@@ -20,6 +23,7 @@ export default class Utility {
 
 	/**
 	 * Convert a class to a string format (usually for eval returns).
+	 *
 	 * @static
 	 * @template T - The class' type.
 	 * @param {T} d - The class.
@@ -56,6 +60,7 @@ export default class Utility {
 
 	/**
 	 * Generate an error embed.
+	 *
 	 * @static
 	 * @param {Languages} lang - The language for the embed.
 	 * @param {("INVALID_USER" | "INVALID_MEMBER" | "INVALID_ROLE" | "INVALID_CHANNEL")} type - The type of the embed.
@@ -78,6 +83,7 @@ export default class Utility {
 
 	/**
 	 * Conver a number into an emoji (single digit only).
+	 *
 	 * @static
 	 * @param {(number | string)} num - The number to convert.
 	 * @returns {string}
@@ -104,6 +110,7 @@ export default class Utility {
 
 	/**
 	 * Get the longest string in an array.
+	 *
 	 * @static
 	 * @param {((string | number)[])} arr - The array to check
 	 * @returns {(string | number)}
@@ -124,6 +131,7 @@ export default class Utility {
 
 	/**
 	 * Convert an array of numbers into percentages.
+	 *
 	 * @static
 	 * @param {number[]} arr - The array to convert.
 	 * @returns {GetPercentsResult[]}
@@ -165,6 +173,7 @@ export default class Utility {
 
 	/**
 	 * Compare one member with another.
+	 *
 	 * @static
 	 * @param {Eris.Member} member1 - The first member of the comparison.
 	 * @param {Eris.Member} member2 - The second member of the comparison.
@@ -231,6 +240,7 @@ export default class Utility {
 
 	/**
 	 * Compare a member with a role.
+	 *
 	 * @static
 	 * @param {Eris.Member} member - The member to compare.
 	 * @param {Eris.Role} role - The role to compare.
@@ -263,6 +273,7 @@ export default class Utility {
 
 	/**
 	 * Parse message arguments.
+	 *
 	 * @static
 	 * @template V
 	 * @template P
@@ -276,7 +287,7 @@ export default class Utility {
 	 * 	})}
 	 * @memberof Utility
 	 */
-	static parseArgs<V extends { [k: string]: any; } = { [k: string]: string | boolean | number; }, P extends (string | string[]) = any>(args: P): {
+	static parseArgs<V extends { [k: string]: any } = { [k: string]: string | boolean | number }, P extends (string | string[]) = any>(args: P): {
 		args: {
 			[K in keyof V]: V[K];
 		};
@@ -298,6 +309,7 @@ export default class Utility {
 
 	/**
 	 * Get a member's top role.
+	 *
 	 * @static
 	 * @param {Eris.Member} member - The member to get the top role of.
 	 * @param {(role: Eris.Role) => boolean} [filter] - Filter roles.
@@ -313,6 +325,7 @@ export default class Utility {
 
 	/**
 	 * Get a member's color role.
+	 *
 	 * @static
 	 * @param {Eris.Member} member - The member to get the color role of.
 	 * @returns {Eris.Role}
@@ -327,6 +340,7 @@ export default class Utility {
 	 * Get keys from Redis.
 	 *
 	 * Because it came to my attention that I should *not* use KEYS in production.
+	 *
 	 * @static
 	 * @param {string} pattern - The seatch pattern to use.
 	 * @param {(number | string)} cur - Internal use only, provide "0".
@@ -352,6 +366,7 @@ export default class Utility {
 
 	/**
 	 * Get the highest user levels.
+	 *
 	 * @static
 	 * @param {boolean} [skipCache] - If the cache should be skipped.
 	 * @param {("asc" | "desc")} [sort] - The sort order.
@@ -416,6 +431,7 @@ export default class Utility {
 
 	/**
 	 * Log an error
+	 *
 	 * @static
 	 * @param {FurryBot} client - The bot client.
 	 * @param {Error} err - The error instance.
@@ -500,6 +516,7 @@ export default class Utility {
 
 	/**
 	 * Internal use only.
+	 *
 	 * @static
 	 * @template F
 	 * @param {F} func
@@ -523,6 +540,7 @@ export default class Utility {
 
 	/**
 	 * Get info about the CPU.
+	 *
 	 * @static
 	 * @returns {CPUInfo}
 	 * @memberof Utility
@@ -548,6 +566,7 @@ export default class Utility {
 
 	/**
 	 * Get CPU Usage.
+	 *
 	 * @static
 	 * @returns {number}
 	 * @memberof Utility

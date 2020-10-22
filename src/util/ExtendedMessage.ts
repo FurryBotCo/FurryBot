@@ -26,13 +26,27 @@ export default class ExtendedMessage {
 		// tag & me were moved to ErisUtil
 	}
 
-	get id() { return this.#msg.id; }
-	get delete() { return this.#msg.delete.bind(this.#msg); }
-	get edit() { return this.#msg.edit.bind(this.#msg); }
-	get author() { return this.#msg.author; }
-	get member() { return this.#msg.member; }
-	get channel() { return this.#msg.channel; }
-	get content() { return this.#msg.content; }
+	get id() {
+		return this.#msg.id;
+	}
+	get delete() {
+		return this.#msg.delete.bind(this.#msg);
+	}
+	get edit() {
+		return this.#msg.edit.bind(this.#msg);
+	}
+	get author() {
+		return this.#msg.author;
+	}
+	get member() {
+		return this.#msg.member;
+	}
+	get channel() {
+		return this.#msg.channel;
+	}
+	get content() {
+		return this.#msg.content;
+	}
 	get mentions() {
 		return {
 			channels: this.#msg.channelMentions.map(c => this.#msg.channel.guild.channels.get(c) || null).filter(c => c),
@@ -46,15 +60,33 @@ export default class ExtendedMessage {
 		};
 	}
 
-	get gConfig() { return this.#gConfig; }
-	get uConfig() { return this.#uConfig; }
-	get args() { return this.#args; }
-	set args(a: string[]) { this.#args = a; }
-	get dashedArgs() { return this.#dashedArgs; }
-	get cmd() { return this.#cmd; }
-	get prefix() { return this.#prefix; }
-	get timestamp() { return this.#msg.timestamp; }
-	get erisMessage() { return this.#msg; }
+	get gConfig() {
+		return this.#gConfig;
+	}
+	get uConfig() {
+		return this.#uConfig;
+	}
+	get args() {
+		return this.#args;
+	}
+	set args(a: string[]) {
+		this.#args = a;
+	}
+	get dashedArgs() {
+		return this.#dashedArgs;
+	}
+	get cmd() {
+		return this.#cmd;
+	}
+	get prefix() {
+		return this.#prefix;
+	}
+	get timestamp() {
+		return this.#msg.timestamp;
+	}
+	get erisMessage() {
+		return this.#msg;
+	}
 
 	async load() {
 		const g = this.#gConfig = await db.getGuild(this.channel.guild.id);

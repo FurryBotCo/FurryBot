@@ -9,7 +9,9 @@ export default class EmbedBuilder {
 		this.json = json ?? {};
 	}
 
-	getTitle() { return this.json.title; }
+	getTitle() {
+		return this.json.title;
+	}
 
 	setTitle(title: string) {
 		this.json.title = Language.parseString(this.lang, title);
@@ -21,7 +23,9 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	getDescription() { return this.json.description; }
+	getDescription() {
+		return this.json.description;
+	}
 
 	setDescription(description: string) {
 		this.json.description = Language.parseString(this.lang, description);
@@ -33,7 +37,9 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	getURL() { return this.json.url; }
+	getURL() {
+		return this.json.url;
+	}
 
 	setURL(url: string) {
 		this.json.url = url;
@@ -45,7 +51,9 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	getColor() { return this.json.color; }
+	getColor() {
+		return this.json.color;
+	}
 
 	setColor(color: number | string) {
 		this.json.color = typeof color === "string" ? parseInt(color.toString().replace(/#/g, ""), 16) : color;
@@ -57,7 +65,9 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	getTimestamp() { return this.json.timestamp; }
+	getTimestamp() {
+		return this.json.timestamp;
+	}
 
 	setTimestamp(timestamp: number | Date | string) {
 		this.json.timestamp = timestamp instanceof Date ? timestamp : new Date(timestamp);
@@ -69,7 +79,9 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	getFooter() { return this.json.footer; }
+	getFooter() {
+		return this.json.footer;
+	}
 
 	setFooter(text: string, iconURL?: string) {
 		this.json.footer = {
@@ -84,7 +96,9 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	getThumbnail() { return this.json.thumbnail; }
+	getThumbnail() {
+		return this.json.thumbnail;
+	}
 
 	setThumbnail(url: string) {
 		this.json.thumbnail = {
@@ -98,7 +112,9 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	getImage() { return this.json.image; }
+	getImage() {
+		return this.json.image;
+	}
 
 	setImage(url: string) {
 		this.json.image = {
@@ -112,7 +128,9 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	getAuthor() { return this.json.author; }
+	getAuthor() {
+		return this.json.author;
+	}
 
 	setAuthor(name: string, iconURL?: string, url?: string) {
 		this.json.author = {
@@ -139,7 +157,9 @@ export default class EmbedBuilder {
 		return this;
 	}
 
-	addEmptyField(inline?: boolean) { return this.addField("\u200b", "\u200b", inline); }
+	addEmptyField(inline?: boolean) {
+		return this.addField("\u200b", "\u200b", inline);
+	}
 
 
 	addFields(...args: Eris.EmbedField[]) {
@@ -159,5 +179,7 @@ export default class EmbedBuilder {
 		return Object(this.json); // to prevent external editing of internal properties
 	}
 
-	get [Symbol.toStringTag]() { return "EmbedBuilder"; }
+	get [Symbol.toStringTag]() {
+		return "EmbedBuilder";
+	}
 }

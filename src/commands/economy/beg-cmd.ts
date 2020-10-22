@@ -27,7 +27,7 @@ export default new Command(["beg"], __filename)
 		const a = Math.floor(Math.random() * (config.eco.amounts.beg.max - config.eco.amounts.beg.min)) + config.eco.amounts.beg.min;
 		let item = "";
 		const get = await EconomyUtil.shouldGetItem(msg.author.id);
-		console.log(`Getting Item:`, get);
+		console.log("Getting Item:", get);
 		if (get) {
 			const t = await EconomyUtil.calcItem("EPIC");
 			if (t) item = `\n{lang:${cmd.lang}.item|${p}|<:${t.emoji}>|${Language.get(msg.gConfig.settings.lang, t.name)}}`;

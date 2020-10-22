@@ -159,7 +159,7 @@ export default new Command(["stats"], __filename)
 						const cmd = stats.commands.specific[k];
 						if (!text[i]) text[i] = "";
 						const v = [
-							/*`**${Strings.ucwords(k)}**:`,
+							/* `**${Strings.ucwords(k)}**:`,
 							`\t{lang:other.words.total$ucwords$}: ${cmd.general}`,
 							`\t{lang:other.words.thisSession$ucwords$}: ${cmd.session}`,
 							"",

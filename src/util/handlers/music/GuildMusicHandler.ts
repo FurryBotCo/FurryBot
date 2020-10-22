@@ -32,7 +32,9 @@ export default class GuildMusicHandler {
 		};
 	}
 
-	get paused() { return this.queue.paused; }
+	get paused() {
+		return this.queue.paused;
+	}
 
 	async playURL(url: string) {
 		if (this.paused) this.unpause();
@@ -43,7 +45,9 @@ export default class GuildMusicHandler {
 		this.connection?.play(v);
 	}
 
-	get getVideo() { return ytdl.getInfo; }
+	get getVideo() {
+		return ytdl.getInfo;
+	}
 
 	async addVideo(url: string, blame: string) {
 		const v = await this.getVideo(url);
@@ -83,13 +87,25 @@ export default class GuildMusicHandler {
 		await this.voiceChannel?.leave();
 	}
 
-	async clearQueue() { return this.queue.clear(); }
+	async clearQueue() {
+		return this.queue.clear();
+	}
 
-	get connection() { return this.client.bot.voiceConnections.get(this.guildId); }
-	get guild() { return this.client.bot.guilds.get(this.guildId); }
-	get voiceChannel() { return (this.guild?.channels.get(this.channels.voice) || null) as Eris.VoiceChannel; }
-	get textChannel() { return (this.guild?.channels.get(this.channels.text) || null) as Eris.GuildTextableChannel; }
-	get voiceState() { return this.guild.members.get(this.client.bot.user.id).voiceState; }
+	get connection() {
+		return this.client.bot.voiceConnections.get(this.guildId);
+	}
+	get guild() {
+		return this.client.bot.guilds.get(this.guildId);
+	}
+	get voiceChannel() {
+		return (this.guild?.channels.get(this.channels.voice) || null) as Eris.VoiceChannel;
+	}
+	get textChannel() {
+		return (this.guild?.channels.get(this.channels.text) || null) as Eris.GuildTextableChannel;
+	}
+	get voiceState() {
+		return this.guild.members.get(this.client.bot.user.id).voiceState;
+	}
 
 	setTextChannel(id: string) {
 		this.channels.text = id;

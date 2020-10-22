@@ -19,12 +19,24 @@ export default class Logger {
 		command: leeks.colors.green
 	};
 
-	static get log(): OmitFirstArg<typeof Logger["_log"]> { return this._log.bind(this, "log"); }
-	static get info(): OmitFirstArg<typeof Logger["_log"]> { return this._log.bind(this, "info"); }
-	static get error(): OmitFirstArg<typeof Logger["_log"]> { return this._log.bind(this, "error"); }
-	static get warn(): OmitFirstArg<typeof Logger["_log"]> { return this._log.bind(this, "warn"); }
-	static get debug(): OmitFirstArg<typeof Logger["_log"]> { return this._log.bind(this, "debug"); }
-	static get command(): OmitFirstArg<typeof Logger["_log"]> { return this._log.bind(this, "command"); }
+	static get log(): OmitFirstArg<typeof Logger["_log"]> {
+		return this._log.bind(this, "log");
+	}
+	static get info(): OmitFirstArg<typeof Logger["_log"]> {
+		return this._log.bind(this, "info");
+	}
+	static get error(): OmitFirstArg<typeof Logger["_log"]> {
+		return this._log.bind(this, "error");
+	}
+	static get warn(): OmitFirstArg<typeof Logger["_log"]> {
+		return this._log.bind(this, "warn");
+	}
+	static get debug(): OmitFirstArg<typeof Logger["_log"]> {
+		return this._log.bind(this, "debug");
+	}
+	static get command(): OmitFirstArg<typeof Logger["_log"]> {
+		return this._log.bind(this, "command");
+	}
 
 	private static _log(type: string, name: string | string[], message?: any) {
 		const d = new Date();

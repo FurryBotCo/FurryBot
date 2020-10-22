@@ -28,8 +28,8 @@ export default new Command(["disable"], __filename)
 				if (!all) {
 					const cmds = this.cmd.triggers.map(t => t.toLowerCase());
 					const cats = this.cmd.categories.map(c => c.name.toLowerCase());
-					if (cmds.includes(msg.args[1].toLowerCase())) (type = "cmd", d.command = msg.args[1].toLowerCase());
-					else if (cats.includes(msg.args[1].toLowerCase())) (type = "cat", d.category = msg.args[1].toLowerCase());
+					if (cmds.includes(msg.args[1].toLowerCase())) (type = "cmd", d.command = msg.args[1].toLowerCase()); // eslint-disable-line @typescript-eslint/no-unused-expressions
+					else if (cats.includes(msg.args[1].toLowerCase())) (type = "cat", d.category = msg.args[1].toLowerCase()); // eslint-disable-line @typescript-eslint/no-unused-expressions
 					else return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalid`, [msg.args[1].toLowerCase()]));
 				} else d.all = true;
 
@@ -56,8 +56,7 @@ export default new Command(["disable"], __filename)
 						},
 						content: Language.get(msg.gConfig.settings.lang, `${cmd.lang}.success.${type}Server`, [msg.args[1].toLowerCase()])
 					});
-				}
-				else {
+				} else {
 					const ch = await msg.getChannelFromArgs(2, true, 0);
 					const role = await msg.getRoleFromArgs(2, true, 0);
 					const user = await msg.getMemberFromArgs(2, true, 0);

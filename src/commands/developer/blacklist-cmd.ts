@@ -162,8 +162,7 @@ export default new Command(["blacklist", "bl"], __filename)
 							.toJSON()
 					});
 					return;
-				}
-				else if (subType === "guild" && d instanceof Eris.Guild && dbEntry instanceof GuildConfig) {
+				} else if (subType === "guild" && d instanceof Eris.Guild && dbEntry instanceof GuildConfig) {
 					const bl = await dbEntry.checkBlacklist();
 					const expired: ReturnType<typeof formatEntry>[][] = chunk(bl.expired.map((e, i) => formatEntry(i + 1, e.created, e.blame, e.reason, e.expire, e.id)), 3);
 					const current: ReturnType<typeof formatEntry>[][] = chunk(bl.current.map((e, i) => formatEntry(i + 1, e.created, e.blame, e.reason, e.expire, e.id)), 3);
@@ -195,8 +194,7 @@ export default new Command(["blacklist", "bl"], __filename)
 							.toJSON()
 					});
 					return;
-				}
-				else throw new TypeError("We shouldn't be here.");
+				} else throw new TypeError("We shouldn't be here.");
 				break;
 			}
 
@@ -212,8 +210,7 @@ export default new Command(["blacklist", "bl"], __filename)
 						const k = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id, 1);
 						if (!k.content || k.content.toLowerCase() !== "yes") return msg.reply(`${Language.get(config.devLanguage, "other.words.canceled")}.`);
 						m = { content: bl.current[0].id } as any;
-					}
-					else {
+					} else {
 						await msg.reply(Language.get(config.devLanguage, `${cmd.lang}.remove.chose`));
 						await msg.channel.createMessage({
 							embed: new EmbedBuilder(config.devLanguage)
@@ -258,8 +255,7 @@ export default new Command(["blacklist", "bl"], __filename)
 						]
 					});
 					return msg.reply(Language.get(config.devLanguage, `${cmd.lang}.remove.user`, [e.id, `${d.username}#${d.discriminator}`]));
-				}
-				else if (subType === "guild" && d instanceof Eris.Guild && dbEntry instanceof GuildConfig) {
+				} else if (subType === "guild" && d instanceof Eris.Guild && dbEntry instanceof GuildConfig) {
 					const bl = await dbEntry.checkBlacklist();
 
 					if (bl.current.length === 0) return msg.reply(Language.get(config.devLanguage, `${cmd.lang}.remove.notBlacklistedGuild`, [d ? d.name : "Unknown"]));
@@ -270,8 +266,7 @@ export default new Command(["blacklist", "bl"], __filename)
 						const k = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id, 1);
 						if (!k.content || k.content.toLowerCase() !== "yes") return msg.reply(`${Language.get(config.devLanguage, "other.words.canceled")}.`);
 						m = { content: bl.current[0].id } as any;
-					}
-					else {
+					} else {
 						await msg.reply(Language.get(config.devLanguage, `${cmd.lang}.remove.chose`));
 						await msg.channel.createMessage({
 							embed: new EmbedBuilder(config.devLanguage)
@@ -316,8 +311,7 @@ export default new Command(["blacklist", "bl"], __filename)
 						]
 					});
 					return msg.reply(Language.get(config.devLanguage, `${cmd.lang}.remove.guild`, [e.id, d.name]));
-				}
-				else throw new TypeError("We shouldn't be here.");
+				} else throw new TypeError("We shouldn't be here.");
 				break;
 			}
 		}

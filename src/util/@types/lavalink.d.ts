@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 declare namespace Lavalink {
 	type ValidTypes = "youtube";
 

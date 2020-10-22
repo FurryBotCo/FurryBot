@@ -17,10 +17,16 @@ export default class QueueHandler {
 		this.handler = handler;
 	}
 
-	pause() { this.paused = true; }
-	unpause() { this.paused = false; }
+	pause() {
+		this.paused = true;
+	}
+	unpause() {
+		this.paused = false;
+	}
 
-	getKey() { return `music:${this.handler.guildId}:queue`; }
+	getKey() {
+		return `music:${this.handler.guildId}:queue`;
+	}
 
 	async getLength() {
 		return Redis.llen(this.getKey());

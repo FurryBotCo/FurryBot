@@ -1,4 +1,6 @@
 /// <reference path="../@types/Discord.d.ts" />
+/* eslint-disable @typescript-eslint/ban-types */
+
 import Category from "../cmd/Category";
 import path from "path";
 import Command from "../cmd/Command";
@@ -20,6 +22,7 @@ export default class Internal {
 
 	/**
 	 * Merge objects for configuration purposes.
+	 *
 	 * @static
 	 * @param {object} a - The object to put the properties on.
 	 * @param {object} b - The provided data.
@@ -33,7 +36,7 @@ export default class Internal {
 		// using this dirty method because spread leaves a deep reference
 		const d = JSON.parse(JSON.stringify(c));
 		const obj = Object.keys(d).length === 0 ? b : d;
-		if (a["id"]) d["id"] = a["id"]; // tslint:disable-line no-string-literal
+		if (a.id) d.id = a.id; // tslint:disable-line no-string-literal
 		Object.keys(obj).map(k => {
 			if (typeof d[k] === "object" && d[k] !== null) {
 				if (d[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? d[k] : b[k];
@@ -47,6 +50,7 @@ export default class Internal {
 
 	/**
 	 * Load commands in a directory into a category.
+	 *
 	 * @static
 	 * @param {string} dir - The directory to laod from.
 	 * @param {Category} cat - The category to add on to.
@@ -65,6 +69,7 @@ export default class Internal {
 
 	/**
 	 * Extra argument parsing for some commands.
+	 *
 	 * @static
 	 * @param {ExtendedMessage} msg - The message instance.
 	 * @returns {string}
@@ -108,6 +113,7 @@ export default class Internal {
 
 	/**
 	 * Combine multiple spam reports into one report.
+	 *
 	 * @static
 	 * @param {SpamReport[]} reports
 	 * @returns {SpamReport}
@@ -125,16 +131,16 @@ export default class Internal {
 			cmd: string;
 		}[];
 	}[]): {
-		userTag: string;
-		userId: string;
-		generatedTimestamp: number;
-		type: "cmd";
-		beta: boolean;
-		entries: {
-			time: number;
-			cmd: string;
-		}[];
-	} {
+			userTag: string;
+			userId: string;
+			generatedTimestamp: number;
+			type: "cmd";
+			beta: boolean;
+			entries: {
+				time: number;
+				cmd: string;
+			}[];
+		} {
 		if (Array.from(new Set(reports.map(r => r.userId))).length > 1) throw new TypeError("Cannot combine reports of different users.");
 		if (Array.from(new Set(reports.map(r => r.type))).length > 1) throw new TypeError("Cannot combine reports of different types.");
 		if (Array.from(new Set(reports.map(r => r.beta))).length > 1) throw new TypeError("Cannot combine beta, and non-beta reports.");
@@ -152,6 +158,7 @@ export default class Internal {
 
 	/**
 	 * Authorize with Discord's OAuth.
+	 *
 	 * @static
 	 * @param {string} code - The code of the authorization.
 	 * @param {string} [redirectURL] - The redirect URL used.
@@ -184,6 +191,7 @@ export default class Internal {
 
 	/**
 	 * Get the user behind a Discord authorization token.
+	 *
 	 * @static
 	 * @param {string} auth - The bearer token.
 	 * @returns
@@ -204,6 +212,7 @@ export default class Internal {
 
 	/**
 	 * Sanitize text to replace certain characters
+	 *
 	 * @static
 	 * @param {string} str - The string to sanitize.
 	 * @returns {string}
@@ -218,6 +227,7 @@ export default class Internal {
 
 	/**
 	 * Sanitize console output to remove special characters.
+	 *
 	 * @static
 	 * @param {string} str - The string to sanitize-
 	 * @returns {string}
@@ -233,17 +243,21 @@ export default class Internal {
 	 * Get the number of days in a given month.
 	 *
 	 * Not zero based.
+	 *
 	 * @static
 	 * @param {number} month
 	 * @returns {number}
 	 * @memberof Internal
 	 * @example Internal.getDaysInMonth(2);
 	 */
-	static getDaysInMonth(month: number) { return new Date(new Date().getFullYear(), month, 0).getDate(); }
+	static getDaysInMonth(month: number) {
+		return new Date(new Date().getFullYear(), month, 0).getDate();
+	}
 
 
 	/**
 	 * Get the paid time for a dollar amount.
+	 *
 	 * @static
 	 * @param {("db" | "main")} type - The type we're calculating for.
 	 * @param {number} amount - The amount we're calculating for.
@@ -279,6 +293,7 @@ export default class Internal {
 
 	/**
 	 * Get the local disk usage.
+	 *
 	 * @static
 	 * @returns {DiskUsage}
 	 * @memberof Internal
@@ -320,6 +335,7 @@ export default class Internal {
 
 	/**
 	 * Generate a tooltip for an embed.
+	 *
 	 * @static
 	 * @param {Languages} lang - The language of the tooltip.
 	 * @param {string} text - The title of the tooltip.
@@ -335,6 +351,7 @@ export default class Internal {
 
 	/**
 	 * Get our tsconfig file in a json format.
+	 *
 	 * @static
 	 * @param {(string | null)} [file] - A file to read from.
 	 * @returns {ts.TranspileOptions}
@@ -367,6 +384,7 @@ export default class Internal {
 
 	/**
 	 * Transpile a single file, returning the transpiled contents.
+	 *
 	 * @static
 	 * @param {string} mod - The code to transpile
 	 * @param {(ts.TranspileOptions | string)} [tsconfig] - the tsconfig to use

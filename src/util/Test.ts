@@ -10,8 +10,12 @@ class SpecificTest<N extends string> {
 		this.#name = name;
 	}
 
-	execute<T = any>(...args: Parameters<Test["tests"][string]>) { return this.#t.executeTest<T>(this.#name, ...args); }
-	delete() { return this.#t.deleteTest(this.#name); }
+	execute<T = any>(...args: Parameters<Test["tests"][string]>) {
+		return this.#t.executeTest<T>(this.#name, ...args);
+	}
+	delete() {
+		return this.#t.deleteTest(this.#name);
+	}
 }
 
 export default class Test {
@@ -23,7 +27,9 @@ export default class Test {
 	constructor() {
 		this.#tests = {};
 	}
-	get tests() { return this.#tests; }
+	get tests() {
+		return this.#tests;
+	}
 
 	registerTest<T = any>(name: string, test: (...args: Parameters<Test["tests"][string]>) => Promise<T>) {
 		if (this.tests[name]) throw new TypeError(`Duplicate test "${name}"`);

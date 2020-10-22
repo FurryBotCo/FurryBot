@@ -57,8 +57,8 @@ export default new ClientEvent("guildUpdate", async function (guild, old) {
 		old.features.map(feature => guild.features.includes(feature) ? null : current.push(feature));
 		guild.features.map(feature => old.features.includes(feature) ? null : oldFeatures.push(feature));
 
-		if (oldFeatures.length) content[0].push(`{lang:other.words.features$ucwords$}: **${oldFeatures.join(', ')}**`);
-		if (current.length) content[1].push(`{lang:other.words.features$ucwords$}: **${current.join(', ')}**`);
+		if (oldFeatures.length) content[0].push(`{lang:other.words.features$ucwords$}: **${oldFeatures.join(", ")}**`);
+		if (current.length) content[1].push(`{lang:other.words.features$ucwords$}: **${current.join(", ")}**`);
 
 		if (guild.permissionsOf(this.bot.user.id).has("viewAuditLogs")) {
 			const { entries: a } = await guild.getAuditLogs(10, null, Eris.Constants.AuditLogActions.GUILD_UPDATE);
