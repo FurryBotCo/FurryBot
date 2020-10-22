@@ -4,15 +4,11 @@ declare global {
 	namespace Economy {
 		interface EcoUser {
 			bal: number;
-			inv: Inventory;
-			history: Economy.HistoryEntry.Any[];
-		}
-
-		interface Inventory {
-			items: {
+			inv: {
 				id: Economy.Items.Any;
 				amount: number;
 			}[];
+			history: Economy.HistoryEntry.Any[];
 		}
 	}
 

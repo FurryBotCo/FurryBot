@@ -14,6 +14,10 @@
 		"2020-pumpkin": {
 			"name": "2020 Pumpkin",
 			"description": "Collectible item for Halloween 2020."
+		},
+		"knot": {
+			"name": "Knot",
+			"description": "You know what this is 😉"
 		}
 	}
 }

@@ -1,3 +1,4 @@
+/// <reference path="./@types/other.d.ts" />
 import { MongoClient, Collection, MongoError, WithId } from "mongodb";
 import config from "../config";
 import Logger from "./Logger";

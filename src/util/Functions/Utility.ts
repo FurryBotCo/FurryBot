@@ -560,4 +560,16 @@ export default class Utility {
 
 		return (10000 - Math.round(10000 * (i2 - i1) / (t2 - t1))) / 100;
 	}
+
+	static chooseWeighted<K extends string = string>(values: {
+		[k in K]: number;
+	}) {
+		const items = Object.keys(values);
+		let chances: number[] = Object.values(values);
+		const sum = chances.reduce((a, b) => a + b, 0);
+		let b = 0;
+		chances = chances.map(a => (b = a + b));
+		const rand = Math.random() * sum;
+		return items[chances.filter(el => el <= rand).length] as K;
+	}
 }

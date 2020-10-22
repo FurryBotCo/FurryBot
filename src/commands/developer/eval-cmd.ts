@@ -16,6 +16,7 @@ import Logger from "../../util/Logger";
 import util from "util";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { performance } from "perf_hooks";
+import EconomyUtil from "../../util/EconomyUtil";
 
 export default new Command(["eval", "ev"], __filename)
 	.setBotPermissions([])
@@ -49,7 +50,8 @@ export default new Command(["eval", "ev"], __filename)
 				Request,
 				Strings,
 				Time,
-				Utility
+				Utility,
+				EconomyUtil
 			});
 		} catch (e) {
 			res = e;

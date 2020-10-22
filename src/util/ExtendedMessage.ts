@@ -35,7 +35,7 @@ export default class ExtendedMessage {
 	get content() { return this.#msg.content; }
 	get mentions() {
 		return {
-			channels: this.#msg.channelMentions.map(c => this.#msg.channel.guild.channels.get(c) as Eris.GuildTextableChannel || null).filter(c => c),
+			channels: this.#msg.channelMentions.map(c => this.#msg.channel.guild.channels.get(c) || null).filter(c => c),
 			channelsRaw: this.#msg.channelMentions,
 			roles: this.#msg.roleMentions.map(r => this.#msg.channel.guild.roles.get(r) || null).filter(r => r),
 			rolesRaw: this.#msg.roleMentions,

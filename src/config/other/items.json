@@ -1,0 +1,26 @@
+{
+	"lucky-apple": {
+		"name": "other.economy.items.lucky-apple.name",
+		"description": "other.economy.items.lucky-apple.description",
+		"type": "collectible",
+		"icon": "{API}/assets/items/LuckyApple.png",
+		"emoji": "LuckyApple:768386467466051596",
+		"rarity": "rare"
+	},
+	"pumpkin-2020": {
+		"name": "other.economy.items.2020-pumpkin.name",
+		"description": "other.economy.items.pumpkin-2020.description",
+		"type": "collectible",
+		"icon": "{API}/assets/items/Pumpkin.png",
+		"emoji": "Pumpkin:768412614216122368",
+		"rarity": "common"
+	},
+	"knot": {
+		"name": "other.economy.items.knot.name",
+		"description": "other.economy.items.knot.description",
+		"type": "collectible",
+		"icon": "{API}/assets/items/Knot.png",
+		"emoji": "Knot:768726082060550164",
+		"rarity": "epic"
+	}
+}

@@ -22,5 +22,12 @@
 		"description": "Claim your weekly coins. Donators only.",
 		"title": "Here's Your Coins!",
 		"desc": "You got **{0}** {1}, they have been placed in your wallet."
+	},
+	"beg": {
+		"usage": "",
+		"description": "Beg for money",
+		"title": "Begging For Money..",
+		"desc": "**{0}** gave you **{1}** {2}, they have been placed in your wallet.",
+		"item": "**{0}** also gave you a {1} **{2}**"
 	}
 }
