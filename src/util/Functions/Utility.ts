@@ -576,4 +576,12 @@ export default class Utility {
 		const rand = Math.random() * sum;
 		return items[chances.filter(el => el <= rand).length] as K;
 	}
+
+	static getUserFlags(user: Eris.User) {
+		return Object.entries(Eris.Constants.UserFlags).map(([f, v]) => ({
+			[f]: (user.publicFlags & v) !== 0
+		})).reduce((a, b) => ({ ...a, ...b }), {}) as {
+		[K in keyof typeof Eris.Constants.UserFlags]: boolean;
+	};
+	}
 }

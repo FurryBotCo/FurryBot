@@ -5,6 +5,7 @@ import { Colors } from "../util/Constants";
 import db from "../util/Database";
 import EmbedBuilder from "../util/EmbedBuilder";
 import Time from "../util/Functions/Time";
+import Utility from "../util/Functions/Utility";
 
 export default new ClientEvent("guildMemberAdd", async function (guild, member) {
 	if (config.beta && guild.id !== config.client.supportServerId) return;
@@ -17,19 +18,20 @@ export default new ClientEvent("guildMemberAdd", async function (guild, member) 
 			continue;
 		}
 
+		const flags = Utility.getUserFlags(member.user);
 		const b = [];
-		if (member.user.publicFlags & Eris.Constants.UserFlags.DISCORD_EMPLOYEE) b.push(`<:${config.emojis.badges.DiscordStaff}> {lang:other.badges.DiscordStaff}`);
-		if (member.user.bot /* this is some padding to make the lines similar */) b.push(`<:${config.emojis.badges.Bot}> {lang:other.badges.Bot}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.VERIFIED_BOT) b.push(`<:${config.emojis.badges.VerifiedBot}> {lang:other.badges.VerifiedBot}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.VERIFIED_BOT_DEVELOPER) b.push(`<:${config.emojis.badges.VerifiedDev}> {lang:other.badges.VerifiedDev}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.DISCORD_PARTNER) b.push(`<:${config.emojis.badges.DiscordPartner}> {lang:other.badges.DiscordPartner}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.HYPESQUAD_EVENTS) b.push(`<:${config.emojis.badges.HypesquadEvents}> {lang:other.badges.HypesquadEvents}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.HOUSE_BRAVERY) b.push(`<:${config.emojis.badges.HypesquadBravery}> {lang:other.badges.HypesquadBravery}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.HOUSE_BALANCE) b.push(`<:${config.emojis.badges.HypesquadBalance}> {lang:other.badges.HypesquadBalance}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.HOUSE_BRILLIANCE) b.push(`<:${config.emojis.badges.HypesquadBrilliance}> {lang:other.badges.HypesquadBrilliance}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.EARLY_SUPPORTER) b.push(`<:${config.emojis.badges.EarlySupporter}> {lang:other.badges.EarlySupporter}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.BUG_HUNTER_LEVEL_1) b.push(`<:${config.emojis.badges.BugHunter}> {lang:other.badges.BugHunter}`);
-		if (member.user.publicFlags & Eris.Constants.UserFlags.BUG_HUNTER_LEVEL_2) b.push(`<:${config.emojis.badges.BugHunter2}> {lang:other.badges.BugHunter2}`);
+		if (flags.DISCORD_EMPLOYEE) b.push(`<:${config.emojis.badges.DiscordStaff}> {lang:other.badges.DiscordStaff}`);
+		if (member.user.bot) b.push(`<:${config.emojis.badges.Bot}> {lang:other.badges.Bot}`);
+		if (flags.VERIFIED_BOT) b.push(`<:${config.emojis.badges.VerifiedBot}> {lang:other.badges.VerifiedBot}`);
+		if (flags.VERIFIED_BOT_DEVELOPER) b.push(`<:${config.emojis.badges.VerifiedDev}> {lang:other.badges.VerifiedDev}`);
+		if (flags.DISCORD_PARTNER) b.push(`<:${config.emojis.badges.DiscordPartner}> {lang:other.badges.DiscordPartner}`);
+		if (flags.HYPESQUAD_EVENTS) b.push(`<:${config.emojis.badges.HypesquadEvents}> {lang:other.badges.HypesquadEvents}`);
+		if (flags.HOUSE_BRAVERY) b.push(`<:${config.emojis.badges.HypesquadBravery}> {lang:other.badges.HypesquadBravery}`);
+		if (flags.HOUSE_BALANCE) b.push(`<:${config.emojis.badges.HypesquadBalance}> {lang:other.badges.HypesquadBalance}`);
+		if (flags.HOUSE_BRILLIANCE) b.push(`<:${config.emojis.badges.HypesquadBrilliance}> {lang:other.badges.HypesquadBrilliance}`);
+		if (flags.EARLY_SUPPORTER) b.push(`<:${config.emojis.badges.EarlySupporter}> {lang:other.badges.EarlySupporter}`);
+		if (flags.BUG_HUNTER_LEVEL_1) b.push(`<:${config.emojis.badges.BugHunter}> {lang:other.badges.BugHunter}`);
+		if (flags.BUG_HUNTER_LEVEL_2) b.push(`<:${config.emojis.badges.BugHunter2}> {lang:other.badges.BugHunter2}`);
 
 		const e = new EmbedBuilder(g.settings.lang)
 			.setColor(Colors.green)
