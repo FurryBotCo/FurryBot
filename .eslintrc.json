@@ -14,8 +14,35 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-	  "project": "tsconfig.json",
-	  "sourceType": "module"
+    "ecmaVersion": 2020,
+	"sourceType": "module",
+	"project": "./tsconfig.json",
+    "ecmaFeatures": {
+      "jsx": true,
+      "forOf": true,
+      "spread": true,
+      "modules": true,
+      "classes": true,
+      "generators": true,
+      "restParams": true,
+      "regexUFlag": true,
+      "regexYFlag": true,
+      "globalReturn": true,
+      "destructuring": true,
+      "impliedStrict": true,
+      "blockBindings": true,
+      "defaultParams": true,
+      "octalLiterals": true,
+      "arrowFunctions": true,
+      "binaryLiterals": true,
+      "templateStrings": true,
+      "superInFunctions": true,
+      "unicodeCodePointEscapes": true,
+      "objectLiteralShorthandMethods": true,
+      "objectLiteralComputedProperties": true,
+      "objectLiteralDuplicateProperties": true,
+      "objectLiteralShorthandProperties": true
+    }
   },
   "plugins": [
 	  "eslint-plugin-jsdoc",
@@ -63,9 +90,10 @@
 			  "accessibility": "explicit"
 		  }
 	  ],
-	  "@typescript-eslint/indent": [
+	  "indent": [
 		  "error",
-		  "tab"
+      "tab",
+      { "SwitchCase": 1 }
 	  ],
 	  "@typescript-eslint/member-delimiter-style": [
 		  "error",
