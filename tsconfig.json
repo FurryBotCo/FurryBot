@@ -3,7 +3,7 @@
     "compilerOptions": {
         "outDir": "./build",
         "allowJs": true,
-        "target": "esnext",
+        "target": "ESNext",
         "baseUrl": "src",
         "resolveJsonModule": true,
         "esModuleInterop": true,
@@ -15,10 +15,13 @@
             "./node_modules/@types",
             "./src/util/@types"
         ],
-        "inlineSourceMap": true
+		"inlineSourceMap": true,
+		"charset": "UTF-8",
+		"downlevelIteration": true,
+		"newLine": "lf" 
     },
     "include": [
-        "**/*"
+		"**/*"
     ],
     "exclude": [
         "node_modules",
@@ -27,8 +30,6 @@
         "tmp",
         "logs",
         "test",
-        "scripts/version.ts",
-        "./ConfigManager.ts",
-        "scripts"
+        "./ConfigManager.ts"
     ]
 }

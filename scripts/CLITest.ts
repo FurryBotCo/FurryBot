@@ -3,6 +3,6 @@
  * @returns {boolean} True if CLI, false if MODULE.
  */
 export default function CLITest() {
-	const [, , l] = new Error().stack.split("\n");
-	return require.main.filename === /\((.*):\d+:\d+\)$/.exec(l)[1];
+  const [,,l] = new Error().stack.split("\n");
+	return require.main.filename === /\((.*):\d+:\d+\)$/.exec(l)?.[1];
 }
