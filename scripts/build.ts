@@ -6,8 +6,8 @@ import CLITest from "./CLITest";
 import deasync from "deasync";
 
 function build(del?: boolean) {
-  return deasync((err, cb) => {
-    let e: Error | null = null;
+	return deasync((err, cb) => {
+		let e: Error | null = null;
 		if (del) {
 			rimraf.sync(`${__dirname}/../build`);
 			console.debug("[build.ts]: Removing previous built files.");
@@ -20,9 +20,9 @@ function build(del?: boolean) {
 			.on("error", (error) => {
 				console.warn("[build.ts]: `tsc` command has failed to run, view below for stacktrace");
 				console.error(error);
-        result = false;
-        e = error;
-        
+				result = false;
+				e = error;
+
 			})
 			.on("exit", (code, signal) => {
 				console.info(`[build.ts]: \`tsc\` command closed with exit code ${code}${signal ? ` with signal "${signal}"` : ""} (success: ${code === 0 ? "yes" : "no"})`);
@@ -32,13 +32,12 @@ function build(del?: boolean) {
 	})();
 }
 
-// cli
 if (CLITest()) {
+	// cli
 	console.debug("[build.ts]: Running in CLI mode");
 	build(!!yargs.argv.del);
-}
-// module
-else {
+} else {
+	// module
 	console.debug("[build.ts]: Running in MODULE mode");
 }
 
