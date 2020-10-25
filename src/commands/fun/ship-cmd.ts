@@ -21,7 +21,6 @@ export default new Command(["ship"], __filename)
 		if (Object.keys(msg.dashedArgs.keyValue).includes("percent")) {
 			if (!config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyOption`, ["percent"]));
 			amount = Number(msg.dashedArgs.keyValue.percent);
-			msg.args = msg.args.filter(a => a !== `--percent=${amount}`);
 		}
 
 		if (msg.args.length === 0) member2 = msg.channel.guild.members.random();
