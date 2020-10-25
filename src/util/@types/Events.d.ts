@@ -49,8 +49,8 @@ interface GuildUpdate { (guild: Eris.Guild, oldGuild: Eris.OldGuild); }
 
 interface Hello { (trace: string[], id: number); }
 
-interface InviteCreate { (guild: Eris.Guild, invite: Eris.GuildInvite); }
-interface InviteDelete { (guild: Eris.Guild, invite: Eris.GuildInvite); }
+interface InviteCreate { (guild: Eris.Guild, invite: Eris.Invite); }
+interface InviteDelete { (guild: Eris.Guild, invite: Eris.Invite); }
 
 interface MessageCreate { (message: Eris.Message); }
 

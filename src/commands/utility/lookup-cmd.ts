@@ -38,7 +38,7 @@ export default new Command(["lookup"], __filename)
 					.setTimestamp(new Date().toISOString());
 
 				const [_, code] = w.body.instant_invite?.match(new RegExp("^(?:(?:https?\:\/\/)?(?:discord\.gg|discord(?:app)?\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i")) ?? [];
-				const inv = !code ? null : (await this.bot.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
+				const inv = !code ? null : (await this.bot.getInvite(code, true).catch(err => null));
 				if (!inv) {
 					embed.addField(
 						"{lang:other.words.info$ucwords$}",

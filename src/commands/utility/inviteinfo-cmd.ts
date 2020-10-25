@@ -19,7 +19,7 @@ export default new Command(["inviteinfo", "invinfo"], __filename)
 
 		if (!code) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noInv`));
 
-		const inv = (await this.bot.getInvite(code, true).catch(err => null)) as Eris.RESTChannelInvite;
+		const inv = (await this.bot.getInvite(code, true).catch(err => null));
 		if (!inv) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalid`));
 		const { guild, inviter, channel } = inv;
 
