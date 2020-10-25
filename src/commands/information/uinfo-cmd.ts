@@ -92,7 +92,9 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 					})),
 					"",
 					`**{lang:${cmd.lang}.badges}:**`,
-					...(f.length === 0 ? [`${config.emojis.default.dot} {lang:other.words.none}`] : f.map(k => `{lang:other.userFlags.${k}}`))
+        		...(f.length === 0 ? [`${config.emojis.default.dot} {lang:other.words.none}`] : f.map(k => `{lang:other.userFlags.${k}}`)),
+        		"",
+        		`{lang:${cmd.lang}.statusNote}`
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))

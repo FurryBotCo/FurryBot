@@ -203,7 +203,8 @@
 		"joinPos": "Join Position",
 		"nearbyJoins": "Nearby Joins",
 		"badges": "User Badges",
-		"socialProfiles": "Social Profiles"
+		"socialProfiles": "Social Profiles",
+		"statusNote": "Note: Since Discord hasn't given us the `presence` intent, we cannot get proper status/game information."
 	},
 	"whoisplaying": {
 		"description": "Get a list of users playing the specified game.",
