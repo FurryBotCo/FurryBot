@@ -5,7 +5,7 @@ import Eris from "eris";
 export default new ClientEvent("messageReactionRemove", async function (message, emoji) {
 	const m = message as unknown as Eris.Message;
 	// eslint-disable-next-line @typescript-eslint/dot-notation
-	if (message["author"]) return;
+	if (!message["author"]) return;
 
 	const e = Object.values(config.emojis.default.numbers);
 	if (e.includes(emoji.name)) {
