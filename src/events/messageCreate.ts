@@ -19,7 +19,7 @@ import Utility from "../util/Functions/Utility";
 
 export default new ClientEvent("messageCreate", async function (message, update) {
 	if (config.beta && !config.developers.includes(message.author.id)) return;
-	const t = new Timers(config.developers.includes(message.author.id), message.channel.id); // `${message.channel.id}/${message.id}/${message.author.id}`);
+	const t = new Timers(config.developers.includes(message.author.id), `${message.author.id}/${message.channel.id}`); // `${message.channel.id}/${message.id}/${message.author.id}`);
 	t.start("main");
 	t.start("stats.msg");
 	await this.sh.processMessage(message);
@@ -33,10 +33,19 @@ export default new ClientEvent("messageCreate", async function (message, update)
 	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) {
 		await this.sh.track("stats", "directMessages", "general");
 		await this.sh.track("stats", "directMessages", "session");
-		if (/((https?:\/\/)?(discord((app)?\.com\/invite|\.gg))\/[A-Z0-9]{1,10})/i.test(message.content))
-			return message.channel.createMessage(config.text.inviteDM(config.devLanguage, this));
-		else
-			return message.channel.createMessage(config.text.normalDM(config.devLanguage, this));
+		const inv = /((https?:\/\/)?(discord((app)?\.com\/invite|\.gg))\/[A-Z0-9]{1,10})/i.test(message.content);
+		await this.w.get("directMessage").execute({
+			embeds: [
+				new EmbedBuilder(config.devLanguage)
+					.setTitle(`Direct Message${inv ? " Advertisment" : ""}`)
+					.setDescription(message.content)
+					.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.avatarURL)
+					.setColor(Colors.gold)
+					.setTimestamp(new Date().toISOString())
+					.toJSON()
+			]
+		});
+		return message.channel.createMessage(config.text[inv ? "inviteDM" : "normalDM"](config.devLanguage, this));
 
 	}
 	t.end("dm");

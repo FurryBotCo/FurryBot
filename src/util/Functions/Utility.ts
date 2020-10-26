@@ -581,7 +581,20 @@ export default class Utility {
 		return Object.entries(Eris.Constants.UserFlags).map(([f, v]) => ({
 			[f]: (user.publicFlags & v) !== 0
 		})).reduce((a, b) => ({ ...a, ...b }), {}) as {
-			[K in keyof typeof Eris.Constants.UserFlags]: boolean;
-		};
+				[K in keyof typeof Eris.Constants.UserFlags]: boolean;
+			};
+	}
+
+	static mergeObjects<R = object>(a: object, b: object) {
+		// avoid references
+		const obj = JSON.parse(JSON.stringify(a)) as R;
+		for (const k of Object.keys(b)) {
+			if (b[k] instanceof Array) obj[k] = typeof a[k] === "undefined" ? b[k] : a[k];
+			else if (typeof b[k] === "object" && b[k] !== null) {
+				if (typeof a[k] !== "object" || a[k] === null) a[k] = {};
+				obj[k] = this.mergeObjects(a[k], b[k]);
+			} else obj[k] = typeof a[k] === "undefined" ? b[k] : a[k];
+		}
+		return obj;
 	}
 }

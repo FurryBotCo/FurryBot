@@ -3,6 +3,7 @@ import config from "../../config";
 import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";
 import merge from "deepmerge";
+import Utility from "../Functions/Utility";
 
 export type DBKeys = ConfigDataTypes<UserConfig>;
 export default class UserConfig {
@@ -21,7 +22,7 @@ export default class UserConfig {
 	socials: Socials.AnySocial[];
 	booster: {
 		active: boolean;
-		date: string;
+		expiry: string;
 	};
 	levels: {
 		[k: string]: number;
@@ -42,7 +43,7 @@ export default class UserConfig {
 
 	private load(data: WithId<ConfigDataTypes<UserConfig, "id">>) {
 		if (data?._id) delete data._id;
-		Object.assign(this, merge(data, config.defaults.config.user));
+		Object.assign(this, Utility.mergeObjects(data, config.defaults.config.user));
 		return this;
 	}
 
@@ -62,7 +63,7 @@ export default class UserConfig {
 		await mdb.collection("users").findOneAndUpdate({
 			id: this.id
 		}, {
-			$set: merge.all([this, data, config.defaults.config.user])
+			$set: Utility.mergeObjects(data, this)
 		});
 
 		return this.reload();
@@ -95,5 +96,51 @@ export default class UserConfig {
 
 	async checkVote() {
 		return db.checkVote(this.id);
+	}
+
+	async checkBooster() {
+		if (!this.booster.active) return {
+			active: false,
+			expired: false,
+			expiry: null
+		};
+
+		if (!this.booster.expiry) {
+			await this.edit({
+				booster: {
+					active: false,
+					expiry: null
+				}
+			});
+
+			return {
+				active: false,
+				expired: true,
+				expiry: null
+			};
+		}
+
+		const e = new Date(this.booster.expiry).getTime();
+		const d = new Date().setHours(0, 0, 0);
+
+		if (e < d) {
+			await this.edit({
+				booster: {
+					active: false,
+					expiry: null
+				}
+			});
+
+			return {
+				active: false,
+				expired: true,
+				expiry: null
+			};
+		}
+		return {
+			active: true,
+			expired: false,
+			expiry: this.booster.expiry
+		};
 	}
 }

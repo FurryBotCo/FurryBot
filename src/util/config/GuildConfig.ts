@@ -4,6 +4,7 @@ import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";
 import { Languages } from "../Language";
 import merge from "deepmerge";
+import Utility from "../Functions/Utility";
 
 export type DBKeys = ConfigDataTypes<GuildConfig>;
 export default class GuildConfig {
@@ -84,7 +85,7 @@ export default class GuildConfig {
 	private load(data: WithId<ConfigDataTypes<GuildConfig, "id">>) {
 		if (data._id) delete data._id;
 		delete data._id;
-		Object.assign(this, merge(data, config.defaults.config.guild));
+		Object.assign(this, Utility.mergeObjects(data, config.defaults.config.guild));
 		if (!(this.logEvents instanceof Array)) this.logEvents = [];
 		return this;
 	}
@@ -105,7 +106,7 @@ export default class GuildConfig {
 		await mdb.collection("guilds").findOneAndUpdate({
 			id: this.id
 		}, {
-			$set: merge.all([this, data, config.defaults.config.guild])
+			$set: Utility.mergeObjects(data, this)
 		});
 
 		return this.reload();
