@@ -3,7 +3,7 @@ import config from "../../config";
 import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";
 import { Languages } from "../Language";
-import Internal from "../Functions/Internal";
+import merge from "deepmerge";
 
 export type DBKeys = ConfigDataTypes<GuildConfig>;
 export default class GuildConfig {
@@ -84,7 +84,7 @@ export default class GuildConfig {
 	private load(data: WithId<ConfigDataTypes<GuildConfig, "id">>) {
 		if (data._id) delete data._id;
 		delete data._id;
-		Internal.goKeys(this, data, config.defaults.config.guild);
+		Object.assign(this, merge(data, config.defaults.config.guild));
 		if (!(this.logEvents instanceof Array)) this.logEvents = [];
 		return this;
 	}
@@ -102,13 +102,10 @@ export default class GuildConfig {
 	}
 
 	async edit(data: ConfigEditTypes<GuildConfig, "id">) {
-		const d = this;
-		Internal.goKeys(d, data, config.defaults.config.guild);
-
 		await mdb.collection("guilds").findOneAndUpdate({
 			id: this.id
 		}, {
-			$set: d
+			$set: merge.all([this, data, config.defaults.config.guild])
 		});
 
 		return this.reload();

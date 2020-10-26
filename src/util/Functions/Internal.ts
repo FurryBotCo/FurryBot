@@ -21,34 +21,6 @@ export default class Internal {
 	}
 
 	/**
-	 * Merge objects for configuration purposes.
-	 *
-	 * @static
-	 * @param {object} a - The object to put the properties on.
-	 * @param {object} b - The provided data.
-	 * @param {object} c - The default data.
-	 * @returns
-	 * @memberof Internal
-	 * @example Internal.goKeys(Object1, Object2, Object3);
-	 */
-	static goKeys(a: object & { id?: string; }, b: object, c: object): void {
-		// cloning because we don't want to edit the original defaults
-		// using this dirty method because spread leaves a deep reference
-		const d = JSON.parse(JSON.stringify(c));
-		const obj = Object.keys(d).length === 0 ? b : d;
-		if (a.id) d.id = a.id;
-		Object.keys(obj).map(k => {
-			if (typeof d[k] === "object" && d[k] !== null) {
-				if (d[k] instanceof Array) a[k] = [undefined, null, ""].includes(b[k]) ? d[k] : b[k];
-				else {
-					if ([undefined, null, ""].includes(a[k])) a[k] = d[k];
-					if (![undefined, null, ""].includes(b[k])) return this.goKeys(a[k], b[k], d[k]);
-				}
-			} else return a[k] = [undefined].includes(b[k]) ? d[k] : b[k];
-		});
-	}
-
-	/**
 	 * Load commands in a directory into a category.
 	 *
 	 * @static
@@ -60,6 +32,7 @@ export default class Internal {
 	static loadCommands(dir: string, cat: Category) {
 		const ext = __filename.split(".").slice(-1)[0];
 		fs.readdirSync(dir).filter(f => !fs.lstatSync(`${dir}/${f}`).isDirectory() && f.endsWith(ext) && f !== `index.${ext}`).map(f => {
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			let c = require(`${dir}/${f}`);
 			if (c.default) c = c.default;
 			if (c instanceof Command) cat.addCommand(c);

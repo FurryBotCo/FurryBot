@@ -2,7 +2,7 @@
 import config from "../../config";
 import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";
-import Internal from "../Functions/Internal";
+import merge from "deepmerge";
 
 export type DBKeys = ConfigDataTypes<UserConfig>;
 export default class UserConfig {
@@ -19,7 +19,10 @@ export default class UserConfig {
 		};
 	};
 	socials: Socials.AnySocial[];
-	booster: boolean;
+	booster: {
+		active: boolean;
+		date: string;
+	};
 	levels: {
 		[k: string]: number;
 	};
@@ -29,7 +32,7 @@ export default class UserConfig {
 		"ko-fi": {
 			name: string | null;
 		};
-		totalMonths: number;
+		"totalMonths": number;
 	};
 	eco: Economy.EcoUser;
 	constructor(id: string, data: ConfigDataTypes<UserConfig, "id">) {
@@ -39,7 +42,7 @@ export default class UserConfig {
 
 	private load(data: WithId<ConfigDataTypes<UserConfig, "id">>) {
 		if (data?._id) delete data._id;
-		Internal.goKeys(this, data, config.defaults.config.user);
+		Object.assign(this, merge(data, config.defaults.config.user));
 		return this;
 	}
 
@@ -56,13 +59,10 @@ export default class UserConfig {
 	}
 
 	async edit(data: ConfigEditTypes<UserConfig, "id">) {
-		const d = this;
-		Internal.goKeys(d, data, config.defaults.config.user);
-
 		await mdb.collection("users").findOneAndUpdate({
 			id: this.id
 		}, {
-			$set: d
+			$set: merge.all([this, data, config.defaults.config.user])
 		});
 
 		return this.reload();

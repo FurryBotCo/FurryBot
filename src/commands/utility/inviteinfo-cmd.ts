@@ -15,7 +15,7 @@ export default new Command(["inviteinfo", "invinfo"], __filename)
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
-		const [_, code] = msg.args.join("").match(new RegExp("^(?:(?:https?\:\/\/)?(?:discord\.gg|discord(?:app)?\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i")) ?? [];
+		const [, code] = msg.args.join("").match(new RegExp("^(?:(?:https?\:\/\/)?(?:discord\.gg|discord(?:app)?\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i")) ?? [];
 
 		if (!code) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noInv`));
 
