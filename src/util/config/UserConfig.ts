@@ -2,7 +2,6 @@
 import config from "../../config";
 import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";
-import merge from "deepmerge";
 import Utility from "../Functions/Utility";
 
 export type DBKeys = ConfigDataTypes<UserConfig>;
