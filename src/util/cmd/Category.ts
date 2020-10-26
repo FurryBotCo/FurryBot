@@ -15,7 +15,8 @@ export default class Category {
 		this.name = name;
 		this.displayName = "";
 		this.file = file;
-		this.#cmds = []; this.description = "";
+		this.#cmds = [];
+		this.description = "";
 		this.restrictions = [];
 
 	}
