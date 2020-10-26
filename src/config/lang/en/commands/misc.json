@@ -82,5 +82,12 @@
 		"missingTitle": "Missing report title. Separate a title a description with a pipe (|).",
 		"missingDescription": "Missing report description. Separate a title a description with a pipe (|).",
 		"done": "Your report was successfully posted.\nYou can view it and add more details here: {0}"
+	},
+	"booster": {
+		"description": "Claim perks for boosting our support server.",
+		"usage": "",
+		"notABooster": "You are not a booster in our support server.",
+		"alreadyActive": "You perks are already active. Come back on **{0}** to reactivate them.",
+		"done": "you've got perks now, congrats. Come back and renew them in 10 days."
 	}
 }
