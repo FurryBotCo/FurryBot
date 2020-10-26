@@ -7,6 +7,10 @@
 		"displayName": "🛠 Developer",
 		"description": "Tools to make development easy and smooth."
 	},
+	"economy": {
+		"displayName": "💰 Economy",
+		"description": "Play some games and such for virtual money!"
+	},
 	"fun": {
 		"displayName": "😄 Fun",
 		"description": "Some commands to spice up your chat"
@@ -38,9 +42,5 @@
 	"utility": {
 		"displayName": "🛠 Utility",
 		"description": "Some useful utility commands."
-	},
-	"economy": {
-		"displayName": "💰 Economy",
-		"description": "Play some games and such for virtual money!"
 	}
 }

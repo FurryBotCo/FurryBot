@@ -1,11 +1,4 @@
 {
-	"rarities": {
-		"common": "Common",
-		"uncommon": "Uncommon",
-		"rare": "Rare",
-		"epic": "Epic",
-		"legendary": "Legendary"
-	},
 	"items": {
 		"lucky-apple": {
 			"name": "Lucky Apple",
@@ -19,5 +12,12 @@
 			"name": "Knot",
 			"description": "You know what this is 😉"
 		}
+	},
+	"rarities": {
+		"common": "Common",
+		"uncommon": "Uncommon",
+		"rare": "Rare",
+		"epic": "Epic",
+		"legendary": "Legendary"
 	}
 }

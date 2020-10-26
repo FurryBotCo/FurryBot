@@ -14,6 +14,9 @@
 	"guildBanRemove": {
 		"title": "Member Unbanned"
 	},
+	"guildUpdate": {
+		"title": "Guild Updated"
+	},
 	"memberJoin": {
 		"title": "Member Joined",
 		"footer": "Member #{0} | Account Created {1} Ago"
@@ -31,6 +34,9 @@
 	"messageDelete": {
 		"title": "Message Deleted"
 	},
+	"messageDeleteBulk": {
+		"title": "Message Bulk Deletion"
+	},
 	"messageUpdate": {
 		"title": "Message Edited"
 	},
@@ -46,6 +52,11 @@
 	"roleUpdate": {
 		"title": "Role Updated"
 	},
+	"userUpdate": {
+		"title": "User Update",
+		"oldAvNote": "Old avatar is displayed in the thumbnail (upper right)",
+		"newAvNote": "New avatar is displayed in the image (below this)"
+	},
 	"voiceChannelJoin": {
 		"title": "Joined Voice Channel"
 	},
@@ -57,16 +68,5 @@
 	},
 	"voiceStateUpdate": {
 		"title": "Voice State Updated"
-	},
-	"messageDeleteBulk": {
-		"title": "Message Bulk Deletion"
-	},
-	"userUpdate": {
-		"title": "User Update",
-		"oldAvNote": "Old avatar is displayed in the thumbnail (upper right)",
-		"newAvNote": "New avatar is displayed in the image (below this)"
-	},
-	"guildUpdate": {
-		"title": "Guild Updated"
 	}
 }
