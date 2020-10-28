@@ -3,19 +3,19 @@ import Logger from "./Logger";
 import crypto from "crypto";
 
 interface Timer {
-	start: number;
-	end: number;
+	start: number | null;
+	end: number | null;
 }
 
 export default class Timers {
 	id: string;
 	timers: {
 		[k: string]: Timer;
-	}[];
+	};
 	log: boolean;
 	constructor(log?: boolean, id?: string) {
 		this.id = id || crypto.randomBytes(10).toString("hex");
-		this.timers = [];
+		this.timers = {};
 		this.log = !!log;
 	}
 
