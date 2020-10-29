@@ -111,4 +111,4 @@ src/util/DailyJoins.ts
 config.key
 
 # temp
-src/bot/commands/utility/welcomer-cmd.ts
+src/commands/nsfw/comics-cmd.ts

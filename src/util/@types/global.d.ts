@@ -23,8 +23,11 @@ declare global {
 
 	type ConfigDataTypes<T, O extends (string | number) = ""> = Omit<WithoutFunctions<{ [K in keyof T]: T[K]; }>, O>;
 	type ConfigEditTypes<T, O extends (string | number) = ""> = DeepPartial<ConfigDataTypes<T, O>>;
+	type KnownKeys<T> = {
+		[K in keyof T]: string extends K ? never : number extends K ? never : K
+	} extends { [_ in keyof T]: infer U } ? U : never;
 
-	type ErisPermissions = (keyof typeof Eris.Constants.Permissions);
+	type ErisPermissions = KnownKeys<typeof Eris.Constants.Permissions>;
 
 	type CommandRestrictions = "beta" | "developer" | "donator" | "guildOwner" | "nsfw" | "premium" | "supportServer";
 	type CategoryRestrictions = "beta" | "developer";

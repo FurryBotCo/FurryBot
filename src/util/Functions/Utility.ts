@@ -1,3 +1,4 @@
+/// <reference path="../@types/global.d.ts" />
 import config from "../../config";
 import { Languages } from "../Language";
 import EmbedBuilder from "../EmbedBuilder";
@@ -581,7 +582,7 @@ export default class Utility {
 		return Object.entries(Eris.Constants.UserFlags).map(([f, v]) => ({
 			[f]: (user.publicFlags & v) !== 0
 		})).reduce((a, b) => ({ ...a, ...b }), {}) as {
-				[K in keyof typeof Eris.Constants.UserFlags]: boolean;
+				[K in KnownKeys<typeof Eris.Constants.UserFlags>]: boolean;
 			};
 	}
 
