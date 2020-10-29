@@ -9,7 +9,9 @@ export default new Command(["weekly"], __filename)
 	])
 	.setUserPermissions([])
 	.setRestrictions([
-		"donator"
+		"beta",
+		"donator",
+		"developer"
 	])
 	.setCooldown(8.64e+7, true)
 	.setExecutor(async function (msg, cmd) {

@@ -8,7 +8,10 @@ export default new Command(["bal", "balance"], __filename)
 		"embedLinks"
 	])
 	.setUserPermissions([])
-	.setRestrictions([])
+	.setRestrictions([
+		"beta",
+		"developer"
+	])
 	.setCooldown(6e4, false)
 	.setDonatorCooldown(3e4)
 	.setExecutor(async function (msg, cmd) {

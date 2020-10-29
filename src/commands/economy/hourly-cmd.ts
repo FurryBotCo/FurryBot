@@ -8,7 +8,10 @@ export default new Command(["hourly"], __filename)
 		"embedLinks"
 	])
 	.setUserPermissions([])
-	.setRestrictions([])
+	.setRestrictions([
+		"beta",
+		"developer"
+	])
 	.setCooldown(8.64e+7, true)
 	.setExecutor(async function (msg, cmd) {
 		await msg.uConfig.edit({
