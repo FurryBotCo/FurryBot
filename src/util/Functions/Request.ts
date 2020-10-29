@@ -25,7 +25,8 @@ export default class Request {
 	 * @example Request.createPaste("Example Content", "Example Title", "1D");
 	 * @example Request.createPaste("Example Content", "Example Title", "1W", 1);
 	 */
-	static async createPaste(content: string, name: string, expire?: string, privacy?: 0 | 1 | 2) {
+	// expiries can ONLY be these
+	static async createPaste(content: string, name: string, expire?: "N" | "10M" | "1H" | "1D" | "1W" | "2W" | "1M" | "6M" | "1Y", privacy?: 0 | 1 | 2) {
 		return new Promise<string>((a, b) => {
 			const d = qs.stringify({
 				api_option: "paste",

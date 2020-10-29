@@ -1,4 +1,5 @@
 /// <reference path="../@types/global.d.ts" />
+/// <reference path="../@types/Economy.d.ts" />
 import config from "../../config";
 import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";

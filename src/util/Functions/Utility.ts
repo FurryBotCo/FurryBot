@@ -439,11 +439,11 @@ export default class Utility {
 		message: Eris.Message<Eris.TextableChannel>;
 		code: string;
 	}> {
-		if ([1006, 1012, "ERR_INVALID_USAGE", "Connection reset by peer"].some(v => err.message.indexOf(v.toString()) !== -1)) return { message: null, code: "" };
+		if ([1006, 1012, "ERR_INVALID_USAGE", "Connection reset by peer"].some(v => err.message.indexOf(v.toString()) !== -1)) return { message: { embeds: [] } as any, code: "" };
 
 		const d = new Date();
 		const code = `err.${config.beta ? "beta" : "prod"}.${crypto.randomBytes(8).toString("hex")}`;
-		const p = await client.createPaste(err.stack, "Furry Bot Error", "2D", 1);
+		const p = await client.createPaste(err.stack, "Furry Bot Error", "1W", 1);
 		const e = new EmbedBuilder(config.devLanguage)
 			.setTitle("\u274c Error")
 			.setTimestamp(d)
