@@ -286,7 +286,8 @@
 		"disabled": "Disabled",
 		"invalidLang": "{0} is not a valid language we support. Valid languages: {1}",
 		"invalidYiffType": "{0} is not a valid yiff type. Valid types: {1}",
-		"arrayInvalidOpt": "invalid usage. After the setting name, supply one of the following: \"add\", \"remove\", then the value to add or remove.\nEx: {0}settings {1} add <value>"
+		"arrayInvalidOpt": "invalid usage. After the setting name, supply one of the following: \"add\", \"remove\", then the value to add or remove.\nEx: {0}settings {1} add <value>",
+		"muteNotice": "To setup the permission overrides required for mutes to work, run the command `{0}setup-mutes`."
 	},
 	"slowmode": {
 		"description": "Set the slowmode on a channel.",

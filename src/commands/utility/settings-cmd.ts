@@ -196,12 +196,16 @@ export default new Command(["settings"], __filename)
 					}
 				});
 
-				return msg.reply({
+				await msg.reply({
 					content: Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set`, [n, cur === null ? Language.get(msg.gConfig.settings.lang, "other.words.none").toUpperCase() : `<@&${cur}>`, `<@&${r.id}>`]),
 					allowedMentions: {
 						roles: []
 					}
 				});
+
+				if (s === "muteRole") await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.muteNotice`, [msg.gConfig.settings.prefix]));
+
+				return;
 				break;
 			}
 

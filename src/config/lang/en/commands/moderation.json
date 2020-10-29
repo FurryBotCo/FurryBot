@@ -214,5 +214,15 @@
 			"noWarnings": "The user **{0}** has no warnings to clear.",
 			"done": "Removed **{0}** warnings from the user **{1}**."
 		}
+	},
+	"setup-mutes": {
+		"description": "Setup mutes in this server.",
+		"usage": "",
+		"noRole": "No mute role has been setup. You can set one up by using `{0}settings mute role @Role`",
+		"confirm": "This will update **{0}** channels, and this action is not reversible, are you sure? **yes** or **no**.",
+		"canceled": "Canceled due to timeout, invalid response, or general cancellation.",
+		"inProgress": "Updating **{0}** channels, please be patient...",
+		"_": "Do not translate \"yes\" or \"no\", they are literal values.",
+		"done": "Finished updating **{0}** channels."
 	}
 }
