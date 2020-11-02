@@ -440,7 +440,16 @@ export default class Utility {
 		message: Eris.Message<Eris.TextableChannel>;
 		code: string;
 	}> {
-		if ([1006, 1012, "ERR_INVALID_USAGE", "Connection reset by peer"].some(v => err.message.indexOf(v.toString()) !== -1)) return { message: { embeds: [] } as any, code: "" };
+		if ([
+			1001,
+			1006,
+			1012,
+			"ERR_INVALID_USAGE",
+			"Connection reset by peer",
+			"Missing Permissions",
+			"Missing Access",
+			"'tags' conatins a tag that is listed in 'filterTags'"
+		].some(v => err.message.indexOf(v.toString()) !== -1)) return { message: { embeds: [] } as any, code: "" };
 
 		const d = new Date();
 		const code = `err.${config.beta ? "beta" : "prod"}.${crypto.randomBytes(8).toString("hex")}`;
