@@ -56,13 +56,14 @@ export default new Command(["leaderboard", "lb"], __filename)
 				}
 			}
 
+			const e = this.bot.users.size - entries.length;
 			return msg.channel.createMessage({
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.embed.titleGlobal}`)
 					.setDescription([
 						`{lang:${cmd.lang}.embed.hover}`
 					].join("\n"))
-					.setFooter(`{lang:${cmd.lang}.embed.footer|${page}|${c.length}|${this.bot.users.size - entries.length}|${time}}`)
+					.setFooter(`{lang:${cmd.lang}.embed.footer|${page}|${c.length}|${e < 0 ? 0 : e}|${time}}`)
 					.setColor(Colors.gold)
 					.addFields(...content.map((v, i) => ({
 						name: `{lang:${cmd.lang}.embed.listNum|${i + 1}}`,
@@ -106,7 +107,7 @@ export default new Command(["leaderboard", "lb"], __filename)
 							return `**#${(i + 1) + ((page - 1) * 10)}**: <@!${k.id}> - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
 						})
 					].join("\n"))
-					.setFooter(`{lang:${cmd.lang}.embed.footer|${page}|${c.length}|${f}|${(end - start).toFixed(3)}}`)
+					.setFooter(`{lang:${cmd.lang}.embed.footer|${page}|${c.length}|${f < 0 ? 0 : f}|${(end - start).toFixed(3)}}`)
 					.setColor(Colors.gold)
 					.setTimestamp(new Date().toISOString())
 					.toJSON()
