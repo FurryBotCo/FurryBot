@@ -27,7 +27,7 @@ export default class InfoRoute extends Route {
 
 				return res.status(200).render("donate/index");
 			})
-			.get("/ko-fi/setup", async (req, res) => {
+			.get("/setup/ko-fi", async (req, res) => {
 				if (!req.data.user) {
 					req.data.return = req.originalUrl;
 					return res.redirect("/socials/discord");
@@ -35,29 +35,14 @@ export default class InfoRoute extends Route {
 
 				const user = await db.getUser(req.data.user.id);
 
-				if (user.donations["ko-fi"].name) return res.redirect("/donate/ko-fi/go");
+				if (user.donations["ko-fi"].name) return res.redirect("/donate/go/ko-fi");
 
 				return res.status(200).render("donate/ko-fi/setup", {
 					username: req.data.user.username,
 					discriminator: req.data.user.discriminator
 				});
 			})
-			.get("/ko-fi/go", async (req, res) => {
-				if (!req.data.user) {
-					req.data.return = req.originalUrl;
-					return res.redirect("/socials/discord");
-				}
-
-				const user = await db.getUser(req.data.user.id);
-				if (!user.donations["ko-fi"].name) return res.redirect("/donate/ko-fi/setup");
-
-				return res.status(200).render("donate/ko-fi/setup-done", {
-					link: config.client.socials["ko-fi"],
-					name: user.donations["ko-fi"].name,
-					supportServer: config.client.socials.discord
-				});
-			})
-			.post("/ko-fi/setup", async (req, res) => {
+			.post("/setup/ko-fi", async (req, res) => {
 				if (!req.data.user) {
 					req.data.return = req.originalUrl;
 					return res.redirect("/socials/discord");
@@ -73,9 +58,24 @@ export default class InfoRoute extends Route {
 					}
 				});
 
-				return res.redirect("/donate/ko-fi/go");
+				return res.redirect("/donate/go/ko-fi");
 			})
-			.post("/ko-fi/count", async (req, res) => {
+			.get("/go/ko-fi", async (req, res) => {
+				if (!req.data.user) {
+					req.data.return = req.originalUrl;
+					return res.redirect("/socials/discord");
+				}
+
+				const user = await db.getUser(req.data.user.id);
+				if (!user.donations["ko-fi"].name) return res.redirect("/donate/setup/ko-fi");
+
+				return res.status(200).render("donate/ko-fi/setup-done", {
+					link: config.client.socials["ko-fi"],
+					name: user.donations["ko-fi"].name,
+					supportServer: config.client.socials.discord
+				});
+			})
+			.post("/done/ko-fi", async (req, res) => {
 				if (req.query.auth?.toString() !== config.apis["ko-fi"].webhookKey) return res.status(401).json({
 					success: false,
 					error: "Invalid authentication."
@@ -162,6 +162,9 @@ export default class InfoRoute extends Route {
 				});
 
 				return res.status(204).end();
-			});
+			})
+			.get("/go/gh-sponsors", async (req, res) => res.redirect(config.client.socials["gh-sponsors"]))
+			.get("/gp/patreon", async (req, res) => res.redirect(config.client.socials.patreon))
+			.get("/gp/paypal.me", async (req, res) => res.redirect(config.client.socials["paypal.me"]));
 	}
 }

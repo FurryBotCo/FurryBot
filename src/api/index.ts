@@ -94,6 +94,7 @@ export default class API {
 
 		fs
 			.readdirSync(`${__dirname}/routes`)
+			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			.map(r => new (require(`${__dirname}/routes/${r}`).default)() as Route)
 			.map(r => this.addRoute(r));
 	}
