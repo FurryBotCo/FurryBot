@@ -109,6 +109,7 @@ src/util/Functions/RPG.ts
 # other
 src/util/DailyJoins.ts
 config.key
+!.github/
 
 # temp
 src/commands/nsfw/comics-cmd.ts
