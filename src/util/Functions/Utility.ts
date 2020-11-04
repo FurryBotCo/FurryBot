@@ -595,9 +595,9 @@ export default class Utility {
 			};
 	}
 
-	static mergeObjects<R = object>(a: object, b: object) {
+	static mergeObjects<A = object, B = object>(a: A, b: B) {
 		// avoid references
-		const obj = JSON.parse(JSON.stringify(a)) as R;
+		const obj = JSON.parse(JSON.stringify(a)) as A & B;
 		for (const k of Object.keys(b)) {
 			if (b[k] instanceof Array) obj[k] = typeof a[k] === "undefined" ? b[k] : a[k];
 			else if (typeof b[k] === "object" && b[k] !== null) {
