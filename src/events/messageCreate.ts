@@ -29,20 +29,20 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 	/* start dm */
 	t.start("dm");
-	// @FIXME DM LOGGING
 	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) {
 		await this.sh.track("stats", "directMessages", "general");
 		await this.sh.track("stats", "directMessages", "session");
 		const inv = /((https?:\/\/)?(discord((app)?\.com\/invite|\.gg))\/[A-Z0-9]{1,10})/i.test(message.content);
+		const e = new EmbedBuilder(config.devLanguage)
+			.setTitle(`Direct Message${inv ? " Advertisment" : ""}`)
+			.setDescription(message.content)
+			.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.avatarURL)
+			.setColor(Colors.gold)
+			.setTimestamp(new Date().toISOString());
+		if (message.attachments?.length > 0) e.setImage(message.attachments[0].url);
 		await this.w.get("directMessage").execute({
 			embeds: [
-				new EmbedBuilder(config.devLanguage)
-					.setTitle(`Direct Message${inv ? " Advertisment" : ""}`)
-					.setDescription(message.content)
-					.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.avatarURL)
-					.setColor(Colors.gold)
-					.setTimestamp(new Date().toISOString())
-					.toJSON()
+				e.toJSON()
 			]
 		});
 		return message.channel.createMessage(config.text[inv ? "inviteDM" : "normalDM"](config.devLanguage, this));
