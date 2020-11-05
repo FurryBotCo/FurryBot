@@ -23,7 +23,7 @@ export default new Command(["iamn"], __filename)
 		if (!msg.member.roles.includes(role.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.notHave`, [msg.gConfig.settings.prefix]));
 		const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), msg.channel.guild.roles.get(role.id));
 		if (a.lower || a.same) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.higher`));
-		await msg.member.removeRole(role.id, "iamn command");
+		await msg.member.removeRole(role.id, encodeURIComponent(`iamn command: ${msg.author.tag} (${msg.author.id})`));
 
 		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.removed`, [role.name]));
 	});

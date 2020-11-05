@@ -95,7 +95,7 @@ export default new Command(["mute"], __filename)
 		const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
 		if (!member.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, `other.dm.mute${isNaN(time) || time === 0 ? "Permanent" : ""}`, [Time.ms(time, true), msg.channel.guild.name, reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
 
-		await member.addRole(msg.gConfig.settings.muteRole, `Mute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+		await member.addRole(msg.gConfig.settings.muteRole, encodeURIComponent(`Mute: ${msg.author.tag} (${msg.author.id}) -> ${reason}`)).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.muted`, [`${member.username}#${member.discriminator}`, reason])}***`).catch(noerr => null);
 			await this.m.createMuteEntry(msg.channel, msg.gConfig, msg.author, member, time, reason);
 			if (!isNaN(time) && time !== 0) await this.t.addEntry("mute", time, Date.now() + time, member.id, msg.channel.guild.id, reason);

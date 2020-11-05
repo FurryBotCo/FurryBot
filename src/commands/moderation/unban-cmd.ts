@@ -38,7 +38,7 @@ export default new Command(["unban"], __filename)
 		});
 
 		const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
-		await msg.channel.guild.unbanMember(user.id, `Unban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+		await msg.channel.guild.unbanMember(user.id, encodeURIComponent(`Unban: ${msg.author.tag} (${msg.author.id}) ->  ${reason}`)).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.unbanned`, [`${user.username}#${user.discriminator}`, reason])}***`).catch(noerr => null);
 			await this.m.createUnbanEntry(msg.channel, msg.gConfig, msg.author, user, reason);
 		}).catch(async (err) => {

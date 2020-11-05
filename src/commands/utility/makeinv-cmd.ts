@@ -42,7 +42,7 @@ export default new Command(["makeinv"], __filename)
 			temporary: a.value.includes("t"),
 			maxAge: Object.keys(a.keyValue).includes("maxAge") ? Number(a.keyValue.maxAge) : 0,
 			maxUses: Object.keys(a.keyValue).includes("maxUses") ? Number(a.keyValue.maxUses) : 0
-		});
+		}, encodeURIComponent(`Makeinv: ${msg.author.tag} (${msg.author.id})`));
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

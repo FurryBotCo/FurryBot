@@ -23,7 +23,7 @@ export default new Command(["iam"], __filename)
 		if (msg.member.roles.includes(role.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.alreadyHave`, [msg.gConfig.settings.prefix]));
 		const a = Utility.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id), msg.channel.guild.roles.get(role.id));
 		if (a.lower || a.same) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.higher`));
-		await msg.member.addRole(role.id, "iam command");
+		await msg.member.addRole(role.id, encodeURIComponent(`iam command: ${msg.author.tag} (${msg.author.id})`));
 
 		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.given`, [role.name]));
 	});

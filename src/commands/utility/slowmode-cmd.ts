@@ -23,7 +23,7 @@ export default new Command(["slowmode"], __filename)
 		});
 		if (s === ch.rateLimitPerUser) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.unchanged`, [ch.id]));
 
-		await ch.edit({ rateLimitPerUser: s }, `Command: ${msg.author.tag}`);
+		await ch.edit({ rateLimitPerUser: s }, encodeURIComponent(`slowmode command: ${msg.author.tag} (${msg.author.id})`));
 
 		return msg.reply(s === 0 ? Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove`, [ch.id]) : Language.get(msg.gConfig.settings.lang, `${cmd.lang}.set`, [ch.id, s, s === 1 ? "OwO" : "s"]));
 	});

@@ -21,7 +21,7 @@ export default new Command(["unlock"], __filename)
 		if (o.allow & 2048 || !(o.deny & 2048)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.unlock.${ch.id === msg.channel.id ? "this" : "that"}NotLocked`));
 		if (o.deny & 2048) o.deny -= 2048;
 
-		await ch.editPermission(msg.channel.guild.id, o.allow, o.deny, "role");
+		await ch.editPermission(msg.channel.guild.id, o.allow, o.deny, "role", encodeURIComponent(`Unlock: ${msg.author.tag} (${msg.author.id})`));
 
 		await this.m.createUnlockEntry(msg.channel, msg.gConfig, msg.author, ch);
 

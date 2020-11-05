@@ -26,7 +26,7 @@ export default new Command(["steal"], __filename)
 		await msg.channel.guild.createEmoji({
 			name,
 			image: `data:${img.headers["content-type"]};base64,${Buffer.from(img.body).toString("base64")}`
-		}).then(j =>
+		}, encodeURIComponent(`steal command: ${msg.author.tag} (${msg.author.id})`)).then(j =>
 			msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.success`, [`<${j.animated ? "a" : ""}:${j.name}:${j.id}>`, j.name]))
 		).catch(err =>
 			msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.fail`, [`${err.name}: ${err.message}`]))

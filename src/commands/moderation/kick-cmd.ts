@@ -31,7 +31,7 @@ export default new Command(["kick"], __filename)
 
 		let m: Eris.Message;
 		if (!member.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(Language.parseString(msg.gConfig.settings.lang, `{lang:other.dm.kick|${msg.channel.guild.name}|${reason}}\n\n{lang:other.dm.notice}`))).catch(err => null);
-		await msg.channel.guild.kickMember(member.id, `Kick: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+		await msg.channel.guild.kickMember(member.id, encodeURIComponent(`Kick: ${msg.author.tag} (${msg.author.id}) -> ${reason}`)).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userKicked`, [`${member.user.username}#${member.user.discriminator}`, reason])}***`).catch(err => null);
 			await this.m.createKickEntry(msg.channel, msg.gConfig, msg.author, member, reason);
 		}).catch(async (err) => {

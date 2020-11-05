@@ -28,7 +28,7 @@ export default new Command(["setup-mutes"], __filename)
 				if (a && a.allow & Eris.Constants.Permissions.sendMessages) await ch.editPermission(msg.channel.guild.id, a.allow - Eris.Constants.Permissions.sendMessages, a.deny, "role", `Setup-Mutes: ${msg.author.tag}`);
 				if (b && b.allow & Eris.Constants.Permissions.sendMessages) b.allow -= Eris.Constants.Permissions.sendMessages;
 				if (b && !(b.deny & Eris.Constants.Permissions.sendMessages)) b.deny += Eris.Constants.Permissions.sendMessages;
-				await ch.editPermission(msg.gConfig.settings.muteRole, b?.allow || 0, b?.deny || Eris.Constants.Permissions.sendMessages, "role", `Setup-Mutes: ${msg.author.tag}`);
+				await ch.editPermission(msg.gConfig.settings.muteRole, b?.allow || 0, b?.deny || Eris.Constants.Permissions.sendMessages, "role", encodeURIComponent(`Setup-Mutes: ${msg.author.tag} (${msg.author.id})`));
 			} catch (e) {
 				Logger.error(`SetupMutes[${msg.channel.guild.id}/${msg.author.id}]`, e);
 			}

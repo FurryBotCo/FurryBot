@@ -33,7 +33,7 @@ export default new Command(["unlockdown"], __filename)
 			const v = ch[c.id];
 			if (!v) continue;
 			i++;
-			await c.editPermission(msg.channel.guild.id, v.allow, v.deny, "role", `Unlockdown: ${msg.author.tag}`);
+			await c.editPermission(msg.channel.guild.id, v.allow, v.deny, "role", encodeURIComponent(`Unlockdown: ${msg.author.tag} (${msg.author.id})`));
 		}
 
 		await this.m.createUnlockdownEntry(msg.channel, msg.gConfig, msg.author);

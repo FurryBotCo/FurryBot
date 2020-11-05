@@ -40,10 +40,10 @@ export default new Command(["softban"], __filename)
 
 		let m: Eris.Message;
 		if (!member.bot) m = await member.user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, "other.dm.softBan", [msg.channel.guild.name, reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
-		await msg.channel.guild.banMember(member.id, deleteDays, `Softban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+		await msg.channel.guild.banMember(member.id, deleteDays, encodeURIComponent(`Softban: ${msg.author.tag} (${msg.author.id}) -> ${reason}`)).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userSoftBanned`, [`${member.username}#${member.discriminator}`, reason])}***`).catch(err => null);
 			await this.m.createSoftBanEntry(msg.channel, msg.gConfig, msg.author, member, deleteDays, reason);
-			await msg.channel.guild.unbanMember(member.id, `Softban: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`);
+			await msg.channel.guild.unbanMember(member.id, encodeURIComponent(`Softban: ${msg.author.tag} (${msg.author.id}) ->  ${reason}`));
 		}).catch(async (err) => {
 			if (err.name.indexOf("ERR_INVALID_CHAR") !== -1) await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.englishOnly`));
 			else await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.couldNotSoftBan`, [`${member.username}#${member.discriminator}`, `${err.name}: ${err.message}`]));

@@ -40,7 +40,7 @@ export default new Command(["lockdown"], __filename)
 					deny: p.deny
 				};
 				if (p.allow & Eris.Constants.Permissions.sendMessages) p.allow -= Eris.Constants.Permissions.sendMessages;
-				await c.editPermission(msg.channel.guild.id, p.allow, p.deny + Eris.Constants.Permissions.sendMessages, "role", `Lockdown: ${msg.author.tag}`);
+				await c.editPermission(msg.channel.guild.id, p.allow, p.deny + Eris.Constants.Permissions.sendMessages, "role", encodeURIComponent(`Lockdown: ${msg.author.tag} (${msg.author.id})`));
 			}
 		}
 

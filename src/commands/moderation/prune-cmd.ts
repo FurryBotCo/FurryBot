@@ -32,7 +32,7 @@ export default new Command(["prune", "purge"], __filename)
 			if (!del[a.author.id]) del[a.author.id] = 0;
 			del[a.author.id]++;
 		}
-		await Promise.all(chunk(f, 100).map(t => msg.channel.deleteMessages(t.map(m => m.id))));
+		await Promise.all(chunk(f, 100).map(async (t) => msg.channel.deleteMessages(t.map(m => m.id), encodeURIComponent(`Prune: ${msg.author.tag} (${msg.author.id})`))));
 		const t = [];
 		for (const k of Object.keys(del)) {
 			let u: Eris.Member | Eris.User = msg.channel.guild.members.get(k) || this.bot.users.get(k) || await this.getUser(k).catch(err => null);

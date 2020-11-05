@@ -23,7 +23,7 @@ export default new Command(["lock"], __filename)
 			if (o.deny & 2048) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.alreadyDenied${ch.id === msg.channel.id ? "This" : "That"}`));
 		}
 
-		await ch.editPermission(msg.channel.guild.id, !o ? 0 : o.allow, !o ? 2048 : o.deny + 2048, "role");
+		await ch.editPermission(msg.channel.guild.id, !o ? 0 : o.allow, !o ? 2048 : o.deny + 2048, "role", encodeURIComponent(`Lock: ${msg.author.tag} (${msg.author.id})`));
 
 		await this.m.createLockEntry(msg.channel, msg.gConfig, msg.author, ch);
 

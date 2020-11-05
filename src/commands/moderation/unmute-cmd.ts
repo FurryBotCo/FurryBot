@@ -72,7 +72,7 @@ export default new Command(["unmute"], __filename)
 		if (member.id === msg.member.id) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noSelf`));
 		const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
 
-		await member.removeRole(msg.gConfig.settings.muteRole, `Unmute: ${msg.author.username}#${msg.author.discriminator} -> ${reason}`).then(async () => {
+		await member.removeRole(msg.gConfig.settings.muteRole, encodeURIComponent(`Unmute: ${msg.author.tag} (${msg.author.id}) -> ${reason}`)).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.unmuted`, [`${member.username}#${member.discriminator}`, reason])}***`).catch(noerr => null);
 			await this.m.createUnmuteEntry(msg.channel, msg.gConfig, msg.author, member, reason);
 		}).catch(async (err) => {
