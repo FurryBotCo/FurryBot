@@ -51,6 +51,8 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 		const p = await c.checkPremium();
 		const ubl = await c.checkBlacklist();
 		if (ubl.current.length > 0) f.push(config.flags.blacklisted);
+		if (["280158289667555328", "158750488563679232"].includes(user.id)) f.push(config.flags.horny);
+		if (["280158289667555328"].includes(user.id)) f.push(config.flags.sub);
 		if (p.active) f.push(config.flags.donator);
 
 		return msg.channel.createMessage({
@@ -92,9 +94,9 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 					})),
 					"",
 					`**{lang:${cmd.lang}.badges}:**`,
-        		...(f.length === 0 ? [`${config.emojis.default.dot} {lang:other.words.none}`] : f.map(k => `{lang:other.userFlags.${k}}`)),
-        		"",
-        		`{lang:${cmd.lang}.statusNote}`
+					...(f.length === 0 ? [`${config.emojis.default.dot} {lang:other.words.none}`] : f.map(k => `{lang:other.userFlags.${k}}`)),
+					"",
+					`{lang:${cmd.lang}.statusNote}`
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))
