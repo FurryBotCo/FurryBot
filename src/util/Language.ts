@@ -2,7 +2,8 @@ import * as fs from "fs-extra";
 import dot from "dot-object";
 import JSON5 from "json5";
 import Strings from "./Functions/Strings";
-
+import path from "path";
+const p = path;
 /*
 FORMAT (parsing):
 Normal - {lang:some.language.location}
@@ -12,7 +13,7 @@ Both formatting and modifiers can be combined. Order does not matter, prefer for
 */
 
 // because circular dependencies
-const dir = `${__dirname}/..${__filename.endsWith(".ts") ? "" : "/../../src"}/config/lang`;
+const dir = path.resolve(`${__dirname}/..${__filename.endsWith(".ts") ? "" : "/../../src"}/config/lang`);
 class LanguageError extends Error {
 	constructor(name: string, message: string) {
 		super(message);
@@ -39,6 +40,7 @@ export default class Language {
 	static get(lang: Languages, path: string, formatArgs: (string | number)[], nullOnNotFound: boolean, random: false): string[];
 	static get(lang: Languages, path: string, formatArgs?: (string | number)[], nullOnNotFound?: boolean, random?: true): string;
 	static get(lang: Languages, path: string, formatArgs?: (string | number)[], nullOnNotFound?: boolean, random?: boolean): string | string[] {
+		if (!fs.existsSync(`${dir}/${lang}`)) throw new TypeError(`Directory "${p.resolve(`${dir}/${lang}`)}" for language "${lang}" does not exist.`);
 		function loop(dir: string, parts: string[]): string | string[] {
 			if (fs.existsSync(`${dir}/${parts[0]}.json`)) {
 				const f = JSON5.parse(fs.readFileSync(`${dir}/${parts[0]}.json`).toString());
