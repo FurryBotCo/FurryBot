@@ -8,7 +8,9 @@ const Redis = new IORedis(config.keys.redis.port, config.keys.redis.host, {
 	db: config.keys.redis[config.beta ? "dbBeta" : "db"],
 	enableReadyCheck: true,
 	autoResendUnfulfilledCommands: true,
-	connectionName: `Furry Bot${config.beta ? " Beta" : ""}`
+	connectionName: `FurryBot${config.beta ? "Beta" : ""}`
 });
+
+Redis.client("SETNAME", `FurryBot${config.beta ? "Beta" : ""}`);
 
 export default Redis;
