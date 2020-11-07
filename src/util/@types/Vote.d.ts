@@ -1,9 +1,20 @@
 declare namespace Vote {
 	interface DBLVote {
+		bot: string;
 		user: string;
 		type: "upvote" | "test";
-		weekend: boolean;
-		query: string;
-		time: number;
+		isWeekend: boolean;
+		query?: string;
+	}
+	interface DBoatsVote {
+		bot: {
+			id: string;
+			name: string;
+		};
+		user: {
+			id: string;
+			username: string;
+			discriminator: string;
+		};
 	}
 }

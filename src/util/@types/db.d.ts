@@ -125,6 +125,10 @@ declare global {
 			query: string;
 			time: number;
 		}
-	}
 
+		interface DBoatsVote {
+			user: string;
+			time: number;
+		}
+	}
 }
