@@ -100,15 +100,15 @@ export default new Command(["stats"], __filename)
 				.addField(
 					"{lang:other.words.messages$ucwords$}",
 					[
-						"{lang:other.words.server$ucwords$} {lang:other.words.messages$ucwords$}",
+						"**{lang:other.words.server$ucwords$} {lang:other.words.messages$ucwords$}**",
 						`{lang:other.words.total$ucwords$}: **${stats.messages.general.toLocaleString()}**`,
 						`{lang:other.words.thisSession$ucwords$}: **${stats.messages.session.toLocaleString()}**`,
 						"",
-						"{lang:other.words.direct$ucwords$} {lang:other.words.messages$ucwords$}",
+						"**{lang:other.words.direct$ucwords$} {lang:other.words.messages$ucwords$}**",
 						`{lang:other.words.total$ucwords$}: **${stats.directMessages.general.toLocaleString()}**`,
 						`{lang:other.words.thisSession$ucwords$}: **${stats.directMessages.session.toLocaleString()}**`
 					].join("\n"),
-					false)
+					true)
 				.addField(
 					"{lang:other.words.redis$ucwords$}",
 					[
@@ -119,7 +119,8 @@ export default new Command(["stats"], __filename)
 						`{lang:${cmd.lang}.netIn}: **${Strings.formatBytes(r.total_net_input_bytes)}**`,
 						`{lang:${cmd.lang}.netOut}: **${Strings.formatBytes(r.total_net_output_bytes)}**`
 					].join("\n"),
-					false)
+					true)
+				.addEmptyField(true)
 				.addField(
 					"{lang:other.words.mongodb}",
 					[
@@ -128,11 +129,19 @@ export default new Command(["stats"], __filename)
 						`{lang:${cmd.lang}.dbTotal}: **${dbStats.connections.totalCreated.toLocaleString()}**`,
 						`{lang:${cmd.lang}.dbActive}: **${dbStats.connections.active.toLocaleString()}**`,
 						"",
-						"**{lang:other.words.commands$ucwords$}**:",
+						"**{lang:other.words.mongodb} {lang:other.words.commands$ucwords$}**",
 						...Object.keys(dbStats.opcounters).map(k => `${config.emojis.default.dot} {lang:other.words.${k}$upper$}: **${(dbStats.opcounters[k] as number).toLocaleString()}**`)
 					].join("\n"),
-					false
+					true
 				)
+				.addField(
+					`{lang:${cmd.lang}.botInvites}`,
+					[
+						...Object.keys(s).map(v => `${v}: **${s[v]}**`)
+					].join("\n"),
+					true
+				)
+				.addEmptyField(true)
 				.addField(
 					"{lang:other.words.commands$ucwords$}",
 					[
@@ -140,13 +149,6 @@ export default new Command(["stats"], __filename)
 						`{lang:other.words.thisSession$ucwords$}: **${stats.commands.session.toLocaleString()}**`,
 						"",
 						`{lang:${cmd.lang}.cmdFull|${msg.gConfig.settings.prefix}}`
-					].join("\n"),
-					false
-				)
-				.addField(
-					`{lang:${cmd.lang}.botInvites}`,
-					[
-						...Object.keys(s).map(v => `${v}: **${s[v]}**`)
 					].join("\n"),
 					false
 				);
