@@ -64,7 +64,7 @@ export default new Command(["ping"], __filename)
 							`{lang:${cmd.lang}.deleteTime}: **${Math.abs(Math.floor(del - create))}ms**`,
 							`{lang:${cmd.lang}.clusterTime|${this.cluster.id}}: **${c.time}ms**`,
 							...cl,
-							`{lang:${cmd.lang}.shardTime|${msg.channel.guild.shard.id + 1}}: **${Math.abs(Math.floor(msg.channel.guild.shard.latency))}ms**`,
+							`{lang:${cmd.lang}.shardTime|${msg.channel.guild.shard.id}}: **${Math.abs(Math.floor(msg.channel.guild.shard.latency))}ms**`,
 							`{lang:${cmd.lang}.shardAverage|${sh.length}}: **${Math.abs(Math.floor(sh.reduce((a, b) => a + b.latency, 0) / sh.length))}ms**`
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())

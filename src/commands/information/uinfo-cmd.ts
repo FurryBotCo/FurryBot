@@ -4,6 +4,9 @@ import db from "../../util/Database";
 import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import Time from "../../util/Functions/Time";
+import KSoft from "../../util/req/KSoft";
+import phin from "phin";
+import DRep from "../../util/req/DRep";
 
 export default new Command(["uinfo", "userinfo", "ui"], __filename)
 	.setBotPermissions([
@@ -51,9 +54,22 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 		const p = await c.checkPremium();
 		const ubl = await c.checkBlacklist();
 		if (ubl.current.length > 0) f.push(config.flags.blacklisted);
-		if (["280158289667555328", "158750488563679232"].includes(user.id)) f.push(config.flags.horny);
-		if (["280158289667555328"].includes(user.id)) f.push(config.flags.sub);
+		switch (user.id) {
+			case "158750488563679232": f.push(config.flags.horny); break;
+			case "280158289667555328": f.push(config.flags.horny, config.flags.sub, config.flags.cute); break;
+		}
 		if (p.active) f.push(config.flags.donator);
+
+		const check = await KSoft.bans.check(user.id);
+
+		const rep = await DRep.rep(user.id) as {
+			upvotes: number;
+			downvotes: number;
+			rank: string;
+			xp: number;
+			staff: boolean;
+			reputation: number;
+		};
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

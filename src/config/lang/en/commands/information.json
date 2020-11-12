@@ -206,7 +206,7 @@
 		"socialProfiles": "Social Profiles",
 		"statusNote": "Note: Since Discord hasn't given us the `presence` intent, we cannot get proper status/game information."
 	},
-	"whoisplaying": {
+	"whoplays": {
 		"description": "Get a list of users playing the specified game.",
 		"usage": "<game>",
 		"title": "Who Is Playing: {0}",

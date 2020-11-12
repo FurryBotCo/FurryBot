@@ -51,7 +51,8 @@ export default new Command(["eval", "ev"], __filename)
 				Strings,
 				Time,
 				Utility,
-				EconomyUtil
+				EconomyUtil,
+				EmbedBuilder
 			});
 		} catch (e) {
 			res = e;
