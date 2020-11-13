@@ -126,5 +126,9 @@ export default class StatsHandler {
 		await this.track("stats", "commands", "general", msg.cmd.triggers[0]);
 		await this.track("stats", "commands", "session", "total");
 		await this.track("stats", "commands", "session", msg.cmd.triggers[0]);
+		this.#client.counters.push({
+			type: "command",
+			time: Date.now()
+		});
 	}
 }

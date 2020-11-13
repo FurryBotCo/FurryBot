@@ -61,6 +61,7 @@ class FurryBot extends Base {
 		time: number;
 	}[];
 	POSSIBLE_COUNTERS = [
+		"command",
 		"guildMemberAdd",
 		"guildMemberRemove",
 		"messageCreate",
@@ -68,7 +69,7 @@ class FurryBot extends Base {
 		"messageDeleteBulk",
 		"messageUpdate",
 		"userUpdate"
-	];
+	] as const;
 	constructor(d: Cluster) {
 		super(d);
 		this.m = new ModLogUtil(this);

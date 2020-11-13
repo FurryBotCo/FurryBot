@@ -119,7 +119,7 @@ export default new Command(["stats"], __filename)
 						`{lang:other.words.ping$ucwords$}: **${(redisEnd - redisStart).toFixed(3)}ms**`,
 						`{lang:${cmd.lang}.connections}: **${r.total_connections_received.toLocaleString()}**`,
 						`{lang:${cmd.lang}.cmdsProcessed}: **${r.total_commands_processed.toLocaleString()}**`,
-						`{lang:${cmd.lang}.ops}: **${r.instantaneous_ops_per_sec.toLocaleString()} / {lang:other.words.second$ucwords$}**`,
+						`{lang:${cmd.lang}.ops}: **${r.instantaneous_ops_per_sec.toLocaleString()}/{lang:other.words.second$ucwords$}**`,
 						`{lang:${cmd.lang}.netIn}: **${Strings.formatBytes(r.total_net_input_bytes)}**`,
 						`{lang:${cmd.lang}.netOut}: **${Strings.formatBytes(r.total_net_output_bytes)}**`
 					].join("\n"),
@@ -158,7 +158,7 @@ export default new Command(["stats"], __filename)
 				)
 				.addField(
 					"{lang:other.words.events$ucwords$}",
-					Object.keys(ev).map(v => `{lang:other.words.${v}$ucwords$}: **${ev[v].avg?.toLocaleString() || 0} / {lang:other.words.second$ucwords$}**`).join("\n"),
+					Object.keys(ev).map(v => `{lang:other.words.${v}$ucwords$}: **${ev[v].avg?.toLocaleString() || 0}/{lang:other.words.second$ucwords$}**`).join("\n"),
 					false
 				);
 		} else {
