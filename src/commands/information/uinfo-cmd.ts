@@ -5,7 +5,6 @@ import config from "../../config";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import Time from "../../util/Functions/Time";
 import KSoft from "../../util/req/KSoft";
-import phin from "phin";
 import DRep from "../../util/req/DRep";
 
 export default new Command(["uinfo", "userinfo", "ui"], __filename)
@@ -48,7 +47,8 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 		// if (config.helpers.includes(user.id)) f.push(config.flags.helper);
 		// try { if (u.staff) f.push(config.flags.staff); } catch (e) { }
 		try {
-			if (u.booster) f.push(config.flags.booster);
+			// if (u.booster) f.push(config.flags.booster);
+			if (this.bot.guilds.get(config.client.supportServerId).members.get(user.id)?.roles?.includes(config.roles.booster)) f.push(config.flags.booster);
 		} catch (e) { }
 		const c = await db.getUser(user.id);
 		const p = await c.checkPremium();
@@ -111,6 +111,11 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 					"",
 					`**{lang:${cmd.lang}.badges}:**`,
 					...(f.length === 0 ? [`${config.emojis.default.dot} {lang:other.words.none}`] : f.map(k => `{lang:other.userFlags.${k}}`)),
+					"",
+					"**{lang:other.words.other}:**",
+					`{lang:${cmd.lang}.drep}: **${rep.reputation}** (**${rep.upvotes}** <:${config.emojis.custom.upvote}> / **${rep.downvotes}** <:${config.emojis.custom.downvote}>)`,
+					`{lang:${cmd.lang}.ksoft}: **{lang:other.words.${check ? "yes" : "no"}$ucwords$}**`,
+					"",
 					"",
 					`{lang:${cmd.lang}.statusNote}`
 				].join("\n"))

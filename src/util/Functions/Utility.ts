@@ -607,4 +607,24 @@ export default class Utility {
 		}
 		return obj;
 	}
+
+	static average<O extends { time: number; type: T; } = any, T extends string = string>(items: O[], sampleSize?: number, type?: T) {
+		const s: {
+			[k: number]: number;
+		} = {};
+		if (type) items = items.filter(i => i.type === type);
+
+		for (const v of items) {
+			const sec = Number(Math.floor(v.time / 1000).toString().slice(-1));
+			if (!s[sec]) s[sec] = 0;
+			s[sec]++;
+		}
+
+		const sample = Object.values(s).slice(0, sampleSize);
+
+		return {
+			avg: Math.floor(sample.reduce((a, b) => a + b, 0) / sample.length) || 0,
+			sample
+		};
+	}
 }

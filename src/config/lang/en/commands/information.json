@@ -204,7 +204,9 @@
 		"nearbyJoins": "Nearby Joins",
 		"badges": "User Badges",
 		"socialProfiles": "Social Profiles",
-		"statusNote": "Note: Since Discord hasn't given us the `presence` intent, we cannot get proper status/game information."
+		"statusNote": "Note: Since Discord hasn't given us the `presence` intent, we cannot get proper status/game information.",
+		"drep": "Discord Rep",
+		"ksoft": "Ksoft.SI Banned"
 	},
 	"whoplays": {
 		"description": "Get a list of users playing the specified game.",

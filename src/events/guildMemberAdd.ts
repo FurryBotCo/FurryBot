@@ -8,6 +8,10 @@ import Time from "../util/Functions/Time";
 import Utility from "../util/Functions/Utility";
 
 export default new ClientEvent("guildMemberAdd", async function (guild, member) {
+	this.counters.push({
+		type: "guildMemberAdd",
+		time: Date.now()
+	});
 	if (config.beta && guild.id !== config.client.supportServerId) return;
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.filter(l => l.type === "memberJoin");

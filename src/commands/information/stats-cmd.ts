@@ -8,6 +8,7 @@ import Redis from "../../util/Redis";
 import { mongo } from "../../util/Database";
 import config from "../../config";
 import Utility from "../../util/Functions/Utility";
+import FurryBot from "../../main";
 
 export default new Command(["stats"], __filename)
 	.setBotPermissions([
@@ -85,6 +86,9 @@ export default new Command(["stats"], __filename)
 			[v.split(":").slice(-1)[0]]: await Redis.get(v).then(Number)
 		}))).then(v => v.sort((a, b) => Object.values(a)[0] < Object.values(b)[0] ? 1 : -1).reduce((a, b) => ({ ...a, ...b })));
 		if (config.beta) await Redis.select(config.keys.redis.dbBeta);
+		const ev = this.POSSIBLE_COUNTERS.map(v => ({
+			[v]: Utility.average<FurryBot["counters"][number], FurryBot["counters"][number]["type"]>(this.counters, 30, v)
+		})).reduce((a, b) => ({ ...a, ...b }), {});
 
 		const end = performance.now();
 
@@ -115,7 +119,7 @@ export default new Command(["stats"], __filename)
 						`{lang:other.words.ping$ucwords$}: **${(redisEnd - redisStart).toFixed(3)}ms**`,
 						`{lang:${cmd.lang}.connections}: **${r.total_connections_received.toLocaleString()}**`,
 						`{lang:${cmd.lang}.cmdsProcessed}: **${r.total_commands_processed.toLocaleString()}**`,
-						`{lang:${cmd.lang}.ops}: **${r.instantaneous_ops_per_sec.toLocaleString()}/{lang:other.words.second$ucwords$}**`,
+						`{lang:${cmd.lang}.ops}: **${r.instantaneous_ops_per_sec.toLocaleString()} / {lang:other.words.second$ucwords$}**`,
 						`{lang:${cmd.lang}.netIn}: **${Strings.formatBytes(r.total_net_input_bytes)}**`,
 						`{lang:${cmd.lang}.netOut}: **${Strings.formatBytes(r.total_net_output_bytes)}**`
 					].join("\n"),
@@ -151,6 +155,11 @@ export default new Command(["stats"], __filename)
 						`{lang:${cmd.lang}.cmdFull|${msg.gConfig.settings.prefix}}`
 					].join("\n"),
 					false
+				)
+				.addField(
+					"{lang:other.words.events$ucwords$}",
+					Object.keys(ev).map(v => `{lang:other.words.${v}$ucwords$}: **${ev[v].avg?.toLocaleString() || 0} / {lang:other.words.second$ucwords$}**`).join("\n"),
+					false
 				);
 		} else {
 			switch (msg.args[0].toLowerCase()) {
@@ -166,7 +175,7 @@ export default new Command(["stats"], __filename)
 							`\t{lang:other.words.thisSession$ucwords$}: ${cmd.session}`,
 							"",
 							""*/
-							`\`${Strings.ucwords(k)}\`: **${cmd.general.toLocaleString()} / ${cmd.session.toLocaleString()}**`,
+							`\`${k}\`: **${cmd.general.toLocaleString()} / ${cmd.session.toLocaleString()}**`,
 							""
 						].join("\n");
 						if (text[i].length + v.length >= 1024) {

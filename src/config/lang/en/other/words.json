@@ -152,5 +152,15 @@
 	"voiceConnections": "voice connections",
 	"web": "web",
 	"xp": "xp",
-	"yes": "yes"
+	"yes": "yes",
+	"guildMemberAdd": "guild member add",
+	"guildMemberRemove": "guild member remove",
+	"messageCreate": "message create",
+	"messageDelete": "message delete",
+	"messageDeleteBulk": "message delete bulk",
+	"messageUpdate": "message update",
+	"userUpdate": "user update",
+	"sampleSize": "sample size",
+	"samples": "samples",
+	"events": "events"
 }

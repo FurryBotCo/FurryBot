@@ -18,6 +18,10 @@ import * as fs from "fs-extra";
 import Utility from "../util/Functions/Utility";
 
 export default new ClientEvent("messageCreate", async function (message, update) {
+	this.counters.push({
+		type: "messageCreate",
+		time: Date.now()
+	});
 	if (config.beta && !config.developers.includes(message.author.id)) return;
 	const t = new Timers(config.developers.includes(message.author.id), `${message.author.id}/${message.channel.id}`); // `${message.channel.id}/${message.id}/${message.author.id}`);
 	t.start("main");
