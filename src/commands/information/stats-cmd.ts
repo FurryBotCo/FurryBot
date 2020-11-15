@@ -87,7 +87,7 @@ export default new Command(["stats"], __filename)
 		}))).then(v => v.sort((a, b) => Object.values(a)[0] < Object.values(b)[0] ? 1 : -1).reduce((a, b) => ({ ...a, ...b })));
 		if (config.beta) await Redis.select(config.keys.redis.dbBeta);
 		const ev = this.POSSIBLE_COUNTERS.map(v => ({
-			[v]: Utility.average<FurryBot["counters"][number], FurryBot["counters"][number]["type"]>(this.counters, 30, v)
+			[v]: Utility.average<FurryBot["counters"][number], FurryBot["counters"][number]["type"]>(this.counters, 15, v)
 		})).reduce((a, b) => ({ ...a, ...b }), {});
 
 		const end = performance.now();

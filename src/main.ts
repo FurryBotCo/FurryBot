@@ -90,7 +90,9 @@ class FurryBot extends Base {
 
 	removeOldCounters() {
 		const d = Date.now();
-		for (const [i, v] of this.counters.entries()) if (v.time + 3e4 < d) this.counters.splice(i, 1);
+		const len = Number(this.counters.length);
+		this.counters = this.counters.filter(c => (c.time + 1.5e4) > d);
+		return len - this.counters.length;
 	}
 
 	async loadCommands() {
@@ -220,7 +222,7 @@ class FurryBot extends Base {
 				.start();
 		}
 
-		setTimeout(this.removeOldCounters.bind(this), 1e3);
+		setTimeout(() => this.removeOldCounters(), 1e3);
 
 		const end = performance.now();
 		Logger.info([`Cluster #${this.cluster.id}`, "General"], `Ready with ${this.bot.guilds.size} guild${this.bot.guilds.size === 1 ? "" : "s"}, ${this.bot.users.size} user${this.bot.users.size === 1 ? "" : "s"}, and ${Object.keys(this.bot.channelGuildMap).length} guild channel${Object.keys(this.bot.channelGuildMap).length === 1 ? "" : "s"}. Launch processing took ${(end - start).toFixed(3)}ms.`);

@@ -113,7 +113,7 @@ export default class API {
 
 		const svr = http.createServer(express())
 			.on("error", () => {
-				Logger.warn([`Cluster #${this.client.cluster.id}`, "API Server"], `[${this.launchAttempts}/${this.maxAttempts}]: Attempted to start api server, but the port is in use. ${this.launchAttempts >= this.maxAttempts ? "Max start attempts reached, not attempting to start anymore." : `Attempting to start again in ${this.timeBetweenAttempts / 1000} seconds.`}`);
+				Logger.warn([`Cluster #${this.client.cluster.id}`, "API Server"], `[${this.launchAttempts}/${this.maxAttempts}]: Attempted to start api server, but it was not able to bind. Is the port in use? ${this.launchAttempts >= this.maxAttempts ? "Max start attempts reached, not attempting to start anymore." : `Attempting to start again in ${this.timeBetweenAttempts / 1000} seconds.`}`);
 				if (this.launchAttempts >= this.maxAttempts) return;
 				// this seems to throw an internal error
 				setTimeout(this.launch.bind(this), this.timeBetweenAttempts);

@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "10.2.4-20201113",
+  "version": "10.2.4-20201115",
   "description": "A fun bot for furry Discord servers!",
   "main": "index.js",
   "scripts": {
