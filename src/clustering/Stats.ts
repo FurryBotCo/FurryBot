@@ -14,7 +14,8 @@ export default class Stats implements Clustering.Stats {
 			rss: 0,
 			heapTotal: 0,
 			heapUsed: 0,
-			external: 0
+			external: 0,
+			arrayBuffers: 0
 		};
 
 		try {
