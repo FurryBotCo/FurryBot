@@ -212,7 +212,9 @@
 		"description": "Get a list of users playing the specified game.",
 		"usage": "<game>",
 		"title": "Who Is Playing: {0}",
+		"titleGlobal": "Who Is Playing (Globally): {0}",
 		"total": "Total: **{0}**",
-		"limit": "There are too many people playing this game to display them separately."
+		"limit": "There are too many people playing this game to display them separately.",
+		"globalNote": "You can add `--global` after the game to search globally."
 	}
 }
