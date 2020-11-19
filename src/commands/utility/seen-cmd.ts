@@ -31,7 +31,7 @@ export default new Command(["seen"], __filename)
 			let v = "";
 			if (showLocation) v += `[#${this.cluster.id} / #${s.shard.id}]`; // @FIXME
 			if (showIds) v += `[${s.id}]`;
-			v += `[${s.memberCount}] ${s.name}`;
+			v += `[${s.memberCount.toLocaleString()}] ${s.name}`;
 			if (!guilds[i]) guilds[i] = "";
 			if (guilds[i].length > 1000 || +guilds[i].length + v.length > 1000) {
 				i++;
@@ -52,7 +52,7 @@ export default new Command(["seen"], __filename)
 		let t = "";
 		if (showLocation) t += `{lang:${cmd.lang}.info.location}`;
 		if (showIds) t += `{lang:${cmd.lang}.info.id}`;
-		t += `{lang:${cmd.lang}.info.memberCount} {lang:${cmd.lang}.info.memberCount}`;
+		t += `{lang:${cmd.lang}.info.memberCount} {lang:${cmd.lang}.info.id}`;
 
 		const embed = new EmbedBuilder(msg.gConfig.settings.lang)
 			.setTitle(`{lang:${cmd.lang}.amountTitle|${seen.length}|${user.username}#${user.discriminator}|${user.id}}`)
