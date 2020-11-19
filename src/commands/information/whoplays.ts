@@ -35,7 +35,7 @@ export default new Command(["whoplays"], __filename)
 					"",
 					...l.map(m => `${m.username}#${m.discriminator} (<@!${m.id}>)`),
 					...(limit ? [`{lang:${cmd.lang}.limit}`] : []),
-					...(global ? [`{lang:${cmd.lang}.globalNote}`] : [])
+					...(global ? [] : [`{lang:${cmd.lang}.globalNote}`])
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.gold)
