@@ -5,7 +5,7 @@ import { Colors } from "../../util/Constants";
 import { number } from "yargs";
 import config from "../../config";
 
-export default new Command(["invite", "inv", "discord"], __filename)
+export default new Command(["invite", "discord", "support"], __filename)
 	.setBotPermissions([
 		"embedLinks"
 	])

@@ -17,10 +17,14 @@ export default new Command(["beg"], __filename)
 	.setCooldown(6e4, false)
 	.setDonatorCooldown(4.5e4)
 	.setExecutor(async function (msg, cmd) {
+		function r() {
+			const p = msg.channel.guild.members.filter(m => !m.user.bot);
+			return p[Math.floor(Math.random() * p.length)];
+		}
 		const people = [
 			"built-in",
-			msg.channel.guild.members.random().username,
-			msg.channel.guild.members.random().username
+			r().username,
+			r().username
 		];
 		let p = people[Math.floor(Math.random() * people.length)];
 		if (p === "built-in") p = config.eco.people[Math.random() * config.eco.people.length];
@@ -29,8 +33,11 @@ export default new Command(["beg"], __filename)
 		const get = await EconomyUtil.shouldGetItem(msg.author.id);
 		console.log("Getting Item:", get);
 		if (get) {
-			const t = await EconomyUtil.calcItem("EPIC");
-			if (t) item = `\n{lang:${cmd.lang}.item|${p}|<:${t.emoji}>|${Language.get(msg.gConfig.settings.lang, t.name)}}`;
+			const t = EconomyUtil.calcItem("EPIC", msg.channel.nsfw);
+			if (t) {
+				item = `\n{lang:${cmd.lang}.item|${p}|<:${t.emoji}>|${Language.get(msg.gConfig.settings.lang, t.name)}}`;
+				await EconomyUtil.addItemToUser(msg.author.id, t.id as any, 1);
+			}
 		}
 		return msg.channel.createMessage({
 			embed:

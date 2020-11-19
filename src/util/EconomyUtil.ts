@@ -103,14 +103,16 @@ export default class EconomyUtil {
 		else return false;
 	}
 
-	static async calcRarity() {
+	static calcRarity() {
 		return Utility.chooseWeighted(this.CHANCES);
 	}
 
-	static async calcItem(rarity?: ThenReturnType<typeof EconomyUtil["calcRarity"]>): Promise<typeof config["eco"]["items"]["lucky-apple"]> {
-		if (!rarity) rarity = await this.calcRarity();
-		const items = Object.keys(config.eco.items).filter(v => config.eco.items[v].rarity === rarity.toLowerCase());
+	static calcItem(rarity?: ReturnType<typeof EconomyUtil["calcRarity"]>, secret?: boolean): typeof config["eco"]["items"]["lucky-apple"] {
+		const it = { ...config.eco.items };
+		if (!rarity) rarity = this.calcRarity();
+		const items = Object.keys(it).filter(v => it[v].rarity === rarity.toLowerCase());
+		if (secret) it.knot.emoji = it.knot.emojiAlt;
 		if (items.length === 0) return null;
-		else return config.eco.items[items[Math.floor(Math.random() * items.length)]];
+		else return it[items[Math.floor(Math.random() * items.length)]];
 	}
 }

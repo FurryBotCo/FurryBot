@@ -114,10 +114,7 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 					"",
 					"**{lang:other.words.other}:**",
 					`{lang:${cmd.lang}.drep}: **${rep.reputation}** (**${rep.upvotes}** <:${config.emojis.custom.upvote}> / **${rep.downvotes}** <:${config.emojis.custom.downvote}>)`,
-					`{lang:${cmd.lang}.ksoft}: **{lang:other.words.${check ? "yes" : "no"}$ucwords$}**`,
-					"",
-					"",
-					`{lang:${cmd.lang}.statusNote}`
+					`{lang:${cmd.lang}.ksoft}: **{lang:other.words.${check ? "yes" : "no"}$ucwords$}**`
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Math.floor(Math.random() * 0xFFFFFF))

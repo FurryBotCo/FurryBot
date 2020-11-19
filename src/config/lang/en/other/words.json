@@ -162,5 +162,7 @@
 	"voiceConnections": "voice connections",
 	"web": "web",
 	"xp": "xp",
-	"yes": "yes"
+	"yes": "yes",
+	"item": "item",
+	"rarity": "rarity"
 }

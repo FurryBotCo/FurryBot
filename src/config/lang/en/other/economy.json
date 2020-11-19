@@ -11,9 +11,14 @@
 		"knot": {
 			"name": "Knot",
 			"description": "You know what this is 😉"
+		},
+		"unknown": {
+			"name": "Unknown Item",
+			"description": "An unknown and missing item."
 		}
 	},
 	"rarities": {
+		"unknown": "Unknown",
 		"common": "Common",
 		"uncommon": "Uncommon",
 		"rare": "Rare",

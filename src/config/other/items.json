@@ -5,6 +5,7 @@
 		"type": "collectible",
 		"icon": "{API}/assets/items/LuckyApple.png",
 		"emoji": "LuckyApple:768386467466051596",
+		"emojiAlt": null,
 		"rarity": "rare"
 	},
 	"pumpkin-2020": {
@@ -13,6 +14,7 @@
 		"type": "collectible",
 		"icon": "{API}/assets/items/Pumpkin.png",
 		"emoji": "Pumpkin:768412614216122368",
+		"emojiAlt": null,
 		"rarity": "common"
 	},
 	"knot": {
@@ -21,6 +23,7 @@
 		"type": "collectible",
 		"icon": "{API}/assets/items/Knot.png",
 		"emoji": "Knot:768726082060550164",
+		"emojiAlt": "knot:778975732272594974",
 		"rarity": "epic"
 	}
 }

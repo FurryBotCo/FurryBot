@@ -29,5 +29,16 @@
 		"description": "Claim your weekly coins. Donators only.",
 		"title": "Here's Your Coins!",
 		"desc": "You got **{0}** {1}, they have been placed in your wallet."
+	},
+	"inv": {
+		"usage": "[@user] [page]",
+		"description": "Check the contents of your inventory, or someone elses.",
+		"titleSelf": "Your Inventory",
+		"titleOther": "{0}'s Inventory",
+		"emptySelf": "You have no items in your inventory.",
+		"emptyOther": "{0} has no items in their inventory.",
+		"tooManyPagesSelf": "You only have {1} page{2} of items in your inventory.",
+		"tooManyPagesOther": "{0} only has {1} page{2} of items in their inventory.",
+		"oneOrMore": "You must provide a page number that is one or greater."
 	}
 }

@@ -13,4 +13,8 @@ export default new ClientEvent("messageReactionAdd", async function (message, em
 		Object.values(config.emojis.default.numbers).find((e, i) => e === emoji.name ? o = i : null);
 		this.p.addReaction(m.id, m.author.id, o);
 	}
+
+	if (config.developers.includes((message as Eris.Message).author.id)) {
+		// if(emoji.name === "❌" )
+	}
 });
