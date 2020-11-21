@@ -12,8 +12,6 @@ export default new Command(["wag"], __filename)
 	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
-		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
-
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
