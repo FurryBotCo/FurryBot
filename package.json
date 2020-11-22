@@ -61,7 +61,7 @@
     "wolfram-alpha-node": "0.0.3",
     "ws": "^7.4.0",
     "yargs": "^16.1.1",
-    "ytdl-core": "^4.0.5"
+    "ytdl-core": "^4.0.6"
   },
   "devDependencies": {
     "@types/chalk": "^2.2.0",
