@@ -234,7 +234,6 @@ export default class ExtendedMessage {
 
 	async reply(content: Eris.MessageContent, type?: "mention" | "quote" | "new") {
 		const text = await this.getReplyText(content, type, this.id);
-		console.log(text);
 		return this.channel.createMessage(text);
 	}
 }
