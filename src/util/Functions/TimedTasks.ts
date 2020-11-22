@@ -4,8 +4,6 @@ import config from "../../config";
 import FurryBot from "../../main";
 import { Colors } from "../Constants";
 import GuildConfig from "../config/GuildConfig";
-import Eris from "eris";
-import Internal from "./Internal";
 import DailyJoins from "../handlers/DailyJoinsHandler";
 import Logger from "../Logger";
 
