@@ -190,7 +190,7 @@ export default class ExtendedMessage {
 	}
 
 	async getReplyText(content: Eris.MessageContent, type?: "mention" | "quote" | "new", id?: string) {
-		if (!type) type = config.beta ? "mention" : "mention"; // quote is undergoing changes
+		if (!type) type = config.beta ? "new" : "new"; // quote is undergoing changes
 		if (!id) id = this.id;
 		switch (type) {
 			case "mention": {
@@ -207,17 +207,24 @@ export default class ExtendedMessage {
 				if (typeof content === "string") content = {
 					content: `> ${m.content}\n<@!${m.author.id}>, ${content}`
 				};
-				else content.content = `> ${m.content}\n${content.content || ""}`;
+				else content.content = `> ${m.content}\n<@!${m.author.id}>, ${content.content || ""}`;
 				break;
 			}
 
 			case "new": {
-				const m: Eris.Message = this.channel.messages.get(id) || await this.channel.getMessage(id).catch(err => null);
-				if (!id || !m) throw new TypeError("Invalid message id provided.");
+				if (!id) throw new TypeError("Invalid message id provided.");
 				if (typeof content === "string") content = {
-					content: `Replying to <@!${m.author.id}> from https://discordapp.com/channels/${this.channel.guild.id}/${this.channel.id}/${id}\n${content}`
+					content
 				};
-				else content.content = `Replying to <@!${m.author.id}> from https://discordapp.com/channels/${this.channel.guild.id}/${this.channel.id}/${id}\n${content.content || ""}`;
+				Object.assign(content, {
+					message_reference: {
+						message_id: id
+					},
+					allowedMentions: {
+						replied_user: true
+					}
+				});
+
 				break;
 			}
 		}
@@ -227,6 +234,7 @@ export default class ExtendedMessage {
 
 	async reply(content: Eris.MessageContent, type?: "mention" | "quote" | "new") {
 		const text = await this.getReplyText(content, type, this.id);
+		console.log(text);
 		return this.channel.createMessage(text);
 	}
 }

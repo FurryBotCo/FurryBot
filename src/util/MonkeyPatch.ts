@@ -1,7 +1,8 @@
 /// <reference path="./@types/MonkeyPatch.d.ts" />
 /* eslint-disable @typescript-eslint/ban-types */
 
-import Eris from "eris";
+import Eris, { Client } from "eris";
+import FurryBot from "../main";
 import Utility from "./Functions/Utility";
 
 Object.defineProperty(Eris.User.prototype, "tag", {
@@ -33,3 +34,10 @@ Object.defineProperty(Function.prototype, "owo", {
 		return Utility.callFunction.bind(Utility, this);
 	}
 });
+
+const o = (Client.prototype as any)._formatAllowedMentions;
+(Client.prototype as any)._formatAllowedMentions = function (allowed) {
+	const v = o.call(this, allowed);
+	if (allowed && allowed.replied_user) v.replied_user = true;
+	return v;
+};
