@@ -1,5 +1,4 @@
 import FurryBot from "../../main";
-import Internal from "../Functions/Internal";
 import * as https from "https";
 import config from "../../config";
 import Redis from "../Redis";
@@ -52,7 +51,7 @@ async function DailyJoins(client: FurryBot) {
 		],
 		username: `Daily Joins${config.beta ? " - Beta" : ""}`,
 		avatarURL: "https://i.furry.bot/furry.png"
-	});
+	}).catch(console.error);
 }
 
 export default DailyJoins;
