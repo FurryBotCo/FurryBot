@@ -1,3 +1,5 @@
+import pkg from "./package.json";
+if (pkg.engineStrict && process.version !== pkg.engines.node) throw new TypeError(`Invalid node version "${process.version}", version "${pkg.engines.node}" is required.`);
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import SuppressWarnings from "suppress-warnings";
 SuppressWarnings([
