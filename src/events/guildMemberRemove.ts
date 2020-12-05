@@ -7,10 +7,10 @@ import EmbedBuilder from "../util/EmbedBuilder";
 import Time from "../util/Functions/Time";
 
 export default new ClientEvent("guildMemberRemove", async function (guild, member) {
-	this.counters.push({
+	/* this.counters.push({
 		type: "guildMemberRemove",
 		time: Date.now()
-	});
+	}); */
 	if (config.beta && guild.id !== config.client.supportServerId) return;
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.filter(l => l.type === "memberLeave");

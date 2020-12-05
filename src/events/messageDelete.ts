@@ -7,10 +7,10 @@ import EmbedBuilder from "../util/EmbedBuilder";
 import Redis from "../util/Redis";
 
 export default new ClientEvent("messageDelete", async function (message: Eris.Message) {
-	this.counters.push({
+	/* this.counters.push({
 		type: "messageDelete",
 		time: Date.now()
-	});
+	}); */
 	if (!this || !message || !message.author || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any) || (config.beta && !config.developers.includes(message.author.id))) return;
 
 	// we want to get bots here so we don't check bots yet

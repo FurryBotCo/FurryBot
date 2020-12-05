@@ -86,10 +86,6 @@ export default new Command(["stats"], __filename)
 			[v.split(":").slice(-1)[0]]: await Redis.get(v).then(Number)
 		}))).then(v => v.sort((a, b) => Object.values(a)[0] < Object.values(b)[0] ? 1 : -1).reduce((a, b) => ({ ...a, ...b })));
 		if (config.beta) await Redis.select(config.keys.redis.dbBeta);
-		const ev = this.POSSIBLE_COUNTERS.map(v => ({
-			[v]: Utility.average<FurryBot["counters"][number], FurryBot["counters"][number]["type"]>(this.counters, 15, v)
-		})).reduce((a, b) => ({ ...a, ...b }), {});
-
 		const end = performance.now();
 
 		const e = new EmbedBuilder(msg.gConfig.settings.lang)
@@ -154,11 +150,6 @@ export default new Command(["stats"], __filename)
 						"",
 						`{lang:${cmd.lang}.cmdFull|${msg.gConfig.settings.prefix}}`
 					].join("\n"),
-					false
-				)
-				.addField(
-					"{lang:other.words.events$ucwords$}",
-					Object.keys(ev).map(v => `{lang:other.words.${v}$ucwords$}: **${ev[v].avg?.toLocaleString() || 0}/{lang:other.words.second$ucwords$}**`).join("\n"),
 					false
 				);
 		} else {

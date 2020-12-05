@@ -123,6 +123,7 @@ export default class CommandHandler {
 			.filter(k => k.startsWith(c.file.split(path.sep.replace(/\\/, "\\\\")).slice(0, -1).join(path.sep.replace(/\\/, "\\\\")))) // because windows
 			.map(f => (i++, delete require.cache[require.resolve(f)]));
 
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		const f = require(c.file).default;
 
 		this.addCategory(f);

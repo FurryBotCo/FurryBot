@@ -8,10 +8,10 @@ import Utility from "../util/Functions/Utility";
 import Logger from "../util/Logger";
 
 export default new ClientEvent("userUpdate", async function (user, oldUser) {
-	this.counters.push({
+	/* this.counters.push({
 		type: "userUpdate",
 		time: Date.now()
-	});
+	}); */
 	// if we're getting their events, they should in theory be cached
 	const guilds = await this.bot.guilds.filter(g => g.members.has(user.id));
 	for (const guild of guilds) {
