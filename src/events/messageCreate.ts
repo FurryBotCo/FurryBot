@@ -31,6 +31,31 @@ export default new ClientEvent("messageCreate", async function (message, update)
 	// can't do the length bit because of things like AFK
 	if (message.author.bot/* || message.content.length < 2*/) return;
 
+	const uBl = await db.checkBl("user", message.author.id);
+
+	if (message.channel.type !== Eris.Constants.ChannelTypes.DM && (message.channel as Eris.GuildTextableChannel).guild.id === config.client.supportServerId) {
+		if (uBl.current.length === 0 && message.member.roles.includes(config.roles.blacklist)) message.member.removeRole(config.roles.blacklist, "User is not blacklisted.");
+		if (uBl.current.length > 0 && message.member.roles.includes(config.roles.blacklist)) message.member.addRole(config.roles.blacklist, "User is blacklisted.");
+	}
+
+	if (uBl.current.length > 0) {
+
+		if (uBl.notice.length > 0) {
+			const b = uBl.notice[0];
+			await mdb.collection<Blacklist.UserEntry>("blacklist").findOneAndUpdate({
+				id: b.id
+			}, {
+				$set: {
+					noticeShown: true
+				}
+			});
+
+			return message.channel.createMessage(Language.get(config.devLanguage, "other.blacklisted.user", [b.blame, b.reason, [0, null].includes(b.expire) ? Language.get(config.devLanguage, "other.words.never") : Time.formatDateWithPadding(b.expire), config.urls.appealUser(message.author.id)]));
+		}
+
+		return;
+	}
+
 	/* start dm */
 	t.start("dm");
 	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) {
@@ -60,10 +85,9 @@ export default new ClientEvent("messageCreate", async function (message, update)
 	const l = await msg.load(); // returns false if message does not start with prefix
 	t.end("process");
 
-	/* start blacklist */
-	t.start("blacklist");
+	/* start guild blacklist */
+	t.start("guild-blacklist");
 	let gBl: { [k in "all" | "expired" | "current" | "notice"]: Blacklist.GenericEntry[]; };
-	const uBl = await db.checkBl("user", msg.author.id);
 
 	if (typeof msg.channel.guild !== "undefined") {
 		gBl = typeof msg.channel.guild !== "undefined" ? await db.checkBl("guild", msg.channel.guild.id) : null;
@@ -85,32 +109,15 @@ export default new ClientEvent("messageCreate", async function (message, update)
 		}
 	}
 
-	if (uBl.current.length > 0) {
-		if (typeof msg.channel.guild !== "undefined" && msg.channel.guild.id === config.client.supportServerId) {
-			if (!msg.member.roles.includes(config.roles.blacklist)) msg.member.addRole(config.roles.blacklist, "User is blacklisted.");
-		}
 
-		if (uBl.notice.length > 0) {
-			const b = uBl.notice[0];
-			await mdb.collection<Blacklist.UserEntry>("blacklist").findOneAndUpdate({
-				id: b.id
-			}, {
-				$set: {
-					noticeShown: true
-				}
-			});
-
-			return msg.reply(Language.get(msg.gConfig.settings.lang, "other.blacklisted.user", [b.blame, b.reason, [0, null].includes(b.expire) ? Language.get(msg.gConfig.settings.lang, "other.words.never") : Time.formatDateWithPadding(b.expire), config.urls.appealUser(msg.author.id)]));
-		}
-
-		return;
-	} else {
-		if (typeof msg.channel.guild !== "undefined" && msg.channel.guild.id === config.client.supportServerId) {
-			if (msg.member.roles.includes(config.roles.blacklist)) msg.member.removeRole(config.roles.blacklist, "User is not blacklisted.");
-		}
+	if (typeof msg.channel.guild !== "undefined" && msg.channel.guild.id === config.client.supportServerId) {
+		if (msg.member.roles.includes(config.roles.blacklist)) msg.member.removeRole(config.roles.blacklist, "User is not blacklisted.");
 	}
-	t.end("blacklist");
-	/* end blacklist */
+	if (typeof msg.channel.guild !== "undefined" && msg.channel.guild.id === config.client.supportServerId) {
+		if (!msg.member.roles.includes(config.roles.blacklist)) msg.member.addRole(config.roles.blacklist, "User is blacklisted.");
+	}
+	t.end("guild-blacklist");
+	/* end guild blacklist */
 
 
 	/* start leveling */

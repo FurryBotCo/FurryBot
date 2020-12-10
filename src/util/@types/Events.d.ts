@@ -1,107 +1,107 @@
 import Eris from "eris";
-interface Ready { (); }
-interface Disconnect { (); }
+type Ready = () => void;
+type Disconnect = () => void;
 
-interface CallCreate { (call: Eris.Call); }
-interface CallRing { (call: Eris.Call); }
-interface CallDelete { (call: Eris.Call); }
+type CallCreate = (call: Eris.Call) => void;
+type CallRing = (call: Eris.Call) => void;
+type CallDelete = (call: Eris.Call) => void;
 
-interface CallUpdate { (call: Eris.Call, oldCall: Eris.OldCall); }
+type CallUpdate = (call: Eris.Call, oldCall: Eris.OldCall) => void;
 
-interface ChannelCreate { (channel: Eris.AnyChannel); }
-interface ChannelDelete { (channel: Eris.AnyChannel); }
+type ChannelCreate = (channel: Eris.AnyChannel) => void;
+type ChannelDelete = (channel: Eris.AnyChannel) => void;
 
-interface ChannelPinUpdate { (channel: Eris.TextableChannel, timestamp: number, oldTimestamp: number); }
+type ChannelPinUpdate = (channel: Eris.TextableChannel, timestamp: number, oldTimestamp: number) => void;
 
-interface ChannelRecipientAdd { (channel: Eris.GroupChannel, user: Eris.User); }
-interface ChannelRecipientRemove { (channel: Eris.GroupChannel, user: Eris.User); }
+type ChannelRecipientAdd = (channel: Eris.GroupChannel, user: Eris.User) => void;
+type ChannelRecipientRemove = (channel: Eris.GroupChannel, user: Eris.User) => void;
 
-interface ChannelUpdate { (channel: Eris.AnyGuildChannel, oldChannel: Eris.OldGuildChannel); }
+type ChannelUpdate = (channel: Eris.AnyGuildChannel, oldChannel: Eris.OldGuildChannel) => void;
 
-interface FriendSuggestionCreate { (user: Eris.User, reasons: Eris.FriendSuggestionReasons); }
+type FriendSuggestionCreate = (user: Eris.User, reasons: Eris.FriendSuggestionReasons) => void;
 
-interface FriendSuggestionDelete { (user: Eris.User); }
+type FriendSuggestionDelete = (user: Eris.User) => void;
 
-interface GuildAvailable { (guild: Eris.Guild, user: Eris.User); }
-interface GuildBanAdd { (guild: Eris.Guild, user: Eris.User); }
-interface GuildBanRemove { (guild: Eris.Guild, user: Eris.User); }
+type GuildAvailable = (guild: Eris.Guild, user: Eris.User) => void;
+type GuildBanAdd = (guild: Eris.Guild, user: Eris.User) => void;
+type GuildBanRemove = (guild: Eris.Guild, user: Eris.User) => void;
 
-interface GuildDelete { (guild: Eris.Guild); }
-interface GuildUnavailable { (guild: Eris.Guild); }
-interface GuildCreate { (guild: Eris.Guild); }
+type GuildDelete = (guild: Eris.Guild) => void;
+type GuildUnavailable = (guild: Eris.Guild) => void;
+type GuildCreate = (guild: Eris.Guild) => void;
 
-interface GuildEmojisUpdate { (guild: Eris.Guild, emojis: Eris.Emoji[], oldEmojis: Eris.Emoji[]); }
+type GuildEmojisUpdate = (guild: Eris.Guild, emojis: Eris.Emoji[], oldEmojis: Eris.Emoji[]) => void;
 
-interface GuildMemberAdd { (guild: Eris.Guild, member: Eris.Member); }
+type GuildMemberAdd = (guild: Eris.Guild, member: Eris.Member) => void;
 
-interface GuildMemberChunk { (guild: Eris.Guild, members: Eris.Member[]); }
+type GuildMemberChunk = (guild: Eris.Guild, members: Eris.Member[]) => void;
 
-interface GuildMemberRemove { (guild: Eris.Guild, member: Eris.Member | Eris.MemberPartial); }
+type GuildMemberRemove = (guild: Eris.Guild, member: Eris.Member | Eris.MemberPartial) => void;
 
-interface GuildMemberUpdate { (guild: Eris.Guild, member: Eris.Member, oldMember: { roles: string[]; nick?: string; }); }
+type GuildMemberUpdate = (guild: Eris.Guild, member: Eris.Member, oldMember: { roles: string[]; nick?: string; }) => void;
 
-interface GuildRoleCreate { (guild: Eris.Guild, role: Eris.Role); }
-interface GuildRoleDelete { (guild: Eris.Guild, role: Eris.Role); }
+type GuildRoleCreate = (guild: Eris.Guild, role: Eris.Role) => void;
+type GuildRoleDelete = (guild: Eris.Guild, role: Eris.Role) => void;
 
-interface GuildRoleUpdate { (guild: Eris.Guild, role: Eris.Role, oldRole: Eris.OldRole); }
+type GuildRoleUpdate = (guild: Eris.Guild, role: Eris.Role, oldRole: Eris.OldRole) => void;
 
-interface GuildUpdate { (guild: Eris.Guild, oldGuild: Eris.OldGuild); }
+type GuildUpdate = (guild: Eris.Guild, oldGuild: Eris.OldGuild) => void;
 
-interface Hello { (trace: string[], id: number); }
+type Hello = (trace: string[], id: number) => void;
 
-interface InviteCreate { (guild: Eris.Guild, invite: Eris.Invite); }
-interface InviteDelete { (guild: Eris.Guild, invite: Eris.Invite); }
+type InviteCreate = (guild: Eris.Guild, invite: Eris.Invite) => void;
+type InviteDelete = (guild: Eris.Guild, invite: Eris.Invite) => void;
 
-interface MessageCreate { (message: Eris.Message); }
+type MessageCreate = (message: Eris.Message) => void;
 
-interface MessageDelete { (message: Eris.PossiblyUncachedMessage); }
-interface MessageReactionRemoveAll { (message: Eris.PossiblyUncachedMessage); }
+type MessageDelete = (message: Eris.PossiblyUncachedMessage) => void;
+type MessageReactionRemoveAll = (message: Eris.PossiblyUncachedMessage) => void;
 
-interface MessageReactionRemoveEmoji { (message: Eris.PossiblyUncachedMessage, emoji: Eris.PartialEmoji); }
+type MessageReactionRemoveEmoji = (message: Eris.PossiblyUncachedMessage, emoji: Eris.PartialEmoji) => void;
 
-interface MessageDeleteBulk { (messages: Eris.PossiblyUncachedMessage[]); }
+type MessageDeleteBulk = (messages: Eris.PossiblyUncachedMessage[]) => void;
 
-interface MessageReactionAdd { (message: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, userID: string); }
-interface MessageReactionRemove { (message: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, userID: string); }
+type MessageReactionAdd = (message: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, userID: string) => void;
+type MessageReactionRemove = (message: Eris.PossiblyUncachedMessage, emoji: Eris.Emoji, userID: string) => void;
 
-interface MessageUpdate { (message: Eris.Message, oldMessage?: Eris.OldMessage); }
+type MessageUpdate = (message: Eris.Message, oldMessage?: Eris.OldMessage) => void;
 
-interface PresenceUpdate { (other: Eris.Member | Eris.Relationship, oldPresence?: Eris.Presence); }
+type PresenceUpdate = (other: Eris.Member | Eris.Relationship, oldPresence?: Eris.Presence) => void;
 
-interface RawREST { (request: Eris.RawRESTRequest); }
+type RawREST = (request: Eris.RawRESTRequest) => void;
 
-interface RawWS { (packet: Eris.RawPacket, id: number); }
-interface Unknown { (packet: Eris.RawPacket, id: number); }
+type RawWS = (packet: Eris.RawPacket, id: number) => void;
+type Unknown = (packet: Eris.RawPacket, id: number) => void;
 
-interface RelationshipAdd { (relationship: Eris.Relationship); }
-interface RelationshipRemove { (relationship: Eris.Relationship); }
+type RelationshipAdd = (relationship: Eris.Relationship) => void;
+type RelationshipRemove = (relationship: Eris.Relationship) => void;
 
-interface RelationshipUpdate { (relationship: Eris.Relationship, oldRelationship: { type: number; }); }
+type RelationshipUpdate = (relationship: Eris.Relationship, oldRelationship: { type: number; }) => void;
 
-interface TypingStart { (channel: Eris.TextableChannel, user: Eris.User); }
+type TypingStart = (channel: Eris.TextableChannel, user: Eris.User) => void;
 
-interface UnavailableGuildCreate { (guild: Eris.UnavailableGuild); }
+type UnavailableGuildCreate = (guild: Eris.UnavailableGuild) => void;
 
-interface UserUpdate { (user: Eris.User, oldUser: { username: string; discriminator: string; avatar?: string; }); }
+type UserUpdate = (user: Eris.User, oldUser: { username: string; discriminator: string; avatar?: string; }) => void;
 
-interface VoiceChannelJoin { (member: Eris.Member, newChannel: Eris.VoiceChannel); }
+type VoiceChannelJoin = (member: Eris.Member, newChannel: Eris.VoiceChannel) => void;
 
-interface VoiceChannelLeave { (member: Eris.Member, oldChannel: Eris.VoiceChannel); }
+type VoiceChannelLeave = (member: Eris.Member, oldChannel: Eris.VoiceChannel) => void;
 
-interface VoiceChannelSwitch { (member: Eris.Member, newChannel: Eris.VoiceChannel, oldChannel: Eris.VoiceChannel); }
+type VoiceChannelSwitch = (member: Eris.Member, newChannel: Eris.VoiceChannel, oldChannel: Eris.VoiceChannel) => void;
 
-interface VoiceStateUpdate { (member: Eris.Member, oldState: Eris.OldVoiceState); }
+type VoiceStateUpdate = (member: Eris.Member, oldState: Eris.OldVoiceState) => void;
 
-interface Warn { (message: string, id: number); }
-interface Debug { (message: string, id: number); }
+type Warn = (message: string, id: number) => void;
+type Debug = (message: string, id: number) => void;
 
-interface ShardDisconnect { (err: Error, id: number); }
-interface Error { (err: Error, id: number); }
-interface ShardPreReady { (err: Error, id: number); }
-interface Connect { (err: Error, id: number); }
+type ShardDisconnect = (err: Error, id: number) => void;
+type Error = (err: Error, id: number) => void;
+type ShardPreReady = (err: Error, id: number) => void;
+type Connect = (err: Error, id: number) => void;
 
-interface ShardReady { (id: number); }
-interface ShardResume { (id: number); }
+type ShardReady = (id: number) => void;
+type ShardResume = (id: number) => void;
 
 
 type WrapThis<F extends (...args: any[]) => any, C extends Eris.Client = Eris.Client> = (this: C, ...args: Parameters<F>) => ReturnType<F>;

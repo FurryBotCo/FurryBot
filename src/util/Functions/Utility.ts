@@ -342,9 +342,7 @@ export default class Utility {
 	 * @example Utility.getKeys("some:pattern", "0");
 	 * @example Utility.getKeys("some:pattern", "0", null, 10000);
 	 */
-	static async getKeys(pattern: string, cur: number | string, keys?: string[], maxPerRun?: number): Promise<string[]> {
-		keys = keys || [];
-		maxPerRun = maxPerRun || 10000;
+	static async getKeys(pattern: string, cur: string, keys = [] as string[], maxPerRun = 10000): Promise<string[]> {
 		if (config.beta) return Redis.keys(pattern);
 		const s = await Redis.scan(cur, "MATCH", pattern, "COUNT", maxPerRun);
 		keys.push(...s[1]);
@@ -381,7 +379,7 @@ export default class Utility {
 		const cache = await Redis.get("leveling:global-cache");
 		let entries: ThenReturnType<(typeof Utility)["getHighestLevels"]>["entries"];
 		if (!cache) {
-			const keys = await this.getKeys("leveling:*:*", 0, [], 10000);
+			const keys = await this.getKeys("leveling:*:*", "0", [], 10000);
 			const values = await Redis.mget(keys);
 			entries = keys.map((v, i) => ({
 				amount: Number(values[i]),
