@@ -35,7 +35,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 	if (message.channel.type !== Eris.Constants.ChannelTypes.DM && (message.channel as Eris.GuildTextableChannel).guild.id === config.client.supportServerId) {
 		if (uBl.current.length === 0 && message.member.roles.includes(config.roles.blacklist)) message.member.removeRole(config.roles.blacklist, "User is not blacklisted.");
-		if (uBl.current.length > 0 && message.member.roles.includes(config.roles.blacklist)) message.member.addRole(config.roles.blacklist, "User is blacklisted.");
+		if (uBl.current.length > 0 && !message.member.roles.includes(config.roles.blacklist)) message.member.addRole(config.roles.blacklist, "User is blacklisted.");
 	}
 
 	if (uBl.current.length > 0) {
@@ -107,14 +107,6 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 			return;
 		}
-	}
-
-
-	if (typeof msg.channel.guild !== "undefined" && msg.channel.guild.id === config.client.supportServerId) {
-		if (msg.member.roles.includes(config.roles.blacklist)) msg.member.removeRole(config.roles.blacklist, "User is not blacklisted.");
-	}
-	if (typeof msg.channel.guild !== "undefined" && msg.channel.guild.id === config.client.supportServerId) {
-		if (!msg.member.roles.includes(config.roles.blacklist)) msg.member.addRole(config.roles.blacklist, "User is blacklisted.");
 	}
 	t.end("guild-blacklist");
 	/* end guild blacklist */
