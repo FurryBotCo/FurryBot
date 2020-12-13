@@ -22,7 +22,12 @@
 		"blueHeart": "\ud83d\udc99",
 		"wave": "\ud83d\udc4b",
 		"human": "\ud83d\ude4b\u200d\u2642\ufe0f",
-		"questionMark": "\u2754"
+		"questionMark": "\u2754",
+		"circle": {
+			"green": "\ud83d\udfe2",
+			"yellow": "\ud83d\udfe1",
+			"red": "\ud83d\udd34"
+		}
 	},
 	"custom": {
 		"greenTick": "greenTick:714726282792927263",
@@ -46,17 +51,17 @@
 		"discord.bio": "DiscordBio:724837154534064269"
 	},
 	"badges": {
-		"DiscordStaff": "DiscordStaff:762940729000722462", 
-		"Bot": "Bot:762940735276187668", 
-		"VerifiedBot": "VerifiedBot:762940750584872970", 
-		"VerifiedDev": "VerifiedDev:762940761401458699", 
-		"DiscordPartner": "DiscordPartner:762940772206772235", 
-		"HypesquadEvents": "HypesquadEvents:762940781278527508", 
-		"HypesquadBravery": "HypesquadBravery:762940789578924053", 
-		"HypesquadBrilliance": "HypesquadBrilliance:762940819119931394", 
+		"DiscordStaff": "DiscordStaff:762940729000722462",
+		"Bot": "Bot:762940735276187668",
+		"VerifiedBot": "VerifiedBot:762940750584872970",
+		"VerifiedDev": "VerifiedDev:762940761401458699",
+		"DiscordPartner": "DiscordPartner:762940772206772235",
+		"HypesquadEvents": "HypesquadEvents:762940781278527508",
+		"HypesquadBravery": "HypesquadBravery:762940789578924053",
+		"HypesquadBrilliance": "HypesquadBrilliance:762940819119931394",
 		"HypesquadBalance": "HypesquadBalance:762940813126533120",
-		"EarlySupporter": "EarlySupporter:762941484264849419", 
-		"BugHunter": "BugHunter:762941497422118932", 
+		"EarlySupporter": "EarlySupporter:762941484264849419",
+		"BugHunter": "BugHunter:762941497422118932",
 		"BugHunter2": "BugHunter2:762941503520768002",
 		"NitroBooster": "NitroBooster:706261703712571425",
 		"ServerStaff": "ServerStaff:706262018784493638"

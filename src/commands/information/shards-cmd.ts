@@ -32,7 +32,7 @@ export default new Command(["shards"], __filename)
 						name: `${i === msg.channel.guild.shard.id ? "(\\*)" : ""} {lang:other.words.shard$ucwords$} #${i}`,
 						value: [
 							`{lang:other.words.status$ucwords$}: ${Strings.ucwords(s.status)}`,
-							`{lang:other.words.latency$ucwords$}: ${s.latency}ms`,
+							`{lang:other.words.latency$ucwords$}: ${config.emojis.default.circle[s.latency <= 100 ? "green" : s.latency <= 300 ? "yellow" : "red"]} **${s.latency}ms**`,
 							`{lang:other.words.servers$ucwords$}: ${s.guilds}`
 						].join("\n"),
 						inline: true
