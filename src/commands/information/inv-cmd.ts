@@ -5,7 +5,7 @@ import { Colors } from "../../util/Constants";
 import { number } from "yargs";
 import config from "../../config";
 
-export default new Command(["invite", "discord", "support"], __filename)
+export default new Command(["inv", "invite", "discord", "support"], __filename)
 	.setBotPermissions([
 		"embedLinks"
 	])
@@ -16,7 +16,7 @@ export default new Command(["invite", "discord", "support"], __filename)
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle("Discord")
-				.setDescription(`[Support Server](${config.client.socials.discord})\n[Add Me To A Server](${config.client.socials.discordInvite})`)
+				.setDescription(`[{lang:${cmd.lang}.support}](${config.client.socials.discord})\n[{lang:${cmd.lang}.add}](${config.client.socials.discordInvite})`)
 				.setThumbnail(this.bot.user.avatarURL)
 				.setColor(Colors.green)
 				.setTimestamp(new Date().toISOString())

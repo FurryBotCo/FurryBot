@@ -8,7 +8,7 @@ import Utility from "../../util/Functions/Utility";
 import Language from "../../util/Language";
 import chunk from "chunk";
 
-export default new Command(["inv", "inventory"], __filename)
+export default new Command(["inventory"], __filename)
 	.setBotPermissions([
 		"embedLinks"
 	])

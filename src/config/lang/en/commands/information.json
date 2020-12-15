@@ -216,5 +216,11 @@
 		"total": "Total: **{0}**",
 		"limit": "There are too many people playing this game to display them separately.",
 		"globalNote": "You can add `--global` after the game to search globally."
+	},
+	"inv": {
+		"description": "Invite me to a server, or join my support server.",
+		"usage": "",
+		"support": "Support Server",
+		"add": "Add Me To A Server"
 	}
 }
