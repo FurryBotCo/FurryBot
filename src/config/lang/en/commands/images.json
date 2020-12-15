@@ -9,5 +9,10 @@
 		"usage": "",
 		"title": "Kadi (Wah!)",
 		"inc": "Kadi Inc."
+	},
+	"chris": {
+		"description": "Get an out of context picture of Chris.",
+		"usage": "",
+		"title": "Chris is cute."
 	}
 }
