@@ -161,7 +161,7 @@
 		"hiddenYou": "Hidden (for you)",
 		"visibleYou": "Visible (for you)",
 		"hiddenMe": "Hidden (for me)",
-		"visibleMe": "Hidden (for me)",
+		"visibleMe": "Visible (for me)",
 		"no": "No",
 		"yes": "Yes",
 		"invalidType": "invalid type, valid types: \"channels\", \"members\", \"server\", \"icon\", \"splash\", \"banner\""

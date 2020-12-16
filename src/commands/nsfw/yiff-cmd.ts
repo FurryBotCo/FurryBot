@@ -18,7 +18,7 @@ export default new Command(["yiff"], __filename)
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		let type: string;
-		if (!msg.args[0]) type = "gay";
+		if (!msg.args[0]) type = msg.gConfig.settings.defaultYiffType;
 		else {
 			if (!config.yiffTypes.includes(msg.args[0])) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidYiff`, [msg.args[0].toLowerCase(), config.yiffTypes.map(v => `**${v}**`).join(", ")]));
 			else type = msg.args[0].toLowerCase();

@@ -357,7 +357,40 @@ process.nextTick(async () => {
 
 	await h.createGlobalCommand("shards", Language.get(config.devLanguage, "commands.information.shards.description"), []);
 
-	await h.createGlobalCommand("sinfo", Language.get(config.devLanguage, "commands.information.sinfo.description"), []);
+	await h.createGlobalCommand("sinfo", Language.get(config.devLanguage, "commands.information.sinfo.description"), [
+		{
+			type: ApplicationCommandOptionType.STRING,
+			name: "section",
+			description: "The section to get info about.",
+			required: false,
+			choices: [
+				{
+					name: "Server",
+					value: "server"
+				},
+				{
+					name: "Members",
+					value: "members"
+				},
+				{
+					name: "Channels",
+					value: "channels"
+				},
+				{
+					name: "Icon",
+					value: "icon"
+				},
+				{
+					name: "Server Banner",
+					value: "banner"
+				},
+				{
+					name: "Invite Splash",
+					value: "splash"
+				}
+			]
+		}
+	]);
 
 	await h.createGlobalCommand("uinfo", Language.get(config.devLanguage, "commands.information.uinfo.description"), [
 		{
@@ -416,8 +449,8 @@ process.nextTick(async () => {
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
-			description: "The user to rate.",
-			required: true
+			description: "The user to rate. Defaults to you.",
+			required: false
 		}
 	]);
 
