@@ -19,13 +19,14 @@ export default new ClientEvent("rawWS", async function (packet) {
 				}
 
 				case 2: {
+					await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACKNOWLEDGE);
 					const guild = this.bot.guilds.get(data.guild_id);
 					const cnf = await db.getGuild(guild.id);
 					data.member.id = data.member.user.id;
 					const member = guild.members.update(data.member, guild);
 					if (config.beta && !config.developers.includes(member.id)) return;
 					if (!cnf.settings.slashCommandsEnabled) {
-						await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.CHANNEL_MESSAGE, {
+						await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, {
 							content: `<@!${member.id}>, ${Language.get(cnf.settings.lang, "other.slashNotEnabled", [cnf.settings.prefix])}`
 						});
 						return;

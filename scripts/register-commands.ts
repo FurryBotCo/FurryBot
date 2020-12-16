@@ -3,7 +3,7 @@ import CommandHelper from "../src/util/DiscordCommands/main";
 import Language from "../src/util/Language";
 import config from "../src/config";
 
-const h = new CommandHelper("TOKEN", /* "347221999963340810" */ "398251412246495233");
+const h = new CommandHelper("Mzk4MjUxNDEyMjQ2NDk1MjMz.Wk1ihw.VfdOG_ca7_n91eQ8o3M8784f2YE", /* "347221999963340810" */ "398251412246495233");
 
 const guildId = "760631859385335838";
 
@@ -356,7 +356,7 @@ process.nextTick(async () => {
 
 	await h.createGlobalCommand("sinfo", Language.get(config.devLanguage, "commands.information.sinfo.description"), []);
 
-	await h.createGlobalCommand("sinfo", Language.get(config.devLanguage, "commands.information.uinfo.description"), [
+	await h.createGlobalCommand("uinfo", Language.get(config.devLanguage, "commands.information.uinfo.description"), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -441,15 +441,6 @@ process.nextTick(async () => {
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
 			description: "The user to lick.",
-			required: true
-		}
-	]);
-
-	await h.createGlobalCommand("pat", Language.get(config.devLanguage, "commands.fun.pat.description"), [
-		{
-			type: ApplicationCommandOptionType.USER,
-			name: "user",
-			description: "The user to pat.",
 			required: true
 		}
 	]);

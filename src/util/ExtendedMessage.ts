@@ -38,7 +38,7 @@ export default class ExtendedMessage {
 				if (content.messageReferenceID) delete content.messageReferenceID;
 			}
 
-			return this.#client.bot.createMessage(this.channel.id, content) as any;
+			return this.#client.bot.createMessage(this.channel.id, content, file) as any;
 		});
 	}
 
