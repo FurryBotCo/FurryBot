@@ -89,22 +89,18 @@ export default new ClientEvent("rawWS", async function (packet) {
 					if (config.beta) {
 						const e = new ExtendedMessage(m, this);
 						await e.load();
-						await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, {
-							content: `\`\`\`json\n${JSON.stringify({
-								discord: i,
-								cmd: !e.cmd ? null : {
-									triggers: e.cmd.triggers,
-									category: e.cmd.category.name
-								},
-								args: {
-									normal: e.args,
-									dashed: e.dashedArgs
-								},
-								content: e.content
-							}, null, "\t")}\`\`\``
-						});
-					} else {
-						await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACK_WITH_SOURCE);
+						await channel.createMessage(`\`\`\`json\n${JSON.stringify({
+							discord: i,
+							cmd: !e.cmd ? null : {
+								triggers: e.cmd.triggers,
+								category: e.cmd.category.name
+							},
+							args: {
+								normal: e.args,
+								dashed: e.dashedArgs
+							},
+							content: e.content
+						}, null, "\t")}\`\`\``);
 					}
 					this.bot.emit("messageCreate", m, false, true, {
 						id: data.id,
