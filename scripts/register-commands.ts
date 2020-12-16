@@ -202,7 +202,7 @@ process.nextTick(async () => {
 			description: "The member to mute."
 		},
 		{
-			type: ApplicationCommandOptionType.INTEGER,
+			type: ApplicationCommandOptionType.STRING,
 			name: "time",
 			required: false,
 			description: "The time the mute will last. Ex: 1mn2d3h5m (1 month, 2 days, 3 hours, 5 minutes)"
