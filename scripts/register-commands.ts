@@ -3,7 +3,7 @@ import CommandHelper from "../src/util/DiscordCommands/main";
 import Language from "../src/util/Language";
 import config from "../src/config";
 
-const h = new CommandHelper("Mzk4MjUxNDEyMjQ2NDk1MjMz.Wk1ihw.VfdOG_ca7_n91eQ8o3M8784f2YE", /* "347221999963340810" */ "398251412246495233");
+const h = new CommandHelper("TOKEN", /* "347221999963340810" */ "398251412246495233");
 
 const guildId = "760631859385335838";
 
