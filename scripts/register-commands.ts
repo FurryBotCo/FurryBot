@@ -103,7 +103,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("bulge", "Get a picture of a bulge.", []);
+	await h.createGlobalCommand("bulge", Language.get(config.devLanguage, "commands.nsfw.e621.bulge"), []);
 
 	/* end nsfw */
 
