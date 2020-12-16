@@ -7,6 +7,7 @@ import { InteractionResponseType } from "../util/DiscordCommands/Constants";
 import { ApplicationCommandInteractionDataOption, Interaction } from "../util/DiscordCommands/types";
 import ExtendedMessage from "../util/ExtendedMessage";
 import Language from "../util/Language";
+import Redis from "../util/Redis";
 export default new ClientEvent("rawWS", async function (packet) {
 	switch (packet.t) {
 		case "INTERACTION_CREATE": {
@@ -14,12 +15,14 @@ export default new ClientEvent("rawWS", async function (packet) {
 
 			switch (data.type) {
 				case 1: {
+					await Redis.incr("stats:interactions:ping");
 					// console.log("Interaction Ping");
 					break;
 				}
 
 				case 2: {
 					await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACK_WITH_SOURCE);
+					await Redis.incr("stats:interactions:command");
 					const guild = this.bot.guilds.get(data.guild_id);
 					const cnf = await db.getGuild(guild.id);
 					data.member.id = data.member.user.id;
