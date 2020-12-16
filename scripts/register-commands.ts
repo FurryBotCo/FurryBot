@@ -2,8 +2,11 @@ import { ApplicationCommandOptionType } from "../src/util/DiscordCommands/Consta
 import CommandHelper from "../src/util/DiscordCommands/main";
 import Language from "../src/util/Language";
 import config from "../src/config";
+import beta from "../src/config/client/beta.json";
+import production from "../src/config/client/production.json";
 
-const h = new CommandHelper("TOKEN", /* "347221999963340810" */ "398251412246495233");
+const c = production;
+const h = new CommandHelper(c.token, c.id);
 
 const guildId = "760631859385335838";
 
