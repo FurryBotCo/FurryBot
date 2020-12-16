@@ -30,12 +30,13 @@
 	},
 	"yiff": {
 		"description": "Get a yiff image.",
-		"usage": "[gay/straight/lesbian/dickgirl]",
+		"usage": "[gay/straight/lesbian/gynomorph]",
 		"titles": {
 			"gay": "Gay Yiff",
 			"straight": "Straight Yiff",
 			"lesbian": "Lesbian Yiff",
-			"dickgirl": "DickGirl Yiff"
-		}
+			"gynomorph": "Gynomorph Yiff"
+		},
+		"invalidYiff": "Invalid yiff type `{0}`. Valid types: {1}"
 	}
 }

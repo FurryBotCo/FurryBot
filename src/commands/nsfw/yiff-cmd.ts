@@ -4,6 +4,7 @@ import { Colors } from "../../util/Constants";
 import FurryBotAPI from "../../util/req/FurryBotAPI";
 import { JSONResponse } from "furrybotapi/src/typings";
 import Language from "../../util/Language";
+import config from "../../config";
 
 export default new Command(["yiff"], __filename)
 	.setBotPermissions([
@@ -19,7 +20,7 @@ export default new Command(["yiff"], __filename)
 		let type: string;
 		if (!msg.args[0]) type = "gay";
 		else {
-			if (!["gay", "straight", "lesbian", "dickgirl"].includes(msg.args[0])) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidYiff`, [msg.args[0].toLowerCase()]));
+			if (!config.yiffTypes.includes(msg.args[0])) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidYiff`, [msg.args[0].toLowerCase(), config.yiffTypes.map(v => `**${v}**`).join(", ")]));
 			else type = msg.args[0].toLowerCase();
 		}
 		const img = await FurryBotAPI.furry.yiff[type]?.("json", 1) as JSONResponse;

@@ -28,7 +28,7 @@
 		"alreadyPresent": "you are already in this howl!"
 	},
 	"bap": {
-		"description": "Bap someone! Ouch!",
+		"description": "Bap someone on the snoot with a newspaper.",
 		"usage": "<@member/text>",
 		"$": "97% sure \"themself\" isn't proper, but it sounds better than \"themselves\"",
 		"possible": [
@@ -53,7 +53,7 @@
 		]
 	},
 	"boop": {
-		"description": "Boop someones snoot!",
+		"description": "Boop someone's snoot!",
 		"usage": "<@member/text>",
 		"possible": [
 			"<@!{0}> has booped {1}!\nOwO",
@@ -133,10 +133,6 @@
 		"start": "<@!{0}> started a furpile on <@!{1}>!\nJoin in using `{2}furpile`.",
 		"alreadyPresent": "you are already in this furpile!",
 		"noSelf": "you cannot start a furpile on yourself!"
-	},
-	"fursuit": {
-		"description": "Get a random fursuit image!",
-		"usage": ""
 	},
 	"gayrate": {
 		"description": "Get someone's gayness!",

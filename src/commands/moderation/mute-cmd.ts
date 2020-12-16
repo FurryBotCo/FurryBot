@@ -75,9 +75,11 @@ export default new Command(["mute"], __filename)
 
 		if (msg.args.length >= 2) {
 			try {
-				time = parseTime(msg.args[1], "ms");
-				if (time) a.splice(1, 1);
-				else time = 0;
+				time = Number(a[1]);
+				if (time) {
+					time = parseTime(msg.args[1], "ms");
+					a.splice(1, 1);
+				} else time = 0;
 				msg.args = a;
 			} catch (e) {
 				if (e instanceof Error) {// for typings, catch clause cannot be annotated (TS1196)

@@ -31,7 +31,7 @@ export default class ClientEvent {
 	constructor(event: "guildUpdate", listener: (this: FurryBot, guild: Eris.Guild, oldGuild: Eris.OldGuild) => void);
 	constructor(event: "hello", listener: (this: FurryBot, trace: string[], id: number) => void);
 	constructor(event: "inviteCreate" | "inviteDelete", listener: (this: FurryBot, guild: Eris.Guild, invite: Eris.Invite<null>) => void);
-	constructor(event: "messageCreate", listener: (this: FurryBot, message: Eris.Message, update?: boolean /* added by us, the reemit from messageUpdate */) => void);
+	constructor(event: "messageCreate", listener: (this: FurryBot, message: Eris.Message, /* everything after this is added by us */ update?: boolean, slash?: boolean, slashInfo?: { id: string; token: string; }) => void);
 	constructor(event: "messageDelete" | "messageReactionRemoveAll", listener: (this: FurryBot, message: Eris.PossiblyUncachedMessage) => void);
 	constructor(event: "messageReactionRemoveEmoji", listener: (this: FurryBot, message: Eris.PossiblyUncachedMessage, emoji: Eris.PartialEmoji) => void);
 	constructor(event: "messageDeleteBulk", listener: (this: FurryBot, messages: Eris.PossiblyUncachedMessage[]) => void);

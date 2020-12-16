@@ -195,6 +195,7 @@
 		"desc": "I was added to a server.\n\nServer: **{0}** ({1})\nOwner: **{2}** ({3})\nMember Count: {4}\nInviter: **{5}** ({6})\nPermissions Provided: {7}\n\nSource: {8}",
 		"footer": "Total Servers: {0}"
 	},
+	"slashNotEnabled": "Slash commands are not enabled in this server. Have a moderator run `{0}settings slash commands enabled` to enable them.",
 	"test1": "hi",
 	"test2": "HELL{0}",
 	"test3": "what's up"

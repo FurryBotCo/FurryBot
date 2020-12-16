@@ -42,7 +42,7 @@
 	},
 	"help": {
 		"description": "List my commands, or get help with a command or category.",
-		"usage": "[command/restrictions]",
+		"usage": "[command/category]",
 		"hoverInfo": "Hover for more info",
 		"helpMe": "Ha ha, very funny. Please specify either a command, category, or nothing.",
 		"neitherFound": "Neither a command nor category was found with what you supplied.",

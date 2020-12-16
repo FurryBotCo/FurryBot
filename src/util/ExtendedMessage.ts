@@ -5,6 +5,8 @@ import GuildConfig from "./config/GuildConfig";
 import UserConfig from "./config/UserConfig";
 import Command from "./cmd/Command";
 import config from "../config";
+import { InteractionResponseType } from "./DiscordCommands/Constants";
+import { f } from "furrybotapi/build/src/typings";
 
 export default class ExtendedMessage {
 	#client: FurryBot;
@@ -20,10 +22,24 @@ export default class ExtendedMessage {
 			[k: string]: string;
 		};
 	};
-	constructor(msg: Eris.Message<Eris.GuildTextableChannel>, client: FurryBot) {
+	slash: boolean;
+	slashInfo: {
+		id: string;
+		token: string;
+	};
+	constructor(msg: Eris.Message<Eris.GuildTextableChannel>, client: FurryBot, slash?: boolean, slashInfo?: ExtendedMessage["slashInfo"]) {
 		this.#msg = msg as any;
 		this.#client = client;
+		this.slash = slash;
+		this.slashInfo = slashInfo;
 		// tag & me were moved to ErisUtil
+		if (this.slash) this.channel.createMessage = ((content: Eris.MessageContent, file?: Eris.MessageFile | Eris.MessageFile[]) => {
+			if (typeof content !== "string") {
+				if (content.messageReferenceID) delete content.messageReferenceID;
+			}
+
+			return this.#client.bot.createMessage(this.channel.id, content) as any;
+		});
 	}
 
 	get id() {
@@ -74,6 +90,9 @@ export default class ExtendedMessage {
 	}
 	get dashedArgs() {
 		return this.#dashedArgs;
+	}
+	set dashedArgs(s) {
+		this.dashedArgs = s;
 	}
 	get cmd() {
 		return this.#cmd;
@@ -216,14 +235,7 @@ export default class ExtendedMessage {
 				if (typeof content === "string") content = {
 					content
 				};
-				Object.assign(content, {
-					message_reference: {
-						message_id: id
-					},
-					allowedMentions: {
-						replied_user: true
-					}
-				});
+				content.messageReferenceID = id;
 
 				break;
 			}
@@ -233,7 +245,16 @@ export default class ExtendedMessage {
 	}
 
 	async reply(content: Eris.MessageContent, type?: "mention" | "quote" | "new") {
+
+		/* if (this.slash) {
+			if (type === "new") type = "mention";
+			const text = await this.getReplyText(content, type, this.id);
+			return this.#client.h.createInteractionResponse(this.slashInfo.id, this.slashInfo.token, InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE)
+		}
+		else { */
+		if (this.slash) return this.channel.createMessage(content);
 		const text = await this.getReplyText(content, type, this.id);
 		return this.channel.createMessage(text);
+		/* } */
 	}
 }

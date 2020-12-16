@@ -34,10 +34,3 @@ Object.defineProperty(Function.prototype, "owo", {
 		return Utility.callFunction.bind(Utility, this);
 	}
 });
-
-const o = (Client.prototype as any)._formatAllowedMentions;
-(Client.prototype as any)._formatAllowedMentions = function (allowed) {
-	const v = o.call(this, allowed);
-	if (allowed && allowed.replied_user) v.replied_user = true;
-	return v;
-};

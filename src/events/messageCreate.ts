@@ -17,12 +17,12 @@ import Timers from "../util/Timers";
 import * as fs from "fs-extra";
 import Utility from "../util/Functions/Utility";
 
-export default new ClientEvent("messageCreate", async function (message, update) {
+export default new ClientEvent("messageCreate", async function (message, update, slash, slashInfo) {
 	/* this.counters.push({
 		type: "messageCreate",
 		time: Date.now()
 	}); */
-	if (config.beta && !config.developers.includes(message.author.id)) return;
+	// if (config.beta && !config.developers.includes(message.author.id)) return;
 	const t = new Timers(config.developers.includes(message.author.id), `${message.author.id}/${message.channel.id}`); // `${message.channel.id}/${message.id}/${message.author.id}`);
 	t.start("main");
 	t.start("stats.msg");
@@ -58,7 +58,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 
 	/* start dm */
 	t.start("dm");
-	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as any)) {
+	if ([Eris.Constants.ChannelTypes.DM, Eris.Constants.ChannelTypes.GROUP_DM].includes(message.channel.type as unknown as any)) {
 		await this.sh.track("stats", "directMessages", "general");
 		await this.sh.track("stats", "directMessages", "session");
 		const inv = /((https?:\/\/)?(discord((app)?\.com\/invite|\.gg))\/[A-Z0-9]{1,10})/i.test(message.content);
@@ -81,7 +81,7 @@ export default new ClientEvent("messageCreate", async function (message, update)
 	/* end dm */
 
 	t.start("process");
-	const msg = new ExtendedMessage(message as Eris.Message<Eris.GuildTextableChannel>, this);
+	const msg = new ExtendedMessage(message as Eris.Message<Eris.GuildTextableChannel>, this, slash, slashInfo);
 	const l = await msg.load(); // returns false if message does not start with prefix
 	t.end("process");
 

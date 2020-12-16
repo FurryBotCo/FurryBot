@@ -19,17 +19,22 @@ export default new Command(["ban"], __filename)
 	.setExecutor(async function (msg, cmd) {
 		const a = [...msg.args], noDM = msg.dashedArgs.value.includes("no-dm");
 		let time = 0, deleteDays = 1;
-		if (Object.keys(msg.dashedArgs.keyValue).includes("days")) {
-			deleteDays = Number(msg.dashedArgs.keyValue.days);
+		if (!isNaN(Number(msg.args[msg.args.length - 1]))) {
+			deleteDays = Number(msg.args[3]);
+			a.splice(-1, 1);
+			msg.args = a;
+
 			if (deleteDays < 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.deleteLessThan`));
-			if (deleteDays > 14) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.deleteMoreThan`));
+			if (deleteDays > 7) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.deleteMoreThan`));
 		}
 
 		if (msg.args.length >= 2) {
 			try {
-				time = parseTime(msg.args[1], "ms");
-				if (time) a.splice(1, 1);
-				else time = 0;
+				time = Number(a[1]);
+				if (time) {
+					time = time * 1000; // seconds to ms
+					a.splice(1, 1);
+				} else time = 0;
 				msg.args = a;
 			} catch (e) {
 				if (e instanceof Error) {// for typings, catch clause cannot be annotated (TS1196)

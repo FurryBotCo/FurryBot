@@ -22,13 +22,28 @@ export default new Command(["e621", "e6"], __filename)
 		// this has to have a ratelimiting system
 		if (this.e6Active.includes(msg.channel.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.alreadyRunning`, [config.emojis.default.stop]));
 		if (!msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.permsRequired`));
+		let slice = msg.args.length;
+		if (msg.slash) {
+			if (msg.args[msg.args.length - 2].match(/(true|false)/) && msg.args[msg.args.length - 1].match(/(true|false)/)) {
+				// both provided
+				if (msg.args[msg.args.length - 2] === "true") msg.dashedArgs.value.push("no-flash");
+				if (msg.args[msg.args.length - 1] === "true") msg.dashedArgs.value.push("no-video");
+				slice -= 2;
+			} else {
+				// only one provided
+				if (msg.args[msg.args.length - 1] === "true") msg.dashedArgs.value.push("no-flash");
+				slice--;
+			}
+		}
+
 		const noVideo = msg.dashedArgs.value.includes("no-video");
 		const noFlash = msg.dashedArgs.value.includes("no-flash");
-		const t = [...msg.args];
+		const t = [...msg.args.slice(0, slice)];
 		let ratelimited = false, rlTimeout: NodeJS.Timeout = null;
-		if (t.every(j => j.indexOf("order") === -1)) t.push("order:favcount");
+		if (t.every(j => j.indexOf("order:") === -1)) t.push("order:favcount");
 		if (noVideo) t.push("-type:webm");
-		else if (noFlash) t.push("-type:swf");
+		if (noFlash) t.push("-type:swf");
+		console.log(t);
 		const img = await E6API.listPosts(t, 50, null, null, config.apis.e621.blacklistedTags).then(v => v.filter(p =>
 			noVideo && p.file.ext === "webm" ? false :
 				noFlash && p.file.ext === "swf" ? false :
@@ -53,7 +68,7 @@ export default new Command(["e621", "e6"], __filename)
 		function filtering() {
 			return [
 				`**{lang:${cmd.lang}.filterTitle}**`,
-				`{lang:${cmd.lang}.filterNote}`,
+				noVideo || noFlash || msg.slash ? "" : `{lang:${cmd.lang}.filterNote}`,
 				"",
 				`{lang:${cmd.lang}.videoFilter}: <:${config.emojis.custom[noVideo ? "greenTick" : "redTick"]}>`,
 				`{lang:${cmd.lang}.flashFilter}: <:${config.emojis.custom[noFlash ? "greenTick" : "redTick"]}>`,

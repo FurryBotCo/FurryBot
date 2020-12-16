@@ -17,6 +17,7 @@ export default class GuildConfig {
 		defaultYiffType: string;
 		announceLevelUp: boolean;
 		ecoEmoji: string;
+		slashCommandsEnabled: boolean;
 	};
 	selfAssignableRoles: string[];
 	disable: (({

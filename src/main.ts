@@ -24,6 +24,7 @@ import phin from "phin";
 import db from "./util/Database";
 import Request from "./util/Functions/Request";
 import Utility from "./util/Functions/Utility";
+import CommandHelper from "./util/DiscordCommands/main";
 
 // create log directories if they don't exist
 for (const l of Object.keys(config.dir.logs)) if (!fs.existsSync(config.dir.logs[l])) fs.mkdirpSync(config.dir.logs[l]);
@@ -70,6 +71,7 @@ class FurryBot extends Base {
 		"messageUpdate",
 		"userUpdate"
 	] as const;
+	h: CommandHelper;
 	constructor(d: Cluster) {
 		super(d);
 		this.m = new ModLogUtil(this);
@@ -156,6 +158,7 @@ class FurryBot extends Base {
 		this.t = new TimedActionsHandler(this);
 		this.col = new MessageCollector(this);
 		this.music = new MusicHandler(this);
+		this.h = new CommandHelper(this.bot.token, this.bot.user.id);
 
 		if (this.cluster.id === 0) this.api.launch();
 		await this.loadCommands();
