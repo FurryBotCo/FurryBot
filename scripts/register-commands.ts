@@ -11,7 +11,7 @@ const h = new CommandHelper(c.token, c.id);
 const guildId = "760631859385335838";
 
 process.nextTick(async () => {
-	await h.createGlobalCommand("help", Language.get(config.devLanguage, "commands.misc.help.description"), [
+	await h.createGlobalCommand("help", Language.get(config.devLanguage, "commands.misc.help.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.STRING,
 			name: "category",
@@ -55,12 +55,12 @@ process.nextTick(async () => {
 
 	/* start nsfw */
 
-	await h.createGlobalCommand("yiff", Language.get(config.devLanguage, "commands.nsfw.yiff.description"), [
+	await h.createGlobalCommand("yiff", Language.get(config.devLanguage, "commands.nsfw.yiff.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.STRING,
 			name: "type",
 			description: "The type of yiff to get.",
-			required: true,
+			required: false,
 			choices: [
 				{
 					name: "Gay",
@@ -82,7 +82,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("e621", Language.get(config.devLanguage, "commands.nsfw.e621.description"), [
+	await h.createGlobalCommand("e621", Language.get(config.devLanguage, "commands.nsfw.e621.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.STRING,
 			name: "tags",
@@ -103,13 +103,13 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("bulge", Language.get(config.devLanguage, "commands.nsfw.e621.bulge.description"), []);
+	await h.createGlobalCommand("bulge", Language.get(config.devLanguage, "commands.nsfw.bulge.description", [], false, true, true), []);
 
 	/* end nsfw */
 
 	/* start moderaton */
 
-	await h.createGlobalCommand("ban", Language.get(config.devLanguage, "commands.moderation.ban.description"), [
+	await h.createGlobalCommand("ban", Language.get(config.devLanguage, "commands.moderation.ban.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "member",
@@ -136,7 +136,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("kick", Language.get(config.devLanguage, "commands.moderation.kick.description"), [
+	await h.createGlobalCommand("kick", Language.get(config.devLanguage, "commands.moderation.kick.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "member",
@@ -151,7 +151,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("lock", Language.get(config.devLanguage, "commands.moderation.lock.description"), [
+	await h.createGlobalCommand("lock", Language.get(config.devLanguage, "commands.moderation.lock.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.CHANNEL,
 			name: "channel",
@@ -160,7 +160,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("modlog", Language.get(config.devLanguage, "commands.moderation.modlog.description"), [
+	await h.createGlobalCommand("modlog", Language.get(config.devLanguage, "commands.moderation.modlog.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.SUB_COMMAND,
 			name: "set",
@@ -194,7 +194,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("mute", Language.get(config.devLanguage, "commands.moderation.mute.description"), [
+	await h.createGlobalCommand("mute", Language.get(config.devLanguage, "commands.moderation.mute.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "member",
@@ -215,7 +215,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("prune", Language.get(config.devLanguage, "commands.moderation.prune.description"), [
+	await h.createGlobalCommand("prune", Language.get(config.devLanguage, "commands.moderation.prune.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.INTEGER,
 			name: "amount",
@@ -224,7 +224,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("reason", Language.get(config.devLanguage, "commands.moderation.reason.description"), [
+	await h.createGlobalCommand("reason", Language.get(config.devLanguage, "commands.moderation.reason.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.INTEGER,
 			name: "id",
@@ -239,7 +239,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("unban", Language.get(config.devLanguage, "commands.moderation.unban.description"), [
+	await h.createGlobalCommand("unban", Language.get(config.devLanguage, "commands.moderation.unban.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.STRING,
 			name: "id",
@@ -254,7 +254,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("unlock", Language.get(config.devLanguage, "commands.moderation.unlock.description"), [
+	await h.createGlobalCommand("unlock", Language.get(config.devLanguage, "commands.moderation.unlock.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.CHANNEL,
 			name: "channel",
@@ -263,7 +263,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("unmute", Language.get(config.devLanguage, "commands.moderation.unmute.description"), [
+	await h.createGlobalCommand("unmute", Language.get(config.devLanguage, "commands.moderation.unmute.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -278,7 +278,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("warn", Language.get(config.devLanguage, "commands.moderation.warn.description"), [
+	await h.createGlobalCommand("warn", Language.get(config.devLanguage, "commands.moderation.warn.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -293,7 +293,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("warnings", Language.get(config.devLanguage, "commands.moderation.warnings.description"), [
+	await h.createGlobalCommand("warnings", Language.get(config.devLanguage, "commands.moderation.warnings.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.SUB_COMMAND,
 			name: "list",
@@ -351,13 +351,13 @@ process.nextTick(async () => {
 
 	/* start information */
 
-	await h.createGlobalCommand("info", Language.get(config.devLanguage, "commands.information.info.description"), []);
+	await h.createGlobalCommand("info", Language.get(config.devLanguage, "commands.information.info.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("ping", Language.get(config.devLanguage, "commands.information.ping.description"), []);
+	await h.createGlobalCommand("ping", Language.get(config.devLanguage, "commands.information.ping.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("shards", Language.get(config.devLanguage, "commands.information.shards.description"), []);
+	await h.createGlobalCommand("shards", Language.get(config.devLanguage, "commands.information.shards.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("sinfo", Language.get(config.devLanguage, "commands.information.sinfo.description"), [
+	await h.createGlobalCommand("sinfo", Language.get(config.devLanguage, "commands.information.sinfo.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.STRING,
 			name: "section",
@@ -392,7 +392,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("uinfo", Language.get(config.devLanguage, "commands.information.uinfo.description"), [
+	await h.createGlobalCommand("uinfo", Language.get(config.devLanguage, "commands.information.uinfo.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -401,13 +401,13 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("invite", Language.get(config.devLanguage, "commands.information.inv.description"), []);
+	await h.createGlobalCommand("invite", Language.get(config.devLanguage, "commands.information.inv.description", [], false, true, true), []);
 
 	/* end information */
 
 	/* start fun */
 
-	await h.createGlobalCommand("8ball", Language.get(config.devLanguage, "commands.fun.8ball.description"), [
+	await h.createGlobalCommand("8ball", Language.get(config.devLanguage, "commands.fun.8ball.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.STRING,
 			name: "question",
@@ -416,7 +416,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("bap", Language.get(config.devLanguage, "commands.fun.bap.description"), [
+	await h.createGlobalCommand("bap", Language.get(config.devLanguage, "commands.fun.bap.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -425,7 +425,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("boop", Language.get(config.devLanguage, "commands.fun.boop.description"), [
+	await h.createGlobalCommand("boop", Language.get(config.devLanguage, "commands.fun.boop.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -434,7 +434,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("cuddle", Language.get(config.devLanguage, "commands.fun.cuddle.description"), [
+	await h.createGlobalCommand("cuddle", Language.get(config.devLanguage, "commands.fun.cuddle.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -443,9 +443,9 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("dadjoke", Language.get(config.devLanguage, "commands.fun.dadjoke.description"), []);
+	await h.createGlobalCommand("dadjoke", Language.get(config.devLanguage, "commands.fun.dadjoke.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("gayrate", Language.get(config.devLanguage, "commands.fun.gayrate.description"), [
+	await h.createGlobalCommand("gayrate", Language.get(config.devLanguage, "commands.fun.gayrate.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -454,7 +454,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("hug", Language.get(config.devLanguage, "commands.fun.hug.description"), [
+	await h.createGlobalCommand("hug", Language.get(config.devLanguage, "commands.fun.hug.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -463,7 +463,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("kiss", Language.get(config.devLanguage, "commands.fun.kiss.description"), [
+	await h.createGlobalCommand("kiss", Language.get(config.devLanguage, "commands.fun.kiss.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -472,7 +472,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("lick", Language.get(config.devLanguage, "commands.fun.lick.description"), [
+	await h.createGlobalCommand("lick", Language.get(config.devLanguage, "commands.fun.lick.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -481,7 +481,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("ship", Language.get(config.devLanguage, "commands.fun.ship.description"), [
+	await h.createGlobalCommand("ship", Language.get(config.devLanguage, "commands.fun.ship.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user1",
@@ -496,7 +496,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("slap", Language.get(config.devLanguage, "commands.fun.slap.description"), [
+	await h.createGlobalCommand("slap", Language.get(config.devLanguage, "commands.fun.slap.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -505,7 +505,7 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("spray", Language.get(config.devLanguage, "commands.fun.spray.description"), [
+	await h.createGlobalCommand("spray", Language.get(config.devLanguage, "commands.fun.spray.description", [], false, true, true), [
 		{
 			type: ApplicationCommandOptionType.USER,
 			name: "user",
@@ -518,45 +518,45 @@ process.nextTick(async () => {
 
 	/* start images */
 
-	await h.createGlobalCommand("fursuit", Language.get(config.devLanguage, "commands.images.fursuit.description"), []);
+	await h.createGlobalCommand("fursuit", Language.get(config.devLanguage, "commands.images.fursuit.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("kadi", Language.get(config.devLanguage, "commands.images.kadi.description"), []);
+	await h.createGlobalCommand("kadi", Language.get(config.devLanguage, "commands.images.kadi.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("chris", Language.get(config.devLanguage, "commands.images.chris.description"), []);
+	await h.createGlobalCommand("chris", Language.get(config.devLanguage, "commands.images.chris.description", [], false, true, true), []);
 
 	/* end images */
 
 	/* start animals */
 
-	await h.createGlobalCommand("birb", Language.get(config.devLanguage, "commands.animals.birb.description"), []);
+	await h.createGlobalCommand("birb", Language.get(config.devLanguage, "commands.animals.birb.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("bunny", Language.get(config.devLanguage, "commands.animals.bunny.description"), []);
+	await h.createGlobalCommand("bunny", Language.get(config.devLanguage, "commands.animals.bunny.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("cat", Language.get(config.devLanguage, "commands.animals.cat.description"), []);
+	await h.createGlobalCommand("cat", Language.get(config.devLanguage, "commands.animals.cat.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("duck", Language.get(config.devLanguage, "commands.animals.duck.description"), []);
+	await h.createGlobalCommand("duck", Language.get(config.devLanguage, "commands.animals.duck.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("fox", Language.get(config.devLanguage, "commands.animals.fox.description"), []);
+	await h.createGlobalCommand("fox", Language.get(config.devLanguage, "commands.animals.fox.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("koala", Language.get(config.devLanguage, "commands.animals.koala.description"), []);
+	await h.createGlobalCommand("koala", Language.get(config.devLanguage, "commands.animals.koala.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("otter", Language.get(config.devLanguage, "commands.animals.otter.description"), []);
+	await h.createGlobalCommand("otter", Language.get(config.devLanguage, "commands.animals.otter.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("panda", Language.get(config.devLanguage, "commands.animals.panda.description"), []);
+	await h.createGlobalCommand("panda", Language.get(config.devLanguage, "commands.animals.panda.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("snek", Language.get(config.devLanguage, "commands.animals.snek.description"), []);
+	await h.createGlobalCommand("snek", Language.get(config.devLanguage, "commands.animals.snek.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("turtle", Language.get(config.devLanguage, "commands.animals.turtle.description"), []);
+	await h.createGlobalCommand("turtle", Language.get(config.devLanguage, "commands.animals.turtle.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("wah", Language.get(config.devLanguage, "commands.animals.wah.description"), []);
+	await h.createGlobalCommand("wah", Language.get(config.devLanguage, "commands.animals.wah.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("wolf", Language.get(config.devLanguage, "commands.animals.wolf.description"), []);
+	await h.createGlobalCommand("wolf", Language.get(config.devLanguage, "commands.animals.wolf.description", [], false, true, true), []);
 
 	/* end animals */
 
 	/* start utility */
 
-	await h.createGlobalCommand("snipe", Language.get(config.devLanguage, "commands.utility.snipe.description"), []);
+	await h.createGlobalCommand("snipe", Language.get(config.devLanguage, "commands.utility.snipe.description", [], false, true, true), []);
 
 	/* end utility */
 
