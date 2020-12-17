@@ -37,9 +37,9 @@ export default class Language {
 	};
 	private constructor() { }
 
-	static get(lang: Languages, path: string, formatArgs: (string | number)[], nullOnNotFound: boolean, random: false): string[];
-	static get(lang: Languages, path: string, formatArgs?: (string | number)[], nullOnNotFound?: boolean, random?: true): string;
-	static get(lang: Languages, path: string, formatArgs?: (string | number)[], nullOnNotFound?: boolean, random?: boolean): string | string[] {
+	static get(lang: Languages, path: string, formatArgs: (string | number)[], nullOnNotFound: boolean, random: false, returnPathOnly?: boolean): string[];
+	static get(lang: Languages, path: string, formatArgs?: (string | number)[], nullOnNotFound?: boolean, random?: true, returnPathOnly?: boolean): string;
+	static get(lang: Languages, path: string, formatArgs?: (string | number)[], nullOnNotFound?: boolean, random?: boolean, returnPathOnly?: boolean): string | string[] {
 		if (!fs.existsSync(`${dir}/${lang}`)) throw new TypeError(`Directory "${p.resolve(`${dir}/${lang}`)}" for language "${lang}" does not exist.`);
 		function loop(dir: string, parts: string[]): string | string[] {
 			if (fs.existsSync(`${dir}/${parts[0]}.json`)) {

@@ -43,7 +43,6 @@ export default new Command(["e621", "e6"], __filename)
 		if (t.every(j => j.indexOf("order:") === -1)) t.push("order:favcount");
 		if (noVideo) t.push("-type:webm");
 		if (noFlash) t.push("-type:swf");
-		console.log(t);
 		const img = await E6API.listPosts(t, 50, null, null, config.apis.e621.blacklistedTags).then(v => v.filter(p =>
 			noVideo && p.file.ext === "webm" ? false :
 				noFlash && p.file.ext === "swf" ? false :
