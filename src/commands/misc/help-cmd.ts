@@ -36,8 +36,8 @@ export default new Command(["help", "h"], __filename)
 		} else {
 			if (msg.args[0].toLowerCase() === "me") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.helpMe`));
 
-			const c = this.cmd.getCommand(msg.args[0]);
-			const cat = this.cmd.getCategory(msg.args[0]);
+			const c = this.cmd.getCommand(msg.args[0].toLowerCase());
+			const cat = this.cmd.getCategory(msg.args[0].toLowerCase());
 
 			if (c.cmd && c.cat) {
 				if (c.cmd.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyCommand`));
