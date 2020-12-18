@@ -13,12 +13,7 @@ export default new Command(["help", "h"], __filename)
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length === 0) {
-			const categories = [...this.cmd.categories];
-
-			for (const cat of categories) {
-				if (cat.restrictions.includes("beta") && !config.beta) categories.splice(categories.indexOf(cat), 1);
-				if (cat.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) categories.splice(categories.indexOf(cat), 1);
-			}
+			const categories = this.cmd.categories.filter(cat => !(cat.restrictions.includes("beta") && !config.beta) && !(cat.restrictions.includes("developer") && !config.developers.includes(msg.author.id)));
 
 			return msg.channel.createMessage({
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
