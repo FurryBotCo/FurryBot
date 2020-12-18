@@ -149,11 +149,13 @@ export default new Command(["modlog"], __filename)
 						.setTitle("\u274c {lang:other.words.invalid$ucwords$} {lang:other.words.usage$ucwords$}")
 						.setDescription([
 							`{lang:${cmd.lang}.help.main}`,
-							`{lang:other.words.example$ucwords$}: \`{lang:${cmd.lang}.example|${msg.gConfig.settings.prefix}}\``,
-							`{lang:${cmd.lang}.help.set|${msg.gConfig.settings.prefix}}`,
-							`{lang:${cmd.lang}.help.disable|${msg.gConfig.settings.prefix}}`,
-							`{lang:${cmd.lang}.help.list|${msg.gConfig.settings.prefix}}`/* ,
-							`{lang:${cmd.lang}.help.clear|${msg.gConfig.settings.prefix}}`*/
+							`{lang:${cmd.lang}.help.noInclude}`,
+							"",
+							`{lang:other.words.example$ucwords$}: \`${msg.gConfig.settings.prefix}modlog set <#channel>\``,
+							`\`${msg.gConfig.settings.prefix}modlog set\` - {lang:${cmd.lang}.help.set}`,
+							`\`${msg.gConfig.settings.prefix}modlog disable\` - {lang:${cmd.lang}.help.disable}`,
+							`\`${msg.gConfig.settings.prefix}modlog list <@user>\` - {lang:${cmd.lang}.help.list}`/* ,
+							`\`${msg.gConfig.settings.prefix}modlog clear <@user>\` - {lang:${cmd.lang}.help.clear}`*/
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)

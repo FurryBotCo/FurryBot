@@ -31,6 +31,9 @@ export default new ClientEvent("presenceUpdate", async function (other, oldPrese
 				else return "unknown";
 			}
 
+			// since we aren't doing game/activities right now
+			if (oldPresence.status === other.status && oldPresence.clientStatus === other.clientStatus) return;
+
 			const oldPrs = [], newPrs = [];
 
 			// @TODO

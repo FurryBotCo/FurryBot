@@ -56,7 +56,7 @@ export default class Language {
 		}
 
 		let str = loop(`${dir}/${lang}`, path.split("."));
-		if ([undefined, null].includes(str)) return nullOnNotFound ? null : `{lang:${path}}`;
+		if ([undefined, null].includes(str)) return nullOnNotFound ? null : returnPathOnly ? path : `{lang:${path}}`;
 
 		if (str instanceof Array) {
 			if ([null, undefined].includes(random) || random) {

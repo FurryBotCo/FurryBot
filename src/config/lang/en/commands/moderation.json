@@ -45,14 +45,14 @@
 	},
 	"modlog": {
 		"description": "Manage this server's moderation log.",
-		"usage": "",
-		"example": "{0}modlog set <#channel>",
+		"usage": "[set/disable/list]",
 		"help": {
+			"noInclude": "Do not include the `<>` when running commands.",
 			"main": "This command consists of several subcommands.",
-			"set": "`{0}modlog set <#channel>` - Set the modlog channel",
-			"disable": "`{0}modlog disable` - Disable the modlog.",
-			"list": "`{0}modlog list <@user>` - List a users modlog entries",
-			"clear": "`{0}modlog clear` - Remove all modlog entries."
+			"set": "Set the modlog channel",
+			"disable": "Disable the modlog.",
+			"list": "List a users modlog entries",
+			"clear": "Remove all modlog entries."
 		},
 		"set": {
 			"missingPermission": "I cannot set to <#{0}> because I am missing the permission **{1}** in that channel. Either update the permissions, or chose a different channel.",

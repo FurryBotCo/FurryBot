@@ -8,7 +8,7 @@ import production from "../src/config/client/production.json";
 const c = production;
 const h = new CommandHelper(c.token, c.id);
 
-const guildId = "760631859385335838";
+const guildId = "247488777621209091";
 
 process.nextTick(async () => {
 	await h.createGlobalCommand("help", Language.get(config.devLanguage, "commands.misc.help.description", [], false, true, true), [
@@ -559,6 +559,12 @@ process.nextTick(async () => {
 	await h.createGlobalCommand("snipe", Language.get(config.devLanguage, "commands.utility.snipe.description", [], false, true, true), []);
 
 	/* end utility */
+
+	/* start custom */
+
+	await h.createGuildCommand(guildId, "register", Language.get(config.devLanguage, "commands.custom.register.description", [], false, true, true), []);
+
+	/* end custom */
 
 	/* count */
 
