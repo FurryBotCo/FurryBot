@@ -1,6 +1,6 @@
 import FurryBot from "../../../main";
 import QueueHandler from "./QueueHandler";
-import Eris, { IntegrationOptions } from "eris";
+import Eris from "eris";
 import Logger from "../../Logger";
 import config from "../../../config";
 import ytdl from "ytdl-core";
