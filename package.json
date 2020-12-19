@@ -84,7 +84,7 @@
     "@typescript-eslint/parser": "^4.10.0",
     "compressing": "^1.5.1",
     "es-main": "^1.0.2",
-    "eslint": "^7.15.0",
+    "eslint": "^7.16.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsdoc": "^30.7.8",
     "eslint-plugin-json": "^2.1.2",
