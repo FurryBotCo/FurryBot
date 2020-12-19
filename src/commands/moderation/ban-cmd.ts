@@ -30,11 +30,10 @@ export default new Command(["ban"], __filename)
 
 		if (msg.args.length >= 2) {
 			try {
-				time = Number(a[1]);
-				if (time) {
-					time = time * 1000; // seconds to ms
-					a.splice(1, 1);
-				} else time = 0;
+				time = parseTime(msg.args[1], "ms");
+				if (time) a.splice(1, 1);
+				else time = 0;
+				msg.args = a;
 				msg.args = a;
 			} catch (e) {
 				if (e instanceof Error) {// for typings, catch clause cannot be annotated (TS1196)
