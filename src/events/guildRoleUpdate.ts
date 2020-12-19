@@ -67,8 +67,8 @@ export default new ClientEvent("guildRoleUpdate", async function (guild, role, o
 		}
 
 		if (role.permissions.allow !== oldRole.permissions.allow) {
-			content[0].push(`{lang:other.words.permissions$ucwords$}: **[${oldRole.permissions.allow}](https://discordapi.com/permissions.html#${role.permissions})**`);
-			content[1].push(`{lang:other.words.permissions$ucwords$}: **[${role.permissions.allow}](https://discordapi.com/permissions.html#${role.permissions})**`);
+			content[0].push(`{lang:other.words.permissions$ucwords$}: **[${oldRole.permissions.allow}](https://discordapi.com/permissions.html#${role.permissions.allow})**`);
+			content[1].push(`{lang:other.words.permissions$ucwords$}: **[${role.permissions.allow}](https://discordapi.com/permissions.html#${role.permissions.allow})**`);
 		}
 
 		// assume no changes happened
