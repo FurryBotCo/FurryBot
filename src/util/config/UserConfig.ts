@@ -34,6 +34,7 @@ export default class UserConfig {
 			name: string | null;
 		};
 		"totalMonths": number;
+		"activationTime": number | null;
 	};
 	eco: Economy.EcoUser;
 	constructor(id: string, data: ConfigDataTypes<UserConfig, "id">) {
@@ -69,17 +70,45 @@ export default class UserConfig {
 		return this.reload();
 	}
 
-	async checkPremium(): Promise<PremiumUserEntry> {
-		const r = await mdb.collection("premium").find<PremiumUserEntry>({ userId: this.id }).toArray();
-		if (!r || r.length === 0) return {
-			type: "user",
-			userId: this.id,
-			amount: 0,
-			active: false,
-			activationDate: null,
-			patronId: null
+	async checkPremium(): Promise<{
+		remainingMonths: number;
+		activationTime: number | null;
+		active: boolean;
+	}> {
+		if (!this.donations.activationTime || this.donations.totalMonths < 1) return {
+			remainingMonths: 0,
+			activationTime: null,
+			active: false
 		};
-		else return r[0];
+		// 30.42 days
+		const d = 2.62829e+9;
+		if ((this.donations.activationTime + d) > Date.now()) {
+			if (this.donations.totalMonths === 1) {
+				await this.mongoEdit({
+					$set: {
+						"donations.totalMonths": 0
+					}
+				});
+				return {
+					remainingMonths: 0,
+					activationTime: null,
+					active: false
+				};
+			} else {
+				await this.mongoEdit({
+					$set: {
+						"donations.totalMonths": this.donations.totalMonths - 1,
+						"donations.activationTime": Date.now()
+					}
+				});
+			}
+		}
+
+		return {
+			remainingMonths: this.donations.totalMonths,
+			activationTime: this.donations.activationTime,
+			active: true
+		};
 	}
 
 	getLevel(g: string) {
