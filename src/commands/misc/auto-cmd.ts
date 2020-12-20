@@ -71,7 +71,7 @@ export default new Command(["auto"], __filename)
 						auto: j
 					}
 				});
-				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.gConfig.settings.prefix, k.auto.length + 1]));
+				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.gConfig.settings.prefix, (k.auto?.length || 0) + 1]));
 
 				break;
 			}

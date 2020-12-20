@@ -94,7 +94,7 @@ export default new Command(["log"], __filename)
 							logEvents: j
 						}
 					});
-					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.gConfig.settings.prefix, k.logEvents.length + 1]));
+					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.gConfig.settings.prefix, (k.logEvents?.length || 0) + 1]));
 				}
 
 				break;
