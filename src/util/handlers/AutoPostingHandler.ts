@@ -326,8 +326,9 @@ export default class AutoPostingHandler {
 			}
 		}
 
-		await ch.createMessage({
+		const msg = await ch.createMessage({
 			embed: e.toJSON()
 		}, file);
+		if (ch.type === Eris.Constants.ChannelTypes.GUILD_NEWS) await (msg as Eris.Message<Eris.NewsChannel>).crosspost().catch(err => null);
 	}
 }
