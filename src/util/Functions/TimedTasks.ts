@@ -26,6 +26,10 @@ export default class TimedTasks {
 		}
 	}
 
+	static async runTimedActionsHandler(client: FurryBot) {
+		client.t.processEntries(client);
+	}
+
 	static async runDeleteUsers(client: FurryBot) {
 		if (client.cluster.id !== 0) return;
 		const d = await mdb.collection<UserConfig>("users").find({

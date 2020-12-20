@@ -172,7 +172,6 @@ class FurryBot extends Base {
 
 		setInterval(async () => {
 			TimedTasks.runAll.bind(TimedTasks, this);
-			this.t.processEntries();
 			const d = new Date();
 			const stats = await this.ipc.getStats();
 			const s = config.statuses(this, stats);
