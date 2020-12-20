@@ -109,7 +109,9 @@ export default new Command(["log"], __filename)
 				const j = [...msg.gConfig.logEvents];
 				const v = j.splice(id - 1, 1)[0];
 				await msg.gConfig.mongoEdit({
-					$pull: v
+					$pull: {
+						logEvents: v
+					}
 				});
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.done`, [id, v.type, v.channel]));
 				break;
