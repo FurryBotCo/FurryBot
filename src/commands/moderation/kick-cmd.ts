@@ -25,7 +25,7 @@ export default new Command(["kick"], __filename)
 		if (member.id === msg.member.id) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noKickSelf`));
 		if (member.id === msg.channel.guild.ownerID) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noKickOwner`));
 		const c = Utility.compareMembers(msg.member, member);
-		if ((c.member1.higher || c.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noKickOther`, [`${member.user.username}#${member.user.discriminator}`]));
+		if ((c.member1.lower || c.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noKickOther`, [`${member.user.username}#${member.user.discriminator}`]));
 		const d = Utility.compareMembers(member, msg.channel.guild.me);
 		if ((d.member1.higher || d.member1.same)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.meNoKick`, [`${member.user.username}#${member.user.discriminator}`]));
 

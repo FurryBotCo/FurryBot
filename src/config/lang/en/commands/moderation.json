@@ -21,9 +21,9 @@
 	"kick": {
 		"description": "Kick members from your server.",
 		"usage": "<@member/id> [reason]",
-		"noSelf": "Pretty sure you don't want to do this to yourself.",
+		"noKickSelf": "Pretty sure you don't want to do this to yourself.",
 		"dm": "You were kicked from **{0}**.\nReason: {1}",
-		"noKick": "you cannot kick **{0}** as their highest role is higher than yours!",
+		"noKickOther": "you cannot kick **{0}** as their highest role is higher than yours!",
 		"meNoKick": "I cannot kick **{0}**, as their highest role is higher than, or as high as mine.",
 		"userKicked": "User {0} was kicked, {1}",
 		"couldNotKick": "I couldn't kick **{0}**, {1}",
