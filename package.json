@@ -61,7 +61,7 @@
     "wolfram-alpha-node": "0.0.3",
     "ws": "^7.4.1",
     "yargs": "^16.2.0",
-    "ytdl-core": "^4.2.0"
+    "ytdl-core": "^4.2.1"
   },
   "devDependencies": {
     "@types/chalk": "^2.2.0",
@@ -86,7 +86,7 @@
     "es-main": "^1.0.2",
     "eslint": "^7.16.0",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsdoc": "^30.7.8",
+    "eslint-plugin-jsdoc": "^30.7.9",
     "eslint-plugin-json": "^2.1.2",
     "eslint-plugin-no-null": "^1.0.2",
     "eslint-plugin-prefer-arrow": "^1.2.2",
