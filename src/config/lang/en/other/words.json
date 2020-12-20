@@ -165,5 +165,6 @@
 	"yes": "yes",
 	"item": "item",
 	"rarity": "rarity",
-	"never": "never"
+	"never": "never",
+	"minutes": "minutes"
 }

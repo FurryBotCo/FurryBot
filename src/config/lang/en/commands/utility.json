@@ -355,7 +355,8 @@
 			"invalidType": "Invalid type **{0}**. Use `{0}log available` to see the valid types.",
 			"missingPermission": "I'm missing the permission **{0}** in the channel <#{1}>.",
 			"done": "Setup logging of **{0}** in <#{1}>. Use `{2}log remove {3}` to disable it.",
-			"doneAll": "Setup all events in <#{0}>. You can use `{1}log clear` to disable all logging."
+			"doneAll": "Setup all events in <#{0}>. You can use `{1}log clear` to disable all logging.",
+			"max": "You may only have **{0}** log entries total. Contact a developer if you believe you need more than this, or remove some with `{1}log remove`."
 		},
 		"remove": {
 			"invalidId": "An entry was not found with the id **{0}**.",

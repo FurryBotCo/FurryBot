@@ -89,5 +89,72 @@
 		"missing1": "First text missing. You must provide some text separated by commas.",
 		"missing2": "Second text missing. You must provide some text separated by commas.",
 		"edited": "This message will be edited soon."
+	},
+	"auto": {
+		"description": "Manage automatic posting of certain images.",
+		"usage": "[add/remove/list/available]",
+		"help": {
+			"noInclude": "Do not include the `<>` when running commands.",
+			"main": "This command consists of several subcommands.",
+			"validTimes": "5, 10, 15, 30, and 60. These are in minutes.",
+			"add": "Add an auto entry.",
+			"remove": "Remove an auto entry.",
+			"list": "List the current auto entries.",
+			"available": "List the available auto types.",
+			"clear": "Remove all current auto entries."
+		},
+		"add": {
+			"invalidType": "Invalid type **{0}**. Use `{0}auto available` to see the valid types.",
+			"missingPermission": "I'm missing the permission **{0}** in the channel <#{1}>.",
+			"done": "Setup automatic posting of **{0}** in <#{1}>. Use `{2}auto remove {3}` to disable it.",
+			"nsfw": "The type **{0}** is nsfw, and the channel <#{1}> is not nsfw.",
+			"invalidTime": "Invalid time **{0}**. Valid times: `5`, `10`, `15`, `30`, `60`.",
+			"max": "You may only have **{0}** auto entries total. Contact a developer if you believe you need more than this, or remove some with `{1}auto remove`."
+		},
+		"remove": {
+			"invalidId": "An entry was not found with the id **{0}**.",
+			"lessThanOne": "The entry id cannot be less than one.",
+			"done": "Removed the entry id **{0}** (**{1}** in <#{2}>)"
+		},
+		"list": {
+			"noEntries": "There aren't any auto entries to list.",
+			"lessThanOne": "The page number cannot be less than one.",
+			"invalidPageOne": "Invalid page number **{0}**, there is only one page.",
+			"invalidPage": "Invalid page number **{0}**, there are **{1}** pages.",
+			"page": "Logging - Page #{0}",
+			"footer": "Page {0}/{1} | {2} Total Entries | {3}auto remove <id>",
+			"entry": "`#{0}` - **{1}** in <#{2}>, every **{3} minutes**"
+		},
+		"available": {
+			"possible": "These are the possible auto types.",
+			"incomplete": "If the name is __underlined__, the type is incomplete.",
+			"birb": "Images from the `birb` command.",
+			"bunny": "Images from the `bunny` command.",
+			"cat": "Images from the `cat` command.",
+			"duck": "Images from the `duck` command.",
+			"fox": "Images from the `fox` command.",
+			"koala": "Images from the `koala` command.",
+			"otter": "Images from the `otter` command.",
+			"panda": "Images from the `panda` command.",
+			"snek": "Images from the `snek` command.",
+			"turtle": "Images from the `turtle` command.",
+			"wah": "Images from the `wah` command.",
+			"wolf": "Images from the `wolf` command.",
+			"fursuit": "Images from the `fursuit` command.",
+			"butts": "Images from the `fursuitbutts` command.",
+			"bulge": "Images from the `bulge` command.",
+			"yiff-gay": "Images from the `yiff` command, `gay` category.",
+			"yiff-straight": "Images from the `yiff` command, `straight` category.",
+			"yiff-lesbian": "Images from the `yiff` command, `lesbian` category.",
+			"yiff-gynomorph": "Images from the `yiff` command, `gynomorph` category."
+		},
+		"clear": {
+			"needPermission": "You need the **manageGuild** permission to use this subcommand.",
+			"noEntries": "There are no entries to clear.",
+			"confirm": "Are you sure you want to remove **{0}** entries? **yes** or **no**.",
+			"$": "Do not translate yes or no",
+			"cancelled": "Cancelled.",
+			"done": "Removed **{0}** auto entries."
+		}
 	}
 }

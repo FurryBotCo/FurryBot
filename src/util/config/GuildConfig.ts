@@ -72,6 +72,16 @@ export default class GuildConfig {
 		"inviteCreate" |
 		"inviteDelete";
 	}[];
+	auto: {
+		id: string;
+		type: "birb" | "bunny" | "cat" | "duck" |
+		"fox" | "koala" | "otter" | "panda" |
+		"snek" | "turtle" | "wah" | "wolf" |
+		"fursuit" | "butts" | "bulge" |
+		"yiff.gay" | "yiff.straight" | "yiff.lesbian" | "yiff.gynomorph";
+		time: 5 | 10 | 15 | 30 | 60;
+		channel: string;
+	}[];
 	modlog: {
 		enabled: boolean;
 		channel: string | null;

@@ -196,6 +196,31 @@
 		"footer": "Total Servers: {0}"
 	},
 	"slashNotEnabled": "Slash commands are not enabled in this server. Have a moderator run `{0}settings slash commands enabled` to enable them.",
+	"auto": {
+		"footer": "Automatically Posted | Use {0}auto to manage this.",
+		"titles": {
+			"disabled": "Autoposting Disabled",
+			"birb": "Birb!",
+			"bunny": "Bunny!",
+			"cat": "Kitty!",
+			"fox": "Foxxo!",
+			"koala": "Koala!",
+			"otter": "Otter",
+			"panda": "Panda",
+			"snek": "Snek",
+			"turtle": "Tortle!",
+			"wah": "Wah!",
+			"wolf": "Wolf",
+			"fursuit": "Fursuit!",
+			"butts": "Fursuit Butts!",
+			"bulge": "Bulge!",
+			"yiff-gay": "Gay Yiff!",
+			"yiff-straight": "Straight Yiff!",
+			"yiff-lesbian": "Lesbian Yiff!",
+			"yiff-gynomorph": "Gynomorph Yiff!"
+		},
+		"disabledNSFW": "Autoposting of **{0}** has been disabled here due to this channel no longer being nsfw."
+	},
 	"test1": "hi",
 	"test2": "HELL{0}",
 	"test3": "what's up"

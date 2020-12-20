@@ -3,9 +3,10 @@ import UserConfig from "../config/UserConfig";
 import config from "../../config";
 import FurryBot from "../../main";
 import { Colors } from "../Constants";
-import GuildConfig from "../config/GuildConfig";
+import GuildConfig, { DBKeys } from "../config/GuildConfig";
 import DailyJoins from "../handlers/DailyJoinsHandler";
 import Logger from "../Logger";
+import AutoPostingHandler from "../handlers/AutoPostingHandler";
 
 export default class TimedTasks {
 	private constructor() {
@@ -15,9 +16,11 @@ export default class TimedTasks {
 	static async runAll(client: FurryBot) {
 		const d = new Date();
 		if (d.getSeconds() === 0) {
+			if ((d.getMinutes() % 5) === 0) await this.runAutoPosting(client).then(() => Logger.debug("Timed Tasks |  Auto Posting", "Finished processing."));
 			if (d.getMinutes() === 0) {
-				await this.runDeleteUsers(client).then(() => Logger.debug("Timed Tasks |  Delete Users", "Finished processing."));
-				await this.runDeleteGuilds(client).then(() => Logger.debug("Timed Tasks |  Delete Guilds", "Finished processing."));
+				await this.runDeleteUsers(client).then(() => Logger.debug("Timed Tasks | Delete Users", "Finished processing."));
+				await this.runDeleteGuilds(client).then(() => Logger.debug("Timed Tasks | Delete Guilds", "Finished processing."));
+				await this.runRefreshBoosters(client).then(() => Logger.debug("Timed Tasks | Refresh Boosters", "Finished processing."));
 				if (!config.beta && d.getHours() === 0) await this.runDailyJoins(client).then(() => Logger.debug("Timed Tasks | Daily Joins", "Finished processing."));
 			}
 		}
@@ -73,14 +76,16 @@ export default class TimedTasks {
 			Logger.debug("Timed Tasks |  Delete Guild", `Deleted the guild "${u.id}"`);
 		}));
 	}
+
 	static async runDailyJoins(client: FurryBot) {
+		Logger.debug("Timed Tasks | Daily Joins", "run");
 		if (client.cluster.id !== 0) return;
 		DailyJoins(client);
 	}
 
 	static async runRefreshBoosters(client: FurryBot) {
-		if (client.cluster.id !== 0) return;
-		const g = await client.bot.getRESTGuild(config.client.supportServerId);
+		if (!client.bot.guilds.has(config.client.supportServerId)) return;
+		const g = await client.bot.guilds.get(config.client.supportServerId);
 		await g.fetchAllMembers();
 
 		await mdb.collection("users").updateMany({
@@ -106,5 +111,24 @@ export default class TimedTasks {
 		}
 
 		Logger.debug("Timed Tasks | Refresh Boosters", `Got ${i} boosters.`);
+	}
+
+	static async runAutoPosting(client: FurryBot) {
+		const d = new Date();
+		const entries = await mdb.collection("guilds").find<DBKeys>({ $where: "![undefined,null].includes(this.auto) && this.auto.length > 0" }).toArray();
+		for (const g of entries) {
+			for (const e of g.auto) {
+				if (
+					((d.getMinutes() % 5) === 0 && e.time === 5) ||
+					((d.getMinutes() % 10) === 0 && e.time === 10) ||
+					((d.getMinutes() % 15) === 0 && e.time === 15) ||
+					((d.getMinutes() % 30) === 0 && e.time === 30) ||
+					((d.getMinutes() % 60) === 0 && e.time === 60)
+				) {
+					await AutoPostingHandler.execute(e.id, e.type, e.channel, new GuildConfig(g.id, g), client);
+					Logger.debug("Timed Tasks | Auto Posting", `Ran auto posting for type "${e.type}" in channel "${e.channel}" (time: ${e.time}, id: ${e.id})`);
+				}
+			}
+		}
 	}
 }

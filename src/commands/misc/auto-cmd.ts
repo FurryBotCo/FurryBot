@@ -1,3 +1,4 @@
+import Eris from "eris";
 import Command from "../../util/cmd/Command";
 import CommandError from "../../util/cmd/CommandError";
 import { Colors } from "../../util/Constants";
@@ -5,60 +6,48 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import Utility from "../../util/Functions/Utility";
 import Language from "../../util/Language";
 import chunk from "chunk";
-import Eris from "eris";
-import GuildConfig from "../../util/config/GuildConfig";
+import crypto from "crypto";
 
-export default new Command(["log"], __filename)
-	.setBotPermissions([])
-	.setUserPermissions([
-		"manageMessages"
+// @TODO webhooks
+export default new Command(["auto"], __filename)
+	.setBotPermissions([
+		"embedLinks",
+		"attachFiles"
 	])
-	.setRestrictions([])
+	.setUserPermissions([
+		"manageGuild"
+	])
+	.setRestrictions([
+		"donator"
+	])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
-		if ([null, undefined].includes(msg.gConfig.logEvents)) await msg.gConfig.mongoEdit({
+		if ([null, undefined].includes(msg.gConfig.auto)) await msg.gConfig.mongoEdit({
 			$set: {
-				logEvents: []
+				auto: []
 			}
 		});
 		const types = [
-			"channelCreate",
-			"channelDelete",
-			"channelUpdate",
-			"memberBan", // guildBanAdd
-			"memberUnban", // guildBanRemove
-			"memberJoin", // guildMemberAdd
-			"memberLeave", // guildMemberRemove
-			"userKick", // guildMemberRemove
-			"memberUpdate", // guildMemberUpdate
-			"roleCreate", // guildRoleCreate
-			"roleDelete", // guildRoleDelete
-			"roleUpdate", // guildRoleUpdate
-			"messageDelete",
-			"messageDeleteBulk",
-			"messageEdit", // messageUpdate
-			"presenceUpdate",
-			"userUpdate",
-			"voiceJoin", // voiceChannelJoin
-			"voiceLeave", // voiceChannelLeave
-			"voiceSwitch", // voiceChannelSwitch
-			"voiceStateUpdate",
-			"guildUpdate",
-			"inviteCreate",
-			"inviteDelete"
-		] as GuildConfig["logEvents"][number]["type"][];
-		const max = 60;
+			"birb", "bunny", "cat", "duck",
+			"fox", "koala", "otter", "panda",
+			"snek", "turtle", "wah", "wolf",
+			"fursuit", "butts", "bulge",
+			"yiff.gay", "yiff.straight", "yiff.lesbian", "yiff.gynomorph"
+		] as const;
+		const max = 10;
 		function f(t: string) {
-			if (t.toLowerCase() === "all") return "all";
-			return types.find(v => v.toLowerCase() === t.toLowerCase());
+			// allows for stuff like yiff-gay and yiffgay
+			return types.find(v => [v, v.replace(/\./g, "-"), v.replace(/\./g, "")].some(j => j.toLowerCase() === t.toLowerCase()));
 		}
 		switch (msg.args[0]?.toLowerCase()) {
 			case "add": {
 				if (msg.gConfig.auto.length >= max) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.max`, [max, msg.gConfig.settings.prefix]));
-				if (msg.args.length !== 3) return new CommandError("ERR_INVALID_USAGE", cmd);
+				if (msg.args.length !== 4) return new CommandError("ERR_INVALID_USAGE", cmd);
 				const t = f(msg.args[1]);
 				if (!t) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.invalidType`, [msg.args[1]]));
-				const ch = await msg.getChannelFromArgs(2, true, 0);
+				const time = Number(msg.args[2]) as (5 | 10 | 15 | 30 | 60);
+				if (isNaN(time) || !([5, 10, 15, 30, 60] as const).includes(time)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.invalidTime`, [msg.args[2]]));
+				const ch = await msg.getChannelFromArgs(3, true, 0);
 				if (!ch) return msg.reply({
 					embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_CHANNEL", true)
 				});
@@ -69,48 +58,35 @@ export default new Command(["log"], __filename)
 				for (const p of perms) {
 					if (!ch.permissionsOf(this.bot.user.id).has(p)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.missingPermission`, [p, ch.id]));
 				}
-				if (t === "all") {
-					await msg.gConfig.mongoEdit({
-						$push: {
-							logEvents: {
-								$each: types.map(v => ({
-									channel: ch.id,
-									type: v,
-									ignore: []
-								}))
-							}
-						}
-					});
+				if ((t.startsWith("yiff") || ["butts", "bulge"].includes(t)) && !ch.nsfw) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.nsfw`, [msg.args[1], ch.id]));
+				const j = {
+					id: crypto.randomBytes(12).toString("hex"),
+					type: t,
+					time,
+					channel: ch.id
+				} as const;
 
-					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.doneAll`, [ch.id, msg.gConfig.settings.prefix]));
-				} else {
-					const j = {
-						channel: ch.id,
-						type: t,
-						ignore: []
-					};
-					const { value: k } = await msg.gConfig.mongoEdit({
-						$push: {
-							logEvents: j
-						}
-					});
-					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.gConfig.settings.prefix, k.logEvents.length + 1]));
-				}
+				const { value: k } = await msg.gConfig.mongoEdit({
+					$push: {
+						auto: j
+					}
+				});
+				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.gConfig.settings.prefix, k.auto.length + 1]));
 
 				break;
 			}
 
 			case "remove": {
 				if (msg.args.length !== 2) return new CommandError("ERR_INVALID_USAGE", cmd);
-				if (msg.gConfig.logEvents.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.noEntries`));
+				if (msg.gConfig.auto.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.noEntries`));
 				const id = Number(msg.args[1]);
 				if (id < 1) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.lessThanOne`));
-				if (id > msg.gConfig.logEvents.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.invalidId`, [id]));
-				const j = [...msg.gConfig.logEvents];
+				if (id > msg.gConfig.auto.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.invalidId`, [id]));
+				const j = [...msg.gConfig.auto];
 				const v = j.splice(id - 1, 1)[0];
 				await msg.gConfig.mongoEdit({
 					$pull: {
-						logEvents: v
+						auto: v
 					}
 				});
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.done`, [id, v.type, v.channel]));
@@ -118,18 +94,18 @@ export default new Command(["log"], __filename)
 			}
 
 			case "list": {
-				if (msg.gConfig.logEvents.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.noEntries`));
+				if (msg.gConfig.auto.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.noEntries`));
 				const perPage = 15;
-				const pages = chunk(msg.gConfig.logEvents, perPage);
+				const pages = chunk(msg.gConfig.auto, perPage);
 				const page = msg.args.length === 1 ? 1 : Number(msg.args[1]);
 				if (page < 1) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.lessThanOne`));
 				if (page > pages.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.list.invalidPage${pages.length === 1 ? "One" : ""}`, [page, pages.length]));
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(msg.gConfig.settings.lang)
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.setDescription(pages[page - 1].map((v, i) => `{lang:${cmd.lang}.list.entry|${(i + 1) + ((page - 1) * perPage)}|${v.type}|${v.channel}}`).join("\n"))
+						.setDescription(pages[page - 1].map((v, i) => `{lang:${cmd.lang}.list.entry|${(i + 1) + ((page - 1) * perPage)}|${v.type}|${v.channel}|${v.time}}`).join("\n"))
 						.setTitle(`{lang:${cmd.lang}.list.page|${page}}`)
-						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.logEvents.length}|${msg.gConfig.settings.prefix}}`, this.bot.user.avatarURL)
+						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.auto.length}|${msg.gConfig.settings.prefix}}`, this.bot.user.avatarURL)
 						.setColor(Colors.gold)
 						.setTimestamp(new Date().toISOString())
 						.toJSON()
@@ -139,10 +115,8 @@ export default new Command(["log"], __filename)
 
 			case "available": {
 				const incomplete = [
-					"inviteCreate",
-					"inviteDelete"
 				];
-				const text = ["all", ...types].map(v => `**${v}** - ${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.available.${v}`)}`);
+				const text = types.map(v => `**${v}** - ${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.available.${v.replace(/\./g, "-")}`)}`);
 				const end: string[] = [];
 				let i = 0;
 				for (const t of text) {
@@ -171,14 +145,14 @@ export default new Command(["log"], __filename)
 
 			case "clear": {
 				if (!msg.member.permissions.has("manageGuild")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.needPermission`));
-				const len = msg.gConfig.logEvents.length;
+				const len = msg.gConfig.auto.length;
 				if (len === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.noEntries`));
 				await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.confirm`, [len]));
 				const v = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id, 1);
 				if (!v || v.content.toLowerCase() !== "yes") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.cancelled`));
 				await msg.gConfig.mongoEdit({
 					$set: {
-						logEvents: []
+						auto: []
 					}
 				});
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.done`, [len]));
@@ -200,8 +174,9 @@ export default new Command(["log"], __filename)
 							`{lang:${cmd.lang}.help.main}`,
 							`{lang:${cmd.lang}.help.noInclude}`,
 							"",
-							`{lang:other.words.example$ucwords$}: \`${msg.gConfig.settings.prefix}auto add fox <#channel>\``,
-							`\`${msg.gConfig.settings.prefix}log add <type> <#channel>\` - {lang:${cmd.lang}.help.add}`,
+							`{lang:other.words.example$ucwords$}: \`${msg.gConfig.settings.prefix}auto add wah 5 <#channel>\``,
+							`{lang:${cmd.lang}.help.validTimes}`,
+							`\`${msg.gConfig.settings.prefix}log add <type> <time> <#channel>\` - {lang:${cmd.lang}.help.add}`,
 							`\`${msg.gConfig.settings.prefix}log remove <id>\` - {lang:${cmd.lang}.help.remove}`,
 							`\`${msg.gConfig.settings.prefix}log list\` - {lang:${cmd.lang}.help.list}`,
 							`\`${msg.gConfig.settings.prefix}log available\` - {lang:${cmd.lang}.help.available}`,
