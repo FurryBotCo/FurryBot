@@ -75,13 +75,6 @@ export default new Command(["log"], __filename)
 						}
 					});
 
-					console.log(types.length);
-					console.log(types.map(v => ({
-						channel: ch.id,
-						type: v,
-						ignore: []
-					})).length);
-
 					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.doneAll`, [ch.id, msg.gConfig.settings.prefix]));
 				} else {
 					const j = {
@@ -200,7 +193,7 @@ export default new Command(["log"], __filename)
 							`{lang:${cmd.lang}.help.main}`,
 							`{lang:${cmd.lang}.help.noInclude}`,
 							"",
-							`{lang:other.words.example$ucwords$}: \`${msg.gConfig.settings.prefix}log add memberJoin <#channel>\``,
+							`{lang:other.words.example$ucwords$}: \`${msg.gConfig.settings.prefix}auto add fox <#channel>\``,
 							`\`${msg.gConfig.settings.prefix}log add <type> <#channel>\` - {lang:${cmd.lang}.help.add}`,
 							`\`${msg.gConfig.settings.prefix}log remove <id>\` - {lang:${cmd.lang}.help.remove}`,
 							`\`${msg.gConfig.settings.prefix}log list\` - {lang:${cmd.lang}.help.list}`,
