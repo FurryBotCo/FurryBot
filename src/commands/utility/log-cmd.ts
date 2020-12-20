@@ -16,6 +16,11 @@ export default new Command(["log"], __filename)
 	.setRestrictions([])
 	.setCooldown(3e3, true)
 	.setExecutor(async function (msg, cmd) {
+		if ([null, undefined].includes(msg.gConfig.logEvents)) await msg.gConfig.mongoEdit({
+			$set: {
+				logEvents: []
+			}
+		});
 		const types = [
 			"channelCreate",
 			"channelDelete",
