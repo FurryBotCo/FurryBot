@@ -25,7 +25,7 @@ export default new Command(["e621", "e6"], __filename)
 		if (!msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.permsRequired`));
 		let slice = msg.args.length;
 		if (msg.slash) {
-			if (msg.args[msg.args.length - 2].match(/(true|false)/) && msg.args[msg.args.length - 1].match(/(true|false)/)) {
+			if (msg.args[msg.args.length - 2]?.match(/(true|false)/) && msg.args[msg.args.length - 1]?.match(/(true|false)/)) {
 				// both provided
 				if (msg.args[msg.args.length - 2] === "true") msg.dashedArgs.value.push("no-flash");
 				if (msg.args[msg.args.length - 1] === "true") msg.dashedArgs.value.push("no-video");
