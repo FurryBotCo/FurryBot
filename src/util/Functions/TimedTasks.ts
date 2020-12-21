@@ -1,4 +1,4 @@
-import { mdb, db } from "../Database";
+import { mdb } from "../Database";
 import UserConfig from "../config/UserConfig";
 import config from "../../config";
 import FurryBot from "../../main";
@@ -8,6 +8,7 @@ import DailyJoins from "../handlers/DailyJoinsHandler";
 import Logger from "../Logger";
 import AutoPostingHandler from "../handlers/AutoPostingHandler";
 import Utility from "./Utility";
+import { performance } from "perf_hooks";
 
 export default class TimedTasks {
 	private constructor() {
@@ -15,18 +16,21 @@ export default class TimedTasks {
 	}
 
 	static async runAll(client: FurryBot) {
+		const start = performance.now();
 		const d = new Date();
-		await this.runUpdateStatus(client, d);
-		if ((d.getSeconds() % 5) === 0) await this.runCalculateCPUUsage(client);
 		if (d.getSeconds() === 0) {
-			if ((d.getMinutes() % 5) === 0) await this.runAutoPosting(client).then(() => Logger.debug("Timed Tasks | Auto Posting", "Finished processing."));
+			if ((d.getMinutes() % 5) === 0) await this.runAutoPosting(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Auto Posting`, "Finished processing."));
 			if (d.getMinutes() === 0) {
-				await this.runDeleteUsers(client).then(() => Logger.debug("Timed Tasks | Delete Users", "Finished processing."));
-				await this.runDeleteGuilds(client).then(() => Logger.debug("Timed Tasks | Delete Guilds", "Finished processing."));
-				await this.runRefreshBoosters(client).then(() => Logger.debug("Timed Tasks | Refresh Boosters", "Finished processing."));
-				if (!config.beta && d.getHours() === 0) await this.runDailyJoins(client).then(() => Logger.debug("Timed Tasks | Daily Joins", "Finished processing."));
+				await this.runDeleteUsers(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Delete Users", "Finished processing.`));
+				await this.runDeleteGuilds(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Delete Guilds", "Finished processing.`));
+				await this.runRefreshBoosters(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Refresh Boosters", "Finished processing.`));
+				if (!config.beta && d.getHours() === 0) await this.runDailyJoins(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Daily Joins`, "Finished processing."));
 			}
 		}
+		await this.runUpdateStatus(client, d);
+		if ((d.getSeconds() % 5) === 0) await this.runCalculateCPUUsage(client);
+		const end = performance.now();
+		if (d.getSeconds() === 0) Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks`, `Total processing took ${(end - start).toFixed(3)}ms`);
 	}
 
 	static async runTimedActionsHandler(client: FurryBot) {

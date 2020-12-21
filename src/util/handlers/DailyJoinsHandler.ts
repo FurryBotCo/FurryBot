@@ -30,7 +30,7 @@ async function DailyJoins(client: FurryBot) {
 				.on("error", (err) => b(err))
 				.on("end", () => a(
 					Number(
-						Buffer.concat(data).toString().match(/(?:Currently serving [0-9,]{1,} furries in ([0-9,]{5,}) Discord servers)/)[1].replace(/,/g, "")
+						Buffer.concat(data).toString().match(/(?:Currently serving [0-9,]{1,} <a href="https:\/\/en.wikipedia.org\/wiki\/Furry_fandom">furries<\/a> in ([0-9,]{5,}) <a href="https:\/\/discord.com">Discord<\/a> servers)/)[1].replace(/,/g, "")
 					)
 				));
 		}).end();

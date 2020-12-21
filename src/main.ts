@@ -170,7 +170,7 @@ class FurryBot extends Base {
 			type: s[0].type
 		});
 
-		setInterval(async () => TimedTasks.runAll.bind(TimedTasks, this), 1e3);
+		setInterval(async () => TimedTasks.runAll.call(TimedTasks, this), 1e3);
 
 		if (!config.beta) {
 			BLClient
