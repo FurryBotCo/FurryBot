@@ -170,27 +170,7 @@ class FurryBot extends Base {
 			type: s[0].type
 		});
 
-		setInterval(async () => {
-			TimedTasks.runAll.bind(TimedTasks, this);
-			const d = new Date();
-			const stats = await this.ipc.getStats();
-			const s = config.statuses(this, stats);
-			const st = s.find(t => t.filter(d.getHours(), d.getMinutes(), d.getSeconds()));
-			if (!st) return;
-			else {
-				await this.bot.editStatus(st.status, {
-					name: st.name,
-					type: st.type
-				});
-			}
-		}, 1e3);
-
-		// explination in index.ts
-		setInterval(async () => {
-			this.cpuUsage = await Utility.getCPUUsage();
-		}, 5e3);
-
-		setInterval(() => TimedTasks.runAll(this), 1e3);
+		setInterval(async () => TimedTasks.runAll.bind(TimedTasks, this), 1e3);
 
 		if (!config.beta) {
 			BLClient
@@ -223,8 +203,6 @@ class FurryBot extends Base {
 				)
 				.start();
 		}
-
-		setTimeout(() => this.removeOldCounters(), 1e3);
 
 		const end = performance.now();
 		Logger.info([`Cluster #${this.cluster.id}`, "General"], `Ready with ${this.bot.guilds.size} guild${this.bot.guilds.size === 1 ? "" : "s"}, ${this.bot.users.size} user${this.bot.users.size === 1 ? "" : "s"}, and ${Object.keys(this.bot.channelGuildMap).length} guild channel${Object.keys(this.bot.channelGuildMap).length === 1 ? "" : "s"}. Launch processing took ${(end - start).toFixed(3)}ms.`);

@@ -7,6 +7,7 @@ import GuildConfig, { DBKeys } from "../config/GuildConfig";
 import DailyJoins from "../handlers/DailyJoinsHandler";
 import Logger from "../Logger";
 import AutoPostingHandler from "../handlers/AutoPostingHandler";
+import Utility from "./Utility";
 
 export default class TimedTasks {
 	private constructor() {
@@ -15,8 +16,10 @@ export default class TimedTasks {
 
 	static async runAll(client: FurryBot) {
 		const d = new Date();
+		await this.runUpdateStatus(client, d);
+		if ((d.getSeconds() % 5) === 0) await this.runCalculateCPUUsage(client);
 		if (d.getSeconds() === 0) {
-			if ((d.getMinutes() % 5) === 0) await this.runAutoPosting(client).then(() => Logger.debug("Timed Tasks |  Auto Posting", "Finished processing."));
+			if ((d.getMinutes() % 5) === 0) await this.runAutoPosting(client).then(() => Logger.debug("Timed Tasks | Auto Posting", "Finished processing."));
 			if (d.getMinutes() === 0) {
 				await this.runDeleteUsers(client).then(() => Logger.debug("Timed Tasks | Delete Users", "Finished processing."));
 				await this.runDeleteGuilds(client).then(() => Logger.debug("Timed Tasks | Delete Guilds", "Finished processing."));
@@ -133,6 +136,24 @@ export default class TimedTasks {
 					Logger.debug("Timed Tasks | Auto Posting", `Ran auto posting for type "${e.type}" in channel "${e.channel}" (time: ${e.time}, id: ${e.id})`);
 				}
 			}
+		}
+	}
+
+	// explination in index.ts
+	static async runCalculateCPUUsage(client: FurryBot) {
+		client.cpuUsage = await Utility.getCPUUsage();
+	}
+
+	static async runUpdateStatus(client: FurryBot, d: Date) {
+		const stats = await client.ipc.getStats();
+		const s = config.statuses(client, stats);
+		const st = s.find(t => t.filter(d.getHours(), d.getMinutes(), d.getSeconds()));
+		if (!st) return;
+		else {
+			await client.bot.editStatus(st.status, {
+				name: st.name,
+				type: st.type
+			});
 		}
 	}
 }

@@ -21,17 +21,18 @@ export default class Command {
 	cooldown: number;
 	donatorCooldown: number;
 	category: Category;
+	hasSlashVariant: boolean;
 	run: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<any>;
 	// allow isn't used right now but it can be a bypass system in the future
 	overrides:
-	{
-		permissionError: (this: FurryBot, msg: ExtendedMessage, cmd: Command, type: "user" | "bot", permissions: ErisPermissions[]) => Promise<OverrideReturn>;
-		invalidUsage: (this: FurryBot, msg: ExtendedMessage, cmd: Command, err: CommandError<"ERR_INVALID_USAGE">) => Promise<OverrideReturn>;
-		help: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<OverrideReturn>;
-		cooldown: (this: FurryBot, msg: ExtendedMessage, cmd: Command, time: number) => Promise<OverrideReturn>;
-	} & {
-		[k in "beta" | "developer" | "donator" | "guildOwner" | "nsfw" | "premium" | "supportServer"]: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<OverrideReturn>;
-	};
+		{
+			permissionError: (this: FurryBot, msg: ExtendedMessage, cmd: Command, type: "user" | "bot", permissions: ErisPermissions[]) => Promise<OverrideReturn>;
+			invalidUsage: (this: FurryBot, msg: ExtendedMessage, cmd: Command, err: CommandError<"ERR_INVALID_USAGE">) => Promise<OverrideReturn>;
+			help: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<OverrideReturn>;
+			cooldown: (this: FurryBot, msg: ExtendedMessage, cmd: Command, time: number) => Promise<OverrideReturn>;
+		} & {
+			[k in "beta" | "developer" | "donator" | "guildOwner" | "nsfw" | "premium" | "supportServer"]: (this: FurryBot, msg: ExtendedMessage, cmd: Command) => Promise<OverrideReturn>;
+		};
 	file: string;
 	constructor(triggers: ArrayOneOrMore<string>, file: string) {
 		if (!triggers) throw new TypeError("One or more triggers must be provided.");
@@ -137,5 +138,10 @@ export default class Command {
 
 	runOverride<K extends keyof Command["overrides"]>(type: K, client: FurryBot, ...args: Parameters<Command["overrides"][K]>): ReturnType<Command["overrides"][K]> {
 		return this.overrides[type].call(client, ...args);
+	}
+
+	setHasSlashVariant(data: boolean) {
+		this.hasSlashVariant = data;
+		return this;
 	}
 }
