@@ -13,6 +13,7 @@ export default new Command(["prune", "purge"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(1.5e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const count = Number(msg.args[0]);
 		if (msg.args.length === 0 || isNaN(count)) throw new CommandError("ERR_INVALID_USAGE", cmd);

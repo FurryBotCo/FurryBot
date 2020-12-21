@@ -13,6 +13,7 @@ export default new Command(["kadi"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const c = await Redis.get("kadi");
 		async function get() {

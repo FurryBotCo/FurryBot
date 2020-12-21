@@ -18,6 +18,7 @@ export default new Command(["reload"], __filename)
 	.setUserPermissions([])
 	.setRestrictions(["developer"])
 	.setCooldown(0, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 		async function rebuild(this: FurryBot, obj: Command | Category) {

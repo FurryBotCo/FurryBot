@@ -12,6 +12,7 @@ export default new Command(["conga"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const h = this.v.conga[msg.channel.id];
 

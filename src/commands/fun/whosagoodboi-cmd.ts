@@ -10,6 +10,7 @@ export default new Command(["whosagoodboi", "whosagoodboy", "goodboi", "goodboy"
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

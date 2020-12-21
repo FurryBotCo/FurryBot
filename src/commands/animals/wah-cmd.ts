@@ -10,6 +10,7 @@ export default new Command(["wah", "redpanda"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const r = await Request.fetchURL("https://some-random-api.ml/img/red_panda");
 		const img = JSON.parse(r.toString()).link as string;

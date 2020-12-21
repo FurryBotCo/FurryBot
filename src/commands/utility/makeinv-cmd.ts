@@ -14,6 +14,7 @@ export default new Command(["makeinv"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length === 0) return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

@@ -15,6 +15,7 @@ export default new Command(["marry"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const member = await msg.getMemberFromArgs();
 		if (!member) return msg.channel.createMessage({

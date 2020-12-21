@@ -14,6 +14,7 @@ export default new Command(["kick"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(1e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 		const member = await msg.getMemberFromArgs();

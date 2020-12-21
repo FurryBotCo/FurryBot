@@ -6,6 +6,7 @@ export default new Command(["dice"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const min = typeof msg.args[0] !== "undefined" ? Number(msg.args[0]) : 1;
 		const max = typeof msg.args[1] !== "undefined" ? Number(msg.args[1]) : 20;

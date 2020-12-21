@@ -7,6 +7,7 @@ export default new Command(["tag"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const tags: {
 			[k: string]: string;

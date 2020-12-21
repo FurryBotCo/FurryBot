@@ -13,6 +13,7 @@ export default new Command(["inviteinfo", "invinfo"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 		const [, code] = msg.args.join("").match(new RegExp("^(?:(?:https?\:\/\/)?(?:discord\.gg|discord(?:app)?\.com\/invite)\/)?([A-Za-z0-9]{2,32})$", "i")) ?? [];

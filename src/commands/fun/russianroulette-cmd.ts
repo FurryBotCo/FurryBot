@@ -8,6 +8,7 @@ export default new Command(["russianroulette", "rr"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const val = Math.floor(Math.random() * 6);
 		const bullets = typeof msg.args[0] !== "undefined" ? parseInt(msg.args[0], 10) : 3;

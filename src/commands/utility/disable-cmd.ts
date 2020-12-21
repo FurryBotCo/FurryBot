@@ -14,6 +14,7 @@ export default new Command(["disable"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const notAllowed = [
 			"disable"

@@ -9,6 +9,7 @@ export default new Command(["test"], __filename)
 	.setUserPermissions([])
 	.setRestrictions(["developer"])
 	.setCooldown(0, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length === 0) return new CommandError("ERR_INVALID_USAGE", cmd);
 		const testHandler = new Test();

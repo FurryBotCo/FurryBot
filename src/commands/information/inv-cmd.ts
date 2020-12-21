@@ -12,6 +12,7 @@ export default new Command(["inv", "invite", "discord", "support"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

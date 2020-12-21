@@ -11,6 +11,7 @@ export default new Command(["booster"], __filename)
 		"supportServer"
 	])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (!msg.member.roles.includes(config.roles.booster)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.notABooster`));
 		const check = await msg.uConfig.checkBooster();

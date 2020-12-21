@@ -15,6 +15,7 @@ export default new Command(["log"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if ([null, undefined].includes(msg.gConfig.logEvents)) await msg.gConfig.mongoEdit({
 			$set: {

@@ -12,6 +12,7 @@ export default new Command(["steal"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 		const e = msg.args[0].match(/(?:<a?:(.*):)?([0-9]{15,21})(?:>)?/i);

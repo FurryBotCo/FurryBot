@@ -13,6 +13,7 @@ export default new Command(["slowmode"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 		const s = Number(msg.args[0]);

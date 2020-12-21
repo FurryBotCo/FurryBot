@@ -7,6 +7,7 @@ export default new Command(["dadjoke"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const req = await phin<{ joke: string; }>({
 			method: "GET",

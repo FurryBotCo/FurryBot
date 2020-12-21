@@ -11,6 +11,7 @@ export default new Command(["turtle"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const img = await Request.chewyBotAPIRequest("turtle");
 

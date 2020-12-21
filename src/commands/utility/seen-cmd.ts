@@ -10,6 +10,7 @@ export default new Command(["seen"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		// @TODO across clusters
 		const showLocation = msg.dashedArgs.value.includes("show-location") || msg.dashedArgs.value.includes("show-all");

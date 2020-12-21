@@ -13,6 +13,7 @@ export default new Command(["shell", "sh"], __filename)
 	.setUserPermissions([])
 	.setRestrictions(["developer"])
 	.setCooldown(0, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const
 			silent = !!msg.dashedArgs.value.includes("silent"),

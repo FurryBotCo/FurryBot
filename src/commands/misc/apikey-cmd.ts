@@ -12,6 +12,7 @@ export default new Command(["apikey"], __filename)
 		"beta"
 	])
 	.setCooldown(8.64e+7, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		return msg.reply("This has not been implemented yet.");
 	});

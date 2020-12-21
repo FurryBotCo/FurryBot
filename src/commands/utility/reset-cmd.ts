@@ -10,6 +10,7 @@ export default new Command(["reset", "resetsettings"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(36e5, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.confirm`));
 		const d = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id);

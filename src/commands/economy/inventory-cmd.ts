@@ -17,6 +17,7 @@ export default new Command(["inventory"], __filename)
 		"developer"
 	])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		let pArg = 0, mArg = 0;
 		if (msg.args.length === 0) {

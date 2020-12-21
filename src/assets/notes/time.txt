@@ -1,9 +1,0 @@
-|        Usage        |   Unit  | Previous Unit Amount |
-|:-------------------:|:-------:|:--------------------:|
-| s / sec / second(s) | seconds |          N/A         |
-| m / min / minute(s) | minutes |      60 seconds      |
-|   h / hr / hour(s)  |  hours  |      60 minutes      |
-|      d / day(s)     |   days  |       24 hours       |
-|   w / wk / week(s)  |  weeks  |        28 days       |
-|       month(s)      |  months |        30 days       |
-|   y / yr / year(s)  |  years  |      365.25 days     |

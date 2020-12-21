@@ -12,6 +12,7 @@ export default new Command(["sinfo", "serverinfo", "si"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const o: Eris.User = await this.getUser(msg.channel.guild.ownerID).catch(err => null);
 		const owner = !o ? `{lang:other.words.unknown$ucwords$} (${msg.channel.guild.ownerID})` : `${o.username}#${o.discriminator} (${o.id})`;

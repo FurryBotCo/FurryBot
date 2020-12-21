@@ -16,6 +16,7 @@ export default new Command(["ship"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		let member1 = msg.member, member2: Eris.Member, amount = Math.floor(Math.random() * 100) + 1;
 		if (Object.keys(msg.dashedArgs.keyValue).includes("percent")) {

@@ -10,6 +10,7 @@ export default new Command(["koala"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const r = await Request.fetchURL("https://some-random-api.ml/img/koala");
 		const img = JSON.parse(r.toString()).link as string;

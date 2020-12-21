@@ -10,6 +10,7 @@ export default new Command(["afk"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(6e4, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const type = msg.args.length === 0 || msg.args[0].toLowerCase() !== "global" ? "server" : "global";
 		await Redis.set(`afk:${type === "server" ? `servers:${msg.channel.guild.id}` : "global"}:${msg.author.id}`, Date.now());

@@ -16,6 +16,7 @@ export default new Command(["bancount"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e4, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const b: Eris.GuildAuditLogEntry[] = [];
 

@@ -16,6 +16,7 @@ export default new Command(["beg"], __filename)
 	])
 	.setCooldown(6e4, false)
 	.setDonatorCooldown(4.5e4)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		function r() {
 			const p = msg.channel.guild.members.filter(m => !m.user.bot);

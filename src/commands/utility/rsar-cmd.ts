@@ -9,6 +9,7 @@ export default new Command(["rsar"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const role = await msg.getRoleFromArgs();
 		if (!role) return msg.channel.createMessage({

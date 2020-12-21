@@ -15,6 +15,7 @@ export default new Command(["fursuitbutt", "fursuitbutts"], __filename)
 		"nsfw"
 	])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (!msg.channel.nsfw) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.nsfw`));
 		const img = await FurryBotAPI.furry.butts("json", 1) as JSONResponse;

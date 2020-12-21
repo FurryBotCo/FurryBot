@@ -13,6 +13,7 @@ export default new Command(["todo"], __filename)
 		"developer"
 	])
 	.setCooldown(0, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 		const name = msg.args.join(" ").trim();

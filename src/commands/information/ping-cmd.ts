@@ -14,6 +14,7 @@ export default new Command(["ping"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		let create: number, edit: number, del: number;
 		await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.calculating`))

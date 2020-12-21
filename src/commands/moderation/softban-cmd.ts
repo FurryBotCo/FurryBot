@@ -13,6 +13,7 @@ export default new Command(["softban"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(1e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		let deleteDays = 7;
 		if (Object.keys(msg.dashedArgs.keyValue).includes("days")) {

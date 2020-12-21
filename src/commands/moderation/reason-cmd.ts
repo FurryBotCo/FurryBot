@@ -12,6 +12,7 @@ export default new Command(["reason"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 2) throw new CommandError("ERR_INVALID_USAGE", cmd);
 		if (!msg.gConfig.modlog.enabled || !msg.channel.guild.channels.has(msg.gConfig.modlog.channel)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noModlog`));

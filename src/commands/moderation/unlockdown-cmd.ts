@@ -15,6 +15,7 @@ export default new Command(["unlockdown"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 
 		const v = await Redis.get(`lockdown:${msg.channel.guild.id}`);

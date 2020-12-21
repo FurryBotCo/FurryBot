@@ -12,6 +12,7 @@ export default new Command(["dependencies", "dep"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(1e4, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const dep: {
 			[k in "main" | "dev" | string]: {

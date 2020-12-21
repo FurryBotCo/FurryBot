@@ -14,6 +14,7 @@ export default new Command(["setup-mutes"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(1.5e4, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (!msg.gConfig.settings.muteRole) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noRole`, [msg.gConfig.settings.prefix]));
 		const e = await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.confirm`, [msg.channel.guild.channels.size]));

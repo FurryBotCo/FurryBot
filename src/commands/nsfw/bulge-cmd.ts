@@ -14,6 +14,7 @@ export default new Command(["bulge"], __filename)
 		"nsfw"
 	])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const img = await FurryBotAPI.furry.bulge("json", 1) as JSONResponse;
 		if (!img) throw new TypeError("API method \"furry.bulge\" did not return an image.");

@@ -12,6 +12,7 @@ export default new Command(["furpile"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const h = this.v.furpile[msg.channel.id];
 

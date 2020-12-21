@@ -15,6 +15,7 @@ export default new Command(["rank"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const member = msg.args.length === 0 ? msg.member : await msg.getMemberFromArgs();
 

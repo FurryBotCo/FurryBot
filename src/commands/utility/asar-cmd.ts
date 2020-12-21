@@ -11,6 +11,7 @@ export default new Command(["asar"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const role = await msg.getRoleFromArgs(0, true);
 		if (!role) return msg.channel.createMessage({

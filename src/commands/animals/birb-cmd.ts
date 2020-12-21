@@ -10,6 +10,7 @@ export default new Command(["birb", "bird"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const img = await FurryBotAPI.animals.birb("json", 1);
 		return msg.channel.createMessage({

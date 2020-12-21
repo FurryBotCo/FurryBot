@@ -8,6 +8,7 @@ export default new Command(["prefix"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.current`, [msg.gConfig.settings.prefix]));
 		if (msg.args.join("").toLowerCase() === msg.gConfig.settings.prefix.toLowerCase()) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.same`));

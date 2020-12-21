@@ -21,6 +21,7 @@ export default new Command(["auto"], __filename)
 		"donator"
 	])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if ([null, undefined].includes(msg.gConfig.auto)) await msg.gConfig.mongoEdit({
 			$set: {

@@ -16,6 +16,7 @@ export default new Command(["yiff"], __filename)
 		"nsfw"
 	])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		let type: string;
 		if (!msg.args[0]) type = msg.gConfig.settings.defaultYiffType;

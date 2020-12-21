@@ -49,7 +49,8 @@
 		"commandList": "Command List #{0}",
 		"cmdCount": "Total Commands: **{0}**",
 		"devOnlyCommand": "That command is developer only",
-		"devOnlyCategory": "That category is developer only."
+		"devOnlyCategory": "That category is developer only.",
+		"slashTip": "TIP:\nCommands with a **\\*** beside them have a slash command variant. If your client supports them, and you invited me properly, you can type `/`, then the command and use it there. You can read more about it [here]({0})."
 	},
 	"leaderboard": {
 		"description": "Get the server leveling leaderboard.",

@@ -12,6 +12,7 @@ export default new Command(["cat"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const img = await phin<any>({
 			method: "GET",

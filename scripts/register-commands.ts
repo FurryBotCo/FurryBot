@@ -353,9 +353,9 @@ process.nextTick(async () => {
 
 	await h.createGlobalCommand("info", Language.get(config.devLanguage, "commands.information.info.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("ping", Language.get(config.devLanguage, "commands.information.ping.description", [], false, true, true), []);
+	await h.createGlobalCommand("invite", Language.get(config.devLanguage, "commands.information.inv.description", [], false, true, true), []);
 
-	await h.createGlobalCommand("shards", Language.get(config.devLanguage, "commands.information.shards.description", [], false, true, true), []);
+	await h.createGlobalCommand("ping", Language.get(config.devLanguage, "commands.information.ping.description", [], false, true, true), []);
 
 	await h.createGlobalCommand("sinfo", Language.get(config.devLanguage, "commands.information.sinfo.description", [], false, true, true), [
 		{
@@ -401,8 +401,13 @@ process.nextTick(async () => {
 		}
 	]);
 
-	await h.createGlobalCommand("invite", Language.get(config.devLanguage, "commands.information.inv.description", [], false, true, true), []);
-
+	await h.createGlobalCommand("whoplays", Language.get(config.devLanguage, "commands.information.whoplays.description", [], false, true, true), [
+		{
+			type: ApplicationCommandOptionType.STRING,
+			name: "game",
+			description: "The game name to search for."
+		}
+	]);
 	/* end information */
 
 	/* start fun */
@@ -518,11 +523,11 @@ process.nextTick(async () => {
 
 	/* start images */
 
+	await h.createGlobalCommand("chris", Language.get(config.devLanguage, "commands.images.chris.description", [], false, true, true), []);
+
 	await h.createGlobalCommand("fursuit", Language.get(config.devLanguage, "commands.images.fursuit.description", [], false, true, true), []);
 
 	await h.createGlobalCommand("kadi", Language.get(config.devLanguage, "commands.images.kadi.description", [], false, true, true), []);
-
-	await h.createGlobalCommand("chris", Language.get(config.devLanguage, "commands.images.chris.description", [], false, true, true), []);
 
 	/* end images */
 

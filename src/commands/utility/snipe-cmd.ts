@@ -11,6 +11,7 @@ export default new Command(["snipe"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		let ch: Eris.TextChannel;
 		if (msg.args.length > 0) ch = await msg.getChannelFromArgs();

@@ -14,6 +14,7 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const user = msg.args.length === 0 || !msg.args ? msg.member : await msg.getMemberFromArgs();
 

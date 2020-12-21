@@ -17,6 +17,7 @@ export default new Command(["leaderboard", "lb"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(1.5e4, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const global = msg.dashedArgs.value.includes("global");
 

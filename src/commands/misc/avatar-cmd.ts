@@ -10,6 +10,7 @@ export default new Command(["avatar"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const member = msg.args.length === 0 ? msg.member : await msg.getMemberFromArgs();
 		if (!member) return msg.channel.createMessage({

@@ -16,6 +16,7 @@ export default new Command(["ban"], __filename)
 	])
 	.setRestrictions([])
 	.setCooldown(1e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const a = [...msg.args], noDM = msg.dashedArgs.value.includes("no-dm");
 		let time = 0, deleteDays = 1;

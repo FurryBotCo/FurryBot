@@ -11,6 +11,7 @@ export default new Command(["dmuser"], __filename)
 	.setUserPermissions([])
 	.setRestrictions(["developer"])
 	.setCooldown(0, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 2) return new CommandError("ERR_INVALID_USAGE", cmd);
 

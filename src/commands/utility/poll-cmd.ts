@@ -16,6 +16,7 @@ export default new Command(["poll"], __filename)
 	.setRestrictions([])
 	.setCooldown(3e4, false)
 	.setDonatorCooldown(2e4)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const p = msg.args.slice(1).join(" ").split(";");
 		if (msg.args.length === 0 || p.length === 0) return new CommandError("ERR_INVALID_USAGE", cmd, "NONE_PROVIDED");

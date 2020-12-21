@@ -13,6 +13,7 @@ export default new Command(["chris"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const c = await Redis.get("chris");
 		async function get() {

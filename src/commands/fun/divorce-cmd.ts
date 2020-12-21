@@ -7,6 +7,7 @@ export default new Command(["divorce"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (!msg.uConfig.marriage) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.notMarried`));
 

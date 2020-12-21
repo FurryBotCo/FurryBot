@@ -14,6 +14,7 @@ export default new Command(["bal", "balance"], __filename)
 	])
 	.setCooldown(6e4, false)
 	.setDonatorCooldown(3e4)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const m = msg.args.length === 0 ? msg.member : await msg.getMemberFromArgs();
 

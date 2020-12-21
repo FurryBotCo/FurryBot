@@ -17,6 +17,7 @@ export default new Command(["e621", "e6"], __filename)
 		"nsfw"
 	])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		// because we can't have nice things without jackasses ruining it,
 		// this has to have a ratelimiting system

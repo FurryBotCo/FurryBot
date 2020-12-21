@@ -10,6 +10,7 @@ export default new Command(["awoo"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const h = this.v.awoo[msg.channel.id];
 

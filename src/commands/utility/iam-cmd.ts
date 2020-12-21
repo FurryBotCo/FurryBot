@@ -10,6 +10,7 @@ export default new Command(["iam"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length === 0) throw new CommandError("ERR_INVALID_USAGE", cmd);
 		const roles = msg.gConfig.selfAssignableRoles.map(a => msg.channel.guild.roles.get(a)).filter(a => a);

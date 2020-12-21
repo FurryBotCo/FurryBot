@@ -11,6 +11,7 @@ export default new Command(["bugreport"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(9e5, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 		const [title, desc] = msg.args.join(" ").split("|").map(v => v.trim());

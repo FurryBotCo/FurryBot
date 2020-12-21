@@ -10,6 +10,7 @@ export default new Command(["gayrate"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const member = msg.args.length < 1 ? msg.member : await msg.getMemberFromArgs();
 		if (!member) return msg.channel.createMessage({

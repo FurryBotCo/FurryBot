@@ -11,6 +11,7 @@ export default new Command(["help", "h"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length === 0) {
 			const categories = this.cmd.categories.filter(cat => !(cat.restrictions.includes("beta") && !config.beta) && !(cat.restrictions.includes("developer") && !config.developers.includes(msg.author.id)));
@@ -45,7 +46,7 @@ export default new Command(["help", "h"], __filename)
 				let i = 0;
 				for (const t of cat.commands) {
 					if (t.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) continue;
-					const v = `\`${t.triggers[0]}\` - ${t.description || `{lang:commands.${t.category.name}.${t.triggers[0]}.description}`}`;
+					const v = `\`${t.triggers[0]}\`${t.hasSlashVariant ? "**\\***" : ""} - ${t.description || `{lang:commands.${t.category.name}.${t.triggers[0]}.description}`}`;
 					if (!list[i]) list[i] = "";
 					if (list[i].length + v.length > 1024) list[++i] = `${v}\n`;
 					else list[i] += `${v}\n`;
@@ -55,7 +56,7 @@ export default new Command(["help", "h"], __filename)
 					embed: new EmbedBuilder(msg.gConfig.settings.lang)
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
 						.setTitle(cat.displayName || `{lang:categories.${cat.name}.displayName}`)
-						.setDescription(`${cat.description || `{lang:categories.${cat.name}.description}`}\n\n{lang:${cmd.lang}.cmdCount|${cat.commands.length}}`)
+						.setDescription(`${cat.description || `{lang:categories.${cat.name}.description}`}\n\n{lang:${cmd.lang}.cmdCount|${cat.commands.length}}\n\n{lang:${cmd.lang}.slashTip|http${config.web.api.security ? "s" : ""}://${config.web.api.host}:${config.web.api.port}/note/slash}`)
 						.setColor(Math.floor(Math.random() * 0xFFFFFF))
 						.setTimestamp(new Date().toISOString())
 						.addFields(...list.map((l, i) => ({

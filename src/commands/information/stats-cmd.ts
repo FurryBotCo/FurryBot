@@ -17,6 +17,7 @@ export default new Command(["stats"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const start = performance.now();
 		const stats = await this.sh.getStats();

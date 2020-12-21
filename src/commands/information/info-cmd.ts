@@ -19,6 +19,7 @@ export default new Command(["info"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const { drives: diskUsage } = Internal.getDiskUsage();
 		const d = [];

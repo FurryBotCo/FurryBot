@@ -18,6 +18,7 @@ export default new Command(["fursuit"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const img = await FurryBotAPI.furry.fursuit("json", 1) as JSONResponse;
 		if (!img) throw new TypeError(`API method "furry.${msg.args[0].toLowerCase()}" did not return an image.`);

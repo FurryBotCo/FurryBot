@@ -8,6 +8,7 @@ export default new Command(["lsar"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const page = msg.args.length > 0 ? parseInt(msg.args[0], 10) : 1;
 		if (msg.gConfig.selfAssignableRoles.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noRoles`));

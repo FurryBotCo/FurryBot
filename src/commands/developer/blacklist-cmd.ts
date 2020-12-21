@@ -18,6 +18,7 @@ export default new Command(["blacklist", "bl"], __filename)
 		"developer"
 	])
 	.setCooldown(0, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		function formatEntry(pos: number, date: number, blame: string, reason: string, expiry: number, id: string) {
 			return {

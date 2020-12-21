@@ -14,6 +14,7 @@ export default new Command(["weekly"], __filename)
 		"developer"
 	])
 	.setCooldown(8.64e+7, true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		await msg.uConfig.edit({
 			eco: {

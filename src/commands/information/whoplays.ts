@@ -11,6 +11,7 @@ export default new Command(["whoplays"], __filename)
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 		// if (msg.channel.guild.memberCount < 1000 && msg.channel.guild.members.size !== msg.channel.guild.memberCount) await msg.channel.guild.fetchAllMembers();
