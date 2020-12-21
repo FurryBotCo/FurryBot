@@ -7,6 +7,7 @@ import EmbedBuilder from "../util/EmbedBuilder";
 import Logger from "../util/Logger";
 
 export default new ClientEvent("presenceUpdate", async function (other, oldPresence) {
+	if (config.beta && !config.eventTest) return;
 	if (other instanceof Eris.Member) {
 		const { guild } = other;
 		if (config.beta && guild.id !== config.client.supportServerId) return;

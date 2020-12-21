@@ -7,10 +7,6 @@ import EmbedBuilder from "../util/EmbedBuilder";
 import Redis from "../util/Redis";
 
 export default new ClientEvent("messageUpdate", async function (message, oldMessage) {
-	/* this.counters.push({
-		type: "messageUpdate",
-		time: Date.now()
-	}); */
 	if (!this || !message || !message.author || !oldMessage || !(message.content && oldMessage.content) || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any) || message.content === oldMessage.content || (config.beta && !config.developers.includes(message.author.id))) return;
 
 	// we want to get bots here so we don't check bots yet

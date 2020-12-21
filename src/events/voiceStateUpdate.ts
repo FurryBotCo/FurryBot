@@ -6,6 +6,7 @@ import EmbedBuilder from "../util/EmbedBuilder";
 import Eris from "eris";
 
 export default new ClientEvent("voiceStateUpdate", async function (member, oldState) {
+	if (config.beta && !config.eventTest) return;
 	const { guild } = member;
 	if (config.beta && guild.id !== config.client.supportServerId) return;
 	const g = await db.getGuild(guild.id);

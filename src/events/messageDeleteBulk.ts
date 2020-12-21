@@ -10,10 +10,7 @@ import Time from "../util/Functions/Time";
 import * as fs from "fs-extra";
 
 export default new ClientEvent("messageDeleteBulk", async function (messages) {
-	/* this.counters.push({
-		type: "messageDeleteBulk",
-		time: Date.now()
-	}); */
+	if (config.beta && !config.eventTest) return;
 	const delCh = await this.bot.getChannel(messages[0].channel.id) as Eris.GuildTextableChannel;
 	if (!delCh || ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(delCh.type)) return;
 	const { guild } = delCh;

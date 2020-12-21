@@ -6,6 +6,7 @@ import db from "../util/Database";
 import EmbedBuilder from "../util/EmbedBuilder";
 
 export default new ClientEvent("voiceChannelLeave", async function onGuildMemberJoin(member, oldChannel) {
+	if (config.beta && !config.eventTest) return;
 	const { guild } = member;
 	if (config.beta && guild.id !== config.client.supportServerId) return;
 	const g = await db.getGuild(member.guild.id);

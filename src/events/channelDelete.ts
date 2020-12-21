@@ -7,6 +7,7 @@ import EmbedBuilder from "../util/EmbedBuilder";
 import Time from "../util/Functions/Time";
 
 export default new ClientEvent("channelDelete", async function (channel) {
+	if (config.beta && !config.eventTest) return;
 	if (channel instanceof Eris.GuildChannel) {
 		const { guild } = channel;
 		if (config.beta && guild.id !== config.client.supportServerId) return;

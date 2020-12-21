@@ -11,7 +11,7 @@ export default new ClientEvent("guildMemberRemove", async function (guild, membe
 		type: "guildMemberRemove",
 		time: Date.now()
 	}); */
-	if (config.beta && guild.id !== config.client.supportServerId) return;
+	if (config.beta && !config.eventTest) return;
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.filter(l => l.type === "memberLeave");
 	for (const log of e) {

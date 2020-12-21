@@ -6,7 +6,7 @@ import db from "../util/Database";
 import EmbedBuilder from "../util/EmbedBuilder";
 
 export default new ClientEvent("guildBanRemove", async function (guild, user) {
-	if (config.beta && guild.id !== config.client.supportServerId) return;
+	if (config.beta && !config.eventTest) return;
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.filter(l => l.type === "memberUnban");
 

@@ -8,6 +8,7 @@ import Time from "../util/Functions/Time";
 import Logger from "../util/Logger";
 
 export default new ClientEvent("channelUpdate", async function (channel, oldChannel) {
+	if (config.beta && !config.eventTest) return;
 	if (channel instanceof Eris.GuildChannel) {
 		const { guild } = channel;
 		if (config.beta && guild.id !== config.client.supportServerId) return;

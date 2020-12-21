@@ -3,8 +3,10 @@ import db from "../util/Database";
 import EmbedBuilder from "../util/EmbedBuilder";
 import ClientEvent from "../util/ClientEvent";
 import Eris from "eris";
+import config from "../config";
 
 export default new ClientEvent("guildUpdate", async function (guild, old) {
+	if (config.beta && !config.eventTest) return;
 	const settings = await db.getGuild(guild.id);
 	const events = settings.logEvents.filter(event => event.type === "guildUpdate");
 

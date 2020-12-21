@@ -7,7 +7,7 @@ import EmbedBuilder from "../util/EmbedBuilder";
 import Logger from "../util/Logger";
 
 export default new ClientEvent("guildRoleUpdate", async function (guild, role, oldRole) {
-	if (config.beta && guild.id !== config.client.supportServerId) return;
+	if (config.beta && !config.eventTest) return;
 	const g = await db.getGuild(guild.id);
 	const e = g.logEvents.filter(l => l.type === "roleUpdate");
 

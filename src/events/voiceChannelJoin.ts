@@ -6,6 +6,7 @@ import db from "../util/Database";
 import EmbedBuilder from "../util/EmbedBuilder";
 
 export default new ClientEvent("voiceChannelJoin", async function onGuildMemberJoin(member, channel) {
+	if (config.beta && !config.eventTest) return;
 	const { guild } = member;
 	if (config.beta && guild.id !== config.client.supportServerId) return;
 	const g = await db.getGuild(guild.id);
