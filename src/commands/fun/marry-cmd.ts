@@ -69,9 +69,8 @@ export default new Command(["marry"], __filename)
 
 			d = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === member.id, 1);
 			if (!d || !d.content) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noReply`));
-			if (!["yes", "no"].includes(d.content.toLowerCase())) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidOption`, [member.id]));
 		} else d = { content: "yes" } as any;
-		if (d.content.toLowerCase() === "yes") {
+		if (["yes", "ye"].some(v => d.content.toLowerCase() === v)) {
 			await msg.uConfig.edit({
 				marriage: member.id
 			}).then(d => d.reload());
@@ -79,7 +78,5 @@ export default new Command(["marry"], __filename)
 				marriage: msg.author.id
 			}).then(d => d.reload());
 			return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.accepted`, [msg.author.id, member.id]));
-		} else {
-			return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.denied`));
-		}
+		} else return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.denied`));
 	});
