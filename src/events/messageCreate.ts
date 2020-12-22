@@ -369,7 +369,7 @@ export default new ClientEvent("messageCreate", async function (message, update,
 			.call(this, msg, cmd)
 			.then(res => {
 				const end = performance.now();
-				Logger.info([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, "Command Handler"], `Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms.`);
+				Logger.info([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, `Command Handler${msg.slash ? "[Slash]" : ""}`], `Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms.`);
 				if (res instanceof Error) throw res;
 			})
 			/* start command error handler */
