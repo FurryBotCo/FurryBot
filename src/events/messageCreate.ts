@@ -118,7 +118,7 @@ export default new ClientEvent("messageCreate", async function (message, update,
 	if (!k) {
 		const v = await msg.uConfig.checkVote();
 		await Redis.setex(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`, v.weekend ? 30 : 60, 1);
-		const lvl = config.leveling.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
+		const lvl = Utility.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
 		const j = (Math.floor(Math.random() * 10) + 5) * (v.voted ? 2 : 1);
 		await msg.uConfig.edit({
 			levels: {
@@ -126,7 +126,7 @@ export default new ClientEvent("messageCreate", async function (message, update,
 			}
 		});
 		await Redis.set(`leveling:${msg.channel.guild.id}:${message.author.id}`, (msg.uConfig.getLevel(msg.channel.guild.id) + 1).toString());
-		const nlvl = config.leveling.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
+		const nlvl = Utility.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
 		if (nlvl.level > lvl.level && msg.gConfig.settings.announceLevelUp) {
 			this.sh.track("stats", "levelUp");
 			if (msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) {

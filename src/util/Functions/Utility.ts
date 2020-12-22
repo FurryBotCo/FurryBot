@@ -625,4 +625,31 @@ export default class Utility {
 			sample
 		};
 	}
+
+	static calcExp(lvl: number) {
+		const k = {
+			lvl: lvl < config.leveling.flatRateStart ? lvl * 100 : config.leveling.flatRate,
+			total: 0
+		};
+		for (let i = 0; i <= lvl; i++) k.total += i < config.leveling.flatRateStart ? i * 100 : config.leveling.flatRate;
+		return k;
+	}
+
+	static calcLevel(exp: number) {
+		let e = Number(exp), lvl = 0, complete = false;
+		while (!complete) {
+			const l = Utility.calcExp(lvl + 1).lvl;
+			if (e >= l) {
+				e -= l;
+				lvl++;
+			} else complete = true;
+		}
+
+		return {
+			level: lvl,
+			total: exp,
+			leftover: e,
+			needed: Utility.calcExp(lvl + 1).lvl - e
+		};
+	}
 }
