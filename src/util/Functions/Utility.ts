@@ -631,18 +631,34 @@ export default class Utility {
 			lvl: lvl < config.leveling.flatRateStart ? lvl * 100 : config.leveling.flatRate,
 			total: 0
 		};
-		for (let i = 0; i <= lvl; i++) k.total += i < config.leveling.flatRateStart ? i * 100 : config.leveling.flatRate;
+		if (lvl <= config.leveling.flatRateStart) for (let i = 0; i <= lvl; i++) k.total += i < config.leveling.flatRateStart ? i * 100 : config.leveling.flatRate;
+		else {
+			const { total: t } = Utility.calcExp(config.leveling.flatRateStart);
+			k.total = t + (lvl - config.leveling.flatRateStart) * config.leveling.flatRate;
+		}
 		return k;
 	}
 
 	static calcLevel(exp: number) {
 		let e = Number(exp), lvl = 0, complete = false;
-		while (!complete) {
-			const l = Utility.calcExp(lvl + 1).lvl;
-			if (e >= l) {
-				e -= l;
-				lvl++;
-			} else complete = true;
+		const { total: t } = Utility.calcExp(config.leveling.flatRateStart);
+		if (exp <= t) {
+			while (!complete) {
+				const l = Utility.calcExp(lvl + 1).lvl;
+				if (e >= l) {
+					e -= l;
+					lvl++;
+				} else complete = true;
+			}
+		} else {
+			// leftover exp after level 20
+			const l = exp - t;
+			// leftover exp
+			const a = l % config.leveling.flatRate;
+			// levels above 20
+			const b = Math.floor(l / config.leveling.flatRate);
+			lvl = b + config.leveling.flatRateStart;
+			e = a;
 		}
 
 		return {
