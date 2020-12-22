@@ -18,7 +18,7 @@ export default new Command(["prune", "purge"], __filename)
 		const count = Number(msg.args[0]);
 		if (msg.args.length === 0 || isNaN(count)) throw new CommandError("ERR_INVALID_USAGE", cmd);
 		if (count < 2 || count > 1000) return msg.channel.createMessage(`<@!${msg.author.id}>, ${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.amount`)}`);
-		await msg.delete();
+		if (!msg.slash) await msg.delete();
 		const m: Eris.Message[] = [];
 		let i = count;
 		while (i > 0) {
