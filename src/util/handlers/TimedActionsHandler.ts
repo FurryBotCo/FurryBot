@@ -36,10 +36,10 @@ export default class TimedActionsHandler {
 		});
 	}
 
-	async processEntries(client: FurryBot) {
+	async processEntries() {
 		const entries = await this.col.find({}).toArray();
 		for (const entry of entries) {
-			if (entry.expiry > Date.now() || client.bot.guilds.has(entry.guildId)) continue;
+			if (entry.expiry > Date.now() || this.client.bot.guilds.has(entry.guildId)) continue;
 			await entry.type === "ban" ? this.handleBanEntry(entry as any) : this.handleMuteEntry(entry as any); // eslint-disable-line
 		}
 	}

@@ -121,7 +121,7 @@ export default class Cluster {
 			}
 
 			case "CONNECT": {
-				Logger.info(`Cluster #${this.id}`, `Connecting with ${this.options.shardCount} ([${this.shards[0]} - ${this.shards[this.shards.length - 1]}]) shards.`);
+				Logger.info(`Cluster #${this.id}`, `Connecting with ${this.shards.length} ([${this.shards[0]} - ${this.shards[this.shards.length - 1]}]) shards.`);
 				this.client.connect();
 				break;
 			}

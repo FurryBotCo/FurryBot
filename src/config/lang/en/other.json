@@ -198,6 +198,7 @@
 	"slashNotEnabled": "Slash commands are not enabled in this server. Have a moderator run `{0}settings slash commands enabled` to enable them.",
 	"auto": {
 		"footer": "Automatically Posted | Use {0}auto to manage this.",
+		"footerNews": "Automatically Posted",
 		"titles": {
 			"disabled": "Autoposting Disabled",
 			"birb": "Birb!",

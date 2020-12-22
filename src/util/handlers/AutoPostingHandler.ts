@@ -326,6 +326,9 @@ export default class AutoPostingHandler {
 			}
 		}
 
+		// remove the removal notice if we publish the message
+		if (ch.type === Eris.Constants.ChannelTypes.GUILD_NEWS) e.setFooter("{lang:other.auto.footerNews}");
+
 		const msg = await ch.createMessage({
 			embed: e.toJSON()
 		}, file);
