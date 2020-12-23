@@ -172,13 +172,23 @@ class FurryBot extends Base {
 
 		setInterval(async () => TimedTasks.runAll.call(TimedTasks, this), 1e3);
 
-		if (!config.beta) {
+		if (!config.beta && this.cluster.id === 0) {
 			BLClient
 				.on("beforePost", async () => {
-					BLClient.update(this.bot.guilds.size, this.bot.shards.map(s => ({
+					const sh: Clustering.ShardStats[] = await this.ipc.getStats().then(v => v.shards && v.shards.size > 0 ? Array.from(v.shards?.values()) : this.bot.shards.map(s => ({
 						id: s.id,
-						count: this.bot.guilds.filter(g => g.shard.id === s.id).length
-					})).reduce((a, b) => a.concat(b), []));
+						latency: s.latency,
+						lastHeartbeatReceived: s.lastHeartbeatReceived,
+						lastHeartbeatSent: s.lastHeartbeatSent,
+						status: s.status,
+						guilds: this.bot.guilds.filter(g => g.shard.id === s.id).length,
+						largeGuilds: this.bot.guilds.filter(g => g.large && g.shard.id === s.id).length,
+						channels: this.bot.guilds.filter(g => g.shard.id === s.id).reduce((a, b) => a + b.channels.size, 0)
+					}) as Clustering.ShardStats));
+					BLClient.update(sh.reduce((a, b) => a + b.guilds, 0), sh.map(v => ({
+						id: v.id,
+						count: v.guilds
+					})));
 					await phin({
 						method: "POST",
 						url: "https://top.gg/api/bots/398251412246495233/stats",
@@ -187,8 +197,8 @@ class FurryBot extends Base {
 							"User-Agent": config.web.userAgent
 						},
 						data: {
-							server_count: this.bot.guilds.size,
-							shards: this.bot.shards.map(s => this.bot.guilds.filter(g => g.shard.id === s.id).length)
+							server_count: sh.reduce((a, b) => a + b.guilds, 0),
+							shards: sh.map(v => v.guilds)
 						} as any
 					}).then(res => {
 						Logger.debug(["Bot List Stats", "DBL"], res.statusCode === 200 ? "Successfully posted stats" : "failed to post stats");

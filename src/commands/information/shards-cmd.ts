@@ -14,6 +14,7 @@ export default new Command(["shards"], __filename)
 	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const sh: Clustering.ShardStats[] = await this.ipc.getStats().then(v => v.shards && v.shards.size > 0 ? Array.from(v.shards?.values()) : this.bot.shards.map(s => ({
+			id: s.id,
 			latency: s.latency,
 			lastHeartbeatReceived: s.lastHeartbeatReceived,
 			lastHeartbeatSent: s.lastHeartbeatSent,
