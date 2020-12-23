@@ -16,7 +16,7 @@ export default new Command(["setup-mutes"], __filename)
 	.setCooldown(1.5e4, true)
 	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
-		if (!msg.gConfig.settings.muteRole) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noRole`, [msg.gConfig.settings.prefix]));
+		if (!msg.gConfig.settings.muteRole) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noRole`, [msg.prefix]));
 		const e = await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.confirm`, [msg.channel.guild.channels.size]));
 		const m = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id, 1);
 		await m.delete().catch(err => null);

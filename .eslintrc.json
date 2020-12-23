@@ -50,7 +50,8 @@
 		"eslint-plugin-import",
 		"eslint-plugin-prefer-arrow",
 		"@typescript-eslint",
-		"@typescript-eslint/tslint"
+		"@typescript-eslint/tslint",
+		"deprecation"
 	],
 	"rules": {
 		"@typescript-eslint/adjacent-overload-signatures": "error",
@@ -175,7 +176,7 @@
 		"id-match": "off",
 		"import/no-extraneous-dependencies": "off",
 		"import/no-internal-modules": "off",
-		"import/order": "off",
+		"import/order": "on",
 		"jsdoc/check-alignment": "error",
 		"jsdoc/check-indentation": "error",
 		"jsdoc/newline-after-description": "error",
@@ -253,6 +254,7 @@
 			"rules": {
 				"whitespace": [true, "check-branch", "check-decl", "check-operator", "check-module", "check-separator", "check-type"]
 			}
-		}]
+		}],
+		 "deprecation/deprecation": "error"
 	}
 }

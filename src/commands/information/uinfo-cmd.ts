@@ -82,7 +82,7 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 					`${config.emojis.default.dot} {lang:${cmd.lang}.id}: ${user.id}`,
 					`${config.emojis.default.dot} {lang:${cmd.lang}.joinDate}: ${Time.formatDateWithPadding(user.joinedAt, true)}`,
 					`${config.emojis.default.dot} {lang:${cmd.lang}.creationDate}: ${Time.formatDateWithPadding(user.createdAt, true)}`,
-					`${config.emojis.default.dot} {lang:${cmd.lang}.roles} [${user.roles.length}]: ${user.roles.reduce((a, b) => a + msg.channel.guild.roles.get(b).name.length, 0) > 250 ? `{lang:${cmd.lang}.tooManyRoles|${msg.gConfig.settings.prefix}|${user.user.id}}` : user.roles.length === 0 ? "NONE" : user.roles.map(r => `<@&${r}>`).join(" ")}`,
+					`${config.emojis.default.dot} {lang:${cmd.lang}.roles} [${user.roles.length}]: ${user.roles.reduce((a, b) => a + msg.channel.guild.roles.get(b).name.length, 0) > 250 ? `{lang:${cmd.lang}.tooManyRoles|${msg.prefix}|${user.user.id}}` : user.roles.length === 0 ? "NONE" : user.roles.map(r => `<@&${r}>`).join(" ")}`,
 					`${config.emojis.default.dot} {lang:other.words.status$ucwords$}: <:${config.emojis.status[user.status || "offline"]}> ${user.status || "offline"}`, /* if we get no status, assume offline */
 					`${config.emojis.default.dot} {lang:other.words.game$ucwords$}: ${!user.game ? "{lang:other.words.none}" : `${user.game.name}`}`,
 					`${config.emojis.default.dot} {lang:${cmd.lang}.joinPos}: #${m.indexOf(user.id) + 1}`,

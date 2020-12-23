@@ -214,12 +214,37 @@
 	},
 	"prefix": {
 		"description": "List this servers prefix, or change my prefix for this server.",
-		"usage": "[new prefix]",
-		"current": "this servers prefix is \"{0}\", if you want to change this, run this again with the new prefix! (ex: `{0}prefix <new prefix>`)",
-		"invalid": "you cannot use {0} as my prefix.",
-		"same": "that is already this servers prefix.",
-		"maxLen": "the maximum length for my prefix is 15 characters (not counting spaces).",
-		"set": "set this servers prefix to {0}"
+		"usage": "[add/remove/list]",
+		"help": {
+			"noInclude": "Do not include the `<>` when running commands.",
+			"main": "This command consists of several subcommands.",
+			"add": "Add a prefix.",
+			"remove": "Remove a prefix.",
+			"list": "List the current prefixes.",
+			"reset": "Reset this servers prefixes."
+		},
+		"add": {
+			"done": "Added the prefix **{0}**. Use `{1}prefix remove {0}` to remove it.",
+			"max": "You may only have **{0}** prefixes. Remove some with `{1}prefix remove` to add more.",
+			"duplicate": "**{0}** is already a prefix in this server. Use `{1}prefix remove {0}` to remove it.\n\nTip: my mentions are included by default, and cannot be removed."
+		},
+		"remove": {
+			"zero": "You cannot have zero prefixes.",
+			"invalid": "This server does not have **{0}** as a prefix. You can list them with `{1}prefix list`.",
+			"done": "Removed the prefix **{0}**. You can still use me via **{1}**, or mentions."
+		},
+		"list": {
+			"title": "Server Prefixes",
+			"mention": "The mention cannot be removed.",
+			"footer": "{0} Total Prefixes | {1}prefix remove <prefix>"
+		},
+		"reset": {
+			"default": "This server is already in a default state.",
+			"confirm": "Are you sure you want to reset this servers prefixes? **yes** or **no**.",
+			"$": "Do not translate yes or no",
+			"cancelled": "Cancelled.",
+			"done": "Reset this servers prefixes. Use **{0}** for my commands, or mention me."
+		}
 	},
 	"reembed": {
 		"description": "Reenable embeds on a message where they have been disabled.",

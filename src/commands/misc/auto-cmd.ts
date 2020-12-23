@@ -42,7 +42,7 @@ export default new Command(["auto"], __filename)
 		}
 		switch (msg.args[0]?.toLowerCase()) {
 			case "add": {
-				if (msg.gConfig.auto.length >= max) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.max`, [max, msg.gConfig.settings.prefix]));
+				if (msg.gConfig.auto.length >= max) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.max`, [max, msg.prefix]));
 				if (msg.args.length !== 4) return new CommandError("ERR_INVALID_USAGE", cmd);
 				const t = f(msg.args[1]);
 				if (!t) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.invalidType`, [msg.args[1]]));
@@ -72,7 +72,7 @@ export default new Command(["auto"], __filename)
 						auto: j
 					}
 				});
-				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.gConfig.settings.prefix, (k.auto?.length || 0) + 1]));
+				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.prefix, (k.auto?.length || 0) + 1]));
 
 				break;
 			}
@@ -106,7 +106,7 @@ export default new Command(["auto"], __filename)
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
 						.setDescription(pages[page - 1].map((v, i) => `{lang:${cmd.lang}.list.entry|${(i + 1) + ((page - 1) * perPage)}|${v.type}|${v.channel}|${v.time}}`).join("\n"))
 						.setTitle(`{lang:${cmd.lang}.list.page|${page}}`)
-						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.auto.length}|${msg.gConfig.settings.prefix}}`, this.bot.user.avatarURL)
+						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.auto.length}|${msg.prefix}}`, this.bot.user.avatarURL)
 						.setColor(Colors.gold)
 						.setTimestamp(new Date().toISOString())
 						.toJSON()
@@ -175,13 +175,13 @@ export default new Command(["auto"], __filename)
 							`{lang:${cmd.lang}.help.main}`,
 							`{lang:${cmd.lang}.help.noInclude}`,
 							"",
-							`{lang:other.words.example$ucwords$}: \`${msg.gConfig.settings.prefix}auto add wah 5 <#channel>\``,
+							`{lang:other.words.example$ucwords$}: \`${msg.prefix}auto add wah 5 <#channel>\``,
 							`{lang:${cmd.lang}.help.validTimes}`,
-							`\`${msg.gConfig.settings.prefix}log add <type> <time> <#channel>\` - {lang:${cmd.lang}.help.add}`,
-							`\`${msg.gConfig.settings.prefix}log remove <id>\` - {lang:${cmd.lang}.help.remove}`,
-							`\`${msg.gConfig.settings.prefix}log list\` - {lang:${cmd.lang}.help.list}`,
-							`\`${msg.gConfig.settings.prefix}log available\` - {lang:${cmd.lang}.help.available}`,
-							`\`${msg.gConfig.settings.prefix}log clear\` - {lang:${cmd.lang}.help.clear}`
+							`\`${msg.prefix}log add <type> <time> <#channel>\` - {lang:${cmd.lang}.help.add}`,
+							`\`${msg.prefix}log remove <id>\` - {lang:${cmd.lang}.help.remove}`,
+							`\`${msg.prefix}log list\` - {lang:${cmd.lang}.help.list}`,
+							`\`${msg.prefix}log available\` - {lang:${cmd.lang}.help.available}`,
+							`\`${msg.prefix}log clear\` - {lang:${cmd.lang}.help.clear}`
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)

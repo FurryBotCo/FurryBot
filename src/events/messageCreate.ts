@@ -22,7 +22,6 @@ export default new ClientEvent("messageCreate", async function (message, update,
 		type: "messageCreate",
 		time: Date.now()
 	}); */
-	if (config.beta && !config.eventTest) return;
 	const t = new Timers(config.developers.includes(message.author.id), `${message.author.id}/${message.channel.id}`); // `${message.channel.id}/${message.id}/${message.author.id}`);
 	t.start("main");
 	t.start("stats.msg");

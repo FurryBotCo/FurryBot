@@ -22,9 +22,9 @@ export default new Command(["makeinv"], __filename)
 				.setDescription([
 					`{lang:${cmd.lang}.helpDesc}`,
 					`{lang:${cmd.lang}.helpUsage}:`,
-					`{lang:${cmd.lang}.temp}: \`${msg.gConfig.settings.prefix}makeinv -t\``,
-					`{lang:${cmd.lang}.maxAge}: \`${msg.gConfig.settings.prefix}makeinv --maxAge=<seconds>\``,
-					`{lang:${cmd.lang}.maxUses}: \`${msg.gConfig.settings.prefix}makeinv --maxUses=<number>\``
+					`{lang:${cmd.lang}.temp}: \`${msg.prefix}makeinv -t\``,
+					`{lang:${cmd.lang}.maxAge}: \`${msg.prefix}makeinv --maxAge=<seconds>\``,
+					`{lang:${cmd.lang}.maxUses}: \`${msg.prefix}makeinv --maxUses=<number>\``
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.red)

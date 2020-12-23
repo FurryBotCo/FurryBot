@@ -93,7 +93,7 @@ export default new Command(["settings"], __filename)
 							].join("\n");
 						})
 					].join("\n\n"))
-					.setFooter(`{lang:${cmd.lang}.footer|${page}|${pages.length}|${msg.gConfig.settings.prefix}}`, this.bot.user.avatarURL)
+					.setFooter(`{lang:${cmd.lang}.footer|${page}|${pages.length}|${msg.prefix}}`, this.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString())
 					.setColor(Colors.gold)
 					.toJSON()
@@ -204,7 +204,7 @@ export default new Command(["settings"], __filename)
 					}
 				});
 
-				if (s === "muteRole") await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.muteNotice`, [msg.gConfig.settings.prefix]));
+				if (s === "muteRole") await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.muteNotice`, [msg.prefix]));
 
 				return;
 				break;

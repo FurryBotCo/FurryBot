@@ -4,11 +4,13 @@ import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";
 import { Languages } from "../Language";
 import Utility from "../Functions/Utility";
+import Logger from "../Logger";
 
 export type DBKeys = ConfigDataTypes<GuildConfig>;
 export default class GuildConfig {
 	id: string;
 	settings: {
+		/** @deprecated */
 		prefix: string;
 		lang: Languages;
 		muteRole: string;
@@ -19,6 +21,7 @@ export default class GuildConfig {
 		ecoEmoji: string;
 		slashCommandsEnabled: boolean;
 	};
+	prefix: string[];
 	selfAssignableRoles: string[];
 	disable: (({
 		type: "channel" | "role" | "user";
@@ -96,7 +99,6 @@ export default class GuildConfig {
 		if (data._id) delete data._id;
 		delete data._id;
 		Object.assign(this, Utility.mergeObjects(data, config.defaults.config.guild));
-		if (!(this.logEvents instanceof Array)) this.logEvents = [];
 		return this;
 	}
 
@@ -169,5 +171,31 @@ export default class GuildConfig {
 	}
 	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
 		return db.addBl("guild", this.id, blame, blameId, reason, expire, report);
+	}
+
+	async fix() {
+		const obj: Parameters<GuildConfig["edit"]>[0] = Object.create(null);
+		if ([undefined, null].includes(this.auto)) obj.auto = [];
+		if ([undefined, null].includes(this.logEvents)) obj.logEvents = [];
+		if ([undefined, null].includes(this.prefix)) obj.prefix = [
+			this.settings.prefix || config.defaults.prefix
+		];
+		if (this.settings.prefix) {
+			if (this.prefix && this.settings.prefix !== this.prefix[0]) obj.prefix = [
+				this.settings.prefix
+			];
+			await this.mongoEdit({
+				$unset: {
+					"settings.prefix": true
+				}
+			});
+			delete this.settings.prefix;
+		}
+		if (JSON.stringify(obj) !== "{}") {
+			Logger.warn(["Database", "Guild"], `Fixed guild "${this.id}": ${JSON.stringify(obj)}`);
+			await this.edit(obj);
+		}
+
+		return this;
 	}
 }

@@ -57,7 +57,7 @@ export default new Command(["poll"], __filename)
 						.setTitle("\u274c {lang:other.words.invalid$ucwords$} {lang:other.words.usage$ucwords$}")
 						.setDescription([
 							`{lang:${cmd.lang}.wrongOptionsAmount|${maxOptions}}`,
-							`{lang:other.words.example$ucwords$}: \`{lang:${cmd.lang}.example|${msg.gConfig.settings.prefix}}\``
+							`{lang:other.words.example$ucwords$}: \`{lang:${cmd.lang}.example|${msg.prefix}}\``
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)
@@ -73,7 +73,7 @@ export default new Command(["poll"], __filename)
 						.setTitle("\u274c {lang:other.words.invalid$ucwords$} {lang:other.words.usage$ucwords$}")
 						.setDescription([
 							`{lang:${cmd.lang}.invalidTime}`,
-							`{lang:other.words.example$ucwords$}: \`{lang:${cmd.lang}.example|${msg.gConfig.settings.prefix}}\``
+							`{lang:other.words.example$ucwords$}: \`{lang:${cmd.lang}.example|${msg.prefix}}\``
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)

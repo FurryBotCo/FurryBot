@@ -39,8 +39,8 @@ export default new Command(["tag"], __filename)
 			return msg.channel.createMessage({
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.page|${page}|${pages.length}}`)
-					.setDescription(`\`${pages[page - 1].join("` `")}\`${pages.length > page ? `\n\n{lang:${cmd.lang}.next|${msg.gConfig.settings.prefix}|${page + 1}}` : ""}`)
-					.setFooter(`{lang:${cmd.lang}.use|${msg.gConfig.settings.prefix}}`)
+					.setDescription(`\`${pages[page - 1].join("` `")}\`${pages.length > page ? `\n\n{lang:${cmd.lang}.next|${msg.prefix}|${page + 1}}` : ""}`)
+					.setFooter(`{lang:${cmd.lang}.use|${msg.prefix}}`)
 					.setColor(Math.floor(Math.random() * 0xFFFFFF))
 					.setTimestamp(new Date().toISOString())
 					.toJSON()
@@ -48,9 +48,9 @@ export default new Command(["tag"], __filename)
 			});
 		}
 		if (msg.args.length === 1 || !["create", "delete", "edit"].includes(msg.args[0].toLowerCase())) {
-			if (msg.args[0].toLowerCase() === "create") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.createUsage`, [msg.gConfig.settings.prefix]));
-			if (msg.args[0].toLowerCase() === "delete") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.deleteUsage`, [msg.gConfig.settings.prefix]));
-			if (msg.args[0].toLowerCase() === "edit") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.editUsage`, [msg.gConfig.settings.prefix]));
+			if (msg.args[0].toLowerCase() === "create") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.createUsage`, [msg.prefix]));
+			if (msg.args[0].toLowerCase() === "delete") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.deleteUsage`, [msg.prefix]));
+			if (msg.args[0].toLowerCase() === "edit") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.editUsage`, [msg.prefix]));
 			if (!Object.keys(tags).includes(msg.args[0].toLowerCase())) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalid`));
 
 			return msg.channel.createMessage(tags[msg.args[0].toLowerCase()]);

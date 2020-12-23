@@ -25,7 +25,7 @@ export default new Command(["conga"], __filename)
 				delete this.v.awoo[ch.id];
 			}, 18e5, msg.channel);
 			this.v.conga[msg.channel.id] = h;
-			return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.join`, [msg.author.id, h.users.length - 1, msg.gConfig.settings.prefix, h.users.length, h.users.length > 30 ? Language.get(msg.gConfig.settings.lang, `${cmd.lang}.tooLarge`) : `<a:${config.emojis.custom.conga}>`.repeat(h.users.length)]));
+			return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.join`, [msg.author.id, h.users.length - 1, msg.prefix, h.users.length, h.users.length > 30 ? Language.get(msg.gConfig.settings.lang, `${cmd.lang}.tooLarge`) : `<a:${config.emojis.custom.conga}>`.repeat(h.users.length)]));
 		} else {
 			if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 			const m = await msg.getMemberFromArgs();
@@ -39,6 +39,6 @@ export default new Command(["conga"], __filename)
 					delete this.v.awoo[ch.id];
 				}, 18e5, msg.channel)
 			};
-			await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.start`, [msg.author.id, m.id, msg.gConfig.settings.prefix, `<a:${config.emojis.custom.conga}>`]));
+			await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.start`, [msg.author.id, m.id, msg.prefix, `<a:${config.emojis.custom.conga}>`]));
 		}
 	});

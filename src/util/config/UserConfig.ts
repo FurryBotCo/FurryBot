@@ -4,6 +4,7 @@ import config from "../../config";
 import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";
 import Utility from "../Functions/Utility";
+import Logger from "../Logger";
 
 export type DBKeys = ConfigDataTypes<UserConfig>;
 export default class UserConfig {
@@ -171,5 +172,16 @@ export default class UserConfig {
 			expired: false,
 			expiry: this.booster.expiry
 		};
+	}
+
+	async fix() {
+		const obj: Parameters<UserConfig["edit"]>[0] = Object.create(null);
+		if (JSON.stringify(obj) !== "{}") {
+			console.log(JSON.stringify(obj), true);
+			await this.edit(obj);
+			Logger.warn(["Database", "User"], `Fixed user "${this.id}": ${JSON.stringify(obj)}`);
+		}
+
+		return this;
 	}
 }

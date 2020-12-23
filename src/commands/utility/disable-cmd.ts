@@ -186,7 +186,7 @@ export default new Command(["disable"], __filename)
 						.setColor(Colors.green)
 						.setTimestamp(new Date().toISOString())
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.disable.length}|${msg.gConfig.settings.prefix}}`, this.bot.user.avatarURL)
+						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.disable.length}|${msg.prefix}}`, this.bot.user.avatarURL)
 						.toJSON()
 				});
 				break;

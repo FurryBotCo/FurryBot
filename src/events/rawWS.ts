@@ -30,7 +30,7 @@ export default new ClientEvent("rawWS", async function (packet) {
 					const channel = guild.channels.get(data.channel_id) as Eris.TextChannel;
 					if (config.beta && !config.developers.includes(member.id)) return;
 					if (!cnf.settings.slashCommandsEnabled) {
-						await channel.createMessage(`<@!${member.id}>, ${Language.get(cnf.settings.lang, "other.slashNotEnabled", [cnf.settings.prefix])}`);
+						await channel.createMessage(`<@!${member.id}>, ${Language.get(cnf.settings.lang, "other.slashNotEnabled", [cnf.prefix[0]])}`);
 						return;
 					}
 					const command = {
@@ -81,7 +81,7 @@ export default new ClientEvent("rawWS", async function (packet) {
 							bot: member.user.bot,
 							system: member.user.system
 						},
-						content: `${cnf.settings.prefix}${command.data.name}${args.length === 0 ? "" : ` ${args.join(" ")}`}`,
+						content: `${cnf.prefix[0]}${command.data.name}${args.length === 0 ? "" : ` ${args.join(" ")}`}`,
 						mention_everyone: false,
 						mentions: [],
 						mention_roles: roleMentions,

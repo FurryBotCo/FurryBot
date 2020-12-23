@@ -37,7 +37,7 @@ export default new Command(["perms"], __filename)
 					"```",
 					...(!msg.dashedArgs.value.includes("compact") ? [
 						"",
-						`{lang:${cmd.lang}.compact|${msg.gConfig.settings.prefix}|${member.username}#${member.discriminator}}`
+						`{lang:${cmd.lang}.compact|${msg.prefix}|${member.username}#${member.discriminator}}`
 					] : [])
 				].join("\n"))
 				.toJSON()

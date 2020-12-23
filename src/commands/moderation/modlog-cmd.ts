@@ -152,11 +152,11 @@ export default new Command(["modlog"], __filename)
 							`{lang:${cmd.lang}.help.main}`,
 							`{lang:${cmd.lang}.help.noInclude}`,
 							"",
-							`{lang:other.words.example$ucwords$}: \`${msg.gConfig.settings.prefix}modlog set <#channel>\``,
-							`\`${msg.gConfig.settings.prefix}modlog set\` - {lang:${cmd.lang}.help.set}`,
-							`\`${msg.gConfig.settings.prefix}modlog disable\` - {lang:${cmd.lang}.help.disable}`,
-							`\`${msg.gConfig.settings.prefix}modlog list <@user>\` - {lang:${cmd.lang}.help.list}`/* ,
-							`\`${msg.gConfig.settings.prefix}modlog clear <@user>\` - {lang:${cmd.lang}.help.clear}`*/
+							`{lang:other.words.example$ucwords$}: \`${msg.prefix}modlog set <#channel>\``,
+							`\`${msg.prefix}modlog set\` - {lang:${cmd.lang}.help.set}`,
+							`\`${msg.prefix}modlog disable\` - {lang:${cmd.lang}.help.disable}`,
+							`\`${msg.prefix}modlog list <@user>\` - {lang:${cmd.lang}.help.list}`/* ,
+							`\`${msg.prefix}modlog clear <@user>\` - {lang:${cmd.lang}.help.clear}`*/
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)

@@ -90,7 +90,7 @@ export default class ExtraHandlers {
 						"```",
 						"",
 						"**{lang:other.words.extra$ucwords$}**",
-						`{lang:other.words.usage$ucwords$}: \`${msg.gConfig.settings.prefix}${cmd.triggers[0]}${!u ? "" : ` ${u}`}\``,
+						`{lang:other.words.usage$ucwords$}: \`${msg.prefix}${cmd.triggers[0]}${!u ? "" : ` ${u}`}\``,
 						`{lang:other.words.aliases$ucwords$}: ${cmd.triggers.slice(1).join(", ") || "**{lang:other.words.none$upper$}**"}`,
 						`{lang:other.words.normal$ucwords$} {lang:other.words.cooldown$ucwords$}: ${Time.ms(cmd.cooldown, true)}`,
 						`{lang:other.words.donator$ucwords$} {lang:other.words.cooldown$ucwords$}: ${Time.ms(cmd.donatorCooldown, true)}`,
@@ -119,7 +119,7 @@ export default class ExtraHandlers {
 					.setDescription([
 						"**{lang:other.words.info$ucwords$}**",
 						`${config.emojis.default.dot} {lang:other.words.command$ucwords$}: **${cmd.triggers[0]}**`,
-						`${config.emojis.default.dot} {lang:other.words.usage$ucwords$}: \`${msg.gConfig.settings.prefix}${cmd.triggers[0]}${!u ? "" : ` ${u}`}\``,
+						`${config.emojis.default.dot} {lang:other.words.usage$ucwords$}: \`${msg.prefix}${cmd.triggers[0]}${!u ? "" : ` ${u}`}\``,
 						`${config.emojis.default.dot} {lang:other.words.description$ucwords$}: ${cmd.description || `{lang:${cmd.lang}.description}`}`,
 						`${config.emojis.default.dot} {lang:other.words.category$ucwords$}: **${cmd.category.name}**`,
 						`${config.emojis.default.dot} {lang:other.words.provided$ucwords$} {lang:other.words.arguments$ucwords$}:** ${msg.args.join(" ") || "{lang:other.words.none$upper$}"}**`

@@ -20,6 +20,7 @@ declare global {
 		}
 
 		export interface ShardStats {
+			id: number;
 			latency: number;
 			lastHeartbeatReceived: number;
 			lastHeartbeatSent: number;

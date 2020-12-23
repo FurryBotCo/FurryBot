@@ -29,7 +29,7 @@ export default new Command(["lsar"], __filename)
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
-				.setDescription(`{lang:${cmd.lang}.desc|${msg.gConfig.settings.prefix}|${page}|${c.length}}`)
+				.setDescription(`{lang:${cmd.lang}.desc|${msg.prefix}|${page}|${c.length}}`)
 				.addField(`{lang:${cmd.lang}.roles}`, rl, false)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setTimestamp(new Date().toISOString())

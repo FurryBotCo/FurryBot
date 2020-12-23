@@ -149,7 +149,7 @@ export default new Command(["stats"], __filename)
 						`{lang:other.words.total$ucwords$}: **${stats.commands.general.toLocaleString()}**`,
 						`{lang:other.words.thisSession$ucwords$}: **${stats.commands.session.toLocaleString()}**`,
 						"",
-						`{lang:${cmd.lang}.cmdFull|${msg.gConfig.settings.prefix}}`
+						`{lang:${cmd.lang}.cmdFull|${msg.prefix}}`
 					].join("\n"),
 					false
 				);

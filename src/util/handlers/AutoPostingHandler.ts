@@ -52,7 +52,7 @@ export default class AutoPostingHandler {
 						`[[{lang:other.images.reportURL}]](${img.reportURL})`,
 						`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 					].join("\n"))
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -64,7 +64,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.bunny}")
 					.setImage(img)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -85,7 +85,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.cat}")
 					.setImage(img[0].url)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -97,7 +97,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.duck}")
 					.setImage(img)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -109,7 +109,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.fox}")
 					.setImage("attachment://fox.png")
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -126,7 +126,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.koala}")
 					.setImage(img)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -138,7 +138,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.otter}")
 					.setImage(img)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -150,7 +150,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.panda}")
 					.setImage(img)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -162,7 +162,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.snek}")
 					.setImage(img)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -174,7 +174,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.turtle}")
 					.setImage(img)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -187,7 +187,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.wah}")
 					.setImage(img)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -199,7 +199,7 @@ export default class AutoPostingHandler {
 				e
 					.setTitle("{lang:other.auto.titles.wolf}")
 					.setImage(img)
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -216,7 +216,7 @@ export default class AutoPostingHandler {
 						`[[{lang:other.images.reportURL}]](${img.reportURL})`,
 						`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 					].join("\n"))
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -233,7 +233,7 @@ export default class AutoPostingHandler {
 						`[[{lang:other.images.reportURL}]](${img.reportURL})`,
 						`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 					].join("\n"))
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -250,7 +250,7 @@ export default class AutoPostingHandler {
 						`[[{lang:other.images.reportURL}]](${img.reportURL})`,
 						`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 					].join("\n"))
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -267,7 +267,7 @@ export default class AutoPostingHandler {
 						`[[{lang:other.images.reportURL}]](${img.reportURL})`,
 						`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 					].join("\n"))
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -284,7 +284,7 @@ export default class AutoPostingHandler {
 						`[[{lang:other.images.reportURL}]](${img.reportURL})`,
 						`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 					].join("\n"))
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -301,7 +301,7 @@ export default class AutoPostingHandler {
 						`[[{lang:other.images.reportURL}]](${img.reportURL})`,
 						`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 					].join("\n"))
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());
@@ -318,7 +318,7 @@ export default class AutoPostingHandler {
 						`[[{lang:other.images.reportURL}]](${img.reportURL})`,
 						`${!img.sources || img.sources.length === 0 || !img.sources[0] ? "[{lang:other.images.noSource}]" : `[[{lang:other.images.source}]](${img.sources[0]})`}`
 					].join("\n"))
-					.setFooter(`{lang:other.auto.footer|${gConfig.settings.prefix}}`)
+					.setFooter(`{lang:other.auto.footer|${gConfig.prefix[0]}}`)
 					.setColor(Colors.gold)
 					.setAuthor(client.bot.user.username, client.bot.user.avatarURL)
 					.setTimestamp(new Date().toISOString());

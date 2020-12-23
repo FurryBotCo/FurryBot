@@ -23,7 +23,7 @@ export default new Command(["awoo"], __filename)
 				delete this.v.awoo[ch.id];
 			}, 18e5, msg.channel);
 			this.v.awoo[msg.channel.id] = h;
-			return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.join`, [msg.author.id, h.users.length, msg.gConfig.settings.prefix, h.users.length > 30 ? Language.get(msg.gConfig.settings.lang, `${cmd.lang}.tooLarge`) : `<:${config.emojis.custom.awoo}>`.repeat(h.users.length)]));
+			return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.join`, [msg.author.id, h.users.length, msg.prefix, h.users.length > 30 ? Language.get(msg.gConfig.settings.lang, `${cmd.lang}.tooLarge`) : `<:${config.emojis.custom.awoo}>`.repeat(h.users.length)]));
 		} else {
 			this.v.awoo[msg.channel.id] = {
 				users: [msg.author.id],
@@ -31,6 +31,6 @@ export default new Command(["awoo"], __filename)
 					delete this.v.awoo[ch.id];
 				}, 18e5, msg.channel)
 			};
-			await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.start`, [msg.author.id, msg.gConfig.settings.prefix, `<:${config.emojis.custom.awoo}>`]));
+			await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.start`, [msg.author.id, msg.prefix, `<:${config.emojis.custom.awoo}>`]));
 		}
 	});

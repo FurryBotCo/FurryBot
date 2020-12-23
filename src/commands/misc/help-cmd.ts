@@ -24,7 +24,7 @@ export default new Command(["help", "h"], __filename)
 					.setColor(Colors.random)
 					.addFields(...categories.map(c => ({
 						name: c.displayName || `{lang:categories.${c.name}.displayName}`,
-						value: `\`${msg.gConfig.settings.prefix}help ${c.name}\`\n[{lang:${cmd.lang}.hoverInfo}](https://furry.bot '${c.description}\n${c.commands.length} {lang:other.words.total$ucwords$} {lang:other.words.commands$ucwords$}\n{lang:categories.${c.name}.description}')`,
+						value: `\`${msg.prefix}help ${c.name}\`\n[{lang:${cmd.lang}.hoverInfo}](https://furry.bot '${c.description}\n${c.commands.length} {lang:other.words.total$ucwords$} {lang:other.words.commands$ucwords$}\n{lang:categories.${c.name}.description}')`,
 						inline: true
 					})))
 					.toJSON()

@@ -12,6 +12,7 @@ import crypto from "crypto";
 import Time from "./Time";
 import ExtendedMessage from "../ExtendedMessage";
 import * as os from "os";
+import GuildConfig, { DBKeys } from "../config/GuildConfig";
 
 export default class Utility {
 	private constructor() {
@@ -589,7 +590,7 @@ export default class Utility {
 		return Object.entries(Eris.Constants.UserFlags).map(([f, v]) => ({
 			[f]: (user.publicFlags & v) !== 0
 		})).reduce((a, b) => ({ ...a, ...b }), {}) as {
-				[K in KnownKeys<typeof Eris.Constants.UserFlags>]: boolean;
+				[K in keyof typeof Eris.Constants.UserFlags]: boolean;
 			};
 	}
 

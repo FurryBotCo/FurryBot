@@ -108,12 +108,14 @@ export default class ExtendedMessage {
 	}
 
 	async load() {
-		const g = this.#gConfig = await db.getGuild(this.channel.guild.id);
-		const u = this.#uConfig = await db.getUser(this.author.id);
-		const p = this.#msg.content.match(new RegExp(`(${g.settings.prefix.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")}|<@!?${this.#client.bot.user.id}>)(?:\s+)*`, "i"));
+		const g = this.#gConfig = await db.getGuild(this.channel.guild.id).then(v => v.fix());
+		const u = this.#uConfig = await db.getUser(this.author.id).then(v => v.fix());
+		const p = this.#msg.content.match(new RegExp(`(${g.prefix.map(v => v.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")).join("|")}|<@!?${this.#client.bot.user.id}>)(?:\s+)*`, "i"));
 		if (!p || p.length === 0) return false;
 		const prefix = this.#prefix = p[1].toLowerCase();
 		if (!this.#msg.content.toLowerCase().startsWith(prefix)) return false;
+		// this should only happen on mentions, we replace it because it looks weird in ``
+		if (!g.prefix.includes(this.#prefix)) this.#prefix = g.prefix[0];
 		const args = this.#args = this.#msg.content.slice(prefix.length).split(" ").filter(a => a.length > 0 && !a.match(/^--(.{1,})(?:=(.*))?$/));
 		const c = args.splice(0, 1)[0]?.toLowerCase();
 		const cmd = this.#cmd = !c ? null : this.#client.cmd.getCommand(c).cmd;

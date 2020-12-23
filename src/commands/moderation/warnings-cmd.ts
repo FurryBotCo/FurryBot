@@ -117,7 +117,7 @@ export default new Command(["warnings"], __filename)
 					`\\* - {lang:${cmd.lang}.help.requiresPerm1|manageMessages}`,
 					`\\+ - {lang:${cmd.lang}.help.requiresPerm1|manageServer}`,
 					"",
-					`{lang:${cmd.lang}.help.example|${msg.gConfig.settings.prefix}}`,
+					`{lang:${cmd.lang}.help.example|${msg.prefix}}`,
 					"",
 					`\`list\` - {lang:${cmd.lang}.help.listDesc}`,
 					`(\\*) \`remove\` - {lang:${cmd.lang}.help.removeDesc}`,
@@ -137,7 +137,7 @@ export default new Command(["warnings"], __filename)
 					.setDescription([
 						`{lang:${cmd.lang}.help.noPerms}`,
 						"",
-						`{lang:other.words.usage$ucwords$}: \`${msg.gConfig.settings.prefix}warnings list @user [page]\``
+						`{lang:other.words.usage$ucwords$}: \`${msg.prefix}warnings list @user [page]\``
 					].join("\n"))
 					.setTimestamp(new Date().toISOString())
 					.toJSON()
@@ -152,7 +152,7 @@ export default new Command(["warnings"], __filename)
 					.setDescription([
 						`{lang:${cmd.lang}.help.requiresPerm2|manageMessages}`,
 						"",
-						`{lang:other.words.usage$ucwords$}: \`${msg.gConfig.settings.prefix}warnings remove @user <id>\``
+						`{lang:other.words.usage$ucwords$}: \`${msg.prefix}warnings remove @user <id>\``
 					].join("\n"))
 					.setTimestamp(new Date().toISOString())
 					.toJSON()
@@ -167,7 +167,7 @@ export default new Command(["warnings"], __filename)
 					.setDescription([
 						`{lang:${cmd.lang}.help.requiresPerm2|manageServer}`,
 						"",
-						`{lang:other.words.usage$ucwords$}: \`${msg.gConfig.settings.prefix}warnings clear @user\``
+						`{lang:other.words.usage$ucwords$}: \`${msg.prefix}warnings clear @user\``
 					].join("\n"))
 					.setTimestamp(new Date().toISOString())
 					.toJSON()

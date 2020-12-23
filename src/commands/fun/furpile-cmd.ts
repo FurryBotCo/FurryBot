@@ -25,7 +25,7 @@ export default new Command(["furpile"], __filename)
 				delete this.v.awoo[ch.id];
 			}, 18e5, msg.channel);
 			this.v.furpile[msg.channel.id] = h;
-			return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.join`, [msg.author.id, h.users.length - 1, h.users.length, msg.gConfig.settings.prefix]));
+			return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.join`, [msg.author.id, h.users.length - 1, h.users.length, msg.prefix]));
 		} else {
 			if (msg.args.length < 1) return new CommandError("ERR_INVALID_USAGE", cmd);
 			const m = await msg.getMemberFromArgs();
@@ -39,6 +39,6 @@ export default new Command(["furpile"], __filename)
 					delete this.v.awoo[ch.id];
 				}, 18e5, msg.channel)
 			};
-			await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.start`, [msg.author.id, m.id, msg.gConfig.settings.prefix]));
+			await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.start`, [msg.author.id, m.id, msg.prefix]));
 		}
 	});
