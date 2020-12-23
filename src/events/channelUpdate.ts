@@ -12,7 +12,7 @@ export default new ClientEvent("channelUpdate", async function (channel, oldChan
 	if (channel instanceof Eris.GuildChannel) {
 		const { guild } = channel;
 		if (config.beta && guild.id !== config.client.supportServerId) return;
-		const g = await db.getGuild(guild.id);
+		const g = await db.getGuild(guild.id).then(v => v.fix());
 		const e = g.logEvents.filter(l => l.type === "channelUpdate");
 
 		for (const log of e) {

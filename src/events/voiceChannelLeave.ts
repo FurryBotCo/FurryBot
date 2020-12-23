@@ -9,7 +9,7 @@ export default new ClientEvent("voiceChannelLeave", async function onGuildMember
 	if (config.beta && !config.eventTest) return;
 	const { guild } = member;
 	if (config.beta && guild.id !== config.client.supportServerId) return;
-	const g = await db.getGuild(member.guild.id);
+	const g = await db.getGuild(member.guild.id).then(v => v.fix());
 	const e = g.logEvents.filter(l => l.type === "voiceLeave");
 	for (const log of e) {
 		const ch = member.guild.channels.get(log.channel) as Eris.GuildTextableChannel;

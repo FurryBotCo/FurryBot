@@ -11,7 +11,7 @@ export default new ClientEvent("messageUpdate", async function (message, oldMess
 
 	// we want to get bots here so we don't check bots yet
 	const { guild } = (message.channel as Eris.AnyGuildChannel);
-	const g = await db.getGuild(guild.id);
+	const g = await db.getGuild(guild.id).then(v => v.fix());
 	const e = g.logEvents.filter(l => l.type === "messageEdit");
 	for (const log of e) {
 		const ch = guild.channels.get(log.channel) as Eris.GuildTextableChannel;

@@ -8,7 +8,7 @@ import Logger from "../util/Logger";
 
 export default new ClientEvent("guildRoleUpdate", async function (guild, role, oldRole) {
 	if (config.beta && !config.eventTest) return;
-	const g = await db.getGuild(guild.id);
+	const g = await db.getGuild(guild.id).then(v => v.fix());
 	const e = g.logEvents.filter(l => l.type === "roleUpdate");
 
 	for (const log of e) {

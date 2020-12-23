@@ -14,7 +14,7 @@ export default new ClientEvent("messageDeleteBulk", async function (messages) {
 	const delCh = await this.bot.getChannel(messages[0].channel.id) as Eris.GuildTextableChannel;
 	if (!delCh || ![Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(delCh.type)) return;
 	const { guild } = delCh;
-	const g = await db.getGuild(delCh.guild.id);
+	const g = await db.getGuild(delCh.guild.id).then(v => v.fix());
 	const e = g.logEvents.filter(l => l.type === "messageDeleteBulk");
 	if (e.length === 0) return;
 	const d = path.resolve(config.dir.logs.bulkDelete);

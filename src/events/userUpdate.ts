@@ -13,7 +13,7 @@ export default new ClientEvent("userUpdate", async function (user, oldUser) {
 	const guilds = await this.bot.guilds.filter(g => g.members.has(user.id));
 	for (const guild of guilds) {
 		if (config.beta && guild.id !== config.client.supportServerId) continue;
-		const g = await db.getGuild(guild.id);
+		const g = await db.getGuild(guild.id).then(v => v.fix());
 		const e = g.logEvents.filter(l => l.type === "userUpdate");
 
 		for (const log of e) {

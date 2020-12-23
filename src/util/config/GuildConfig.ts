@@ -175,9 +175,9 @@ export default class GuildConfig {
 
 	async fix() {
 		const obj: Parameters<GuildConfig["edit"]>[0] = Object.create(null);
-		if ([undefined, null].includes(this.auto)) obj.auto = [];
-		if ([undefined, null].includes(this.logEvents)) obj.logEvents = [];
-		if ([undefined, null].includes(this.prefix)) obj.prefix = [
+		if (!Array.isArray(this.auto)) obj.auto = [];
+		if (!Array.isArray(this.prefix)) obj.logEvents = [];
+		if (!Array.isArray(this.prefix)) obj.prefix = [
 			this.settings.prefix || config.defaults.prefix
 		];
 		if (this.settings.prefix) {
@@ -193,7 +193,9 @@ export default class GuildConfig {
 		}
 		if (JSON.stringify(obj) !== "{}") {
 			Logger.warn(["Database", "Guild"], `Fixed guild "${this.id}": ${JSON.stringify(obj)}`);
-			await this.edit(obj);
+			await this.mongoEdit({
+				$set: obj
+			});
 		}
 
 		return this;

@@ -7,7 +7,7 @@ import config from "../config";
 
 export default new ClientEvent("guildUpdate", async function (guild, old) {
 	if (config.beta && !config.eventTest) return;
-	const settings = await db.getGuild(guild.id);
+	const settings = await db.getGuild(guild.id).then(v => v.fix());
 	const events = settings.logEvents.filter(event => event.type === "guildUpdate");
 
 	for (const event of events) {

@@ -9,7 +9,7 @@ export default new ClientEvent("voiceChannelJoin", async function onGuildMemberJ
 	if (config.beta && !config.eventTest) return;
 	const { guild } = member;
 	if (config.beta && guild.id !== config.client.supportServerId) return;
-	const g = await db.getGuild(guild.id);
+	const g = await db.getGuild(guild.id).then(v => v.fix());
 	const e = g.logEvents.filter(l => l.type === "voiceJoin");
 	for (const log of e) {
 		const ch = guild.channels.get(log.channel) as Eris.GuildTextableChannel;

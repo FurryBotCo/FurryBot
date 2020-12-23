@@ -7,7 +7,7 @@ import EmbedBuilder from "../util/EmbedBuilder";
 
 export default new ClientEvent("guildBanAdd", async function (guild, user) {
 	if (config.beta && !config.eventTest) return;
-	const g = await db.getGuild(guild.id);
+	const g = await db.getGuild(guild.id).then(v => v.fix());
 	const e = g.logEvents.filter(l => l.type === "memberBan");
 
 	for (const log of e) {
