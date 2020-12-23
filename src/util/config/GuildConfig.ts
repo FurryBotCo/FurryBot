@@ -180,6 +180,9 @@ export default class GuildConfig {
 		if (!Array.isArray(this.prefix)) obj.prefix = [
 			this.settings.prefix || config.defaults.prefix
 		];
+		if (this.prefix?.length === 0) obj.prefix = [
+			this.settings.prefix || config.defaults.prefix
+		];
 		if (this.settings.prefix) {
 			if (this.prefix && this.settings.prefix !== this.prefix[0]) obj.prefix = [
 				this.settings.prefix
