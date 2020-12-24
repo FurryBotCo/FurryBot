@@ -27,8 +27,8 @@ export default new Command(["prune", "purge"], __filename)
 			const s = await msg.channel.getMessages(n, m.length === 0 ? null : m[m.length - 1].id, null, null);
 			m.push(...s);
 		}
-		const a = m.filter(d => !(d.timestamp + 12096e5 < Date.now()));
-		const f = m.filter(d => d.type !== 20);
+		const b = m.filter(d => !(d.timestamp + 12096e5 < Date.now()));
+		const f = b.filter(d => d.type !== 20);
 		const del = {};
 		for (const a of f) {
 			if (!del[a.author.id]) del[a.author.id] = 0;
@@ -49,5 +49,5 @@ export default new Command(["prune", "purge"], __filename)
 		}
 		// await msg.gConfig.modlog.add({ blame: this.client.user.id, action: "purgeMessages", count, actual: f.length, timestamp: Date.now() });
 		await msg.channel.createMessage(`${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.done`, [f.length])}\n\n${t.join("\n")}`);
-		if (m.length !== a.length) await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.skipped`, [m.length - a.length]));
+		if (m.length !== b.length) await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.skipped`, [m.length - b.length]));
 	});
