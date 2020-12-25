@@ -166,5 +166,6 @@
 	"item": "item",
 	"rarity": "rarity",
 	"never": "never",
-	"minutes": "minutes"
+	"minutes": "minutes",
+	"canceled": "canceled"
 }

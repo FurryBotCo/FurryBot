@@ -117,7 +117,7 @@ export default new Command(["blacklist", "bl"], __filename)
 					const strike = await dbEntry.checkBlacklist().then(b => b.all.length);
 					const e = await dbEntry.addBlacklist(msg.author.tag, msg.author.id, reason, !expire ? 0 : date + (expire * 8.64e+7));
 
-					return msg.reply(Language.get(config.devLanguage, `${cmd.lang}.added.user`, [`${d.username}#${d.discriminator}`, [null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(date + (expire * 8.64e+7)), strike, e.id]));
+					return msg.reply(Language.get(config.devLanguage, `${cmd.lang}.added.user`, [`${d.username}#${d.discriminator}`, reason, [null, 0].includes(expire) ? "Never" : Time.formatDateWithPadding(date + (expire * 8.64e+7)), strike, e.id]));
 				} else if (subType === "guild" && d instanceof Eris.Guild && dbEntry instanceof GuildConfig) {
 					if (id === config.client.supportServerId) return msg.reply(Language.get(config.devLanguage, `${cmd.lang}.cannotBlacklist.supportServer`, [d ? d.name : "Unknown"]));
 
@@ -228,7 +228,7 @@ export default new Command(["blacklist", "bl"], __filename)
 					if (!isNaN(Number(m.content))) {
 						if (Number(m.content) > bl.current.length) return msg.reply(Language.get(config.devLanguage, `${cmd.lang}.remove.invalidPos`, [bl.current.length]));
 						m.content = bl.current[Number(m.content) - 1].id;
-					}
+					} else m.content = bl.current[0].id;
 					if (!bl.current.map(c => c.id).includes(m.content)) return msg.reply(Language.get(config.devLanguage, `${cmd.lang}.remove.invalid`));
 					const e = bl.current.find(c => c.id === m.content);
 					await mdb.collection<Blacklist.GenericEntry>("blacklist").findOneAndUpdate({
