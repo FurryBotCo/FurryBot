@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "10.3.3-20201225",
+  "version": "10.3.4-20201227",
   "description": "A fun bot for furry Discord servers!",
   "main": "index.js",
   "scripts": {
@@ -70,8 +70,8 @@
     "@types/dot-object": "^2.1.2",
     "@types/express": "^4.17.9",
     "@types/express-session": "^1.17.3",
-    "@types/fs-extra": "^9.0.5",
-    "@types/ioredis": "^4.17.9",
+    "@types/fs-extra": "^9.0.6",
+    "@types/ioredis": "^4.17.10",
     "@types/json5": "0.0.30",
     "@types/mongodb": "^3.6.3",
     "@types/morgan": "^1.9.2",

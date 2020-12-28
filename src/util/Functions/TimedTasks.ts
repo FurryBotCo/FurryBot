@@ -18,6 +18,7 @@ export default class TimedTasks {
 	static async runAll(client: FurryBot) {
 		const start = performance.now();
 		const d = new Date();
+		this.runTimedActionsHandler(client);
 		if (d.getSeconds() === 0) {
 			if ((d.getMinutes() % 5) === 0) await this.runAutoPosting(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Auto Posting`, "Finished processing."));
 			if (d.getMinutes() === 0) {
