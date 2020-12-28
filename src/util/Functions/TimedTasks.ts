@@ -35,7 +35,7 @@ export default class TimedTasks {
 	}
 
 	static async runTimedActionsHandler(client: FurryBot) {
-		client.t.processEntries.call(client.t.processEntries, client);
+		client.t.processEntries.call(client.t);
 	}
 
 	static async runDeleteUsers(client: FurryBot) {
