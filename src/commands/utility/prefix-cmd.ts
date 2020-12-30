@@ -96,10 +96,10 @@ export default new Command(["prefix"], __filename)
 							`{lang:${cmd.lang}.help.noInclude}`,
 							"",
 							`{lang:other.words.example$ucwords$}: \`${msg.gConfig.prefix[0]}prefix add %\``,
-							`\`${msg.gConfig.prefix[0]}log add <prefix>\` - {lang:${cmd.lang}.help.add}`,
-							`\`${msg.gConfig.prefix[0]}log remove <prefix>\` - {lang:${cmd.lang}.help.remove}`,
-							`\`${msg.gConfig.prefix[0]}log list\` - {lang:${cmd.lang}.help.list}`,
-							`\`${msg.gConfig.prefix[0]}log reset\` - {lang:${cmd.lang}.help.reset}`
+							`\`${msg.gConfig.prefix[0]}prefix add <prefix>\` - {lang:${cmd.lang}.help.add}`,
+							`\`${msg.gConfig.prefix[0]}prefix remove <prefix>\` - {lang:${cmd.lang}.help.remove}`,
+							`\`${msg.gConfig.prefix[0]}prefix list\` - {lang:${cmd.lang}.help.list}`,
+							`\`${msg.gConfig.prefix[0]}prefix reset\` - {lang:${cmd.lang}.help.reset}`
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)
