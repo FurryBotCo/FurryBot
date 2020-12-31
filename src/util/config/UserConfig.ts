@@ -5,6 +5,7 @@ import { UpdateQuery, FindOneAndUpdateOption, WithId } from "mongodb";
 import db, { mdb } from "../Database";
 import Utility from "../Functions/Utility";
 import Logger from "../Logger";
+import FurryBot from "../../main";
 
 export type DBKeys = ConfigDataTypes<UserConfig>;
 export default class UserConfig {
@@ -184,4 +185,6 @@ export default class UserConfig {
 
 		return this;
 	}
+
+	async getBadges(client: FurryBot) { return client.b.getUserBadges(this.id); }
 }

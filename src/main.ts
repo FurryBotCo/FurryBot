@@ -25,6 +25,7 @@ import db from "./util/Database";
 import Request from "./util/Functions/Request";
 import Utility from "./util/Functions/Utility";
 import CommandHelper from "./util/DiscordCommands/main";
+import BadgeHandler from "./util/handlers/BadgeHandler";
 
 // create log directories if they don't exist
 for (const l of Object.keys(config.dir.logs)) if (!fs.existsSync(config.dir.logs[l])) fs.mkdirpSync(config.dir.logs[l]);
@@ -36,6 +37,7 @@ class FurryBot extends Base {
 	p: PollHandler;
 	t: TimedActionsHandler;
 	m: ModLogUtil;
+	b: BadgeHandler;
 	col: MessageCollector;
 	sh: StatsHandler;
 	music: MusicHandler;
@@ -75,6 +77,7 @@ class FurryBot extends Base {
 	constructor(d: Cluster) {
 		super(d);
 		this.m = new ModLogUtil(this);
+		this.b = new BadgeHandler(this);
 		this.firstReady = false;
 		this.sh = new StatsHandler(this);
 		this.events = new Map();

@@ -202,7 +202,6 @@
 		"tooManyRoles": "Too many roles to list, please use `{0}roles {1}` to list them.",
 		"joinPos": "Join Position",
 		"nearbyJoins": "Nearby Joins",
-		"badges": "User Badges",
 		"socialProfiles": "Social Profiles",
 		"statusNote": "Note: Since Discord hasn't given us the `presence` intent, we cannot get proper status/game information.",
 		"drep": "Discord Rep",

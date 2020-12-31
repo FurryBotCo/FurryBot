@@ -4,10 +4,14 @@ import Logger from "../util/Logger";
 import { DEBUG, EVAL_CODES } from "./Constants";
 import Stats from "./Stats";
 
-function parse(d: Function | string) { // eslint-disable-line @typescript-eslint/ban-types
+function parse<T extends { [k: string]: string | number | boolean; } = {}>(d: Function | string, args?: T) { // eslint-disable-line @typescript-eslint/ban-types
+	if (!args) args = {} as unknown as any;
+	(args as any).cnfDir = `${__dirname}/../config/index.js`;
 	if (typeof d === "string") return d;
 	if (typeof d === "function") d = d.toString();
-	return `(async()=>{${d.slice(d.indexOf("{") + 1, d.lastIndexOf("}")).trim()}})()`;
+	// ${!args || Object.keys(args).length === 0 ? "" : `${Object.keys(args).map(v => `const ${v} = ${typeof args[v] === "string" ? `"${args[v]}"` : args[v]};`)}`}
+	return `(async()=>{const args = JSON.parse(\`${JSON.stringify(args)}\`);const {default:config} = require(args.cnfDir);${d.slice(d.indexOf("{") + 1, d.lastIndexOf("}")).trim()}})()`
+		.replace(/config_1\.default/g, "config");
 }
 
 class EvalError extends Error {
@@ -72,7 +76,8 @@ export default class IPC {
 			case "evalAtCluster": {
 				// if ([1, 3].includes(d.from) && d.data?.result !== "NOT_READY") return;
 				this.cb.delete(d.callbackId);
-				if (d.data.error) c.reject(new EvalError(d.data.res.name, d.data.res.message, d.data.res.stack));
+
+				if (d.data.error) c.reject(new EvalError(d.data.result.name, d.data.result.message, d.data.result.stack));
 				else if (d.data.result === "NOT_READY") c.resolve({
 					result: null,
 					time: 0,
@@ -105,18 +110,18 @@ export default class IPC {
 		}
 	}
 
-	async broadcastEval<R = any>(code: ((this: Cluster) => Promise<any>) | string): Promise<(Clustering.EvalResponse<R> & { clusterId: number; })[]> {
-		return Promise.all(Array.from(Array(this.cluster.options.clusterCount).keys()).map(async (id) => this.evalAtCluster<R>(id, code).then(v => ({ ...v, clusterId: id }))));
+	async broadcastEval<R = any, T extends { [k: string]: string | number | boolean; } = {}>(code: ((this: Cluster, args: T) => Promise<any> | any) | string, args?: T): Promise<(Clustering.EvalResponse<R> & { clusterId: number; })[]> {
+		return Promise.all(Array.from(Array(this.cluster.options.clusterCount).keys()).map(async (id) => this.evalAtCluster<R>(id, code, args).then(v => ({ ...v, clusterId: id }))));
 	}
 
-	async evalAtCluster<R = any>(id: number, code: ((this: Cluster) => Promise<any>) | string) {
+	async evalAtCluster<R = any, T extends { [k: string]: string | number | boolean; } = {}>(id: number, code: ((this: Cluster, args: T) => Promise<any> | any) | string, args?: T) {
 		return new Promise<Clustering.EvalResponse<R>>((resolve, reject) => {
 			const callbackId = crypto.randomBytes(32).toString("hex");
 			this.cluster.sendMessage("COMMAND", {
 				type: "evalAtCluster",
 				id,
 				callbackId,
-				code: parse(code)
+				code: parse(code, args)
 			});
 			setTimeout(() => {
 				resolve({
@@ -132,13 +137,13 @@ export default class IPC {
 		});
 	}
 
-	async evalAtMaster<R = any>(code: ((this: Cluster) => Promise<any>) | string) {
+	async evalAtMaster<R = any>(code: ((this: Cluster) => Promise<any> | any) | string, args?: Parameters<IPC["evalAtCluster"]>[2]) {
 		return new Promise<Clustering.EvalResponse<R>>((resolve, reject) => {
 			const callbackId = crypto.randomBytes(32).toString("hex");
 			this.cluster.sendMessage("COMMAND", {
 				type: "evalAtMaster",
 				callbackId,
-				code: parse(code)
+				code: parse(code, args)
 			});
 			this.cb.set(callbackId, {
 				resolve,

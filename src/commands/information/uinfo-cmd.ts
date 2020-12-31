@@ -39,27 +39,16 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 			return k;
 		}
 		const around = [...workItOut(true).reverse(), user.id, ...workItOut(false)];
-		const f: number[] = [];
 
-		// assuming Discord flags are max 20
-		for (let i = 0; i < 20; i++) if ((flags & (1 << i)) !== 0) f.push(i);
-		if (config.developers.includes(user.id)) f.push(config.flags.dev);
-		// if (config.contributors.includes(user.id)) f.push(config.flags.contrib);
-		// if (config.helpers.includes(user.id)) f.push(config.flags.helper);
-		// try { if (u.staff) f.push(config.flags.staff); } catch (e) { }
-		try {
-			// if (u.booster) f.push(config.flags.booster);
-			if (this.bot.guilds.get(config.client.supportServerId).members.get(user.id)?.roles?.includes(config.roles.booster)) f.push(config.flags.booster);
-		} catch (e) { }
 		const c = await db.getUser(user.id);
-		const p = await c.checkPremium();
-		const ubl = await c.checkBlacklist();
-		if (ubl.current.length > 0) f.push(config.flags.blacklisted);
-		switch (user.id) {
-			case "158750488563679232": f.push(config.flags.horny); break;
-			case "280158289667555328": f.push(config.flags.horny, config.flags.sub, config.flags.cute); break;
-		}
-		if (p.active) f.push(config.flags.donator);
+		const badges = await msg.uConfig.getBadges(this);
+		const cat: {
+			[k in typeof badges[number]["category"]]: (typeof badges[number])[];
+		} = {};
+		badges.map(b => {
+			if (!cat[b.category]) cat[b.category] = [];
+			cat[b.category].push(b);
+		});
 
 		const check = await KSoft.bans.check(user.id);
 
@@ -110,10 +99,15 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 						}
 					})),
 					"",
-					`**{lang:${cmd.lang}.badges}:**`,
-					...(f.length === 0 ? [`${config.emojis.default.dot} {lang:other.words.none}`] : f.map(k => `{lang:other.userFlags.${k}}`)),
+					"**{lang:other.words.user$ucwords$} {lang:other.words.badges$ucwords$}:**",
+					...Object.keys(cat).map(k => {
+						return [
+							`- {lang:other.badges.category.${k}}`,
+							...(cat[k].map(v => `${v.emoji} **{lang:other.badges.names.${v.id}}**`) || [`${config.emojis.default.dot} {lang:other.words.none}`])
+						].join("\n");
+					}),
 					"",
-					"**{lang:other.words.other}:**",
+					"**{lang:other.words.other$ucwords$}:**",
 					`{lang:${cmd.lang}.drep}: **${rep.reputation}** (**${rep.upvotes}** <:${config.emojis.custom.upvote}> / **${rep.downvotes}** <:${config.emojis.custom.downvote}>)`,
 					`{lang:${cmd.lang}.ksoft}: **{lang:other.words.${check ? "yes" : "no"}$ucwords$}**`
 				].join("\n"))

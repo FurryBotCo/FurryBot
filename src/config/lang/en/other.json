@@ -1,18 +1,4 @@
 {
-	"badges": {
-		"DiscordStaff": "Discord Staff",
-		"Bot": "Bot",
-		"VerifiedBot": "Verified Bot",
-		"VerifiedDev": "Verified Dev",
-		"DiscordPartner": "Discord Partner",
-		"HypesquadEvents": "Hypesquad Events",
-		"HypesquadBravery": "Hypesquad Bravery",
-		"HypesquadBrilliance": "Hypesquad Brilliance",
-		"HypesquadBalance": "Hypesquad Balance",
-		"EarlySupporter": "Early Supporter",
-		"BugHunter": "Bug Hunter",
-		"BugHunter2": "Bug Hunter 2"
-	},
 	"blacklisted": {
 		"guild": "This server has been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}",
 		"user": "You have been blacklisted. Blame: {0}. Reason: {1}. Expiry: {2}. You can appeal here: {3}"
@@ -195,7 +181,7 @@
 		"desc": "I was added to a server.\n\nServer: **{0}** ({1})\nOwner: **{2}** ({3})\nMember Count: {4}\nInviter: **{5}** ({6})\nPermissions Provided: {7}\n\nSource: {8}",
 		"footer": "Total Servers: {0}"
 	},
-	"slashNotEnabled": "Slash commands are not enabled in this server. Have a moderator run `{0}settings slash commands enabled` to enable them.",
+	"slashNotEnabled": "Slash commands are not enabled in this server. Have a moderator run `{0}settings slash commands enabled` to enable them.\n\nWarning: Slash commands are in **beta**, and may have unexpected side effects, or not work properly.",
 	"auto": {
 		"footer": "Automatically Posted | Use {0}auto to manage this.",
 		"footerNews": "Automatically Posted",

@@ -5,14 +5,12 @@ import { Colors } from "../util/Constants";
 import db from "../util/Database";
 import EmbedBuilder from "../util/EmbedBuilder";
 import Time from "../util/Functions/Time";
-import Utility from "../util/Functions/Utility";
 
 export default new ClientEvent("guildMemberAdd", async function (guild, member) {
 	/* this.counters.push({
 		type: "guildMemberAdd",
 		time: Date.now()
 	}); */
-	if (config.beta && !config.eventTest) return;
 	const g = await db.getGuild(guild.id).then(v => v.fix());
 	const e = g.logEvents.filter(l => l.type === "memberJoin");
 	for (const log of e) {
@@ -22,20 +20,15 @@ export default new ClientEvent("guildMemberAdd", async function (guild, member) 
 			continue;
 		}
 
-		const flags = Utility.getUserFlags(member.user);
-		const b = [];
-		if (flags.DISCORD_EMPLOYEE) b.push(`<:${config.emojis.badges.DiscordStaff}> {lang:other.badges.DiscordStaff}`);
-		if (member.user.bot) b.push(`<:${config.emojis.badges.Bot}> {lang:other.badges.Bot}`);
-		if (flags.VERIFIED_BOT) b.push(`<:${config.emojis.badges.VerifiedBot}> {lang:other.badges.VerifiedBot}`);
-		if (flags.VERIFIED_BOT_DEVELOPER) b.push(`<:${config.emojis.badges.VerifiedDev}> {lang:other.badges.VerifiedDev}`);
-		if (flags.DISCORD_PARTNER) b.push(`<:${config.emojis.badges.DiscordPartner}> {lang:other.badges.DiscordPartner}`);
-		if (flags.HYPESQUAD_EVENTS) b.push(`<:${config.emojis.badges.HypesquadEvents}> {lang:other.badges.HypesquadEvents}`);
-		if (flags.HOUSE_BRAVERY) b.push(`<:${config.emojis.badges.HypesquadBravery}> {lang:other.badges.HypesquadBravery}`);
-		if (flags.HOUSE_BALANCE) b.push(`<:${config.emojis.badges.HypesquadBalance}> {lang:other.badges.HypesquadBalance}`);
-		if (flags.HOUSE_BRILLIANCE) b.push(`<:${config.emojis.badges.HypesquadBrilliance}> {lang:other.badges.HypesquadBrilliance}`);
-		if (flags.EARLY_SUPPORTER) b.push(`<:${config.emojis.badges.EarlySupporter}> {lang:other.badges.EarlySupporter}`);
-		if (flags.BUG_HUNTER_LEVEL_1) b.push(`<:${config.emojis.badges.BugHunter}> {lang:other.badges.BugHunter}`);
-		if (flags.BUG_HUNTER_LEVEL_2) b.push(`<:${config.emojis.badges.BugHunter2}> {lang:other.badges.BugHunter2}`);
+		const u = await db.getUser(member.id);
+		const badges = await u.getBadges(this);
+		const cat: {
+			[k in typeof badges[number]["category"]]: (typeof badges[number])[];
+		} = {};
+		badges.map(b => {
+			if (!cat[b.category]) cat[b.category] = [];
+			cat[b.category].push(b);
+		});
 
 		const e = new EmbedBuilder(g.settings.lang)
 			.setColor(Colors.green)
@@ -47,7 +40,13 @@ export default new ClientEvent("guildMemberAdd", async function (guild, member) 
 				`{lang:other.words.member$ucwords$}: **${member.user.username}#${member.user.discriminator}** <@!${member.user.id}>`,
 				`{lang:other.words.creationDate$ucwords$}: **${Time.formatDateWithPadding(member.user.createdAt, true, false, true, true)}**`,
 				"",
-				...b
+				"**{lang:other.words.user$ucwords$} {lang:other.words.badges$ucwords$}:**",
+				...Object.keys(cat).map(k => {
+					return [
+						`- {lang:other.badges.category.${k}}`,
+						...(cat[k].map(v => `${v.emoji} **{lang:other.badges.names.${v.id}}**`) || [`${config.emojis.default.dot} {lang:other.words.none}`])
+					].join("\n");
+				})
 			].join("\n"))
 			.setFooter(`{lang:other.events.memberJoin.footer|${guild.memberCount}|${Time.formatAgo(member.user.createdAt, true, true).split(",")[0]}$ucwords$}`);
 
