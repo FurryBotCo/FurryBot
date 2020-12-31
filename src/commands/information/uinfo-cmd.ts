@@ -41,7 +41,7 @@ export default new Command(["uinfo", "userinfo", "ui"], __filename)
 		const around = [...workItOut(true).reverse(), user.id, ...workItOut(false)];
 
 		const c = await db.getUser(user.id);
-		const badges = await msg.uConfig.getBadges(this);
+		const badges = await c.getBadges(this);
 		const cat: {
 			[k in typeof badges[number]["category"]]: (typeof badges[number])[];
 		} = {};
