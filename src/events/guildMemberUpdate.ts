@@ -7,8 +7,8 @@ import EmbedBuilder from "../util/EmbedBuilder";
 import Logger from "../util/Logger";
 
 export default new ClientEvent("guildMemberUpdate", async function (guild, member, oldMember) {
+	// console.log(member.toJSON(), oldMember);
 	if (config.beta && !config.eventTest) return;
-	if (config.beta && guild.id !== config.client.supportServerId) return;
 	const g = await db.getGuild(guild.id).then(v => v.fix());
 	const e = g.logEvents.filter(l => l.type === "memberUpdate");
 	for (const log of e) {

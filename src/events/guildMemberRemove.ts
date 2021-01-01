@@ -36,8 +36,8 @@ export default new ClientEvent("guildMemberRemove", async function (guild, membe
 			const { entries: a } = await guild.getAuditLogs(10, null, Eris.Constants.AuditLogActions.MEMBER_KICK);
 			for (const log of a) {
 				if (log.targetID === member.id) {
-					const e = g.logEvents.filter(event => event.type === "memberLeave");
-					inner: for (const l of e) {
+					const e = g.logEvents.filter(event => event.type === "userKick");
+					inner: for await (const l of e) {
 						const ch = guild.channels.get(l.channel) as Eris.GuildTextableChannel;
 						if (!ch || !["readMessages", "sendMessages"].some(perm => ch.permissionsOf(this.bot.user.id).has(perm))) {
 							await g.mongoEdit({ $pull: { logEvents: l } });
@@ -58,7 +58,7 @@ export default new ClientEvent("guildMemberRemove", async function (guild, membe
 								`{lang:other.words.reason$ucwords$}: **${log.reason || "{lang:other.words.none$upper$}"}**`
 							].join("\n"));
 
-						ch.createMessage({
+						await ch.createMessage({
 							embed: e.toJSON()
 						});
 						break;
