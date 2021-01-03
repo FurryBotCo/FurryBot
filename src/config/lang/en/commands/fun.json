@@ -302,6 +302,16 @@
 		"description": "Who's a good boi?!",
 		"usage": "[@user]",
 		"me": "Yip! Yip! I am!",
-		"other": "Yip! Yip! {0} is!"
+		"other": "Yip! Yip! {0} is!",
+		"meBad": [
+			"Anyone but you.",
+			"Not you.",
+			"Everyone that isn't you."
+			],
+		"otherBad": [
+			"Definitely not them.",
+			"Anyone but them.",
+			"Literally anyone else."
+		]
 	}
 }
