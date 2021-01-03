@@ -46,8 +46,12 @@ export default class TimedActionsHandler {
 
 	async handleBanEntry(entry: TimedEntry<"ban">) {
 		if (!entry.expiry) return this.deleteEntry(entry);
-		const g: Eris.Guild | null = this.client.bot.guilds.get(entry.guildId) || await this.client.bot.getRESTGuild(entry.guildId).catch(err => null) || null;
-		if (g === null) return this.deleteEntry(entry);
+		const g = this.client.bot.guilds.get(entry.guildId);
+		if (!g) {
+			const a = this.client.bot.getRESTGuild(entry.guildId);
+			if (a) this.deleteEntry(entry);
+			return;
+		}
 
 		const user: Eris.User | null = this.client.bot.users.get(entry.userId) || await this.client.getUser(entry.userId).catch(err => null) || null;
 		if (user === null) return this.deleteEntry(entry);
@@ -66,8 +70,12 @@ export default class TimedActionsHandler {
 
 	async handleMuteEntry(entry: TimedEntry<"mute">) {
 		if (!entry.expiry) return this.deleteEntry(entry);
-		const g: Eris.Guild | null = this.client.bot.guilds.get(entry.guildId) || await this.client.bot.getRESTGuild(entry.guildId).catch(err => null) || null;
-		if (g === null) return this.deleteEntry(entry);
+		const g = this.client.bot.guilds.get(entry.guildId);
+		if (!g) {
+			const a = this.client.bot.getRESTGuild(entry.guildId);
+			if (a) this.deleteEntry(entry);
+			return;
+		}
 
 		const member: Eris.Member | null = g.members.get(entry.userId) || await g.getRESTMember(entry.userId).catch(err => null) || null;
 
