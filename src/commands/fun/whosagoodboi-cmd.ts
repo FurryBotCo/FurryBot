@@ -25,7 +25,7 @@ export default new Command(["whosagoodboi", "whosagoodboy", "goodboi", "goodboy"
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setDescription(`{lang:${cmd.lang}.${msg.args.length === 0 ? "me" : "other"}${[u?.id, msg.author.id].some(v => naughtyList.includes(v)) ? "Bad" : ""}|${Internal.extraArgParsing(msg)}}`)
+				.setDescription(`{lang:${cmd.lang}.${msg.args.length === 0 ? "me" : "other"}${((u && naughtyList.includes(u.id)) || (naughtyList.includes(msg.author.id))) ? "Bad" : ""}|${Internal.extraArgParsing(msg)}}`)
 				.setTimestamp(new Date().toISOString())
 				.setFooter("OwO", this.bot.user.avatarURL)
 				.setColor(Colors.gold)
