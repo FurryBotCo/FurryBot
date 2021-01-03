@@ -19,9 +19,13 @@ export default class AppealRoute extends Route {
 		const client = this.client;
 
 		app
-			.get("/go", async (req, res) =>
+			.get("/add", async (req, res) =>
 				res.redirect(config.client.socials.discordInviteSource(req.query.source?.toString()?.toLowerCase() as any || "botapi"))
 			)
+			.get("/support", async (req, res) => {
+				// support server analytics
+				res.redirect(config.client.socials.discordWebsite);
+			})
 			.get("/finished", async (req, res) => {
 				// storing source in state because it makes my life easier and elss cluttered
 				let state: {
