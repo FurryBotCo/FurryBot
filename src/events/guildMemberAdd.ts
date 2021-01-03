@@ -11,6 +11,7 @@ export default new ClientEvent("guildMemberAdd", async function (guild, member) 
 		type: "guildMemberAdd",
 		time: Date.now()
 	}); */
+	if (config.beta && !config.eventTest) return;
 	const g = await db.getGuild(guild.id).then(v => v.fix());
 	const e = g.logEvents.filter(l => l.type === "memberJoin");
 	for (const log of e) {
