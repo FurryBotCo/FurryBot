@@ -22,7 +22,7 @@ export default new ClientEvent("guildMemberRemove", async function (guild, membe
 		}
 
 		const e = new EmbedBuilder(g.settings.lang)
-			.setColor(Colors.green)
+			.setColor(Colors.red)
 			.setTimestamp(new Date().toISOString())
 			.setAuthor(guild.name, guild.iconURL)
 			.setThumbnail(member.user.avatarURL)
