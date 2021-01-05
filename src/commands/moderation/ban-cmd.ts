@@ -73,7 +73,7 @@ export default new Command(["ban"], __filename)
 
 		let m: Eris.Message;
 		if (!noDM && !user.bot && msg.channel.guild.members.has(user.id)) m = await user.getDMChannel().then(dm => dm.createMessage(`${Language.get(msg.gConfig.settings.lang, `other.dm.ban${time === 0 ? "Permanent" : ""}`, [msg.channel.guild.name, Time.ms(time, true), reason])}\n\n${Language.get(msg.gConfig.settings.lang, "other.dm.notice")}`)).catch(err => null);
-		await msg.channel.guild.banMember(user.id, deleteDays, encodeURIComponent(`Ban: ${msg.author.tag} (${msg.author.id}) -> ${reason}`)).then(async () => {
+		await msg.channel.guild.banMember(user.id, deleteDays, `Ban: ${msg.author.tag} (${msg.author.id}) -> ${reason}`).then(async () => {
 			await msg.channel.createMessage(`***${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userBanned${isNaN(time) || time === 0 ? "" : "Timed"}`, [`${user.username}#${user.discriminator}`, Time.ms(time, true), reason])}***`).catch(err => null);
 			await this.m.createBanEntry(msg.channel, msg.gConfig, msg.author, user, time, deleteDays, reason);
 			if (!isNaN(time) && time !== 0) await this.t.addEntry("ban", time, Date.now() + time, user.id, msg.channel.guild.id, reason);
