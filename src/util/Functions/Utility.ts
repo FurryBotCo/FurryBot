@@ -598,7 +598,8 @@ export default class Utility {
 		// avoid references
 		const obj = JSON.parse(JSON.stringify(a)) as A & B;
 		for (const k of Object.keys(b)) {
-			if (b[k] instanceof Array) obj[k] = typeof a[k] === "undefined" ? b[k] : a[k];
+			// handling arrays is a tricky thing since we can't just merge them because of duplicates, so we'll just assume arrays will be zero length if they're "wrong"
+			if (Array.isArray(b[k])) obj[k] = a[k]?.length === 0 ? b[k] : a[k];
 			else if (typeof b[k] === "object" && b[k] !== null) {
 				if (typeof a[k] !== "object" || a[k] === null) a[k] = {};
 				obj[k] = this.mergeObjects(a[k], b[k]);

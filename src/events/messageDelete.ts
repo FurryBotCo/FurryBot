@@ -7,6 +7,8 @@ import EmbedBuilder from "../util/EmbedBuilder";
 import Redis from "../util/Redis";
 
 export default new ClientEvent("messageDelete", async function (message: Eris.Message) {
+	
+	console.log(message.guildID);
 	if (config.beta && !config.eventTest) return;
 	if (!this || !message || !message.author || !message.content || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any) || (config.beta && !config.developers.includes(message.author.id))) return;
 
