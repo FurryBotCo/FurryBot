@@ -175,6 +175,7 @@ export default class GuildConfig {
 
 	async fix() {
 		const obj: Parameters<GuildConfig["edit"]>[0] = Object.create(null);
+		if (!Array.isArray(this.disable)) obj.disable = [];
 		if (!Array.isArray(this.auto)) obj.auto = [];
 		if (!Array.isArray(this.logEvents)) obj.logEvents = [];
 		if (!Array.isArray(this.prefix)) obj.prefix = [
