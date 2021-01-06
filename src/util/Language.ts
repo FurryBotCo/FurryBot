@@ -91,7 +91,7 @@ export default class Language {
 			if (!j) {
 				const e = new LanguageError("UnknownModifierError", `Unknown modifier "${mod}"`).stack;
 				// would be Logger but circular dependencies suck
-				console.warn("Language", e);
+				console.warn(e);
 			} else mods.push(j);
 		});
 		const d = c.split("|");

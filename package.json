@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "10.3.4-20210104",
+  "version": "10.3.4-20210106",
   "description": "A fun bot for furry Discord servers!",
   "main": "index.js",
   "scripts": {
@@ -61,7 +61,7 @@
     "wolfram-alpha-node": "0.0.3",
     "ws": "^7.4.2",
     "yargs": "^16.2.0",
-    "ytdl-core": "^4.4.0"
+    "ytdl-core": "^4.4.1"
   },
   "devDependencies": {
     "@types/chalk": "^2.2.0",
