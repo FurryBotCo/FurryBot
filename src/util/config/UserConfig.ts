@@ -178,7 +178,6 @@ export default class UserConfig {
 	async fix() {
 		const obj: Parameters<UserConfig["edit"]>[0] = Object.create(null);
 		if (JSON.stringify(obj) !== "{}") {
-			console.log(JSON.stringify(obj), true);
 			await this.edit(obj);
 			Logger.warn(["Database", "User"], `Fixed user "${this.id}": ${JSON.stringify(obj)}`);
 		}
