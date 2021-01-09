@@ -177,7 +177,7 @@ export default new Command(["auto"], __filename)
 							"",
 							`{lang:other.words.example$ucwords$}: \`${msg.prefix}auto add wah 5 <#channel>\``,
 							`{lang:${cmd.lang}.help.validTimes}`,
-							`\`${msg.prefix}log add <type> <time> <#channel>\` - {lang:${cmd.lang}.help.add}`,
+							`\`${msg.prefix}auto add <type> <time> <#channel>\` - {lang:${cmd.lang}.help.add}`,
 							`\`${msg.prefix}log remove <id>\` - {lang:${cmd.lang}.help.remove}`,
 							`\`${msg.prefix}log list\` - {lang:${cmd.lang}.help.list}`,
 							`\`${msg.prefix}log available\` - {lang:${cmd.lang}.help.available}`,
