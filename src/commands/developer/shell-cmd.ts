@@ -43,7 +43,7 @@ export default new Command(["shell", "sh"], __filename)
 		if (!silent) {
 
 			if (res.length > 1000) {
-				const link = await Request.createPaste(res, "FurryBot Shell Execution", "1H", 1);
+				const link = await Request.createPaste(res, "FurryBot Shell Execution", "1H", 2);
 				res = `Uploaded ${link}`;
 			}
 

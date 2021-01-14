@@ -81,7 +81,7 @@ export default new Command(["eval", "ev"], __filename)
 
 		if (!silent) {
 			if (res.length > 1000) {
-				const pasteURL = await Request.createPaste(res, "FurryBot Eval", "1H", 1);
+				const pasteURL = await Request.createPaste(res, "FurryBot Eval", "1H", 2);
 				res = `Uploaded ${pasteURL}`;
 			}
 
