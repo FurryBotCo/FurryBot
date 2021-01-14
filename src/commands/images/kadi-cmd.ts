@@ -1,7 +1,6 @@
 import Command from "../../util/cmd/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
-import { JSONResponse } from "furrybotapi/src/typings";
 import Request from "../../util/Functions/Request";
 import Redis from "../../util/Redis";
 
@@ -17,7 +16,7 @@ export default new Command(["kadi"], __filename)
 	.setExecutor(async function (msg, cmd) {
 		const c = await Redis.get("kadi");
 		async function get() {
-			const v = await Request.fetchURL("https://api.augu.dev/kadi", false).then(v => JSON.parse(v.toString()).url) as string;
+			const v = await Request.fetchURL("https://api.floofy.dev/kadi", false).then(v => JSON.parse(v.toString()).url) as string;
 			if (v === c) return get();
 			else {
 				await Redis.set("kadi", v);
