@@ -6,6 +6,7 @@ import chunk from "chunk";
 import Language from "../../util/Language";
 import Strings from "../../util/Functions/Strings";
 import config from "../../config";
+import Eris from "eris";
 
 export default new Command(["disable"], __filename)
 	.setBotPermissions([])
@@ -58,11 +59,13 @@ export default new Command(["disable"], __filename)
 						content: Language.get(msg.gConfig.settings.lang, `${cmd.lang}.success.${type}Server`, [msg.args[1].toLowerCase()])
 					});
 				} else {
-					const ch = await msg.getChannelFromArgs(2, true, 0);
+					msg.args = [...msg.args.slice(0, 2), msg.args.slice(2).join(" ")];
+					const ch = await msg.getChannelFromArgs<Eris.GuildTextableChannel | Eris.CategoryChannel>(2, true, 0);
 					const role = await msg.getRoleFromArgs(2, true, 0);
 					const user = await msg.getMemberFromArgs(2, true, 0);
 
 					if (ch) {
+						if ((ch.type as any) === Eris.Constants.ChannelTypes.GUILD_VOICE) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidChannel`))
 						const c = {
 							type: "channel",
 							id: ch.id,
@@ -88,7 +91,7 @@ export default new Command(["disable"], __filename)
 								roles: false,
 								users: [msg.author.id]
 							},
-							content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.success.${type || "all"}Channel|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${ch.id}}`)
+							content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.success.${type || "all"}${ch.type === Eris.Constants.ChannelTypes.GUILD_CATEGORY ? "Category" : "Channel"}|${msg.args[1].toLowerCase()}|${ch[ch.type === Eris.Constants.ChannelTypes.GUILD_CATEGORY ? "name" : "id"]}}`)
 						});
 					} else if (role) {
 						const c = {
@@ -110,7 +113,7 @@ export default new Command(["disable"], __filename)
 								roles: false,
 								users: [msg.author.id]
 							},
-							content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.success.${type || "all"}Role|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${role.id}}`)
+							content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.success.${type || "all"}Role|${msg.args[1].toLowerCase()}|${role.id}}`)
 						});
 					} else if (user) {
 						const c = {
@@ -132,7 +135,7 @@ export default new Command(["disable"], __filename)
 								roles: false,
 								users: [msg.author.id]
 							},
-							content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.success.${type || "all"}User|${!type ? "" : `${msg.args[1].toLowerCase()}|`}${user.id}}`)
+							content: Language.parseString(msg.gConfig.settings.lang, `{lang:${cmd.lang}.success.${type || "all"}User|${msg.args[1].toLowerCase()}|${user.id}}`)
 						});
 					} else return msg.reply({
 						allowedMentions: {
@@ -181,6 +184,7 @@ export default new Command(["disable"], __filename)
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(msg.gConfig.settings.lang)
 						.setDescription([
+							// @TODO different message for category
 							...pages[page - 1].map(d => `[#${msg.gConfig.disable.indexOf(d) + 1}]: {lang:${cmd.lang}.list.${(d as any).command ? "cmd" : (d as any).category ? "cat" : "all"}${Strings.ucwords(d.type)}${(d as any).command ? `|${(d as any).command}` : (d as any).category ? `|${(d as any).category}` : ""}${d.type !== "server" ? `|${(d as any).id}` : ""}}`)
 						].join("\n"))
 						.setColor(Colors.green)
