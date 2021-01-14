@@ -187,7 +187,9 @@
 		"dbTotal": "Total Connections",
 		"dbActive": "Active Connections",
 		"devOnly": "This section is for developers only.",
-		"botInvites": "Bot Invite Sources"
+		"botInvites": "Bot Invite Sources",
+		"eventsNum": "Events #{0}",
+		"interval": "All per second stats are calculated over a 15 second period."
 	},
 	"uinfo": {
 		"description": "Get some info about a user.",

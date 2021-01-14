@@ -59,20 +59,13 @@ class FurryBot extends Base {
 	// will this make it inaccurate? Well yes, of course, but it makes the command not sit there stalling,
 	// waiting for the test to finish
 	cpuUsage: number;
-	counters: {
-		type: FurryBot["POSSIBLE_COUNTERS"][number];
+	ev: {
+		type: string;
 		time: number;
 	}[];
-	POSSIBLE_COUNTERS = [
-		"command",
-		"guildMemberAdd",
-		"guildMemberRemove",
-		"messageCreate",
-		"messageDelete",
-		"messageDeleteBulk",
-		"messageUpdate",
-		"userUpdate"
-	] as const;
+	evTotal: {
+		[k: string]: number;
+	};
 	h: CommandHelper;
 	constructor(d: Cluster) {
 		super(d);
@@ -89,15 +82,14 @@ class FurryBot extends Base {
 		this.api = new API(this);
 		this.cpuUsage = 0;
 		this.e6Active = [];
-		this.counters = [];
+		this.ev = [];
+		this.evTotal = {};
 		db.setClient(this);
 	}
 
-	removeOldCounters() {
+	removeEv() {
 		const d = Date.now();
-		const len = Number(this.counters.length);
-		this.counters = this.counters.filter(c => (c.time + 1.5e4) > d);
-		return len - this.counters.length;
+		this.ev = this.ev.filter(v => (v.time + 1.5e4) > d);
 	}
 
 	async loadCommands() {
@@ -165,6 +157,7 @@ class FurryBot extends Base {
 
 		if (this.cluster.id === 0) this.api.launch();
 		await this.loadCommands();
+		setInterval(this.removeEv.bind(this), 1e3);
 
 		const s = config.statuses(this);
 

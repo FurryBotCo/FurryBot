@@ -110,11 +110,11 @@ export default class IPC {
 		}
 	}
 
-	async broadcastEval<R = any, T extends { [k: string]: string | number | boolean; } = {}>(code: ((this: Cluster, args: T) => Promise<any> | any) | string, args?: T): Promise<(Clustering.EvalResponse<R> & { clusterId: number; })[]> {
+	async broadcastEval<R = any, T extends { [k: string]: string | number | boolean; } = {}>(code: ((this: Cluster, args: T & { cnfDir: string; }) => Promise<any> | any) | string, args?: T): Promise<(Clustering.EvalResponse<R> & { clusterId: number; })[]> {
 		return Promise.all(Array.from(Array(this.cluster.options.clusterCount).keys()).map(async (id) => this.evalAtCluster<R>(id, code, args).then(v => ({ ...v, clusterId: id }))));
 	}
 
-	async evalAtCluster<R = any, T extends { [k: string]: string | number | boolean; } = {}>(id: number, code: ((this: Cluster, args: T) => Promise<any> | any) | string, args?: T) {
+	async evalAtCluster<R = any, T extends { [k: string]: string | number | boolean; } = {}>(id: number, code: ((this: Cluster, args: T & { cnfDir: string; }) => Promise<any> | any) | string, args?: T) {
 		return new Promise<Clustering.EvalResponse<R>>((resolve, reject) => {
 			const callbackId = crypto.randomBytes(32).toString("hex");
 			this.cluster.sendMessage("COMMAND", {

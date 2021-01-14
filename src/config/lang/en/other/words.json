@@ -168,5 +168,7 @@
 	"never": "never",
 	"minutes": "minutes",
 	"canceled": "canceled",
-	"badges": "badges"
+	"badges": "badges",
+	"perSecond": "per second",
+	"allTime": "all time"
 }
