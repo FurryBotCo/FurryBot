@@ -42,10 +42,11 @@ export default new Command(["editsnipe", "esnipe", "es"], __filename)
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
-				.setDescription(`{lang:${cmd.lang}.old}: ${oldContent}\n{lang:${cmd.lang}.new}: ${newContent}`)
 				.setAuthor(`${u.username}#${u.discriminator}`, u.avatarURL)
 				.setTimestamp(new Date(Number(time)).toISOString())
 				.setColor(Colors.gold)
+				.addField(`{lang:${cmd.lang}.old}`, oldContent, false)
+				.addField(`{lang:${cmd.lang}.new}`, newContent, false)
 				.toJSON()
 		});
 	});
