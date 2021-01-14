@@ -58,7 +58,7 @@ export default new Command(["reload"], __filename)
 
 					const end = performance.now();
 					m = await m.edit(`Rebuild finished in ${Time.ms(end - start, true, true)}.\`\`\`fix\n${rb.toString()}\n\`\`\``);
-				} else m = await m.edit("Not rebuilding code.");
+				} else m = await m?.edit?.("Not rebuilding code.");
 			} catch (e) {
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(msg.gConfig.settings.lang)
