@@ -1,8 +1,8 @@
 import Command from "../../util/cmd/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
-import FurryBotAPI from "../../util/req/FurryBotAPI";
-import { JSONResponse } from "furrybotapi/src/typings";
+import Yiffy from "../../util/req/Yiffy";
+import { JSONResponse } from "yiffy";
 
 export default new Command(["bulge"], __filename)
 	.setBotPermissions([
@@ -16,7 +16,7 @@ export default new Command(["bulge"], __filename)
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
-		const img = await FurryBotAPI.furry.bulge("json", 1) as JSONResponse;
+		const img = await Yiffy.furry.bulge("json", 1) as JSONResponse;
 		if (!img) throw new TypeError("API method \"furry.bulge\" did not return an image.");
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

@@ -1,8 +1,8 @@
 import Command from "../../util/cmd/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
-import FurryBotAPI from "../../util/req/FurryBotAPI";
-import { JSONResponse } from "furrybotapi/src/typings";
+import Yiffy from "../../util/req/Yiffy";
+import { JSONResponse } from "yiffy";
 import Language from "../../util/Language";
 
 export default new Command(["fursuitbutt", "fursuitbutts"], __filename)
@@ -18,7 +18,7 @@ export default new Command(["fursuitbutt", "fursuitbutts"], __filename)
 	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (!msg.channel.nsfw) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.nsfw`));
-		const img = await FurryBotAPI.furry.butts("json", 1) as JSONResponse;
+		const img = await Yiffy.furry.butts("json", 1) as JSONResponse;
 		if (!img) throw new TypeError("API method \"furry.butts\" did not return an image.");
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

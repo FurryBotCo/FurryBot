@@ -1,8 +1,8 @@
 import Command from "../../util/cmd/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
-import FurryBotAPI from "../../util/req/FurryBotAPI";
-import { JSONResponse } from "furrybotapi/src/typings";
+import Yiffy from "../../util/req/Yiffy";
+import { JSONResponse } from "yiffy";
 import Language from "../../util/Language";
 import config from "../../config";
 
@@ -24,7 +24,7 @@ export default new Command(["yiff"], __filename)
 			if (!config.yiffTypes.includes(msg.args[0])) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidYiff`, [msg.args[0].toLowerCase(), config.yiffTypes.map(v => `**${v}**`).join(", ")]));
 			else type = msg.args[0].toLowerCase();
 		}
-		const img = await FurryBotAPI.furry.yiff[type]?.("json", 1) as JSONResponse;
+		const img = await Yiffy.furry.yiff[type]?.("json", 1) as JSONResponse;
 		if (!img) throw new TypeError(`API method "furry.yiff.${type}" did not return an image.`);
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
