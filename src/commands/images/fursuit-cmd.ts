@@ -3,8 +3,8 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
 import CommandError from "../../util/cmd/CommandError";
 import E6API from "../../util/req/E6API";
-import FurryBotAPI from "../../util/req/FurryBotAPI";
-import { JSONResponse } from "furrybotapi/src/typings";
+import Yiffy from "../../util/req/Yiffy";
+import { JSONResponse } from "yiffy";
 import Language from "../../util/Language";
 import config from "../../config";
 import FurryBot from "../../main";
@@ -20,7 +20,7 @@ export default new Command(["fursuit"], __filename)
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
-		const img = await FurryBotAPI.furry.fursuit("json", 1) as JSONResponse;
+		const img = await Yiffy.furry.fursuit("json", 1) as JSONResponse;
 		if (!img) throw new TypeError(`API method "furry.${msg.args[0].toLowerCase()}" did not return an image.`);
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

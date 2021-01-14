@@ -1,7 +1,7 @@
 import Command from "../../util/cmd/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import { Colors } from "../../util/Constants";
-import { JSONResponse } from "furrybotapi/src/typings";
+import { JSONResponse } from "yiffy";
 import Request from "../../util/Functions/Request";
 import Redis from "../../util/Redis";
 

@@ -4,7 +4,7 @@ import { Colors } from "../../util/Constants";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import Internal from "../../util/Functions/Internal";
 import Language from "../../util/Language";
-import FurryBotAPI from "../../util/req/FurryBotAPI";
+import Yiffy from "../../util/req/Yiffy";
 
 export default new Command(["kiss"], __filename)
 	.setBotPermissions([
@@ -26,7 +26,7 @@ export default new Command(["kiss"], __filename)
 
 		if (msg.gConfig.settings.commandImages) {
 			if (!msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.permissionMissing", ["attachFiles"]));
-			const img = await FurryBotAPI.furry.kiss("json", 1);
+			const img = await Yiffy.furry.kiss("json", 1);
 			embed.setImage(img.url);
 		}
 		return msg.channel.createMessage({

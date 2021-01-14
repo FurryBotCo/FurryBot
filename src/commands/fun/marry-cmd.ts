@@ -6,7 +6,7 @@ import EmbedBuilder from "../../util/EmbedBuilder";
 import Request from "../../util/Functions/Request";
 import Utility from "../../util/Functions/Utility";
 import Language from "../../util/Language";
-import FurryBotAPI from "../../util/req/FurryBotAPI";
+import Yiffy from "../../util/req/Yiffy";
 
 export default new Command(["marry"], __filename)
 	.setBotPermissions([
@@ -42,7 +42,7 @@ export default new Command(["marry"], __filename)
 			return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.otherAlreadyMarried`, [u]));
 		}
 
-		const img = await FurryBotAPI.furry.propose("json", 1);
+		const img = await Yiffy.furry.propose("json", 1);
 
 		let d: Eris.Message<Eris.TextableChannel>;
 		let force = false;

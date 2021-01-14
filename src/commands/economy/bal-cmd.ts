@@ -1,7 +1,7 @@
 import Command from "../../util/cmd/Command";
 import { Colors } from "../../util/Constants";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import FurryBotAPI from "../../util/req/FurryBotAPI";
+import Yiffy from "../../util/req/Yiffy";
 
 export default new Command(["bal", "balance"], __filename)
 	.setBotPermissions([

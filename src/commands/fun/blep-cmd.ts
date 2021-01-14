@@ -2,7 +2,7 @@ import Command from "../../util/cmd/Command";
 import { Colors } from "../../util/Constants";
 import EmbedBuilder from "../../util/EmbedBuilder";
 import Internal from "../../util/Functions/Internal";
-import FurryBotAPI from "../../util/req/FurryBotAPI";
+import Yiffy from "../../util/req/Yiffy";
 
 export default new Command(["blep"], __filename)
 	.setBotPermissions([
@@ -14,7 +14,7 @@ export default new Command(["blep"], __filename)
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
-		const img = await FurryBotAPI.animals.blep("json", 1);
+		const img = await Yiffy.animals.blep("json", 1);
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

@@ -1,6 +1,6 @@
 import Command from "../../util/cmd/Command";
 import EmbedBuilder from "../../util/EmbedBuilder";
-import FurryBotAPI from "../../util/req/FurryBotAPI";
+import Yiffy from "../../util/req/Yiffy";
 
 export default new Command(["birb", "bird"], __filename)
 	.setBotPermissions([
@@ -12,7 +12,7 @@ export default new Command(["birb", "bird"], __filename)
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
-		const img = await FurryBotAPI.animals.birb("json", 1);
+		const img = await Yiffy.animals.birb("json", 1);
 		return msg.channel.createMessage({
 			embed:
 				new EmbedBuilder(msg.gConfig.settings.lang)

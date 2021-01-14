@@ -2,7 +2,7 @@ import config from "../../config";
 import GuildConfig from "../config/GuildConfig";
 import EmbedBuilder from "../EmbedBuilder";
 import Request from "../Functions/Request";
-import FurryBotAPI from "../req/FurryBotAPI";
+import Yiffy from "../req/Yiffy";
 import phin from "phin";
 import Eris from "eris";
 import { Colors } from "../Constants";
@@ -43,7 +43,7 @@ export default class AutoPostingHandler {
 		}
 		switch (type) {
 			case "birb": {
-				const img = await FurryBotAPI.animals.birb("json", 1);
+				const img = await Yiffy.animals.birb("json", 1);
 				e
 					.setTitle("{lang:other.auto.titles.birb}")
 					.setImage(img.url)
@@ -207,7 +207,7 @@ export default class AutoPostingHandler {
 			}
 
 			case "fursuit": {
-				const img = await FurryBotAPI.furry.fursuit("json", 1);
+				const img = await Yiffy.furry.fursuit("json", 1);
 				e
 					.setTitle("{lang:other.auto.titles.fursuit}")
 					.setImage(img.url)
@@ -224,7 +224,7 @@ export default class AutoPostingHandler {
 			}
 
 			case "butts": {
-				const img = await FurryBotAPI.furry.butts("json", 1);
+				const img = await Yiffy.furry.butts("json", 1);
 				e
 					.setTitle("{lang:other.auto.titles.butts}")
 					.setImage(img.url)
@@ -241,7 +241,7 @@ export default class AutoPostingHandler {
 			}
 
 			case "bulge": {
-				const img = await FurryBotAPI.furry.bulge("json", 1);
+				const img = await Yiffy.furry.bulge("json", 1);
 				e
 					.setTitle("{lang:other.auto.titles.bulge}")
 					.setImage(img.url)
@@ -258,7 +258,7 @@ export default class AutoPostingHandler {
 			}
 
 			case "yiff.gay": {
-				const img = await FurryBotAPI.furry.yiff.gay("json", 1);
+				const img = await Yiffy.furry.yiff.gay("json", 1);
 				e
 					.setTitle("{lang:other.auto.titles.yiff-gay}")
 					.setImage(img.url)
@@ -275,7 +275,7 @@ export default class AutoPostingHandler {
 			}
 
 			case "yiff.straight": {
-				const img = await FurryBotAPI.furry.yiff.straight("json", 1);
+				const img = await Yiffy.furry.yiff.straight("json", 1);
 				e
 					.setTitle("{lang:other.auto.titles.yiff-straight}")
 					.setImage(img.url)
@@ -292,7 +292,7 @@ export default class AutoPostingHandler {
 			}
 
 			case "yiff.lesbian": {
-				const img = await FurryBotAPI.furry.yiff.lesbian("json", 1);
+				const img = await Yiffy.furry.yiff.lesbian("json", 1);
 				e
 					.setTitle("{lang:other.auto.titles.yiff-lesbian}")
 					.setImage(img.url)
@@ -309,7 +309,7 @@ export default class AutoPostingHandler {
 			}
 
 			case "yiff.gynomorph": {
-				const img = await FurryBotAPI.furry.yiff.gynomorph("json", 1);
+				const img = await Yiffy.furry.yiff.gynomorph("json", 1);
 				e
 					.setTitle("{lang:other.auto.titles.yiff-gynomorph}")
 					.setImage(img.url)
