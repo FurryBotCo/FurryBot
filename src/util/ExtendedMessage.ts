@@ -5,8 +5,6 @@ import GuildConfig from "./config/GuildConfig";
 import UserConfig from "./config/UserConfig";
 import Command from "./cmd/Command";
 import config from "../config";
-import { InteractionResponseType } from "./DiscordCommands/Constants";
-import { f } from "furrybotapi/build/src/typings";
 
 export default class ExtendedMessage {
 	#client: FurryBot;

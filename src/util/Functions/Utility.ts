@@ -12,7 +12,6 @@ import crypto from "crypto";
 import Time from "./Time";
 import ExtendedMessage from "../ExtendedMessage";
 import * as os from "os";
-import GuildConfig, { DBKeys } from "../config/GuildConfig";
 
 export default class Utility {
 	private constructor() {
@@ -452,7 +451,7 @@ export default class Utility {
 
 		const d = new Date();
 		const code = `err.${config.beta ? "beta" : "prod"}.${crypto.randomBytes(8).toString("hex")}`;
-		const p = await client.createPaste(err.stack, "Furry Bot Error", "1W", 1);
+		const p = await client.createPaste(err.stack, "Furry Bot Error", "1W", 2);
 		const e = new EmbedBuilder(config.devLanguage)
 			.setTitle("\u274c Error")
 			.setTimestamp(d)
