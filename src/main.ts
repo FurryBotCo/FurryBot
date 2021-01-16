@@ -23,9 +23,9 @@ import BLClient from "./util/handlers/BotListHandler";
 import phin from "phin";
 import db from "./util/Database";
 import Request from "./util/Functions/Request";
-import Utility from "./util/Functions/Utility";
 import CommandHelper from "./util/DiscordCommands/main";
 import BadgeHandler from "./util/handlers/BadgeHandler";
+import pid from "./util/handlers/pid";
 
 // create log directories if they don't exist
 for (const l of Object.keys(config.dir.logs)) if (!fs.existsSync(config.dir.logs[l])) fs.mkdirpSync(config.dir.logs[l]);
@@ -145,6 +145,7 @@ class FurryBot extends Base {
 
 	async launch(shards: number) {
 		const start = performance.now();
+		pid(`${config.dir.tmp}/pid/cluster-${this.cluster.id}.pid`);
 		await this.sh.resetSessionStats();
 		await this.loadEvents(true);
 		this.cmd = new CommandHandler(this);

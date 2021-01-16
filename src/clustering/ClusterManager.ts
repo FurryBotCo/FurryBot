@@ -12,7 +12,7 @@ import { Colors } from "../util/Constants";
 import Stats from "./Stats";
 import { performance } from "perf_hooks";
 import { DEBUG, SHARDS_PER_CLUSTER } from "./Constants";
-
+import pid from "../util/handlers/pid";
 
 export default class ClusterManager {
 	// private client for webhooks & shard count
@@ -88,6 +88,7 @@ export default class ClusterManager {
 
 	async launch() {
 		if (cluster.isMaster) {
+			pid(`${config.dir.tmp}/pid/main.pid`);
 			const e = this.#eris = new Eris.Client(this.token);
 			const c = await e.getBotGateway();
 
