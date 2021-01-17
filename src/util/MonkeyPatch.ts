@@ -64,3 +64,27 @@ Client.prototype.createMessage = async function (ch, content, file) {
 	}
 	return o.call(this, ch, content, file);
 }
+
+Object.defineProperty(Eris.Client.prototype, "typing", {
+	value: {}
+});
+
+const per = 7;
+Object.defineProperty(Eris.TextChannel.prototype, "startTyping", {
+	value: async function (this: Eris.TextChannel, rounds = 6) {
+		let r = 1;
+		await this.client.sendChannelTyping(this.id);
+		this.client.typing[this.id] = setInterval(async () => {
+			r++;
+			await this.client.sendChannelTyping(this.id);
+			if (r >= rounds) this.stopTyping();
+		}, per * 1e3);
+	}
+});
+
+Object.defineProperty(Eris.TextChannel.prototype, "stopTyping", {
+	value: async function (this: Eris.TextChannel) {
+		clearInterval(this.client.typing[this.id]);
+		delete this.client.typing[this.id];
+	}
+});

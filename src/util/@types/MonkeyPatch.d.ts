@@ -47,6 +47,17 @@ declare module "eris" {
 		 */
 		_client: Client;
 	}
+
+	interface TextChannel {
+		startTyping(rounds?: number): void;
+		stopTyping(): void;
+	}
+
+	interface Client {
+		typing: {
+			[k: string]: NodeJS.Timeout;
+		};
+	}
 }
 
 declare global {
