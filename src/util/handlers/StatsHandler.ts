@@ -2,7 +2,6 @@ import FurryBot from "../../main";
 import ExtendedMessage from "../ExtendedMessage";
 import Eris from "eris";
 import Redis from "../Redis";
-import config from "../../config";
 
 export default class StatsHandler {
 	#client: FurryBot;
