@@ -20,18 +20,18 @@ export default class TimedTasks {
 		const d = new Date();
 		this.runTimedActionsHandler(client);
 		if (d.getSeconds() === 0) {
-			if ((d.getMinutes() % 5) === 0) await this.runAutoPosting(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Auto Posting`, "Finished processing."));
+			if ((d.getMinutes() % 5) === 0) await this.runAutoPosting(client).then(() => Logger.debug([`Cluster #${client.cluster.id}`, "Timed Tasks", "Auto Posting"], "Finished processing."));
 			if (d.getMinutes() === 0) {
-				await this.runDeleteUsers(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Delete Users", "Finished processing.`));
-				await this.runDeleteGuilds(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Delete Guilds", "Finished processing.`));
-				await this.runRefreshBoosters(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Refresh Boosters", "Finished processing.`));
-				if (!config.beta && d.getHours() === 0) await this.runDailyJoins(client).then(() => Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks | Daily Joins`, "Finished processing."));
+				await this.runDeleteUsers(client).then(() => Logger.debug([`Cluster #${client.cluster.id}`, "Timed Tasks", "Delete Users"], "Finished processing."));
+				await this.runDeleteGuilds(client).then(() => Logger.debug([`Cluster #${client.cluster.id}`, "Timed Tasks", "Delete Guilds"], "Finished processing."));
+				await this.runRefreshBoosters(client).then(() => Logger.debug([`Cluster #${client.cluster.id}`, "Timed Tasks", "Refresh Boosters"], "Finished processing."));
+				if (!config.beta && d.getHours() === 0) await this.runDailyJoins(client).then(() => Logger.debug([`Cluster #${client.cluster.id}`, "Timed Tasks", "Daily Joins"], "Finished processing."));
 			}
 		}
 		await this.runUpdateStatus(client, d);
 		if ((d.getSeconds() % 5) === 0) await this.runCalculateCPUUsage(client);
 		const end = performance.now();
-		if (d.getSeconds() === 0) Logger.debug(`Cluster #${client.cluster.id} | Timed Tasks`, `Total processing took ${(end - start).toFixed(3)}ms`);
+		if (d.getSeconds() === 0) Logger.debug([`Cluster #${client.cluster.id}`, "Timed Tasks"], `Total processing took ${(end - start).toFixed(3)}ms`);
 	}
 
 	static async runTimedActionsHandler(client: FurryBot) {
@@ -48,7 +48,7 @@ export default class TimedTasks {
 		}).toArray();
 
 		if (d.length === 0) {
-			if (config.beta) Logger.debug("Timed Tasks |  Delete Users", "No processable entries found.");
+			if (config.beta) Logger.debug(["Timed Tasks", "Delete Users"], "No processable entries found.");
 			return;
 		}
 
@@ -65,7 +65,7 @@ export default class TimedTasks {
 			})).catch(err => null);
 
 			await mdb.collection<UserConfig>("users").findOneAndDelete({ id: u.id });
-			Logger.debug("Timed Tasks |  Delete Users", `Deleted the user "${u.id}"`);
+			Logger.debug(["Timed Tasks", "Delete Users"], `Deleted the user "${u.id}"`);
 		}));
 	}
 
@@ -79,18 +79,18 @@ export default class TimedTasks {
 		}).toArray();
 
 		if (d.length === 0) {
-			if (config.beta) Logger.debug("Timed Tasks |  Delete Guilds", "No processable entries found.");
+			if (config.beta) Logger.debug(["Timed Tasks", "Delete Guilds"], "No processable entries found.");
 			return;
 		}
 
 		await Promise.all(d.map(async (u) => {
 			await mdb.collection<GuildConfig>("guilds").findOneAndDelete({ id: u.id });
-			Logger.debug("Timed Tasks |  Delete Guild", `Deleted the guild "${u.id}"`);
+			Logger.debug(["Timed Tasks", "Delete Guild"], `Deleted the guild "${u.id}"`);
 		}));
 	}
 
 	static async runDailyJoins(client: FurryBot) {
-		Logger.debug("Timed Tasks | Daily Joins", "run");
+		Logger.debug(["Timed Tasks", "Daily Joins"], "run");
 		if (client.cluster.id !== 0) return;
 		DailyJoins(client);
 	}
@@ -122,7 +122,7 @@ export default class TimedTasks {
 			}
 		}
 
-		Logger.debug("Timed Tasks | Refresh Boosters", `Got ${i} boosters.`);
+		Logger.debug(["Timed Tasks", "Refresh Boosters"], `Got ${i} boosters.`);
 	}
 
 	static async runAutoPosting(client: FurryBot) {
@@ -138,7 +138,7 @@ export default class TimedTasks {
 					((d.getMinutes() % 60) === 0 && e.time === 60)
 				) {
 					await AutoPostingHandler.execute(e.id, e.type, e.channel, new GuildConfig(g.id, g), client);
-					Logger.debug("Timed Tasks | Auto Posting", `Ran auto posting for type "${e.type}" in channel "${e.channel}" (time: ${e.time}, id: ${e.id})`);
+					Logger.debug(["Timed Tasks", "Auto Posting"], `Ran auto posting for type "${e.type}" in channel "${e.channel}" (time: ${e.time}, id: ${e.id})`);
 				}
 			}
 		}
