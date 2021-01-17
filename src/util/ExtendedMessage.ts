@@ -173,7 +173,7 @@ export default class ExtendedMessage {
 		return username || tag || id || null;
 	}
 
-	async getChannelFromArgs<T extends Eris.GuildTextableChannel = Eris.TextChannel>(argPos?: number, useMentions?: boolean, mentionPos?: number): Promise<T> {
+	async getChannelFromArgs<T extends Eris.GuildChannel = Eris.TextChannel>(argPos?: number, useMentions?: boolean, mentionPos?: number): Promise<T> {
 		argPos = [undefined, null].includes(argPos) ? 0 : argPos;
 		useMentions = [undefined, null].includes(useMentions) ? true : useMentions;
 		mentionPos = [undefined, null].includes(mentionPos) ? argPos : mentionPos;
