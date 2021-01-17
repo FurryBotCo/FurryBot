@@ -8,7 +8,7 @@ export default function pid(path: string) {
 		try { fs.unlinkSync(path); } catch (e) { }
 		process.exit(0);
 	}
-	console.log(path);
+
 	process
 		.on("exit", handle)
 		.on("SIGINT", handle)
