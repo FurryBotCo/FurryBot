@@ -82,7 +82,7 @@
 		"usage": "Suggestion Title | Suggestion Description",
 		"missingTitle": "Missing suggestion title. Separate a title a description with a pipe (|).",
 		"missingDescription": "Missing suggestion description. Separate a title a description with a pipe (|).",
-		"done": "Your suggestion was successfully posted.\nYou can view it here: {0}"
+		"done": "Your suggestion was successfully posted.\nYou can view it here: {0}, and you can join our support server (<{1}>), and vote on it in <#800197845985525800>."
 	},
 	"weirdedit": {
 		"description": "Make a message with a weird little edit thing.",
