@@ -224,8 +224,8 @@ export default new Command(["stats"], __filename)
 					const j = this.cluster.id === 0 ? this.evTotal : await this.ipc.evalAtCluster(0, async function (args) {
 						return this.class.evTotal;
 					});
-					if (j.code !== EVAL_CODES.SUCCESS) throw new TypeError(`Unexpected eval response: ${Object.keys(EVAL_CODES).find((c, i) => Object.values(EVAL_CODES)[i] === j.code)}`);
-					const evTotal = j.result as FurryBot["evTotal"];
+					if (j.code && j.code !== EVAL_CODES.SUCCESS) throw new TypeError(`Unexpected eval response: ${Object.keys(EVAL_CODES).find((c, i) => Object.values(EVAL_CODES)[i] === j.code)}`);
+					const evTotal = (j.result || j) as FurryBot["evTotal"];
 					end = performance.now();
 					e
 						.setDescription([
