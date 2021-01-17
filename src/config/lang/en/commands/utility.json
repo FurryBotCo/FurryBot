@@ -438,5 +438,13 @@
 			"cancelled": "Cancelled.",
 			"done": "Removed **{0}** log entries."
 		}
+	},
+	"moveall": {
+		"description": "Move all users in a voice channel to another.",
+		"usage": "<from> <to>",
+		"notVoice": "You must provide two **voice** channels.",
+		"youNoAccess": "You must have access to join the channel you're moving people to. You're missing **{0}**.",
+		"meNoAccess": "I do not have access to the channel you wanted to move people to. I'm missing **{0}**.",
+		"done": "Moved **{0}** users from **{1}** to **{2}**"
 	}
 }
