@@ -21,7 +21,7 @@ export default new Command(["todo"], __filename)
 		const t = await Trello.addCard({
 			name,
 			desc: `Add more info here, or in the comments..\n\nUser: ${msg.author.tag} (${msg.author.id})\nGuild: ${msg.channel.guild.name} (${msg.channel.guild.id})`,
-			idList: config.apis.trello.lists.suggestions
+			idList: config.apis.trello.lists.todo
 		});
 		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.done`, [t.shortUrl]));
 	});
