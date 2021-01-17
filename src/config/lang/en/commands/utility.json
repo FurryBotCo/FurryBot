@@ -26,18 +26,22 @@
 		"duplicate": "there is already a disable entry with that specification!",
 		"noAddFound": "nothing was found for the provided argument \"{0}\"",
 		"commandNotAllowed": "the command \"{0}\" cannot be disabled.",
+		"invalidChannel": "Voice channels cannot be used with this command.",
 		"success": {
 			"cmdServer": "disabled the usage of the command \"{0}\" server wide.",
 			"catServer": "disabled the usage of the category \"{0}\" server wide.",
 			"cmdChannel": "disabled the usage of the command \"{0}\" in the channel <#{1}>.",
 			"catChannel": "disabled the usage of the category \"{0}\" in the channel <#{1}>.",
-			"allChannel": "disabled the usage of all commands in the channel <#{0}>.",
+			"allChannel": "disabled the usage of all commands in the channel <#{1}>.",
+			"cmdCategory": "disabled the usage of the command \"{0}\" in the category **{1}**.",
+			"catCategory": "disabled the usage of the category \"{0}\" in the category **{1}**.",
+			"allCategory": "disabled the usage of all commands in the category **{1}**.",
 			"cmdRole": "disabled the usage of the command \"{0}\" for the role <@&{1}>.",
 			"catRole": "disabled the usage of the category \"{0}\" for the role <@&{1}>.",
-			"allRole": "disabled the usage of all commands for the role <@&{0}>.",
+			"allRole": "disabled the usage of all commands for the role <@&{1}>.",
 			"cmdUser": "disabled the usage of the command \"{0}\" for the user <@!{1}>.",
 			"catUser": "disabled the usage of the category \"{0}\" for the user <@!{1}>.",
-			"allUser": "disabled the usage of all commands for the user <@!{0}>."
+			"allUser": "disabled the usage of all commands for the user <@!{1}>."
 		},
 		"remove": {
 			"cleared": "remove all disable entries.",
