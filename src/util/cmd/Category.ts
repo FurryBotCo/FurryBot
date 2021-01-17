@@ -49,7 +49,7 @@ export default class Category {
 	addCommand(data: Command) {
 		if (!data) throw new TypeError("Missing command.");
 		// I could do this differently but nah
-		for (const t of data.triggers) if (this.triggers.includes(t)) throw new TypeError(`Duplicate trigger "${t}" in command "${data.file}" (duplicate: ${this.#cmds.find(c => c.triggers.includes(t)).file})`);
+		for (const t of data.triggers) if (this.triggers.includes(t)) throw new TypeError(`Duplicate trigger "${t}" in command "${data.tsFile}" (duplicate: ${this.#cmds.find(c => c.triggers.includes(t)).tsFile})`);
 		data.setCategory(this);
 		this.#cmds.push(data);
 		return true;
