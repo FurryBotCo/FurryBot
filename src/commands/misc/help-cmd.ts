@@ -46,18 +46,17 @@ export default new Command(["help", "h"], __filename)
 				let i = 0;
 				for (const t of cat.commands) {
 					if (t.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) continue;
-					// const v = `\`${t.triggers[0]}\`${t.hasSlashVariant ? "**\\***" : ""} - ${t.description || `{lang:commands.${t.category.name}.${t.triggers[0]}.description}`}`;
-					const v = `\`${t.triggers[0]}\`${t.hasSlashVariant ? "**\\***" : ""}`;
+					const v = cat.commands.length > 30 ? `\`${t.triggers[0]}\`${t.hasSlashVariant ? "**\\***" : ""} ` : `\`${t.triggers[0]}\`${t.hasSlashVariant ? "**\\***" : ""} - ${t.description || `{lang:commands.${t.category.name}.${t.triggers[0]}.description}`}\n`;
 					if (!list[i]) list[i] = "";
-					if (list[i].length + v.length > 1024) list[++i] = `${v} `;
-					else list[i] += `${v} `;
+					if (list[i].length + v.length > 1024) list[++i] = v;
+					else list[i] += v;
 				}
 
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(msg.gConfig.settings.lang)
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
 						.setTitle(cat.displayName || `{lang:categories.${cat.name}.displayName}`)
-						.setDescription(`${cat.description || `{lang:categories.${cat.name}.description}`}\n\n{lang:${cmd.lang}.cmdCount|${cat.commands.length}}\n\n{lang:${cmd.lang}.slashTip|http${config.web.api.security ? "s" : ""}://${config.web.api.host}:${config.web.api.port}/note/slash}`)
+						.setDescription(`${cat.description || `{lang:categories.${cat.name}.description}`}\n\n{lang:${cmd.lang}.cmdCount|${cat.commands.length}}\n\n{lang:${cmd.lang}.slashTip|http${config.web.api.security ? "s" : ""}://${config.web.api.host}:${config.web.api.port}/note/slash}${cat.commands.length > 30 ? `\n\n{lang:${cmd.lang}.large}` : ""}`)
 						.setColor(Math.floor(Math.random() * 0xFFFFFF))
 						.setTimestamp(new Date().toISOString())
 						.addFields(...list.map((l, i) => ({
