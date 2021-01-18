@@ -69,6 +69,7 @@ declare namespace DiscordSlashCommands {
 		content: string;
 		embeds?: Eris.EmbedOptions[];
 		allowed_mentions?: Eris.AllowedMentions;
+		flags?: number;
 	}
 }
 
