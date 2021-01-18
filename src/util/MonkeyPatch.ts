@@ -36,7 +36,7 @@ Object.defineProperty(Function.prototype, "owo", {
 	}
 });
 
-const o = Client.prototype.createMessage;
+const ocm = Client.prototype.createMessage;
 Client.prototype.createMessage = async function (ch, content, file) {
 	const c = JSON.stringify(content);
 	const l = [
@@ -62,7 +62,7 @@ Client.prototype.createMessage = async function (ch, content, file) {
 			break;
 		} else continue;
 	}
-	return o.call(this, ch, content, file);
+	return ocm.call(this, ch, content, file);
 }
 
 Object.defineProperty(Eris.Client.prototype, "typing", {
@@ -87,4 +87,10 @@ Object.defineProperty(Eris.TextChannel.prototype, "stopTyping", {
 		clearInterval(this.client.typing[this.id]);
 		delete this.client.typing[this.id];
 	}
+});
+
+const ou = Eris.GuildChannel.prototype.update;
+Eris.GuildChannel.prototype.update = (function (data) {
+	ou.call(this, data);
+	this.nsfw = data.nsfw;
 });

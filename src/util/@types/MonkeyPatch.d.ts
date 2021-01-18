@@ -48,6 +48,10 @@ declare module "eris" {
 		_client: Client;
 	}
 
+	interface GuildChannel {
+		update(data: any): void;
+	}
+
 	interface TextChannel {
 		startTyping(rounds?: number): void;
 		stopTyping(): void;
