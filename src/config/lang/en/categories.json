@@ -23,6 +23,10 @@
 		"displayName": "ℹ️ Information",
 		"description": "Get some information about me."
 	},
+	"meme": {
+		"displayName": "😂 Memey",
+		"description": "A bunch of meme based commands."
+	},
 	"misc": {
 		"displayName": "🛠 Miscellaneous",
 		"description": "Other miscellaneous commands."
@@ -42,9 +46,5 @@
 	"utility": {
 		"displayName": "🛠 Utility",
 		"description": "Some useful utility commands."
-	},
-	"meme": {
-		"displayName": "😂 Memey",
-		"description": "A bunch of meme based commands."
 	}
 }

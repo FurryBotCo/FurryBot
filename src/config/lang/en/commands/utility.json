@@ -138,6 +138,77 @@
 		"yes": "Yes",
 		"no": "No"
 	},
+	"log": {
+		"description": "Manage my logging in your server.",
+		"usage": "[add/remove/list/available]",
+		"help": {
+			"noInclude": "Do not include the `<>` when running commands.",
+			"main": "This command consists of several subcommands.",
+			"add": "Add a log entry.",
+			"remove": "Remove a log entry.",
+			"list": "List the current log entries.",
+			"available": "List the available log types.",
+			"clear": "Remove all current log entries."
+		},
+		"add": {
+			"invalidType": "Invalid type **{0}**. Use `{0}log available` to see the valid types.",
+			"missingPermission": "I'm missing the permission **{0}** in the channel <#{1}>.",
+			"done": "Setup logging of **{0}** in <#{1}>. Use `{2}log remove {3}` to disable it.",
+			"doneAll": "Setup all events in <#{0}>. You can use `{1}log clear` to disable all logging.",
+			"max": "You may only have **{0}** log entries total. Contact a developer if you believe you need more than this, or remove some with `{1}log remove`."
+		},
+		"remove": {
+			"invalidId": "An entry was not found with the id **{0}**.",
+			"lessThanOne": "The entry id cannot be less than one.",
+			"done": "Removed the entry id **{0}** (**{1}** in <#{2}>)"
+		},
+		"list": {
+			"noEntries": "There aren't any log entries to list.",
+			"lessThanOne": "The page number cannot be less than one.",
+			"invalidPageOne": "Invalid page number **{0}**, there is only one page.",
+			"invalidPage": "Invalid page number **{0}**, there are **{1}** pages.",
+			"page": "Logging - Page #{0}",
+			"footer": "Page {0}/{1} | {2} Total Entries | {3}log remove <id>",
+			"entry": "`#{0}` - **{1}** in <#{2}>"
+		},
+		"available": {
+			"possible": "These are the possible log events.",
+			"incomplete": "If the name is __underlined__, the event is incomplete.",
+			"all": "Encompasses all of the below events.",
+			"channelCreate": "When a channel is created.",
+			"channelDelete": "When a channel is deleted.",
+			"channelUpdate": "When a channel is updated.",
+			"memberBan": "When a server member is banned.",
+			"memberUnban": "When a server member is unbanned",
+			"memberJoin": "When someone joins the server.",
+			"memberLeave": "When someone leaves the server.",
+			"userKick": "When a server member is kicked.",
+			"memberUpdate": "When a server member is updated. (roles, nickname, etc)",
+			"roleCreate": "When a role is created.",
+			"roleDelete": "When a role is deleted.",
+			"roleUpdate": "When a role is updated.",
+			"messageDelete": "When a message is deleted.",
+			"messageDeleteBulk": "When messages are deleted in bulk.",
+			"messageEdit": "When a message is edited.",
+			"presenceUpdate": "When a user changes their presence. (status, game, etc)",
+			"userUpdate": "When a user is updated. (username, avatar, etc)",
+			"voiceJoin": "When someone joins a voice channel.",
+			"voiceLeave": "When someone leaves a voice channel.",
+			"voiceSwitch": "When someone switches voice channels.",
+			"voiceStateUpdate": "When someone's voice state is updated. (deaf, mute, etc)",
+			"guildUpdate": "When the server is updated. (name, region, icon, etc)",
+			"inviteCreate": "When an invite is created.",
+			"inviteDelete": "When an invite is deleted."
+		},
+		"clear": {
+			"needPermission": "You need the **manageGuild** permission to use this subcommand.",
+			"noEntries": "There are no entries to clear.",
+			"confirm": "Are you sure you want to remove **{0}** entries? **yes** or **no**.",
+			"$": "Do not translate yes or no",
+			"cancelled": "Cancelled.",
+			"done": "Removed **{0}** log entries."
+		}
+	},
 	"lookup": {
 		"description": "Lookup a Discord server by its id.",
 		"usage": "<id>",
@@ -200,6 +271,14 @@
 		"yes": "Yes",
 		"no": "No",
 		"none": "None"
+	},
+	"moveall": {
+		"description": "Move all users in a voice channel to another.",
+		"usage": "<from> <to>",
+		"notVoice": "You must provide two **voice** channels.",
+		"youNoAccess": "You must have access to join the channel you're moving people to. You're missing **{0}**.",
+		"meNoAccess": "I do not have access to the channel you wanted to move people to. I'm missing **{0}**.",
+		"done": "Moved **{0}** users from **{1}** to **{2}**"
 	},
 	"poll": {
 		"description": "Start a poll. Provide a list of options, separated by semicolons (;).",
@@ -368,84 +447,5 @@
 		"newContent": "New Content",
 		"edited": "Tag Edited",
 		"deleted": "Deleted the tag **{0}**."
-	},
-	"log": {
-		"description": "Manage my logging in your server.",
-		"usage": "[add/remove/list/available]",
-		"help": {
-			"noInclude": "Do not include the `<>` when running commands.",
-			"main": "This command consists of several subcommands.",
-			"add": "Add a log entry.",
-			"remove": "Remove a log entry.",
-			"list": "List the current log entries.",
-			"available": "List the available log types.",
-			"clear": "Remove all current log entries."
-		},
-		"add": {
-			"invalidType": "Invalid type **{0}**. Use `{0}log available` to see the valid types.",
-			"missingPermission": "I'm missing the permission **{0}** in the channel <#{1}>.",
-			"done": "Setup logging of **{0}** in <#{1}>. Use `{2}log remove {3}` to disable it.",
-			"doneAll": "Setup all events in <#{0}>. You can use `{1}log clear` to disable all logging.",
-			"max": "You may only have **{0}** log entries total. Contact a developer if you believe you need more than this, or remove some with `{1}log remove`."
-		},
-		"remove": {
-			"invalidId": "An entry was not found with the id **{0}**.",
-			"lessThanOne": "The entry id cannot be less than one.",
-			"done": "Removed the entry id **{0}** (**{1}** in <#{2}>)"
-		},
-		"list": {
-			"noEntries": "There aren't any log entries to list.",
-			"lessThanOne": "The page number cannot be less than one.",
-			"invalidPageOne": "Invalid page number **{0}**, there is only one page.",
-			"invalidPage": "Invalid page number **{0}**, there are **{1}** pages.",
-			"page": "Logging - Page #{0}",
-			"footer": "Page {0}/{1} | {2} Total Entries | {3}log remove <id>",
-			"entry": "`#{0}` - **{1}** in <#{2}>"
-		},
-		"available": {
-			"possible": "These are the possible log events.",
-			"incomplete": "If the name is __underlined__, the event is incomplete.",
-			"all": "Encompasses all of the below events.",
-			"channelCreate": "When a channel is created.",
-			"channelDelete": "When a channel is deleted.",
-			"channelUpdate": "When a channel is updated.",
-			"memberBan": "When a server member is banned.",
-			"memberUnban": "When a server member is unbanned",
-			"memberJoin": "When someone joins the server.",
-			"memberLeave": "When someone leaves the server.",
-			"userKick": "When a server member is kicked.",
-			"memberUpdate": "When a server member is updated. (roles, nickname, etc)",
-			"roleCreate": "When a role is created.",
-			"roleDelete": "When a role is deleted.",
-			"roleUpdate": "When a role is updated.",
-			"messageDelete": "When a message is deleted.",
-			"messageDeleteBulk": "When messages are deleted in bulk.",
-			"messageEdit": "When a message is edited.",
-			"presenceUpdate": "When a user changes their presence. (status, game, etc)",
-			"userUpdate": "When a user is updated. (username, avatar, etc)",
-			"voiceJoin": "When someone joins a voice channel.",
-			"voiceLeave": "When someone leaves a voice channel.",
-			"voiceSwitch": "When someone switches voice channels.",
-			"voiceStateUpdate": "When someone's voice state is updated. (deaf, mute, etc)",
-			"guildUpdate": "When the server is updated. (name, region, icon, etc)",
-			"inviteCreate": "When an invite is created.",
-			"inviteDelete": "When an invite is deleted."
-		},
-		"clear": {
-			"needPermission": "You need the **manageGuild** permission to use this subcommand.",
-			"noEntries": "There are no entries to clear.",
-			"confirm": "Are you sure you want to remove **{0}** entries? **yes** or **no**.",
-			"$": "Do not translate yes or no",
-			"cancelled": "Cancelled.",
-			"done": "Removed **{0}** log entries."
-		}
-	},
-	"moveall": {
-		"description": "Move all users in a voice channel to another.",
-		"usage": "<from> <to>",
-		"notVoice": "You must provide two **voice** channels.",
-		"youNoAccess": "You must have access to join the channel you're moving people to. You're missing **{0}**.",
-		"meNoAccess": "I do not have access to the channel you wanted to move people to. I'm missing **{0}**.",
-		"done": "Moved **{0}** users from **{1}** to **{2}**"
 	}
 }

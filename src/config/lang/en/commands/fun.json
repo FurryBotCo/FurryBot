@@ -175,6 +175,14 @@
 			"<@!{0}> wraps their arms around {1}, giving them a big warm hug"
 		]
 	},
+	"impostor": {
+		"description": "You're an impostor.",
+		"usage": "[@user/text]",
+		"possible": [
+			"{0} was An Impostor.",
+			"{0} was not An Impostor."
+		]
+	},
 	"kiss": {
 		"description": "Kiss someone 0.0",
 		"usage": "<@member/text>",
@@ -307,19 +315,11 @@
 			"Anyone but you.",
 			"Not you.",
 			"Everyone that isn't you."
-			],
+		],
 		"otherBad": [
 			"Definitely not them.",
 			"Anyone but them.",
 			"Literally anyone else."
-		]
-	},
-	"impostor": {
-		"description": "You're an impostor.",
-		"usage": "[@user/text]",
-		"possible": [
-			"{0} was An Impostor.",
-			"{0} was not An Impostor."
 		]
 	}
 }

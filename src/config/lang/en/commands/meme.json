@@ -24,6 +24,11 @@
 		"usage": "<text>",
 		"title": "Nothing shall pierce me"
 	},
+	"batslap": {
+		"description": "slap someone",
+		"usage": "[@user] [@user]",
+		"title": "Slap"
+	},
 	"bed": {
 		"description": "There's something scary under the bed",
 		"usage": "[@user] [@user]",
@@ -143,15 +148,15 @@
 		"usage": "<text>",
 		"title": "Excume Me Fuck The What"
 	},
-	"expanddong": {
-		"description": "expand your dong",
-		"usage": "<text>",
-		"title": "Expand Dong"
-	},
 	"expandbrain": {
 		"description": "expand your brain",
 		"usage": "",
 		"title": "Expand Brain"
+	},
+	"expanddong": {
+		"description": "expand your dong",
+		"usage": "<text>",
+		"title": "Expand Dong"
 	},
 	"facts": {
 		"description": "straight up facts",
@@ -329,11 +334,6 @@
 		"description": "ban this",
 		"usage": "[@user]",
 		"title": "Ban This"
-	},
-	"batslap": {
-		"description": "slap someone",
-		"usage": "[@user] [@user]",
-		"title": "Slap"
 	},
 	"slapsroof": {
 		"description": "slap the roof",

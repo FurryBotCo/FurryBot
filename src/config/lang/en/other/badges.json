@@ -1,4 +1,8 @@
 {
+	"category": {
+		"user-flag": "Discord Flags",
+		"special": "Special"
+	},
 	"names": {
 		"discord-employee": "Discord Employee",
 		"discord-partner": "Discord Partner",
@@ -20,9 +24,5 @@
 		"horny": "Horny 24/7",
 		"sub": "Subby Bitch",
 		"blacklisted": "Blacklisted"
-	},
-	"category": {
-		"user-flag": "Discord Flags",
-		"special": "Special"
 	}
 }
