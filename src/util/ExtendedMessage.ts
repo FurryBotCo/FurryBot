@@ -61,6 +61,7 @@ export default class ExtendedMessage {
 	get content() {
 		return this.#msg.content;
 	}
+
 	get mentions() {
 		return {
 			channels: this.#msg.channelMentions.map(c => this.#msg.channel.guild.channels.get(c) || null).filter(c => c),
@@ -77,32 +78,45 @@ export default class ExtendedMessage {
 	get gConfig() {
 		return this.#gConfig;
 	}
+
 	get uConfig() {
 		return this.#uConfig;
 	}
+
 	get args() {
 		return this.#args;
 	}
+
 	set args(a: string[]) {
 		this.#args = a;
 	}
+
 	get dashedArgs() {
 		return this.#dashedArgs;
 	}
+
 	set dashedArgs(s) {
 		this.dashedArgs = s;
 	}
+
 	get cmd() {
 		return this.#cmd;
 	}
+
 	get prefix() {
 		return this.#prefix;
 	}
+
 	get timestamp() {
 		return this.#msg.timestamp;
 	}
+
 	get erisMessage() {
 		return this.#msg;
+	}
+
+	get client() {
+		return this.#client;
 	}
 
 	async load() {

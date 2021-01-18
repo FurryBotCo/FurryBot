@@ -46,10 +46,11 @@ export default new Command(["help", "h"], __filename)
 				let i = 0;
 				for (const t of cat.commands) {
 					if (t.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) continue;
-					const v = `\`${t.triggers[0]}\`${t.hasSlashVariant ? "**\\***" : ""} - ${t.description || `{lang:commands.${t.category.name}.${t.triggers[0]}.description}`}`;
+					// const v = `\`${t.triggers[0]}\`${t.hasSlashVariant ? "**\\***" : ""} - ${t.description || `{lang:commands.${t.category.name}.${t.triggers[0]}.description}`}`;
+					const v = `\`${t.triggers[0]}\`${t.hasSlashVariant ? "**\\***" : ""}`;
 					if (!list[i]) list[i] = "";
-					if (list[i].length + v.length > 1024) list[++i] = `${v}\n`;
-					else list[i] += `${v}\n`;
+					if (list[i].length + v.length > 1024) list[++i] = `${v} `;
+					else list[i] += `${v} `;
 				}
 
 				return msg.channel.createMessage({

@@ -42,5 +42,9 @@
 	"utility": {
 		"displayName": "🛠 Utility",
 		"description": "Some useful utility commands."
+	},
+	"meme": {
+		"displayName": "😂 Memey",
+		"description": "A bunch of meme based commands."
 	}
 }

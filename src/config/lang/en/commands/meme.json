@@ -1,0 +1,428 @@
+{
+	"abandon": {
+		"description": "Get abandoned because of what you say",
+		"usage": "[text]",
+		"title": "Abandonment"
+	},
+	"aborted": {
+		"description": "Why you should have been aborted",
+		"usage": "[@user]",
+		"title": "Why you should have been aborted"
+	},
+	"affect": {
+		"description": "It won't affect the baby",
+		"usage": "[@user]",
+		"title": "It won't affect the baby."
+	},
+	"airpods": {
+		"description": "I can't hear you",
+		"usage": "[@user]",
+		"title": "I can't hear you, I've got airpods in"
+	},
+	"balloon": {
+		"description": "You can't hurt me",
+		"usage": "<text>",
+		"title": "Nothing shall pierce me"
+	},
+	"bed": {
+		"description": "There's something scary under the bed",
+		"usage": "[@user] [@user]",
+		"title": "Why do you hate me"
+	},
+	"bongocat": {
+		"description": "I'm a cat I play the bongos",
+		"usage": "[@user]",
+		"title": "Bongo Cat"
+	},
+	"boo": {
+		"description": "Really spooky",
+		"usage": "<first, second>",
+		"title": "Ooh, scary"
+	},
+	"brain": {
+		"description": "big brain time",
+		"usage": "<first, second, third, fourth>",
+		"title": "Big Brain Time"
+	},
+	"brazzers": {
+		"description": "😏",
+		"usage": "[@user]",
+		"title": "Brazzers"
+	},
+	"byemom": {
+		"description": "bye mom",
+		"usage": "[@user] <text>",
+		"title": "Bye Mom"
+	},
+	"cancer": {
+		"description": "it's cancer",
+		"usage": "[@user]",
+		"title": "You're cancerous"
+	},
+	"changemymind": {
+		"description": "Change my mind",
+		"usage": "<text>",
+		"title": "You Cannot"
+	},
+	"cheating": {
+		"description": "trying to cheat",
+		"usage": "<first, second>",
+		"title": "Cheating"
+	},
+	"citation": {
+		"description": "pay your fines",
+		"usage": "<first, second, third>",
+		"title": "Citation"
+	},
+	"communism": {
+		"description": "for mother Russia",
+		"usage": "[@user]",
+		"title": "Коммунизм"
+	},
+	"confusedcat": {
+		"description": "why are you yelling at me",
+		"usage": "<first, second>",
+		"title": "Confusion"
+	},
+	"corporate": {
+		"description": "find the difference",
+		"usage": "[@user] [@user]",
+		"title": "There Is No Difference"
+	},
+	"crab": {
+		"description": "🦀 crab rave 🦀",
+		"usage": "<first, second>"
+	},
+	"cry": {
+		"description": "we need water",
+		"usage": "<text>",
+		"title": "Water."
+	},
+	"dab": {
+		"description": "dabdabdabdab",
+		"usage": "[@user]",
+		"title": "Dabbing on the haters"
+	},
+	"dank": {
+		"description": "that's dank bro",
+		"usage": "[@user]",
+		"title": "Dank"
+	},
+	"deepfry": {
+		"description": "nice and crispy",
+		"usage": "[@user]",
+		"title": "Crispy"
+	},
+	"delete": {
+		"description": "delete this?",
+		"usage": "[@user]",
+		"title": "Delet This"
+	},
+	"disability": {
+		"description": "not all disabilities are visible",
+		"usage": "[@user]",
+		"title": ""
+	},
+	"doglemon": {
+		"description": "dog lemon",
+		"usage": "<first, second>",
+		"title": "Dog Lemon"
+	},
+	"door": {
+		"description": "close the door",
+		"usage": "[@user]",
+		"title": "Close The Door"
+	},
+	"egg": {
+		"description": "egg",
+		"usage": "[@user]",
+		"title": "Egg"
+	},
+	"excuseme": {
+		"description": "excuse me",
+		"usage": "<text>",
+		"title": "Excume Me Fuck The What"
+	},
+	"expanddong": {
+		"description": "expand your dong",
+		"usage": "<text>",
+		"title": "Expand Dong"
+	},
+	"expandbrain": {
+		"description": "expand your brain",
+		"usage": "",
+		"title": "Expand Brain"
+	},
+	"facts": {
+		"description": "straight up facts",
+		"usage": "[text]",
+		"title": "Straight Up Facts"
+	},
+	"failure": {
+		"description": "today's class is about failures",
+		"usage": "[@user]",
+		"title": "You're A Failure"
+	},
+	"fedora": {
+		"description": "tip your fedora",
+		"usage": "[@user]",
+		"title": "*tips fedora*"
+	},
+	"floor": {
+		"description": "don't touch the floor",
+		"usage": "<text>",
+		"title": "Don't Touch The Floor"
+	},
+	"fuck": {
+		"description": "f**k",
+		"usage": "<text>",
+		"title": "Fuck"
+	},
+	"garfield": {
+		"description": "whose that sign for",
+		"usage": "[@user] <text>",
+		"title": "I can't read"
+	},
+	"gay": {
+		"description": "gay",
+		"usage": "[@user]",
+		"title": "🏳️‍🌈"
+	},
+	"godwhy": {
+		"description": "god why",
+		"usage": "<text>",
+		"title": "God Why"
+	},
+	"goggles": {
+		"description": "put your safety goggles on",
+		"usage": "[@user]",
+		"title": "Safety Goggles Off"
+	},
+	"hitler": {
+		"description": "no.",
+		"usage": "[@user]",
+		"title": "Worse Than Hitler"
+	},
+	"humansgood": {
+		"description": "humans are good",
+		"usage": "<text>",
+		"title": "Humans Are Good"
+	},
+	"invert": {
+		"description": "invert an image",
+		"usage": "[@user]",
+		"title": "trevnI"
+	},
+	"jail": {
+		"description": "go to jail",
+		"usage": "[@user]",
+		"title": "Do Not Collect $200"
+	},
+	"justpretending": {
+		"description": "just pretending",
+		"usage": "[@user]",
+		"title": "They're Definitely Dead"
+	},
+	"keepurdistance": {
+		"description": "keep your distance",
+		"usage": "[text]",
+		"title": "Stay 500 Feet Away"
+	},
+	"knowyourlocation": {
+		"description": "they want your location",
+		"usage": "<first, second>",
+		"title": "They Want Your Location"
+	},
+	"kowalski": {
+		"description": "analysis",
+		"usage": "<text>",
+		"title": "Analysis",
+		"$": "anal"
+	},
+	"letmein": {
+		"description": "let me in",
+		"usage": "<text>",
+		"title": "Let Me In"
+	},
+	"madethis": {
+		"description": "I made this",
+		"usage": "[@user] [@user]",
+		"title": "I Made This"
+	},
+	"magik": {
+		"description": "Magic 'n' shit",
+		"usage": "[@user]",
+		"title": "Magik"
+	},
+	"master": {
+		"description": "master",
+		"usage": "<first, second, third>",
+		"title": "Master"
+	},
+	"note": {
+		"description": "passing notes",
+		"usage": "<text>",
+		"title": "Passing Notes"
+	},
+	"obama": {
+		"description": "",
+		"usage": "",
+		"title": "",
+		"$": "didn't work last time I tried it"
+	},
+	"ohno": {
+		"description": "oh no, it's dumb",
+		"usage": "<text>",
+		"title": "Oh No, It's Stupid"
+	},
+	"plan": {
+		"description": "describe your plan",
+		"usage": "<first, second, third>",
+		"title": "Describe Your Plan"
+	},
+	"presentation": {
+		"description": "present it",
+		"usage": "<text>",
+		"title": "Presentation"
+	},
+	"quote": {
+		"description": "quote someone",
+		"usage": "[@user] <text>",
+		"title": "Quote"
+	},
+	"radialblur": {
+		"description": "make an image radially blurred",
+		"usage": "[@user]",
+		"title": "Radialblur"
+	},
+	"rip": {
+		"description": "rip",
+		"usage": "[@user]",
+		"title": "Rest In Piece"
+	},
+	"salty": {
+		"description": "you're salty",
+		"usage": "[@user]",
+		"title": "Why Are You Salty?"
+	},
+	"satan": {
+		"description": "you're satan",
+		"usage": "[@user]",
+		"title": "You're Satan"
+	},
+	"savehumanity": {
+		"description": "the secret to save humanity",
+		"usage": "<text>",
+		"title": "I'm Saving Humanity"
+	},
+	"screams": {
+		"description": "why can't you be normal",
+		"usage": "[@user] [@user]",
+		"title": "Why Can't You Be Normal"
+	},
+	"shit": {
+		"description": "you're shit",
+		"usage": "<text>",
+		"title": "You're Shit"
+	},
+	"sickban": {
+		"description": "ban this",
+		"usage": "[@user]",
+		"title": "Ban This"
+	},
+	"batslap": {
+		"description": "slap someone",
+		"usage": "[@user] [@user]",
+		"title": "Slap"
+	},
+	"slapsroof": {
+		"description": "slap the roof",
+		"usage": "<text>",
+		"title": "*slaps roof*"
+	},
+	"spank": {
+		"description": "spank someone",
+		"usage": "[@user] [@user]",
+		"title": "You've Been A Bad Boy"
+	},
+	"stroke": {
+		"description": "having a stroke",
+		"usage": "<text>",
+		"title": "Recognize A Stroke"
+	},
+	"surprised": {
+		"description": "surprised pikachu",
+		"usage": "<first, second>",
+		"title": "Surprised Pikachu"
+	},
+	"sword": {
+		"description": "big sword",
+		"usage": "[@user] <first, second>",
+		"title": "Sword"
+	},
+	"thesearch": {
+		"description": "intelligent life",
+		"usage": "<text>",
+		"title": "Intelligent Life"
+	},
+	"trash": {
+		"description": "put on glasses",
+		"usage": "[@user]",
+		"title": "Put On Some Glasses"
+	},
+	"trigger": {
+		"description": "triggered",
+		"usage": "[@user]",
+		"title": "I'm So Triggered"
+	},
+	"tweet": {
+		"description": "make a tweet image",
+		"usage": "[@user] <text>",
+		"title": "Tweet"
+	},
+	"ugly": {
+		"description": "uglier up close",
+		"usage": "[@user]",
+		"title": "So Ugly"
+	},
+	"unpopular": {
+		"description": "unpopular opinion",
+		"usage": "[@user] <text>",
+		"title": ""
+	},
+	"violence": {
+		"description": "violence is never the answer",
+		"usage": "<tet>",
+		"title": "Violence Is Never The Answer"
+	},
+	"violentsparks": {
+		"description": "I'm tired of describing commands",
+		"usage": "<first, second>",
+		"title": "fuck you"
+	},
+	"vr": {
+		"description": "so realistic",
+		"usage": "<text>",
+		"title": "Very Realistic"
+	},
+	"wanted": {
+		"description": "you're wanted",
+		"usage": "[@user]",
+		"title": "Wanted"
+	},
+	"warp": {
+		"description": "warp an image",
+		"usage": "[@user]",
+		"title": "Warped"
+	},
+	"yomomma": {
+		"description": "get a yomomma joke",
+		"usage": "",
+		"title": "Yomomma Joke"
+	},
+	"youtube": {
+		"description": "youtube comments",
+		"usage": "[@user]",
+		"title": ""
+	}
+}

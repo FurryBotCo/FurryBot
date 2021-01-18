@@ -1,6 +1,4 @@
 /// <reference path="../@types/Discord.d.ts" />
-
-
 import Category from "../cmd/Category";
 import path from "path";
 import Command from "../cmd/Command";
@@ -14,6 +12,12 @@ import { execSync } from "child_process";
 import Language, { Languages } from "../Language";
 import JSON5 from "json5";
 import ts from "typescript";
+import CommandError from "../cmd/CommandError";
+import DankMemerAPI from "../req/DankMemerAPI";
+import { MemeRequestResponse, APIError } from "dankmemerapi";
+import EmbedBuilder from "../EmbedBuilder";
+import { Colors } from "../Constants";
+import Utility from "./Utility";
 
 export default class Internal {
 	private constructor() {
@@ -51,23 +55,14 @@ export default class Internal {
 	 */
 	static extraArgParsing(msg: ExtendedMessage) {
 		let str = msg.args.join(" ");
-		try {
-			str
-				.match(new RegExp("[0-9]{16,21}", "g"))
-				.filter(k => !str.split(" ")[str.split(" ").indexOf(k)].match(new RegExp("<@!?[0-9]{16,21}>")) || msg.channel.guild.members.has(k))
-				.map(k => str = str.replace(k, `<@!${k}>`));
 
-		} catch (e) { }
 		str
 			.split(" ")
-			.filter(k => !k.match(new RegExp("<@!?[0-9]{16,21}>", "i")) && k.length >= 3)
-			.map(k => {
-				let m: Eris.Member;
-				if (k.indexOf("#") !== -1) m = msg.channel.guild.members.filter(u => (`${u.username}#${u.discriminator}`).toLowerCase() === k.toLowerCase())[0];
-				else m = msg.channel.guild.members.filter(u => u.username.toLowerCase() === k.toLowerCase() || (u.nick && u.nick.toLowerCase() === k.toLowerCase()))[0];
-
-				if (m) str = str.replace(k, `<@!${m.id}>`);
-			});
+			.map(k => k.match(new RegExp("(?:<@!?)?([0-9]{15,21})>?", "i")))
+			.filter(v => v !== null)
+			.map(([k, id]) => [k, (msg.client.bot.users.get(id) || msg.channel.guild.members.get(id))?.username])
+			.filter(([, v]) => v !== undefined)
+			.map(([k, u]) => str = str.replace(k, u));
 
 		return str;
 	}
@@ -104,16 +99,16 @@ export default class Internal {
 			cmd: string;
 		}[];
 	}[]): {
-			userTag: string;
-			userId: string;
-			generatedTimestamp: number;
-			type: "cmd";
-			beta: boolean;
-			entries: {
-				time: number;
-				cmd: string;
-			}[];
-		} {
+		userTag: string;
+		userId: string;
+		generatedTimestamp: number;
+		type: "cmd";
+		beta: boolean;
+		entries: {
+			time: number;
+			cmd: string;
+		}[];
+	} {
 		if (Array.from(new Set(reports.map(r => r.userId))).length > 1) throw new TypeError("Cannot combine reports of different users.");
 		if (Array.from(new Set(reports.map(r => r.type))).length > 1) throw new TypeError("Cannot combine reports of different types.");
 		if (Array.from(new Set(reports.map(r => r.beta))).length > 1) throw new TypeError("Cannot combine beta, and non-beta reports.");
@@ -370,5 +365,69 @@ export default class Internal {
 		const cnf = typeof tsconfig === "object" ? tsconfig : this.getTSConfig(tsconfig || null);
 
 		return ts.transpileModule(mod, cnf).outputText;
+	}
+
+	static async handleMemeCommand(type: "text" | "image", msg: ExtendedMessage, cmd: Command, override?: string) {
+		if (!override) override = cmd.triggers[0];
+		return type === "text" ? Internal.handleTextMemeCommand(override, msg, cmd) : Internal.handleImageMemeCommand(override, msg, cmd);
+	}
+
+	static async handleTextMemeCommand(type: string, msg: ExtendedMessage, cmd: Command) {
+		if (msg.args.length === 0) return new CommandError("ERR_INVALID_USAGE", cmd);
+		let res: MemeRequestResponse;
+		try {
+			res = await DankMemerAPI[type](Internal.extraArgParsing(msg));
+		} catch (e) {
+			if (e instanceof APIError) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.dankMemer", [e.message, e.body.error]));
+			else throw e;
+		}
+		const { ext, file } = res;
+		return msg.channel.createMessage({
+			embed: new EmbedBuilder(msg.gConfig.settings.lang)
+				.setTitle(`{lang:${cmd.lang}.title}`)
+				.setTimestamp(new Date().toISOString())
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setFooter("dankmemer.services", msg.client.bot.user.avatarURL)
+				.setColor(Colors.gold)
+				.setImage(`attachment://${type}.${ext}`)
+				.toJSON()
+		}, {
+			name: `${type}.${ext}`,
+			file
+		});
+	}
+
+	static async handleImageMemeCommand(type: string, msg: ExtendedMessage, cmd: Command) {
+		let v: string;
+		if (msg.args.length === 0 && msg.erisMessage.attachments.length > 0) v = msg.erisMessage.attachments[0].url;
+		else if (msg.args[0]?.match(config.urlRegex)) v = msg.args[0];
+		else {
+			const user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
+			if (!user) return msg.reply({
+				embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_USER", true)
+			});
+			v = user.avatarURL;
+		}
+		let res: MemeRequestResponse;
+		try {
+			res = await DankMemerAPI[type](v);
+		} catch (e) {
+			if (e instanceof APIError) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.dankMemer", [e.message, e.body.error]));
+			else throw e;
+		}
+		const { ext, file } = res;
+		return msg.channel.createMessage({
+			embed: new EmbedBuilder(msg.gConfig.settings.lang)
+				.setTitle(`{lang:${cmd.lang}.title}`)
+				.setTimestamp(new Date().toISOString())
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setFooter("dankmemer.services", msg.client.bot.user.avatarURL)
+				.setColor(Colors.gold)
+				.setImage(`attachment://${type}.${ext}`)
+				.toJSON()
+		}, {
+			name: `${type}.${ext}`,
+			file
+		});
 	}
 }
