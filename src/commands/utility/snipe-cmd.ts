@@ -21,9 +21,19 @@ export default new Command(["snipe"], __filename)
 		if (!ch.permissionsOf(msg.author.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userCantSee`));
 		if (!ch.permissionsOf(this.bot.user.id).has("readMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfCantSee`));
 
-		let content = await Redis.get(`snipe:delete:${ch.id}:content`);
-		const author = await Redis.get(`snipe:delete:${ch.id}:author`);
-		const time = await Redis.get(`snipe:delete:${ch.id}:time`);
+		const [c, author, time, r] = await Redis.mget(
+			`snipe:delete:${ch.id}:content`,
+			`snipe:delete:${ch.id}:author`,
+			`snipe:delete:${ch.id}:time`,
+			`snipe:delete:${ch.id}:ref`
+		);
+		const ref: {
+			link: string;
+			author: string;
+			content: string;
+		} | null = r ? JSON.parse(r) : null;
+		// need to be able to edit;
+		let content = c;
 
 		if (!content || !author || !time) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noSnipes`, [ch.id]));
 
@@ -32,15 +42,25 @@ export default new Command(["snipe"], __filename)
 		const u = await this.getUser(author);
 
 
-		await Redis.del(`snipe:delete:${ch.id}:content`);
-		await Redis.del(`snipe:delete:${ch.id}:author`);
-		await Redis.del(`snipe:delete:${ch.id}:time`);
+		await Redis.del(
+			`snipe:delete:${ch.id}:content`,
+			`snipe:delete:${ch.id}:author`,
+			`snipe:delete:${ch.id}:time`,
+			`snipe:delete:${ch.id}:ref`,
+		);
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setAuthor(`${u.username}#${u.discriminator}`, `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png`)
-				.setDescription(content)
+				.setDescription([
+					c,
+					...(ref ? [
+						"",
+						`{lang:${cmd.lang}.reply|${ref.author}|${ref.link}}`,
+						`> ${ref.content.slice(0, 40)}${ref.content.length > 40 ? " (...)" : ""}`
+					] : [])
+				].join("\n"))
 				.setTimestamp(new Date(Number(time)).toISOString())
 				.setColor(Colors.red)
 				.toJSON()

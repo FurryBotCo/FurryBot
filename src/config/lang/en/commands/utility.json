@@ -332,7 +332,8 @@
 		"noSnipes": "no snipes found for the channel <#{0}>.",
 		"title": "Message Delete Snipe",
 		"userCantSee": "You cannot snipe messages in channels you cannot see.",
-		"selfCantSee": "I cannot see that channel, so I cannot provide any snipes for it."
+		"selfCantSee": "I cannot see that channel, so I cannot provide any snipes for it.",
+		"reply": "In reply to [{0}]({1})"
 	},
 	"steal": {
 		"description": "Steal an emoji from another server, and add it to this server.",
