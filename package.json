@@ -1,6 +1,6 @@
 {
   "name": "furrybot",
-  "version": "10.3.5-20210118",
+  "version": "10.3.6-20210118",
   "description": "A fun bot for furry Discord servers!",
   "main": "index.js",
   "scripts": {
@@ -89,7 +89,7 @@
     "eslint": "^7.18.0",
     "eslint-plugin-deprecation": "^1.2.0",
     "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jsdoc": "^31.0.6",
+    "eslint-plugin-jsdoc": "^31.0.7",
     "eslint-plugin-json": "^2.1.2",
     "eslint-plugin-no-null": "^1.0.2",
     "eslint-plugin-prefer-arrow": "^1.2.2",
