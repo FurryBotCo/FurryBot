@@ -40,6 +40,7 @@ export default new ClientEvent("rawWS", async function ({ op, d, s, t }) {
 					}
 
 					case 2: {
+						// flags: 1 << 6 for client side message
 						await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACK_WITH_SOURCE);
 						await Redis.incr("stats:interactions:command");
 						const guild = this.bot.guilds.get(data.guild_id);
