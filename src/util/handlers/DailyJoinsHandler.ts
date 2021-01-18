@@ -13,28 +13,6 @@ async function DailyJoins(client: FurryBot) {
 	else k = (st.guilds - Number(k)).toString();
 	Logger.log("Daily Joins", `Daily joins for ${id}: ${k}`);
 
-	const count = await new Promise<number>((a, b) => {
-		https.request({
-			method: "GET",
-			host: "sheri.bot",
-			port: 443,
-			protocol: "https:",
-			path: "/",
-			headers: {
-				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.68 Safari/537.36"
-			}
-		}, (res) => {
-			const data = [];
-			res
-				.on("data", (d) => data.push(d))
-				.on("error", (err) => b(err))
-				.on("end", () => a(
-					Number(
-						Buffer.concat(data).toString().match(/(?:Currently serving [0-9,]{1,} <a href="https:\/\/en.wikipedia.org\/wiki\/Furry_fandom">furries<\/a> in ([0-9,]{5,}) <a href="https:\/\/discord.com">Discord<\/a> servers)/)[1].replace(/,/g, "")
-					)
-				));
-		}).end();
-	});
 
 	await client.w.get("dailyjoins").execute({
 		embeds: [
@@ -42,9 +20,7 @@ async function DailyJoins(client: FurryBot) {
 				title: `Daily Joins for ${id}`,
 				description: [
 					`Total Servers Joined Today: ${k}`,
-					`Total Servers: ${st.guilds}`,
-					`Sheri Total: ${count}`,
-					`Difference: ${count - st.guilds}`
+					`Total Servers: ${st.guilds}`
 				].join("\n"),
 				timestamp: new Date().toISOString()
 			}
