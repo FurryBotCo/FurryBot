@@ -19,7 +19,7 @@ export default new Command(["avatar"], __filename)
 
 		const top = msg.member.roles.map(r => msg.channel.guild.roles.get(r)).sort((a, b) => b.position - a.position)[0];
 		const color = !top?.color ? Colors.gold : top.color;
-		const format = (size: 128 | 256 | 512 | 1024 | 2048 | 4096) => member.user.dynamicAvatarURL(member.user.avatar.startsWith("_a") ? "gif" : "png", size);
+		const format = (size: 128 | 256 | 512 | 1024 | 2048 | 4096) => member.user.dynamicAvatarURL(member.user.avatar.startsWith("a_") ? "gif" : "png", size);
 
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
