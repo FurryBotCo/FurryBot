@@ -148,20 +148,8 @@ export default class ExtendedMessage {
 
 		const username = this.#client.bot.users.find(u => u.username.toLowerCase() === t);
 		const tag = this.#client.bot.users.find(u => `${u.username}#${u.discriminator}`.toLowerCase() === t);
-		const mention: string = this.args[argPos].match(/<@!?([0-9]{15,21})>/g) as any; // apparently there's no specific type for global matches
-		let id: Eris.User;
-		if (/[0-9]{15,21}/.test(t)) {
-			id = this.#client.bot.users.find(u => u.id === this.args[argPos]);
-			if (!id) id = await this.#client.getUser(t).catch(err => null);
-			if (id) this.#client.bot.users.add(id);
-		}
-
-		if (mention && !id) {
-			id = this.#client.bot.users.find(u => u.id === mention);
-			if (!id) id = await this.#client.getUser(mention).catch(err => null);
-			if (id) this.#client.bot.users.add(id);
-		}
-
+		const [, a, b] = t.match(/(?:<@!?([0-9]{15,21})>|([0-9]{15,21}))/) ?? [];
+		const id = a || b ? await this.#client.getUser(a || b).catch(err => null) : null;
 		return username || tag || id || null;
 	}
 
