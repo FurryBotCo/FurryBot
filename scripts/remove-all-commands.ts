@@ -1,7 +1,4 @@
-import { ApplicationCommandOptionType } from "../src/util/DiscordCommands/Constants";
 import CommandHelper from "../src/util/DiscordCommands/main";
-import Language from "../src/util/Language";
-import config from "../src/config";
 import beta from "../src/config/client/beta.json";
 import production from "../src/config/client/production.json";
 
