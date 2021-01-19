@@ -1,11 +1,13 @@
 import FurryBot from "../../main";
 import { mongo } from "../Database";
-import { InteractionResponseType } from "../DiscordCommands/Constants";
-import { Interaction, ApplicationCommandOption, ApplicationCommandInteractionDataOption } from "../DiscordCommands/types";
+import { Interaction } from "../DiscordCommands/types";
 import util from "util";
 import { ObjectId } from "mongodb";
 import config from "../../config";
 import crypto from "crypto";
+import EmbedBuilder from "../EmbedBuilder";
+import { Colors } from "../Constants";
+import Logger from "../Logger";
 
 interface DBEntry {
 	_id: ObjectId;
@@ -14,6 +16,7 @@ interface DBEntry {
 	owner: string;
 	application: string;
 	active: boolean;
+	contact: string;
 }
 
 export default class APIKey {
@@ -33,6 +36,8 @@ export default class APIKey {
 		} = (o || []).map(v => ({
 			[v.name]: v.value
 		})).reduce((a, b) => ({ ...a, ...b }), {});
+
+		Logger.debug([`Cluster #${client.cluster.id}`, "APIKeyHandler"], `Command "${sub}" ran with ${Object.keys(opt).length === 0 ? "no arguments" : `the arguments '${JSON.stringify(opt)}'`}`)
 
 		switch (sub) {
 			case "create": {
@@ -62,12 +67,31 @@ export default class APIKey {
 
 				const key = crypto.randomBytes(20).toString("hex");
 
-				await this.col.insertOne({
+				const { ops: [k] } = await this.col.insertOne({
 					key,
 					unlimited: false,
 					owner: data.member.user.id,
 					application: opt.name,
-					active: true
+					active: true,
+					contact: opt.contact
+				});
+
+				await client.w.get("apikey").execute({
+					embeds: [
+						new EmbedBuilder(config.devLanguage)
+							.setTitle("API Key Created")
+							.setDescription([
+								`Key: ${opt.key}`,
+								`Application: **${k.application}**`,
+								`Contact: ${k.contact || "**NONE**"}`,
+								`Active: <:${config.emojis.custom[k.active ? "greenTick" : "redTick"]}>`,
+								`Unlimited: <:${config.emojis.custom[k.unlimited ? "greenTick" : "redTick"]}>`
+							].join("\n"))
+							.setColor(Colors.green)
+							.setTimestamp(new Date().toISOString())
+							.setAuthor(`${data.member.user.username}#${data.member.user.discriminator}`, `https://cdn.discordapp.com/avatars/${data.member.user.id}/${data.member.user.avatar}.png?size=256`)
+							.toJSON()
+					]
 				});
 
 				return client.h.createFollowupResponse(client.bot.user.id, data.token, {
@@ -94,6 +118,24 @@ export default class APIKey {
 				await this.col.findOneAndDelete({
 					key: opt.key,
 					owner: data.member.user.id
+				});
+
+				await client.w.get("apikey").execute({
+					embeds: [
+						new EmbedBuilder(config.devLanguage)
+							.setTitle("API Key Deleted")
+							.setDescription([
+								`Key: ${opt.key}`,
+								`Application: **${k.application}**`,
+								`Contact: ${k.contact || "**NONE**"}`,
+								`Active: <:${config.emojis.custom[k.active ? "greenTick" : "redTick"]}>`,
+								`Unlimited: <:${config.emojis.custom[k.unlimited ? "greenTick" : "redTick"]}>`
+							].join("\n"))
+							.setColor(Colors.red)
+							.setTimestamp(new Date().toISOString())
+							.setAuthor(`${data.member.user.username}#${data.member.user.discriminator}`, `https://cdn.discordapp.com/avatars/${data.member.user.id}/${data.member.user.avatar}.png?size=256`)
+							.toJSON()
+					]
 				});
 
 				return client.h.createFollowupResponse(client.bot.user.id, data.token, {
