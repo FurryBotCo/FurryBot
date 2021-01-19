@@ -41,13 +41,21 @@ export default new ClientEvent("rawWS", async function ({ op, d, s, t }) {
 					}
 
 					case 2: {
+						await new Promise((a, b) => setTimeout(a, 4e3));
 						// flags: 1 << 6 for client side message
 						if (data.guild_id === config.client.supportServerId && data.data.name === "apikey") {
-							await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACKNOWLEDGE);
+							await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACKNOWLEDGE)
 							return APIKey.handle(data);
 						}
 
-						await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACK_WITH_SOURCE);
+						const v = await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACK_WITH_SOURCE).catch(async (err) => {
+							await this.h.createFollowupResponse(this.bot.user.id, data.token, {
+								content: "Sorry, that command timed out on our side. Could you try again?",
+								flags: 1 << 6
+							});
+							return "TIMEOUT";
+						});
+						if ((v as any) === "TIMEOUT") return;
 						await Redis.incr("stats:interactions:command");
 						const guild = this.bot.guilds.get(data.guild_id);
 						const cnf = await db.getGuild(guild.id);
