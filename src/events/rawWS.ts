@@ -41,8 +41,6 @@ export default new ClientEvent("rawWS", async function ({ op, d, s, t }) {
 					}
 
 					case 2: {
-						await new Promise((a, b) => setTimeout(a, 4e3));
-						// flags: 1 << 6 for client side message
 						if (data.guild_id === config.client.supportServerId && data.data.name === "apikey") {
 							// we don't really care if this times out
 							await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACKNOWLEDGE).catch(err => null);
