@@ -5,6 +5,7 @@ import db from "../util/Database";
 import { InteractionResponseType } from "../util/DiscordCommands/Constants";
 import { ApplicationCommandInteractionDataOption, Interaction } from "../util/DiscordCommands/types";
 import ExtendedMessage from "../util/ExtendedMessage";
+import APIKey from "../util/handlers/APIKey";
 import Language from "../util/Language";
 import Redis from "../util/Redis";
 
@@ -41,12 +42,16 @@ export default new ClientEvent("rawWS", async function ({ op, d, s, t }) {
 
 					case 2: {
 						// flags: 1 << 6 for client side message
+						if (data.guild_id === config.client.supportServerId && data.data.name === "apikey") {
+							await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACKNOWLEDGE);
+							return APIKey.handle(data);
+						}
+
 						await this.h.createInteractionResponse(data.id, data.token, InteractionResponseType.ACK_WITH_SOURCE);
 						await Redis.incr("stats:interactions:command");
 						const guild = this.bot.guilds.get(data.guild_id);
 						const cnf = await db.getGuild(guild.id);
-						data.member.id = data.member.user.id;
-						const member = guild.members.update(data.member, guild);
+						const member = guild.members.update(data.member as any, guild);
 						const channel = guild.channels.get(data.channel_id) as Eris.TextChannel;
 						if (config.beta && !config.developers.includes(member.id)) return;
 						if (!cnf.settings.slashCommandsEnabled) {

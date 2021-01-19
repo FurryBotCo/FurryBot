@@ -266,4 +266,26 @@ export default class CommandHelper {
 				else return b;
 			});
 	}
+
+	async createFollowupResponse(applicationId: string, interactionToken: string, data?: Types.InteractionResponse["data"]): Promise<void> {
+		return fetch(`https://discordapp.com/api/v8/webhooks/${applicationId}/${interactionToken}`, {
+			method: "POST",
+			headers: {
+				"Authorization": `Bot ${this.token}`,
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(data)
+		})
+			.then(async (res) => {
+				let b, s = await res.text();
+				try {
+					b = JSON.parse(s);
+					s = JSON.stringify(b);
+				} catch (e) {
+					b = s;
+				}
+				if (res.status >= 400) throw new TypeError(`Unexpected ${res.status}: ${s}`);
+				else return b;
+			});
+	}
 }

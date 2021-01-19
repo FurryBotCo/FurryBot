@@ -1,7 +1,28 @@
 import { ApplicationCommandOptionType, InteractionType, VERSION, InteractionResponseType } from "./Constants";
-import Eris from "eris";
+import { AllowedMentions, EmbedOptions } from "eris";
 
 declare namespace DiscordSlashCommands {
+	interface User {
+		username: string;
+		public_flags: number;
+		id: string;
+		discriminator: string;
+		avatar: string | null;
+	}
+
+	interface Member {
+		user: User;
+		roles: string[];
+		premium_since: string | null;
+		premissions: string;
+		pending: boolean;
+		nick: string | null;
+		mute: boolean;
+		joined_at: string;
+		is_pending: boolean;
+		deaf: boolean;
+	}
+
 	interface ApplicationCommand {
 		id: string;
 		application_id: string;
@@ -42,7 +63,7 @@ declare namespace DiscordSlashCommands {
 		data: ApplicationCommandInteractionData;
 		guild_id: string;
 		channel_id: string;
-		member: Eris.Member;
+		member: Member;
 		token: string;
 		version: typeof VERSION;
 	}
@@ -67,8 +88,8 @@ declare namespace DiscordSlashCommands {
 	interface InteractionApplicationCommandCallbackData {
 		tts?: boolean;
 		content: string;
-		embeds?: Eris.EmbedOptions[];
-		allowed_mentions?: Eris.AllowedMentions;
+		embeds?: EmbedOptions[];
+		allowed_mentions?: AllowedMentions;
 		flags?: number;
 	}
 }

@@ -48,6 +48,10 @@ process.nextTick(async () => {
 				{
 					name: "Utility",
 					value: "utility"
+				},
+				{
+					name: "Meme",
+					value: "meme"
 				}
 			]
 		}
@@ -567,7 +571,48 @@ process.nextTick(async () => {
 
 	/* start custom */
 
-	await h.createGuildCommand(guildId, "register", Language.get(config.devLanguage, "commands.custom.register.description", [], false, true, true), []);
+	// await h.createGuildCommand(guildId, "register", Language.get(config.devLanguage, "commands.custom.register.description", [], false, true, true), []);
+
+	await h.createGuildCommand(guildId, "apikey", Language.get(config.devLanguage, "commands.custom.apikey.description", [], false, true, true), [
+		{
+			type: ApplicationCommandOptionType.SUB_COMMAND,
+			name: "create",
+			description: "Create an api key.",
+			options: [
+				{
+					type: ApplicationCommandOptionType.STRING,
+					name: "name",
+					description: "An application name for the api key you're creating.",
+					required: true
+				},
+				{
+					type: ApplicationCommandOptionType.STRING,
+					name: "contact",
+					description: "A method of contact for you. A website, email, twitter, etc.",
+					required: true
+				}
+			]
+		},
+		{
+			type: ApplicationCommandOptionType.SUB_COMMAND,
+			name: "list",
+			description: "List your api keys.",
+			options: []
+		},
+		{
+			type: ApplicationCommandOptionType.SUB_COMMAND,
+			name: "delete",
+			description: "Delete an api key.",
+			options: [
+				{
+					type: ApplicationCommandOptionType.STRING,
+					name: "key",
+					description: "The key you want to delete. Use the list subcommand to see your active keys.",
+					required: true
+				}
+			]
+		}
+	]);
 
 	/* end custom */
 

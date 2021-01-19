@@ -26,6 +26,7 @@ import Request from "./util/Functions/Request";
 import CommandHelper from "./util/DiscordCommands/main";
 import BadgeHandler from "./util/handlers/BadgeHandler";
 import pid from "./util/handlers/pid";
+import APIKey from "./util/handlers/APIKey";
 
 // create log directories if they don't exist
 for (const l of Object.keys(config.dir.logs)) if (!fs.existsSync(config.dir.logs[l])) fs.mkdirpSync(config.dir.logs[l]);
@@ -85,6 +86,7 @@ class FurryBot extends Base {
 		this.ev = [];
 		this.evTotal = {};
 		db.setClient(this);
+		APIKey.setClient(this);
 	}
 
 	removeEv() {
