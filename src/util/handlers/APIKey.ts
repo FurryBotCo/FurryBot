@@ -81,7 +81,7 @@ export default class APIKey {
 						new EmbedBuilder(config.devLanguage)
 							.setTitle("API Key Created")
 							.setDescription([
-								`Key: ${opt.key}`,
+								`Key: \`${key}\``,
 								`Application: **${k.application}**`,
 								`Contact: ${k.contact || "**NONE**"}`,
 								`Active: <:${config.emojis.custom[k.active ? "greenTick" : "redTick"]}>`,
@@ -125,7 +125,7 @@ export default class APIKey {
 						new EmbedBuilder(config.devLanguage)
 							.setTitle("API Key Deleted")
 							.setDescription([
-								`Key: ${opt.key}`,
+								`Key: \`${opt.key}\``,
 								`Application: **${k.application}**`,
 								`Contact: ${k.contact || "**NONE**"}`,
 								`Active: <:${config.emojis.custom[k.active ? "greenTick" : "redTick"]}>`,
