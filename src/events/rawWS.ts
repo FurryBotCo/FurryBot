@@ -58,7 +58,10 @@ export default new ClientEvent("rawWS", async function ({ op, d, s, t }) {
 						await Redis.incr("stats:interactions:command");
 						const guild = this.bot.guilds.get(data.guild_id);
 						const cnf = await db.getGuild(guild.id);
-						const member = guild.members.update(data.member as any, guild);
+						const member = guild.members.update(({
+							...data.member,
+							id: data.member.user.id
+						}) as any, guild);
 						const channel = guild.channels.get(data.channel_id) as Eris.TextChannel;
 						if (config.beta && !config.developers.includes(member.id)) return;
 						if (!cnf.settings.slashCommandsEnabled) {
