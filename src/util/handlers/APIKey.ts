@@ -156,7 +156,7 @@ export default class APIKey {
 				});
 
 				await client.h.createFollowupResponse(client.bot.user.id, data.token, {
-					content: `We found the following api keys related to you:\n\n${keys.map((v, i) => `${i + 1}.)\n- Key: ||${v.key}||\n- Application: **${v.application}**\n- Active: <:${config.emojis.custom[v.active ? "greenTick" : "redTick"]}>\n- Unlimited: <:${config.emojis.custom[v.unlimited ? "greenTick" : "redTick"]}>`).join("\n\n")}`,
+					content: `We found the following api keys related to you:\n\n${keys.map((v, i) => `${i + 1}.)\n- Key: ||${v.key}||\n- Application: **${v.application}**\n- Contact: \`${v.contact || "**NONE**"}\`\n- Active: <:${config.emojis.custom[v.active ? "greenTick" : "redTick"]}>\n- Unlimited: <:${config.emojis.custom[v.unlimited ? "greenTick" : "redTick"]}>`).join("\n\n")}`,
 					flags: 1 << 6
 				});
 				break;
