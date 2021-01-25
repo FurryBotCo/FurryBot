@@ -46,13 +46,14 @@ export default new ClientEvent("messageDelete", async function (message: Eris.Me
 
 	if (message.author.bot) return;
 
-	// auto delete after 30 minutes
-	await Redis.setex(`snipe:delete:${message.channel.id}:content`, 1800, message.content);
-	await Redis.setex(`snipe:delete:${message.channel.id}:author`, 1800, message.author.id);
-	await Redis.setex(`snipe:delete:${message.channel.id}:time`, 1800, Date.now().toString());
-	if (message.referencedMessage) await Redis.setex(`snipe:delete:${message.channel.id}:ref`, 1800, JSON.stringify({
-		link: message.referencedMessage.jumpLink,
-		author: message.referencedMessage.author.tag,
-		content: message.referencedMessage.content
-	}));
+	this.sn.add("delete", message.channel.id, {
+		content: message.content,
+		author: message.author.id,
+		time: new Date().toISOString(),
+		ref: message.referencedMessage ? {
+			link: message.referencedMessage.jumpLink,
+			author: message.referencedMessage.author.tag,
+			content: message.referencedMessage.content
+		} : null
+	});
 });

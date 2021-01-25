@@ -27,6 +27,7 @@ import CommandHelper from "./util/DiscordCommands/main";
 import BadgeHandler from "./util/handlers/BadgeHandler";
 import pid from "./util/handlers/pid";
 import APIKey from "./util/handlers/APIKey";
+import SnipeHandler from "./util/handlers/SnipeHandler";
 
 // create log directories if they don't exist
 for (const l of Object.keys(config.dir.logs)) if (!fs.existsSync(config.dir.logs[l])) fs.mkdirpSync(config.dir.logs[l]);
@@ -68,6 +69,7 @@ class FurryBot extends Base {
 		[k: string]: number;
 	};
 	h: CommandHelper;
+	sn: SnipeHandler;
 	constructor(d: Cluster) {
 		super(d);
 		this.m = new ModLogUtil(this);
@@ -85,6 +87,7 @@ class FurryBot extends Base {
 		this.e6Active = [];
 		this.ev = [];
 		this.evTotal = {};
+		this.sn = new SnipeHandler();
 		db.setClient(this);
 		APIKey.setClient(this);
 	}

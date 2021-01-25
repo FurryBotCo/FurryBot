@@ -50,11 +50,13 @@ export default new ClientEvent("messageUpdate", async function (message, oldMess
 
 	if (message.author.bot) return;
 
-	// auto delete after 30 minutes
-	await Redis.setex(`snipe:edit:${message.channel.id}:oldContent`, 1800, oldMessage.content);
-	await Redis.setex(`snipe:edit:${message.channel.id}:newContent`, 1800, message.content);
-	await Redis.setex(`snipe:edit:${message.channel.id}:author`, 1800, message.author.id);
-	await Redis.setex(`snipe:edit:${message.channel.id}:time`, 1800, Date.now().toString());
+
+	this.sn.add("edit", message.channel.id, {
+		oldContent: oldMessage.content,
+		newContent: message.content,
+		author: message.author.id,
+		time: new Date().toISOString()
+	});
 
 	this.bot.emit("messageCreate", message, true);
 });
