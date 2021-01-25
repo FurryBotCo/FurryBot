@@ -4,7 +4,6 @@ interface MsResponse {
 	m: number;
 	h: number;
 	d: number;
-	w: number;
 	mn: number;
 	y: number;
 }
@@ -21,57 +20,47 @@ export default class Time {
 	 * @static
 	 * @param {number} time - The time to convert.
 	 * @param {boolean} [words=false] - If we should return full words or just letters.
-	 * @returns {(Promise<string | T.MsResponse>)}
+	 * @returns {(Promise<string | MsResponse>)}
 	 * @memberof Time
 	 * @example Time.ms(120000);
 	 * @example Time.ms(240000, true);
 	 */
-	static ms(time: number, words?: true, seconds?: boolean): string;
-	static ms(time: number, words?: false, seconds?: boolean): MsResponse;
-	static ms(time: number, words = false, seconds = true): string | MsResponse {
+	static ms(time: number, words?: boolean, seconds?: boolean, ms?: boolean, obj?: false): string;
+	static ms(time: number, words: boolean, seconds: boolean, ms: boolean, obj: true): MsResponse;
+	static ms(time: number, words = false, seconds = true, ms = false, obj = false): any {
 		if (time < 0) throw new TypeError("Negative time provided.");
 		// @FIXME language :sweats:
 		if (time === 0) return words ? "0 seconds" : "0s";
 		const r = {
+			ms: time % 1000,
 			s: 0,
 			m: 0,
 			h: 0,
 			d: 0,
-			w: 0,
 			mn: 0,
 			y: 0
 		};
+		r.y = Math.floor(time / 3.154e+10);
+		time -= r.y * 3.154e+10;
+		r.mn = Math.floor(time / 2.628e+9);
+		time -= r.mn * 2.628e+9;
+		r.d = Math.floor(time / 8.64e+7);
+		time -= r.d * 8.64e+7;
+		r.h = Math.floor(time / 3.6e+6);
+		time -= r.h * 3.6e+6;
+		r.m = Math.floor(time / 6e4);
+		time -= r.m * 6e4;
+		r.s = Math.floor(time / 1e3);
+		time -= r.s * 1e3;
 
-		while (time >= 1e3) {
-			r.s++; time -= 1e3;
-		}
-		while (r.s >= 60) {
-			r.m++; r.s -= 60;
-		}
-		while (r.m >= 60) {
-			r.h++; r.m -= 60;
-		}
-		while (r.h >= 24) {
-			r.d++; r.h -= 24;
-		}
-		// while (r.d >= 7) { r.w++; r.d -= 7; }
-		// while (r.w >= 4 && r.d >= 2) { r.mn++; r.w -= 4; r.d -= 2; }
-		while (r.d >= 30) {
-			r.mn++; r.d -= 30;
-		}
-		while (r.mn >= 12) {
-			r.y++; r.mn -= 12;
-		}
-		if (time > 0) r.s += time / 1000;
-
-		Object.keys(r).map(k => r[k] = Math.floor(r[k]));
+		if (obj) return r;
 
 		const str: string[] = [];
+		if (r.ms > 0 && ms) str.push(`${r.s} millisecond${r.s === 1 ? "" : "s"}`);
 		if (r.s > 0) str.push(`${r.s} second${r.s === 1 ? "" : "s"}`);
 		if (r.m > 0) str.push(`${r.m} minute${r.m === 1 ? "" : "s"}`);
 		if (r.h > 0) str.push(`${r.h} hour${r.h === 1 ? "" : "s"}`);
 		if (r.d > 0) str.push(`${r.d} day${r.d === 1 ? "" : "s"}`);
-		// if (r.w > 0) str.push(`${r.w} week${r.w === 1 ? "" : "s"}`);
 		if (r.mn > 0) str.push(`${r.mn} month${r.mn === 1 ? "" : "s"}`);
 		if (r.y > 0) str.push(`${r.y} year${r.y === 1 ? "" : "s"}`);
 
@@ -86,6 +75,18 @@ export default class Time {
 				}
 			} else {
 				delete r.s;
+			}
+		}
+
+		if (!ms) {
+			if (words) {
+				const e = str.find(v => v.indexOf("millisecond") !== -1);
+				if (e) {
+					str.splice(str.indexOf(e), 1);
+					if (str.length < 1) str.push("less than 1 second");
+				}
+			} else {
+				delete r.ms;
 			}
 		}
 
