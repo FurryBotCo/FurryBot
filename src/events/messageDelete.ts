@@ -9,6 +9,8 @@ import Redis from "../util/Redis";
 export default new ClientEvent("messageDelete", async function (message: Eris.Message) {
 	// if (config.beta && !config.eventTest) return;
 	if (!this || !message || !message.author || !message.content || ![Eris.Constants.ChannelTypes.GUILD_NEWS, Eris.Constants.ChannelTypes.GUILD_STORE, Eris.Constants.ChannelTypes.GUILD_TEXT].includes(message.channel.type as any) || (config.beta && !config.developers.includes(message.author.id))) return;
+	// might do some different handling later, for now we just toss it out
+	if (message.type !== Eris.Constants.MessageTypes.DEFAULT) return;
 
 	// we want to get bots here so we don't check bots yet
 	const { guild } = (message.channel as Eris.AnyGuildChannel);
