@@ -1,6 +1,8 @@
 import config from "../../config";
 import Command from "../../util/cmd/Command";
 import phin from "phin";
+import EmbedBuilder from "../../util/EmbedBuilder";
+import { Colors } from "../../util/Constants";
 
 export default new Command(["dadjoke"], __filename)
 	.setBotPermissions([])
@@ -20,5 +22,13 @@ export default new Command(["dadjoke"], __filename)
 			timeout: 5e3
 		});
 
-		return msg.channel.createMessage(req.body.joke);
+		return msg.channel.createMessage({
+			embed: new EmbedBuilder(msg.gConfig.settings.lang)
+				.setDescription(req.body.joke)
+				.setThumbnail("https://static1.e621.net/data/c4/b3/c4b393d3135bab89ef66139491d0d112.png")
+				.setColor(Colors.gold)
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setTimestamp(new Date().toISOString())
+				.toJSON()
+		});
 	});
