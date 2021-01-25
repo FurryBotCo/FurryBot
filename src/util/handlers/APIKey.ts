@@ -19,6 +19,15 @@ interface DBEntry {
 	contact: string;
 }
 
+interface UsageEntry {
+	ip: string;
+	ua: string[];
+	key: string;
+	usage: {
+		[k: string]: number;
+	};
+}
+
 export default class APIKey {
 	static client: FurryBot = null;
 	static setClient(v: FurryBot) { return this.client = v; }
@@ -156,9 +165,34 @@ export default class APIKey {
 				});
 
 				await client.h.createFollowupResponse(client.bot.user.id, data.token, {
-					content: `We found the following api keys related to you:\n\n${keys.map((v, i) => `${i + 1}.)\n- Key: ||${v.key}||\n- Application: **${v.application}**\n- Contact: \`${v.contact || "**NONE**"}\`\n- Active: <:${config.emojis.custom[v.active ? "greenTick" : "redTick"]}>\n- Unlimited: <:${config.emojis.custom[v.unlimited ? "greenTick" : "redTick"]}>`).join("\n\n")}`,
+					content: `We found the following api keys related to you:\n\n${keys.map((v, i) => `${i + 1}.)\n- Key: ||${v.key}||\n- Application: **${v.application}**\n- Contact: ${v.contact || "**NONE**"}\n- Active: <:${config.emojis.custom[v.active ? "greenTick" : "redTick"]}>\n- Unlimited: <:${config.emojis.custom[v.unlimited ? "greenTick" : "redTick"]}>`).join("\n\n")}`,
 					flags: 1 << 6
 				});
+				break;
+			}
+
+			case "edit": {
+				// @TODO
+				break;
+			}
+
+			case "usage": {
+				const keys = await this.col.find({
+					owner: data.member.user.id
+				}).toArray();
+
+				if (keys.length === 0) return client.h.createFollowupResponse(client.bot.user.id, data.token, {
+					content: "We couldn't find any api keys related to you.",
+					flags: 1 << 6
+				});
+
+				for (const { key } of keys) {
+					const usage = await mongo.db("furry-services").collection<UsageEntry>("usage").findOne({ key });
+					await client.h.createFollowupResponse(client.bot.user.id, data.token, {
+						content: `Key: \`${key}\`\nUsage:`,
+						flags: 1 << 6
+					});
+				}
 				break;
 			}
 		}
