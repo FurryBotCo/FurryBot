@@ -16,6 +16,7 @@ import crypto from "crypto";
 import Timers from "../util/Timers";
 import * as fs from "fs-extra";
 import Utility from "../util/Functions/Utility";
+import { DEBUG } from "../clustering/Constants";
 
 export default new ClientEvent("messageCreate", async function (message, update, slash, slashInfo) {
 	/* this.counters.push({
@@ -67,13 +68,18 @@ export default new ClientEvent("messageCreate", async function (message, update,
 			.setAuthor(`${message.author.tag} (${message.author.id})`, message.author.avatarURL)
 			.setColor(Colors.gold)
 			.setTimestamp(new Date().toISOString());
-		if (message.attachments?.length > 0) e.setImage(message.attachments[0].url);
+		if (message.attachments?.length > 0) {
+			e.setImage(message.attachments[0].url);
+			e.addField("Attachments", message.attachments.map((a, i) => `[[#${i + 1}](${a.url})]`).join(" "))
+		}
 		await this.w.get("directMessage").execute({
 			embeds: [
 				e.toJSON()
 			]
 		});
-		return message.channel.createMessage(config.text[inv ? "inviteDM" : "normalDM"](config.devLanguage, this));
+		const cnf = await db.getUser(message.author.id);
+		if (cnf.dmResponse) await message.channel.createMessage(config.text[inv ? "inviteDM" : "normalDM"](config.devLanguage, this));
+		return
 
 	}
 	t.end("dm");

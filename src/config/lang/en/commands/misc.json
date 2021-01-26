@@ -158,5 +158,11 @@
 		"missing1": "First text missing. You must provide some text separated by commas.",
 		"missing2": "Second text missing. You must provide some text separated by commas.",
 		"edited": "This message will be edited soon."
+	},
+	"toggledmresponse": {
+		"description": "Toggle the direct message response.",
+		"usage": "some, text",
+		"off": "You will no longer get a response when you direct message me.",
+		"on": "You will now revieve a response when you direct message me."
 	}
 }

@@ -57,7 +57,9 @@
 			"- [Twitter]({4})",
 			"- [Website]({5})",
 			"",
-			"Commands **__CANNOT__** be ran in my DMs! Please use my [invite link]({2}) to invite me to a server to be able to use commands."
+			"Commands **__CANNOT__** be ran in my DMs! Please use my [invite link]({2}) to invite me to a server to be able to use commands.",
+			"",
+			"To disable this response, go into a **server** with me, and run `{6}toggledmresponse`."
 		],
 		"invite": [
 			"It seems you have sent me a server invite, I cannot use these.",
@@ -67,7 +69,9 @@
 			"3.) Click the **continue** button.",
 			"4.) On the next page, uncheck any permissions you don't want (we recommend not touching these).",
 			"5.) Click the **authorize** button.",
-			"6.) Use me in your server. For example, to list my commands, you can use `{1}help` in any channel I can see."
+			"6.) Use me in your server. For example, to list my commands, you can use `{1}help` in any channel I can see.",
+			"",
+			"To disable this response, go into a **server** with me, and run `{2}toggledmresponse`."
 		],
 		"title": "Direct Message Response",
 		"vote": [],

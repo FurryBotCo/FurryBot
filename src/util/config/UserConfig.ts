@@ -39,6 +39,7 @@ export default class UserConfig {
 		"activationTime": number | null;
 	};
 	eco: Economy.EcoUser;
+	dmResponse: boolean;
 	constructor(id: string, data: ConfigDataTypes<UserConfig, "id">) {
 		this.id = id;
 		this.load.call(this, data);
