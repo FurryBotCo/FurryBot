@@ -363,7 +363,7 @@ export default new ClientEvent("messageCreate", async function (message, update,
 		t.end("cooldown");
 		/* end command cooldown */
 
-		Logger.info([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, "Message Handler"], `Command "${cmd.triggers[0]}" ran with ${msg.args.length === 0 ? "no arguments" : `the arguments "${msg.args.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
+		Logger.info([`Cluster #${this.cluster.id}`, `Shard #${msg.channel.guild.shard.id}`, `Command Handler${msg.slash ? "[Slash]" : ""}`], `Command "${cmd.triggers[0]}" ran with ${msg.args.length === 0 ? "no arguments" : `the arguments "${msg.args.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 
 		const start = performance.now();
 
