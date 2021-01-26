@@ -152,17 +152,17 @@
 		"missingDescription": "Missing suggestion description. Separate a title a description with a pipe (|).",
 		"done": "Your suggestion was successfully posted.\nYou can view it here: {0}, and you can join our support server (<{1}>), and vote on it in <#800197845985525800>."
 	},
+	"toggledmresponse": {
+		"description": "Toggle the direct message response.",
+		"usage": "some, text",
+		"off": "You will no longer get a response when you direct message me.",
+		"on": "You will now revieve a response when you direct message me."
+	},
 	"weirdedit": {
 		"description": "Make a message with a weird little edit thing.",
 		"usage": "some, text",
 		"missing1": "First text missing. You must provide some text separated by commas.",
 		"missing2": "Second text missing. You must provide some text separated by commas.",
 		"edited": "This message will be edited soon."
-	},
-	"toggledmresponse": {
-		"description": "Toggle the direct message response.",
-		"usage": "some, text",
-		"off": "You will no longer get a response when you direct message me.",
-		"on": "You will now revieve a response when you direct message me."
 	}
 }
