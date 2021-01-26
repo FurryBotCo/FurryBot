@@ -58,6 +58,43 @@ export default class Internal {
 
 		str
 			.split(" ")
+			.map(k => k.match(new RegExp("([0-9]{15,21})", "i")))
+			.filter(v => v !== null)
+			.map(([k, id]) => [k, `<@!${id}>`])
+			.map(([k, u]) => str = str.replace(k, u));
+
+		str
+			.split(" ")
+			// throw away mentions
+			.filter(k => !k.match(new RegExp("(?:<@!?)?([0-9]{15,21})>?", "i")))
+			.map(v => [v, msg.channel.guild.members.find(m =>
+				m.username.toLowerCase() === v.toLowerCase() ||
+				m.tag.toLowerCase() === v.toLowerCase() ||
+				(
+					m.nick &&
+					m.nick.toLowerCase() === v.toLowerCase()
+				)
+			)] as const)
+			.filter(v => v !== undefined)
+			.map(([k, u]) => str = str.replace(k, `<@!${u.id}>`));
+
+		return str;
+	}
+
+	/**
+	 * Parsing for mention/id to username.
+	 *
+	 * @static
+	 * @param {ExtendedMessage} msg - The message instance.
+	 * @returns {string}
+	 * @memberof Internal
+	 * @example Internal.mentionOrIdToUsername(<ExtendedMessage>);
+	 */
+	static mentionOrIdToUsername(msg: ExtendedMessage) {
+		let str = msg.args.join(" ");
+
+		str
+			.split(" ")
 			.map(k => k.match(new RegExp("(?:<@!?)?([0-9]{15,21})>?", "i")))
 			.filter(v => v !== null)
 			.map(([k, id]) => [k, (msg.client.bot.users.get(id) || msg.channel.guild.members.get(id))?.username])
@@ -376,7 +413,7 @@ export default class Internal {
 		if (msg.args.length === 0) return new CommandError("ERR_INVALID_USAGE", cmd);
 		let res: MemeRequestResponse;
 		try {
-			res = await DankMemerAPI[type](Internal.extraArgParsing(msg));
+			res = await DankMemerAPI[type](Internal.mentionOrIdToUsername(msg));
 		} catch (e) {
 			if (e instanceof APIError) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.dankMemer", [e.message, e.body.error]));
 			else throw e;
