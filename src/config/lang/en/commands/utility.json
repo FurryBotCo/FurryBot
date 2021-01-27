@@ -409,11 +409,11 @@
 		"description": "Get the last deleted message in a channel.",
 		"usage": "[channel]",
 		"noSnipes": "no snipes found for the channel <#{0}>.",
-		"title": "Message Delete Snipe #{0}",
+		"title": "Message Delete Snipe",
 		"userCantSee": "You cannot snipe messages in channels you cannot see.",
 		"selfCantSee": "I cannot see that channel, so I cannot provide any snipes for it.",
 		"reply": "In reply to [{0}]({1})",
-		"expl": "Up to 3 messages may be sent after this, in the order they were deleted."
+		"footer": "You can run this command again to see the snipe history (up to 2 more)."
 	},
 	"steal": {
 		"description": "Steal an emoji from another server, and add it to this server.",
