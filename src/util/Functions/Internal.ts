@@ -58,6 +58,8 @@ export default class Internal {
 
 		str
 			.split(" ")
+			// throw away mentions
+			.filter(k => !k.match(new RegExp("(?:<@!?)([0-9]{15,21})>", "i")))
 			.map(k => k.match(new RegExp("([0-9]{15,21})", "i")))
 			.filter(v => v !== null)
 			.map(([k, id]) => [k, `<@!${id}>`])
@@ -65,7 +67,7 @@ export default class Internal {
 
 		str
 			.split(" ")
-			// throw away mentions
+			// throw away mentions & ids
 			.filter(k => !k.match(new RegExp("(?:<@!?)?([0-9]{15,21})>?", "i")))
 			.map(v => [v, msg.channel.guild.members.find(m =>
 				m.username.toLowerCase() === v.toLowerCase() ||
@@ -75,7 +77,7 @@ export default class Internal {
 					m.nick.toLowerCase() === v.toLowerCase()
 				)
 			)] as const)
-			.filter(v => v !== undefined)
+			.filter(([, v]) => v !== undefined)
 			.map(([k, u]) => str = str.replace(k, `<@!${u.id}>`));
 
 		return str;
