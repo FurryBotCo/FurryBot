@@ -22,10 +22,7 @@ export default class UserConfig {
 		};
 	};
 	socials: Socials.AnySocial[];
-	booster: {
-		active: boolean;
-		expiry: string;
-	};
+	booster: boolean;
 	levels: {
 		[k: string]: number;
 	};
@@ -73,11 +70,17 @@ export default class UserConfig {
 		return this.reload();
 	}
 
-	async checkPremium(): Promise<{
-		remainingMonths: number;
+	async checkPremium(checkBoost = false): Promise<{
+		remainingMonths: number | "BOOSTER";
 		activationTime: number | null;
 		active: boolean;
 	}> {
+		if (checkBoost && this.booster) return {
+			remainingMonths: "BOOSTER",
+			activationTime: null,
+			active: true
+		};
+
 		if (!this.donations.activationTime || this.donations.totalMonths < 1) return {
 			remainingMonths: 0,
 			activationTime: null,
@@ -130,57 +133,14 @@ export default class UserConfig {
 		return db.checkVote(this.id);
 	}
 
-	async checkBooster() {
-		if (!this.booster.active) return {
-			active: false,
-			expired: false,
-			expiry: null
-		};
-
-		if (!this.booster.expiry) {
-			await this.edit({
-				booster: {
-					active: false,
-					expiry: null
-				}
-			});
-
-			return {
-				active: false,
-				expired: true,
-				expiry: null
-			};
-		}
-
-		const e = new Date(this.booster.expiry).getTime();
-		const d = new Date().setHours(0, 0, 0);
-
-		if (e < d) {
-			await this.edit({
-				booster: {
-					active: false,
-					expiry: null
-				}
-			});
-
-			return {
-				active: false,
-				expired: true,
-				expiry: null
-			};
-		}
-		return {
-			active: true,
-			expired: false,
-			expiry: this.booster.expiry
-		};
-	}
-
 	async fix() {
 		const obj: Parameters<UserConfig["edit"]>[0] = Object.create(null);
+		if (typeof this.booster !== "boolean") obj.booster = false;
 		if (JSON.stringify(obj) !== "{}") {
-			await this.edit(obj);
 			Logger.warn(["Database", "User"], `Fixed user "${this.id}": ${JSON.stringify(obj)}`);
+			await this.mongoEdit({
+				$set: obj
+			});
 		}
 
 		return this;

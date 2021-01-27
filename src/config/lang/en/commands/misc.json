@@ -97,8 +97,8 @@
 		"description": "Claim perks for boosting our support server.",
 		"usage": "",
 		"notABooster": "You are not a booster in our support server.",
-		"alreadyActive": "You perks are already active. Come back on **{0}** to reactivate them.",
-		"done": "you've got perks now, congrats. Come back and renew them in 10 days."
+		"alreadyActive": "You are already marked as a booster.",
+		"done": "Congrats, your perks have been set up."
 	},
 	"bugreport": {
 		"description": "Report a bug you found in the bot.",
