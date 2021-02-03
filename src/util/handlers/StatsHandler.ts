@@ -2,6 +2,7 @@ import FurryBot from "../../main";
 import ExtendedMessage from "../ExtendedMessage";
 import Eris from "eris";
 import Redis from "../Redis";
+import Utility from "../Functions/Utility";
 
 export default class StatsHandler {
 	#client: FurryBot;
@@ -56,26 +57,31 @@ export default class StatsHandler {
 		return Redis.incr(parts.join(":"));
 	}
 
+	joinParts(...parts: string[]) { return parts.join(":"); }
+
 	async processMessage(msg: Eris.Message<Eris.TextableChannel> | ExtendedMessage) {
 		if (msg.channel instanceof Eris.PrivateChannel) return;
-		await this.track("stats", "messages", "servers", msg.channel.guild.id);
-		await this.track("stats", "messages", "channels", msg.channel.id);
-		await this.track("stats", "messages", "users", msg.author.id, "total");
-		await this.track("stats", "messages", "users", msg.author.id, "servers", msg.channel.guild.id);
-		await this.track("stats", "messages", "users", msg.author.id, "channels", msg.channel.id);
-		await this.track("stats", "messages", "general");
-		await this.track("stats", "messages", "session");
+		await Redis
+			.multi()
+			.incr(this.joinParts("stats", "messages", "servers", msg.channel.guild.id))
+			.incr(this.joinParts("stats", "messages", "channels", msg.channel.id))
+			.incr(this.joinParts("stats", "messages", "users", msg.author.id, "total"))
+			.incr(this.joinParts("stats", "messages", "users", msg.author.id, "servers", msg.channel.guild.id))
+			.incr(this.joinParts("stats", "messages", "users", msg.author.id, "channels", msg.channel.id))
+			.incr(this.joinParts("stats", "messages", "general"))
+			.incr(this.joinParts("stats", "messages", "session"))
+			.exec();
 	}
 
 	async resetSessionStats() {
-		await Redis.del("stats:messages:session");
-		await Redis.del("stats:directMessages:session");
-		await Redis.del("stats:messages:session");
-		await Redis.del("stats:commands:session:total");
-		const keys = await Redis.keys("stats:commands:session:*");
-		for (const key of keys) {
-			await Redis.del(key);
-		}
+		const keys = await Utility.getKeys("stats:commands:session:*");
+		await Redis.del(
+			"stats:messages:session",
+			"stats:directMessages:session",
+			"stats:messages:session",
+			"stats:commands:session:total",
+			...keys
+		)
 	}
 
 	async getStats() {
@@ -111,23 +117,22 @@ export default class StatsHandler {
 	}
 
 	async processCommand(msg: ExtendedMessage) {
-		await this.track("stats", "commands", "servers", msg.channel.guild.id, "total");
-		await this.track("stats", "commands", "servers", msg.channel.guild.id, msg.cmd.triggers[0]);
-		await this.track("stats", "commands", "channels", msg.channel.id, "total");
-		await this.track("stats", "commands", "channels", msg.channel.id, msg.cmd.triggers[0]);
-		await this.track("stats", "commands", "users", msg.author.id, "total");
-		await this.track("stats", "commands", "users", msg.author.id, msg.cmd.triggers[0]);
-		await this.track("stats", "commands", "users", msg.author.id, "servers", msg.channel.guild.id, "total");
-		await this.track("stats", "commands", "users", msg.author.id, "servers", msg.channel.guild.id, msg.cmd.triggers[0]);
-		await this.track("stats", "commands", "users", msg.author.id, "channels", msg.channel.id, "total");
-		await this.track("stats", "commands", "users", msg.author.id, "channels", msg.channel.id, msg.cmd.triggers[0]);
-		await this.track("stats", "commands", "general", "total");
-		await this.track("stats", "commands", "general", msg.cmd.triggers[0]);
-		await this.track("stats", "commands", "session", "total");
-		await this.track("stats", "commands", "session", msg.cmd.triggers[0]);
-		/* this.#client.counters.push({
-			type: "command",
-			time: Date.now()
-		}); */
+		await Redis
+			.multi()
+			.incr(this.joinParts("stats", "commands", "servers", msg.channel.guild.id, "total"))
+			.incr(this.joinParts("stats", "commands", "servers", msg.channel.guild.id, msg.cmd.triggers[0]))
+			.incr(this.joinParts("stats", "commands", "channels", msg.channel.id, "total"))
+			.incr(this.joinParts("stats", "commands", "channels", msg.channel.id, msg.cmd.triggers[0]))
+			.incr(this.joinParts("stats", "commands", "users", msg.author.id, "total"))
+			.incr(this.joinParts("stats", "commands", "users", msg.author.id, msg.cmd.triggers[0]))
+			.incr(this.joinParts("stats", "commands", "users", msg.author.id, "servers", msg.channel.guild.id, "total"))
+			.incr(this.joinParts("stats", "commands", "users", msg.author.id, "servers", msg.channel.guild.id, msg.cmd.triggers[0]))
+			.incr(this.joinParts("stats", "commands", "users", msg.author.id, "channels", msg.channel.id, "total"))
+			.incr(this.joinParts("stats", "commands", "users", msg.author.id, "channels", msg.channel.id, msg.cmd.triggers[0]))
+			.incr(this.joinParts("stats", "commands", "general", "total"))
+			.incr(this.joinParts("stats", "commands", "general", msg.cmd.triggers[0]))
+			.incr(this.joinParts("stats", "commands", "session", "total"))
+			.incr(this.joinParts("stats", "commands", "session", msg.cmd.triggers[0]))
+			.exec();
 	}
 }
