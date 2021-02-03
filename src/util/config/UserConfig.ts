@@ -37,6 +37,12 @@ export default class UserConfig {
 	};
 	eco: Economy.EcoUser;
 	dmResponse: boolean;
+	reminders: {
+		channel: string;
+		time: number;
+		end: string;
+		reason: string;
+	}[];
 	constructor(id: string, data: ConfigDataTypes<UserConfig, "id">) {
 		this.id = id;
 		this.load.call(this, data);

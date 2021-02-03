@@ -1,3 +1,5 @@
+import ms from "ms";
+
 interface MsResponse {
 	ms: number;
 	s: number;
@@ -32,7 +34,7 @@ export default class Time {
 		// @FIXME language :sweats:
 		if (time === 0) return words ? "0 seconds" : "0s";
 		const r = {
-			ms: time % 1000,
+			ms: Math.round(((time % 1000) + Number.EPSILON) * 100) / 100,
 			s: 0,
 			m: 0,
 			h: 0,
@@ -56,7 +58,7 @@ export default class Time {
 		if (obj) return r;
 
 		const str: string[] = [];
-		if (r.ms > 0 && ms) str.push(`${r.s} millisecond${r.s === 1 ? "" : "s"}`);
+		if (r.ms > 0 && ms) str.push(`${r.ms} millisecond${r.ms === 1 ? "" : "s"}`);
 		if (r.s > 0) str.push(`${r.s} second${r.s === 1 ? "" : "s"}`);
 		if (r.m > 0) str.push(`${r.m} minute${r.m === 1 ? "" : "s"}`);
 		if (r.h > 0) str.push(`${r.h} hour${r.h === 1 ? "" : "s"}`);
@@ -158,5 +160,18 @@ export default class Time {
 		if (minutes < 10) minutes = `0${minutes}`;
 		if (seconds < 10) seconds = `0${seconds}`;
 		return `${hours}:${minutes}:${seconds}`;
+	}
+
+	/**
+	 * Parse a string into milliseconds
+	 * @param {string} str - the string to parse
+	 * @returns {number} 
+	 */
+	static parseTime(str: string) {
+		return str
+			.split(",")
+			.map(v => ms(v.replace(/and/gi, "").toLowerCase().trim()))
+			.filter(v => v !== undefined)
+			.reduce((a, b) => a + b, 0);
 	}
 }

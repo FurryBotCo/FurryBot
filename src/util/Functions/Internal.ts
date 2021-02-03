@@ -5,7 +5,6 @@ import Command from "../cmd/Command";
 import * as fs from "fs-extra";
 import * as os from "os";
 import ExtendedMessage from "../ExtendedMessage";
-import Eris from "eris";
 import phin from "phin";
 import config from "../../config";
 import { execSync } from "child_process";

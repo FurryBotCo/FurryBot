@@ -18,7 +18,8 @@
 		"inlineSourceMap": true,
 		"charset": "UTF-8",
 		"downlevelIteration": true,
-		"newLine": "lf"
+		"newLine": "lf",
+        "strictBindCallApply": true
     },
     "include": [
 		"**/*"

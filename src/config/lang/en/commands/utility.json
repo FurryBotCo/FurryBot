@@ -448,5 +448,12 @@
 		"newContent": "New Content",
 		"edited": "Tag Edited",
 		"deleted": "Deleted the tag **{0}**."
+	},
+	"remindme": {
+		"description": "Set a reminder for yourself.",
+		"usage": "<time> [reason]",
+		"invalidTime": "You provided an invald time. It must be 1 second or more. To supply multiple units, use something like \"5 minutes, 6 seconds\".",
+		"title": "Reminder Set",
+		"desc": "Your reminder has been set for **{0}**."
 	}
 }

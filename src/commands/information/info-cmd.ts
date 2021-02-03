@@ -26,7 +26,7 @@ export default new Command(["info"], __filename)
 		for (const k of Object.keys(diskUsage)) {
 			d.push(`${config.emojis.default.dot} {lang:other.words.diskUsage$ucwords$} (${k}): ${Strings.formatBytes(diskUsage[k].total - diskUsage[k].free)} / ${Strings.formatBytes(diskUsage[k].total)}`);
 		}
-		if (os.hostname() === "boop") {
+		if (os.hostname().startsWith("boop")) {
 			const { body: k } = await phin<{
 				drives: {
 					[k: string]: {

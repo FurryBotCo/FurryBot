@@ -267,7 +267,7 @@ export default class CommandHelper {
 			});
 	}
 
-	async createFollowupResponse(applicationId: string, interactionToken: string, data?: Types.InteractionResponse["data"]): Promise<void> {
+	async createFollowupResponse(applicationId: string, interactionToken: string, data: Types.InteractionResponse["data"]): Promise<void> {
 		return fetch(`https://discordapp.com/api/v8/webhooks/${applicationId}/${interactionToken}`, {
 			method: "POST",
 			headers: {

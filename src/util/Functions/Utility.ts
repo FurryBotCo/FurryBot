@@ -342,7 +342,7 @@ export default class Utility {
 	 * @example Utility.getKeys("some:pattern", "0");
 	 * @example Utility.getKeys("some:pattern", "0", null, 10000);
 	 */
-	static async getKeys(pattern: string, cur: string, keys = [] as string[], maxPerRun = 10000): Promise<string[]> {
+	static async getKeys(pattern: string, cur = "0", keys = [] as string[], maxPerRun = 10000): Promise<string[]> {
 		if (config.beta) return Redis.keys(pattern);
 		const s = await Redis.scan(cur, "MATCH", pattern, "COUNT", maxPerRun);
 		keys.push(...s[1]);

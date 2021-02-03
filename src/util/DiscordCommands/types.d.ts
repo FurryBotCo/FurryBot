@@ -87,10 +87,10 @@ declare namespace DiscordSlashCommands {
 
 	interface InteractionApplicationCommandCallbackData {
 		tts?: boolean;
-		content: string;
-		embeds?: EmbedOptions[];
 		allowed_mentions?: AllowedMentions;
 		flags?: number;
+		content?: string;
+		embeds?: EmbedOptions[];
 	}
 }
 
