@@ -137,7 +137,7 @@ export default class Command {
 	}
 
 	runOverride<K extends keyof Command["overrides"]>(type: K, client: FurryBot, ...args: Parameters<Command["overrides"][K]>): ReturnType<Command["overrides"][K]> {
-		return this.overrides[type].call(client, ...args);
+		return this.overrides[type as any].call(client, ...args);
 	}
 
 	setHasSlashVariant(data: boolean) {
