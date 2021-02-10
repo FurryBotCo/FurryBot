@@ -39,7 +39,7 @@ export default class Test {
 
 	executeTest<T = any>(name: string, ...args: Parameters<Test["tests"][string]>): Promise<T> {
 		if (!this.tests[name]) throw new TypeError(`Invalid test "${name}"`);
-		return this.tests[name].call(null, ...args);
+		return (this.tests[name] as any).call(null, ...args);
 	}
 
 	deleteTest(name: string) {
