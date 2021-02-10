@@ -36,8 +36,9 @@ export default class AppealRoute extends Route {
 					state = JSON.parse(Buffer.from(req.query.state.toString(), "base64").toString());
 				} catch (e) { }
 				const src = ((state && state.source) || "unknown").toUpperCase();
-				if (!req.query.code) return res.status(400).end("Missing &quot;code&quot; in request.");
-				if (!req.query.guild_id) return res.status(400).end("Missing &quot;guild_id&quot; in request.");
+				if (req.query.error) return res.status(400).end(`Type: ${req.query.error}\nDescription: ${decodeURIComponent(req.query.error_description.toString())}`);
+				if (!req.query.code) return res.status(400).end("Missing \"code\" in request.");
+				if (!req.query.guild_id) return res.status(400).end("Missing \"guild_id\" in request.");
 				const perms = Number(req.query.permissions) || 0;
 
 				const auth: ThenReturnType<typeof Internal["authorizeOAuth"]> | Error = await Internal.authorizeOAuth(req.query.code.toString(), config.web.oauth2.redirectURLInviteFinished).catch(err => err);
