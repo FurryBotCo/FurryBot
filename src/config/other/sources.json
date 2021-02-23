@@ -7,5 +7,6 @@
 	"botapi": "eyJzb3VyY2UiOiJib3RhcGkiLCJjcmVhdGlvblRpbWUiOjE2MDA1MTA0Nzc2MDB9",
 	"api": "eyJzb3VyY2UiOiJhcGkiLCJjcmVhdGlvblRpbWUiOjE2MDA1MTA0ODc2Mjd9",
 	"other": "eyJzb3VyY2UiOiJvdGhlciIsImNyZWF0aW9uVGltZSI6MTYwMDUxMDYxOTc5MH0",
-	"dboats": "eyJzb3VyY2UiOiJkYm9hdHMiLCJjcmVhdGlvblRpbWUiOjE2MDE1NzM2NTQ5NTV9"
+	"dboats": "eyJzb3VyY2UiOiJkYm9hdHMiLCJjcmVhdGlvblRpbWUiOjE2MDE1NzM2NTQ5NTV9",
+	"dservices": "eyJzb3VyY2UiOiJkc2VydmljZXMiLCJjcmVhdGlvblRpbWUiOjE2MTM5Mjk2ODE5OTB9"
 }
