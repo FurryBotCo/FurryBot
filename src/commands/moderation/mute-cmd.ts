@@ -90,7 +90,7 @@ export default new Command(["mute"], __filename)
 		}
 
 		if (member.id === msg.member.id) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noSelf`));
-		const b = Utility.compareMembers(member, msg.member);
+		const b = Utility.compareMembers(msg.member, member);
 		if ((b.member1.lower || b.member1.same) && msg.author.id !== msg.channel.guild.ownerID) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noMuteOther`, [`${member.username}#${member.discriminator}`]));
 		// if (user.permissions.has("administrator")) return msg.channel.createMessage(`<@!${msg.author.id}>, That user has the \`ADMINISTRATOR\` permission, that would literally do nothing.`);
 		const reason = msg.args.length >= 2 ? msg.args.splice(1).join(" ") : Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
