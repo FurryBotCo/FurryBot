@@ -35,6 +35,8 @@ export default new Command(["ship"], __filename)
 			embed: Utility.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_MEMBER", true)
 		});
 
+		if (!Object.keys(msg.dashedArgs.keyValue).includes("random")) amount = Number((BigInt(member1.id) + BigInt(member2.id)) % 100n);
+
 		const ship = {
 			amount,
 			name: member1.username.slice(0, Math.floor(Math.random() * 5) + 3) + member2.username.slice(-(Math.floor(Math.random() * 5) + 3)),
