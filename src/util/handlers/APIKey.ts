@@ -17,6 +17,9 @@ interface DBEntry {
 	application: string;
 	active: boolean;
 	contact: string;
+	disabled: boolean;
+	disabledReason: string | null;
+	flowAccess: false;
 }
 
 interface UsageEntry {
@@ -82,7 +85,10 @@ export default class APIKey {
 					owner: data.member.user.id,
 					application: opt.name,
 					active: true,
-					contact: opt.contact
+					contact: opt.contact,
+					disabled: false,
+					disabledReason: null,
+					flowAccess: false
 				});
 
 				await client.w.get("apikey").execute({
@@ -94,7 +100,9 @@ export default class APIKey {
 								`Application: **${k.application}**`,
 								`Contact: ${k.contact || "**NONE**"}`,
 								`Active: <:${config.emojis.custom[k.active ? "greenTick" : "redTick"]}>`,
-								`Unlimited: <:${config.emojis.custom[k.unlimited ? "greenTick" : "redTick"]}>`
+								`Disabled: <:${config.emojis.custom[k.disabled ? "greenTick" : "redTick"]}>${k.disabled ? ` (Reason: ${k.disabledReason})` : ""}`,
+								`Unlimited: <:${config.emojis.custom[k.unlimited ? "greenTick" : "redTick"]}>`,
+								`Flow Access: <:${config.emojis.custom[k.flowAccess ? "greenTick" : "redTick"]}>`
 							].join("\n"))
 							.setColor(Colors.green)
 							.setTimestamp(new Date().toISOString())
@@ -138,7 +146,9 @@ export default class APIKey {
 								`Application: **${k.application}**`,
 								`Contact: ${k.contact || "**NONE**"}`,
 								`Active: <:${config.emojis.custom[k.active ? "greenTick" : "redTick"]}>`,
-								`Unlimited: <:${config.emojis.custom[k.unlimited ? "greenTick" : "redTick"]}>`
+								`Disabled: <:${config.emojis.custom[k.disabled ? "greenTick" : "redTick"]}>${k.disabled ? ` (Reason: ${k.disabledReason})` : ""}`,
+								`Unlimited: <:${config.emojis.custom[k.unlimited ? "greenTick" : "redTick"]}>`,
+								`Flow Access: <:${config.emojis.custom[k.flowAccess ? "greenTick" : "redTick"]}>`
 							].join("\n"))
 							.setColor(Colors.red)
 							.setTimestamp(new Date().toISOString())
@@ -165,7 +175,7 @@ export default class APIKey {
 				});
 
 				await client.h.createFollowupResponse(client.bot.user.id, data.token, {
-					content: `We found the following api keys related to you:\n\n${keys.map((v, i) => `${i + 1}.)\n- Key: ||${v.key}||\n- Application: **${v.application}**\n- Contact: ${v.contact || "**NONE**"}\n- Active: <:${config.emojis.custom[v.active ? "greenTick" : "redTick"]}>\n- Unlimited: <:${config.emojis.custom[v.unlimited ? "greenTick" : "redTick"]}>`).join("\n\n")}`,
+					content: `We found the following api keys related to you:\n\n${keys.map((v, i) => `${i + 1}.)\n- Key: ||${v.key}||\n- Application: **${v.application}**\n- Contact: ${v.contact || "**NONE**"}\n- Active: <:${config.emojis.custom[v.active ? "greenTick" : "redTick"]}>\n- Disabled: <:${config.emojis.custom[v.disabled ? "greenTick" : "redTick"]}>${v.disabled ? ` (Reason: ${v.disabledReason})` : ""}\n- Unlimited: <:${config.emojis.custom[v.unlimited ? "greenTick" : "redTick"]}>\n- Flow Access: <:${config.emojis.custom[v.flowAccess ? "greenTick" : "redTick"]}>`).join("\n\n")}`,
 					flags: 1 << 6
 				});
 				break;

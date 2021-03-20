@@ -1,6 +1,6 @@
 import * as fs from "fs-extra";
 import util from "util";
-import leeks from "leeks.js";
+import * as leeks from "leeks.js";
 import config from "../config";
 import Strings from "./Functions/Strings";
 import Utility from "./Functions/Utility";
