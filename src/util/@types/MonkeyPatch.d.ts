@@ -1,4 +1,4 @@
-import Eris from "eris";
+import "eris";
 declare module "eris" {
 	export interface Permission {
 		has(permission: ErisPermissions): boolean;
@@ -49,6 +49,7 @@ declare module "eris" {
 	}
 
 	interface GuildChannel {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		update(data: any): void;
 	}
 
@@ -61,17 +62,5 @@ declare module "eris" {
 		typing: {
 			[k: string]: NodeJS.Timeout;
 		};
-	}
-}
-
-declare global {
-	interface Function {
-		/**
-		 * Calls the function, substituting the specified object for the this value of the function, and the specified array for the arguments of the function.
-		 *
-		 * @param thisArg The object to be used as the this object.
-		 * @param argArray A set of arguments to be passed to the function.
-		 */
-		owo<F extends (...args: any) => any>(this: F, thisArg: ThisParameterType<F>, ...argArray: Parameters<F>): ReturnType<F>;
 	}
 }

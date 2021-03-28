@@ -1,8 +1,9 @@
-import Category from "../../util/cmd/Category";
-import Internal from "../../util/Functions/Internal";
+import LocalFunctions from "../../util/LocalFunctions";
+import { BotFunctions, Category } from "core";
+
 
 const cat = new Category("animals", __filename);
 
-Internal.loadCommands(__dirname, cat);
+BotFunctions.loadCommands(__dirname, cat, LocalFunctions.getExt());
 
 export default cat;

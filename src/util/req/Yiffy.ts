@@ -1,6 +1,6 @@
 import config from "../../config";
+import Logger from "logger";
 import YiffyAPI from "yiffy";
-import Logger from "../Logger";
 
 const Yiffy = new YiffyAPI({
 	userAgent: config.web.userAgent,

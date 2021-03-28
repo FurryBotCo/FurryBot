@@ -1,6 +1,7 @@
-import ClientEvent from "../util/ClientEvent";
-import Logger from "../util/Logger";
+import FurryBot from "../main";
+import { ClientEvent } from "core";
+import Logger from "logger";
 
-export default new ClientEvent("debug", async function (info, id) {
-	Logger.debug([`Cluster #${this.cluster.id}`, [undefined, null].includes(id) ? "General" : `Shard #${id}`], info);
+export default new ClientEvent<FurryBot>("debug", async function (info, id) {
+	Logger.debug([`Cluster #${this.clusterId}`, !id ? "General" : `Shard #${id}`], info);
 });
