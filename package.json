@@ -5,7 +5,8 @@
   "description": "A fun bot for furry Discord servers!",
   "main": "index.js",
   "scripts": {
-    "circ": "dpdm --tree=false --circular=true --warning=false -T ."
+    "circ": "dpdm --tree=false --circular=true --warning=false -T .",
+    "update": "git pull && git submodule update --recursive --remote"
   },
   "repository": {
     "type": "git",
