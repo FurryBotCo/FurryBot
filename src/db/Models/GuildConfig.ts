@@ -1,6 +1,6 @@
-import { VALID_LANGUAGES } from "../../util/Language";
 import config from "../../config";
 import db from "..";
+import { VALID_LANGUAGES } from "../../main";
 import { GuildConfig as GC, ConfigDataTypes, ConfigEditTypes } from "core";
 import Logger from "logger";
 import { WithId } from "mongodb";

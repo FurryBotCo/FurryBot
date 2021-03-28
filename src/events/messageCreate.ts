@@ -1,7 +1,6 @@
 import FurryBot from "../main";
 import config from "../config";
 import db, { mdb, Redis } from "../db";
-import Language from "../util/Language";
 import Blacklist from "../util/@types/Blacklist";
 import TextHandler from "../util/handler/TextHandler";
 import UserConfig from "../db/Models/UserConfig";
@@ -12,11 +11,14 @@ import { Time, Timers } from "utilities";
 import Eris from "eris";
 import Logger from "logger";
 import * as fs from "fs-extra";
+import Language from "language";
 import crypto from "crypto";
 import { performance } from "perf_hooks";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildTextableChannel>("messageCreate", async function(msg, update, slash, slashInfo) {
+	if (mdb === null) return Logger.error([`Cluster #${this.clusterId}`, "messageCreate"], `Skipped a message with the id ${msg.id} due to the database not being initialized.`);
+	if (Redis === null) return Logger.error([`Cluster #${this.clusterId}`, "messageCreate"], `Skipped a message with the id ${msg.id} due to redis not being initialized.`);
 
 	if (!(msg instanceof ExtendedMessage)) return;
 	const t = new Timers(config.developers.includes(msg.author.id), `${msg.author.id}/${msg.channel.id}`); // `${msg.channel.id}/${msg.id}/${msg.author.id}`);
@@ -495,7 +497,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 				if (err instanceof CommandError) {
 					switch (err.message) {
 						case "INVALID_USAGE": {
-							void this.cmd.handlers.runInvalidUsage(this, msg, err.cmd, err, Language);
+							void this.cmd.handlers.runInvalidUsage(this, msg, err.cmd, err);
 							break;
 						}
 					}

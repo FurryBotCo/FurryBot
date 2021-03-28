@@ -6,7 +6,7 @@ import Eris from "eris";
 export default new ClientEvent<FurryBot>("rawWS", async function({ op, d, s, t }) {
 	if (op === 0) {
 		this.trackNoResponse(
-			this.sh.joinParts("stats", "stats", t!)
+			this.sh.joinParts("stats", "events", t!)
 		);
 		switch (t) {
 			case "MESSAGE_CREATE": {

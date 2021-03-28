@@ -9,6 +9,7 @@ export default class StatsHandler {
 	}
 
 	async getNumber(path: string) {
+		if (Redis === null) throw new ReferenceError("StatsHandler#getNumber called before redis was initialized.");
 		const v = await Redis.get(path).then(Number);
 		return isNaN(v) ? 0 : v;
 	}
@@ -56,6 +57,7 @@ export default class StatsHandler {
 	}
 
 	async resetSessionStats() {
+		if (Redis === null) throw new ReferenceError("StatsHandler#resetSessionStats called before redis was initialized.");
 		const keys = await Utility.getKeys("stats:commands:session:*");
 		await Redis.del(
 			"stats:messages:session",
@@ -67,6 +69,7 @@ export default class StatsHandler {
 	}
 
 	async getStats() {
+		if (Redis === null) throw new ReferenceError("StatsHandler#getStats called before redis was initialized.");
 		return {
 			messages: {
 				general: await Redis.get("stats:messages:general").then(v => Number(v)),
@@ -80,8 +83,8 @@ export default class StatsHandler {
 				general: await Redis.get("stats:commands:general:total").then(v => Number(v)),
 				session: await Redis.get("stats:commands:session:total").then(v => Number(v)),
 				specific: await Promise.all(this.#client.cmd.commands.map(c => c.triggers[0]).map(async (c) => ({
-					general: await Redis.get(`stats:commands:general:${c}`).then(v => Number(v)),
-					session: await Redis.get(`stats:commands:session:${c}`).then(v => Number(v)),
+					general: await Redis!.get(`stats:commands:general:${c}`).then(v => Number(v)),
+					session: await Redis!.get(`stats:commands:session:${c}`).then(v => Number(v)),
 					cmd: c
 				}))).then(v =>
 					v

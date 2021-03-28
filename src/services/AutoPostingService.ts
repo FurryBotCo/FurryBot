@@ -38,7 +38,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 
 	async run() {
 		const d = new Date();
-		const entries = await mdb.collection("guilds").find<WithId<DBKeys>>({ $where: "![undefined,null].includes(this.auto) && this.auto.length > 0" }, {}).toArray();
+		const entries = await mdb!.collection("guilds").find<WithId<DBKeys>>({ $where: "![undefined,null].includes(this.auto) && this.auto.length > 0" }, {}).toArray();
 		for (const g of entries) {
 			for (const e of g.auto) {
 				if (

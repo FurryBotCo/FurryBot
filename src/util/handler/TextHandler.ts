@@ -1,8 +1,8 @@
-import FurryBot from "../../main";
-import Language, { VALID_LANGUAGES } from "../Language";
+import FurryBot, { VALID_LANGUAGES } from "../../main";
 import config from "../../config";
 import Eris from "eris";
 import { Colors, defaultEmojis, EmbedBuilder } from "core";
+import Language from "language";
 
 export default class TextHandler {
 	private static handlers = {

@@ -15,6 +15,7 @@ import Eris from "eris";
 import { performance } from "perf_hooks";
 import path from "path";
 
+export type VALID_LANGUAGES = typeof config["languages"][number];
 export default class FurryBot extends BaseClusterWorker {
 	cmd: CommandHandler<this, UserConfig, GuildConfig>;
 	w: WebhookStore<this, keyof typeof config["webhooks"]>;

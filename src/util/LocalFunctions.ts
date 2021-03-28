@@ -240,7 +240,13 @@ export default class LocalFunctions {
 				},
 				timeout: 5e3
 			});
-			return r.text();
+			return r.text().then(v => {
+				try {
+					return (JSON.parse(v) as { data: string; }).data;
+				} catch (e) {
+					return v;
+				}
+			});
 		} catch (e) { // cannot annotate try-catch clauses
 			const err = e as Error;
 			Logger.error("Request", `${r!.status} ${r!.statusText}`);

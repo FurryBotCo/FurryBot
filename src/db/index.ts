@@ -11,6 +11,7 @@ import { Strings, Time } from "utilities";
 import Eris from "eris";
 import crypto from "crypto";
 import { performance } from "perf_hooks";
+import { isWorker } from "cluster";
 
 // no
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -18,6 +19,7 @@ import { performance } from "perf_hooks";
 class Database extends DB {
 	static client: FurryBot;
 	static async getUser(id: string): Promise<UserConfig> {
+		if (mdb === null) throw new ReferenceError("Databse#getUser called before database has been intialized.");
 		const start = performance.now();
 		let d = await mdb.collection<WithId<UserKeys>>("users").findOne({ id }).then(res => !res ? null : new UserConfig(id, res));
 		try {
@@ -48,6 +50,7 @@ class Database extends DB {
 	}
 
 	static async getGuild(id: string): Promise<GuildConfig> {
+		if (mdb === null) throw new ReferenceError("Databse#getGuild called before database has been intialized.");
 		const start = performance.now();
 		let d = await mdb.collection<WithId<GuildKeys>>("guilds").findOne({ id }).then(res => !res ? null : new GuildConfig(id, res));
 		try {
@@ -80,6 +83,7 @@ class Database extends DB {
 	static async checkBl(type: "guild", guildId: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.GuildEntry>; }>;
 	static async checkBl(type: "user", userId: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.UserEntry>; }>;
 	static async checkBl(type: "guild" | "user", id: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.GenericEntry>; }> {
+		if (mdb === null) throw new ReferenceError("Databse#checkBl called before database has been intialized.");
 		const d = Date.now();
 		const all = await mdb.collection<Blacklist.GenericEntry>("blacklist").find({ [`${type}Id`]: id }).toArray();
 		const expired = all.filter(bl => ![0, null].includes(bl.expire!) && bl.expire! < d);
@@ -97,6 +101,7 @@ class Database extends DB {
 	static async addBl(type: "guild", guildId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<WithId<Blacklist.GuildEntry>>;
 	static async addBl(type: "user", userId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<WithId<Blacklist.UserEntry>>;
 	static async addBl(type: "guild" | "user", id: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
+		if (mdb === null) throw new ReferenceError("Databse#addBl called before database has been intialized.");
 		const e = crypto.randomBytes(7).toString("hex");
 		if (!reason) reason = "None Provided.";
 		if (!this.client) Logger.warn("Database", "Missing client on blacklist addition, webhook not executed.");
@@ -140,6 +145,7 @@ class Database extends DB {
 	}
 
 	static async checkVote(user: string) {
+		if (mongo === null) throw new ReferenceError("Databse#checkVote called before database has been intialized.");
 		const v = await mongo.db("furrybot").collection<Votes.AnyVote>("votes").find({ user }).toArray();
 
 		const e = v.find(j => Date.now() < j.time + 4.32e+7);
@@ -151,25 +157,57 @@ class Database extends DB {
 	}
 }
 
-Database.init({
-	host: config.services.db.host,
-	port: config.services.db.port,
-	options: config.services.db.options,
-	main: config.services.db[config.beta ? "dbBeta" : "db"]
-}, {
-	host: config.services.redis.host,
-	port: config.services.redis.port,
-	password: config.services.redis.password,
-	db: config.services.redis[config.beta ? "dbBeta" : "db"],
-	name: `FurryBot${config.beta ? "Beta": ""}`
-});
+if (isWorker) {
+	switch (process.env.TYPE) {
+		case "cluster": {
+			Database.init({
+				host: config.services.db.host,
+				port: config.services.db.port,
+				options: config.services.db.options,
+				main: config.services.db[config.beta ? "dbBeta" : "db"]
+			}, {
+				host: config.services.redis.host,
+				port: config.services.redis.port,
+				password: config.services.redis.password,
+				db: config.services.redis[config.beta ? "dbBeta" : "db"],
+				name: `FurryBot${config.beta ? "Beta": ""}`
+			});
+			break;
+		}
 
-const { mongo, mdb, Redis } = Database;
+		case "service": {
+			switch (process.env.NAME) {
+				case "auto-posting": {
+					Database.initDb({
+						host: config.services.db.host,
+						port: config.services.db.port,
+						options: config.services.db.options,
+						main: config.services.db[config.beta ? "dbBeta" : "db"]
+					});
+					break;
+				}
 
-export {
-	Database as db,
-	mdb,
-	mongo,
-	Redis
-};
+				case "stats": {
+					Database.initRedis({
+						host: config.services.redis.host,
+						port: config.services.redis.port,
+						password: config.services.redis.password,
+						db: config.services.redis[config.beta ? "dbBeta" : "db"],
+						name: `FurryBot${config.beta ? "Beta": ""}`
+					});
+					break;
+				}
+			}
+			break;
+		}
+
+		default: throw new TypeError("invalid TYPE in process env.");
+	}
+}
+
+
+export const db = Database;
+export const mdb = Database.dbReady ? Database.mdb : null;
+export const mongo = Database.dbReady ? Database.mongo : null;
+export const Redis = Database.redisReady ? Database.Redis : null;
 export default Database;

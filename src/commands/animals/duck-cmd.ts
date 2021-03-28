@@ -5,7 +5,7 @@ import LocalFunctions from "../../util/LocalFunctions";
 import Language from "language";
 import { Colors, Command, EmbedBuilder } from "core";
 
-export default new Command<FurryBot, UserConfig, GuildConfig>(["bunny", "rabbit"], __filename)
+export default new Command<FurryBot, UserConfig, GuildConfig>(["duck"], __filename)
 	.setBotPermissions([
 		"embedLinks",
 		"attachFiles"
@@ -15,7 +15,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["bunny", "rabbit"
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
-		const img = await LocalFunctions.chewyBotAPIRequest("rabbit");
+		const img = await LocalFunctions.chewyBotAPIRequest("duck");
 		if (!img) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.imageAPI"));
 		return msg.channel.createMessage({
 			embed:
