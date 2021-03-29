@@ -16,7 +16,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["marry"], __filen
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
-	.setHasSlashVariant(true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		const member = await msg.getMemberFromArgs();
 		if (!member) return msg.channel.createMessage({
@@ -52,7 +52,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["marry"], __filen
 			else force = true;
 		}
 		if (!force) {
-			if (["embedLinks", "attachFiles"].some(p => msg.channel.permissionsOf(this.bot.user.id).has(p))) await msg.channel.createMessage({
+			if ((["embedLinks", "attachFiles"] as Array<ErisPermissions>).some(p => msg.channel.permissionsOf(this.bot.user.id).has(p))) await msg.channel.createMessage({
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.title}`)
 					.setDescription(`{lang:${cmd.lang}.text|${msg.author.id}|${member.id}}`)

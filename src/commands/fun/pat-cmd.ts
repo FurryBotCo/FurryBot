@@ -11,7 +11,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["pat", "pet"], __
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
-	.setHasSlashVariant(true)
+	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		return LocalFunctions.genericFunCommand.call(this, msg, cmd);
 	});

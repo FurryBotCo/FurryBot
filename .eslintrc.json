@@ -2,6 +2,9 @@
 	"extends": "@uwu-codes/eslint-config",
 	"rules": {
 		"prefer-arrow-callback": "off",
-		"no-invalid-this": "off"
+		"no-invalid-this": "off",
+		"one-var": "off",
+		"curly": "off",
+		"arrow-parens": "off"
 	}
 }

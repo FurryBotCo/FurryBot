@@ -11,7 +11,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["hug"], __filenam
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
-	.setHasSlashVariant(false)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		return LocalFunctions.genericFunCommandWithImage.call(this, msg, cmd, "hug");
 	});
