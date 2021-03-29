@@ -264,7 +264,7 @@ export default class LocalFunctions {
 	}
 
 	static async genericFunCommand(this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<FurryBot, UserConfig, GuildConfig>) {
-		if (msg.args.length < 1) return new CommandError("INVALID_USAGE", cmd);
+		if (!["wag"].some(v => cmd.triggers.includes(v)) && msg.args.length < 1) return new CommandError("INVALID_USAGE", cmd);
 
 		const embed = new EmbedBuilder(msg.gConfig.settings.lang)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
@@ -284,7 +284,7 @@ export default class LocalFunctions {
 	}
 
 	static async genericFunCommandWithImage(this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<FurryBot, UserConfig, GuildConfig>, type: keyof typeof Yiffy["furry"]) {
-		if (msg.args.length < 1) return new CommandError("INVALID_USAGE", cmd);
+		if (![].some(v => cmd.triggers.includes(v)) && msg.args.length < 1)  return new CommandError("INVALID_USAGE", cmd);
 
 		const embed = new EmbedBuilder(msg.gConfig.settings.lang)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)

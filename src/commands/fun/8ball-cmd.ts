@@ -4,6 +4,7 @@ import GuildConfig from "../../db/Models/GuildConfig";
 import config from "../../config";
 import { Colors, Command, CommandError, EmbedBuilder } from "core";
 
+// @TODO get someone to make 8ball images
 export default new Command<FurryBot, UserConfig, GuildConfig>(["8ball"], __filename)
 	.setBotPermissions([
 		"embedLinks",

@@ -17,7 +17,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["impostor", "impo
 			" 　　.　　　.　　　  　　.　　　　　。　　   。　.",
 			" 　.　　      。　        ඞ   。　    .    •",
 			// eslint-disable-next-line no-irregular-whitespace
-			`    •                ${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.possible`, [!v ? msg.args.join(" ") : v.nick || v.username])}　 。　.`,
+			`    •                ${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.possible`, [!v ? msg.args.join(" ") : v.nick || v.username], false, true)}　 。　.`,
 			"　 　　。　　 　　　　ﾟ　　　.　    　　　."
 		].join("\n"));
 	});
