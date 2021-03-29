@@ -3,4 +3,5 @@
 	url = https://github.com/FurryBotCo/FurryBotConfig
 [submodule "src/lang"]
 	path = src/lang
-	url = https://github.com/FurryBotCo/FurryBotLanguage
+	url = https://github.com/FurryBotCo/FurryBot
+	branch = lang
