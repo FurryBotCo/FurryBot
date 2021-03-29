@@ -31,6 +31,7 @@
     "core": "npm:@uwu-codes/core@^1.0.75",
     "eris": "github:abalabahaha/eris#dev",
     "eris-fleet": "npm:@furrybotco/eris-fleet@^0.3.5-dev.9",
+    "fluxpointapi": "^1.0.0",
     "fs-extra": "^9.1.0",
     "json5": "^2.2.0",
     "language": "npm:@uwu-codes/language@^1.0.1",

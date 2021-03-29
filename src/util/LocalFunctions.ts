@@ -275,6 +275,7 @@ export default class LocalFunctions {
 
 		if (cmd.triggers.includes("bep")) embed.setImage("https://assets.furry.bot/bep.gif");
 		if (cmd.triggers.includes("bellyrub")) embed.setImage("https://assets.furry.bot/bellyrub.gif");
+		if (cmd.triggers.includes("spray")) embed.setDescription(`${embed.getDescription()!}\n${`<:${config.emojis.custom.spray}>`.repeat(Math.floor(Math.random() * 3) + 2)}`);
 
 		return msg.channel.createMessage({
 			embed:
