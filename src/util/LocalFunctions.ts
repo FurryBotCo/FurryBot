@@ -1,10 +1,14 @@
+import Yiffy from "./req/Yiffy";
 import FurryBot from "../main";
 import config from "../config";
-import { Colors, defaultEmojis, EmbedBuilder, ExtendedMessage, GuildConfig, UserConfig } from "core";
+import UserConfig from "../db/Models/UserConfig";
+import GuildConfig from "../db/Models/GuildConfig";
+import { BotFunctions, Colors, Command, CommandError, defaultEmojis, EmbedBuilder, ExtendedMessage } from "core";
 import Eris from "eris";
 import { Request, Time } from "utilities";
 import fetch, { Response } from "node-fetch";
 import Logger from "logger";
+import Language from "language";
 import crypto from "crypto";
 
 export default class LocalFunctions {
@@ -49,7 +53,7 @@ export default class LocalFunctions {
 
 		const d = new Date();
 		const code = `err.${config.beta ? "beta" : "prod"}.${crypto.randomBytes(8).toString("hex")}`;
-		const p = await Request.createPaste(err.stack!, "Furry Bot Error", "1W", 2);
+		const p = config.beta ? "`Running in beta, refusing to create a paste.`" : await Request.createPaste(err.stack!, "Furry Bot Error", "1W", 2);
 		const e = new EmbedBuilder(config.devLanguage)
 			.setTitle("\u274c Error")
 			.setTimestamp(d)
@@ -257,5 +261,45 @@ export default class LocalFunctions {
 
 	static randomColor() {
 		return Math.floor(Math.random() * 0xFFFFFF);
+	}
+
+	static async genericFunCommand(this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<FurryBot, UserConfig, GuildConfig>) {
+		if (msg.args.length < 1) return new CommandError("INVALID_USAGE", cmd);
+
+		const embed = new EmbedBuilder(msg.gConfig.settings.lang)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setDescription(`{lang:${cmd.lang}.possible|${msg.author.id}|${BotFunctions.extraArgParsing(msg)}}`)
+			.setTimestamp(new Date().toISOString())
+			.setFooter("OwO", config.images.icons.bot)
+			.setColor(Colors.furry);
+
+		if (cmd.triggers.includes("bep")) embed.setImage("https://assets.furry.bot/bep.gif");
+		if (cmd.triggers.includes("bellyrub")) embed.setImage("https://assets.furry.bot/bellyrub.gif");
+
+		return msg.channel.createMessage({
+			embed:
+				embed.toJSON()
+		});
+	}
+
+	static async genericFunCommandWithImage(this: FurryBot, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<FurryBot, UserConfig, GuildConfig>, type: keyof typeof Yiffy["furry"]) {
+		if (msg.args.length < 1) return new CommandError("INVALID_USAGE", cmd);
+
+		const embed = new EmbedBuilder(msg.gConfig.settings.lang)
+			.setAuthor(msg.author.tag, msg.author.avatarURL)
+			.setDescription(`{lang:${cmd.lang}.possible|${msg.author.id}|${BotFunctions.extraArgParsing(msg)}}`)
+			.setTimestamp(new Date().toISOString())
+			.setFooter("OwO", config.images.icons.bot)
+			.setColor(Colors.furry);
+
+		if (msg.gConfig.settings.commandImages) {
+			if (!msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.permissionMissing", ["attachFiles"]));
+			// eslint-disable-next-line
+			const img = await (Yiffy.furry[type] as typeof Yiffy["furry"]["boop"])("json", 1);
+			embed.setImage(img.url);
+		}
+		return msg.channel.createMessage({
+			embed: embed.toJSON()
+		});
 	}
 }

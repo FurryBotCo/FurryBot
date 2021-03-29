@@ -139,9 +139,7 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		}
 		if (JSON.stringify(obj) !== "{}") {
 			Logger.warn(["Database", "Guild"], `Fixed guild "${this.id}": ${JSON.stringify(obj)}`);
-			await this.edit({
-				$set: obj
-			});
+			await this.edit(obj);
 		}
 		return this;
 	}

@@ -53,9 +53,7 @@ export default class UserConfig extends UC {
 		if (typeof this.booster !== "boolean") obj.booster = false;
 		if (JSON.stringify(obj) !== "{}") {
 			Logger.warn(["Database", "User"], `Fixed user "${this.id}": ${JSON.stringify(obj)}`);
-			await this.edit({
-				$set: obj
-			});
+			await this.edit(obj);
 		}
 
 		return this;
@@ -82,9 +80,7 @@ export default class UserConfig extends UC {
 		if ((this.donations.activationTime + d) > Date.now()) {
 			if (this.donations.totalMonths === 1) {
 				await this.edit({
-					$set: {
-						"donations.totalMonths": 0
-					}
+					"donations.totalMonths": 0
 				});
 				return {
 					remainingMonths: 0,
@@ -93,10 +89,8 @@ export default class UserConfig extends UC {
 				};
 			} else {
 				await this.edit({
-					$set: {
-						"donations.totalMonths": this.donations.totalMonths - 1,
-						"donations.activationTime": Date.now()
-					}
+					"donations.totalMonths": this.donations.totalMonths - 1,
+					"donations.activationTime": Date.now()
 				});
 			}
 		}

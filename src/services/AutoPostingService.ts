@@ -58,7 +58,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 
 	async execute({ type, webhook: wh, id }: GuildConfig["auto"][number], gConfig: GuildConfig) {
 		if (!wh || !wh.id || !wh.token) {
-			await gConfig.edit<DBKeys>({
+			await gConfig.mongoEdit<DBKeys>({
 				$pull: {
 					auto: gConfig.auto.find(a => a.id === id)!
 				}
@@ -69,7 +69,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 		let file: Eris.MessageFile;
 		const w = await this.testClient.getWebhook(wh.id, wh.token);
 		if (!w) {
-			await gConfig.edit<DBKeys>({
+			await gConfig.mongoEdit<DBKeys>({
 				$pull: {
 					auto: gConfig.auto.find(a => a.id === id)!
 				}
@@ -91,7 +91,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 						.toJSON()
 				]
 			});
-			await gConfig.edit<DBKeys>({
+			await gConfig.mongoEdit<DBKeys>({
 				$pull: {
 					auto: gConfig.auto.find(v => v.id === id)
 				}
