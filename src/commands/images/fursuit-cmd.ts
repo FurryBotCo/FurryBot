@@ -2,9 +2,6 @@ import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
 import GuildConfig from "../../db/Models/GuildConfig";
 import { Colors, Command, EmbedBuilder } from "core";
-import { Request } from "utilities";
-import { JSONResponse } from "yiffy";
-import { Redis } from "../../db";
 import Yiffy from "../../util/req/Yiffy";
 
 export default new Command<FurryBot, UserConfig, GuildConfig>(["fursuit"], __filename)
