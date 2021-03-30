@@ -7,7 +7,7 @@ import UserConfig from "./db/Models/UserConfig";
 import GuildConfig from "./db/Models/GuildConfig";
 import { BaseClusterWorker, BaseClusterWorkerSetup } from "eris-fleet";
 import { Category, ClientEvent, Command, CommandHandler,  MessageCollector, WebhookStore } from "core";
-import { ModuleImport } from "utilities";
+import { ModuleImport, Utility } from "utilities";
 import { CommandHelper } from "slash-commands";
 import * as fs from "fs-extra";
 import Logger from "logger";
@@ -28,6 +28,11 @@ export default class FurryBot extends BaseClusterWorker {
 	ic: IPCCommandHandler;
 	b: BadgeHandler;
 	sh: StatsHandler;
+	// this is stored here to avoid making the info command take at least 1 second on each run
+	// will this make it inaccurate? Well yes, of course, but it makes the command not sit there stalling,
+	// waiting for the test to finish
+	cpuUsage: number;
+	private cpuUsageT: NodeJS.Timeout;
 	constructor(setup: BaseClusterWorkerSetup) {
 		super(setup);
 		this.cmd = new CommandHandler();
@@ -41,6 +46,7 @@ export default class FurryBot extends BaseClusterWorker {
 		this.sh = new StatsHandler(this);
 		db.setClient(this);
 		void this.loadEvents(false);
+		this.cpuUsageT = setInterval(async() => this.cpuUsage = await Utility.getCPUUsage(), 5e3);
 	}
 
 	async launch() {
@@ -48,6 +54,11 @@ export default class FurryBot extends BaseClusterWorker {
 	}
 
 	shutdown(done: () => void) {
+		this.bot.removeAllListeners();
+		clearInterval(this.cpuUsageT);
+		this.trackNoResponse(
+			this.sh.joinParts("stats", "shutdown")
+		);
 		return done();
 	}
 

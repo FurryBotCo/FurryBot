@@ -19,6 +19,7 @@ interface ObjectLog {
 }
 
 if (isMaster) {
+	let blPosted = false;
 	const w = new WebhookStore<Eris.Client, keyof typeof config["webhooks"]>(new Eris.Client("kekw")).addBulk(config.webhooks);
 	Admiral
 		.on("log", (v: string | ObjectLog) => {
@@ -39,17 +40,24 @@ if (isMaster) {
 		.on("error", (v: string | ObjectLog) => {
 			if (typeof v === "string") return;
 			// we can safely assume the lower handle will get unhandled rejections
-			if (["Unhandled Rejection at"].some(r => v.message.indexOf(r) !== -1)) return;
+
+			if (v.message && ["Unhandled Rejection at"].some(r => v.message.toString().indexOf(r) !== -1)) return;
 			Logger.error(v.source, v.message);
 		})
 		// temp
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		.on("stats", (stats: Stats) => {
-			const d = new Date();
+			// eslint-disable-next-line
+			/* console.log("a", require("util").inspect(stats, { depth: null, colors: true }));
+			console.log("b", process.memoryUsage());
+			 */const d = new Date();
 			if ((d.getMinutes() % 15) === 0) {
-				// update botlist stats
-				Logger.info("Bot List Stats", "Stats updated.");
-			}
+				if (blPosted === false) {
+					blPosted = true;
+					// update botlist stats
+					Logger.info("Bot List Stats", "Stats updated.");
+				}
+			} else blPosted = false;
 		})
 		.on("log", (v: ObjectLog) => {
 			const [, a] = /^Launching service (.+)$/.exec(v.message) ?? [];
@@ -209,4 +217,5 @@ if (isMaster) {
 
 process
 	.on("uncaughtException", (err) => Logger.error("Uncaught Exception", err))
-	.on("unhandledRejection", (r, p) => Logger.error("Unhandled Rejection", r ?? p));
+	.on("unhandledRejection", (r, p) => Logger.error("Unhandled Rejection", r ?? p))
+	.on("SIGINT", () => process.kill(process.pid));

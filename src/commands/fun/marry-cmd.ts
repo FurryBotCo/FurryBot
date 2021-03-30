@@ -4,7 +4,7 @@ import GuildConfig from "../../db/Models/GuildConfig";
 import { db } from "../../db";
 import Yiffy from "../../util/req/Yiffy";
 import config from "../../config";
-import { BotFunctions, Command, EmbedBuilder } from "core";
+import { BotFunctions, Command, EmbedBuilder, ErisPermissions } from "core";
 import Language from "language";
 import Eris from "eris";
 import { Request } from "utilities";
