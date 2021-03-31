@@ -290,7 +290,7 @@ export default class LocalFunctions {
 
 		const embed = new EmbedBuilder(msg.gConfig.settings.lang)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setDescription(`{lang:${cmd.lang}.possible|${msg.author.id}|${BotFunctions.extraArgParsing(msg)}}`)
+			.setDescription(`{lang:${cmd.lang}.possible|${msg.author.id}|${BotFunctions.memeArgParsing(msg)}}`)
 			.setTimestamp(new Date().toISOString())
 			.setFooter("OwO", config.images.icons.bot)
 			.setColor(Colors.furry);
@@ -316,7 +316,7 @@ export default class LocalFunctions {
 		let res: MemeRequestResponse;
 		try {
 			// we narrow it to one so it works
-			res = await DankMemerAPI[type as "abandon"](BotFunctions.mentionOrIdToUsername(msg));
+			res = await DankMemerAPI[type as "abandon"](BotFunctions.memeArgParsing(msg));
 		} catch (e) {
 			if (e instanceof APIError) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.dankMemer", [e.message, e.body!.error]));
 			else throw e;
@@ -328,7 +328,7 @@ export default class LocalFunctions {
 				.setTimestamp(new Date().toISOString())
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setFooter("dankmemer.services", msg.client.bot.user.avatarURL)
-				.setColor(Colors.gold)
+				.setColor(Colors.furry)
 				.setImage(`attachment://${type}.${ext}`)
 				.toJSON()
 		}, {
