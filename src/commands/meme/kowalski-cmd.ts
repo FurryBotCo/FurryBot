@@ -16,7 +16,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["kowalski"], __fi
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length === 0) return new CommandError("INVALID_USAGE", cmd);
 		await msg.channel.startTyping();
-		const { ext, file } = await DankMemerAPI.kowalski(BotFunctions.extraArgParsing(msg));
+		const { ext, file } = await DankMemerAPI.kowalski(BotFunctions.memeArgParsing(msg));
 		await msg.channel.stopTyping();
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)

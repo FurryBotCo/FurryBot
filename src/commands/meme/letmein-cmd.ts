@@ -16,7 +16,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["letmein"], __fil
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length === 0) return new CommandError("INVALID_USAGE", cmd);
 		await msg.channel.startTyping();
-		const { ext, file } = await DankMemerAPI.letmein(BotFunctions.extraArgParsing(msg));
+		const { ext, file } = await DankMemerAPI.letmein(BotFunctions.memeArgParsing(msg));
 		await msg.channel.stopTyping();
 		return msg.channel.createMessage({}, {
 			name: `${cmd.triggers[0]}.${ext}`,

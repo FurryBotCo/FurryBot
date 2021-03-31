@@ -31,7 +31,7 @@ export default class FurryBot extends BaseClusterWorker {
 	// this is stored here to avoid making the info command take at least 1 second on each run
 	// will this make it inaccurate? Well yes, of course, but it makes the command not sit there stalling,
 	// waiting for the test to finish
-	cpuUsage: number;
+	cpuUsage = -1;
 	firstReady = false;
 	private cpuUsageT: NodeJS.Timeout;
 	constructor(setup: BaseClusterWorkerSetup) {
@@ -47,7 +47,7 @@ export default class FurryBot extends BaseClusterWorker {
 		this.sh = new StatsHandler(this);
 		db.setClient(this);
 		void this.loadEvents(false);
-		this.cpuUsageT = setInterval(async() => this.cpuUsage = await Utility.getCPUUsage(), 5e3);
+		this.cpuUsageT = setInterval(async() =>  Utility.getCPUUsage().then(v => this.cpuUsage = v), 5e3);
 	}
 
 	async launch() {

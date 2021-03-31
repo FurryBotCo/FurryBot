@@ -16,7 +16,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["crab"], __filena
 	.setExecutor(async function (msg, cmd) {
 		if (msg.args.length === 0) return new CommandError("INVALID_USAGE", cmd);
 		await msg.channel.startTyping();
-		const { ext, file } = await DankMemerAPI.crab(BotFunctions.extraArgParsing(msg));
+		const { ext, file } = await DankMemerAPI.crab(BotFunctions.memeArgParsing(msg));
 		await msg.channel.stopTyping();
 		return msg.channel.createMessage({}, {
 			name: `${cmd.triggers[0]}.${ext}`,

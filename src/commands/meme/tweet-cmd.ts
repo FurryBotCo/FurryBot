@@ -18,7 +18,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["tweet"], __filen
 		if (!member) member = msg.member;
 		else msg.args = msg.args.slice(1);
 		if (msg.args.length === 0) return new CommandError("INVALID_USAGE", cmd);
-		const { ext, file } = await DankMemerAPI.tweet(member.avatarURL, [member.nick || member.username, member.username], BotFunctions.extraArgParsing(msg));
+		const { ext, file } = await DankMemerAPI.tweet(member.avatarURL, [member.nick || member.username, member.username], BotFunctions.memeArgParsing(msg));
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)

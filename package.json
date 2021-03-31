@@ -29,7 +29,7 @@
   "engineStrict": true,
   "dependencies": {
     "@drep/api": "^2.0.3",
-    "core": "npm:@uwu-codes/core@^1.0.80",
+    "core": "npm:@uwu-codes/core@^1.0.84",
     "dankmemerapi": "^1.0.22",
     "eris": "github:abalabahaha/eris#dev",
     "eris-fleet": "npm:@furrybotco/eris-fleet@^0.3.5-dev.18",
@@ -50,7 +50,7 @@
   "devDependencies": {
     "@types/fs-extra": "^9.0.9",
     "@types/json5": "^0.0.30",
-    "@types/mongodb": "^3.6.10",
+    "@types/mongodb": "^3.6.11",
     "@types/node": "^14.14.37",
     "@types/node-fetch": "^2.5.8",
     "@uwu-codes/eslint-config": "^1.0.8",
