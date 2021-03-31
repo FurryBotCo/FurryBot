@@ -32,6 +32,7 @@ export default class FurryBot extends BaseClusterWorker {
 	// will this make it inaccurate? Well yes, of course, but it makes the command not sit there stalling,
 	// waiting for the test to finish
 	cpuUsage: number;
+	firstReady = false;
 	private cpuUsageT: NodeJS.Timeout;
 	constructor(setup: BaseClusterWorkerSetup) {
 		super(setup);

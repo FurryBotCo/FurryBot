@@ -6,6 +6,8 @@ import { pid } from "utilities";
 import * as fs from "fs-extra";
 
 export default new ClientEvent<FurryBot>("ready", async function() {
+	if (this.firstReady === true) return;
+	this.firstReady = true;
 	fs.mkdirpSync(`${config.dir.tmp}/pid`);
 	pid(`${config.dir.tmp}/pid/cluster-${this.clusterId}.pid`);
 
