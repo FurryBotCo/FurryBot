@@ -5,6 +5,7 @@
 		"no-invalid-this": "off",
 		"one-var": "off",
 		"curly": "off",
-		"arrow-parens": "off"
+		"arrow-parens": "off",
+		"prefer-arrow/prefer-arrow-functions": "off"
 	}
 }

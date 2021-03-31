@@ -30,6 +30,7 @@
   "dependencies": {
     "@drep/api": "^2.0.3",
     "core": "npm:@uwu-codes/core@^1.0.80",
+    "dankmemerapi": "^1.0.22",
     "eris": "github:abalabahaha/eris#dev",
     "eris-fleet": "npm:@furrybotco/eris-fleet@^0.3.5-dev.18",
     "fluxpointapi": "^1.0.0",

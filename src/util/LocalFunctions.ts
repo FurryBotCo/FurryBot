@@ -1,4 +1,5 @@
 import Yiffy from "./req/Yiffy";
+import DankMemerAPI from "./req/DankMemerAPI";
 import FurryBot from "../main";
 import config from "../config";
 import UserConfig from "../db/Models/UserConfig";
@@ -9,6 +10,7 @@ import { Request, Time } from "utilities";
 import fetch, { Response } from "node-fetch";
 import Logger from "logger";
 import Language from "language";
+import { APIError, MemeRequestResponse } from "dankmemerapi";
 import crypto from "crypto";
 
 export default class LocalFunctions {
@@ -301,6 +303,72 @@ export default class LocalFunctions {
 		}
 		return msg.channel.createMessage({
 			embed: embed.toJSON()
+		});
+	}
+
+	static async handleMemeCommand(type: "text" | "image", msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<FurryBot, UserConfig, GuildConfig>, override?: string) {
+		if (!override) override = cmd.triggers[0];
+		return type === "text" ? this.handleTextMemeCommand(override, msg, cmd) : this.handleImageMemeCommand(override, msg, cmd);
+	}
+
+	static async handleTextMemeCommand(type: string, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<FurryBot, UserConfig, GuildConfig>) {
+		if (msg.args.length === 0) return new CommandError("INVALID_USAGE", cmd);
+		let res: MemeRequestResponse;
+		try {
+			// we narrow it to one so it works
+			res = await DankMemerAPI[type as "abandon"](BotFunctions.mentionOrIdToUsername(msg));
+		} catch (e) {
+			if (e instanceof APIError) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.dankMemer", [e.message, e.body!.error]));
+			else throw e;
+		}
+		const { ext, file } = res;
+		return msg.channel.createMessage({
+			embed: new EmbedBuilder(msg.gConfig.settings.lang)
+				.setTitle(`{lang:${cmd.lang}.title}`)
+				.setTimestamp(new Date().toISOString())
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setFooter("dankmemer.services", msg.client.bot.user.avatarURL)
+				.setColor(Colors.gold)
+				.setImage(`attachment://${type}.${ext}`)
+				.toJSON()
+		}, {
+			name: `${type}.${ext}`,
+			file
+		});
+	}
+
+	static async handleImageMemeCommand(type: string, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<FurryBot, UserConfig, GuildConfig>) {
+		let v: string;
+		if (msg.args.length === 0 && msg.attachments.length > 0) v = msg.attachments[0].url;
+		else if (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(msg.args[0])) v = msg.args[0];
+		else {
+			const user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
+			if (!user) return msg.reply({
+				embed: BotFunctions.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_USER", true)
+			});
+			v = user.avatarURL;
+		}
+		let res: MemeRequestResponse;
+		try {
+			// we narrow it to one so it works
+			res = await DankMemerAPI[type as "abandon"](v);
+		} catch (e) {
+			if (e instanceof APIError) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.dankMemer", [e.message, e.body!.error]));
+			else throw e;
+		}
+		const { ext, file } = res;
+		return msg.channel.createMessage({
+			embed: new EmbedBuilder(msg.gConfig.settings.lang)
+				.setTitle(`{lang:${cmd.lang}.title}`)
+				.setTimestamp(new Date().toISOString())
+				.setAuthor(msg.author.tag, msg.author.avatarURL)
+				.setFooter("dankmemer.services", msg.client.bot.user.avatarURL)
+				.setColor(Colors.gold)
+				.setImage(`attachment://${type}.${ext}`)
+				.toJSON()
+		}, {
+			name: `${type}.${ext}`,
+			file
 		});
 	}
 }

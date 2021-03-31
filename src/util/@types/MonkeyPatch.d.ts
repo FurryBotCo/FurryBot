@@ -54,8 +54,8 @@ declare module "eris" {
 	}
 
 	interface TextChannel {
-		startTyping(rounds?: number): void;
-		stopTyping(): void;
+		startTyping(rounds?: number): Promise<void>;
+		stopTyping(): Promise<void>;
 	}
 
 	interface Client {
