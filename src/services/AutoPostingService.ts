@@ -29,11 +29,11 @@ export default class AutoPostingService extends BaseServiceWorker {
 
 	// this service doesn't accept commands, but we have to overload this
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async handleCommand(data: never) {
+	override async handleCommand(data: never) {
 		return;
 	}
 
-	shutdown(done: () => void) {
+	override shutdown(done: () => void) {
 		clearInterval(this.interval);
 		done();
 	}

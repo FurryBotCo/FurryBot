@@ -54,7 +54,7 @@ export default class FurryBot extends BaseClusterWorker {
 		// @TODO
 	}
 
-	shutdown(done: () => void) {
+	override shutdown(done: () => void) {
 		this.bot.removeAllListeners();
 		clearInterval(this.cpuUsageT);
 		this.trackNoResponse(

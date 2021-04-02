@@ -9,7 +9,7 @@ export default class StatsService extends BaseServiceWorker {
 		this.serviceReady();
 	}
 
-	async handleCommand(data: string | Array<string>) {
+	override async handleCommand(data: string | Array<string>) {
 		if (!Array.isArray(data)) data = [data];
 		// the middle color screws up the end color
 		if (Redis === null) return Logger.warn("StatsService", `Skipping stats processing for [ ${colors.green(data.join(", "))} ${colors.yellow("] because Redis has not been initialized.")}`);
@@ -19,7 +19,7 @@ export default class StatsService extends BaseServiceWorker {
 		return true;
 	}
 
-	shutdown(done: () => void) {
+	override shutdown(done: () => void) {
 		done();
 	}
 }

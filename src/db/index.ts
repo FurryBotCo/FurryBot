@@ -18,7 +18,7 @@ import { isWorker } from "cluster";
 // @ts-ignore
 class Database extends DB {
 	static client: FurryBot;
-	static async getUser(id: string): Promise<UserConfig> {
+	override static async getUser(id: string): Promise<UserConfig> {
 		if (mdb === null) throw new ReferenceError("Databse#getUser called before database has been intialized.");
 		const start = performance.now();
 		let d = await mdb.collection<WithId<UserKeys>>("users").findOne({ id }).then(res => !res ? null : new UserConfig(id, res));
@@ -49,7 +49,7 @@ class Database extends DB {
 		return d!;
 	}
 
-	static async getGuild(id: string): Promise<GuildConfig> {
+	override static async getGuild(id: string): Promise<GuildConfig> {
 		if (mdb === null) throw new ReferenceError("Databse#getGuild called before database has been intialized.");
 		const start = performance.now();
 		let d = await mdb.collection<WithId<GuildKeys>>("guilds").findOne({ id }).then(res => !res ? null : new GuildConfig(id, res));

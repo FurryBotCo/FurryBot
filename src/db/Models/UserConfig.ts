@@ -59,7 +59,7 @@ export default class UserConfig extends UC {
 		return this;
 	}
 
-	async checkPremium(checkBoost = false): Promise<{
+	override async checkPremium(checkBoost = false): Promise<{
 		remainingMonths: number | "BOOSTER";
 		activationTime: number | null;
 		active: boolean;

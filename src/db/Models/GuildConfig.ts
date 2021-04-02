@@ -104,7 +104,7 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 	}
 
 	/* eslint-disable deprecation/deprecation */
-	async fix() {
+	override async fix() {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const obj: ConfigEditTypes<GuildConfig, "id"> = Object.create(null);
 		if (this.modlog !== undefined){
@@ -158,6 +158,7 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 	async checkBlacklist() {
 		return db.checkBl("guild", this.id);
 	}
+
 	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
 		return db.addBl("guild", this.id, blame, blameId, reason, expire, report);
 	}
