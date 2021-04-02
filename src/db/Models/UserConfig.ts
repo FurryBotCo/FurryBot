@@ -47,7 +47,7 @@ export default class UserConfig extends UC {
 		super(id, data, config.defaults.config.user, db);
 	}
 
-	async fix() {
+	override async fix() {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const obj: ConfigEditTypes<UserConfig, "id"> = Object.create(null);
 		if (typeof this.booster !== "boolean") obj.booster = false;

@@ -29,6 +29,7 @@
   "engineStrict": true,
   "dependencies": {
     "@drep/api": "^2.0.3",
+    "chunk": "^0.0.3",
     "core": "npm:@uwu-codes/core@^1.0.84",
     "dankmemerapi": "^1.0.22",
     "eris": "github:abalabahaha/eris#dev",
@@ -48,13 +49,15 @@
     "yiffy": "^2.0.9"
   },
   "devDependencies": {
+    "@types/chunk": "*",
     "@types/fs-extra": "^9.0.9",
     "@types/json5": "^0.0.30",
     "@types/mongodb": "^3.6.11",
     "@types/node": "^14.14.37",
     "@types/node-fetch": "^2.5.8",
-    "@uwu-codes/eslint-config": "^1.0.8",
+    "@uwu-codes/eslint-config": "^1.0.9",
     "@uwu-codes/tsconfig": "^1.0.1",
-    "dpdm": "^3.6.0"
+    "dpdm": "^3.6.0",
+    "typescript": "beta"
   }
 }

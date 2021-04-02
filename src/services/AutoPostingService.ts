@@ -15,17 +15,19 @@ import { WithId } from "mongodb";
 
 export default class AutoPostingService extends BaseServiceWorker {
 	private interval: NodeJS.Timeout;
-	private testClient = new Eris.Client("kekw");
+	// we have to prefix the token because we aren't connecting to the gateway
+	private testClient = new Eris.Client(`Bot ${config.client.token}`, { restMode: true });
+	private DONE: Array<string> = [];
 	constructor(setup: BaseServiceWorkerSetup) {
 		super(setup);
 		this.interval = setInterval(() => {
 			const d = new Date();
 			if ((d.getMinutes() % 5) === 0) void this.run();
-		});
+		}, 250);
 		this.serviceReady();
 	}
 
-	// this service shouldn't need any commands sent to it
+	// this service doesn't accept commands, but we have to overload this
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	async handleCommand(data: never) {
 		return;
@@ -38,6 +40,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 
 	async run() {
 		const d = new Date();
+		if ((d.getMinutes() % 5) !== 0 && (d.getSeconds() % 15) === 0) this.DONE = [];
 		const entries = await mdb!.collection("guilds").find<WithId<DBKeys>>({ $where: "![undefined,null].includes(this.auto) && this.auto.length > 0" }, {}).toArray();
 		for (const g of entries) {
 			for (const e of g.auto) {
@@ -48,15 +51,17 @@ export default class AutoPostingService extends BaseServiceWorker {
 					((d.getMinutes() % 30) === 0 && e.time === 30) ||
 					((d.getMinutes() % 60) === 0 && e.time === 60)
 				) {
+					if (this.DONE.includes(e.id)) continue;
 					await this.execute(e, new GuildConfig(g.id, g));
 					// eslint-disable-next-line deprecation/deprecation
-					Logger.debug(["Timed Tasks", "Auto Posting"], `Ran auto posting for type "${e.type}" with webhook id "${e.webhook?.id || `ch-${e.channel}`}" (time: ${e.time}, id: ${e.id})`);
+					Logger.info(["Auto Posting"], `Ran auto posting for type "${e.type}" with webhook id "${e.webhook?.id || `ch-${e.webhook.channelId}`}" (time: ${e.time}, id: ${e.id})`);
 				}
 			}
 		}
 	}
 
 	async execute({ type, webhook: wh, id }: GuildConfig["auto"][number], gConfig: GuildConfig) {
+		this.DONE.push(id);
 		if (!wh || !wh.id || !wh.token) {
 			await gConfig.mongoEdit<DBKeys>({
 				$pull: {
@@ -76,7 +81,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 			});
 			return;
 		}
-		const ch = await this.ipc.fetchChannel(w.channel_id);
+		const ch = await this.testClient.getRESTChannel(w.channel_id);
 		// we assume this is temporary, since it likely is
 		if (ch === null || !("guild" in ch)) return;
 		if ((type.startsWith("yiff") || ["butts", "bulge"].includes(type)) && !ch.nsfw) {

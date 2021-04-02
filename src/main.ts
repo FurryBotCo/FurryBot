@@ -93,11 +93,17 @@ export default class FurryBot extends BaseClusterWorker {
 		Logger.debug([`Cluster #${this.clusterId}`, "Event Loader"], `Finished loading ${events.length} events in ${(end - start).toFixed(3)}ms.`);
 	}
 
-	async loadCommands() {
+	async loadCommands(dir: string, skip?: string | Array<string>) {
+		if (!skip) skip = [];
+		if (!Array.isArray(skip)) skip = [skip];
 		const start = performance.now();
 		Logger.debug([`Cluster #${this.clusterId}`, "Command Handler"], "Loading commands.");
-		const c = fs.readdirSync(`${__dirname}/commands`);
+		const c = fs.readdirSync(dir);
 		for (const f of c) {
+			if (skip.includes(f.toLowerCase())) {
+				Logger.warn([`Cluster #${this.clusterId}`, "Command Handler"], `Skipping category "${f}" (${dir}/${f})`);
+				continue;
+			}
 			let cat;
 			try {
 				cat = await import(`${__dirname}/commands/${f}/index.${__filename.split(".").slice(-1)[0]}`) as ModuleImport<Command<this, UserConfig, GuildConfig>>;
@@ -105,7 +111,6 @@ export default class FurryBot extends BaseClusterWorker {
 			} catch (e) {
 				console.error(e);
 			}
-
 			if (cat instanceof Category) this.cmd.addCategory(cat);
 			else throw new TypeError(`Missing or Invalid index in category "${f}" (${path.resolve(`${__dirname}/commands/${f}`)})`);
 		}

@@ -15,5 +15,13 @@ export default new ClientEvent<FurryBot>("ready", async function() {
 		.init(this)
 		.run(new Date(2021, 0, 1));
 
-	void this.loadCommands();
+	// @FIXME REMOVE THE SKIP IN PRODUCTION!
+	void this.loadCommands(`${config.dir.src}/commands`, [
+		"animals",
+		"developer",
+		"fun",
+		"images",
+		"information",
+		"meme"
+	]);
 });

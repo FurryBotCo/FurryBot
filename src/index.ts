@@ -1,3 +1,4 @@
+#!/usr/bin/env ts-node
 import "./util/first";
 import config from "./config";
 import Logger from "logger";
@@ -74,6 +75,8 @@ if (isMaster) {
 				embeds: [
 					new EmbedBuilder(config.devLanguage)
 						.setTitle("Service Launched")
+						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+						// @ts-ignore -- https://github.com/microsoft/TypeScript/issues/43249
 						.setDescription(`The service **${a}** has launched.`)
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.orange)

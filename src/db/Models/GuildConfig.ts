@@ -80,11 +80,10 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		"fursuit" | "butts" | "bulge" |
 		"yiff.gay" | "yiff.straight" | "yiff.lesbian" | "yiff.gynomorph";
 		time: 5 | 10 | 15 | 30 | 60;
-		/** @deprecated */
-		channel: string;
 		webhook: {
 			id: string;
 			token: string;
+			channelId: string;
 		};
 	}>;
 	modlog: {
@@ -94,6 +93,7 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		webhook: {
 			id: string;
 			token: string;
+			channelId: string;
 		} | null;
 	};
 	deletion: number | null;
@@ -124,11 +124,17 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		if (this.prefix?.length === 0) obj.prefix = [
 			this.settings.prefix || config.defaults.prefix
 		];
+		const v = JSON.parse(JSON.stringify(this.auto)) as GuildConfig["auto"];
+		for (const a of v) if ("channel" in a) {
+			if ((a as typeof a & { channel: null; }).channel === null) delete (v[v.indexOf(a)] as typeof a & { channel?: null; }).channel;
+			else v.splice(this.auto.indexOf(a), 1);
+		}
+		if (JSON.stringify(this.auto) !== JSON.stringify(v)) obj.auto = v;
 		if (this.settings.prefix) {
 			if (this.prefix && this.settings.prefix !== this.prefix[0]) obj.prefix = [
 				this.settings.prefix
 			];
-			await this.edit({
+			await this.mongoEdit({
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 				$unset: {
 					"settings.prefix": true
@@ -139,7 +145,11 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		}
 		if (JSON.stringify(obj) !== "{}") {
 			Logger.warn(["Database", "Guild"], `Fixed guild "${this.id}": ${JSON.stringify(obj)}`);
-			await this.edit(obj);
+			console.log(this.auto);
+			console.log(obj);
+			await this.mongoEdit({
+				$set: obj
+			});
 		}
 		return this;
 	}
