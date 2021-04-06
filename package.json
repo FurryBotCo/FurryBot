@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/FurryBotCo/FurryBot#readme",
   "engines": {
-    "node": "15.12.0",
+    "node": "15.13.0",
     "npm": ">=7.x"
   },
   "os": [
@@ -30,10 +30,12 @@
   "dependencies": {
     "@drep/api": "^2.0.3",
     "chunk": "^0.0.3",
-    "core": "npm:@uwu-codes/core@^1.0.84",
+    "core": "npm:@uwu-codes/core@^1.0.85",
     "dankmemerapi": "^1.0.22",
     "eris": "github:abalabahaha/eris#dev",
     "eris-fleet": "npm:@furrybotco/eris-fleet@^0.3.5-dev.18",
+    "express": "^4.17.1",
+    "file-type": "^16.3.0",
     "fluxpointapi": "^1.0.0",
     "fs-extra": "^9.1.0",
     "json5": "^2.2.0",
@@ -45,19 +47,23 @@
     "node-fetch": "^2.6.1",
     "slash-commands": "npm:@uwu-codes/discord-slash-commands@^1.0.3",
     "source-map-support": "^0.5.19",
+    "trello-helper": "^3.0.7",
     "utilities": "npm:@uwu-codes/utils@^1.0.22",
+    "ws": "^7.4.4",
     "yiffy": "^2.0.9"
   },
   "devDependencies": {
     "@types/chunk": "*",
-    "@types/fs-extra": "^9.0.9",
+    "@types/express": "^4.17.11",
+    "@types/fs-extra": "^9.0.10",
     "@types/json5": "^0.0.30",
     "@types/mongodb": "^3.6.11",
     "@types/node": "^14.14.37",
-    "@types/node-fetch": "^2.5.8",
+    "@types/node-fetch": "^2.5.9",
+    "@types/ws": "^7.4.1",
     "@uwu-codes/eslint-config": "^1.0.9",
     "@uwu-codes/tsconfig": "^1.0.1",
     "dpdm": "^3.6.0",
-    "typescript": "beta"
+    "typescript": "^4.3.0-beta"
   }
 }

@@ -1,10 +1,13 @@
 import GuildConfig from "../../db/Models/GuildConfig";
 import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
+import config from "../../config";
 import { Colors, Command, CommandError, EmbedBuilder } from "core";
 import Language from "language";
 import Eris from "eris";
 import chunk from "chunk";
+import { Request } from "utilities";
+import FileType from "file-type";
 import crypto from "crypto";
 
 export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filename)
@@ -44,40 +47,64 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 				if (!t) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.invalidType`, [msg.args[1]]));
 				const time = Number(msg.args[2]) as (5 | 10 | 15 | 30 | 60);
 				if (isNaN(time) || !([5, 10, 15, 30, 60] as const).includes(time)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.invalidTime`, [msg.args[2]]));
-				await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.select`, [msg.channel.id]));
+				await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.select`, [msg.channel.id]));
 				const sel = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id } }) => id === msg.author.id, 1);
-				let hook: Eris.Webhook;
+				let hook: Eris.Webhook, created = false;
 				if (sel === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
 				switch (!sel.content ? NaN : Number(sel.content)) {
 					case 1: {
 						const w = await msg.channel.getWebhooks();
-						if (w.length === 0)  return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.noWebhooksChannel`));
-						await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.select1`, [w.map((v, i) => `**${i + 1}.)** \`${v.name}\``).join("\n")]));
+						if (w.length === 0)  return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.noWebhooksChannel`));
+						await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.select1`, [w.map((v, i) => `**${i + 1}.)** \`${v.name}\``).join("\n")]));
 						const j = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id } }) => id === msg.author.id, 1);
 						if (j === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
 						const a = !j.content ? NaN : Number(j.content);
 						if (isNaN(a) || a < 1 || a > w.length) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.invalidSelection`, [w.length]));
 						hook = w[a - 1];
-						await msg.channel.createMessage({
-							content: Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.using`, [hook.name, hook.id]),
+						break;
+					}
+
+					case 2: {
+						const wh = await msg.channel.guild.getWebhooks();
+						if (wh.length === 0)  return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.noWebhooksServer`));
+						await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.select2`));
+						const j = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id } }) => id === msg.author.id, 1);
+						if (j === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
+						const [ , id, token] = (/https?:\/\/(?:canary\.|ptb\.)?discord.com\/api\/webhooks\/(\d{15,21})\/([a-zA-Z\d_-]+)/.exec(j.content) ?? [] as unknown) as  [_: never, id?: string, token?: string];
+						if (!id || !token) return msg.channel.createMessage({
+							content: Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.invalidURL`),
 							messageReferenceID: j.id,
 							allowedMentions: {
 								repliedUser: false
 							}
 						});
-						break;
-					}
-
-					case 2: {
+						const w = wh.find(v => v.id === id && v.token === v.token);
+						if (w === undefined) return msg.channel.createMessage({
+							content: Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.invalidWebhook`),
+							messageReferenceID: j.id,
+							allowedMentions: {
+								repliedUser: false
+							}
+						});
+						hook = w;
 						break;
 					}
 
 					case 3: {
 						if (!msg.channel.permissionsOf(this.bot.user.id).has("manageWebhooks")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.missingPermission`, ["manageWebhooks", msg.channel.id]));
+						const img = await Request.getImageFromURL(config.images.icons.bot);
+						const { mime } = await FileType.fromBuffer(img) ?? { mime: null };
+						if (mime === null) throw new Error("Internal error.");
+						const b64 = Buffer.from(img).toString("base64");
+						hook = await msg.channel.createWebhook({
+							name: "Furry Bot Auto Posting",
+							avatar: `data:${mime};base64,${b64}`
+						});
+						created = true;
 						break;
 					}
 
-					default: return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.invalidSelection`, [3]));
+					default: return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.invalidSelection`, [3]));
 				}
 				let ch = this.bot.getChannel(hook!.channel_id) as Eris.GuildChannel;
 				if (!ch || !(ch instanceof Eris.GuildChannel)) ch = await this.bot.getRESTChannel(hook!.channel_id) as Eris.GuildChannel;
@@ -100,7 +127,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 						auto: j
 					}
 				});
-				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.prefix, (k!.auto?.length || 0) + 1]));
+				return msg.reply(`${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, hook!.name, hook!.id, msg.prefix, (k!.auto?.length || 0) + 1])}${created ? `\n${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.created`)}` : ""}`);
 
 				break;
 			}
@@ -113,20 +140,22 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 				if (id > msg.gConfig.auto.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.invalidId`, [id]));
 				const j = [...msg.gConfig.auto];
 				const v = j.splice(id - 1, 1)[0];
+				const w = await this.bot.getWebhook(v.webhook.id, v.webhook.token).catch(() => null);
+				if (w !== null) {
+					await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.removeWebhook`, [w.id]));
+					const n = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id: d } }) => d === msg.author.id, 1);
+					if (n === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
+					console.log(n.content === "yes", n?.content);
+					if (n.content.toLowerCase() === "yes") {
+						await this.bot.deleteWebhook(w.id, w.token);
+						return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.doneWebhook`, [id, v.type, w.id]));
+					}
+				}
 				await msg.gConfig.mongoEdit({
 					$pull: {
 						auto: v
 					}
 				});
-				const w = await this.bot.getWebhook(v.webhook.id, v.webhook.token).catch(() => null);
-				if (w !== null) {
-					await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.removeWebhook`, [w.id]));
-					const n = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id: d } }) => d === msg.author.id, 1);
-					if (n !== null && n.content.toLowerCase() === "yes") {
-						await this.bot.deleteWebhook(w.id, w.token);
-						return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.doneWebhook`, [id, v.type, w.id]));
-					}
-				}
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.done`, [id, v.type]));
 				break;
 			}

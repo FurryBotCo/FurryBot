@@ -4,14 +4,16 @@ import FurryBot from "../main";
 import config from "../config";
 import UserConfig from "../db/Models/UserConfig";
 import GuildConfig from "../db/Models/GuildConfig";
+import { Redis } from "../db";
 import { BotFunctions, Colors, Command, CommandError, defaultEmojis, EmbedBuilder, ExtendedMessage } from "core";
 import Eris from "eris";
-import { Request, Time } from "utilities";
+import { Request, ThenReturnType, Time, Utility } from "utilities";
 import fetch, { Response } from "node-fetch";
 import Logger from "logger";
 import Language from "language";
 import { APIError, MemeRequestResponse } from "dankmemerapi";
 import crypto from "crypto";
+import { performance } from "perf_hooks";
 
 export default class LocalFunctions {
 	/**
@@ -363,12 +365,66 @@ export default class LocalFunctions {
 				.setTimestamp(new Date().toISOString())
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setFooter("dankmemer.services", msg.client.bot.user.avatarURL)
-				.setColor(Colors.gold)
+				.setColor(Colors.furry)
 				.setImage(`attachment://${type}.${ext}`)
 				.toJSON()
 		}, {
 			name: `${type}.${ext}`,
 			file
 		});
+	}
+
+
+	/**
+	 * Get the highest user levels.
+	 *
+	 * @static
+	 * @param {boolean} [skipCache] - If the cache should be skipped.
+	 * @param {("asc" | "desc")} [sort] - The sort order.
+	 * @returns {Promise<object>}
+	 * @memberof Utility
+	 * @example Utility.getHighestLevels();
+	 * @example Utility.getHighestLevels(true);
+	 * @example Utility.getHighestLevels(true, "asc");
+	 */
+	static async getHighestLevels(skipCache?: boolean, sort?: "asc" | "desc"): Promise<{
+		entries: Array<{
+			amount: number;
+			guild: string;
+			user: string;
+		}>;
+		time: number;
+	}> {
+		if (!Redis) return { entries: [], time: 0 };
+		skipCache = !!skipCache;
+		const start = performance.now();
+		if (skipCache) void Redis.del("leveling:global-cache");
+		const cache = await Redis.get("leveling:global-cache");
+		let entries: ThenReturnType<(typeof LocalFunctions)["getHighestLevels"]>["entries"];
+		if (!cache) {
+			const keys = await Utility.getKeys("leveling:*:*", "0", [], 10000);
+			const values = await Redis.mget(keys);
+			entries = keys.map((v, i) => ({
+				amount: Number(values[i]),
+				guild: v.split(":")[1],
+				user: v.split(":")[2]
+			}));
+			await Redis.setex("leveling:global-cache", 3600, JSON.stringify(entries));
+		} else {
+			try {
+				entries = JSON.parse(cache) as typeof entries;
+			} catch (e) {
+				return this.getHighestLevels(true);
+			}
+		}
+
+		entries = entries.sort((a, b) => b.amount - a.amount);
+		if (sort === "asc") entries = entries.reverse();
+		const end = performance.now();
+
+		return {
+			entries,
+			time: parseFloat((end - start).toFixed(3))
+		};
 	}
 }

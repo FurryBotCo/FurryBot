@@ -6,9 +6,7 @@ import { Colors, Command, EmbedBuilder } from "core";
 import Language from "language";
 
 export default new Command<FurryBot, UserConfig, GuildConfig>(["afk"], __filename)
-	.setBotPermissions([
-		"attachFiles"
-	])
+	.setBotPermissions([])
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)

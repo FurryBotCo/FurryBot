@@ -23,7 +23,8 @@ export default class AutoPostingService extends BaseServiceWorker {
 		this.interval = setInterval(() => {
 			const d = new Date();
 			if ((d.getMinutes() % 5) === 0) void this.run();
-		}, 250);
+			else if ((d.getSeconds() % 15) === 0) this.DONE = [];
+		}, 800);
 		this.serviceReady();
 	}
 
@@ -40,7 +41,6 @@ export default class AutoPostingService extends BaseServiceWorker {
 
 	async run() {
 		const d = new Date();
-		if ((d.getMinutes() % 5) !== 0 && (d.getSeconds() % 15) === 0) this.DONE = [];
 		const entries = await mdb!.collection("guilds").find<WithId<DBKeys>>({ $where: "![undefined,null].includes(this.auto) && this.auto.length > 0" }, {}).toArray();
 		for (const g of entries) {
 			for (const e of g.auto) {
@@ -72,8 +72,9 @@ export default class AutoPostingService extends BaseServiceWorker {
 		}
 		const e = new EmbedBuilder(gConfig.settings.lang);
 		let file: Eris.MessageFile;
-		const w = await this.testClient.getWebhook(wh.id, wh.token);
+		const w = await this.testClient.getWebhook(wh.id, wh.token).catch(() => null);
 		if (!w) {
+			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to its webhook being invalid.`);
 			await gConfig.mongoEdit<DBKeys>({
 				$pull: {
 					auto: gConfig.auto.find(a => a.id === id)!
@@ -81,10 +82,18 @@ export default class AutoPostingService extends BaseServiceWorker {
 			});
 			return;
 		}
-		const ch = await this.testClient.getRESTChannel(w.channel_id);
-		// we assume this is temporary, since it likely is
-		if (ch === null || !("guild" in ch)) return;
+		const ch = await this.testClient.getRESTChannel(w.channel_id).catch(() => null) as Eris.AnyGuildChannel | null;
+		if (ch === null) {
+			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to its webhook channel not existing.`);
+			await gConfig.mongoEdit<DBKeys>({
+				$pull: {
+					auto: gConfig.auto.find(a => a.id === id)!
+				}
+			});
+			return;
+		}
 		if ((type.startsWith("yiff") || ["butts", "bulge"].includes(type)) && !ch.nsfw) {
+			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to the channel it goes to not being marked nsfw.`);
 			await this.testClient.executeWebhook(wh.id, wh.token, {
 				embeds: [
 					e
