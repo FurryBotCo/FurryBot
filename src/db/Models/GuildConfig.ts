@@ -1,6 +1,7 @@
 import config from "../../config";
 import db from "..";
 import { VALID_LANGUAGES } from "../../main";
+import { ModLogEntry, Warning } from "../../util/@types/Database";
 import { GuildConfig as GC, ConfigDataTypes, ConfigEditTypes } from "core";
 import Logger from "logger";
 import { WithId } from "mongodb";
@@ -90,12 +91,12 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		enabled: boolean;
 		/** @deprecated */
 		channel: string | null;
-		webhook: {
-			id: string;
-			token: string;
-			channelId: string;
-		} | null;
+		webhook: Record<"id" | "token" | "channelId", string> | null;
 	};
+	levelRoles: Array<{
+		role: string;
+		level: number;
+	}>;
 	deletion: number | null;
 	constructor(id: string, data: WithId<ConfigDataTypes<GuildConfig, "id">>) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -112,24 +113,27 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		// @ts-ignore -- dot notation for mongodb
 			if (typeof this.modlog.webhook === "undefined") obj["modlog.webhook"] = null;
 		} else obj.modlog = {
+			enabled: false,
 			webhook: null
 		};
 		if (!Array.isArray(this.auto)) obj.auto = [];
 		if (!Array.isArray(this.logEvents)) obj.logEvents = [];
 		if (!Array.isArray(this.disable)) obj.disable = [];
 		if (!Array.isArray(this.tags)) obj.tags = [];
+		if (!Array.isArray(this.levelRoles)) obj.levelRoles = [];
 		if (!Array.isArray(this.prefix)) obj.prefix = [
 			this.settings.prefix || config.defaults.prefix
 		];
 		if (this.prefix?.length === 0) obj.prefix = [
 			this.settings.prefix || config.defaults.prefix
 		];
-		const v = JSON.parse(JSON.stringify(this.auto)) as GuildConfig["auto"];
+		// @FIXME send a notice inside the AutoPosting service & remove channel there
+		/* const v = JSON.parse(JSON.stringify(this.auto)) as GuildConfig["auto"];
 		for (const a of v) if ("channel" in a) {
 			if ((a as typeof a & { channel: null; }).channel === null) delete (v[v.indexOf(a)] as typeof a & { channel?: null; }).channel;
 			else v.splice(this.auto.indexOf(a), 1);
 		}
-		if (JSON.stringify(this.auto) !== JSON.stringify(v)) obj.auto = v;
+		if (JSON.stringify(this.auto) !== JSON.stringify(v)) obj.auto = v; */
 		if (this.settings.prefix) {
 			if (this.prefix && this.settings.prefix !== this.prefix[0]) obj.prefix = [
 				this.settings.prefix
@@ -159,5 +163,13 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 
 	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
 		return db.addBl("guild", this.id, blame, blameId, reason, expire, report);
+	}
+
+	async getWarningId(userId: string) {
+		return db.collection<Warning>("warnings").find({ guildId: this.id, userId }).toArray().then(v => v.sort((a, b) => b.id - a.id)?.[0]?.id + 1 || 1);
+	}
+
+	async getModlogId() {
+		return (await db.collection<ModLogEntry.GenericEntry>("modlog").find({ guildId: this.id }).count()) + 1;
 	}
 }

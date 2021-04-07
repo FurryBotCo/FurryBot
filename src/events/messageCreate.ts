@@ -142,13 +142,15 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 		const v = await msg.uConfig.checkVote();
 		await Redis.setex(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`, v.weekend ? 30 : 60, 1);
 		const lvl = LocalFunctions.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
-		const j = (Math.floor(Math.random() * 10) + 5) * (v.voted ? 2 : 1);
+		const j = (Math.floor(Math.random() * 10) + 5) * (v.voted ? 2 : 1) + 2000;
 		await msg.uConfig.edit({
 			[`levels.${msg.channel.guild.id}`]: msg.uConfig.getLevel(msg.channel.guild.id) + j
 		});
 		await Redis.set(`leveling:${msg.channel.guild.id}:${msg.author.id}`, (msg.uConfig.getLevel(msg.channel.guild.id) + 1).toString());
 		const nlvl = LocalFunctions.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
 		if (nlvl.level > lvl.level) {
+			const r = msg.gConfig.levelRoles.filter(h => h.level <= nlvl.level && !msg.member.roles.includes(h.role));
+			for (const { role, level } of r) await msg.member.addRole(role, `Level Up Role (${level})`).catch(() => null);
 			// separated for proper stats tracking
 			this.trackNoResponse(
 				this.sh.joinParts("stats", "levelUp")
