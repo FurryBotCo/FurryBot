@@ -3,7 +3,6 @@ import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
 import Yiffy from "../../util/req/Yiffy";
 import { Colors, Command, EmbedBuilder } from "core";
-import Language from "language";
 
 export default new Command<FurryBot, UserConfig, GuildConfig>(["fursuitbutt", "fursuitbutts"], __filename)
 	.setBotPermissions([
@@ -17,7 +16,6 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["fursuitbutt", "f
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
-		if (!msg.channel.nsfw) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.nsfw`));
 		const img = await Yiffy.furry.butts("json", 1);
 		if (!img) throw new TypeError("API method \"furry.butts\" did not return an image.");
 		return msg.channel.createMessage({

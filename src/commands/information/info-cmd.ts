@@ -34,6 +34,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["info"], __filena
 			else j.push(c.id);
 		}
 
+		const e = lock.dependencies.eris.version.indexOf("#") === -1 ? `[Eris](https://npm.im/eris) (**${Eris.VERSION}**)` : `[Eris Dev](https://github.com/abalabahaha/eris/commit/${lock.dependencies.eris.version.split("#")[1]}) (**${Eris.VERSION}**, \`${lock.dependencies.eris.version.split("#")[1].slice(0, 7)}\`)`;
+
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
@@ -61,7 +63,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["info"], __filena
 					`${defaultEmojis.dot} [{lang:other.words.contributor$ucwords$}] [August](https://augu.dev) <-- **Dumbass Cutie**`,
 					"",
 					"**{lang:other.words.other$ucwords$}**:",
-					`${defaultEmojis.dot} {lang:other.words.discordLib$ucwords$}: [Eris Dev](https://github.com/abalabahaha/eris/commit/${lock.dependencies.eris.version.split("#")[1]}) (**${Eris.VERSION}**, \`${lock.dependencies.eris.version.split("#")[1].slice(0, 7)}\`)`,
+					`${defaultEmojis.dot} {lang:other.words.discordLib$ucwords$}: ${e}`,
 					`${defaultEmojis.dot} {lang:other.words.clusteringLib$ucwords$}: [Eris-Fleet (custom)](https://github.com/FurryBotCo/eris-fleet) (**${FleetVersion}**)`,
 					`${defaultEmojis.dot} {lang:other.words.apiVersion$ucwords$}: ${Eris.Constants.REST_VERSION}`,
 					`${defaultEmojis.dot} {lang:other.words.gatewayVersion$ucwords$}: ${Eris.Constants.GATEWAY_VERSION}`,

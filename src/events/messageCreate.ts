@@ -12,8 +12,8 @@ import Eris from "eris";
 import Logger from "logger";
 import * as fs from "fs-extra";
 import Language from "language";
-import crypto from "crypto";
-import { performance } from "perf_hooks";
+import crypto from "node:crypto";
+import { performance } from "node:perf_hooks";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildTextableChannel>("messageCreate", async function(msg, update, slash, slashInfo) {
@@ -21,6 +21,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	if (Redis === null) return Logger.error([`Cluster #${this.clusterId}`, "messageCreate"], `Skipped a message with the id ${msg.id} due to redis not being initialized.`);
 
 	if (!(msg instanceof ExtendedMessage)) return;
+	if (msg.author.id !== "242843345402069002") return;
 	const t = new Timers(config.developers.includes(msg.author.id), `${msg.author.id}/${msg.channel.id}`); // `${msg.channel.id}/${msg.id}/${msg.author.id}`);
 	t.start("main");
 	t.start("stats.msg");
@@ -142,7 +143,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 		const v = await msg.uConfig.checkVote();
 		await Redis.setex(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`, v.weekend ? 30 : 60, 1);
 		const lvl = LocalFunctions.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
-		const j = (Math.floor(Math.random() * 10) + 5) * (v.voted ? 2 : 1) + 2000;
+		const j = (Math.floor(Math.random() * 10) + 5) * (v.voted ? 2 : 1);
 		await msg.uConfig.edit({
 			[`levels.${msg.channel.guild.id}`]: msg.uConfig.getLevel(msg.channel.guild.id) + j
 		});
@@ -183,7 +184,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 					this.trackNoResponse(
 						this.sh.joinParts("stats", "levelUp", "dm")
 					);
-					void msg.author.getDMChannel().then(dm => dm.createMessage(Language.get(msg.gConfig.settings.lang, "other.leveling.directMessage", [nlvl.level, ((msg.channel as Eris.GuildTextableChannel).guild).name]))).catch(() => null);
+					void msg.author.getDMChannel().then(dm => dm.createMessage(Language.get(msg.gConfig.settings.lang, "other.leveling.directMessage", [nlvl.level, ((msg.channel).guild).name]))).catch(() => null);
 				}
 			}
 		}
@@ -206,20 +207,18 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	t.start("afk");
 	// eslint-disable-next-line no-constant-condition -- if(true) to make the variables block scoped
 	if (true) {
-		const g = await Redis.get(`afk:global:${msg.author.id}`);
 		const s = await Redis.get(`afk:servers:${msg.channel.guild.id}:${msg.author.id}`);
-		if (g || s) {
+		if (s) {
 			this.trackNoResponse(
 				this.sh.joinParts("stats", "afk", "remove"),
-				this.sh.joinParts("stats", "afk", g ? "global" : "server", "remove")
+				this.sh.joinParts("stats", "afk", "server", "remove")
 			);
-			if (g) await Redis.del(`afk:global:${msg.author.id}`);
-			if (s) await Redis.del(`afk:servers:${msg.channel.guild.id}:${msg.author.id}`);
+			await Redis.del(`afk:servers:${msg.channel.guild.id}:${msg.author.id}`);
 			const embed = new EmbedBuilder(msg.gConfig.settings.lang)
-				.setTitle(`{lang:commands.misc.afk.removed.${g ? "global" : "server"}.title}`)
-				.setDescription(`{lang:commands.misc.afk.removed.${g ? "global" : "server"}.description}`)
+				.setTitle("{lang:commands.misc.afk.removed.title}")
+				.setDescription("{lang:commands.misc.afk.removed.description}")
 				.setTimestamp(new Date().toISOString())
-				.setColor(Colors.gold)
+				.setColor(Colors.red)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setFooter("{lang:other.selfDestructMessage|15}", this.bot.user.avatarURL)
 				.toJSON();
@@ -237,30 +236,35 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 		const p: Array<{
 			id: string;
 			time: number;
+			message?: string;
 		}> = [];
 		const un = Array.from(new Set(msg.mentionList.users));
 		for (const m of un) {
 			if (m.id === msg.author.id) continue;
-			// eslint-disable-next-line no-shadow
-			const g = await Redis.get(`afk:global:${m.id}`);
-			// eslint-disable-next-line no-shadow
-			const s = await Redis.get(`afk:servers:${msg.channel.guild.id}:${m.id}`);
-			if (g || s) p.push({
-				id: m.id,
-				time: Number(g || s)
-			});
+			const j = await Redis.get(`afk:servers:${msg.channel.guild.id}:${m.id}`);
+			if (j) {
+				let v: number | { time: number; message?: string; } = Number(j) ?? JSON.parse(j);
+				if (typeof v === "number") v = {
+					time: v,
+					message: undefined
+				};
+				p.push({
+					id: m.id,
+					...v
+				});
+			}
 		}
 
 		if (p.length > 0) {
 			this.trackNoResponse(
 				this.sh.joinParts("stats", "afk", "mention"),
-				this.sh.joinParts("stats", "afk", g ? "global" : "server", "mention")
+				this.sh.joinParts("stats", "afk", "server", "mention")
 			);
 			const embed = new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle("{lang:commands.misc.afk.msg.title}")
-				.setDescription(p.map(v => `{lang:commands.misc.afk.msg.description|${v.id}|${Time.formatAgo(v.time, true, false)}}`).join("\n"))
+				.setDescription(p.map(v => `{lang:commands.misc.afk.msg.description${v.message ? "Message" : ""}|${v.id}|${Time.formatAgo(v.time, true, false)}|${v.message || ""}}`).join("\n"))
 				.setTimestamp(new Date().toISOString())
-				.setColor(Colors.gold)
+				.setColor(Colors.furry)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setFooter("{lang:other.selfDestructMessage|15}", this.bot.user.avatarURL)
 				.toJSON();
@@ -476,7 +480,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 					this.sh.joinParts("stats", "commandRun", "success")
 				);
 				const end = performance.now();
-				Logger.info([`Cluster #${this.clusterId}`, `Shard #${((msg.channel as Eris.GuildTextableChannel).guild).shard.id}`, `Command Handler${msg.slash ? "[Slash]" : ""}`], `Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms.`);
+				Logger.info([`Cluster #${this.clusterId}`, `Shard #${((msg.channel).guild).shard.id}`, `Command Handler${msg.slash ? "[Slash]" : ""}`], `Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms.`);
 				if ((res  as Error) instanceof Error) throw res;
 			})
 			/* start command error handler */
@@ -502,10 +506,10 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 				} else {
 					if (err.message.indexOf("filterTags") !== -1) await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.e6Blacklist"));
 					else {
-						if (config.developers.includes(msg.author.id)) await (msg.channel as Eris.GuildTextableChannel).createMessage({ embed: e });
+						if (config.developers.includes(msg.author.id)) await (msg.channel).createMessage({ embed: e });
 						else await msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.command", [code, config.client.socials.discord, `${err.name}: ${err.message}`]));
 					}
-					Logger.error([`Cluster #${this.clusterId}`, `Shard #${(msg.channel as Eris.GuildTextableChannel).guild.shard.id}`, "Command Handler"], err);
+					Logger.error([`Cluster #${this.clusterId}`, `Shard #${(msg.channel).guild.shard.id}`, "Command Handler"], err);
 				}
 			});
 		t.end("run");

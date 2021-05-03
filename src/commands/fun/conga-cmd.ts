@@ -16,7 +16,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["conga"], __filen
 	.setCooldown(5e3, true)
 	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
-		if (Redis === null) throw new ReferenceError("Redis is not ready yet.");
+		if (Redis === null) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.redisNotReady"));
 		const k = `cmd:multiUser:conga:${msg.channel.id}`;
 		const h = await Redis.smembers(k);
 

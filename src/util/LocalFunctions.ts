@@ -12,8 +12,8 @@ import fetch, { Response } from "node-fetch";
 import Logger from "logger";
 import Language from "language";
 import { APIError, MemeRequestResponse } from "dankmemerapi";
-import crypto from "crypto";
-import { performance } from "perf_hooks";
+import crypto from "node:crypto";
+import { performance } from "node:perf_hooks";
 
 export default class LocalFunctions {
 	/**
@@ -83,7 +83,7 @@ export default class LocalFunctions {
 
 			case "message": {
 				const v = extra as ExtendedMessage<FurryBot, UserConfig, GuildConfig>;
-				const ch = v.channel as Eris.GuildTextableChannel;
+				const ch = v.channel ;
 				e.setDescription([
 					e.getDescription(),
 					"",

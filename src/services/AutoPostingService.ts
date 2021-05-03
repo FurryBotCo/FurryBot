@@ -15,8 +15,7 @@ import { WithId } from "mongodb";
 
 export default class AutoPostingService extends BaseServiceWorker {
 	private interval: NodeJS.Timeout;
-	// we have to prefix the token because we aren't connecting to the gateway
-	private testClient = new Eris.Client(`Bot ${config.client.token}`, { restMode: true });
+	private client = new Eris.Client(`Bot ${config.client.token}`, { restMode: true });
 	private DONE: Array<string> = [];
 	constructor(setup: BaseServiceWorkerSetup) {
 		super(setup);
@@ -72,7 +71,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 		}
 		const e = new EmbedBuilder(gConfig.settings.lang);
 		let file: Eris.MessageFile;
-		const w = await this.testClient.getWebhook(wh.id, wh.token).catch(() => null);
+		const w = await this.client.getWebhook(wh.id, wh.token).catch(() => null);
 		if (!w) {
 			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to its webhook being invalid.`);
 			await gConfig.mongoEdit<DBKeys>({
@@ -82,7 +81,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 			});
 			return;
 		}
-		const ch = await this.testClient.getRESTChannel(w.channel_id).catch(() => null) as Eris.AnyGuildChannel | null;
+		const ch = await this.client.getRESTChannel(w.channel_id).catch(() => null) as Eris.AnyGuildChannel | null;
 		if (ch === null) {
 			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to its webhook channel not existing.`);
 			await gConfig.mongoEdit<DBKeys>({
@@ -94,7 +93,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 		}
 		if ((type.startsWith("yiff") || ["butts", "bulge"].includes(type)) && !ch.nsfw) {
 			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to the channel it goes to not being marked nsfw.`);
-			await this.testClient.executeWebhook(wh.id, wh.token, {
+			await this.client.executeWebhook(wh.id, wh.token, {
 				embeds: [
 					e
 						.setTitle("{lang:other.auto.titles.disabled}")
@@ -400,7 +399,7 @@ export default class AutoPostingService extends BaseServiceWorker {
 		// remove the removal notice if we publish the message
 		if (ch.type === Eris.Constants.ChannelTypes.GUILD_NEWS) e.setFooter("{lang:other.auto.footerNews}");
 
-		const msg = await this.testClient.executeWebhook(wh.id, wh.token, {
+		const msg = await this.client.executeWebhook(wh.id, wh.token, {
 			wait: true,
 			embeds: [
 				e.toJSON()

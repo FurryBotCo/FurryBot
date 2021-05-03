@@ -19,7 +19,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["leaderboard", "l
 	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
 		if (Redis === null) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.redisNotReady"));
-		const global = msg.dashedArgs.value.includes("global");
+		const global = msg.dashedArgs.value.includes("global") || ((msg.args[0] || msg.args[1] || "").toLowerCase()) === "true";
 
 		const page = msg.args.length > 0 ? Number(msg.args[0]) : 1;
 

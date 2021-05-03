@@ -54,10 +54,11 @@ export default class BadgeHandler {
 
 		switch (u.id) {
 			case "158750488563679232": badges.push("horny", "sub"); break;
-			case "280158289667555328": badges.push("horny", "chris", "sub"); break;
+			case "280158289667555328": badges.push("horny", "sub", "chris"); break;
 			case "608483791832481813": badges.push("horny", "sub"); break;
 			case "515317973335146512": badges.push("horny"); break;
-			case "777702082357624874": badges.push("horny", "sub");
+			case "777702082357624874": badges.push("horny", "sub"); break;
+			case "302604426781261824": badges.push("horny", "sub", "ice"); break;
 		}
 
 		return badges.map(v => ({

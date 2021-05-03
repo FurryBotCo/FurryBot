@@ -5,15 +5,17 @@ import BadgeHandler from "./util/handler/BadgeHandler";
 import StatsHandler from "./util/handler/StatsHandler";
 import UserConfig from "./db/Models/UserConfig";
 import GuildConfig from "./db/Models/GuildConfig";
+import ModLogServiceTypes from "./util/@types/ModLogServiceTypes";
+import ReadyEvent from "./events/ready";
 import { BaseClusterWorker, BaseClusterWorkerSetup } from "eris-fleet";
 import { Category, ClientEvent, Command, CommandHandler,  MessageCollector, WebhookStore } from "core";
 import { ModuleImport, Utility } from "utilities";
-import { CommandHelper } from "slash-commands";
+import { CommandHelper } from "slash-extras";
 import * as fs from "fs-extra";
 import Logger from "logger";
 import Eris from "eris";
-import { performance } from "perf_hooks";
-import path from "path";
+import { performance } from "node:perf_hooks";
+import path from "node:path";
 
 export type VALID_LANGUAGES = typeof config["languages"][number];
 export default class FurryBot extends BaseClusterWorker {
@@ -46,11 +48,12 @@ export default class FurryBot extends BaseClusterWorker {
 		this.b = new BadgeHandler(this);
 		this.sh = new StatsHandler(this);
 		db.setClient(this);
-		void this.loadEvents(false);
 		this.cpuUsageT = setInterval(async() =>  Utility.getCPUUsage().then(v => this.cpuUsage = v), 5e3);
+		this.bot.on("ready", ReadyEvent.handle.bind(ReadyEvent, this));
 	}
 
 	async launch() {
+		void this.loadEvents(false);
 		// @TODO
 	}
 
@@ -77,6 +80,7 @@ export default class FurryBot extends BaseClusterWorker {
 			if (e instanceof ClientEvent) {
 				if (this.events.has(e.event)) this.bot.off(e.event, this.events.get(e.event)!.handler);
 				const handler = (...d: Array<unknown>) => e.handle(this, ...d) as void;
+				if (e.event === "ready") continue;
 				this.events.set(e.event, {
 					handler,
 					event: e as ClientEvent<this>
@@ -149,5 +153,12 @@ export default class FurryBot extends BaseClusterWorker {
 
 	trackNoResponse(...data: Array<string>) {
 		void this.ipc.command("stats", data, false);
+	}
+
+	async executeModCommand<K extends keyof ModLogServiceTypes.Commands.CommandMap>(type: K, data: Omit<ModLogServiceTypes.Commands.CommandMap[K], "type">) {
+		return this.ipc.command("mod", {
+			type,
+			...data
+		}, true);
 	}
 }

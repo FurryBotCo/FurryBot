@@ -62,10 +62,10 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["e621", "e6"], __
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.gold)
 			.setDescription(`{lang:${cmd.lang}.loading}`);
-
 		const m = await msg.channel.createMessage({
 			embed: e.toJSON()
 		});
+		// even though this is a typescript rule, it apparently doesn't know overloading exists
 		// eslint-disable-next-line deprecation/deprecation
 		for (const r of reactions) await m.addReaction(r);
 		await Redis.sadd("cmd:e621:active", msg.channel.id);

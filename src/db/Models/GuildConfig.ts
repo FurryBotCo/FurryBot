@@ -8,7 +8,7 @@ import { WithId } from "mongodb";
 
 export type DBKeys = ConfigDataTypes<GuildConfig>;
 export default class GuildConfig extends GC<VALID_LANGUAGES> {
-	settings: {
+	declare settings: {
 		/** @deprecated */
 		prefix?: string;
 		lang: VALID_LANGUAGES;
@@ -47,39 +47,11 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 			type: "user" | "channel" | "role";
 			id: string;
 		}>;
-		type:
-		"channelCreate" |
-		"channelDelete" |
-		"channelUpdate" |
-		"memberBan" | // guildBanAdd
-		"memberUnban" | // guildBanRemove
-		"memberJoin" | // guildMemberAdd
-		"memberLeave" | // guildMemberRemove
-		"userKick" | // guildMemberRemove
-		"memberUpdate" | // guildMemberUpdate
-		"roleCreate" | // guildRoleCreate
-		"roleDelete" | // guildRoleDelete
-		"roleUpdate" | // guildRoleUpdate
-		"messageDelete" |
-		"messageDeleteBulk" |
-		"messageEdit" | // messageUpdate
-		"presenceUpdate" |
-		"userUpdate" |
-		"voiceJoin" | // voiceChannelJoin
-		"voiceLeave" | // voiceChannelLeave
-		"voiceSwitch" | // voiceChannelSwitch
-		"voiceStateUpdate" |
-		"guildUpdate" |
-		"inviteCreate" |
-		"inviteDelete";
+		type: typeof config["logTypes"][number];
 	}>;
 	auto: Array<{
 		id: string;
-		type: "birb" | "bunny" | "cat" | "duck" |
-		"fox" | "koala" | "otter" | "panda" |
-		"snek" | "turtle" | "wah" | "wolf" |
-		"fursuit" | "butts" | "bulge" |
-		"yiff.gay" | "yiff.straight" | "yiff.lesbian" | "yiff.gynomorph";
+		type: typeof config["autoTypes"][number];
 		time: 5 | 10 | 15 | 30 | 60;
 		webhook: {
 			id: string;

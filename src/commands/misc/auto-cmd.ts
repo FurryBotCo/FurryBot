@@ -27,17 +27,10 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 	.setCooldown(5e3, true)
 	.setHasSlashVariant(false)
 	.setExecutor(async function (msg, cmd) {
-		const types = [
-			"birb", "bunny", "cat", "duck",
-			"fox", "koala", "otter", "panda",
-			"snek", "turtle", "wah", "wolf",
-			"fursuit", "butts", "bulge",
-			"yiff.gay", "yiff.straight", "yiff.lesbian", "yiff.gynomorph"
-		] as const;
 		const max = 10;
 		function f(t: string) {
 			// allows for stuff like yiff-gay and yiffgay
-			return types.find(v => [v, v.replace(/\./g, "-"), v.replace(/\./g, "")].some(j => j.toLowerCase() === t.toLowerCase()));
+			return config.autoTypes.find(v => [v, v.replace(/\./g, "-"), v.replace(/\./g, "")].some(j => j.toLowerCase() === t.toLowerCase()));
 		}
 		switch (msg.args[0]?.toLowerCase()) {
 			case "add": {
@@ -59,14 +52,14 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 						const j = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id } }) => id === msg.author.id, 1);
 						if (j === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
 						const a = !j.content ? NaN : Number(j.content);
-						if (isNaN(a) || a < 1 || a > w.length) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.invalidSelection`, [w.length]));
+						if (isNaN(a) || a < 1 || a > w.length) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.invalidSelection", [1, w.length]));
 						hook = w[a - 1];
 						break;
 					}
 
 					case 2: {
 						const wh = await msg.channel.guild.getWebhooks();
-						if (wh.length === 0)  return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.webhook.noWebhooksServer`));
+						if (wh.length === 0)  return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.noWebhooksServer`));
 						await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.select2`));
 						const j = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id } }) => id === msg.author.id, 1);
 						if (j === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
@@ -104,7 +97,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 						break;
 					}
 
-					default: return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.invalidSelection`, [3]));
+					default: return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.invalidSelection", [1, 3]));
 				}
 				let ch = this.bot.getChannel(hook!.channel_id) as Eris.GuildChannel;
 				if (!ch || !(ch instanceof Eris.GuildChannel)) ch = await this.bot.getRESTChannel(hook!.channel_id) as Eris.GuildChannel;
@@ -145,7 +138,6 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 					await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.removeWebhook`, [w.id]));
 					const n = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id: d } }) => d === msg.author.id, 1);
 					if (n === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
-					console.log(n.content === "yes", n?.content);
 					if (n.content.toLowerCase() === "yes") {
 						await this.bot.deleteWebhook(w.id, w.token);
 						return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.doneWebhook`, [id, v.type, w.id]));
@@ -173,7 +165,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 						.setDescription(pages[page - 1].map((v, i) => `{lang:${cmd.lang}.list.entry|${(i + 1) + ((page - 1) * perPage)}|${v.type}|${v.webhook.channelId}|${v.time}}`).join("\n"))
 						.setTitle(`{lang:${cmd.lang}.list.page|${page}}`)
 						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.auto.length}|${msg.prefix}}`, this.bot.user.avatarURL)
-						.setColor(Colors.gold)
+						.setColor(Colors.furry)
 						.setTimestamp(new Date().toISOString())
 						.toJSON()
 				});
@@ -183,7 +175,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 			case "available": {
 				const incomplete = [
 				] as Array<string>;
-				const text = types.map(v => `**${v}** - ${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.available.${v.replace(/\./g, "-")}`)}`);
+				const text = config.autoTypes.map(v => `**${v}** - ${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.available.${v.replace(/\./g, "-")}`)}`);
 				const end: Array<string> = [];
 				let i = 0;
 				for (const t of text) {

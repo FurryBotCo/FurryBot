@@ -7,8 +7,7 @@ import chunk from "chunk";
 
 export default new Command<FurryBot, UserConfig, GuildConfig>(["levelroles"], __filename)
 	.setBotPermissions([
-		"embedLinks",
-		"manageRoles"
+		"embedLinks"
 	])
 	.setUserPermissions([])
 	.setRestrictions([])

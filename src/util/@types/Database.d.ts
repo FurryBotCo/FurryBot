@@ -14,7 +14,7 @@ declare namespace Database {
 			guildId: string;
 			blame: string;
 			creationDate?: number; // old entries (before 9/XX/2020) will not have a creation date
-			messageId?: string;
+			messageId: string | null;
 		}
 
 		interface ChannelLockEntry extends GenericEntry {
@@ -67,13 +67,13 @@ declare namespace Database {
 		}
 
 		interface BanEntry extends GenericEntry {
-			expiry?: number;
+			expiry: number | null;
 			deleteDays?: number;
 			type: "ban";
 		}
 
 		interface MuteEntry extends GenericEntry {
-			expiry?: number;
+			expiry: number | null;
 			type: "mute";
 		}
 
@@ -89,13 +89,17 @@ declare namespace Database {
 		date: number;
 	}
 
-	interface TimedEntry<T extends "mute" | "ban" = "mute" | "ban"> extends DBEntry {
+	interface TimedEntry extends DBEntry {
 		time: number;
 		expiry: number;
-		userId: string;
-		guildId: string;
-		type: T;
-		reason: string;
+		user: string;
+		guild: string;
+		/** @deprecated legacy */
+		userId?: string;
+		/** @deprecated legacy */
+		guildId?: string;
+		type: "mute" | "ban";
+		reason: string | null;
 	}
 
 	export type PremiumEntry = PremiumGuildEntry | PremiumUserEntry;

@@ -9,16 +9,16 @@ import { MongoError, WithId } from "mongodb";
 import Logger from "logger";
 import { Strings, Time } from "utilities";
 import Eris from "eris";
-import crypto from "crypto";
-import { performance } from "perf_hooks";
-import { isWorker } from "cluster";
+import crypto from "node:crypto";
+import { performance } from "node:perf_hooks";
+import { isWorker } from "node:cluster";
 
 // no
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 class Database extends DB {
 	static client: FurryBot;
-	override static async getUser(id: string): Promise<UserConfig> {
+	static override async getUser(id: string): Promise<UserConfig> {
 		if (mdb === null) throw new ReferenceError("Databse#getUser called before database has been intialized.");
 		const start = performance.now();
 		let d = await mdb.collection<WithId<UserKeys>>("users").findOne({ id }).then(res => !res ? null : new UserConfig(id, res));
@@ -49,7 +49,7 @@ class Database extends DB {
 		return d!;
 	}
 
-	override static async getGuild(id: string): Promise<GuildConfig> {
+	static override async getGuild(id: string): Promise<GuildConfig> {
 		if (mdb === null) throw new ReferenceError("Databse#getGuild called before database has been intialized.");
 		const start = performance.now();
 		let d = await mdb.collection<WithId<GuildKeys>>("guilds").findOne({ id }).then(res => !res ? null : new GuildConfig(id, res));
@@ -177,7 +177,8 @@ if (isWorker) {
 
 		case "service": {
 			switch (process.env.NAME) {
-				case "auto-posting": {
+				case "auto-posting":
+				case "mod": {
 					Database.initDb({
 						host: config.services.db.host,
 						port: config.services.db.port,
@@ -202,6 +203,25 @@ if (isWorker) {
 		}
 
 		default: throw new TypeError("invalid TYPE in process env.");
+	}
+} else {
+	if (process.env.ENABLE_DB === "1") {
+		Database.initDb({
+			host: config.services.db.host,
+			port: config.services.db.port,
+			options: config.services.db.options,
+			main: config.services.db[config.beta ? "dbBeta" : "db"]
+		});
+	}
+
+	if (process.env.ENABLE_REDIS === "1") {
+		Database.initRedis({
+			host: config.services.redis.host,
+			port: config.services.redis.port,
+			password: config.services.redis.password,
+			db: config.services.redis[config.beta ? "dbBeta" : "db"],
+			name: `FurryBot${config.beta ? "Beta": ""}`
+		});
 	}
 }
 

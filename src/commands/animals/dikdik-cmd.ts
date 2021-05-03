@@ -13,7 +13,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["dikdik"], __file
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
-	.setHasSlashVariant(false)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const img = await Yiffy.animals.dikdik("json", 1);
 		if (!img) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.imageAPI"));

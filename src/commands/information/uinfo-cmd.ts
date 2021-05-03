@@ -59,17 +59,27 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["uinfo", "userinf
 				cat[b.category].push(b);
 			});
 
-			const check = await KSoft.bans.check(user.id);
+			let check: boolean | null;
+			try {
+				check = await KSoft.bans.check(user.id);
+			} catch (e) {
+				check = null;
+			}
 
-			// eslint-disable-next-line
-		const rep = await DRep.rep(user.id) as {
+			let rep: {
 				upvotes: number;
 				downvotes: number;
 				rank: string;
 				xp: number;
 				staff: boolean;
 				reputation: number;
-			};
+			} | null;
+			try {
+				// eslint-disable-next-line
+				rep = await DRep.rep(user.id);
+			} catch (e) {
+				rep = null;
+			}
 
 			return msg.channel.createMessage({
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
@@ -116,8 +126,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["uinfo", "userinf
 						].join("\n")),
 						"",
 						"**{lang:other.words.other$ucwords$}:**",
-						`[{lang:${cmd.lang}.drep}](https://discordrep.com/u/${user.id}): **${rep.reputation}** (**${rep.upvotes}** <:${config.emojis.custom.upvote}> / **${rep.downvotes}** <:${config.emojis.custom.downvote}>)`,
-						`{lang:${cmd.lang}.ksoft}: **{lang:other.words.${check ? "yes" : "no"}$ucwords$}**`
+						`[{lang:${cmd.lang}.drep}](https://discordrep.com/u/${user.id}): ${rep === null ? "**{lang:other.words.unknown$ucwords}**" : `**${rep.reputation}** (**${rep.upvotes}** <:${config.emojis.custom.upvote}> / **${rep.downvotes}** <:${config.emojis.custom.downvote}>)`}`,
+						`{lang:${cmd.lang}.ksoft}: **{lang:other.words.${check === null ? "unknown" : check ? "yes" : "no"}$ucwords$}**`
 					].join("\n"))
 					.setTimestamp(new Date().toISOString())
 					.setColor(Math.floor(Math.random() * 0xFFFFFF))

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import config from "../../config";
 import FurryBot from "../../main";
-import crypto from "crypto";
+import crypto from "node:crypto";
 
 interface IPCMessage<T = unknown> {
 	op: string;

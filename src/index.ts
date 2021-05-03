@@ -6,11 +6,13 @@ import Logger from "logger";
 import { Fleet, Stats } from "eris-fleet";
 import Eris from "eris";
 import { Colors, EmbedBuilder, WebhookStore } from "core";
+import { Cluster } from "eris-fleet/dist/src/clusters/Cluster";
+import { workers } from "node:cluster";
 import { isMaster } from "cluster";
 if (isMaster) Logger.info(`Running in ${config.beta ? "BETA" : "PRODUCTION"} mode.`);
 const Admiral = new Fleet({
 	...config.options,
-	path: `${config.dir.src}/main.${__filename.split(".").slice(-1)[0]}`,
+	path: `${config.dir.codeSrc}/main.${config.ext}`,
 	token: config.client.token
 });
 interface ObjectLog {
@@ -221,4 +223,7 @@ if (isMaster) {
 process
 	.on("uncaughtException", (err) => Logger.error("Uncaught Exception", err))
 	.on("unhandledRejection", (r, p) => Logger.error("Unhandled Rejection", r ?? p))
-	.on("SIGINT", () => process.kill(process.pid));
+	.on("SIGINT", () => {
+		Object.keys(workers).map(v => workers[v]?.kill("SIGKILL"));
+		process.kill(process.pid, "SIGKILL");
+	});

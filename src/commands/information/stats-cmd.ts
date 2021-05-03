@@ -15,7 +15,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["stats"], __filen
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
-	.setHasSlashVariant(false)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		if (mongo === null) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.dbNotReady"));
 		if (Redis === null) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.redisNotReady"));

@@ -11,17 +11,27 @@ export default new ClientEvent<FurryBot>("ready", async function() {
 	fs.mkdirpSync(`${config.dir.tmp}/pid`);
 	pid(`${config.dir.tmp}/pid/cluster-${this.clusterId}.pid`);
 
+	const d = new Date();
+	// zero out h, m, s, ms
+	d.setHours(0, 0, 0, 0);
 	void StatusHandler
 		.init(this)
-		.run(new Date(2021, 0, 1));
+		.run(d);
 
 	// @FIXME REMOVE THE SKIP IN PRODUCTION!
-	void this.loadCommands(`${config.dir.src}/commands`, [
+	void this.loadCommands(`${config.dir.codeSrc}/commands`, [
 		"animals",
 		"developer",
 		"fun",
 		"images",
-		"information",
-		"meme"
-	]);
+		// "information",
+		"meme",
+		"misc",
+		"moderation",
+		// eslint-disable-next-line comma-dangle
+		"nsfw",
+		// "utility"
+	]).then(() => {/*
+		console.log("t", this.cmd.triggers); */
+	});
 });

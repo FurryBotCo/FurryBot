@@ -10,15 +10,17 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["afk"], __filenam
 	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
-	.setHasSlashVariant(false)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		if (Redis === null) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.redisNotReady"));
-		const type = msg.args.length === 0 || msg.args[0].toLowerCase() !== "global" ? "server" : "global";
-		await Redis.set(`afk:${type === "server" ? `servers:${msg.channel.guild.id}` : "global"}:${msg.author.id}`, Date.now());
+		await Redis.set(`afk:servers:${msg.channel.guild.id}:${msg.author.id}`, JSON.stringify({
+			time: Date.now(),
+			message: msg.args.join(" ")
+		}));
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
-				.setTitle(`{lang:${cmd.lang}.title${type === "global" ? "Global" : ""}}`)
-				.setDescription(`{lang:${cmd.lang}.done${type === "global" ? "Global" : ""}}`)
+				.setTitle(`{lang:${cmd.lang}.title}`)
+				.setDescription(`{lang:${cmd.lang}.done${msg.args.length === 0 ? "Message" : ""}|${msg.args.join(" ")}}`)
 				.setTimestamp(new Date().toISOString())
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setFooter("OwO", this.bot.user.avatarURL)
