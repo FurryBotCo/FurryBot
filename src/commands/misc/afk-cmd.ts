@@ -23,7 +23,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["afk"], __filenam
 				.setDescription(`{lang:${cmd.lang}.done${msg.args.length === 0 ? "Message" : ""}|${msg.args.join(" ")}}`)
 				.setTimestamp(new Date().toISOString())
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setColor(Colors.furry)
 				.toJSON()
 		});

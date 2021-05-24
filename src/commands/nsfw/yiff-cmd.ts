@@ -35,7 +35,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["yiff", "thegoods
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.titles.${type}}`)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setTimestamp(new Date().toISOString())
 				.setDescription([
 					`[[{lang:other.images.shortURL}]](${img.shortURL})`,

@@ -188,7 +188,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["disable"], __fil
 						.setColor(Colors.green)
 						.setTimestamp(new Date().toISOString())
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
-						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.disable.length}|${msg.prefix}}`, this.bot.user.avatarURL)
+						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.disable.length}|${msg.prefix}}`, this.client.user.avatarURL)
 						.toJSON()
 				});
 				break;
@@ -218,7 +218,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["disable"], __fil
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.furry)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.toJSON()
 		}).then(() => undefined);
 		else return "DEFAULT";
@@ -244,7 +244,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["disable"], __fil
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.furry)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.toJSON()
 		}).then(() => undefined);
 	});

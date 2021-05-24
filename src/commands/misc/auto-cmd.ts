@@ -84,7 +84,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 					}
 
 					case 3: {
-						if (!msg.channel.permissionsOf(this.bot.user.id).has("manageWebhooks")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.missingPermission`, ["manageWebhooks", msg.channel.id]));
+						if (!msg.channel.permissionsOf(this.client.user.id).has("manageWebhooks")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.missingPermission`, ["manageWebhooks", msg.channel.id]));
 						const img = await Request.getImageFromURL(config.images.icons.bot);
 						const { mime } = await FileType.fromBuffer(img) ?? { mime: null };
 						if (mime === null) throw new Error("Internal error.");
@@ -99,8 +99,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 
 					default: return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.invalidSelection", [1, 3]));
 				}
-				let ch = this.bot.getChannel(hook!.channel_id) as Eris.GuildChannel;
-				if (!ch || !(ch instanceof Eris.GuildChannel)) ch = await this.bot.getRESTChannel(hook!.channel_id) as Eris.GuildChannel;
+				let ch = this.client.getChannel(hook!.channel_id) as Eris.GuildChannel;
+				if (!ch || !(ch instanceof Eris.GuildChannel)) ch = await this.client.getRESTChannel(hook!.channel_id) as Eris.GuildChannel;
 				if (!ch) throw new TypeError("Unable to fetch channel.");
 				if ((t.startsWith("yiff") || ["butts", "bulge"].includes(t)) && !ch.nsfw) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.nsfw`, [msg.args[1], ch.id]));
 				const j: GuildConfig["auto"][number] = {
@@ -133,13 +133,13 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 				if (id > msg.gConfig.auto.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.invalidId`, [id]));
 				const j = [...msg.gConfig.auto];
 				const v = j.splice(id - 1, 1)[0];
-				const w = await this.bot.getWebhook(v.webhook.id, v.webhook.token).catch(() => null);
+				const w = await this.client.getWebhook(v.webhook.id, v.webhook.token).catch(() => null);
 				if (w !== null) {
 					await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.removeWebhook`, [w.id]));
 					const n = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id: d } }) => d === msg.author.id, 1);
 					if (n === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
 					if (n.content.toLowerCase() === "yes") {
-						await this.bot.deleteWebhook(w.id, w.token);
+						await this.client.deleteWebhook(w.id, w.token);
 						return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.doneWebhook`, [id, v.type, w.id]));
 					}
 				}
@@ -164,7 +164,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
 						.setDescription(pages[page - 1].map((v, i) => `{lang:${cmd.lang}.list.entry|${(i + 1) + ((page - 1) * perPage)}|${v.type}|${v.webhook.channelId}|${v.time}}`).join("\n"))
 						.setTitle(`{lang:${cmd.lang}.list.page|${page}}`)
-						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.auto.length}|${msg.prefix}}`, this.bot.user.avatarURL)
+						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.auto.length}|${msg.prefix}}`, this.client.user.avatarURL)
 						.setColor(Colors.furry)
 						.setTimestamp(new Date().toISOString())
 						.toJSON()
@@ -243,7 +243,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)
-						.setFooter("OwO", this.bot.user.avatarURL)
+						.setFooter("OwO", this.client.user.avatarURL)
 						.toJSON()
 				});
 				break;

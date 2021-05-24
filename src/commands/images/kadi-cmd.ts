@@ -31,7 +31,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["kadi"], __filena
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setTimestamp(new Date().toISOString())
 				.setDescription([
 				`[{lang:${cmd.lang}.inc}](https://discord.gg/eCXqpQR)`,

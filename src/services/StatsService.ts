@@ -1,15 +1,15 @@
 import { Redis } from "../db";
-import { BaseServiceWorker, BaseServiceWorkerSetup } from "eris-fleet";
 import Logger from "logger";
 import { colors } from "leeks.js";
+import { BaseService, ServiceInitalizer } from "clustering";
 
-export default class StatsService extends BaseServiceWorker {
-	constructor(setup: BaseServiceWorkerSetup) {
+export default class StatsService extends BaseService {
+	constructor(setup: ServiceInitalizer) {
 		super(setup);
-		this.serviceReady();
+		this.ready();
 	}
 
-	override async handleCommand(data: string | Array<string>) {
+	async handleCommand(data: string | Array<string>) {
 		if (!Array.isArray(data)) data = [data];
 		// the middle color screws up the end color
 		if (Redis === null) return Logger.warn("StatsService", `Skipping stats processing for [ ${colors.green(data.join(", "))} ${colors.yellow("] because Redis has not been initialized.")}`);
@@ -19,7 +19,7 @@ export default class StatsService extends BaseServiceWorker {
 		return true;
 	}
 
-	override shutdown(done: () => void) {
+	shutdown(done: () => void) {
 		done();
 	}
 }

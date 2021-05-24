@@ -26,7 +26,11 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["purge", "prune"]
 		while (i > 0) {
 			const n = i > 100 ? 100 : i;
 			i -= n;
-			const s = await msg.channel.getMessages(n, m.length === 0 ? undefined : m[m.length - 1].id);
+			// eslint-disable-next-line deprecation/deprecation -- it's not deprecated, the eslint plugin is just dumb
+			const s = await msg.channel.getMessages({
+				limit: n,
+				before: m.length === 0 ? undefined : m[m.length - 1].id
+			});
 			m.push(...s);
 		}
 		const b = m.filter(d => !(d.timestamp + 12096e5 < Date.now()));
@@ -41,7 +45,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["purge", "prune"]
 		await msg.channel.stopTyping();
 		const t = [];
 		for (const k of Object.keys(del)) {
-			let u: Eris.Member | Eris.User | null = msg.channel.guild.members.get(k) || this.bot.users.get(k) || await this.getUser(k).catch(() => null);
+			let u: Eris.Member | Eris.User | null = msg.channel.guild.members.get(k) || this.client.users.get(k) || await this.getUser(k).catch(() => null);
 			if (u instanceof Eris.Member) u = u.user;
 			if (u === null) {
 				t.push(`**${k}**: ${del[k]}`);

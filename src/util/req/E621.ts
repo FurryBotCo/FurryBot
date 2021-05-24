@@ -1,6 +1,6 @@
 import config from "../../config";
 import E6 from "e621";
-import os from "node:os";
+import os from "os";
 
 const E621 = new E6(
 	config.apis.e621.username,

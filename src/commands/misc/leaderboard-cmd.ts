@@ -36,7 +36,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["leaderboard", "l
 				return `**#${(i + 1) + ((page - 1) * 10)}**: \`${u.username.replace(/`/g, "")}\` - **Level ${l.level}** (${l.leftover}/${l.leftover + l.needed} {lang:${cmd.lang}.embed.until})`;
 			}));
 
-			const e = this.bot.users.size - entries.length;
+			const e = this.client.users.size - entries.length;
 			return msg.channel.createMessage({
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.embed.titleGlobal}`)

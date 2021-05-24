@@ -104,7 +104,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["ship"], __filena
 				.setDescription(`{lang:${cmd.lang}.text|${member1.id}|${member2.id}|${ship.amount}|${ship.name}}`)
 				.setColor(Colors.furry)
 				.setTimestamp(new Date().toISOString())
-				.setFooter(defaultEmojis.heart, this.bot.user.avatarURL)
+				.setFooter(defaultEmojis.heart, this.client.user.avatarURL)
 				.setImage("attachment://ship.png")
 				.toJSON()
 		}, {

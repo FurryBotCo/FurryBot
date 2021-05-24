@@ -19,7 +19,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["editsnipe", "esn
 		if (ch === null) ch = msg.channel;
 
 		if (!ch.permissionsOf(msg.author.id).has("viewChannel")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.userCantSee`));
-		if (!ch.permissionsOf(this.bot.user.id).has("viewChannel")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfCantSee`));
+		if (!ch.permissionsOf(this.client.user.id).has("viewChannel")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.selfCantSee`));
 
 		const [l] = SnipeHandler.get("edit", ch.id);
 

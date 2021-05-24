@@ -36,7 +36,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["log"], __filenam
 					"embedLinks"
 				];
 				for (const p of perms) {
-					if (!ch.permissionsOf(this.bot.user.id).has(p)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.missingPermission`, [p, ch.id]));
+					if (!ch.permissionsOf(this.client.user.id).has(p)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.missingPermission`, [p, ch.id]));
 				}
 				if (t === "all") {
 					await msg.gConfig.mongoEdit({
@@ -98,7 +98,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["log"], __filenam
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
 						.setDescription(pages[page - 1].map((v, i) => `{lang:${cmd.lang}.list.entry|${(i + 1) + ((page - 1) * perPage)}|${v.type}|${v.channel}}`).join("\n"))
 						.setTitle(`{lang:${cmd.lang}.list.page|${page}}`)
-						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.logEvents.length}|${msg.prefix}}`, this.bot.user.avatarURL)
+						.setFooter(`{lang:${cmd.lang}.list.footer|${page}|${pages.length}|${msg.gConfig.logEvents.length}|${msg.prefix}}`, this.client.user.avatarURL)
 						.setColor(Colors.gold)
 						.setTimestamp(new Date().toISOString())
 						.toJSON()
@@ -178,7 +178,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["log"], __filenam
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)
-						.setFooter("OwO", this.bot.user.avatarURL)
+						.setFooter("OwO", this.client.user.avatarURL)
 						.toJSON()
 				});
 				break;

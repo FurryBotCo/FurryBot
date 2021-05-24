@@ -104,8 +104,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["sinfo", "serveri
 						`${defaultEmojis.dot} {lang:${cmd.lang}.hiddenYou}: ${msg.channel.guild.channels.filter(c => !c.permissionsOf(msg.author.id).has("readMessages")).length}`,
 						`${defaultEmojis.dot} {lang:${cmd.lang}.visibleYou}: ${msg.channel.guild.channels.filter(c => c.permissionsOf(msg.author.id).has("readMessages")).length}`,
 						"",
-						`${defaultEmojis.dot} {lang:${cmd.lang}.hiddenMe}: ${msg.channel.guild.channels.filter(c => !c.permissionsOf(this.bot.user.id).has("readMessages")).length}`,
-						`${defaultEmojis.dot} {lang:${cmd.lang}.visibleMe}: ${msg.channel.guild.channels.filter(c => c.permissionsOf(this.bot.user.id).has("readMessages")).length}`
+						`${defaultEmojis.dot} {lang:${cmd.lang}.hiddenMe}: ${msg.channel.guild.channels.filter(c => !c.permissionsOf(this.client.user.id).has("readMessages")).length}`,
+						`${defaultEmojis.dot} {lang:${cmd.lang}.visibleMe}: ${msg.channel.guild.channels.filter(c => c.permissionsOf(this.client.user.id).has("readMessages")).length}`
 					].join("\n"))
 					.setThumbnail(msg.channel.guild.iconURL!);
 				break;

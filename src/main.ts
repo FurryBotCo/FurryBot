@@ -6,59 +6,64 @@ import StatsHandler from "./util/handler/StatsHandler";
 import UserConfig from "./db/Models/UserConfig";
 import GuildConfig from "./db/Models/GuildConfig";
 import ModLogServiceTypes from "./util/@types/ModLogServiceTypes";
-import ReadyEvent from "./events/ready";
-import { BaseClusterWorker, BaseClusterWorkerSetup } from "eris-fleet";
 import { Category, ClientEvent, Command, CommandHandler,  MessageCollector, WebhookStore } from "core";
 import { ModuleImport, Utility } from "utilities";
 import { CommandHelper } from "slash-extras";
 import * as fs from "fs-extra";
 import Logger from "logger";
 import Eris from "eris";
-import { performance } from "node:perf_hooks";
-import path from "node:path";
+import { BaseCluster, BaseClusterInitializer } from "clustering";
+import { performance } from "perf_hooks";
+import path from "path";
 
 export type VALID_LANGUAGES = typeof config["languages"][number];
-export default class FurryBot extends BaseClusterWorker {
+export default class FurryBot extends BaseCluster {
 	cmd: CommandHandler<this, UserConfig, GuildConfig>;
-	w: WebhookStore<this, keyof typeof config["webhooks"]>;
-	col: MessageCollector<this>;
+	h = new CommandHelper(config.client.token, config.client.id);
 	events = new Map<string, {
 		handler: (...args: Array<unknown>) => void;
 		event: ClientEvent<FurryBot>;
 	}>();
-	h: CommandHelper;
-	ic: IPCCommandHandler;
-	b: BadgeHandler;
-	sh: StatsHandler;
 	// this is stored here to avoid making the info command take at least 1 second on each run
 	// will this make it inaccurate? Well yes, of course, but it makes the command not sit there stalling,
 	// waiting for the test to finish
 	cpuUsage = -1;
 	firstReady = false;
+	w: WebhookStore<this, keyof typeof config["webhooks"]>;
+	col: MessageCollector<this>;
+	ic: IPCCommandHandler;
+	b: BadgeHandler;
+	sh: StatsHandler;
+	blPosted = false;
+	blStats: NodeJS.Timeout;
 	private cpuUsageT: NodeJS.Timeout;
-	constructor(setup: BaseClusterWorkerSetup) {
+	constructor(setup: BaseClusterInitializer) {
 		super(setup);
 		this.cmd = new CommandHandler();
-		this.w = new WebhookStore(this);
-		this.w.addBulk(config.webhooks);
+		this.w = new WebhookStore(this).addBulk(config.webhooks);
 		/* void this.executeLaunchHook(); */
-		this.col = new MessageCollector(this);
-		this.h = new CommandHelper(config.client.token, config.client.id);
 		this.ic = new IPCCommandHandler(this).register();
 		this.b = new BadgeHandler(this);
 		this.sh = new StatsHandler(this);
 		db.setClient(this);
 		this.cpuUsageT = setInterval(async() =>  Utility.getCPUUsage().then(v => this.cpuUsage = v), 5e3);
-		this.bot.on("ready", ReadyEvent.handle.bind(ReadyEvent, this));
 	}
 
 	async launch() {
-		void this.loadEvents(false);
+		this.col = new MessageCollector(this);
+		void this.loadEvents(false).then(() => this.events.get("ready")!.handler());
+		this.blStats = setInterval(() => {
+			const d = new Date();
+			if ((d.getMinutes() % 15) === 0) {
+				if (this.blPosted === true) return;
+				Logger.info("Bot List Stats", "Stats updated.");
+			} else this.blPosted = false;
+		}, 1e3);
 		// @TODO
 	}
 
-	override shutdown(done: () => void) {
-		this.bot.removeAllListeners();
+	shutdown(done: () => void) {
+		this.client.removeAllListeners();
 		clearInterval(this.cpuUsageT);
 		this.trackNoResponse(
 			this.sh.joinParts("stats", "shutdown")
@@ -69,7 +74,7 @@ export default class FurryBot extends BaseClusterWorker {
 	async loadEvents(removeAll: boolean) {
 		const start = performance.now();
 		if (removeAll) {
-			this.bot.removeAllListeners();
+			this.client.removeAllListeners();
 			Logger.debug([`Cluster #${this.clusterId}`, "Event Loader"], "Removed all listeners before loading events.");
 		}
 		const events = fs.readdirSync(`${__dirname}/events`);
@@ -78,14 +83,13 @@ export default class FurryBot extends BaseClusterWorker {
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			const { default: e } = await import(`${__dirname}/events/${event}`) as ModuleImport<ClientEvent<this>>;
 			if (e instanceof ClientEvent) {
-				if (this.events.has(e.event)) this.bot.off(e.event, this.events.get(e.event)!.handler);
+				if (this.events.has(e.event)) this.client.off(e.event, this.events.get(e.event)!.handler);
 				const handler = (...d: Array<unknown>) => e.handle(this, ...d) as void;
-				if (e.event === "ready") continue;
 				this.events.set(e.event, {
 					handler,
 					event: e as ClientEvent<this>
 				});
-				this.bot.on(e.event, handler);
+				this.client.on(e.event, handler);
 				Logger.debug([`Cluster #${this.clusterId}`, "Event Loader"], `Loaded the event "${e.event}".`);
 			} else {
 				Logger.error([`Cluster #${this.clusterId}`, "Event Loader"], `Error loading the event file "${event}", export is not an instance of ClientEvent.`);
@@ -124,39 +128,31 @@ export default class FurryBot extends BaseClusterWorker {
 	}
 
 	async getUser(id: string) {
-		if (this.bot.users.has(id)) return this.bot.users.get(id)!;
-		let user = await this.ipc.fetchUser(id);
+		if (this.client.users.has(id)) return this.client.users.get(id)!;
+		const user = await this.client.getRESTUser(id).catch(() => null);
 		if (user !== null) {
-			this.bot.users.set(id, user);
+			this.client.users.set(id, user);
 			return user;
-		} else {
-			user = await this.bot.getRESTUser(id).catch(() => null);
-			if (user !== null) {
-				this.bot.users.set(id, user);
-				return user;
-			}
 		}
 		return null;
 	}
 
 	async getGuild(id: string) {
-		if (this.bot.guilds.has(id)) return this.bot.guilds.get(id)!;
-		const g = await this.ipc.fetchGuild(id);
-		if (g !== null) return g;
-		const guild: Eris.Guild | null = await this.bot.getRESTGuild(id).catch(() => null);
+		if (this.client.guilds.has(id)) return this.client.guilds.get(id)!;
+		const guild: Eris.Guild | null = await this.client.getRESTGuild(id).catch(() => null);
 		return guild || null;
 	}
 
 	async track(...data: Array<string>) {
-		return this.ipc.command("stats", data, true);
+		return this.ipc.serviceCommand("stats", data, true);
 	}
 
 	trackNoResponse(...data: Array<string>) {
-		void this.ipc.command("stats", data, false);
+		void this.ipc.serviceCommand("stats", data, false);
 	}
 
 	async executeModCommand<K extends keyof ModLogServiceTypes.Commands.CommandMap>(type: K, data: Omit<ModLogServiceTypes.Commands.CommandMap[K], "type">) {
-		return this.ipc.command("mod", {
+		return this.ipc.serviceCommand("mod", {
 			type,
 			...data
 		}, true);

@@ -93,7 +93,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["uinfo", "userinf
 						`${defaultEmojis.dot} {lang:${cmd.lang}.creationDate}: ${Time.formatDateWithPadding(user.createdAt, true)}`,
 						`${defaultEmojis.dot} {lang:other.words.roles$ucwords$} [${user.roles.length}]: ${user.roles.reduce((a, b) => a + msg.channel.guild.roles.get(b)!.name.length, 0) > 250 ? `{lang:${cmd.lang}.tooManyRoles|${msg.prefix}|${user.user.id}}` : user.roles.length === 0 ? "NONE" : user.roles.map(r => `<@&${r}>`).join(" ")}`,
 						`${defaultEmojis.dot} {lang:other.words.status$ucwords$}: <:${config.emojis.status[user.status || "offline"]}> ${user.status || "offline"}`, /* if we get no status, assume offline */
-						`${defaultEmojis.dot} {lang:other.words.game$ucwords$}: ${!user.game ? "{lang:other.words.none}" : `${user.game.name}`}`,
+						`${defaultEmojis.dot} {lang:other.words.game$ucwords$}: ${!user.game ? "{lang:other.words.none}" : `${user.game.name!}`}`,
 						`${defaultEmojis.dot} {lang:${cmd.lang}.joinPos}: #${m.indexOf(user.id) + 1}`,
 						`${defaultEmojis.dot} {lang:${cmd.lang}.nearbyJoins}:`,
 						...around.map(a => a === msg.author.id ? `- [#${m.indexOf(a) + 1}] **<@!${a}>**` : `- [#${m.indexOf(a) + 1}] <@!${a}>`),

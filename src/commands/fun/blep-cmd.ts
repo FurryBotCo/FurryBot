@@ -22,7 +22,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["blep"], __filena
 				.setDescription(`{lang:${cmd.lang}.possible|${msg.author.id}|${BotFunctions.extraArgParsing(msg)}}`)
 				.setImage(img.url)
 				.setTimestamp(new Date().toISOString())
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setColor(Colors.gold)
 				.toJSON()
 		});

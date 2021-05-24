@@ -26,7 +26,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["levelroles"], __
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(msg.gConfig.settings.lang)
 						.setTitle(`{lang:${cmd.lang}.list.title}`)
-						.setFooter(`Page ${page}/${pages.length}`, this.bot.user.avatarURL)
+						.setFooter(`Page ${page}/${pages.length}`, this.client.user.avatarURL)
 						.setTimestamp(new Date().toISOString())
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
 						.setColor(Colors.furry)
@@ -100,7 +100,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["levelroles"], __
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.help.title}`)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setColor(Colors.red)
 				.setDescription([
 					`{lang:${cmd.lang}.help.subNotice}`,
@@ -121,7 +121,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["levelroles"], __
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.help.title} - {lang:other.words.list$ucwords$}`)
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
-					.setFooter("OwO", this.bot.user.avatarURL)
+					.setFooter("OwO", this.client.user.avatarURL)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:${cmd.lang}.help.noPerms}`,
@@ -136,7 +136,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["levelroles"], __
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.help.title} - {lang:other.words.remove$ucwords$}`)
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
-					.setFooter("OwO", this.bot.user.avatarURL)
+					.setFooter("OwO", this.client.user.avatarURL)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:${cmd.lang}.help.requiresPerm2|manageRoles}`,
@@ -151,7 +151,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["levelroles"], __
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.help.title} - {lang:other.words.add$ucwords$}`)
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
-					.setFooter("OwO", this.bot.user.avatarURL)
+					.setFooter("OwO", this.client.user.avatarURL)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:${cmd.lang}.help.requiresPerm2|manageRoles}`,

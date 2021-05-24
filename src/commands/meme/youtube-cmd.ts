@@ -24,7 +24,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["youtube"], __fil
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setTimestamp(new Date().toISOString())
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("dankmemer.services", this.bot.user.avatarURL)
+				.setFooter("dankmemer.services", this.client.user.avatarURL)
 				.setColor(Colors.furry)
 				.setImage(`attachment://${cmd.triggers[0]}.${ext}`)
 				.toJSON()

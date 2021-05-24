@@ -5,7 +5,7 @@ import GuildConfig, { DBKeys } from "../db/Models/GuildConfig";
 import config from "../config";
 import Yiffy from "../util/req/Yiffy";
 import LocalFunctions from "../util/LocalFunctions";
-import { BaseServiceWorker, BaseServiceWorkerSetup } from "eris-fleet";
+import { BaseService, ServiceInitalizer } from "clustering";
 import Logger from "logger";
 import { Colors, EmbedBuilder } from "core";
 import Eris from "eris";
@@ -13,27 +13,27 @@ import fetch from "node-fetch";
 import { Request } from "utilities";
 import { WithId } from "mongodb";
 
-export default class AutoPostingService extends BaseServiceWorker {
+export default class AutoPostingService extends BaseService {
 	private interval: NodeJS.Timeout;
 	private client = new Eris.Client(`Bot ${config.client.token}`, { restMode: true });
 	private DONE: Array<string> = [];
-	constructor(setup: BaseServiceWorkerSetup) {
+	constructor(setup: ServiceInitalizer) {
 		super(setup);
 		this.interval = setInterval(() => {
 			const d = new Date();
 			if ((d.getMinutes() % 5) === 0) void this.run();
 			else if ((d.getSeconds() % 15) === 0) this.DONE = [];
 		}, 800);
-		this.serviceReady();
+		this.done();
 	}
 
 	// this service doesn't accept commands, but we have to overload this
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	override async handleCommand(data: never) {
+	async handleCommand(data: never) {
 		return;
 	}
 
-	override shutdown(done: () => void) {
+	shutdown(done: () => void) {
 		clearInterval(this.interval);
 		done();
 	}

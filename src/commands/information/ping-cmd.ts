@@ -31,7 +31,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["ping"], __filena
 						`{lang:${cmd.lang}.msgTime}: **${Math.abs(Math.floor(edit - create))}ms**`
 					].join("\n"))
 					.setTimestamp(new Date().toISOString())
-					.setFooter("OwO", this.bot.user.avatarURL)
+					.setFooter("OwO", this.client.user.avatarURL)
 					.setColor(Colors.gold);
 				if (extra && mongo !== null && Redis !== null) {
 					const dbStart = performance.now();

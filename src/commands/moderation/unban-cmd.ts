@@ -49,5 +49,5 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["unban", "ub"], _
 				else await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.couldNotUnban`, [`${user.tag}`, `${err.name}: ${err.message}`]));
 			}
 		});
-		if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages") && msg.gConfig.settings.deleteModCommands) await msg.delete().catch(() => null);
+		if (msg.channel.permissionsOf(this.client.user.id).has("manageMessages") && msg.gConfig.settings.deleteModCommands) await msg.delete().catch(() => null);
 	});

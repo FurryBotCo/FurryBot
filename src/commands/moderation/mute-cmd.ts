@@ -58,7 +58,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["mute", "m"], __f
 		}
 
 
-		const c = BotFunctions.compareMemberWithRole(msg.channel.guild.members.get(this.bot.user.id)!, msg.channel.guild.roles.get(msg.gConfig.settings.muteRole)!);
+		const c = BotFunctions.compareMemberWithRole(msg.channel.guild.members.get(this.client.user.id)!, msg.channel.guild.roles.get(msg.gConfig.settings.muteRole)!);
 		if (c.same || c.lower) return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.invalidRole}`)
@@ -105,5 +105,5 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["mute", "m"], __f
 				if (m !== null) await m.delete();
 			}
 		});
-		if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages") && msg.gConfig.settings.deleteModCommands) await msg.delete().catch(() => null);
+		if (msg.channel.permissionsOf(this.client.user.id).has("manageMessages") && msg.gConfig.settings.deleteModCommands) await msg.delete().catch(() => null);
 	});

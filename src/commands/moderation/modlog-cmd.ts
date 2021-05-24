@@ -77,7 +77,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 					}
 
 					case 3: {
-						if (!msg.channel.permissionsOf(this.bot.user.id).has("manageWebhooks")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.setup.missingPermission`, ["manageWebhooks", msg.channel.id]));
+						if (!msg.channel.permissionsOf(this.client.user.id).has("manageWebhooks")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.setup.missingPermission`, ["manageWebhooks", msg.channel.id]));
 						const img = await Request.getImageFromURL(config.images.icons.bot);
 						const { mime } = await FileType.fromBuffer(img) ?? { mime: null };
 						if (mime === null) throw new Error("Internal error.");
@@ -92,20 +92,20 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 
 					default: return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.invalidSelection", [1, 3]));
 				}
-				let ch = this.bot.getChannel(hook!.channel_id) as Eris.GuildChannel;
-				if (!ch || !(ch instanceof Eris.GuildChannel)) ch = await this.bot.getRESTChannel(hook!.channel_id) as Eris.GuildChannel;
+				let ch = this.client.getChannel(hook!.channel_id) as Eris.GuildChannel;
+				if (!ch || !(ch instanceof Eris.GuildChannel)) ch = await this.client.getRESTChannel(hook!.channel_id) as Eris.GuildChannel;
 				if (!ch) throw new TypeError("Unable to fetch channel.");
 
-				await this.bot.executeWebhook(hook!.id, hook!.token, {
+				await this.client.executeWebhook(hook!.id, hook!.token, {
 					wait: false,
 					embeds: [
 						new EmbedBuilder(msg.gConfig.settings.lang)
 							.setTitle(`{lang:${cmd.lang}.setup.testEmbed.title}`)
-							.setDescription(`{lang:${cmd.lang}.setup.testEmbed.desc|${this.bot.user.id}|${msg.prefix}}`)
+							.setDescription(`{lang:${cmd.lang}.setup.testEmbed.desc|${this.client.user.id}|${msg.prefix}}`)
 							.setColor(Colors.furry)
 							.setTimestamp(new Date().toISOString())
 							.setAuthor(msg.author.tag, msg.author.avatarURL)
-							.setFooter("OwO", this.bot.user.avatarURL)
+							.setFooter("OwO", this.client.user.avatarURL)
 							.toJSON()
 					]
 				});
@@ -132,13 +132,13 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 			case "reset": {
 				if (msg.gConfig.modlog.enabled === false) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.reset.notEnabled`));
 				if (msg.gConfig.modlog.webhook) {
-					const w = await this.bot.getWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token).catch(() => null);
+					const w = await this.client.getWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token).catch(() => null);
 					if (w !== null) {
 						await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.reset.removeWebhook`, [w.id]));
 						const n = await this.col.awaitMessages(msg.channel.id, 6e4, ({ author: { id: d } }) => d === msg.author.id, 1);
 						if (n === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
 						if (n.content.toLowerCase() === "yes") {
-							await this.bot.deleteWebhook(w.id, w.token);
+							await this.client.deleteWebhook(w.id, w.token);
 							await msg.gConfig.mongoEdit({
 								$set: {
 									modlog: {
@@ -168,7 +168,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 			case "info":
 			case "get": {
 				if (msg.gConfig.modlog.enabled === false) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.get.notEnabled`));
-				const w =msg.gConfig.modlog.webhook ? await this.bot.getWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token).catch(() => null) : null;
+				const w =msg.gConfig.modlog.webhook ? await this.client.getWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token).catch(() => null) : null;
 				if (w === null) {
 					await msg.gConfig.mongoEdit({
 						$set: {
@@ -186,7 +186,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
 						.setDescription(`{lang:${cmd.lang}.get.desc|${w.channel_id}|${w.name}|${w.id}}`)
 						.setTitle(`{lang:${cmd.lang}.get.title}`)
-						.setFooter("OwO", this.bot.user.avatarURL)
+						.setFooter("OwO", this.client.user.avatarURL)
 						.setColor(Colors.furry)
 						.setTimestamp(new Date().toISOString())
 						.toJSON()
@@ -215,7 +215,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 						].join("\n"))
 						.setTimestamp(new Date().toISOString())
 						.setColor(Colors.red)
-						.setFooter("OwO", this.bot.user.avatarURL)
+						.setFooter("OwO", this.client.user.avatarURL)
 						.toJSON()
 				});
 				break;

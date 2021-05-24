@@ -12,8 +12,8 @@ import Eris from "eris";
 import Logger from "logger";
 import * as fs from "fs-extra";
 import Language from "language";
-import crypto from "node:crypto";
-import { performance } from "node:perf_hooks";
+import crypto from "crypto";
+import { performance } from "perf_hooks";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildTextableChannel>("messageCreate", async function(msg, update, slash, slashInfo) {
@@ -160,13 +160,13 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 				this.trackNoResponse(
 					this.sh.joinParts("stats", "levelUp", "message")
 				);
-				if (msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) {
+				if (msg.channel.permissionsOf(this.client.user.id).has("sendMessages")) {
 					let m: Eris.Message;
-					if (msg.channel.permissionsOf(this.bot.user.id).has("embedLinks")) m = await msg.channel.createMessage({
+					if (msg.channel.permissionsOf(this.client.user.id).has("embedLinks")) m = await msg.channel.createMessage({
 						embed: new EmbedBuilder(msg.gConfig.settings.lang)
 							.setTitle("{lang:other.leveling.embedTitle}")
 							.setDescription(`{lang:other.leveling.embedDescription|${nlvl.level}}`)
-							.setFooter("{lang:other.leveling.embedFooter}", this.bot.user.avatarURL)
+							.setFooter("{lang:other.leveling.embedFooter}", this.client.user.avatarURL)
 							.setColor(Colors.green)
 							.setTimestamp(new Date().toISOString())
 							.setAuthor(msg.author.tag, msg.author.avatarURL)
@@ -194,7 +194,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 
 	/* start mention */
 	t.start("mention");
-	if (new RegExp(`^<@!?${this.bot.user.id}>$`).test(msg.content)) {
+	if (new RegExp(`^<@!?${this.client.user.id}>$`).test(msg.content)) {
 		this.trackNoResponse(
 			this.sh.joinParts("stats", "mention")
 		);
@@ -220,7 +220,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.red)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("{lang:other.selfDestructMessage|15}", this.bot.user.avatarURL)
+				.setFooter("{lang:other.selfDestructMessage|15}", this.client.user.avatarURL)
 				.toJSON();
 
 			let m: Eris.Message | null = await msg.channel.createMessage({
@@ -266,7 +266,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.furry)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("{lang:other.selfDestructMessage|15}", this.bot.user.avatarURL)
+				.setFooter("{lang:other.selfDestructMessage|15}", this.client.user.avatarURL)
 				.toJSON();
 
 			let m: Eris.Message | null = await msg.channel.createMessage({
@@ -352,14 +352,14 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 
 			fs.writeFileSync(`${config.dir.logs.spam}/${msg.author.id}-${reportId}-cmd.json`, JSON.stringify(report));
 
-			Logger.log([`Shard #${msg.channel.guild.shard.id}`, "Command Handler"], `Possible command spam from "${msg.author.tag}" (${msg.author.id}), VL: ${spC}, Report: ${config.beta ? `https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`);
+			Logger.info([`Shard #${msg.channel.guild.shard.id}`, "Command Handler"], `Possible command spam from "${msg.author.tag}" (${msg.author.id}), VL: ${spC}, Report: ${config.beta ? `https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}` : `https://botapi.furry.bot/reports/cmd/${msg.author.id}/${reportId}`}`);
 			await this.w.get("spam")!.execute({
 				embeds: [
 					new EmbedBuilder(config.devLanguage)
 						.setTitle(`Possible Command Spam From ${msg.author.tag} (${msg.author.id}) | VL: ${spC}`)
 						.setDescription(`Report: ${`https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`}`)
 						.setTimestamp(new Date().toISOString())
-						.setAuthor(`${this.bot.user.username}#${this.bot.user.discriminator}`, this.bot.user.avatarURL)
+						.setAuthor(`${this.client.user.username}#${this.client.user.discriminator}`, this.client.user.avatarURL)
 						.setColor(Colors.gold)
 						.toJSON()
 				],
@@ -369,8 +369,8 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 
 			if (spC >= config.antiSpam.cmd.blacklist) {
 				const expire = LocalFunctions.getBlacklistTime("cmd", uBl.current.length, true, true);
-				await db.addBl("user", msg.author.id, "automatic", this.bot.user.id, "Spamming Commands.", expire, `https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`);
-				Logger.log([`Cluster #${this.clusterId}`, `Shard #${msg.channel.guild.shard.id}`, "Command Handler"], `User "${msg.author.tag}" (${msg.author.id}) blacklisted for spamming, VL: ${spC}, Report: https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`);
+				await db.addBl("user", msg.author.id, "automatic", this.client.user.id, "Spamming Commands.", expire, `https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`);
+				Logger.info([`Cluster #${this.clusterId}`, `Shard #${msg.channel.guild.shard.id}`, "Command Handler"], `User "${msg.author.tag}" (${msg.author.id}) blacklisted for spamming, VL: ${spC}, Report: https://${config.web.api.host}/reports/cmd/${msg.author.id}/${reportId}`);
 			}
 		}
 	}
@@ -450,7 +450,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 							.setDescription(`{lang:other.commandChecks.cooldown.description|${Time.ms(c.time, true)}|${Time.ms(cmd.cooldown, true)}}`)
 							.setColor(Colors.red)
 							.setTimestamp(new Date().toISOString())
-							.setFooter("{lang:other.selfDestructMessage|20}", this.bot.user.avatarURL)
+							.setFooter("{lang:other.selfDestructMessage|20}", this.client.user.avatarURL)
 							.toJSON()
 					});
 

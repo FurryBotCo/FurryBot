@@ -77,7 +77,7 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 	}
 
 	/* eslint-disable deprecation/deprecation */
-	override async fix() {
+	async fix() {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const obj: ConfigEditTypes<GuildConfig, "id"> = Object.create(null);
 		if (this.modlog !== undefined){

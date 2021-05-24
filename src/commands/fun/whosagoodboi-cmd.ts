@@ -25,9 +25,9 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["whosagoodboi", "
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setDescription(`{lang:${cmd.lang}.${msg.args.length === 0 ? "self" : u && u.id === this.bot.user.id ? "me" : "other"}${((u && naughtyList.includes(u.id)) || (naughtyList.includes(msg.author.id))) ? "Bad" : ""}|${BotFunctions.extraArgParsing(msg)}}`)
+				.setDescription(`{lang:${cmd.lang}.${msg.args.length === 0 ? "self" : u && u.id === this.client.user.id ? "me" : "other"}${((u && naughtyList.includes(u.id)) || (naughtyList.includes(msg.author.id))) ? "Bad" : ""}|${BotFunctions.extraArgParsing(msg)}}`)
 				.setTimestamp(new Date().toISOString())
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setColor(Colors.furry)
 				.toJSON()
 		});

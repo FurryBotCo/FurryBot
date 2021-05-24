@@ -23,7 +23,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["gayrate"], __fil
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setDescription(`{lang:${cmd.lang}.percent${member.id === msg.author.id ? "Self" : "Other"}|<@!${member.id}>|${Math.floor(Math.random() * 100)}}`)
 				.setTimestamp(new Date().toISOString())
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setColor(Colors.furry)
 				.toJSON()
 		});

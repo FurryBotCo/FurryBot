@@ -18,14 +18,14 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["whoplays"], __fi
 		const global = msg.dashedArgs.value.includes("global");
 		let l: Array<Eris.User | Eris.Member> = [], limit = false;
 		if (global) {
-			for (const [, g] of this.bot.guilds) {
-				const v = g.members.filter(m => m.game! && m.game.name.toLowerCase().indexOf(msg.args.join(" ").toLowerCase()) !== -1);
+			for (const [, g] of this.client.guilds) {
+				const v = g.members.filter(m => m.game! && m.game.name!.toLowerCase().indexOf(msg.args.join(" ").toLowerCase()) !== -1);
 				limit = false;
 				l.push(...v);
 			}
 		} else {
 			// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-			l = msg.channel.guild.members.filter(m => m.game! && m.game.name.toLowerCase().indexOf(msg.args.join(" ").toLowerCase()) !== -1);
+			l = msg.channel.guild.members.filter(m => m.game! && m.game.name!.toLowerCase().indexOf(msg.args.join(" ").toLowerCase()) !== -1);
 			limit = false;
 		}
 		const len = l.length;
@@ -42,7 +42,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["whoplays"], __fi
 				].join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.gold)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.toJSON()
 		});
 	});

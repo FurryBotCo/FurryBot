@@ -18,7 +18,11 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["bancount"], __fi
 		const b: Array<Eris.GuildAuditLogEntry> = [];
 
 		async function get(a?: string): Promise<undefined> {
-			const { entries } = await msg.channel.guild.getAuditLogs(100, a, Eris.Constants.AuditLogActions.MEMBER_BAN_ADD);
+			const { entries } = await msg.channel.guild.getAuditLog({
+				limit: 100,
+				before: a,
+				actionType: Eris.Constants.AuditLogActions.MEMBER_BAN_ADD
+			});
 
 			b.push(...entries);
 			if (entries.length === 100) return get(entries[99].id);

@@ -4,7 +4,6 @@ import { ClientEvent, ExtendedMessage } from "core";
 import Eris from "eris";
 import { GatewayInteractionCreateDispatchData } from "discord-api-types/v8";
 import { InteractionResponseType } from "slash-extras";
-import util from "util";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default new ClientEvent<FurryBot>("rawWS", async function({ op, d, s, t }) {
@@ -15,14 +14,14 @@ export default new ClientEvent<FurryBot>("rawWS", async function({ op, d, s, t }
 		switch (t) {
 			case "MESSAGE_CREATE": {
 				const msg = new ExtendedMessage(d as Eris.BaseData, this);
-				this.bot.emit("messageCreate", msg, false, false, undefined);
+				this.client.emit("messageCreate", msg, false, false, undefined);
 				break;
 			}
 
 			case "INTERACTION_CREATE": {
 				const v = d as GatewayInteractionCreateDispatchData;
 				await this.h.createInteractionResponse(v.id, v.token, InteractionResponseType.ACK_WITH_SOURCE);
-				const c = await this.bot.getRESTChannel(v.channel_id) as Eris.AnyGuildChannel;
+				const c = await this.client.getRESTChannel(v.channel_id) as Eris.AnyGuildChannel;
 				if (!c) return;
 				const g = await db.getGuild(c.guild.id);
 				let opts: Record<string, string | number | bigint | boolean> = {};

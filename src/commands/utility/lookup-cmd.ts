@@ -53,7 +53,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["lookup"], __file
 					.setTimestamp(new Date().toISOString());
 
 				const [, code] = w.body.instant_invite?.match(new RegExp("^(?:(?:https?://)?(?:discord.gg|discord(?:app)?.com/invite)/)?([A-Za-z0-9]{2,32})$", "i")) ?? [];
-				const inv = !code ? null : (await this.bot.getInvite(code, true).catch(() => null));
+				const inv = !code ? null : (await this.client.getInvite(code, true).catch(() => null));
 				if (!inv) {
 					embed.addField(
 						"{lang:other.words.info$ucwords$}",

@@ -25,7 +25,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["e621", "e6"], __
 		// because we can't have nice things without jackasses ruining it,
 		// this has to have a ratelimiting system
 		if (a.includes(msg.channel.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.alreadyRunning`, [defaultEmojis.stop]));
-		if (!msg.channel.permissionsOf(this.bot.user.id).has("manageMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.permsRequired`));
+		if (!msg.channel.permissionsOf(this.client.user.id).has("manageMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.permsRequired`));
 		let slice = msg.args.length;
 		if (msg.slash) {
 			if (/(true|false)/.exec(msg.args[msg.args.length - 2]) && /(true|false)/.exec(msg.args[msg.args.length - 1])) {
@@ -58,7 +58,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["e621", "e6"], __
 		const e = new EmbedBuilder(msg.gConfig.settings.lang)
 			.setTitle(`{lang:${cmd.lang}.title}`)
 			.setAuthor(msg.author.tag, msg.author.avatarURL)
-			.setFooter("OwO", this.bot.user.avatarURL)
+			.setFooter("OwO", this.client.user.avatarURL)
 			.setTimestamp(new Date().toISOString())
 			.setColor(Colors.gold)
 			.setDescription(`{lang:${cmd.lang}.loading}`);
@@ -94,7 +94,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["e621", "e6"], __
 				}
 			}
 			const p = img[index];
-			e.setFooter(`{lang:${cmd.lang}.num|${index + 1}|${img.length}}`, this.bot.user.avatarURL);
+			e.setFooter(`{lang:${cmd.lang}.num|${index + 1}|${img.length}}`, this.client.user.avatarURL);
 			if (p.file.ext === "webm") e.removeImage().setDescription(`${filtering()}{lang:${cmd.lang}.video|https://e621.net/posts/${p.id}}`);
 			else e.setImage(p.file.url).setDescription(`${filtering()}{lang:${cmd.lang}.post|https://e621.net/posts/${p.id}}`);
 			await m.edit({
@@ -111,7 +111,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["e621", "e6"], __
 			await m.edit({
 				embed: e.toJSON()
 			}).catch(() => null);
-			this.bot.off("messageReactionAdd", f);
+			this.client.off("messageReactionAdd", f);
 			await m.removeReactions().catch(() => null);
 		});
 
@@ -151,5 +151,5 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["e621", "e6"], __
 		// need a reference to the exact listener we used
 		const f = reactionHandler.bind(this);
 
-		this.bot.on("messageReactionAdd", f);
+		this.client.on("messageReactionAdd", f);
 	});

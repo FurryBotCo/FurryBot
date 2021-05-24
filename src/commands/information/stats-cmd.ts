@@ -196,7 +196,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["stats"], __filen
 
 		return msg.channel.createMessage({
 			embed: e
-				.setFooter(`{lang:${cmd.lang}.footer|${(end! - start).toFixed(3)}}`, this.bot.user.avatarURL)
+				.setFooter(`{lang:${cmd.lang}.footer|${(end! - start).toFixed(3)}}`, this.client.user.avatarURL)
 				.toJSON()
 		});
 	});

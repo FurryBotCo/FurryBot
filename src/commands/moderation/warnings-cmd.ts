@@ -43,14 +43,14 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 				return msg.channel.createMessage({
 					embed: new EmbedBuilder(msg.gConfig.settings.lang)
 						.setTitle(`{lang:${cmd.lang}.list.title|${member.username}#${member.discriminator}}`)
-						.setFooter(`Page ${page}/${pages.length}`, this.bot.user.avatarURL)
+						.setFooter(`Page ${page}/${pages.length}`, this.client.user.avatarURL)
 						.setTimestamp(new Date().toISOString())
 						.setAuthor(msg.author.tag, msg.author.avatarURL)
 						.setColor(Colors.gold)
 						.setDescription(`{lang:${cmd.lang}.list.dateFormat}: MM/DD/YYYY`)
 						.addFields(...await Promise.all(pages[page - 1].map(async (v) => {
 							const d = new Date(v.date);
-							const u: Eris.User | null = this.bot.users.get(v.blameId) || await this.bot.getRESTUser(v.blameId).catch(() => null);
+							const u: Eris.User | null = this.client.users.get(v.blameId) || await this.client.getRESTUser(v.blameId).catch(() => null);
 							return {
 								name: `{lang:${cmd.lang}.list.num|${v.id}}`,
 								value: [
@@ -125,7 +125,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.help.title}`)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setColor(Colors.red)
 				.setDescription([
 					`{lang:${cmd.lang}.help.subNotice}`,
@@ -147,7 +147,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.help.title} - {lang:other.words.list$ucwords$}`)
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
-					.setFooter("OwO", this.bot.user.avatarURL)
+					.setFooter("OwO", this.client.user.avatarURL)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:${cmd.lang}.help.noPerms}`,
@@ -162,7 +162,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.help.title} - {lang:other.words.remove$ucwords$}`)
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
-					.setFooter("OwO", this.bot.user.avatarURL)
+					.setFooter("OwO", this.client.user.avatarURL)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:${cmd.lang}.help.requiresPerm2|manageMessages}`,
@@ -177,7 +177,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.help.title} - {lang:other.words.clear$ucwords$}`)
 					.setAuthor(msg.author.tag, msg.author.avatarURL)
-					.setFooter("OwO", this.bot.user.avatarURL)
+					.setFooter("OwO", this.client.user.avatarURL)
 					.setColor(Colors.red)
 					.setDescription([
 						`{lang:${cmd.lang}.help.requiresPerm2|manageServer}`,

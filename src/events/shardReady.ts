@@ -10,7 +10,7 @@ export default new ClientEvent<FurryBot>("shardReady", async function(id) {
 				.setDescription(`Shard #${id} is ready!`)
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.green)
-				.setFooter(`Shard ${id + 1}/${this.bot.shards.size} | Cluster #${this.clusterId + 1}`)
+				.setFooter(`Shard ${id + 1}/${this.client.shards.size} | Cluster #${this.clusterId + 1}`)
 				.toJSON()
 		],
 		username: `Furry Bot${config.beta ? " Beta -" : ""} Shard Status`,

@@ -2,7 +2,7 @@ import FurryBot from "../../main";
 import config from "../../config";
 import { GAME_TYPES } from "core";
 import Eris from "eris";
-import { Stats } from "eris-fleet";
+import { Stats } from "clustering";
 
 export default class StatusHandler {
 	static client: FurryBot;
@@ -32,7 +32,7 @@ export default class StatusHandler {
 			)
 			.add(
 				"online",
-				(client) => `${config.defaults.prefix}help in ${Object.keys(client.bot.channelGuildMap).length} channels`,
+				(client, stats) => `${config.defaults.prefix}help in ${stats?.guildChannels || Object.keys(client.bot.channelGuildMap).length} channels`,
 				"LISTENING",
 				(hour: number, minute: number, second: number) => (minute % 2) === 0 && second === 40
 			)
@@ -44,13 +44,13 @@ export default class StatusHandler {
 			)
 			.add(
 				"online",
-				() => `${config.defaults.prefix}help | Chris is cute`,
+				() => `${config.defaults.prefix}help | https://furry.bot`,
 				"PLAYING",
 				(hour: number, minute: number, second: number) => (minute % 2) === 1 && second === 20
 			)
 			.add(
 				"online",
-				() => `${config.defaults.prefix}help | https://furry.bot`,
+				() => `${config.defaults.prefix}help | https://yiff.rest`,
 				"PLAYING",
 				(hour: number, minute: number, second: number) => (minute % 2) === 1 && second === 40
 			);

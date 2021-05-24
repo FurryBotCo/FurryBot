@@ -25,7 +25,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["avatar", "av"], 
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
 				.setColor(color)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setTitle(`{lang:${cmd.lang}.title|${member.username}#${member.discriminator}}`)
 				.setDescription(`[[512x512](${format(512)})] - [[1024x1024](${format(1024)})] - [[2048x2048](${format(2048)})]`)
 				.setImage(format(4096))

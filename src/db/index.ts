@@ -9,16 +9,16 @@ import { MongoError, WithId } from "mongodb";
 import Logger from "logger";
 import { Strings, Time } from "utilities";
 import Eris from "eris";
-import crypto from "node:crypto";
-import { performance } from "node:perf_hooks";
-import { isWorker } from "node:cluster";
+import crypto from "crypto";
+import { performance } from "perf_hooks";
+import { isWorker } from "cluster";
 
 // no
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 class Database extends DB {
 	static client: FurryBot;
-	static override async getUser(id: string): Promise<UserConfig> {
+	static async getUser(id: string): Promise<UserConfig> {
 		if (mdb === null) throw new ReferenceError("Databse#getUser called before database has been intialized.");
 		const start = performance.now();
 		let d = await mdb.collection<WithId<UserKeys>>("users").findOne({ id }).then(res => !res ? null : new UserConfig(id, res));
@@ -49,7 +49,7 @@ class Database extends DB {
 		return d!;
 	}
 
-	static override async getGuild(id: string): Promise<GuildConfig> {
+	static async getGuild(id: string): Promise<GuildConfig> {
 		if (mdb === null) throw new ReferenceError("Databse#getGuild called before database has been intialized.");
 		const start = performance.now();
 		let d = await mdb.collection<WithId<GuildKeys>>("guilds").findOne({ id }).then(res => !res ? null : new GuildConfig(id, res));
@@ -159,7 +159,7 @@ class Database extends DB {
 
 if (isWorker) {
 	switch (process.env.TYPE) {
-		case "cluster": {
+		case "CLUSTER": {
 			Database.init({
 				host: config.services.db.host,
 				port: config.services.db.port,
@@ -175,7 +175,7 @@ if (isWorker) {
 			break;
 		}
 
-		case "service": {
+		case "SERVICE": {
 			switch (process.env.NAME) {
 				case "auto-posting":
 				case "mod": {

@@ -12,8 +12,8 @@ import fetch, { Response } from "node-fetch";
 import Logger from "logger";
 import Language from "language";
 import { APIError, MemeRequestResponse } from "dankmemerapi";
-import crypto from "node:crypto";
-import { performance } from "node:perf_hooks";
+import crypto from "crypto";
+import { performance } from "perf_hooks";
 
 export default class LocalFunctions {
 	/**
@@ -298,7 +298,7 @@ export default class LocalFunctions {
 			.setColor(Colors.furry);
 
 		if (msg.gConfig.settings.commandImages) {
-			if (!msg.channel.permissionsOf(this.bot.user.id).has("attachFiles")) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.permissionMissing", ["attachFiles"]));
+			if (!msg.channel.permissionsOf(this.client.user.id).has("attachFiles")) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.permissionMissing", ["attachFiles"]));
 			// eslint-disable-next-line
 			const img = await (Yiffy.furry[type] as typeof Yiffy["furry"]["boop"])("json", 1);
 			embed.setImage(img.url);

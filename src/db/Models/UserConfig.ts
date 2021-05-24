@@ -47,7 +47,7 @@ export default class UserConfig extends UC {
 		super(id, data, config.defaults.config.user, db);
 	}
 
-	override async fix() {
+	async fix() {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 		const obj: ConfigEditTypes<UserConfig, "id"> = Object.create(null);
 		if (typeof this.booster !== "boolean") obj.booster = false;
@@ -59,7 +59,7 @@ export default class UserConfig extends UC {
 		return this;
 	}
 
-	override async checkPremium(checkBoost = false): Promise<{
+	async checkPremium(checkBoost = false): Promise<{
 		remainingMonths: number | "BOOSTER";
 		activationTime: number | null;
 		active: boolean;

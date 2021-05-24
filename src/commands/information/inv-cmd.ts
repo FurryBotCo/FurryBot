@@ -17,11 +17,11 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["inv", "invite", 
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle("Discord")
 				.setDescription(`[{lang:${cmd.lang}.support}](${config.client.socials.discord})\n[{lang:${cmd.lang}.add}](${config.client.socials.discordInvite})`)
-				.setThumbnail(this.bot.user.avatarURL)
+				.setThumbnail(this.client.user.avatarURL)
 				.setColor(Colors.furry)
 				.setTimestamp(new Date().toISOString())
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.toJSON()
 		});
 	});

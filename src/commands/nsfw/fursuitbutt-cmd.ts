@@ -22,7 +22,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["fursuitbutt", "f
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
-				.setFooter("OwO", this.bot.user.avatarURL)
+				.setFooter("OwO", this.client.user.avatarURL)
 				.setTimestamp(new Date().toISOString())
 				.setDescription([
 					`[[{lang:other.images.shortURL}]](${img.shortURL})`,

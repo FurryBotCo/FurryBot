@@ -21,7 +21,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["inviteinfo", "in
 		// https://github.com/microsoft/TypeScript/issues/43249
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
-		const inv = (await this.bot.getInvite(code , true).catch(() => null));
+		const inv = (await this.client.getInvite(code , true).catch(() => null));
 		if (!inv) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalid`));
 		const { guild, inviter, channel } = inv;
 

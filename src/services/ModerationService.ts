@@ -3,14 +3,13 @@ import config from "../config";
 import { ModLogEntry, TimedEntry } from "../util/@types/Database";
 import { db } from "../db";
 import ModLogServiceTypes, { Blame } from "../util/@types/ModLogServiceTypes";
-import { BaseServiceWorker, BaseServiceWorkerSetup } from "eris-fleet";
 import Language from "language";
 import Eris from "eris";
-import { Colors, EmbedBuilder } from "core";
-import { Webhook } from "core/build/general/WebhookStore";
+import { Colors, EmbedBuilder, Webhook } from "core";
 import { Time } from "utilities";
 import Logger from "logger";
 import { ObjectId } from "mongodb";
+import { BaseService, ServiceInitalizer } from "clustering";
 
 
 class CustomError extends Error {
@@ -21,18 +20,18 @@ class CustomError extends Error {
 }
 
 
-export default class ModerationService extends BaseServiceWorker {
+export default class ModerationService extends BaseService {
 	private client = new Eris.Client(`Bot ${config.client.token}`, { restMode: true }).on("debug", (m) => Logger.debug("Moderation Service", m));
 	private timed: NodeJS.Timeout | null = null;
 	private tag: string;
-	constructor(setup: BaseServiceWorkerSetup) {
+	constructor(setup: ServiceInitalizer) {
 		super(setup);
 		this.timed = setInterval(this.processTimedEntries.bind(this), 1e3);
 		void (this.client.getRESTUser(config.client.id).then(v => v.tag).catch(() => "Unknown#0000")).then(v => this.tag = v);
-		this.serviceReady();
+		this.done();
 	}
 
-	override async handleCommand(data: ModLogServiceTypes.Commands.AnyCommand) {
+	async handleCommand(data: ModLogServiceTypes.Commands.AnyCommand) {
 		if (data.type === "timedAction") {
 			const v = await this.addTimedEntry(data.subType, data.time, data.expiry, data.user, data.guild, data.reason);
 			if (v !== true) Logger.error("Moderation Service", "Failed to create timed entry (returned false)", data);
@@ -135,7 +134,7 @@ export default class ModerationService extends BaseServiceWorker {
 		return true;
 	}
 
-	override shutdown(done: () => void) {
+	shutdown(done: () => void) {
 		if (this.timed !== null) clearInterval(this.timed);
 		done();
 	}

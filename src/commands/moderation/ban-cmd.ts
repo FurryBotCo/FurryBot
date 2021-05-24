@@ -89,5 +89,5 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["ban", "b"], __fi
 				if (m !== null) await m.delete();
 			}
 		});
-		if (msg.channel.permissionsOf(this.bot.user.id).has("manageMessages") && msg.gConfig.settings.deleteModCommands) await msg.delete().catch(() => null);
+		if (msg.channel.permissionsOf(this.client.user.id).has("manageMessages") && msg.gConfig.settings.deleteModCommands) await msg.delete().catch(() => null);
 	});
