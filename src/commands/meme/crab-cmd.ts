@@ -18,7 +18,9 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["crab"], __filena
 		await msg.channel.startTyping();
 		const { ext, file } = await DankMemerAPI.crab(BotFunctions.memeArgParsing(msg));
 		await msg.channel.stopTyping();
-		return msg.channel.createMessage({}, {
+		// because slash command messages don't support file uploads
+		if (msg.slash) await msg.reply("\u200B");
+		return msg.channel.createMessageNoSlash({}, {
 			name: `${cmd.triggers[0]}.${ext}`,
 			file
 		});

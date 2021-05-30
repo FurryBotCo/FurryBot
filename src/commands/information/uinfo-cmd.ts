@@ -30,8 +30,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["uinfo", "userinf
 		}
 
 		if (user instanceof Eris.Member) {
-			let flags: number = user.user.publicFlags ?? 0;
-			if (typeof flags !== "number") {
+			let flags: number = user.user.publicFlags ?? NaN;
+			if (isNaN(flags)) {
 				const v = await this.getUser(user.id);
 				flags = v === null ? 0 : v.publicFlags ?? 0;
 			}
@@ -100,7 +100,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["uinfo", "userinf
 						"",
 						`**{lang:${cmd.lang}.socialProfiles}:**`,
 						...(c.id !== msg.author.id ? [] : [`[[{lang:other.words.add}](https://${config.web.api.host}/socials)] [[{lang:other.words.remove}](https://${config.web.api.host}/unlink)]`]),
-						...(c.socials.length === 0 ? ["{lang:other.words.none}"] : c.socials.map(s => {
+						...((c.socials ?? []).length === 0 ? ["{lang:other.words.none}"] : c.socials.map(s => {
 							switch (s.type) {
 								case "twitter": {
 									return `<:${config.emojis.socials.twitter}> [@${s.username}](https://twitter.com/intent/user?user_id=${s.id})`;
@@ -134,8 +134,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["uinfo", "userinf
 					.toJSON()
 			});
 		} else if (user instanceof Eris.User) {
-			let flags: number = user.publicFlags ?? 0;
-			if (typeof flags !== "number") {
+			let flags: number = user.publicFlags ?? NaN;
+			if (isNaN(flags)) {
 				const v = await this.getUser(user.id);
 				flags = v === null ? 0 : v.publicFlags ?? 0;
 			}
@@ -174,7 +174,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["uinfo", "userinf
 						"",
 						`**{lang:${cmd.lang}.socialProfiles}:**`,
 						...(c.id !== msg.author.id ? [] : [`[[{lang:other.words.add}](https://${config.web.api.host}/socials)] [[{lang:other.words.remove}](https://${config.web.api.host}/unlink)]`]),
-						...(c.socials.length === 0 ? ["{lang:other.words.none}"] : c.socials.map(s => {
+						...((c.socials ?? []).length === 0 ? ["{lang:other.words.none}"] : c.socials.map(s => {
 							switch (s.type) {
 								case "twitter": {
 									return `<:${config.emojis.socials.twitter}> [@${s.username}](https://twitter.com/intent/user?user_id=${s.id})`;

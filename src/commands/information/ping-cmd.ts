@@ -1,7 +1,7 @@
 import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
 import GuildConfig from "../../db/Models/GuildConfig";
-import { mongo, Redis } from "../../db";
+import db, { rdb, Redis } from "../../db";
 import { Colors, Command, EmbedBuilder } from "core";
 import Language from "language";
 import { performance } from "perf_hooks";
@@ -33,18 +33,14 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["ping"], __filena
 					.setTimestamp(new Date().toISOString())
 					.setFooter("OwO", this.client.user.avatarURL)
 					.setColor(Colors.gold);
-				if (extra && mongo !== null && Redis !== null) {
-					const dbStart = performance.now();
-					await mongo.db("admin").command({
-						ping: 1
-					});
-					const dbEnd = performance.now();
+				if (extra && rdb !== null && Redis !== null) {
+					const dbPing = await db.ping();
 					const redisStart = performance.now();
 					await Redis.ping();
 					const redisEnd = performance.now();
 					e.setDescription([
 						e.getDescription(),
-						`{lang:${cmd.lang}.dbPing}: **${Math.abs(dbStart - dbEnd).toFixed(3)}ms**`,
+						`{lang:${cmd.lang}.dbPing}: **${Math.abs(dbPing).toFixed(3)}ms**`,
 						`{lang:${cmd.lang}.redisPing}: **${Math.abs(redisStart - redisEnd).toFixed(3)}ms**`,
 						`{lang:${cmd.lang}.generalTime}: **${Math.abs(Math.floor(create - msg.timestamp))}ms**`,
 						`{lang:${cmd.lang}.deleteTime}: **${Math.abs(Math.floor(del - create))}ms**`

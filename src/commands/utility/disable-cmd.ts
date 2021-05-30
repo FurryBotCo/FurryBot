@@ -1,6 +1,6 @@
 import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
-import GuildConfig from "../../db/Models/GuildConfig";
+import GuildConfig, { DBKeys } from "../../db/Models/GuildConfig";
 import { Colors, Command, CommandError, defaultEmojis, EmbedBuilder } from "core";
 import Eris from "eris";
 import { PartialRecord, Strings } from "utilities";
@@ -44,10 +44,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["disable"], __fil
 					} as GuildConfig["disable"][number];
 					for (const dis of msg.gConfig.disable) if (JSON.stringify(dis) === JSON.stringify(c)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.duplicate`));
 
-					await msg.gConfig.mongoEdit({
-						$push: {
-							disable: c
-						}
+					await msg.gConfig.edit<DBKeys>({
+						disable: [...msg.gConfig.disable, c]
 					});
 					return msg.reply({
 						allowedMentions: {
@@ -70,18 +68,14 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["disable"], __fil
 							id: ch.id,
 							...d
 						} as GuildConfig["disable"][number];
-						if (!msg.gConfig.disable || !(msg.gConfig.disable instanceof Array)) await msg.gConfig.mongoEdit({
-							$set: {
-								disable: []
-							}
+						if (!msg.gConfig.disable || !(msg.gConfig.disable instanceof Array)) await msg.gConfig.edit<DBKeys>({
+							disable: []
 						});
 
 						for (const dis of msg.gConfig.disable) if (JSON.stringify(dis) === JSON.stringify(c)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.duplicate`));
 
-						await msg.gConfig.mongoEdit({
-							$push: {
-								disable: c
-							}
+						await msg.gConfig.edit<DBKeys>({
+							disable: [...msg.gConfig.disable, c]
 						});
 						return msg.reply({
 							allowedMentions: {
@@ -100,10 +94,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["disable"], __fil
 
 						for (const dis of msg.gConfig.disable) if (JSON.stringify(dis) === JSON.stringify(c)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.duplicate`));
 
-						await msg.gConfig.mongoEdit({
-							$push: {
-								disable: c
-							}
+						await msg.gConfig.edit<DBKeys>({
+							disable: [...msg.gConfig.disable, c]
 						});
 						return msg.reply({
 							allowedMentions: {
@@ -122,10 +114,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["disable"], __fil
 
 						for (const dis of msg.gConfig.disable) if (JSON.stringify(dis) === JSON.stringify(c)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.duplicate`));
 
-						await msg.gConfig.mongoEdit({
-							$push: {
-								disable: c
-							}
+						await msg.gConfig.edit<DBKeys>({
+							disable: [...msg.gConfig.disable, c]
 						});
 						return msg.reply({
 							allowedMentions: {
@@ -151,10 +141,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["disable"], __fil
 				if (msg.args.length === 1) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.missingId`));
 
 				if (msg.args[1].toLowerCase() === "all") {
-					await msg.gConfig.mongoEdit({
-						$set: {
-							disable: []
-						}
+					await msg.gConfig.edit<DBKeys>({
+						disable: []
 					});
 					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.cleared`));
 				} else {
@@ -162,10 +150,10 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["disable"], __fil
 					if (isNaN(id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.NaNId`));
 					if (id < 1 || id > msg.gConfig.disable.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidId`, [id]));
 					const e = msg.gConfig.disable[id - 1];
-					await msg.gConfig.mongoEdit({
-						$pull: {
-							disable: e
-						}
+					const k = [...msg.gConfig.disable];
+					k.splice(k.indexOf(e), 1);
+					await msg.gConfig.edit<DBKeys>({
+						disable: k
 					});
 					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.success`, [id]));
 				}

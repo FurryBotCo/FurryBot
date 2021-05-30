@@ -53,7 +53,7 @@ export default class LocalFunctions {
 			"Missing Access",
 			"'tags' conatins a tag that is listed in 'filterTags'"
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-		].some(v => err.message.indexOf(v.toString()) !== -1)) return { message: { embeds: [] } as any, code: "" };
+		].some(v => (err.message ?? "").indexOf(v.toString()) !== -1)) return { message: { embeds: [] } as any, code: "" };
 
 		const d = new Date();
 		const code = `err.${config.beta ? "beta" : "prod"}.${crypto.randomBytes(8).toString("hex")}`;
@@ -324,7 +324,9 @@ export default class LocalFunctions {
 			else throw e;
 		}
 		const { ext, file } = res;
-		return msg.channel.createMessage({
+		// because slash command messages don't support file uploads
+		if (msg.slash) await msg.reply("\u200B");
+		return msg.channel.createMessageNoSlash({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setTimestamp(new Date().toISOString())
@@ -341,7 +343,7 @@ export default class LocalFunctions {
 
 	static async handleImageMemeCommand(type: string, msg: ExtendedMessage<FurryBot, UserConfig, GuildConfig>, cmd: Command<FurryBot, UserConfig, GuildConfig>) {
 		let v: string;
-		if (msg.args.length === 0 && msg.attachments.length > 0) v = msg.attachments[0].url;
+		if (msg.args.length === 0 && msg.attachments && msg.attachments.length > 0) v = msg.attachments[0].url;
 		else if (/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(msg.args[0])) v = msg.args[0];
 		else {
 			const user = msg.args.length === 0 ? msg.author : await msg.getUserFromArgs();
@@ -359,7 +361,9 @@ export default class LocalFunctions {
 			else throw e;
 		}
 		const { ext, file } = res;
-		return msg.channel.createMessage({
+		// because slash command messages don't support file uploads
+		if (msg.slash) await msg.reply("\u200B");
+		return msg.channel.createMessageNoSlash({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setTimestamp(new Date().toISOString())

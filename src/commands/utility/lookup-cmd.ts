@@ -76,7 +76,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["lookup"], __file
 							`${defaultEmojis.dot} {lang:${cmd.lang}.code}: [${inv.code}](https://discord.gg/${inv.code})`,
 							...(guild ? [
 								"",
-								`**{lang:${cmd.lang}.server}**:`,
+								"**{lang:other.words.server$ucwords$}**:",
 								`${defaultEmojis.dot} {lang:${cmd.lang}.serverName}: [${guild.name}](https://discord.gg/${inv.code})`,
 								`${defaultEmojis.dot} {lang:${cmd.lang}.serverId}: ${guild.id}`,
 								`${defaultEmojis.dot} {lang:${cmd.lang}.memberCount}: ${inv.memberCount || "{lang:other.words.unknown$ucwords$}"}`,
@@ -86,7 +86,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["lookup"], __file
 							] : []),
 							...(channel ? [
 								"",
-								`**{lang:${cmd.lang}.channel}**:`,
+								"**{lang:other.words.channel$ucwords$}**:",
 								`${defaultEmojis.dot} {lang:${cmd.lang}.channelName}: ${channel.name || ""}`,
 								`${defaultEmojis.dot} {lang:${cmd.lang}.channelId}: ${channel.id}`,
 								`${defaultEmojis.dot} {lang:${cmd.lang}.channelType}: {lang:other.channelType.${channel.type}$ucwords$}`

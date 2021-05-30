@@ -6,7 +6,6 @@ import { Warning } from "../../util/@types/Database";
 import config from "../../../src/config";
 import { BotFunctions, Colors, Command, CommandError, EmbedBuilder } from "core";
 import Language from "language";
-import { WithId } from "mongodb";
 import chunk from "chunk";
 import Eris from "eris";
 
@@ -26,10 +25,10 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 			embed: BotFunctions.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_MEMBER", true)
 		});
 
-		const w = await db.collection<WithId<Warning>>("warnings").find({
+		const w = await db.filter<Warning>("warnings", {
 			guildId: msg.channel.guild.id,
 			userId: member.id
-		}).toArray().then(v => v.sort((a, b) => a.id - b.id));
+		}).then(v => v.sort((a, b) => a.warningId - b.warningId));
 
 		switch (msg.args[0]?.toLowerCase()) {
 			case "list": {
@@ -52,14 +51,14 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 							const d = new Date(v.date);
 							const u: Eris.User | null = this.client.users.get(v.blameId) || await this.client.getRESTUser(v.blameId).catch(() => null);
 							return {
-								name: `{lang:${cmd.lang}.list.num|${v.id}}`,
+								name: `{lang:${cmd.lang}.list.num|${v.warningId}}`,
 								value: [
 									`{lang:other.words.blame$ucwords$}: ${!u ? `{lang:other.words.unknown$ucwords$}[${v.blameId}]` : `${u.username}#${u.discriminator}`}`,
 									`{lang:other.words.reason$ucwords$}: ${v.reason.length > 200 ? `{lang:${cmd.lang}.list.reasonTooLong}` : v.reason}`,
 									// I hate how long this line is
 									`{lang:other.words.date$ucwords$}: ${(d.getMonth() + 1).toString().padStart(2, "0")}/${d.getDate().toString().padStart(2, "0")}/${d.getFullYear()} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}:${d.getSeconds().toString().padStart(2, "0")}`,
 									...(dev ? [
-										`Internal ID: \`${String(v._id)}\``
+										`Internal ID: \`${String(v.id)}\``
 									] : [])
 								].join("\n"),
 								inline: false
@@ -76,16 +75,16 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 				if (w.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.noWarnings`, [`${member.username}#${member.discriminator}`]));
 				const n = Number(msg.args[2] || 1);
 				if (isNaN(n) || n > w.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.invalidId`, [msg.args[2], w.length]));
-				const j = w.find(k => k.id === n)!;
+				const j = w.find(k => k.warningId === n)!;
 				const reason = msg.args.slice(3)?.join("") || Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
-				await db.collection<Warning>("warnings").findOneAndDelete({
+				await db.filter<Warning>("warnings", {
 					guildId: msg.channel.guild.id,
 					userId: member.id,
-					id: j.id
-				});
+					warningId: j.warningId
+				}).then(v => db.delete("warnings", v[0].id));
 				await this.executeModCommand("deleteWarning", {
 					reason,
-					id: j.id,
+					warningId: j.warningId,
 					channel: msg.channel.id,
 					oldBlame: j.blameId,
 					target: member.id,
@@ -99,11 +98,11 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 				if (!msg.member.permissions.has("manageGuild")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.missingPerm`, ["manageServer"]));
 				if (msg.args.length < 2) return new CommandError("INVALID_USAGE", cmd);
 				if (w.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.noWarnings`, [`${member.username}#${member.discriminator}`]));
-				for (const v of w) await db.collection<Warning>("warnings").findOneAndDelete({
+				for (const v of w) await db.filter<Warning>("warnings", {
 					guildId: msg.channel.guild.id,
 					userId: member.id,
-					id: v.id
-				});
+					warningId: v.warningId
+				}).then(j => db.delete("warnings", j[0].id));
 				const reason = msg.args.slice(3)?.join("") || Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
 				await this.executeModCommand("clearWarnings", {
 					reason,

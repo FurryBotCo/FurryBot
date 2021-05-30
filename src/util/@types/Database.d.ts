@@ -1,8 +1,7 @@
-import { ObjectId } from "mongodb";
-
+// @FIXME Warning.id -> Warning.warningId
 declare namespace Database {
 	interface DBEntry {
-		_id?: ObjectId;
+		id: string;
 	}
 
 	namespace ModLogEntry {
@@ -34,7 +33,7 @@ declare namespace Database {
 		}
 
 		interface WarnEntry extends GenericEntry {
-			id: number;
+			warningId: number;
 			type: "warn";
 		}
 
@@ -45,7 +44,7 @@ declare namespace Database {
 
 		interface DeleteWarnEntry extends GenericEntry {
 			oldBlame: string;
-			id: number;
+			warningId: number;
 			type: "delwarn";
 		}
 
@@ -81,10 +80,12 @@ declare namespace Database {
 	}
 
 	interface Warning {
+		/* @deprecated */
+		id: string;
 		blameId: string;
 		guildId: string;
 		userId: string;
-		id: number;
+		warningId: number;
 		reason: string;
 		date: number;
 	}

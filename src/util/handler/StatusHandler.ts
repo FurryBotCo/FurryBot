@@ -72,12 +72,13 @@ export default class StatusHandler {
 
 	static async run(manualDate?: Date) {
 		const d = manualDate ?? new Date();
-		const stats = await this.client.ipc.getStats();
+		const stats = undefined; // await this.client.ipc.getStats();
 		const s = this.statuses.find(t => t.filter(d.getHours(), d.getMinutes(), d.getSeconds()));
 		if (!s) return;
 		else {
 			this.client.bot.editStatus(s.status, {
-				name: s.name(this.client, stats),
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				name: s.name(this.client, stats as any),
 				type: GAME_TYPES[s.type]
 			});
 		}

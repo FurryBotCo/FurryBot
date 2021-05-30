@@ -1,4 +1,4 @@
-import GuildConfig from "../../db/Models/GuildConfig";
+import GuildConfig, { DBKeys } from "../../db/Models/GuildConfig";
 import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
 import { BotFunctions, Command, EmbedBuilder, CommandError, Colors } from "core";
@@ -35,7 +35,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["unmute"], __file
 		});
 
 		if (!msg.channel.guild.roles.has(msg.gConfig.settings.muteRole)) {
-			await msg.gConfig.mongoEdit({ $set: { "settings.muteRole": null } });
+			await msg.gConfig.edit<DBKeys>({ modlog: { muteRole: null } });
 			return msg.channel.createMessage({
 				embed: new EmbedBuilder(msg.gConfig.settings.lang)
 					.setTitle(`{lang:${cmd.lang}.roleNotFound}`)

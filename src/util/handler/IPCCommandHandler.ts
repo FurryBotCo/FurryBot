@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import config from "../../config";
 import FurryBot from "../../main";
-import { MessageRoute } from "clustering";
 
 
 export default class IPCCommandHandler {
@@ -10,12 +8,23 @@ export default class IPCCommandHandler {
 		this.client = client;
 	}
 
-	async broadcastToWithResponse<R = unknown>(id: number, type: string, data: unknown, error: false): Promise<R | "TIMEOUT">;
-	async broadcastToWithResponse<R = unknown>(id: number, type: string, data?: unknown, error?: true): Promise<R>;
-	async broadcastToWithResponse<R = unknown>(id: number, type: string, data?: unknown, error = true) {
+	async broadcastToWithResponse<R = unknown>(id: number, type: string, data: Record<string, unknown> | null, error: false): Promise<R | "TIMEOUT">;
+	async broadcastToWithResponse<R = unknown>(id: number, type: string, data?: Record<string, unknown> | null, error?: true): Promise<R>;
+	async broadcastToWithResponse<R = unknown>(id: number, type: string, data?: Record<string, unknown> | null, error = true) {
 		return new Promise<R | "TIMEOUT">((a, b) => {
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-			const responseId = this.client.ipc.sendMessage(type, data, `cluster.${id}`);
+			const responseId = this.client.ipc.generateRandomId();
+			if (data === null) data = {};
+			Object.defineProperties(data, {
+				responseId: {
+					value: responseId,
+					enumerable: true
+				},
+				clusterId: {
+					value: this.client.clusterId,
+					enumerable: true
+				}
+			});
+			this.client.ipc.sendMessage(type, data, `cluster.${id}`);
 			const t = setTimeout(() => {
 				this.client.ipc.unregister(responseId);
 				return error ? b(new Error("Response timeout.")) : a("TIMEOUT");
@@ -27,9 +36,9 @@ export default class IPCCommandHandler {
 		});
 	}
 
-	async broadcastWithResponse<R = unknown>(type: string, msg: unknown, error: true): Promise<Array<R>>
-	async broadcastWithResponse<R = unknown>(type: string, msg?: unknown, error?: false): Promise<Array<R | "TIMEOUT">>
-	async broadcastWithResponse<R = unknown>(type: string, msg?: unknown, error = false): Promise<Array<R | "TIMEOUT">> {
+	async broadcastWithResponse<R = unknown>(type: string, msg: Record<string, unknown> | null, error: true): Promise<Array<R>>
+	async broadcastWithResponse<R = unknown>(type: string, msg?: Record<string, unknown> | null, error?: false): Promise<Array<R | "TIMEOUT">>
+	async broadcastWithResponse<R = unknown>(type: string, msg?: Record<string, unknown> | null, error = false): Promise<Array<R | "TIMEOUT">> {
 		const res: Array<R | "TIMEOUT"> = [];
 		for (let i = 0; i < this.client.cluster.options.clusterCount; i++) {
 			const v = await this.broadcastToWithResponse<R>(i, type, msg, error as true);
@@ -39,8 +48,8 @@ export default class IPCCommandHandler {
 	}
 
 	register() {
-		this.client.ipc.register<string>("badgeCheck", (id, messageId, from) => this.handleBadgeCheck(id, messageId, from));
-		this.client.ipc.register<null>("ping", (_, messageId, from) => this.handlePing(messageId, from));
+		this.client.ipc.register<Record<"id" | "responseId", string> & Record<"clusterId", number>>("badgeCheck", (data) => this.handleBadgeCheck(data));
+		this.client.ipc.register<Record<"responseId", string> & Record<"clusterId", number>>("ping", (data) => this.handlePing(data));
 		return this;
 	}
 
@@ -49,15 +58,15 @@ export default class IPCCommandHandler {
 		return this.broadcastToWithResponse<string>(id, "ping", null, false);
 	}
 
-	private async handleBadgeCheck(id: string, messageId: string, from: MessageRoute) {
+	private async handleBadgeCheck({ id, responseId, clusterId }: Record<"id" | "responseId", string> & Record<"clusterId", number>) {
 		const g = this.client.bot.guilds.get(config.client.supportServerId);
-		if (!g) return  this.client.ipc.sendToRoute(from, messageId, "NO_GUILD");
+		if (!g) return  this.client.ipc.sendToCluster(clusterId, responseId, "NO_GUILD");
 		const m = g.members.get(id);
-		if (m === undefined) return this.client.ipc.sendToRoute(from, messageId, "NOT_PRESENT");
+		if (m === undefined) return this.client.ipc.sendToCluster(clusterId, responseId, "NOT_PRESENT");
 		const j = [];
 		if (m.roles.includes(config.roles.booster)) j.push("BOOSTER");
 		if (m.roles.includes(config.roles.staff)) j.push("STAFF");
-		return this.client.ipc.sendToRoute(from, messageId, j || "NONE");
+		return this.client.ipc.sendToCluster(clusterId, responseId, j || "NONE");
 	}
 
 	private async handleReloadCommand() {
@@ -72,7 +81,7 @@ export default class IPCCommandHandler {
 		// @TODO
 	}
 
-	private handlePing(messageId: string, from: MessageRoute) {
-		return this.client.ipc.sendToRoute(from, messageId, new Date().toISOString());
+	private handlePing({ responseId, clusterId }: Record<"responseId", string> & Record<"clusterId", number>) {
+		return this.client.ipc.sendToCluster(clusterId, responseId, new Date().toISOString());
 	}
 }

@@ -35,7 +35,7 @@ declare namespace ModLogServiceTypes {
 		interface WarningCommand extends GenericCommand {
 			type: "warning";
 			target: string;
-			id: number;
+			warningId: number;
 		}
 
 		interface ClearWarningsCommand extends GenericCommand {

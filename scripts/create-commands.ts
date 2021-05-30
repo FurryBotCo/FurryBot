@@ -46,7 +46,7 @@ async function create(cat: string, name: string, options?: Array<ApplicationComm
 			console.log(`Recieved ratelimit response (${cat}:${name}),`, v.retry_after * 1e3);
 			await new Promise(a => setTimeout(a, (v.retry_after + 1) * 1e3));
 			return create(cat, name, options, overrideDesc);
-		} else console.log(`Created ${name} command.`, util.inspect(v, { depth: null }));
+		} else console.log(`Created ${cat}:${name} command.`, !v.id ? util.inspect(v, { depth: null }) : "");
 	});
 }
 
@@ -54,18 +54,19 @@ async function create(cat: string, name: string, options?: Array<ApplicationComm
 // const GUILD = config.client.supportServerId;
 const GUILD = "329498711338123268";
 const ENABLED = {
-	ANIMALS: false,
-	FUN: false,
-	IMAGES: false,
-	INFORMATION: false,
-	MEME: false,
-	MISC: false,
+	ANIMALS: true,
+	FUN: true,
+	IMAGES: true,
+	INFORMATION: true,
+	MEME: true,
+	MISC: true,
 	MODERATION: true,
-	NSFW: false,
+	NSFW: true,
 	UTILITY: true
 };
 
 process.nextTick(async() => {
+	// 67 total commands
 	let c = 0;
 
 	await h.getApplicationCommands(GUILD).then(async(v) => {
@@ -95,17 +96,224 @@ process.nextTick(async() => {
 	/* end animals */
 
 	/* start fun */
-	/* end fun */
-
-	/* start images */
-
-	if (ENABLED.IMAGES) {
-		await create("images", "chris");
-		await create("images", "fursuit");
-		await create("images", "kadi");
+	if (ENABLED.FUN) {
+		await create("fun", "8ball", [
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "question",
+				description: useLang("questionDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "awoo");
+		await create("fun", "bap", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "boop", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "cuddle", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "dadjoke");
+		await create("fun", "dice", [
+			{
+				type: ApplicationCommandOptionType.INTEGER,
+				name: "min",
+				description: useLang("minDesc")
+			},
+			{
+				type: ApplicationCommandOptionType.INTEGER,
+				name: "max",
+				description: useLang("maxDesc")
+			}
+		]);
+		await create("fun", "dictionary", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "flop", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "furpile", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc")
+			}
+		]);
+		await create("fun", "fursuit");
+		await create("fun", "gayrate", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc")
+			}
+		]);
+		await create("fun", "glomp", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "hug", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "impostor", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc")
+			}
+		]);
+		await create("fun", "kiss", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "marry", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "nap", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "nuzzle", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "pat", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "poke", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "pounce", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "russianroulette", [
+			{
+				type: ApplicationCommandOptionType.INTEGER,
+				name: "bullets",
+				description: useLang("bulletsDesc")
+			}
+		]);
+		await create("fun", "ship", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user1",
+				description: useLang("user1Desc")
+			},
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user2",
+				description: useLang("user2Desc")
+			}
+		]);
+		await create("fun", "slap", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "sniff", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "snowball", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "spray", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		await create("fun", "whosagoodboi", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
 	}
-
-	/* end images */
+	/* end fun */
 
 	/* start information */
 
@@ -146,8 +354,7 @@ process.nextTick(async() => {
 						name: "Emojis",
 						value: "emojis"
 					}
-				],
-				required: false
+				]
 			}
 		]);
 		await create("information", "stats", [
@@ -167,8 +374,7 @@ process.nextTick(async() => {
 			{
 				type: ApplicationCommandOptionType.USER,
 				name: "user",
-				description: useLang("userDesc"),
-				required: true
+				description: useLang("userDesc")
 			}
 		]);
 		await create("information", "whoplays", [
@@ -177,6 +383,21 @@ process.nextTick(async() => {
 				name: "game",
 				description: useLang("gameDesc"),
 				required: true
+			},
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "global",
+				description: useLang("globalDesc"),
+				choices: [
+					{
+						name: "Yes",
+						value: "--global"
+					},
+					{
+						name: "No",
+						value: ""
+					}
+				]
 			}
 		]);
 	}
@@ -186,7 +407,80 @@ process.nextTick(async() => {
 	/* start meme */
 
 	if (ENABLED.MEME) {
-		// @TODO
+		await create("meme", "brain", [
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "first",
+				description: useLang("firstDesc"),
+				required: true
+			},
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "second",
+				description: useLang("secondDesc"),
+				required: true
+			},
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "third",
+				description: useLang("thirdDesc"),
+				required: true
+			},
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "fourth",
+				description: useLang("fourthDesc"),
+				required: true
+			}
+		]);
+		await create("meme", "bed", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user1",
+				description: useLang("user1Desc")
+			},
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user2",
+				description: useLang("user2Desc")
+			}
+		]);
+		await create("meme", "crab", [
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "first",
+				description: useLang("firstDesc"),
+				required: true
+			},
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "second",
+				description: useLang("secondDesc"),
+				required: true
+			}
+		]);
+		await create("meme", "gay", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc")
+			}
+		]);
+		await create("meme", "magik", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc")
+			}
+		]);
+		await create("meme", "warp", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc")
+			}
+		]);
+		await create("meme", "yomomma");
 
 	}
 	/* end meme */
@@ -194,16 +488,13 @@ process.nextTick(async() => {
 	/* start misc */
 
 	if (ENABLED.MISC) {
-		// @TODO
 		await create("misc", "afk", [
 			{
 				type: ApplicationCommandOptionType.STRING,
 				name: "reason",
-				description: useLang("reasonDesc"),
-				required: false
+				description: useLang("reasonDesc")
 			}
 		]);
-
 		await create("misc", "auto", [
 			{
 				type: ApplicationCommandOptionType.SUB_COMMAND,
@@ -227,23 +518,23 @@ process.nextTick(async() => {
 						required: true,
 						choices: [
 							{
-								name: useLang("time", "5"),
+								name: "5 Minutes",
 								value: 5
 							},
 							{
-								name: useLang("time", "10"),
+								name: "10 Minutes",
 								value: 10
 							},
 							{
-								name: useLang("time", "15"),
+								name: "15 Minutes",
 								value: 15
 							},
 							{
-								name: useLang("time", "30"),
+								name: "30 Minutes",
 								value: 30
 							},
 							{
-								name: useLang("time", "60"),
+								name: "60 Minutes",
 								value: 60
 							}
 						]
@@ -283,8 +574,7 @@ process.nextTick(async() => {
 			{
 				type: ApplicationCommandOptionType.USER,
 				name: "user",
-				description: useLang("userDesc"),
-				required: true
+				description: useLang("userDesc")
 			}
 		]);
 		await create("misc", "bugreport", [
@@ -397,7 +687,7 @@ process.nextTick(async() => {
 			},
 			{
 				type: ApplicationCommandOptionType.INTEGER,
-				name: "deleteDays",
+				name: "delete_days",
 				description: useLang("deleteDaysDesc"),
 				choices: [
 					{
@@ -534,7 +824,7 @@ process.nextTick(async() => {
 			},
 			{
 				type: ApplicationCommandOptionType.INTEGER,
-				name: "deleteDays",
+				name: "delete_days",
 				description: useLang("deleteDaysDesc"),
 				choices: [
 					{
@@ -635,8 +925,7 @@ process.nextTick(async() => {
 					{
 						type: ApplicationCommandOptionType.INTEGER,
 						name: "page",
-						description: useLang("list", "pageDesc"),
-						required: false
+						description: useLang("list", "pageDesc")
 					}
 				]
 			},
@@ -818,8 +1107,320 @@ process.nextTick(async() => {
 				]
 			}
 		]);
+		await create("utility", "log", [
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "add",
+				description: useLang("help", "add"),
+				options: [
+					{
+						type: ApplicationCommandOptionType.STRING,
+						name: "type",
+						description: useLang("help", "addType"),
+						choices: ["all", ...config.logTypes].map(type => {
+							const parts = type.split(/(?=[A-Z])/);
+							parts[0] = `${parts[0].charAt(0).toUpperCase()}${parts[0].slice(1)}`;
+							return {
+								name: parts.join(" "),
+								value: type
+							};
+						}),
+						required: true
+					}
+				]
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "remove",
+				description: useLang("help", "remove"),
+				options: [
+					{
+						type: ApplicationCommandOptionType.INTEGER,
+						name: "id",
+						description: useLang("help", "removeId")
+					}
+				]
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "list",
+				description: useLang("help", "list")
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "available",
+				description: useLang("help", "available")
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "clear",
+				description: useLang("help", "clear")
+			}
+		]);
+		await create("utility", "lsar");
+		await create("utility", "makeinv", [
+			{
+				type: ApplicationCommandOptionType.CHANNEL,
+				name: "channel",
+				description: useLang("help", "channel"),
+				required: true
+			},
+			{
+				type: ApplicationCommandOptionType.BOOLEAN,
+				name: "temp",
+				description: useLang("help", "temp")
+			},
+			{
+				type: ApplicationCommandOptionType.INTEGER,
+				name: "max_age",
+				description: useLang("help", "maxAge")
+			},
+			{
+				type: ApplicationCommandOptionType.INTEGER,
+				name: "max_uses",
+				description: useLang("help", "maxUses")
+			}
+		]);
+		await create("utility", "moveall", [
+			{
+				type: ApplicationCommandOptionType.CHANNEL,
+				name: "from",
+				description: useLang("fromDesc"),
+				required: true
+			},
+			{
+				type: ApplicationCommandOptionType.CHANNEL,
+				name: "to",
+				description: useLang("toDesc"),
+				required: true
+			}
+		]);
+		await create("utility", "prefix", [
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "add",
+				description: useLang("addDesc"),
+				options: [
+					{
+						type: ApplicationCommandOptionType.STRING,
+						name: "prefix",
+						description: useLang("addPrefixDesc"),
+						required: true
+					}
+				]
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "remove",
+				description: useLang("removeDesc"),
+				options: [
+					{
+						type: ApplicationCommandOptionType.STRING,
+						name: "prefix",
+						description: useLang("removePrefixDesc"),
+						required: true
+					}
+				]
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "list",
+				description: useLang("listDesc")
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "reset",
+				description: useLang("resetDesc"),
+				options: [
+					{
+						type: ApplicationCommandOptionType.BOOLEAN,
+						name: "confirm",
+						description: useLang("confirmDesc")
+					}
+				]
+			}
+		]);
+		await create("utility", "reembed", [
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "url",
+				description: useLang("urlDesc"),
+				required: true
+			}
+		]);
+		await create("utility", "rsar", [
+			{
+				type: ApplicationCommandOptionType.ROLE,
+				name: "role",
+				description: useLang("roleDesc"),
+				required: true
+			}
+		]);
+		await create("utility", "sauce", [
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "url",
+				description: useLang("urlDesc"),
+				required: true
+			}
+		]);
+		await create("utility", "seen", [
+			{
+				type: ApplicationCommandOptionType.USER,
+				name: "user",
+				description: useLang("userDesc"),
+				required: true
+			}
+		]);
+		// this is a mess
+		await create("utility", "settings", config.settings.map(set => {
+			// name can only use lowercase characters, underscores, and dashes
+			let name = set.name.toLowerCase().replace(/\s/g, "-");
+			if (name.length >= 100) name = `${Strings.truncate(name, 94)} (...)`;
+			let description = set.description;
+			if (description.length >= 100) description = `${Strings.truncate(description, 94)} (...)`;
+			const type  = set.type === "boolean" ? ApplicationCommandOptionType.BOOLEAN :
+				set.type === "role" ? ApplicationCommandOptionType.ROLE : null;
+			if (type === null) {
+				switch (set.dbName) {
+					case "defaultYiffType": return {
+						type: ApplicationCommandOptionType.SUB_COMMAND,
+						name,
+						description,
+						options: [
+							{
+								type: ApplicationCommandOptionType.STRING,
+								name: "value",
+								description: "The value for this setting.",
+								required: true,
+								choices: config.yiffTypes.map(v => ({
+									name: Strings.ucwords(v),
+									value: v
+								}))
+							}
+						]
+					};
+					case "lang": return {
+						type: ApplicationCommandOptionType.SUB_COMMAND,
+						name,
+						description,
+						options: [
+							{
+								type: ApplicationCommandOptionType.STRING,
+								name: "value",
+								description: "The value for this setting.",
+								required: true,
+								choices: config.languages.map(v => ({
+									name: v,
+									value: v
+								}))
+							}
+						]
+					};
 
-		// await create("")
+					default: return null;
+				}
+			} else return {
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name,
+				description,
+				options: [
+					{
+						type,
+						name: "value",
+						description: "The value for this setting.",
+						required: true
+					}
+				]
+			};
+		}).filter(Boolean) as Array<ApplicationCommandOption>);
+
+		await create("utility", "slowmode", [
+			{
+				type: ApplicationCommandOptionType.INTEGER,
+				name: "seconds",
+				description: useLang("secondsDesc"),
+				required: true
+			},
+			{
+				type: ApplicationCommandOptionType.CHANNEL,
+				name: "channel",
+				description: useLang("channelDesc")
+			}
+		]);
+		await create("utility", "snipe", [
+			{
+				type: ApplicationCommandOptionType.CHANNEL,
+				name: "channel",
+				description: useLang("channelDesc")
+			}
+		]);
+		await create("utility", "steal", [
+			{
+				type: ApplicationCommandOptionType.STRING,
+				name: "url",
+				description: useLang("urlDesc")
+			}
+		]);
+		await create("utility", "tag", [
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "create",
+				description: useLang("createDesc"),
+				options: [
+					{
+						type: ApplicationCommandOptionType.STRING,
+						name: "name",
+						description: useLang("nameDesc"),
+						required: true
+					},
+					{
+						type: ApplicationCommandOptionType.STRING,
+						name: "value",
+						description: useLang("valueDesc"),
+						required: true
+					}
+				]
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "delete",
+				description: useLang("deleteDesc"),
+				options: [
+					{
+						type: ApplicationCommandOptionType.STRING,
+						name: "name",
+						description: useLang("nameDesc"),
+						required: true
+					}
+				]
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "edit",
+				description: useLang("editDesc"),
+				options: [
+					{
+						type: ApplicationCommandOptionType.STRING,
+						name: "name",
+						description: useLang("nameDesc"),
+						required: true
+					},
+					{
+						type: ApplicationCommandOptionType.STRING,
+						name: "value",
+						description: useLang("valueDesc"),
+						required: true
+					}
+				]
+			},
+			{
+				type: ApplicationCommandOptionType.SUB_COMMAND,
+				name: "list",
+				description: useLang("listDesc"),
+				options: []
+			}
+		]);
 	}
 
 	/* end utility */

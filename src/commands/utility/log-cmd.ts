@@ -7,14 +7,13 @@ import Language from "language";
 import chunk from "chunk";
 
 export default new Command<FurryBot, UserConfig, GuildConfig>(["log"], __filename)
-	.setBotPermissions([
+	.setBotPermissions([])
+	.setUserPermissions([
 		"manageMessages"
 	])
-	.setUserPermissions([])
 	.setRestrictions([])
 	.setCooldown(3e3, true)
-	// it's currently too much of a hassle to do this
-	.setHasSlashVariant(false)
+	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
 		const max = 60;
 		function f(t: string) {

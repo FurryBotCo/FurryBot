@@ -4,7 +4,6 @@ import { VALID_LANGUAGES } from "../../main";
 import { ModLogEntry, Warning } from "../../util/@types/Database";
 import { GuildConfig as GC, ConfigDataTypes, ConfigEditTypes } from "core";
 import Logger from "logger";
-import { WithId } from "mongodb";
 
 export type DBKeys = ConfigDataTypes<GuildConfig>;
 export default class GuildConfig extends GC<VALID_LANGUAGES> {
@@ -12,7 +11,7 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		/** @deprecated */
 		prefix?: string;
 		lang: VALID_LANGUAGES;
-		muteRole: string;
+		muteRole: string | null;
 		deleteModCommands: boolean;
 		commandImages: boolean;
 		defaultYiffType: string;
@@ -70,10 +69,12 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		level: number;
 	}>;
 	deletion: number | null;
-	constructor(id: string, data: WithId<ConfigDataTypes<GuildConfig, "id">>) {
+	constructor(id: string, data: ConfigDataTypes<GuildConfig, "id">) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore -- fuck off
 		super(id, data, config.defaults.config.guild, db);
+		super.setRef(this);
+		super.load(data);
 	}
 
 	/* eslint-disable deprecation/deprecation */
@@ -83,7 +84,7 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		if (this.modlog !== undefined){
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore -- dot notation for mongodb
-			if (typeof this.modlog.webhook === "undefined") obj["modlog.webhook"] = null;
+			if (typeof this.modlog.webhook === "undefined") obj.modlog = { webhook: null };
 		} else obj.modlog = {
 			enabled: false,
 			webhook: null
@@ -110,20 +111,16 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 			if (this.prefix && this.settings.prefix !== this.prefix[0]) obj.prefix = [
 				this.settings.prefix
 			];
-			await this.mongoEdit({
-				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-				$unset: {
-					"settings.prefix": true
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				} as any
+			await this.edit<Omit<ConfigEditTypes<GuildConfig>, "id">>({
+				settings: {
+					prefix: undefined
+				}
 			});
 			delete this.settings.prefix;
 		}
 		if (JSON.stringify(obj) !== "{}") {
 			Logger.warn(["Database", "Guild"], `Fixed guild "${this.id}": ${JSON.stringify(obj)}`);
-			await this.mongoEdit({
-				$set: obj
-			});
+			await this.edit(obj);
 		}
 		return this;
 	}
@@ -138,10 +135,10 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 	}
 
 	async getWarningId(userId: string) {
-		return db.collection<Warning>("warnings").find({ guildId: this.id, userId }).toArray().then(v => v.sort((a, b) => b.id - a.id)?.[0]?.id + 1 || 1);
+		return this.db.filter<Warning>("warnings", { guildId: this.id, userId }).then(v => v.sort((a, b) => b.id - a.id)?.[0]?.id + 1 || 1);
 	}
 
 	async getModlogId() {
-		return (await db.collection<ModLogEntry.GenericEntry>("modlog").find({ guildId: this.id }).count()) + 1;
+		return this.db.filter<ModLogEntry.GenericEntry>("modlog", { guildId: this.id }).then(v => v.length + 1);
 	}
 }

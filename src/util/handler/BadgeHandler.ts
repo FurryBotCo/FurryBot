@@ -36,7 +36,7 @@ export default class BadgeHandler {
 		if (flags.VERIFIED_BOT) badges.push("verified-bot");
 		if (flags.VERIFIED_BOT_DEVELOPER) badges.push("verified-bot-developer");
 		if (config.developers.includes(u.id)) badges.push("developer");
-		const c = await this.client.ic.broadcastWithResponse<("NO_GUILD" | "NOT_PRESENT" | "NONE") | Array<"BOOSTER" | "STAFF">>("badgeCheck", u.id, false);
+		const c = await this.client.ic.broadcastWithResponse<("NO_GUILD" | "NOT_PRESENT" | "NONE") | Array<"BOOSTER" | "STAFF">>("badgeCheck",{ id: u.id }, false);
 		for (const v of c) {
 			if (Array.isArray(v)) {
 				if (v.includes("BOOSTER")) badges.push("nitro-booster");
@@ -60,7 +60,6 @@ export default class BadgeHandler {
 			case "777702082357624874": badges.push("horny", "sub"); break;
 			case "302604426781261824": badges.push("horny", "sub", "ice"); break;
 		}
-
 		return badges.map(v => ({
 			id: v,
 			...config.badges[v]

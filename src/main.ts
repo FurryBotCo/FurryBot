@@ -56,6 +56,7 @@ export default class FurryBot extends BaseCluster {
 			const d = new Date();
 			if ((d.getMinutes() % 15) === 0) {
 				if (this.blPosted === true) return;
+				this.blPosted = true;
 				Logger.info("Bot List Stats", "Stats updated.");
 			} else this.blPosted = false;
 		}, 1e3);

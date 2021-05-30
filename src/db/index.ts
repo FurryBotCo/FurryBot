@@ -5,7 +5,6 @@ import Blacklist from "../util/@types/Blacklist";
 import FurryBot from "../main";
 import { Votes } from "../util/@types/Database";
 import { Colors, Database as DB } from "core";
-import { MongoError, WithId } from "mongodb";
 import Logger from "logger";
 import { Strings, Time } from "utilities";
 import Eris from "eris";
@@ -19,73 +18,47 @@ import { isWorker } from "cluster";
 class Database extends DB {
 	static client: FurryBot;
 	static async getUser(id: string): Promise<UserConfig> {
-		if (mdb === null) throw new ReferenceError("Databse#getUser called before database has been intialized.");
+		if (r === null) throw new ReferenceError("Databse#getUser called before database has been intialized.");
 		const start = performance.now();
-		let d = await mdb.collection<WithId<UserKeys>>("users").findOne({ id }).then(res => !res ? null : new UserConfig(id, res));
-		try {
-			if (!d) {
-				d = await mdb.collection("users").insertOne({
-					...{ ...config.defaults.config.user },
-					id
-				} as unknown).then(res => new UserConfig(id, res.ops[0]));
-				Logger.info(["Database", "User"], `Created user entry "${id}".`);
-			}
-		} catch (err) {
-			if (err instanceof MongoError) {
-				switch (err.code) {
-					case 11000: {
-						Logger.warn(["Database", "User"], `Duplicate key erro (key: ${id})`);
-						return this.getUser(id);
-					}
-
-					default: throw err;
-				}
-			} else throw err;
+		const d = await this.get<UserKeys>("users", id).then(res => !res ? null : new UserConfig(id, res));
+		if (!d) {
+			Logger.info(["Database", "User"], `Created user entry "${id}".`);
+			return this.table("users").insert({
+				...{ ...config.defaults.config.user },
+				id
+			}).run(this.conn).then(() => this.getUser(id));
 		}
 
 		const end = performance.now();
 		if (config.beta || config.developers.includes(id)) Logger.debug("Database", `Query for the user "${id}" took ${(end - start).toFixed(3)}ms.`);
 
-		return d!;
+		return d;
 	}
 
 	static async getGuild(id: string): Promise<GuildConfig> {
-		if (mdb === null) throw new ReferenceError("Databse#getGuild called before database has been intialized.");
+		if (r === null) throw new ReferenceError("Databse#getGuild called before database has been intialized.");
 		const start = performance.now();
-		let d = await mdb.collection<WithId<GuildKeys>>("guilds").findOne({ id }).then(res => !res ? null : new GuildConfig(id, res));
-		try {
-			if (!d) {
-				d = await mdb.collection("guilds").insertOne({
-					...config.defaults.config.guild,
-					id
-				} as unknown).then(res => new GuildConfig(id, res.ops[0]));
-				Logger.info(["Database", "Guild"], `Created guild entry "${id}".`);
-			}
-		} catch (err) {
-			if (err instanceof MongoError) {
-				switch (err.code) {
-					case 11000: {
-						Logger.warn(["Database", "Guild"], `Duplicate key error (key: ${id})`);
-						return this.getGuild(id);
-					}
-
-					default: throw err;
-				}
-			} else throw err;
+		const d = await this.get<GuildKeys>("guilds", id).then(res => !res ? null : new GuildConfig(id, res));
+		if (!d) {
+			return this.table("guilds").insert({
+				...config.defaults.config.guild,
+				id
+			} as unknown).run(this.conn).then(() => this.getGuild(id));
+			Logger.info(["Database", "Guild"], `Created guild entry "${id}".`);
 		}
 
 		const end = performance.now();
 		if (config.beta) Logger.debug("Database", `Query for the guild "${id}" took ${(end - start).toFixed(3)}ms.`);
 
-		return d!;
+		return d;
 	}
 
 	static async checkBl(type: "guild", guildId: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.GuildEntry>; }>;
 	static async checkBl(type: "user", userId: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.UserEntry>; }>;
 	static async checkBl(type: "guild" | "user", id: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.GenericEntry>; }> {
-		if (mdb === null) throw new ReferenceError("Databse#checkBl called before database has been intialized.");
+		if (r === null) throw new ReferenceError("Databse#checkBl called before database has been intialized.");
 		const d = Date.now();
-		const all = await mdb.collection<Blacklist.GenericEntry>("blacklist").find({ [`${type}Id`]: id }).toArray();
+		const all = await this.filter<Blacklist.GenericEntry>("blacklist", { [`${type}Id`]: id });
 		const expired = all.filter(bl => ![0, null].includes(bl.expire!) && bl.expire! < d);
 		const current = all.filter(bl => !expired.map(j => j.id).includes(bl.id));
 		const notice = current.filter(bl => !bl.noticeShown);
@@ -98,10 +71,10 @@ class Database extends DB {
 		};
 	}
 
-	static async addBl(type: "guild", guildId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<WithId<Blacklist.GuildEntry>>;
-	static async addBl(type: "user", userId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<WithId<Blacklist.UserEntry>>;
+	static async addBl(type: "guild", guildId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<Blacklist.GuildEntry>;
+	static async addBl(type: "user", userId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<Blacklist.UserEntry>;
 	static async addBl(type: "guild" | "user", id: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
-		if (mdb === null) throw new ReferenceError("Databse#addBl called before database has been intialized.");
+		if (r === null) throw new ReferenceError("Databse#addBl called before database has been intialized.");
 		const e = crypto.randomBytes(7).toString("hex");
 		if (!reason) reason = "None Provided.";
 		if (!this.client) Logger.warn("Database", "Missing client on blacklist addition, webhook not executed.");
@@ -130,23 +103,22 @@ class Database extends DB {
 				]
 			});
 		}
-		return mdb.collection<Blacklist.GenericEntry>("blacklist").insertOne({
+		return this.insert<Blacklist.GenericEntry>("blacklist", e, {
 			created: Date.now(),
 			type,
 			blame,
 			blameId,
 			reason,
-			id: e,
 			noticeShown: false,
 			expire,
 			report,
 			...(type === "guild" ? { guildId: id } : { userId: id })
-		}).then(res => res.ops[0]);
+		});
 	}
 
 	static async checkVote(user: string) {
-		if (mongo === null) throw new ReferenceError("Databse#checkVote called before database has been intialized.");
-		const v = await mongo.db("furrybot").collection<Votes.AnyVote>("votes").find({ user }).toArray();
+		if (r === null) throw new ReferenceError("Databse#checkVote called before database has been intialized.");
+		const v = await this.filter<Votes.AnyVote>("votes", { user }, "furrybot");
 
 		const e = v.find(j => Date.now() < j.time + 4.32e+7);
 
@@ -161,9 +133,7 @@ if (isWorker) {
 	switch (process.env.TYPE) {
 		case "CLUSTER": {
 			Database.init({
-				host: config.services.db.host,
-				port: config.services.db.port,
-				options: config.services.db.options,
+				...config.services.db.options,
 				main: config.services.db[config.beta ? "dbBeta" : "db"]
 			}, {
 				host: config.services.redis.host,
@@ -180,9 +150,7 @@ if (isWorker) {
 				case "auto-posting":
 				case "mod": {
 					Database.initDb({
-						host: config.services.db.host,
-						port: config.services.db.port,
-						options: config.services.db.options,
+						...config.services.db.options,
 						main: config.services.db[config.beta ? "dbBeta" : "db"]
 					});
 					break;
@@ -207,9 +175,7 @@ if (isWorker) {
 } else {
 	if (process.env.ENABLE_DB === "1") {
 		Database.initDb({
-			host: config.services.db.host,
-			port: config.services.db.port,
-			options: config.services.db.options,
+			...config.services.db.options,
 			main: config.services.db[config.beta ? "dbBeta" : "db"]
 		});
 	}
@@ -227,7 +193,7 @@ if (isWorker) {
 
 
 export const db = Database;
-export const mdb = Database.dbReady ? Database.mdb : null;
-export const mongo = Database.dbReady ? Database.mongo : null;
+export const rdb = Database.dbReady ? Database.rdb : null;
+export const r = Database.dbReady ? Database.connection : null;
 export const Redis = Database.redisReady ? Database.Redis : null;
 export default Database;

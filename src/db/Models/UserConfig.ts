@@ -5,7 +5,6 @@ import db from "..";
 import { UserConfig as UC } from "core";
 import { ConfigDataTypes, ConfigEditTypes } from "core/src/@types/db";
 import Logger from "logger";
-import { WithId } from "mongodb";
 
 export type DBKeys = ConfigDataTypes<UserConfig>;
 export default class UserConfig extends UC {
@@ -41,19 +40,18 @@ export default class UserConfig extends UC {
 		end: string;
 		reason: string;
 	}>;
-	constructor(id: string, data: WithId<ConfigDataTypes<UserConfig, "id">>) {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore -- fuck off
+	constructor(id: string, data: ConfigDataTypes<UserConfig, "id">) {
 		super(id, data, config.defaults.config.user, db);
+		super.setRef(this);
+		super.load(data);
 	}
 
 	async fix() {
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		const obj: ConfigEditTypes<UserConfig, "id"> = Object.create(null);
+		const obj= Object.create(null) as ConfigEditTypes<UserConfig, "id"> ;
 		if (typeof this.booster !== "boolean") obj.booster = false;
 		if (JSON.stringify(obj) !== "{}") {
 			Logger.warn(["Database", "User"], `Fixed user "${this.id}": ${JSON.stringify(obj)}`);
-			await this.edit(obj);
+			await this.edit<Omit<ConfigEditTypes<UserConfig>, "id">>(obj);
 		}
 
 		return this;
@@ -70,7 +68,7 @@ export default class UserConfig extends UC {
 			active: true
 		};
 
-		if (!this.donations.activationTime || this.donations.totalMonths < 1) return {
+		if (!this.donations || !this.donations.activationTime || this.donations.totalMonths < 1) return {
 			remainingMonths: 0,
 			activationTime: null,
 			active: false

@@ -1,6 +1,6 @@
 import FurryBot from "../main";
 import config from "../config";
-import db, { mdb, Redis } from "../db";
+import db, { Redis } from "../db";
 import Blacklist from "../util/@types/Blacklist";
 import TextHandler from "../util/handler/TextHandler";
 import UserConfig from "../db/Models/UserConfig";
@@ -17,7 +17,6 @@ import { performance } from "perf_hooks";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildTextableChannel>("messageCreate", async function(msg, update, slash, slashInfo) {
-	if (mdb === null) return Logger.error([`Cluster #${this.clusterId}`, "messageCreate"], `Skipped a message with the id ${msg.id} due to the database not being initialized.`);
 	if (Redis === null) return Logger.error([`Cluster #${this.clusterId}`, "messageCreate"], `Skipped a message with the id ${msg.id} due to redis not being initialized.`);
 
 	if (!(msg instanceof ExtendedMessage)) return;
@@ -56,13 +55,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 
 		if (uBl.notice.length > 0) {
 			const b = uBl.notice[0];
-			await mdb.collection<Blacklist.UserEntry>("blacklist").findOneAndUpdate({
-				id: b.id
-			}, {
-				$set: {
-					noticeShown: true
-				}
-			});
+			await db.update<Blacklist.UserEntry>("blacklist", b.id, { noticeShown: true });
 
 			return msg.channel.createMessage(Language.get(config.devLanguage, "other.blacklisted.user", [b.blame, b.reason, [0, null].includes(b.expire!) ? Language.get(config.devLanguage, "other.words.never") : Time.formatDateWithPadding(b.expire), config.urls.appealUser(msg.author.id)]));
 		}
@@ -106,7 +99,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	t.start("process");
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore -- fuck you
-	const l = await msg.load(db); // returns false if message does not start with prefix
+	const l = await msg.load(db, update, slash, slashInfo); // returns false if message does not start with prefix
 	t.end("process");
 
 	// they're messing with less cache reliance, so things can be missing
@@ -119,13 +112,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	if (gBl.current.length > 0 && !config.developers.includes(msg.author.id)) {
 		if (gBl.notice.length > 0) {
 			const b = gBl.notice[0];
-			await mdb.collection<Blacklist.GuildEntry>("blacklist").findOneAndUpdate({
-				id: b.id
-			}, {
-				$set: {
-					noticeShown: true
-				}
-			});
+			await db.update<Blacklist.GuildEntry>("blacklist", b.id, { noticeShown: true });
 
 			return msg.reply(Language.get(msg.gConfig.settings.lang, "other.blacklisted.guild", [b.blame, b.reason, [0, null].includes(b.expire!) ? Language.get(msg.gConfig.settings.lang, "other.words.never") : Time.formatDateWithPadding(b.expire), config.urls.appealGuild(msg.channel.guild.id)]));
 		}

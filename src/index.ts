@@ -12,7 +12,7 @@ if (isMaster) {
 const m = new Master({
 	token: config.client.token,
 	path: `${config.dir.codeSrc}/main.${config.ext}`,
-	pid: config.dir.tmp,
+	pid: `${config.dir.tmp}/pid`,
 	...config.options
 });
 void m.launch();

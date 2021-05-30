@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { mdb } from "../db";
+import { db } from "../db";
 import GuildConfig, { DBKeys } from "../db/Models/GuildConfig";
 import config from "../config";
 import Yiffy from "../util/req/Yiffy";
@@ -11,7 +11,7 @@ import { Colors, EmbedBuilder } from "core";
 import Eris from "eris";
 import fetch from "node-fetch";
 import { Request } from "utilities";
-import { WithId } from "mongodb";
+import rdb from "rethinkdb";
 
 export default class AutoPostingService extends BaseService {
 	private interval: NodeJS.Timeout;
@@ -40,7 +40,7 @@ export default class AutoPostingService extends BaseService {
 
 	async run() {
 		const d = new Date();
-		const entries = await mdb!.collection("guilds").find<WithId<DBKeys>>({ $where: "![undefined,null].includes(this.auto) && this.auto.length > 0" }, {}).toArray();
+		const entries = await db.filter<DBKeys>("guilds", rdb.row("auto").ne(null));
 		for (const g of entries) {
 			for (const e of g.auto) {
 				if (
@@ -62,10 +62,8 @@ export default class AutoPostingService extends BaseService {
 	async execute({ type, webhook: wh, id }: GuildConfig["auto"][number], gConfig: GuildConfig) {
 		this.DONE.push(id);
 		if (!wh || !wh.id || !wh.token) {
-			await gConfig.mongoEdit<DBKeys>({
-				$pull: {
-					auto: gConfig.auto.find(a => a.id === id)!
-				}
+			await gConfig.edit<DBKeys>({
+				auto: gConfig.auto.filter(a => a.id !== id)
 			});
 			return;
 		}
@@ -74,20 +72,16 @@ export default class AutoPostingService extends BaseService {
 		const w = await this.client.getWebhook(wh.id, wh.token).catch(() => null);
 		if (!w) {
 			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to its webhook being invalid.`);
-			await gConfig.mongoEdit<DBKeys>({
-				$pull: {
-					auto: gConfig.auto.find(a => a.id === id)!
-				}
+			await gConfig.edit<DBKeys>({
+				auto: gConfig.auto.filter(a => a.id !== id)
 			});
 			return;
 		}
 		const ch = await this.client.getRESTChannel(w.channel_id).catch(() => null) as Eris.AnyGuildChannel | null;
 		if (ch === null) {
 			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to its webhook channel not existing.`);
-			await gConfig.mongoEdit<DBKeys>({
-				$pull: {
-					auto: gConfig.auto.find(a => a.id === id)!
-				}
+			await gConfig.edit<DBKeys>({
+				auto: gConfig.auto.filter(a => a.id !== id)
 			});
 			return;
 		}
@@ -104,10 +98,8 @@ export default class AutoPostingService extends BaseService {
 						.toJSON()
 				]
 			});
-			await gConfig.mongoEdit<DBKeys>({
-				$pull: {
-					auto: gConfig.auto.find(v => v.id === id)
-				}
+			await gConfig.edit<DBKeys>({
+				auto: gConfig.auto.filter(a => a.id !== id)
 			});
 			return;
 		}

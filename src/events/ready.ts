@@ -20,17 +20,17 @@ export default new ClientEvent<FurryBot>("ready", async function() {
 
 	// @FIXME REMOVE THE SKIP IN PRODUCTION!
 	void this.loadCommands(`${config.dir.codeSrc}/commands`, [
-		"animals",
-		"developer",
+		/* "animals",
+		// "developer",
 		"fun",
 		"images",
-		// "information",
+		"information",
 		"meme",
 		"misc",
 		"moderation",
 		// eslint-disable-next-line comma-dangle
 		"nsfw",
-		// "utility"
+		// "utility" */
 	]).then(() => {/*
 		console.log("t", this.cmd.triggers); */
 	});

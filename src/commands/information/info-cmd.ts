@@ -20,20 +20,13 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["info"], __filena
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
-		const st = await this.ipc.getStats();
-		if (st === undefined) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.noStats"));
+		const st = await this.ipc.getStats(false);
+		if (st === null) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.noStats"));
 		const { drives: diskUsage } = Internal.getDiskUsage();
 		const d = [];
 		for (const k of Object.keys(diskUsage)) {
 			d.push(`${defaultEmojis.dot} {lang:other.words.diskUsage$ucwords$} (${k}): ${Strings.formatBytes(diskUsage[k].total - diskUsage[k].free)} / ${Strings.formatBytes(diskUsage[k].total)}`);
 		}
-		// because for some reason, clusters can be present twice
-		const j: Array<number> = [];
-		for (const c of st.clusters) {
-			if (j.includes(c.id)) st.clusters.splice(st.clusters.indexOf(c), 1);
-			else j.push(c.id);
-		}
-
 		const e = lock.dependencies.eris.version.indexOf("#") === -1 ? `[Eris](https://npm.im/eris) (**${Eris.VERSION}**)` : `[Eris Dev](https://github.com/abalabahaha/eris/commit/${lock.dependencies.eris.version.split("#")[1]}) (**${Eris.VERSION}**, \`${lock.dependencies.eris.version.split("#")[1].slice(0, 7)}\`)`;
 
 		return msg.channel.createMessage({

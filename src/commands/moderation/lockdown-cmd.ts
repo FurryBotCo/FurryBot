@@ -33,9 +33,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["lockdown"], __fi
 		const h = msg.channel.guild.channels.filter(c => [Eris.Constants.ChannelTypes.GUILD_TEXT, Eris.Constants.ChannelTypes.GUILD_NEWS].includes(c.type as 0 | 5));
 		for (const c of h) {
 			const p: Eris.PermissionOverwrite = c.permissionOverwrites.find(o => o.type === "role" && o.id === msg.channel.guild.id) || new Eris.PermissionOverwrite({
-				// @FIXME remove this when Eris stops being dumb
-				allow: 0n as unknown as number,
-				deny: 0n as unknown as number,
+				allow: 0n,
+				deny: 0n,
 				id: "000000000000000000",
 				type: "member"
 			});

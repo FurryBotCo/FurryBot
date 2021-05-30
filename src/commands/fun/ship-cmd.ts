@@ -7,6 +7,7 @@ import { BotFunctions, Colors, Command, defaultEmojis, EmbedBuilder } from "core
 import Logger from "logger";
 import Eris from "eris";
 import Language from "language";
+import fetch from "node-fetch";
 
 export default new Command<FurryBot, UserConfig, GuildConfig>(["ship"], __filename)
 	.setBotPermissions([
@@ -98,6 +99,19 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["ship"], __filena
 			throw new TypeError("Unknown Error");
 		}
 
+		// because of slash commands
+		const v = await fetch("https://api.furry.bot/shipimg", {
+			method: "POST",
+			headers: {
+				"User-Agent": config.web.userAgent,
+				"Authorization": config.apis.yiffy,
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				data: img.toString("base64")
+			})
+		}).then(b => b.json() as Promise<{ success: true; data: string; }>);
+
 		return msg.channel.createMessage({
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
@@ -105,10 +119,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["ship"], __filena
 				.setColor(Colors.furry)
 				.setTimestamp(new Date().toISOString())
 				.setFooter(defaultEmojis.heart, this.client.user.avatarURL)
-				.setImage("attachment://ship.png")
+				.setImage(v.data)
 				.toJSON()
-		}, {
-			name: "ship.png",
-			file: img
 		});
 	});

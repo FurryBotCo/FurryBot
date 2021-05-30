@@ -1,6 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference, spaced-comment
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./@types/global.d.ts" />
-import "source-map-support/register";
+// this needs to be first
+// eslint-disable-next-line import/order
+import sourceMapSupport from "source-map-support";
+if (__filename.endsWith(".ts")) sourceMapSupport.install({ hookRequire: true });
+else sourceMapSupport.install();
 import config from "../config";
 import { Redis } from "../db";
 import { MonkeyPatch  } from "core";
@@ -20,6 +24,7 @@ Logger
 		if (!fs.existsSync(config.dir.logs.client)) fs.mkdirpSync(config.dir.logs.client);
 		fs.appendFileSync(`${config.dir.logs.client}/${date}.log`, str);
 	})
-	.setReplacer((str) => str.replace(new RegExp(config.client.token, "g"), "[TOKEN]"));
+	.setReplacer((str) => str.replace(new RegExp(config.client.token, "g"), "[TOKEN]"))
+	.setDepthLimit(0);
 // .initOverrides();
 export default null;

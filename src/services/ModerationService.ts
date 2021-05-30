@@ -8,8 +8,10 @@ import Eris from "eris";
 import { Colors, EmbedBuilder, Webhook } from "core";
 import { Time } from "utilities";
 import Logger from "logger";
-import { ObjectId } from "mongodb";
 import { BaseService, ServiceInitalizer } from "clustering";
+import crypto from "crypto";
+
+const rand = () => crypto.randomBytes(8).toString("hex");
 
 
 class CustomError extends Error {
@@ -141,7 +143,7 @@ export default class ModerationService extends BaseService {
 
 	/* eslint-disable deprecation/deprecation */
 	async addTimedEntry(type: "ban" | "mute", time: number, expiry: number, user: string, guild: string, reason: string | null) {
-		const res = await db.collection<TimedEntry>("timed").insertOne({
+		const res = await db.insert<TimedEntry>("timed", rand(), {
 			type,
 			time,
 			expiry,
@@ -150,17 +152,15 @@ export default class ModerationService extends BaseService {
 			reason
 		});
 
-		return res.result.ok === 1;
+		return res === null;
 	}
 
-	async deleteTimedEntry(e: ObjectId | TimedEntry) {
-		return db.collection<TimedEntry>("timed").findOneAndDelete({
-			_id: e instanceof ObjectId ? e : e._id
-		}).then(v => v.ok === 1);
+	async deleteTimedEntry(e: TimedEntry) {
+		return db.delete("timed", e.id);
 	}
 
 	async processTimedEntries() {
-		const entries = await db.collection<TimedEntry>("timed").find({}).toArray();
+		const entries = await db.getAll<TimedEntry>("timed");
 		for (const entry of entries) {
 			if (entry.expiry > Date.now()) continue;
 			// guildId & userId is legacy
@@ -168,7 +168,7 @@ export default class ModerationService extends BaseService {
 			if (entry.userId) entry.user = entry.userId;
 			const g = await this.client.getRESTGuild(entry.guild).catch(() => null);
 			if (g === null) {
-				Logger.warn("Moderation Service", `Removed timed entry ${entry._id!.toHexString()} due to the guild associated with it being absent.`);
+				Logger.warn("Moderation Service", `Removed timed entry ${entry.id} due to the guild associated with it being absent.`);
 				void this.deleteTimedEntry(entry);
 				continue;
 			}
@@ -203,12 +203,13 @@ export default class ModerationService extends BaseService {
 		if (member === null) return false;
 
 		const s = await db.getGuild(g.id);
+		if (s.settings.muteRole === null) return false;
 		let ch: Eris.GuildTextableChannel | null = null;
 		if (!member.roles.includes(s.settings.muteRole)) return false;
 		if (!g.roles.has(s.settings.muteRole)) {
-			await s.mongoEdit<DBKeys>({
-				$set: {
-					"settings.muteRole": null
+			await s.edit<DBKeys>({
+				settings: {
+					muteRole: null
 				}
 			});
 			return false;
@@ -235,10 +236,10 @@ export default class ModerationService extends BaseService {
 					});
 					return false;
 				}
-			} else await s.mongoEdit({
-				$set: {
-					"modlog.enabled": false,
-					"modlog.webhook": null
+			} else await s.edit<DBKeys>({
+				modlog: {
+					enabled: false,
+					webhook: null
 				}
 			});
 		}
@@ -262,9 +263,9 @@ export default class ModerationService extends BaseService {
 						.setFooter("OwO", config.images.icons.bot)
 						.toJSON()
 				}).catch(() => null);
-				await gConfig.mongoEdit<DBKeys>({
-					$unset: {
-						"modlog.channel": 1
+				await gConfig.replace<DBKeys>({
+					modlog: {
+						channel: undefined
 					}
 				});
 			}
@@ -272,9 +273,9 @@ export default class ModerationService extends BaseService {
 			if (gConfig.modlog.webhook) {
 				hook = await this.client.getWebhook(gConfig.modlog.webhook.id, gConfig.modlog.webhook.token).catch(() => null);
 				if (hook === null) {
-					await gConfig.mongoEdit<DBKeys>({
-						$set: {
-							"modlog.webhook": null
+					await gConfig.edit<DBKeys>({
+						modlog: {
+							webhook: null
 						}
 					});
 				} else guild = await this.client.getRESTGuild(hook.guild_id).catch(() => null);
@@ -319,7 +320,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.ChannelLockEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.ChannelLockEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
@@ -355,7 +356,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.ChannelUnlockEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.ChannelUnlockEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
@@ -390,7 +391,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.ServerLockdownEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.ServerLockdownEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			reason,
 			type: "lockdown",
@@ -424,7 +425,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.ServerUnlockdownEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.ServerUnlockdownEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			reason,
 			type: "unlockdown",
@@ -435,7 +436,7 @@ export default class ModerationService extends BaseService {
 		});
 	}
 
-	async createWarnEntry(ch: Eris.GuildTextableChannel, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, id: number, reason?: string | null): Promise<void> {
+	async createWarnEntry(ch: Eris.GuildTextableChannel, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, warningId: number, reason?: string | null): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
 		const { hook, guild } = await this.modLogCheck(gConfig);
@@ -452,7 +453,7 @@ export default class ModerationService extends BaseService {
 						.setDescription([
 							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
 							`{lang:other.modlog.fields.reason}: ${reason}`,
-							`{lang:other.modlog.fields.id}: ${id}`
+							`{lang:other.modlog.fields.id}: ${warningId}`
 						].join("\n"))
 						.setFooter(...(blame instanceof Eris.User ? [`{lang:other.modlog.action|${blame.username}#${blame.discriminator}}`, blame.avatarURL] : [Language.get(gConfig.settings.lang, "other.modlog.autoAction"), config.images.icons.bot]) as [text: string, iconURL: string])
 						.toJSON()
@@ -460,13 +461,13 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.WarnEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.WarnEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
 			type: "warn",
 			pos,
-			id,
+			warningId,
 			guildId: gConfig.id,
 			messageId: res instanceof Eris.Message ? res.id : null,
 			creationDate: Date.now()
@@ -498,7 +499,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.ClearWarningsEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.ClearWarningsEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
@@ -511,7 +512,7 @@ export default class ModerationService extends BaseService {
 		});
 	}
 
-	async createDeleteWarningEntry(ch: Eris.GuildTextableChannel, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, oldBlame: string, id: number, reason?: string | null): Promise<void> {
+	async createDeleteWarningEntry(ch: Eris.GuildTextableChannel, gConfig: GuildConfig, blame: Blame, target: Eris.Member | Eris.User, oldBlame: string, warningId: number, reason?: string | null): Promise<void> {
 		const pos = await gConfig.getModlogId();
 		if (!reason) reason = Language.get(gConfig.settings.lang, "other.modlog.noReason");
 
@@ -536,7 +537,7 @@ export default class ModerationService extends BaseService {
 							`{lang:other.modlog.fields.target}: ${target.username}#${target.discriminator} <@!${target.id}>`,
 							`{lang:other.modlog.fields.reason}: ${reason}`,
 							`{lang:other.modlog.fields.oldBlame}: ${b}`,
-							`{lang:other.modlog.fields.id}: ${id}`
+							`{lang:other.modlog.fields.id}: ${warningId}`
 						].join("\n"))
 						.setFooter(...(blame instanceof Eris.User ? [`{lang:other.modlog.action|${blame.username}#${blame.discriminator}}`, blame.avatarURL] : [Language.get(gConfig.settings.lang, "other.modlog.autoAction"), config.images.icons.bot]) as [text: string, iconURL: string])
 						.toJSON()
@@ -544,14 +545,14 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.DeleteWarnEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.DeleteWarnEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
 			type: "delwarn",
 			pos,
 			oldBlame: b,
-			id,
+			warningId,
 			guildId: gConfig.id,
 			messageId: res instanceof Eris.Message ? res.id : null,
 			creationDate: Date.now()
@@ -582,7 +583,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.KickEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.KickEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
@@ -618,7 +619,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.UnbanEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.UnbanEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
@@ -654,7 +655,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.UnmuteEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.UnmuteEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
@@ -691,7 +692,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.SoftBanEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.SoftBanEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
@@ -730,7 +731,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.BanEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.BanEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,
@@ -769,7 +770,7 @@ export default class ModerationService extends BaseService {
 			}).catch(err => err as Error);
 			if (res instanceof Error) throw new CustomError(res.name, res.message);
 		}
-		await db.collection<ModLogEntry.MuteEntry>("modlog").insertOne({
+		await db.insert<ModLogEntry.MuteEntry>("modlog", rand(), {
 			blame: blame instanceof Eris.User ? blame.id : blame,
 			target: target.id,
 			reason,

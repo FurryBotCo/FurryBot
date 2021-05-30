@@ -1,4 +1,4 @@
-import GuildConfig from "../../db/Models/GuildConfig";
+import GuildConfig, { DBKeys } from "../../db/Models/GuildConfig";
 import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
 import { BotFunctions, Command } from "core";
@@ -26,6 +26,6 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["asar"], __filena
 		if (role.managed) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.managed`));
 		const roles = msg.gConfig.selfAssignableRoles;
 		if (roles.includes(role.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.alreadyListed`));
-		await msg.gConfig.mongoEdit({ $push: { selfAssignableRoles: role.id } });
+		await msg.gConfig.edit<DBKeys>({ selfAssignableRoles: [...msg.gConfig.selfAssignableRoles, role.id] });
 		return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.added`, [role.name]));
 	});
