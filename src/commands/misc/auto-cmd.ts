@@ -115,13 +115,12 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 					}
 				} as GuildConfig["auto"][number];
 
-				const k = await msg.gConfig.edit({
-					auto: [
-						...msg.gConfig.auto,
-						j
-					]
+				await msg.gConfig.mongoEdit({
+					$push: {
+						auto: j
+					}
 				});
-				return msg.reply(`${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, hook!.name, hook!.id, msg.prefix, (k?.auto?.length || 0) + 1])}${created ? `\n${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.created`)}` : ""}`);
+				return msg.reply(`${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, hook!.name, hook!.id, msg.prefix, (msg.gConfig.auto.length || 0) + 1])}${created ? `\n${Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.created`)}` : ""}`);
 
 				break;
 			}
@@ -132,8 +131,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 				const id = Number(msg.args[1]);
 				if (id < 1) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.lessThanOne`));
 				if (id > msg.gConfig.auto.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.invalidId`, [id]));
-				const j = [...msg.gConfig.auto];
-				const v = j.splice(id - 1, 1)[0];
+				const v = msg.gConfig.auto[id - 1];
 				const w = await this.client.getWebhook(v.webhook.id, v.webhook.token).catch(() => null);
 				if (w !== null) {
 					await msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.removeWebhook`, [w.id]));
@@ -144,10 +142,10 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["auto"], __filena
 						return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.doneWebhook`, [id, v.type, w.id]));
 					}
 				}
-				const a = [...msg.gConfig.auto];
-				a.splice(a.indexOf(v), 1);
-				await msg.gConfig.edit({
-					auto: a
+				await msg.gConfig.mongoEdit({
+					$pull: {
+						auto: v
+					}
 				});
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.done`, [id, v.type]));
 				break;

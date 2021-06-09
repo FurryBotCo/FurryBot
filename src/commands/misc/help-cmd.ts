@@ -43,7 +43,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["help", "h"], __f
 				if (h === "DEFAULT") await this.cmd.handlers.runHelp(this, msg, c.cmd);
 			} else if (cat) {
 				if (cat.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.devOnlyCategory`));
-				const list = [];
+				const list = [] as Array<string> ;
 				let i = 0;
 				for (const t of cat.commands) {
 					if (t.restrictions.includes("developer") && !config.developers.includes(msg.author.id)) continue;

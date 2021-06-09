@@ -1,8 +1,7 @@
-import GuildConfig, { DBKeys } from "../../db/Models/GuildConfig";
+import GuildConfig from "../../db/Models/GuildConfig";
 import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
-import { ModLogEntry }  from "../../util/@types/Database";
-import db from "../../../src/db";
+import db from "../../db";
 import { Command, CommandError } from "core";
 import Language from "language";
 import Eris from "eris";
@@ -24,17 +23,15 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["reason"], __file
 		const id = Number(msg.args[0]);
 		const reason = msg.args.slice(1).join(" ");
 		if (reason.length > 200) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.tooLong`));
-		const entries = await db.filter<ModLogEntry.GenericEntry>("modlog", { guildId: msg.channel.guild.id });
+		const entries = await db.collection("modlog").find({ guildId: msg.channel.guild.id }).toArray();
 		const entry = entries.find(e => e.pos === id);
 		if (isNaN(id) || !entry) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidId`, [msg.args[0]]));
 		if (!entry.messageId) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noMessage`, [msg.args[0]]));
 		const ch = msg.channel.guild.channels.get(msg.gConfig.modlog.webhook.channelId) as Eris.GuildTextableChannel | undefined;
 		if (!ch) {
 			// we assume the modlog channel was deleted
-			await msg.gConfig.edit<DBKeys>({
-				modlog: {
-					webhook: null
-				}
+			await msg.gConfig.edit({
+				"modlog.webhook": null
 			});
 			return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.noModlog`));
 		}

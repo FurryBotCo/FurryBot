@@ -28,10 +28,7 @@ export default new ClientEvent<FurryBot>("ready", async function() {
 		"meme",
 		"misc",
 		"moderation",
-		// eslint-disable-next-line comma-dangle
 		"nsfw",
-		// "utility" */
-	]).then(() => {/*
-		console.log("t", this.cmd.triggers); */
-	});
+		"utility" */
+	]);
 });

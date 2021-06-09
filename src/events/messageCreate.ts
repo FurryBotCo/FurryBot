@@ -1,7 +1,7 @@
 import FurryBot from "../main";
 import config from "../config";
-import db, { Redis } from "../db";
-import Blacklist from "../util/@types/Blacklist";
+import db from "../db";
+const { r: Redis } = db;
 import TextHandler from "../util/handler/TextHandler";
 import UserConfig from "../db/Models/UserConfig";
 import GuildConfig from "../db/Models/GuildConfig";
@@ -17,13 +17,14 @@ import { performance } from "perf_hooks";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildTextableChannel>("messageCreate", async function(msg, update, slash, slashInfo) {
-	if (Redis === null) return Logger.error([`Cluster #${this.clusterId}`, "messageCreate"], `Skipped a message with the id ${msg.id} due to redis not being initialized.`);
+	if (!Redis) return Logger.error([`Cluster #${this.clusterId}`, "messageCreate"], `Skipped a message with the id ${msg.id} due to redis not being initialized.`);
 
 	if (!(msg instanceof ExtendedMessage)) return;
-	if (msg.author.id !== "242843345402069002") return;
-	const t = new Timers(config.developers.includes(msg.author.id), `${msg.author.id}/${msg.channel.id}`); // `${msg.channel.id}/${msg.id}/${msg.author.id}`);
+	const dev = config.developers.includes(msg.author.id);
+	const t = new Timers(dev, `${msg.author.id}/${msg.channel.id}`); // `${msg.channel.id}/${msg.id}/${msg.author.id}`);
 	t.start("main");
 	t.start("stats.msg");
+	if (dev) console.log("a");
 	/* start message stats */
 	this.trackNoResponse(
 		this.sh.joinParts("stats", "messages", "channels", msg.channel.id),
@@ -32,17 +33,21 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 		this.sh.joinParts("stats", "messages", "general"),
 		this.sh.joinParts("stats", "messages", "session")
 	);
+	if (dev) console.log("b");
 
 	if ("guild" in msg.channel) this.trackNoResponse(
 		this.sh.joinParts("stats", "messages", "servers", msg.channel.guild.id),
 		this.sh.joinParts("stats", "messages", "users", msg.author.id, "servers", msg.channel.guild.id)
 	);
+	if (dev) console.log("c");
 	/* end message stats */
 	t.end("stats.msg");
 
 	if (msg.author.bot || !("type" in msg.channel)) return;
+	if (dev) console.log("d");
 
 	const uBl = await db.checkBl("user", msg.author.id);
+	if (dev) console.log("e");
 
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore -- no
@@ -50,18 +55,20 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 		if (uBl.current.length === 0 && msg.member.roles.includes(config.roles.blacklist)) await msg.member.removeRole(config.roles.blacklist, "User is not blacklisted.");
 		if (uBl.current.length > 0 && !msg.member.roles.includes(config.roles.blacklist)) await msg.member.addRole(config.roles.blacklist, "User is blacklisted.");
 	}
+	if (dev) console.log("f");
 
 	if (uBl.current.length > 0) {
 
 		if (uBl.notice.length > 0) {
 			const b = uBl.notice[0];
-			await db.update<Blacklist.UserEntry>("blacklist", b.id, { noticeShown: true });
+			await db.collection("blacklist").findOneAndUpdate({ id: b.id }, { $set: { noticeShown: true } });
 
 			return msg.channel.createMessage(Language.get(config.devLanguage, "other.blacklisted.user", [b.blame, b.reason, [0, null].includes(b.expire!) ? Language.get(config.devLanguage, "other.words.never") : Time.formatDateWithPadding(b.expire), config.urls.appealUser(msg.author.id)]));
 		}
 
 		return;
 	}
+	if (dev) console.log("g");
 
 	/* start dm */
 	t.start("dm");
@@ -95,25 +102,28 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	}
 	t.end("dm");
 	/* end dm */
+	if (dev) console.log("h");
 
 	t.start("process");
 	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 	// @ts-ignore -- fuck you
 	const l = await msg.load(db, update, slash, slashInfo); // returns false if message does not start with prefix
 	t.end("process");
+	if (dev) console.log("i");
 
 	// they're messing with less cache reliance, so things can be missing
 	if (!(msg.channel instanceof Eris.GuildChannel)) return;
 	if (!(msg.channel.guild instanceof Eris.Guild)) return;
+	if (dev) console.log("j");
 
 	/* start guild blacklist */
 	t.start("guild-blacklist");
 	const gBl = await db.checkBl("guild", msg.channel.guild.id);
+	if (dev) console.log("k");
 	if (gBl.current.length > 0 && !config.developers.includes(msg.author.id)) {
 		if (gBl.notice.length > 0) {
 			const b = gBl.notice[0];
-			await db.update<Blacklist.GuildEntry>("blacklist", b.id, { noticeShown: true });
-
+			await db.collection("blacklist").findOneAndUpdate({ id: b.id }, { $set: { noticeShown: true } });
 			return msg.reply(Language.get(msg.gConfig.settings.lang, "other.blacklisted.guild", [b.blame, b.reason, [0, null].includes(b.expire!) ? Language.get(msg.gConfig.settings.lang, "other.words.never") : Time.formatDateWithPadding(b.expire), config.urls.appealGuild(msg.channel.guild.id)]));
 		}
 
@@ -121,20 +131,27 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	}
 	t.end("guild-blacklist");
 	/* end guild blacklist */
+	if (dev) console.log("l");
 
 
 	/* start leveling */
 	t.start("leveling");
 	const k = await Redis.exists(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`).then(v => v !== 0);
+	if (dev) console.log("m");
 	if (!k) {
 		const v = await msg.uConfig.checkVote();
+		if (dev) console.log("n");
 		await Redis.setex(`leveling:${msg.author.id}:${msg.channel.guild.id}:cooldown`, v.weekend ? 30 : 60, 1);
+		if (dev) console.log("o");
 		const lvl = LocalFunctions.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
+		if (dev) console.log("p");
 		const j = (Math.floor(Math.random() * 10) + 5) * (v.voted ? 2 : 1);
 		await msg.uConfig.edit({
 			[`levels.${msg.channel.guild.id}`]: msg.uConfig.getLevel(msg.channel.guild.id) + j
 		});
+		if (dev) console.log("q");
 		await Redis.set(`leveling:${msg.channel.guild.id}:${msg.author.id}`, (msg.uConfig.getLevel(msg.channel.guild.id) + 1).toString());
+		if (dev) console.log("r");
 		const nlvl = LocalFunctions.calcLevel(msg.uConfig.getLevel(msg.channel.guild.id));
 		if (nlvl.level > lvl.level) {
 			const r = msg.gConfig.levelRoles.filter(h => h.level <= nlvl.level && !msg.member.roles.includes(h.role));
@@ -144,6 +161,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 				this.sh.joinParts("stats", "levelUp")
 			);
 			if (msg.gConfig.settings.announceLevelUp) {
+				if (dev) console.log("s");
 				this.trackNoResponse(
 					this.sh.joinParts("stats", "levelUp", "message")
 				);
@@ -178,6 +196,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	}
 	t.end("leveling");
 	/* end leveling */
+	if (dev) console.log("t");
 
 	/* start mention */
 	t.start("mention");
@@ -189,12 +208,14 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	}
 	t.end("mention");
 	/* end mention */
+	if (dev) console.log("u");
 
 	/* start afk */
 	t.start("afk");
 	// eslint-disable-next-line no-constant-condition -- if(true) to make the variables block scoped
 	if (true) {
 		const s = await Redis.get(`afk:servers:${msg.channel.guild.id}:${msg.author.id}`);
+		if (dev) console.log("v");
 		if (s) {
 			this.trackNoResponse(
 				this.sh.joinParts("stats", "afk", "remove"),
@@ -248,8 +269,8 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 				this.sh.joinParts("stats", "afk", "server", "mention")
 			);
 			const embed = new EmbedBuilder(msg.gConfig.settings.lang)
-				.setTitle("{lang:commands.misc.afk.msg.title}")
-				.setDescription(p.map(v => `{lang:commands.misc.afk.msg.description${v.message ? "Message" : ""}|${v.id}|${Time.formatAgo(v.time, true, false)}|${v.message || ""}}`).join("\n"))
+				.setTitle("{lang:commands.misc.afk.message.title}")
+				.setDescription(p.map(v => `{lang:commands.misc.afk.message.description${v.message ? "Message" : ""}|${v.id}|${Time.formatAgo(v.time, true, false)}|${v.message || ""}}`).join("\n"))
 				.setTimestamp(new Date().toISOString())
 				.setColor(Colors.furry)
 				.setAuthor(msg.author.tag, msg.author.avatarURL)
@@ -268,6 +289,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	}
 	t.end("afk");
 	/* end afk */
+	if (dev) console.log("w");
 
 	if (!l || msg.cmd === null) return;
 
@@ -275,6 +297,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	t.start("disable");
 	/* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call */
 	if (msg.gConfig.disable.length > 0 && !config.developers.includes(msg.author.id) && !msg.member.permissions.has("administrator")) {
+		if (dev) console.log("x");
 		const a = msg.gConfig.disable.filter((d: any) => d.type === "server" && (d.all || (d.command && msg.cmd!.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd!.category)));
 		const b = msg.gConfig.disable.filter((d: any) => d.type === "user" && d.id === msg.author.id && (d.all || (d.command && msg.cmd!.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd!.category)));
 		const c = msg.gConfig.disable.filter((d: any) => d.type === "role" && msg.member.roles.includes(d.id) && (d.all || (d.command && msg.cmd!.triggers.includes(d.command.toLowerCase())) || (d.category && d.category === msg.cmd!.category)));
@@ -305,6 +328,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	/* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call */
 	t.end("disable");
 	/* end disable */
+	if (dev) console.log("y");
 
 	/* start antispam */
 	t.start("antispam");
@@ -363,11 +387,13 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 	}
 	t.end("antispam");
 	/* end antispam */
+	if (dev) console.log("z");
 
 	const { cmd } = msg;
 
 	if (cmd) {
 		t.start("stats.cmd");
+		if (dev) console.log("1");
 		this.trackNoResponse(
 			this.sh.joinParts("stats", "commands", "servers", msg.channel.guild.id, "total"),
 			this.sh.joinParts("stats", "commands", "servers", msg.channel.guild.id, msg.cmd.triggers[0]),
@@ -384,10 +410,12 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 			this.sh.joinParts("stats", "commands", "session", "total"),
 			this.sh.joinParts("stats", "commands", "session", msg.cmd.triggers[0])
 		);
+		if (dev) console.log("2");
 		t.end("stats.cmd");
 
 		/* start command restrictions */
 		t.start("restrictions");
+		if (dev) console.log("3");
 		if (!config.developers.includes(msg.author.id)) {
 			// eslint-disable-next-line no-async-promise-executor, @typescript-eslint/no-unused-vars
 			const v = await new Promise(async (a, b) => {
@@ -410,6 +438,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 		}
 		t.end("restrictions");
 		/* end command restrictions */
+		if (dev) console.log("4");
 
 		/* start permission checks */
 		t.start("permission");
@@ -418,6 +447,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 		if (!p) return;
 		t.end("permission");
 		/* end permission checks */
+		if (dev) console.log("5");
 
 		/* start command cooldown */
 		t.start("cooldown");
@@ -456,6 +486,7 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 		Logger.info([`Cluster #${this.clusterId}`, `Shard #${msg.channel.guild.shard.id}`, `Command Handler${msg.slash ? "[Slash]" : ""}`], `Command "${cmd.triggers[0]}" ran with ${msg.args.length === 0 ? "no arguments" : `the arguments "${msg.args.join(" ")}"`} by user ${msg.author.tag} (${msg.author.id}) in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
 
 		const start = performance.now();
+		if (dev) console.log("6");
 
 		/* start run command */
 		t.start("run");
@@ -463,12 +494,14 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 			.run
 			.call(this, msg, cmd)
 			.then(res => {
+				if (dev) console.log("7");
 				this.trackNoResponse(
 					this.sh.joinParts("stats", "commandRun", "success")
 				);
 				const end = performance.now();
 				Logger.info([`Cluster #${this.clusterId}`, `Shard #${((msg.channel).guild).shard.id}`, `Command Handler${msg.slash ? "[Slash]" : ""}`], `Command handler for "${cmd.triggers[0]}" took ${(end - start).toFixed(3)}ms.`);
 				if ((res  as Error) instanceof Error) throw res;
+				if (dev) console.log("8");
 			})
 			/* start command error handler */
 			.catch(async (err: Error) => {
@@ -504,4 +537,5 @@ export default new ClientEvent<FurryBot, UserConfig, GuildConfig, Eris.GuildText
 		/* start run command */
 	}
 	t.end("main");
+	if (dev) console.log("9");
 });

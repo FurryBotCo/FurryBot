@@ -57,12 +57,12 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["log"], __filenam
 						type: t,
 						ignore: []
 					} as unknown as GuildConfig["logEvents"][number];
-					const { value: k } = await msg.gConfig.mongoEdit({
+					await msg.gConfig.mongoEdit({
 						$push: {
 							logEvents: j
 						}
 					});
-					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.prefix, (k?.logEvents?.length || 0) + 1]));
+					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.add.done`, [t, ch.id, msg.prefix, (msg.gConfig.logEvents.length || 0) + 1]));
 				}
 
 				break;
@@ -74,9 +74,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["log"], __filenam
 				const id = Number(msg.args[1]);
 				if (id < 1) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.lessThanOne`));
 				if (id > msg.gConfig.logEvents.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.invalidId`, [id]));
-				const j = [...msg.gConfig.logEvents];
-				const v = j.splice(id - 1, 1)[0];
-				await msg.gConfig.mongoEdit({
+				const v = msg.gConfig.logEvents[id - 1];
+				await msg.gConfig.edit({
 					$pull: {
 						logEvents: v
 					}
@@ -144,10 +143,8 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["log"], __filenam
 				await msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.confirm`, [len]));
 				const v = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id, 1);
 				if (!v || v.content.toLowerCase() !== "yes") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.cancelled`));
-				await msg.gConfig.mongoEdit({
-					$set: {
-						logEvents: []
-					}
+				await msg.gConfig.edit({
+					logEvents: []
 				});
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.done`, [len]));
 				break;

@@ -4,7 +4,8 @@ import FurryBot from "../main";
 import config from "../config";
 import UserConfig from "../db/Models/UserConfig";
 import GuildConfig from "../db/Models/GuildConfig";
-import { Redis } from "../db";
+import db from "../db";
+const { r: Redis } = db;
 import { BotFunctions, Colors, Command, CommandError, defaultEmojis, EmbedBuilder, ExtendedMessage } from "core";
 import Eris from "eris";
 import { Request, ThenReturnType, Time, Utility } from "utilities";
@@ -326,7 +327,7 @@ export default class LocalFunctions {
 		const { ext, file } = res;
 		// because slash command messages don't support file uploads
 		if (msg.slash) await msg.reply("\u200B");
-		return msg.channel.createMessageNoSlash({
+		return (msg.slash ? msg.channel.createMessageNoSlash : msg.channel.createMessage).call(msg.channel, {
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setTimestamp(new Date().toISOString())
@@ -363,7 +364,7 @@ export default class LocalFunctions {
 		const { ext, file } = res;
 		// because slash command messages don't support file uploads
 		if (msg.slash) await msg.reply("\u200B");
-		return msg.channel.createMessageNoSlash({
+		return (msg.slash ? msg.channel.createMessageNoSlash : msg.channel.createMessage).call(msg.channel, {
 			embed: new EmbedBuilder(msg.gConfig.settings.lang)
 				.setTitle(`{lang:${cmd.lang}.title}`)
 				.setTimestamp(new Date().toISOString())

@@ -1,7 +1,8 @@
 import GuildConfig from "../../db/Models/GuildConfig";
 import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
-import { db, Redis } from "../../db";
+import db from "../../db";
+const { r: Redis } = db;
 import LocalFunctions from "../../util/LocalFunctions";
 import { Colors, Command, EmbedBuilder, BotFunctions } from "core";
 import Language from "language";
@@ -29,7 +30,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["rank"], __filena
 		const c = await db.getUser(member.id);
 
 		let u: Array<{ id: string; level: number | null; }>;
-		u = await Promise.all<(typeof u)[number]>(msg.channel.guild.members.filter(m => !m.user.bot).map(async (m) => new Promise((a, b) => Redis!.get(`leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err)))));
+		u = await Promise.all<(typeof u)[number]>(msg.channel.guild.members.filter(m => !m.user.bot).map(async (m) => new Promise((a, b) => Redis.get(`leveling:${msg.channel.guild.id}:${m.id}`, (err, v) => !err ? a({ id: m.id, level: v === null ? null : Number(v) }) : b(err)))));
 		const lvl = LocalFunctions.calcLevel(c.getLevel(msg.channel.guild.id));
 		const n = LocalFunctions.calcExp(lvl.level + 1);
 		const t = { id: member.id, level: lvl.total };

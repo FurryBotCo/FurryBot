@@ -2,7 +2,8 @@ import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
 import GuildConfig from "../../db/Models/GuildConfig";
 import config from "../../config";
-import db, { rdb, Redis } from "../../db";
+import db from "../../db";
+const { mongo, r: Redis } = db;
 import { Colors, Command, CommandError, EmbedBuilder, EvalUtil } from "core";
 import Language from "language";
 import * as fs from "fs-extra";
@@ -26,7 +27,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["eval", "ev"], __
 		const
 			silent = !!msg.dashedArgs.value.includes("silent"),
 			deleteInvoke = !!msg.dashedArgs.value.includes("delete");
-		let error = false, res: unknown, o, stack;
+		let error = false, res: unknown, o, stack = "";
 
 		const start = performance.now();
 		try {
@@ -37,11 +38,12 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["eval", "ev"], __
 				util,
 				fs,
 				db,
-				rdb,
+				mongo,
+				mdb: mongo.db(db.mainDB),
+				Redis,
 				Eris,
 				cmd,
 				Language,
-				Redis,
 				Logger,
 				Internal,
 				Request,
@@ -84,7 +86,6 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["eval", "ev"], __
 				Logger.error(`Shard #${msg.channel.guild.shard.id}`, !o ? res : o);
 				const st: Array<string> = (o as Error)!.stack!.split("\n");
 				let i = 0;
-				if (!stack) stack = "";
 
 				// extra 50 for padding
 				for (const line of st) if ((String(res).length + 50) + stack.length < 950) (stack += `\n${line}`, ++i); // eslint-disable-line @typescript-eslint/no-unused-expressions

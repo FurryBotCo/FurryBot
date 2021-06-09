@@ -11,13 +11,13 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["tag"], __filenam
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
-		const tags: {
-			[k: string]: string;
-		} = {};
-		await Promise.all(msg.gConfig.tags.map(async (t, i) => {
+		const tags: Record<string, string> = {};
+
+		for (const t of msg.gConfig.tags) {
+			const i = msg.gConfig.tags.indexOf(t);
 			if (!msg.gConfig.tags[i] || !msg.gConfig.tags[i].content) await msg.gConfig.mongoEdit({ $pull: { tags: t } });
 			else tags[t.name.toLowerCase()] = t.content;
-		}));
+		}
 		if (msg.args.length < 1) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.invalidUsage`));
 
 		if (["create", "delete", "edit"].includes(msg.args[0].toLowerCase()) && !msg.channel.permissionsOf(this.bot.user.id).has("sendMessages")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.missingPerms`));
@@ -87,12 +87,14 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["tag"], __filenam
 				}
 
 				case "edit": {
-					if (!msg.gConfig.tags.map(t => t.name.toLowerCase()).includes(msg.args[1].toLowerCase())) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.doesNotExist`, [msg.args[1].toLowerCase()]));
-					const c = msg.gConfig.tags.find(t => t.name.toLowerCase() === msg.args[1].toLowerCase())!;
+					const c = msg.gConfig.tags.find(t => t.name.toLowerCase() === msg.args[1].toLowerCase());
+					if (!c) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.doesNotExist`, [msg.args[1].toLowerCase()]));
 					const content = msg.args.slice(2).join(" ");
 					if (!content || content.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.needContent`));
 					await msg.gConfig.mongoEdit({
-						$pull: c,
+						$pull: {
+							tags: c
+						},
 						$push: {
 							tags: {
 								creationBlame: msg.author.id,
@@ -119,9 +121,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["tag"], __filenam
 				case "delete": {
 					if (!msg.gConfig.tags.map(t => t.name.toLowerCase()).includes(msg.args[1].toLowerCase())) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.doesNotExist`, [msg.args[1].toLowerCase()]));
 					await msg.gConfig.mongoEdit({
-						$pull: {
-							tags: msg.gConfig.tags.find(t => t.name.toLowerCase() === msg.args[1].toLowerCase())
-						}
+						$pull: msg.gConfig.tags.find(t => t.name.toLowerCase() === msg.args[1].toLowerCase())!
 					});
 					return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.deleted`, [msg.args[1].toLowerCase()]));
 					break;

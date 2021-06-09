@@ -1,8 +1,7 @@
 import GuildConfig from "../../db/Models/GuildConfig";
 import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
-import db from "../../../src/db";
-import { Warning } from "../../util/@types/Database";
+import db from "../../db";
 import config from "../../../src/config";
 import { BotFunctions, Colors, Command, CommandError, EmbedBuilder } from "core";
 import Language from "language";
@@ -25,10 +24,10 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 			embed: BotFunctions.genErrorEmbed(msg.gConfig.settings.lang, "INVALID_MEMBER", true)
 		});
 
-		const w = await db.filter<Warning>("warnings", {
+		const w = await db.collection("warnings").find({
 			guildId: msg.channel.guild.id,
 			userId: member.id
-		}).then(v => v.sort((a, b) => a.warningId - b.warningId));
+		}).toArray().then(v => v.sort((a, b) => a.warningId - b.warningId));
 
 		switch (msg.args[0]?.toLowerCase()) {
 			case "list": {
@@ -77,11 +76,11 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 				if (isNaN(n) || n > w.length) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.invalidId`, [msg.args[2], w.length]));
 				const j = w.find(k => k.warningId === n)!;
 				const reason = msg.args.slice(3)?.join("") || Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
-				await db.filter<Warning>("warnings", {
+				await db.collection("warnings").find({
 					guildId: msg.channel.guild.id,
 					userId: member.id,
 					warningId: j.warningId
-				}).then(v => db.delete("warnings", v[0].id));
+				}).toArray().then(v => db.collection("warnings").findOneAndDelete({ id: v[0].id }));
 				await this.executeModCommand("deleteWarning", {
 					reason,
 					warningId: j.warningId,
@@ -98,11 +97,11 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["warnings"], __fi
 				if (!msg.member.permissions.has("manageGuild")) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.missingPerm`, ["manageServer"]));
 				if (msg.args.length < 2) return new CommandError("INVALID_USAGE", cmd);
 				if (w.length === 0) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.noWarnings`, [`${member.username}#${member.discriminator}`]));
-				for (const v of w) await db.filter<Warning>("warnings", {
+				for (const v of w) await db.collection("warnings").find({
 					guildId: msg.channel.guild.id,
 					userId: member.id,
 					warningId: v.warningId
-				}).then(j => db.delete("warnings", j[0].id));
+				}).toArray().then(j => db.collection("warnings").findOneAndDelete({ id: j[0].id }));
 				const reason = msg.args.slice(3)?.join("") || Language.get(msg.gConfig.settings.lang, "other.modlog.noReason");
 				await this.executeModCommand("clearWarnings", {
 					reason,

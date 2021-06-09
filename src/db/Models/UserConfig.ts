@@ -3,11 +3,14 @@ import config from "../../config";
 import FurryBot from "../../main";
 import db from "..";
 import { UserConfig as UC } from "core";
-import { ConfigDataTypes, ConfigEditTypes } from "core/src/@types/db";
+import { DataTypes, EditTypes } from "core/src/@types/db";
 import Logger from "logger";
+import { AnyObject } from "utilities";
+import { MatchKeysAndValues, UpdateQuery } from "mongodb";
 
-export type DBKeys = ConfigDataTypes<UserConfig>;
-export default class UserConfig extends UC {
+// @TODO afk servers array
+export type DBKeys = DataTypes<UserConfig>;
+export default class UserConfig extends UC<typeof db> {
 	afk: {
 		servers: Array<{
 			active: boolean;
@@ -40,18 +43,19 @@ export default class UserConfig extends UC {
 		end: string;
 		reason: string;
 	}>;
-	constructor(id: string, data: ConfigDataTypes<UserConfig, "id">) {
-		super(id, data, config.defaults.config.user, db);
+	constructor(id: string, data: DataTypes<UserConfig, "id">) {
+		super(id, config.defaults.config.user, db);
 		super.setRef(this);
 		super.load(data);
 	}
 
 	async fix() {
-		const obj= Object.create(null) as ConfigEditTypes<UserConfig, "id"> ;
+		const obj = Object.create(null) as EditTypes<UserConfig, "id"> & AnyObject ;
 		if (typeof this.booster !== "boolean") obj.booster = false;
+		if (!Array.isArray(this.afk.servers)) obj["afk.servers"] = [];
 		if (JSON.stringify(obj) !== "{}") {
 			Logger.warn(["Database", "User"], `Fixed user "${this.id}": ${JSON.stringify(obj)}`);
-			await this.edit<Omit<ConfigEditTypes<UserConfig>, "id">>(obj);
+			await this.edit(obj);
 		}
 
 		return this;
@@ -105,18 +109,26 @@ export default class UserConfig extends UC {
 	}
 
 	async checkBlacklist() {
-		return db.checkBl("user", this.id);
+		return this.db.checkBl("user", this.id);
 	}
 	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
-		return db.addBl("user", this.id, blame, blameId, reason, expire, report);
+		return this.db.addBl("user", this.id, blame, blameId, reason, expire, report);
 	}
 
 	async checkVote() {
-		return db.checkVote(this.id);
+		return this.db.checkVote(this.id);
 	}
 
 	getLevel(g: string) {
 		// because ts is being screwy
 		return ((this.levels && this.levels[g]) ?? 0) as unknown as number;
+	}
+
+	override async edit(d: MatchKeysAndValues<EditTypes<UserConfig, "id">>) {
+		return super.edit(d);
+	}
+
+	override async mongoEdit(d: UpdateQuery<EditTypes<UserConfig, "id">>) {
+		return super.mongoEdit(d);
 	}
 }

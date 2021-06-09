@@ -63,7 +63,7 @@ export default class IPCCommandHandler {
 		if (!g) return  this.client.ipc.sendToCluster(clusterId, responseId, "NO_GUILD");
 		const m = g.members.get(id);
 		if (m === undefined) return this.client.ipc.sendToCluster(clusterId, responseId, "NOT_PRESENT");
-		const j = [];
+		const j = [] as Array<string>;
 		if (m.roles.includes(config.roles.booster)) j.push("BOOSTER");
 		if (m.roles.includes(config.roles.staff)) j.push("STAFF");
 		return this.client.ipc.sendToCluster(clusterId, responseId, j || "NONE");

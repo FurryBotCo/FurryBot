@@ -6,7 +6,7 @@ import pkg from "../../../package.json";
 import lock from "../../../package-lock.json";
 import { Colors, Command, defaultEmojis, EmbedBuilder } from "core";
 import { Internal, Strings, Time } from "utilities";
-import { VERSION as ClusteringVersion } from "clustering";
+import { Stats, VERSION as ClusteringVersion } from "clustering";
 import Language from "language";
 import Eris from "eris";
 import * as os from "os";
@@ -20,7 +20,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["info"], __filena
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
-		const st = await this.ipc.getStats(false);
+		const st: Stats | null = await this.ipc.getStats(false);
 		if (st === null) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.noStats"));
 		const { drives: diskUsage } = Internal.getDiskUsage();
 		const d = [];

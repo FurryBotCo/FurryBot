@@ -1,12 +1,12 @@
 import config from "../../config";
-import db from "..";
 import { VALID_LANGUAGES } from "../../main";
-import { ModLogEntry, Warning } from "../../util/@types/Database";
-import { GuildConfig as GC, ConfigDataTypes, ConfigEditTypes } from "core";
+import db from "..";
+import { GuildConfig as GC, DataTypes, EditTypes } from "core";
 import Logger from "logger";
+import { MatchKeysAndValues, UpdateQuery } from "mongodb";
 
-export type DBKeys = ConfigDataTypes<GuildConfig>;
-export default class GuildConfig extends GC<VALID_LANGUAGES> {
+export type DBKeys = DataTypes<GuildConfig>;
+export default class GuildConfig extends GC<VALID_LANGUAGES, typeof db> {
 	declare settings: {
 		/** @deprecated */
 		prefix?: string;
@@ -69,10 +69,10 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		level: number;
 	}>;
 	deletion: number | null;
-	constructor(id: string, data: ConfigDataTypes<GuildConfig, "id">) {
+	constructor(id: string, data: DataTypes<GuildConfig, "id">) {
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore -- fuck off
-		super(id, data, config.defaults.config.guild, db);
+		super(id, config.defaults.config.guild, db);
 		super.setRef(this);
 		super.load(data);
 	}
@@ -80,7 +80,7 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 	/* eslint-disable deprecation/deprecation */
 	async fix() {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		const obj: ConfigEditTypes<GuildConfig, "id"> = Object.create(null);
+		const obj: EditTypes<GuildConfig, "id"> = Object.create(null);
 		if (this.modlog !== undefined){
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore -- dot notation for mongodb
@@ -100,20 +100,16 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 		if (this.prefix?.length === 0) obj.prefix = [
 			this.settings.prefix || config.defaults.prefix
 		];
-		// @FIXME send a notice inside the AutoPosting service & remove channel there
-		/* const v = JSON.parse(JSON.stringify(this.auto)) as GuildConfig["auto"];
-		for (const a of v) if ("channel" in a) {
-			if ((a as typeof a & { channel: null; }).channel === null) delete (v[v.indexOf(a)] as typeof a & { channel?: null; }).channel;
-			else v.splice(this.auto.indexOf(a), 1);
-		}
-		if (JSON.stringify(this.auto) !== JSON.stringify(v)) obj.auto = v; */
+		if (!this.settings.lang) obj.settings = {
+			lang: config.defaults.config.guild.settings.lang as "en"
+		};
 		if (this.settings.prefix) {
 			if (this.prefix && this.settings.prefix !== this.prefix[0]) obj.prefix = [
 				this.settings.prefix
 			];
-			await this.edit<Omit<ConfigEditTypes<GuildConfig>, "id">>({
-				settings: {
-					prefix: undefined
+			await this.mongoEdit({
+				$unset: {
+					"settings.prefix": true
 				}
 			});
 			delete this.settings.prefix;
@@ -127,18 +123,26 @@ export default class GuildConfig extends GC<VALID_LANGUAGES> {
 	/* eslint-enable deprecation/deprecation */
 
 	async checkBlacklist() {
-		return db.checkBl("guild", this.id);
+		return this.db.checkBl("guild", this.id);
 	}
 
 	async addBlacklist(blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
-		return db.addBl("guild", this.id, blame, blameId, reason, expire, report);
+		return this.db.addBl("guild", this.id, blame, blameId, reason, expire, report);
 	}
 
 	async getWarningId(userId: string) {
-		return this.db.filter<Warning>("warnings", { guildId: this.id, userId }).then(v => v.sort((a, b) => b.id - a.id)?.[0]?.id + 1 || 1);
+		return this.db.collection("warnings").find({ guildId: this.id, userId }).toArray().then(v => v.sort((a, b) => b.warningId - a.warningId)?.[0]?.warningId + 1 || 1);
 	}
 
 	async getModlogId() {
-		return this.db.filter<ModLogEntry.GenericEntry>("modlog", { guildId: this.id }).then(v => v.length + 1);
+		return this.db.collection("modlog").find({ guildId: this.id }).toArray().then(v => v.length + 1);
+	}
+
+	override async edit(d: MatchKeysAndValues<EditTypes<GuildConfig, "id">>) {
+		return super.edit(d);
+	}
+
+	override async mongoEdit(d: UpdateQuery<EditTypes<GuildConfig, "id">>) {
+		return super.mongoEdit(d);
 	}
 }

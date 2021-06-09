@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { db } from "../db";
-import GuildConfig, { DBKeys } from "../db/Models/GuildConfig";
+import db from "../db";
+import GuildConfig from "../db/Models/GuildConfig";
 import config from "../config";
 import Yiffy from "../util/req/Yiffy";
 import LocalFunctions from "../util/LocalFunctions";
@@ -11,20 +11,25 @@ import { Colors, EmbedBuilder } from "core";
 import Eris from "eris";
 import fetch from "node-fetch";
 import { Request } from "utilities";
-import rdb from "rethinkdb";
 
 export default class AutoPostingService extends BaseService {
 	private interval: NodeJS.Timeout;
 	private client = new Eris.Client(`Bot ${config.client.token}`, { restMode: true });
 	private DONE: Array<string> = [];
+	private ran = false;
 	constructor(setup: ServiceInitalizer) {
 		super(setup);
 		this.interval = setInterval(() => {
 			const d = new Date();
-			if ((d.getMinutes() % 5) === 0) void this.run();
-			else if ((d.getSeconds() % 15) === 0) this.DONE = [];
+			if ((d.getMinutes() % 5) === 0) {
+				if (this.ran === false) void this.run();
+				this.ran = true;
+			} else if ((d.getSeconds() % 15) === 0) {
+				this.ran = false;
+				this.DONE = [];
+			}
 		}, 800);
-		this.done();
+		void db.init(true, false).then(() => this.done());
 	}
 
 	// this service doesn't accept commands, but we have to overload this
@@ -40,7 +45,7 @@ export default class AutoPostingService extends BaseService {
 
 	async run() {
 		const d = new Date();
-		const entries = await db.filter<DBKeys>("guilds", rdb.row("auto").ne(null));
+		const entries = await db.collection("guilds").find({ $where: "![undefined,null].includes(this.auto) && this.auto.length > 0" }, {}).toArray();
 		for (const g of entries) {
 			for (const e of g.auto) {
 				if (
@@ -53,7 +58,7 @@ export default class AutoPostingService extends BaseService {
 					if (this.DONE.includes(e.id)) continue;
 					await this.execute(e, new GuildConfig(g.id, g));
 					// eslint-disable-next-line deprecation/deprecation
-					Logger.info(["Auto Posting"], `Ran auto posting for type "${e.type}" with webhook id "${e.webhook?.id || `ch-${e.webhook.channelId}`}" (time: ${e.time}, id: ${e.id})`);
+					Logger.info(["Auto Posting"], `Ran auto posting for type "${e.type}" with webhook id "${e.webhook?.id || `ch-${e.webhook?.channelId}`}" (time: ${e.time}, id: ${e.id})`);
 				}
 			}
 		}
@@ -62,8 +67,10 @@ export default class AutoPostingService extends BaseService {
 	async execute({ type, webhook: wh, id }: GuildConfig["auto"][number], gConfig: GuildConfig) {
 		this.DONE.push(id);
 		if (!wh || !wh.id || !wh.token) {
-			await gConfig.edit<DBKeys>({
-				auto: gConfig.auto.filter(a => a.id !== id)
+			await gConfig.mongoEdit({
+				$pull: {
+					auto: gConfig.auto.find(a => a.id === id)
+				}
 			});
 			return;
 		}
@@ -72,16 +79,20 @@ export default class AutoPostingService extends BaseService {
 		const w = await this.client.getWebhook(wh.id, wh.token).catch(() => null);
 		if (!w) {
 			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to its webhook being invalid.`);
-			await gConfig.edit<DBKeys>({
-				auto: gConfig.auto.filter(a => a.id !== id)
+			await gConfig.mongoEdit({
+				$pull: {
+					auto: gConfig.auto.find(a => a.id === id)
+				}
 			});
 			return;
 		}
 		const ch = await this.client.getRESTChannel(w.channel_id).catch(() => null) as Eris.AnyGuildChannel | null;
 		if (ch === null) {
 			Logger.warn("Auto Posting", `Removing auto entry #${id} (type: ${type}) due to its webhook channel not existing.`);
-			await gConfig.edit<DBKeys>({
-				auto: gConfig.auto.filter(a => a.id !== id)
+			await gConfig.mongoEdit({
+				$pull: {
+					auto: gConfig.auto.find(a => a.id === id)
+				}
 			});
 			return;
 		}
@@ -98,8 +109,10 @@ export default class AutoPostingService extends BaseService {
 						.toJSON()
 				]
 			});
-			await gConfig.edit<DBKeys>({
-				auto: gConfig.auto.filter(a => a.id !== id)
+			await gConfig.edit({
+				$pull: {
+					auto: gConfig.auto.find(a => a.id === id)
+				}
 			});
 			return;
 		}

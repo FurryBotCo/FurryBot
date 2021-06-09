@@ -1,7 +1,7 @@
 import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
 import GuildConfig from "../../db/Models/GuildConfig";
-import { db } from "../../db";
+import db from "../../db";
 import Yiffy from "../../util/req/Yiffy";
 import config from "../../config";
 import { BotFunctions, Command, EmbedBuilder, ErisPermissions } from "core";

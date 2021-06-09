@@ -5,14 +5,15 @@
 import sourceMapSupport from "source-map-support";
 if (__filename.endsWith(".ts")) sourceMapSupport.install({ hookRequire: true });
 else sourceMapSupport.install();
+
 import config from "../config";
-import { Redis } from "../db";
+import db from "../db";
 import { MonkeyPatch  } from "core";
 import Logger from "logger";
 import { JSON5Helper, setValue } from "utilities";
 import * as fs from "fs-extra";
 import Language from "language";
-setValue("userAgent", config.web.userAgent)("redis", Redis!)("pastebin.userKey", config.apis.pastebin.userKey)("pastebin.devKey", config.apis.pastebin.devKey);
+setValue("userAgent", config.web.userAgent)("redis", db.r)("pastebin.userKey", config.apis.pastebin.userKey)("pastebin.devKey", config.apis.pastebin.devKey);
 JSON5Helper.enable();
 MonkeyPatch.init();
 Language.setDir(config.dir.lang);

@@ -1,4 +1,4 @@
-import GuildConfig, { DBKeys } from "../../db/Models/GuildConfig";
+import GuildConfig from "../../db/Models/GuildConfig";
 import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
 import { BotFunctions, Colors, Command, CommandError, EmbedBuilder } from "core";
@@ -43,7 +43,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["levelroles"], __
 				const n = Number(msg.args[2] || 1);
 				const j = msg.gConfig.levelRoles.find((k, i) => (i + 1) === n);
 				if (isNaN(n) || n > msg.gConfig.levelRoles.length || !j) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.remove.invalidId`, [msg.args[2], msg.gConfig.levelRoles.length]));
-				await msg.gConfig.mongoEdit<DBKeys>({
+				await msg.gConfig.mongoEdit({
 					$pull: {
 						levelRoles: j
 					}

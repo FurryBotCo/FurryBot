@@ -1,6 +1,6 @@
 import FurryBot from "../main";
 import config from "../config";
-import { db } from "../db";
+import db from "../db";
 import SnipeHandler from "../util/handler/SnipeHandler";
 import { ClientEvent, Colors, EmbedBuilder, ErisPermissions } from "core";
 import Eris from "eris";
@@ -19,11 +19,9 @@ export default new ClientEvent<FurryBot>("messageDelete", async function (messag
 	for (const log of e) {
 		const ch = guild.channels.get(log.channel) as Eris.GuildTextableChannel;
 		if (!ch || !(["viewChannel", "sendMessages"] as Array<ErisPermissions>).some(perm => ch.permissionsOf(this.bot.user.id).has(perm))) {
-			const l = [...g.logEvents];
-			l.splice(l.indexOf(log), 1);
-			await db.table("guilds").get(g.id).update({
-				logEvents: l
-			}).run(db.conn);
+			await g.mongoEdit({
+				$pull: log
+			});
 			continue;
 		}
 

@@ -1,4 +1,4 @@
-import GuildConfig, { DBKeys } from "../../db/Models/GuildConfig";
+import GuildConfig from "../../db/Models/GuildConfig";
 import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
 import config from "../../config";
@@ -110,7 +110,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 					]
 				});
 
-				await msg.gConfig.edit<DBKeys>({
+				await msg.gConfig.edit({
 					modlog: {
 						enabled: true,
 						channel: null,
@@ -137,7 +137,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 						if (n === null) return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.collectionTimeout"));
 						if (n.content.toLowerCase() === "yes") {
 							await this.client.deleteWebhook(w.id, w.token);
-							await msg.gConfig.edit<DBKeys>({
+							await msg.gConfig.edit({
 								modlog: {
 									enabled: false,
 									channel: null,
@@ -148,7 +148,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 						} else if (n.content.toLowerCase() === "cancel") return msg.channel.createMessage(Language.get(msg.gConfig.settings.lang, "other.errors.userCancelled"));
 					}
 				}
-				await msg.gConfig.edit<DBKeys>({
+				await msg.gConfig.edit({
 					modlog: {
 						enabled: false,
 						channel: null,
@@ -164,7 +164,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["modlog"], __file
 				if (msg.gConfig.modlog.enabled === false) return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.get.notEnabled`));
 				const w =msg.gConfig.modlog.webhook ? await this.client.getWebhook(msg.gConfig.modlog.webhook.id, msg.gConfig.modlog.webhook.token).catch(() => null) : null;
 				if (w === null) {
-					await msg.gConfig.edit<DBKeys>({
+					await msg.gConfig.edit({
 						modlog: {
 							enabled: false,
 							channel: null,

@@ -2,7 +2,7 @@ import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
 import GuildConfig from "../../db/Models/GuildConfig";
 import config from "../../config";
-import { db } from "../../db";
+import db from "../../db";
 import KSoft from "../../util/req/KSoft";
 import DRep from "../../util/req/DRep";
 import { BotFunctions, Command, defaultEmojis, EmbedBuilder } from "core";

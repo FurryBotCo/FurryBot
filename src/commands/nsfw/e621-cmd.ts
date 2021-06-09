@@ -1,7 +1,8 @@
 import GuildConfig from "../../db/Models/GuildConfig";
 import UserConfig from "../../db/Models/UserConfig";
 import FurryBot from "../../main";
-import { Redis } from "../../db";
+import db from "../../db";
+const { r: Redis } = db;
 import E621 from "../../util/req/E621";
 import config from "../../config";
 import { Colors, Command, defaultEmojis, EmbedBuilder } from "core";
@@ -106,7 +107,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["e621", "e6"], __
 		const remove = (async () => {
 			if (int) clearTimeout(int);
 			if (rlTimeout) clearTimeout(rlTimeout);
-			await Redis!.srem("cmd:e621:active", msg.channel.id);
+			await Redis.srem("cmd:e621:active", msg.channel.id);
 			e.setFooter(`{lang:${cmd.lang}.inactive}`);
 			await m.edit({
 				embed: e.toJSON()

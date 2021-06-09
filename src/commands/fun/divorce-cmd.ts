@@ -1,7 +1,7 @@
 import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
 import GuildConfig from "../../db/Models/GuildConfig";
-import { db } from "../../db";
+import db from "../../db";
 import { Command } from "core";
 import Language from "language";
 

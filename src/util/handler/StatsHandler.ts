@@ -1,4 +1,5 @@
-import { Redis } from "../../db";
+import db from "../../db";
+const { r: Redis } = db;
 import FurryBot from "../../main";
 import { Utility } from "utilities";
 
@@ -69,7 +70,7 @@ export default class StatsHandler {
 	}
 
 	async getStats() {
-		if (Redis === null) throw new ReferenceError("StatsHandler#getStats called before redis was initialized.");
+		if (!Redis) throw new ReferenceError("StatsHandler#getStats called before redis was initialized.");
 		return {
 			messages: {
 				general: await Redis.get("stats:messages:general").then(v => Number(v)),
@@ -83,8 +84,8 @@ export default class StatsHandler {
 				general: await Redis.get("stats:commands:general:total").then(v => Number(v)),
 				session: await Redis.get("stats:commands:session:total").then(v => Number(v)),
 				specific: await Promise.all(this.#client.cmd.commands.map(c => c.triggers[0]).map(async (c) => ({
-					general: await Redis!.get(`stats:commands:general:${c}`).then(v => Number(v)),
-					session: await Redis!.get(`stats:commands:session:${c}`).then(v => Number(v)),
+					general: await Redis.get(`stats:commands:general:${c}`).then(v => Number(v)),
+					session: await Redis.get(`stats:commands:session:${c}`).then(v => Number(v)),
 					cmd: c
 				}))).then(v =>
 					v

@@ -1,0 +1,56 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-member-access */
+import services from "../src/config/extra/services.json";
+import RethinkDB, { Connection } from "rethinkdb";
+
+
+async function run(r?: Connection, user?: string, password?: string) {
+	const adminUser = user ?? process.env.ADMIN_USER;
+	const adminPassword = password ?? process.env.ADMIN_PASSWORD;
+
+	if (!adminPassword) throw new Error("Missing or invalid admin user");
+	if (!adminPassword) throw new Error("Missing or invalid admin password");
+
+	if (!r) r = await RethinkDB.connect({
+		host: services.db.options.host,
+		port: services.db.options.port,
+		user: adminUser,
+		password: adminPassword
+	});
+
+	/* const users = await RethinkDB.db("rethinkdb").table("users").run(r).then(v => v.toArray());
+	for (const u of users) if (u.id === services.db.options.user) {
+		console.log(`Removing the user \`${u.id}\``);
+		await RethinkDB.db("rethinkdb").table("users").get(u.id).delete().run(r);
+	}
+	console.log(`Creating the user \`${services.db.options.user}\``);
+	await RethinkDB.db("rethinkdb").table("users").insert({
+		id: services.db.options.user,
+		password: services.db.options.password
+	}).run(r); */
+
+	const cur = await RethinkDB.dbList().run(r);
+	const db = ["furrybot", "furrybotbeta"];
+	const table = ["blacklist", "guilds", "modlog", "premium", "timed", "users", "votes", "warnings"];
+	for (const d of db) {
+		if (cur.includes(d)) {
+			console.log(`Dropping \`${d}\` database`);
+			await RethinkDB.dbDrop(d).run(r);
+		}
+		console.log(`Creating \`${d}\` database`);
+		await RethinkDB.dbCreate(d).run(r);
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		// eslint-disable-next-line
+		// await RethinkDB.db(d).grant(services.db.options.user, { read: true, write: true, config: true });
+	}
+
+	for (const t of table) {
+		for (const d of db) {
+			console.log(`Creating \`${d}\`.\`${t}\``);
+			await RethinkDB.db(d).tableCreate(t, { primary_key: "id" }).run(r);
+		}
+	}
+}
+
+if (require.main === module) void run().then(() => process.exit(0));
+export default run;

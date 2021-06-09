@@ -1,11 +1,11 @@
 import config from "./config";
-import db from "./db";
 import IPCCommandHandler from "./util/handler/IPCCommandHandler";
 import BadgeHandler from "./util/handler/BadgeHandler";
 import StatsHandler from "./util/handler/StatsHandler";
 import UserConfig from "./db/Models/UserConfig";
 import GuildConfig from "./db/Models/GuildConfig";
 import ModLogServiceTypes from "./util/@types/ModLogServiceTypes";
+import db from "./db";
 import { Category, ClientEvent, Command, CommandHandler,  MessageCollector, WebhookStore } from "core";
 import { ModuleImport, Utility } from "utilities";
 import { CommandHelper } from "slash-extras";
@@ -39,13 +39,13 @@ export default class FurryBot extends BaseCluster {
 	private cpuUsageT: NodeJS.Timeout;
 	constructor(setup: BaseClusterInitializer) {
 		super(setup);
+		void db.setClient(this).init(true, true);
 		this.cmd = new CommandHandler();
 		this.w = new WebhookStore(this).addBulk(config.webhooks);
 		/* void this.executeLaunchHook(); */
 		this.ic = new IPCCommandHandler(this).register();
 		this.b = new BadgeHandler(this);
 		this.sh = new StatsHandler(this);
-		db.setClient(this);
 		this.cpuUsageT = setInterval(async() =>  Utility.getCPUUsage().then(v => this.cpuUsage = v), 5e3);
 	}
 
@@ -60,7 +60,6 @@ export default class FurryBot extends BaseCluster {
 				Logger.info("Bot List Stats", "Stats updated.");
 			} else this.blPosted = false;
 		}, 1e3);
-		// @TODO
 	}
 
 	shutdown(done: () => void) {
@@ -113,14 +112,14 @@ export default class FurryBot extends BaseCluster {
 				Logger.warn([`Cluster #${this.clusterId}`, "Command Handler"], `Skipping category "${f}" (${dir}/${f})`);
 				continue;
 			}
-			let cat;
+			let cat: Command<this, UserConfig, GuildConfig>;
 			try {
-				cat = await import(`${__dirname}/commands/${f}/index.${__filename.split(".").slice(-1)[0]}`) as ModuleImport<Command<this, UserConfig, GuildConfig>>;
-				if (cat.default) cat = cat.default;
+				const v = await import(`${__dirname}/commands/${f}/index.${__filename.split(".").slice(-1)[0]}`) as ModuleImport<typeof cat> | typeof cat;
+				cat = "default" in v ? v.default : v;
 			} catch (e) {
 				console.error(e);
 			}
-			if (cat instanceof Category) this.cmd.addCategory(cat);
+			if (cat! instanceof Category) this.cmd.addCategory(cat);
 			else throw new TypeError(`Missing or Invalid index in category "${f}" (${path.resolve(`${__dirname}/commands/${f}`)})`);
 		}
 		const end = performance.now();

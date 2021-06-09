@@ -71,12 +71,10 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["prefix"], __file
 					const v = await this.col.awaitMessages(msg.channel.id, 6e4, (m) => m.author.id === msg.author.id, 1);
 					if (!v || v.content.toLowerCase() !== "yes") return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.cancelled`));
 				}
-				await msg.gConfig.mongoEdit({
-					$set: {
-						prefix: [
-							config.defaults.prefix
-						]
-					}
+				await msg.gConfig.edit({
+					prefix: [
+						config.defaults.prefix
+					]
 				});
 				return msg.reply(Language.get(msg.gConfig.settings.lang, `${cmd.lang}.clear.done`));
 				break;

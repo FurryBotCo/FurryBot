@@ -25,7 +25,10 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["permissions", "p
 		const chp = msg.channel.permissionsOf(member.id);
 		const type = msg.dashedArgs.value.includes("channel") ? "Channel" : "Server";
 		const compact = msg.dashedArgs.value.includes("compact");
-		Object.keys(Eris.Constants.Permissions).filter(p => !remove.includes(p)).map(p => {
+		const l = Object.keys(Eris.Constants.Permissions);
+		// remove old (duplicate) deprecated permission names
+		["viewAuditLogs", "stream", "viewChannel", "readMessageHistory", "externalEmojis"].forEach(p => l.splice(l.indexOf(p), 1));
+		l.filter(p => !remove.includes(p)).map(p => {
 			const h = (type === "Server" ? member.permissions : chp).has(p);
 			return (h ? v.plus : v.minus).push(`${h ? "+" : "-"} ${compact ? p : `{lang:other.permissions.${p}}`}`);
 		});

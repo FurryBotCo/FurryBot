@@ -1,7 +1,7 @@
 import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
 import GuildConfig from "../../db/Models/GuildConfig";
-import { db } from "../../db";
+import db from "../../db";
 import { BotFunctions, Colors, Command, EmbedBuilder } from "core";
 
 export default new Command<FurryBot, UserConfig, GuildConfig>(["whosagoodboi", "whosagoodboy", "goodboi", "goodboy"], __filename)

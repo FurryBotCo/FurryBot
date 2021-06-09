@@ -50,9 +50,9 @@ async function create(cat: string, name: string, options?: Array<ApplicationComm
 	});
 }
 
-// const GUILD = undefined;
+const GUILD = undefined;
 // const GUILD = config.client.supportServerId;
-const GUILD = "329498711338123268";
+// const GUILD = "329498711338123268";
 const ENABLED = {
 	ANIMALS: true,
 	FUN: true,
@@ -65,14 +65,24 @@ const ENABLED = {
 	UTILITY: true
 };
 
+async function del(d: ApplicationCommand): Promise<boolean> {
+	return h.deleteApplicationCommand(d.id, GUILD).then(r => {
+		console.log(`Delete ${d.name}: ${r ? "Success" : "Fail"}`);
+		if (r === false) return del(d);
+		else return true;
+	});
+}
+
 process.nextTick(async() => {
 	// 67 total commands
 	let c = 0;
 
 	await h.getApplicationCommands(GUILD).then(async(v) => {
 		c = v.length;
-		await Promise.all(v.map(async(d) => h.deleteApplicationCommand(d.id, GUILD)));
+		console.log(v);
+		await Promise.all(v.map(async(d) => del(d)));
 	});
+	return;
 	console.log(`Deleted ${c} Commands.`);
 
 	/* start animals */

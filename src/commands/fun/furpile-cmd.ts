@@ -1,7 +1,8 @@
 import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
 import GuildConfig from "../../db/Models/GuildConfig";
-import { Redis } from "../../db";
+import db from "../../db";
+const { r: Redis } = db;
 import { BotFunctions, Command, CommandError } from "core";
 import Language from "language";
 

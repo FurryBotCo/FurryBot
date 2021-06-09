@@ -76,7 +76,7 @@ declare namespace Database {
 			type: "mute";
 		}
 
-		type AnyModLogEntry = ChannelLockEntry | ChannelUnlockEntry | WarnEntry | ClearWarningsEntry | DeleteWarnEntry | KickEntry | UnbanEntry | UnmuteEntry | SoftBanEntry | BanEntry | MuteEntry;
+		type AnyModLogEntry = ChannelLockEntry | ServerLockdownEntry | ChannelUnlockEntry | ServerUnlockdownEntry | WarnEntry | ClearWarningsEntry | DeleteWarnEntry | KickEntry | UnbanEntry | UnmuteEntry | SoftBanEntry | BanEntry | MuteEntry;
 	}
 
 	interface Warning {

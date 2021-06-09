@@ -1,12 +1,12 @@
 import FurryBot from "../../main";
 import UserConfig from "../../db/Models/UserConfig";
 import GuildConfig from "../../db/Models/GuildConfig";
-import { db, rdb, Redis } from "../../db";
+import db from "../../db";
+const { mongo, r: Redis } = db;
 import config from "../../config";
 import { Colors, Command, defaultEmojis, EmbedBuilder } from "core";
 import Language from "language";
 import { Strings, Utility } from "utilities";
-import r from "rethinkdb";
 import { performance } from "perf_hooks";
 
 export default new Command<FurryBot, UserConfig, GuildConfig>(["stats"], __filename)
@@ -18,7 +18,6 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["stats"], __filen
 	.setCooldown(3e3, true)
 	.setHasSlashVariant(true)
 	.setExecutor(async function (msg, cmd) {
-		if (rdb === null) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.dbNotReady"));
 		if (Redis === null) return msg.reply(Language.get(msg.gConfig.settings.lang, "other.errors.redisNotReady"));
 		const e = new EmbedBuilder(msg.gConfig.settings.lang)
 			.setTimestamp(new Date().toISOString())
@@ -31,7 +30,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["stats"], __filen
 		if (msg.args.length === 0) {
 
 			const stats = await this.sh.getStats();
-			const rs = await Redis.info("stats").then(v => v.split(/\n\r?/).slice(1, -1).map(s => ({
+			const r = await Redis.info("stats").then(v => v.split(/\n\r?/).slice(1, -1).map(s => ({
 				[s.split(":")[0]]: Number(s.split(":")[1])
 			})).reduce((a, b) => ({ ...a, ...b }), {})) as Record<
 			"total_connections_received" | "total_commands_processed" | "instantaneous_ops_per_sec" |
@@ -45,13 +44,34 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["stats"], __filen
 			"active_defrag_key_hits" | "active_defrag_key_misses",
 			number>;
 
-			const dbStats = await db.get("stats", "server", "rethinkdb") as Record<
-			"client_connections" | "clients_active" | "queries_per_sec" |
-			"queries_total" | "read_docs_per_sec" | "read_docs_total" |
-			"written_docs_per_sec" | "written_docs_total",
-			number>;
-			const dbPing = await db.ping();
+			const dbStats: {
+				connections: {
+					current: number;
+					available: number;
+					totalCreated: number;
+					active: number;
+				};
+				opcounters: {
+					insert: number;
+					query: number;
+					update: number;
+					delete: number;
+					getmore: number;
+					command: number;
+				};
+			} = await mongo.db("admin").command({ serverStatus: 1 }).then(v => ({
+				// eslint-disable-next-line
+				connections: v.connections,
+				// eslint-disable-next-line
+				opcounters: v.opcounters
+			}));
 
+
+			const dbStart = performance.now();
+			await mongo.db("admin").command({
+				ping: 1
+			});
+			const dbEnd = performance.now();
 
 			const redisStart = performance.now();
 			await Redis.ping();
@@ -63,7 +83,7 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["stats"], __filen
 			if (config.beta) k = await Redis.keys("stats:inviteSources:*");
 			else k = await Utility.getKeys("stats:inviteSources:*", "0");
 			const s = await Promise.all(k.map(async (v) => ({
-				[v.split(":").slice(-1)[0]]: await Redis!.get(v).then(Number)
+				[v.split(":").slice(-1)[0]]: await Redis.get(v).then(Number)
 			}))).then(v => v.sort((a, b) => Object.values(a)[0] < Object.values(b)[0] ? 1 : -1).reduce((a, b) => ({ ...a, ...b })));
 			if (config.beta) await Redis.select(config.services.redis.dbBeta);
 
@@ -87,23 +107,24 @@ export default new Command<FurryBot, UserConfig, GuildConfig>(["stats"], __filen
 					"{lang:other.words.redis$ucwords$}",
 					[
 						`{lang:other.words.ping$ucwords$}: **${(redisEnd - redisStart).toFixed(3)}ms**`,
-						`{lang:${cmd.lang}.connections}: **${rs.total_connections_received.toLocaleString()}**`,
-						`{lang:${cmd.lang}.cmdsProcessed}: **${rs.total_commands_processed.toLocaleString()}**`,
-						`{lang:${cmd.lang}.ops}: **${rs.instantaneous_ops_per_sec.toLocaleString()}/{lang:other.words.second}**`,
-						`{lang:${cmd.lang}.netIn}: **${Strings.formatBytes(rs.total_net_input_bytes)}**`,
-						`{lang:${cmd.lang}.netOut}: **${Strings.formatBytes(rs.total_net_output_bytes)}**`
+						`{lang:${cmd.lang}.connections}: **${r.total_connections_received.toLocaleString()}**`,
+						`{lang:${cmd.lang}.cmdsProcessed}: **${r.total_commands_processed.toLocaleString()}**`,
+						`{lang:${cmd.lang}.ops}: **${r.instantaneous_ops_per_sec.toLocaleString()}/{lang:other.words.second}**`,
+						`{lang:${cmd.lang}.netIn}: **${Strings.formatBytes(r.total_net_input_bytes)}**`,
+						`{lang:${cmd.lang}.netOut}: **${Strings.formatBytes(r.total_net_output_bytes)}**`
 					].join("\n"),
 					true)
 				.addEmptyField(true)
 				.addField(
-					"{lang:other.words.rethinkdb}",
+					"{lang:other.words.mongodb}",
 					[
-						`{lang:other.words.ping$ucwords$}: **${(dbPing).toFixed(3)}ms**`,
-						`{lang:${cmd.lang}.dbCurrent}: **${dbStats.client_connections.toLocaleString()}**`,
-						`{lang:${cmd.lang}.dbActive}: **${dbStats.clients_active.toLocaleString()}**`,
-						`{lang:${cmd.lang}.dbRead}: **${dbStats.read_docs_total.toLocaleString()}** (**${dbStats.read_docs_per_sec.toLocaleString()}/{lang:other.words.sec$ucwords$}**)`,
-						`{lang:${cmd.lang}.dbWrite}: **${dbStats.written_docs_total.toLocaleString()}** (**${dbStats.written_docs_per_sec.toLocaleString()}/{lang:other.words.sec$ucwords$}**)`,
-						""
+						`{lang:other.words.ping$ucwords$}: **${(dbEnd - dbStart).toFixed(3)}ms**`,
+						`{lang:${cmd.lang}.dbCurrent}: **${dbStats.connections.current.toLocaleString()}**`,
+						`{lang:${cmd.lang}.dbTotal}: **${dbStats.connections.totalCreated.toLocaleString()}**`,
+						`{lang:${cmd.lang}.dbActive}: **${dbStats.connections.active.toLocaleString()}**`,
+						"",
+						"**{lang:other.words.mongodb} {lang:other.words.commands$ucwords$}**",
+						...Object.keys(dbStats.opcounters).map(v => `${defaultEmojis.dot} {lang:other.words.${v}$upper$}: **${(dbStats.opcounters[v as keyof (typeof dbStats)["opcounters"]]).toLocaleString()}**`)
 					].join("\n"),
 					true
 				)

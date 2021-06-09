@@ -1,64 +1,118 @@
-import UserConfig, { DBKeys as UserKeys } from "./Models/UserConfig";
-import GuildConfig, { DBKeys as GuildKeys } from "./Models/GuildConfig";
+/* eslint-disable @typescript-eslint/unified-signatures */
+import GuildConfig from "./Models/GuildConfig";
+import UserConfig from "./Models/UserConfig";
+import FurryBot from "../main";
+import { ModLogEntry, Votes, Warning } from "../util/@types/Database";
 import config from "../config";
 import Blacklist from "../util/@types/Blacklist";
-import FurryBot from "../main";
-import { Votes } from "../util/@types/Database";
-import { Colors, Database as DB } from "core";
+import { Colors, DataTypes, DBLike } from "core";
+import { Strings, Time, Timers } from "utilities";
+import IORedis from "ioredis";
 import Logger from "logger";
-import { Strings, Time } from "utilities";
-import Eris from "eris";
+import { Guild } from "eris";
+import { Collection, MongoClient } from "mongodb";
 import crypto from "crypto";
-import { performance } from "perf_hooks";
-import { isWorker } from "cluster";
 
-// no
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-class Database extends DB {
-	static client: FurryBot;
-	static async getUser(id: string): Promise<UserConfig> {
-		if (r === null) throw new ReferenceError("Databse#getUser called before database has been intialized.");
-		const start = performance.now();
-		const d = await this.get<UserKeys>("users", id).then(res => !res ? null : new UserConfig(id, res));
-		if (!d) {
-			Logger.info(["Database", "User"], `Created user entry "${id}".`);
-			return this.table("users").insert({
-				...{ ...config.defaults.config.user },
-				id
-			}).run(this.conn).then(() => this.getUser(id));
-		}
+class Database implements DBLike {
+	client: FurryBot | null = null;
+	r: IORedis.Redis;
+	mongo: MongoClient;
+	mainDB: string;
+	setClient(client: FurryBot) { this.client = client; return this; }
 
-		const end = performance.now();
-		if (config.beta || config.developers.includes(id)) Logger.debug("Database", `Query for the user "${id}" took ${(end - start).toFixed(3)}ms.`);
-
-		return d;
+	async init(db = true, redis = true) {
+		if (db) await this.initDb();
+		if (redis) await this.initRedis();
 	}
 
-	static async getGuild(id: string): Promise<GuildConfig> {
-		if (r === null) throw new ReferenceError("Databse#getGuild called before database has been intialized.");
-		const start = performance.now();
-		const d = await this.get<GuildKeys>("guilds", id).then(res => !res ? null : new GuildConfig(id, res));
-		if (!d) {
-			return this.table("guilds").insert({
-				...config.defaults.config.guild,
-				id
-			} as unknown).run(this.conn).then(() => this.getGuild(id));
-			Logger.info(["Database", "Guild"], `Created guild entry "${id}".`);
-		}
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	initSync(db = true, redis = true) {
+		throw new Error("method not implemented.");
+		/* deasync((cb: (err: Error | null) => void) => {
+			void this.init(db, redis).then(() => {
+				cb(null);
+			});
+		})();
 
-		const end = performance.now();
-		if (config.beta) Logger.debug("Database", `Query for the guild "${id}" took ${(end - start).toFixed(3)}ms.`);
-
-		return d;
+		return this; */
 	}
 
-	static async checkBl(type: "guild", guildId: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.GuildEntry>; }>;
-	static async checkBl(type: "user", userId: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.UserEntry>; }>;
-	static async checkBl(type: "guild" | "user", id: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.GenericEntry>; }> {
-		if (r === null) throw new ReferenceError("Databse#checkBl called before database has been intialized.");
+	private async initDb() {
+		const d = config.services.db;
+		this.mainDB = config.beta ? d.dbBeta : d.db;
+		const dbString = `mongodb://${d.host}:${d.port}?retryWrites=true&w=majority`;
+		try {
+			const t = new Timers(false);
+			t.start("connect");
+			Logger.debug("Database", `Connecting to ${dbString} (SSL: ${d.options.ssl ? "Yes" : "No"})`);
+			// eslint-disable-next-line @typescript-eslint/unbound-method
+			this.mongo = await MongoClient.connect(dbString, d.options);
+			t.end("connect");
+			Logger.debug("Database", `Connected to ${dbString} (SSL: ${d.options.ssl ? "Yes" : "No"}) in ${t.calc("connect")}ms`);
+		} catch (e) {
+			// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+			Logger.error("Database", `Error connecting to MongoDB instance (${dbString}, SSL: ${d.options.ssl ? "Yes" : "No"})\nReason: ${"stack" in e ? (e as { stack: string; }).stack : e}`);
+			return; // don't need to rethrow it as it's already logged
+		}
+	}
+
+	private async initRedis() {
+		return new Promise<void>(resolve => {
+			const rd = config.services.redis;
+			const redis = this.r = new IORedis(rd.port, rd.host, {
+				password: rd.password,
+				db: config.beta ? rd.dbBeta : rd.db,
+				enableReadyCheck: true,
+				autoResendUnfulfilledCommands: true,
+				connectionName: `FurryBot${config.beta ? "Beta" : ""}`
+			});
+
+			redis.on("connect", () => {
+				Logger.debug("Redis", `Connected to redis://${rd.host}:${rd.port} (db: ${config.beta ? rd.dbBeta : rd.db})`);
+				resolve();
+			});
+		});
+	}
+
+	get mdb() { return this.mongo.db(this.mainDB); }
+
+	collection<T = DataTypes<UserConfig>>(col: "users"): Collection<T>;
+	collection<T = DataTypes<GuildConfig>>(col: "guilds"): Collection<T>;
+	collection<T = Warning>(col: "warnings"): Collection<T>;
+	collection<T = ModLogEntry.AnyModLogEntry>(col: "modlog"): Collection<T>;
+	collection<T = Blacklist.GenericEntry>(col: "blacklist"): Collection<T>;
+	collection<T = unknown>(col: string): Collection<T>;
+	collection<T = unknown>(col: string) {
+		return this.mdb.collection<T>(col);
+	}
+
+	async getUser(id: string) {
+		return this.collection("users").findOne({ id }).then(async(d) => {
+			if (d === null) d = await this.collection("users").insertOne({
+				...config.defaults.config.user,
+				id
+			}).then(res => res.ops[0]);
+
+			return new UserConfig(id, d!);
+		});
+	}
+
+	async getGuild(id: string) {
+		return this.collection("guilds").findOne({ id }).then(async(d) => {
+			if (d === null) d = await this.collection("guilds").insertOne({
+				...(config.defaults.config.guild as typeof config["defaults"]["config"]["guild"] & { settings: { lang: "en"; };}),
+				id
+			}).then(res => res.ops[0]);
+
+			return new GuildConfig(id, d!);
+		});
+	}
+
+	async checkBl(type: "guild", guildId: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.GuildEntry>; }>;
+	async checkBl(type: "user", userId: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.UserEntry>; }>;
+	async checkBl(type: "guild" | "user", id: string): Promise<{ [k in "all" | "expired" | "current" | "notice"]: Array<Blacklist.GenericEntry>; }> {
 		const d = Date.now();
-		const all = await this.filter<Blacklist.GenericEntry>("blacklist", { [`${type}Id`]: id });
+		const all = await this.collection<Blacklist.GenericEntry>("blacklist").find({ [`${type}Id`]: id }).toArray();
 		const expired = all.filter(bl => ![0, null].includes(bl.expire!) && bl.expire! < d);
 		const current = all.filter(bl => !expired.map(j => j.id).includes(bl.id));
 		const notice = current.filter(bl => !bl.noticeShown);
@@ -71,16 +125,15 @@ class Database extends DB {
 		};
 	}
 
-	static async addBl(type: "guild", guildId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<Blacklist.GuildEntry>;
-	static async addBl(type: "user", userId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<Blacklist.UserEntry>;
-	static async addBl(type: "guild" | "user", id: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string) {
-		if (r === null) throw new ReferenceError("Databse#addBl called before database has been intialized.");
+	async addBl(type: "guild", guildId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<Blacklist.GuildEntry>;
+	async addBl(type: "user", userId: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<Blacklist.UserEntry>;
+	async addBl(type: "guild" | "user", id: string, blame: string, blameId: string, reason?: string, expire?: number, report?: string): Promise<Blacklist.GenericEntry> {
 		const e = crypto.randomBytes(7).toString("hex");
 		if (!reason) reason = "None Provided.";
 		if (!this.client) Logger.warn("Database", "Missing client on blacklist addition, webhook not executed.");
 		else {
 			const d = type === "guild" ? await this.client.getGuild(id) : await this.client.getUser(id);
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			if (d === null) throw new TypeError(`expected null ${type} in Database#addBl`);
 			const prev = type === "guild" ? await this.getGuild(id).then(g => g.checkBlacklist().then(b => b.all.length)) : await this.getUser(id).then(u => u.checkBlacklist().then(b => b.all.length));
 			await this.client.w.get("blacklist")!.execute({
 				embeds: [
@@ -89,10 +142,9 @@ class Database extends DB {
 						description: [
 							`${Strings.ucwords(type)} Id: ${id}`,
 							`Entry ID: ${e}`,
-							`${d instanceof Eris.Guild ? `Name: ${d.name}` : `Tag: ${d!.username}#${d!.discriminator}`}`,
+							`${d instanceof Guild ? `Name: ${d.name}` : `Tag: ${d.username}#${d.discriminator}`}`,
 							`Reason: ${reason}`,
 							`Blame: ${blame} (${blameId})`,
-							// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 							`Expiry: ${[0, null, undefined].includes(expire) ? "Never" : Time.formatDateWithPadding(expire, false)}`,
 							`Previous Blacklists: ${prev} (Strike #${prev + 1})`,
 							...(report ? [`Report: ${report}`] : [])
@@ -103,97 +155,32 @@ class Database extends DB {
 				]
 			});
 		}
-		return this.insert<Blacklist.GenericEntry>("blacklist", e, {
+		return this.collection<Blacklist.GenericEntry>("blacklist").insertOne({
 			created: Date.now(),
 			type,
 			blame,
 			blameId,
 			reason,
+			id: e,
 			noticeShown: false,
 			expire,
 			report,
 			...(type === "guild" ? { guildId: id } : { userId: id })
-		});
+		}).then(res => res.ops[0]);
 	}
 
-	static async checkVote(user: string) {
-		if (r === null) throw new ReferenceError("Databse#checkVote called before database has been intialized.");
-		const v = await this.filter<Votes.AnyVote>("votes", { user }, "furrybot");
+	async checkVote(user: string) {
+		const v = await this.mongo.db("furrybot").collection<Votes.AnyVote>("votes").find({ user }).toArray();
 
-		const e = v.find(j => Date.now() < j.time + 4.32e+7);
+		const e = v.find(t => Date.now() < t.time + 4.32e+7);
 
 		return {
 			voted: e,
-			weekend: e && "weekend" in e && e.weekend === true
+			weekend: e && "weekend" in e && e.weekend
 		};
 	}
 }
-
-if (isWorker) {
-	switch (process.env.TYPE) {
-		case "CLUSTER": {
-			Database.init({
-				...config.services.db.options,
-				main: config.services.db[config.beta ? "dbBeta" : "db"]
-			}, {
-				host: config.services.redis.host,
-				port: config.services.redis.port,
-				password: config.services.redis.password,
-				db: config.services.redis[config.beta ? "dbBeta" : "db"],
-				name: `FurryBot${config.beta ? "Beta": ""}`
-			});
-			break;
-		}
-
-		case "SERVICE": {
-			switch (process.env.NAME) {
-				case "auto-posting":
-				case "mod": {
-					Database.initDb({
-						...config.services.db.options,
-						main: config.services.db[config.beta ? "dbBeta" : "db"]
-					});
-					break;
-				}
-
-				case "stats": {
-					Database.initRedis({
-						host: config.services.redis.host,
-						port: config.services.redis.port,
-						password: config.services.redis.password,
-						db: config.services.redis[config.beta ? "dbBeta" : "db"],
-						name: `FurryBot${config.beta ? "Beta": ""}`
-					});
-					break;
-				}
-			}
-			break;
-		}
-
-		default: throw new TypeError("invalid TYPE in process env.");
-	}
-} else {
-	if (process.env.ENABLE_DB === "1") {
-		Database.initDb({
-			...config.services.db.options,
-			main: config.services.db[config.beta ? "dbBeta" : "db"]
-		});
-	}
-
-	if (process.env.ENABLE_REDIS === "1") {
-		Database.initRedis({
-			host: config.services.redis.host,
-			port: config.services.redis.port,
-			password: config.services.redis.password,
-			db: config.services.redis[config.beta ? "dbBeta" : "db"],
-			name: `FurryBot${config.beta ? "Beta": ""}`
-		});
-	}
-}
-
-
-export const db = Database;
-export const rdb = Database.dbReady ? Database.rdb : null;
-export const r = Database.dbReady ? Database.connection : null;
-export const Redis = Database.redisReady ? Database.Redis : null;
-export default Database;
+const db = new Database();
+/* const { r: Redis, mongo } = db;
+export { Redis, mongo }; */
+export default db;
